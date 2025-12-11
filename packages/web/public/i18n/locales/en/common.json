@@ -27,6 +27,8 @@
     "reset": "Reset",
     "retry": "Retry",
     "save": "Save",
+    "loading": "Loading",
+    "saving": "Saving",
     "setDefault": "Set as default",
     "unsetDefault": "Unset default",
     "scanQr": "Scan QR Code",
@@ -37,7 +39,6 @@
     "title": "Meshtastic",
     "fullTitle": "Meshtastic Web Client"
   },
-  "loading": "Loading...",
   "unit": {
     "cps": "CPS",
     "dbm": "dBm",

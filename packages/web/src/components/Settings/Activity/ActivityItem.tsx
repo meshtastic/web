@@ -25,12 +25,12 @@ export function ActivityItem({ item, onRemove }: ActivityItemProps) {
 
       <div className="flex-1 min-w-0 space-y-1">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-medium truncate">{item.label}</p>
+          <p className="text-sm md:text-base font-medium truncate">{item.label}</p>
           <Badge variant="secondary" className="text-xs shrink-0">
             {item.category}
           </Badge>
         </div>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs md:text-sm text-muted-foreground">
           {formatRelativeTime(item.timestamp)}
         </p>
       </div>

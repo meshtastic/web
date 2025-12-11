@@ -10,37 +10,26 @@
   "selectChatPrompt": {
     "text": "Select a channel or node to start messaging."
   },
-  "sendMessage": {
+  "input": {
     "placeholder": "Enter your message here...",
-    "sendButton": "Send"
+    "tooltip": "Send message",
+    "notConnected": "Not connected - go to the Connections page to reconnect"
   },
+  "emojiPicker": { "search": "Search emoji" },
   "actionsMenu": {
-    "addReactionLabel": "Add Reaction",
-    "replyLabel": "Reply"
+    "addReaction": "Add Reaction",
+    "reply": "Reply"
   },
-
   "deliveryStatus": {
-    "delivered": {
-      "text": "Delivered"
-    },
+    "delivered": "Delivered",
     "ack": {
       "delivered": "Delivered",
       "acknowledged": "Acknowledged"
     },
-    "waiting": {
-      "text": "Waiting"
-    },
-    "sending": {
-      "text": "Sending"
-    },
-    "sent": {
-      "text": "Sent"
-    },
-    "failed": {
-      "text": "Failed {{error}}"
-    },
-    "unknown": {
-      "text": "Unknown"
-    }
+    "waiting": "Waiting",
+    "sending": "Sending",
+    "sent": "Sent",
+    "failed": "Failed {{error}}",
+    "unknown": "Unknown"
   }
 }

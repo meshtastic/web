@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import yaml from "js-yaml";
 import type {
   YAMLExportData,
   ParsedYAMLField,
@@ -19,9 +20,16 @@ const ChannelSchema = z.object({
   settings: z.record(z.string(), z.unknown()).optional(),
 });
 
+const UserConfigSchema = z.object({
+  longName: z.string().optional(),
+  shortName: z.string().optional(),
+  isLicensed: z.boolean().optional(),
+});
+
 const YAMLExportSchema: z.ZodType<YAMLExportData> = z.object({
   version: z.string(),
   metadata: MetadataSchema,
+  user: UserConfigSchema.optional(),
   config: ConfigFieldSchema,
   moduleConfig: ConfigFieldSchema,
   channels: z.array(ChannelSchema),
@@ -30,7 +38,7 @@ const YAMLExportSchema: z.ZodType<YAMLExportData> = z.object({
 const ParsedYAMLFieldSchema: z.ZodType<ParsedYAMLField> = z.object({
   path: z.array(z.string()),
   value: z.unknown(),
-  type: z.enum(["config", "moduleConfig", "channel"]),
+  type: z.enum(["config", "moduleConfig", "channel", "user"]),
   section: z.string(),
   field: z.string(),
   originalPath: z.string(),
@@ -88,7 +96,6 @@ export class YAMLValidationService {
     data?: YAMLExportData;
   } {
     try {
-      const yaml = require("js-yaml");
       const parsed = yaml.load(content);
       const validated = this.validateYAMLStructure(parsed);
 
@@ -110,17 +117,18 @@ export class YAMLValidationService {
     const errors: { field: ParsedYAMLField; error: string }[] = [];
 
     fields.forEach((field) => {
-      // Validate field path
-      if (field.path.length < 3) {
+      // Validate field path - user fields have 2 segments, others have 3+
+      const minPathLength = field.type === "user" ? 2 : 3;
+      if (field.path.length < minPathLength) {
         errors.push({
           field,
-          error: "Invalid field path - must have at least 3 segments",
+          error: `Invalid field path - must have at least ${minPathLength} segments`,
         });
         return;
       }
 
       // Validate field type
-      if (!["config", "moduleConfig", "channel"].includes(field.type)) {
+      if (!["config", "moduleConfig", "channel", "user"].includes(field.type)) {
         errors.push({
           field,
           error: "Invalid field type",

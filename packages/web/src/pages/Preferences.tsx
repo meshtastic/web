@@ -68,8 +68,8 @@ export default function PreferencesPage() {
   return (
     <div className="p-6 max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">{t("preferences.title")}</h1>
-        <p className="text-muted-foreground">{t("preferences.description")}</p>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("preferences.title")}</h1>
+        <p className="text-sm md:text-base text-muted-foreground">{t("preferences.description")}</p>
       </div>
 
       {/* Appearance */}
@@ -144,7 +144,7 @@ export default function PreferencesPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>{t("preferences.appearance.compactMode.label")}</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {t("preferences.appearance.compactMode.description")}
               </p>
             </div>
@@ -153,7 +153,7 @@ export default function PreferencesPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>{t("preferences.appearance.showNodeAvatars.label")}</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {t("preferences.appearance.showNodeAvatars.description")}
               </p>
             </div>
@@ -304,7 +304,7 @@ export default function PreferencesPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>{t("preferences.map.showNodeLabels.label")}</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {t("preferences.map.showNodeLabels.description")}
               </p>
             </div>
@@ -316,7 +316,7 @@ export default function PreferencesPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>{t("preferences.map.showConnectionLines.label")}</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {t("preferences.map.showConnectionLines.description")}
               </p>
             </div>
@@ -328,7 +328,7 @@ export default function PreferencesPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>{t("preferences.map.autoCenterOnPosition.label")}</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {t("preferences.map.autoCenterOnPosition.description")}
               </p>
             </div>
@@ -355,7 +355,7 @@ export default function PreferencesPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label>{t("preferences.audio.masterVolume")}</Label>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs md:text-sm text-muted-foreground">
                 {masterVolume}%
               </span>
             </div>
@@ -370,7 +370,7 @@ export default function PreferencesPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>{t("preferences.audio.messageSound.label")}</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {t("preferences.audio.messageSound.description")}
               </p>
             </div>
@@ -382,7 +382,7 @@ export default function PreferencesPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>{t("preferences.audio.alertSound.label")}</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {t("preferences.audio.alertSound.description")}
               </p>
             </div>

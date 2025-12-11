@@ -1,8 +1,7 @@
-import { toBinary } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast";
+import { AdminMessageService } from "@core/services/adminMessageService";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice } from "@core/stores";
-import { Protobuf } from "@meshtastic/core";
 import { useCallback, useState } from "react";
 
 export function useSettingsSave() {
@@ -77,16 +76,8 @@ export function useSettingsSave() {
         await connection?.commitEditSettings();
       }
 
-      if (adminMessages.length > 0) {
-        await Promise.all(
-          adminMessages.map((message) =>
-            connection?.sendPacket(
-              toBinary(Protobuf.Admin.AdminMessageSchema, message),
-              Protobuf.Portnums.PortNum.ADMIN_APP,
-              "self",
-            ),
-          ),
-        );
+      if (adminMessages.length > 0 && connection) {
+        await AdminMessageService.sendQueuedMessages(connection, adminMessages);
       }
 
       channelChanges.forEach((newChannel) => {

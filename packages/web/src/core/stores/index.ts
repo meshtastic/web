@@ -6,7 +6,11 @@ export {
   type DeviceContext,
   useDeviceContext,
 } from "@core/hooks/useDeviceContext";
-export { type Device, useDeviceStore } from "@core/stores/deviceStore/index.ts";
+export {
+  clearConnectionCache,
+  type Device,
+  useDeviceStore,
+} from "@core/stores/deviceStore/index.ts";
 export type {
   Page,
   ValidConfigType,

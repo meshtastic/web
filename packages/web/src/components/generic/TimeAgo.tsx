@@ -117,7 +117,7 @@ export const TimeAgo = ({
         </TooltipTrigger>
         <TooltipPortal>
           <TooltipContent
-            className="rounded-md bg-slate-800 px-3 py-1.5 text-sm text-white shadow-md animate-in fade-in-0 zoom-in-95"
+            className="rounded-md bg-slate-800 px-3 py-1.5 text-sm md:text-base text-white shadow-md animate-in fade-in-0 zoom-in-95"
             side="top"
             align="center"
             sideOffset={5}

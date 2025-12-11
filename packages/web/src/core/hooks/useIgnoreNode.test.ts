@@ -1,32 +1,21 @@
-import type { Protobuf } from "@meshtastic/core";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useIgnoreNode } from "./useIgnoreNode.ts";
 
 const mockNode = {
-  num: 1234,
-  user: {
-    longName: "Test Node",
-  },
+  nodeNum: 1234,
+  longName: "Test Node",
   isIgnored: true,
-} as unknown | Protobuf.Mesh.NodeInfo;
+};
 
-const mockUpdateIgnore = vi.fn();
-const mockGetNode = vi.fn(() => mockNode);
 const mockToast = vi.fn();
-const mockSendAdminMessage = vi.fn();
+const mockSetIgnoredNode = vi.fn();
+const mockGetNode = vi.fn();
+const mockDevice = { id: 1 };
 
 vi.mock("@core/stores", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
-  useNodeDB: () => ({
-    updateIgnore: mockUpdateIgnore,
-    getNode: mockGetNode,
-  }),
-  useDevice: () => ({
-    sendAdminMessage: mockSendAdminMessage,
-  }),
+  useDevice: () => mockDevice,
+  useDeviceContext: () => ({ deviceId: 1234 }),
 }));
 
 vi.mock("@core/hooks/useToast.ts", () => ({
@@ -35,69 +24,74 @@ vi.mock("@core/hooks/useToast.ts", () => ({
   }),
 }));
 
+vi.mock("@db/index", () => ({
+  nodeRepo: {
+    getNode: (deviceId: number, nodeNum: number) =>
+      mockGetNode(deviceId, nodeNum),
+  },
+}));
+
+vi.mock("@core/services/adminMessageService", () => ({
+  AdminMessageService: {
+    setIgnoredNode: (
+      _device: unknown,
+      _deviceId: number,
+      _nodeNum: number,
+      _isIgnored: boolean,
+    ) => mockSetIgnoredNode(_device, _deviceId, _nodeNum, _isIgnored),
+  },
+}));
+
 describe("useIgnoreNode hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetNode.mockResolvedValue(mockNode);
   });
 
-  it("calls updateIgnored and shows correct toast", () => {
+  it("calls AdminMessageService.setIgnoredNode and shows correct toast", async () => {
     const { result } = renderHook(() => useIgnoreNode());
 
-    act(() => {
-      result.current.updateIgnored({ nodeNum: 1234, isIgnored: true });
+    await act(async () => {
+      await result.current.updateIgnored({ nodeNum: 1234, isIgnored: true });
     });
 
-    expect(mockUpdateIgnore).toHaveBeenCalledWith(1234, true);
-    expect(mockGetNode).toHaveBeenCalledWith(1234);
-    expect(mockToast).toHaveBeenCalledWith({
-      title: "Added Test Node to ignore list",
-    });
+    expect(mockSetIgnoredNode).toHaveBeenCalledWith(
+      mockDevice,
+      1234,
+      1234,
+      true,
+    );
+    expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
+    expect(mockToast).toHaveBeenCalled();
   });
 
-  it("handles removal case", () => {
+  it("handles removal case", async () => {
     const { result } = renderHook(() => useIgnoreNode());
 
-    act(() => {
-      result.current.updateIgnored({
-        nodeNum: 1234,
-        isIgnored: false,
-      });
+    await act(async () => {
+      await result.current.updateIgnored({ nodeNum: 1234, isIgnored: false });
     });
 
-    expect(mockUpdateIgnore).toHaveBeenCalledWith(1234, false);
-    expect(mockGetNode).toHaveBeenCalledWith(1234);
-    expect(mockToast).toHaveBeenCalledWith({
-      title: "Removed Test Node from ignore list",
-    });
+    expect(mockSetIgnoredNode).toHaveBeenCalledWith(
+      mockDevice,
+      1234,
+      1234,
+      false,
+    );
+    expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
+    expect(mockToast).toHaveBeenCalled();
   });
 
-  it("falls back to 'node' if longName is missing", () => {
-    mockGetNode.mockReturnValueOnce({
-      num: 5678,
-      user: {},
-    }); // no longName
-
-    const { result } = renderHook(() => useIgnoreNode());
-
-    act(() => {
-      result.current.updateIgnored({ nodeNum: 5678, isIgnored: true });
-    });
-
-    expect(mockToast).toHaveBeenCalledWith({
-      title: "Added node to ignore list",
-    });
-  });
-
-  it("falls back to 'node' if getNode returns undefined", () => {
-    mockGetNode.mockReturnValueOnce(undefined);
+  it("does not call AdminMessageService if node not found", async () => {
+    mockGetNode.mockResolvedValueOnce(null);
 
     const { result } = renderHook(() => useIgnoreNode());
 
-    act(() => {
-      result.current.updateIgnored({ nodeNum: 9999, isIgnored: false });
+    await act(async () => {
+      await result.current.updateIgnored({ nodeNum: 9999, isIgnored: false });
     });
 
-    expect(mockUpdateIgnore).not.toHaveBeenCalled();
+    expect(mockSetIgnoredNode).not.toHaveBeenCalled();
     expect(mockToast).not.toHaveBeenCalled();
   });
 });

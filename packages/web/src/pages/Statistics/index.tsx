@@ -32,10 +32,10 @@ const StatCard = ({
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold">{value}</p>
+          <p className="text-sm md:text-base font-medium text-muted-foreground">{title}</p>
+          <p className="text-3xl md:text-4xl font-bold">{value}</p>
           {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
+            <p className="text-xs md:text-sm text-muted-foreground">{subtitle}</p>
           )}
         </div>
         <Icon className="h-8 w-8 text-muted-foreground" />
@@ -208,9 +208,9 @@ const StatisticsPage = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-blue-500 rounded-full" />
-                  <span className="text-sm">Direct Messages</span>
+                  <span className="text-sm md:text-base">Direct Messages</span>
                 </div>
-                <span className="text-sm font-medium">
+                <span className="text-sm md:text-base font-medium">
                   {stats.directMessageCount.toLocaleString()} (
                   {stats.messageCount > 0
                     ? Math.round(
@@ -236,9 +236,9 @@ const StatisticsPage = () => {
               <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full" />
-                  <span className="text-sm">Broadcast Messages</span>
+                  <span className="text-sm md:text-base">Broadcast Messages</span>
                 </div>
-                <span className="text-sm font-medium">
+                <span className="text-sm md:text-base font-medium">
                   {stats.broadcastMessageCount.toLocaleString()} (
                   {stats.messageCount > 0
                     ? Math.round(
@@ -273,26 +273,26 @@ const StatisticsPage = () => {
           <CardContent>
             <div className="space-y-3">
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm md:text-base text-muted-foreground">
                   Messages per hour
                 </span>
-                <span className="text-sm font-medium">
+                <span className="text-sm md:text-base font-medium">
                   {(stats.messagesLast24h / 24).toFixed(1)}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm md:text-base text-muted-foreground">
                   Position updates per hour
                 </span>
-                <span className="text-sm font-medium">
+                <span className="text-sm md:text-base font-medium">
                   {(stats.positionsLast24h / 24).toFixed(1)}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm md:text-base text-muted-foreground">
                   Node activity rate
                 </span>
-                <span className="text-sm font-medium">
+                <span className="text-sm md:text-base font-medium">
                   {stats.totalNodeCount > 0
                     ? Math.round(
                         (stats.activeNodeCount / stats.totalNodeCount) * 100

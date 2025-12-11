@@ -28,7 +28,8 @@ export function sortNodes<T>(
 ): T[] {
   const { getName, getLastHeard, isFavorite, isChannel } = config;
 
-  const byName = (a: T, b: T) => getName(a).localeCompare(getName(b));
+  const byName = (a: T, b: T) =>
+    getName(a).localeCompare(getName(b), undefined, { numeric: true });
   const byLastHeardDesc = (a: T, b: T) => getLastHeard(b) - getLastHeard(a);
 
   const channels = isChannel ? items.filter(isChannel) : [];

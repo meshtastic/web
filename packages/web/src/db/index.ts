@@ -76,6 +76,12 @@ export {
 } from "./schema.ts";
 // Export subscription service
 export { SubscriptionService } from "./subscriptionService.ts";
+// Export write queue for performance monitoring
+export {
+  packetWriteQueue,
+  generalWriteQueue,
+  WriteQueue,
+} from "./writeQueue.ts";
 
 /**
  * Initialize the database

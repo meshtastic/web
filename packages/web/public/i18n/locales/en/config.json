@@ -479,6 +479,16 @@
       "label": "Logging Settings"
     }
   },
+  "importConfig": {
+    "yamlContent": "YAML Content",
+    "placeholder": "Paste or upload YAML content here",
+    "searchPlaceholder": "Search configuration fields",
+    "fieldCount": "{{count}} fields found",
+    "selectedCount": "{{count}} selected",
+    "importSelected": "Import Selected {{count}}",
+    "selectAll": "Select ALl",
+    "deselectAll": "Deselect All"
+  },
   "user": {
     "title": "User Settings",
     "description": "Configure your device name and identity settings",

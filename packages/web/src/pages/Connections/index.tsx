@@ -285,7 +285,7 @@ function ConnectionCard({
                 </Badge>
               ) : null}
             </CardTitle>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm md:text-base">
               <TypeBadge type={connection.type} />
               <span className="text-slate-500 dark:text-slate-400 truncate">
                 {formatConnectionSubtext(connection)}
@@ -360,19 +360,19 @@ function ConnectionCard({
       </CardHeader>
       <CardContent className="pt-0">
         {connection.error ? (
-          <p className="text-sm text-red-600 dark:text-red-400">
+          <p className="text-sm md:text-base text-red-600 dark:text-red-400">
             {connection.error}
           </p>
         ) : connection.lastConnectedAt ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">
             {t("lastConnectedAt", { date: "" })}{" "}
             <TimeAgo
               timestamp={connection.lastConnectedAt.getTime()}
-              className="text-sm text-slate-500 dark:text-slate-400"
+              className="text-sm md:text-base text-slate-500 dark:text-slate-400"
             />
           </p>
         ) : (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">
             {t("neverConnected")}
           </p>
         )}

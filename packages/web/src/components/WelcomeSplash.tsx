@@ -12,7 +12,7 @@ export function WelcomeSplash({ onComplete }: WelcomeSplashProps) {
   useEffect(() => {
     const stages = [
       { progress: 20, text: "Starting up..." },
-      { progress: 45, text: "Discovering nodes..." },
+      { progress: 45, text: "Creating database..." },
       { progress: 70, text: "Syncing configuration..." },
       { progress: 90, text: "Almost ready..." },
       { progress: 100, text: "Welcome!" },
@@ -46,10 +46,10 @@ export function WelcomeSplash({ onComplete }: WelcomeSplashProps) {
       <div className="relative z-10 flex flex-col items-center gap-8 px-4 text-center">
         {/* Logo/Icon */}
         <div className="relative">
-          <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
-          <div className="relative flex h-24 w-24 items-center justify-center rounded-full border-2 border-primary/50 bg-card">
-            <img src="/logo.svg" alt="App Logo" className="h-24 w-24" />
-          </div>
+          <span className="animate-pulse [animation-duration:3s] z-0">
+            <img src="/logo.svg" alt="App Logo" className="h-24 w-24 z-10" />
+          </span>
+          {/* </div> */}
         </div>
 
         {/* Title */}
@@ -57,7 +57,7 @@ export function WelcomeSplash({ onComplete }: WelcomeSplashProps) {
           <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl text-balance">
             Meshtastic Web Client
           </h1>
-          <p className="text-lg text-gray-300">Off-grid mesh communication</p>
+          <p className="text-base md:text-lg text-gray-300">Off-grid mesh communication</p>
         </div>
 
         {/* Progress section */}
@@ -71,13 +71,13 @@ export function WelcomeSplash({ onComplete }: WelcomeSplashProps) {
           </div>
 
           {/* Status text */}
-          <p className="text-sm font-medium text-gray-300 animate-pulse">
+          <p className="text-xs md:text-sm font-medium text-gray-300 animate-pulse">
             {statusText}
           </p>
         </div>
 
         {/* Reassurance message */}
-        <p className="mt-4 max-w-md text-sm text-gray-400">
+        <p className="mt-4 max-w-md text-xs md:text-sm text-gray-400">
           Setting up your secure mesh connection. You&apos;ll be communicating
           off-grid in just a moment.
         </p>

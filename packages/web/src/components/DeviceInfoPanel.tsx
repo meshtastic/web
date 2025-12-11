@@ -156,7 +156,7 @@ export const DeviceInfoPanel = ({
           {!isCollapsed && (
             <p
               className={cn(
-                "text-sm font-medium text-gray-800 dark:text-gray-200",
+                "text-sm md:text-base font-medium text-gray-800 dark:text-gray-200",
                 "transition-opacity duration-300 ease-in-out truncate",
               )}
             >
@@ -221,7 +221,7 @@ export const DeviceInfoPanel = ({
         {deviceInfoItems.map((item) => {
           const IconComponent = item.icon;
           return (
-            <div key={item.id} className="flex items-center gap-2.5 text-sm">
+            <div key={item.id} className="flex items-center gap-2.5 text-sm md:text-base">
               {IconComponent && (
                 <IconComponent
                   size={16}
@@ -285,7 +285,7 @@ export const DeviceInfoPanel = ({
               />
               <Subtle
                 className={cn(
-                  "text-sm",
+                  "text-sm md:text-base",
                   "text-gray-600 dark:text-gray-300",
                   "transition-colors duration-150",
                   !disableHover &&

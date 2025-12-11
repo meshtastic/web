@@ -1,8 +1,7 @@
-import { create } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast.ts";
+import { AdminMessageService } from "@core/services/adminMessageService";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { nodeRepo } from "@db/index";
-import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -12,30 +11,26 @@ interface FavoriteNodeOptions {
 }
 
 export function useFavoriteNode() {
-  const { sendAdminMessage } = useDevice();
+  const device = useDevice();
   const { deviceId } = useDeviceContext();
   const { t } = useTranslation();
   const { toast } = useToast();
 
   const updateFavoriteCB = useCallback(
     async ({ nodeNum, isFavorite }: FavoriteNodeOptions) => {
-      // Get node from database
+      // Get node from database for toast message
       const node = await nodeRepo.getNode(deviceId, nodeNum);
       if (!node) {
         return;
       }
 
-      sendAdminMessage(
-        create(Protobuf.Admin.AdminMessageSchema, {
-          payloadVariant: {
-            case: isFavorite ? "setFavoriteNode" : "removeFavoriteNode",
-            value: nodeNum,
-          },
-        }),
+      // Send admin message and update local database
+      await AdminMessageService.setFavoriteNode(
+        device,
+        deviceId,
+        nodeNum,
+        isFavorite,
       );
-
-      // Update favorite status in database
-      await nodeRepo.updateFavorite(deviceId, nodeNum, isFavorite);
 
       toast({
         title: t("toast.favoriteNode.title", {
@@ -49,7 +44,7 @@ export function useFavoriteNode() {
         }),
       });
     },
-    [deviceId, sendAdminMessage, t, toast],
+    [device, deviceId, t, toast],
   );
 
   return { updateFavorite: updateFavoriteCB };

@@ -18,7 +18,7 @@ export const ActionItem = ({
   >
     <div className="flex items-center gap-3">
       <Icon className="h-5 w-5 text-muted-foreground" />
-      <span>{label}</span>
+      <span className="text-sm md:text-base">{label}</span>
     </div>
     {showChevron && (
       <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />

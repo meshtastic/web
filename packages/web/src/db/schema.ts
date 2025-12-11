@@ -268,8 +268,8 @@ export const packetLogs = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
 
-    // Optional: Store raw packet as JSON for deep debugging
-    // rawPacket: text("raw_packet", { mode: "json" }),
+    // Store decoded packet as JSON
+    rawPacket: text("raw_packet", { mode: "json" }),
   },
   (table) => [
     // Query packets from a node

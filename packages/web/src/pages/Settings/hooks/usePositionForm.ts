@@ -1,9 +1,6 @@
 import { createZodResolver } from "@components/Form/createZodResolver";
-import { create } from "@bufbuild/protobuf";
-import {
-  type FlagName,
-  usePositionFlags,
-} from "@core/hooks/usePositionFlags";
+import { usePositionFlags } from "@core/hooks/usePositionFlags";
+import { AdminMessageService } from "@core/services/adminMessageService";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { useNodes } from "@db/hooks";
@@ -11,7 +8,6 @@ import {
   type PositionValidation,
   PositionValidationSchema,
 } from "@app/validation/config/position";
-import { Protobuf } from "@meshtastic/core";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 
@@ -122,16 +118,11 @@ export function usePositionForm() {
       data.latitude !== undefined &&
       data.longitude !== undefined
     ) {
-      const message = create(Protobuf.Admin.AdminMessageSchema, {
-        payloadVariant: {
-          case: "setFixedPosition",
-          value: create(Protobuf.Mesh.PositionSchema, {
-            latitudeI: Math.round(data.latitude * 1e7),
-            longitudeI: Math.round(data.longitude * 1e7),
-            altitude: data.altitude || 0,
-            time: Math.floor(Date.now() / 1000),
-          }),
-        },
+      const message = AdminMessageService.createSetFixedPositionMessage({
+        latitudeI: Math.round(data.latitude * 1e7),
+        longitudeI: Math.round(data.longitude * 1e7),
+        altitude: data.altitude || 0,
+        time: Math.floor(Date.now() / 1000),
       });
 
       queueAdminMessage(message);

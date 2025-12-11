@@ -18,16 +18,10 @@ vi.mock("@core/hooks/useToast", () => ({
   useToast: vi.fn(),
 }));
 
-// Mock Protobuf
-vi.mock("@meshtastic/core", () => ({
-  Protobuf: {
-    Portnums: { PortNum: { ADMIN_APP: 1 } },
-    Admin: { AdminMessageSchema: {} },
+vi.mock("@core/services/adminMessageService", () => ({
+  AdminMessageService: {
+    sendQueuedMessages: vi.fn().mockResolvedValue(undefined),
   },
-}));
-
-vi.mock("@bufbuild/protobuf", () => ({
-  toBinary: vi.fn(),
 }));
 
 describe("useSettingsSave", () => {

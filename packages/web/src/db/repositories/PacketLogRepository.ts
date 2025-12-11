@@ -1,6 +1,6 @@
-import { and, count, desc, eq, lt, sql } from "drizzle-orm";
-import { dbClient } from "../client";
-import { packetLogs, type NewPacketLog, type PacketLog } from "../schema";
+import { and, count, desc, eq, lt } from "drizzle-orm";
+import { dbClient } from "../client.ts";
+import { type NewPacketLog, type PacketLog, packetLogs } from "../schema.ts";
 
 // Default limits to prevent unbounded growth
 const DEFAULT_MAX_PACKETS = 10000;
@@ -130,9 +130,7 @@ export class PacketLogRepository {
    * Delete all packets for a device
    */
   async deleteAllPackets(deviceId: number): Promise<void> {
-    await this.db
-      .delete(packetLogs)
-      .where(eq(packetLogs.deviceId, deviceId));
+    await this.db.delete(packetLogs).where(eq(packetLogs.deviceId, deviceId));
   }
 
   /**

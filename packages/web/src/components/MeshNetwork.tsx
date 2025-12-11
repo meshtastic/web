@@ -82,7 +82,7 @@ export function MeshNetwork() {
       });
 
       // Draw connections
-      ctx.strokeStyle = "rgba(45, 212, 191, 0.15)";
+      ctx.strokeStyle = "rgba(45, 212, 191, 0.6)"; // Increased opacity
       ctx.lineWidth = 1;
 
       nodes.forEach((node) => {
@@ -92,7 +92,7 @@ export function MeshNetwork() {
           const maxDist = 300;
 
           if (dist < maxDist) {
-            const alpha = (1 - dist / maxDist) * 0.2;
+            const alpha = (1 - dist / maxDist) * 0.8; // Increased opacity
             ctx.strokeStyle = `rgba(45, 212, 191, ${alpha})`;
             ctx.beginPath();
             ctx.moveTo(node.x, node.y);
@@ -104,7 +104,7 @@ export function MeshNetwork() {
             const pulseX = node.x + (other.x - node.x) * pulsePos;
             const pulseY = node.y + (other.y - node.y) * pulsePos;
 
-            ctx.fillStyle = `rgba(45, 212, 191, ${alpha * 2})`;
+            ctx.fillStyle = `rgba(45, 212, 191, ${alpha * 1.5})`; // Increased opacity
             ctx.beginPath();
             ctx.arc(pulseX, pulseY, 2, 0, Math.PI * 2);
             ctx.fill();

@@ -2,7 +2,7 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useConnections, useConnection, useDefaultConnection } from "./useConnections";
 import { connectionRepo } from "../repositories";
-import { useDeviceStore, useAppStore } from "@core/stores";
+import { useDeviceStore } from "@core/stores";
 
 // Mock Repositories
 vi.mock("../repositories", () => ({
@@ -21,21 +21,24 @@ vi.mock("../repositories", () => ({
 
 // Mock Stores
 const mockSetActiveConnectionId = vi.fn();
+const mockSetActiveDeviceId = vi.fn();
 const mockAddDevice = vi.fn();
-const mockSetSelectedDevice = vi.fn();
 
 vi.mock("@core/stores", () => ({
   useDeviceStore: Object.assign(
     vi.fn((selector) => {
-        if (selector) return selector({ setActiveConnectionId: mockSetActiveConnectionId, addDevice: mockAddDevice });
-        return { setActiveConnectionId: mockSetActiveConnectionId, addDevice: mockAddDevice };
-    }),
-    { getState: vi.fn() }
-  ),
-  useAppStore: Object.assign(
-    vi.fn((selector) => {
-        if (selector) return selector({ selectedDeviceId: 123 });
-        return { setSelectedDevice: mockSetSelectedDevice, selectedDeviceId: 123 };
+        if (selector) return selector({
+          setActiveConnectionId: mockSetActiveConnectionId,
+          setActiveDeviceId: mockSetActiveDeviceId,
+          activeDeviceId: 123,
+          addDevice: mockAddDevice
+        });
+        return {
+          setActiveConnectionId: mockSetActiveConnectionId,
+          setActiveDeviceId: mockSetActiveDeviceId,
+          activeDeviceId: 123,
+          addDevice: mockAddDevice
+        };
     }),
     { getState: vi.fn() }
   ),
@@ -58,20 +61,25 @@ describe("useConnections", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Setup default store mocks
     (useDeviceStore as unknown as vi.Mock).mockImplementation((selector: any) => {
-        if (selector) return selector({ setActiveConnectionId: mockSetActiveConnectionId, addDevice: mockAddDevice });
-        return { setActiveConnectionId: mockSetActiveConnectionId, addDevice: mockAddDevice };
+        if (selector) return selector({
+          setActiveConnectionId: mockSetActiveConnectionId,
+          setActiveDeviceId: mockSetActiveDeviceId,
+          activeDeviceId: 0,
+          addDevice: mockAddDevice
+        });
+        return {
+          setActiveConnectionId: mockSetActiveConnectionId,
+          setActiveDeviceId: mockSetActiveDeviceId,
+          activeDeviceId: 0,
+          addDevice: mockAddDevice
+        };
     });
     (useDeviceStore as any).getState.mockReturnValue({
         getDevice: vi.fn(),
         removeDevice: vi.fn(),
-    });
-
-    (useAppStore as unknown as vi.Mock).mockImplementation((selector: any) => {
-        if (selector) return selector({ selectedDeviceId: null });
-        return { setSelectedDevice: mockSetSelectedDevice, selectedDeviceId: null };
     });
 
     // Default repo mock

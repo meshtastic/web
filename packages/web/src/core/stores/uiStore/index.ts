@@ -73,7 +73,6 @@ export interface UIState {
 
   // App state (some persisted, some ephemeral)
   rasterSources: RasterSource[]; // persisted
-  selectedDeviceId: number; // ephemeral
   nodeNumToBeRemoved: number; // ephemeral
   connectDialogOpen: boolean; // ephemeral
   nodeNumDetails: number; // ephemeral
@@ -104,7 +103,6 @@ export interface UIState {
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
   removeRasterSource: (index: number) => void;
-  setSelectedDevice: (deviceId: number) => void;
   setCommandPaletteOpen: (open: boolean) => void;
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setConnectDialogOpen: (open: boolean) => void;
@@ -154,7 +152,6 @@ const defaultState = {
 
   // App state defaults
   rasterSources: [],
-  selectedDeviceId: 0,
   commandPaletteOpen: false,
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
@@ -221,7 +218,6 @@ export const useUIStore = create<UIState>()(
           set((state) => ({
             rasterSources: state.rasterSources.filter((_, i) => i !== index),
           })),
-        setSelectedDevice: (deviceId) => set({ selectedDeviceId: deviceId }),
         setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
         setNodeNumToBeRemoved: (nodeNum) =>
           set({ nodeNumToBeRemoved: nodeNum }),

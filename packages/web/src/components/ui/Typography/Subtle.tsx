@@ -6,6 +6,6 @@ export function Subtle({
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn("text-sm text-muted-foreground", className)} {...props} />
+    <p className={cn("text-sm md:text-base text-muted-foreground", className)} {...props} />
   );
 }

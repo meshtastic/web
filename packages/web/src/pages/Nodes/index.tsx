@@ -201,7 +201,7 @@ const NodesPage = (): JSX.Element => {
         sortable: true,
         sortKey: "lastHeard",
         render: (node) => (
-          <Mono className="text-xs">
+          <Mono className="text-xs md:text-sm">
             {node.lastHeard === 0 ? (
               t("unknown.longName")
             ) : (
@@ -227,7 +227,7 @@ const NodesPage = (): JSX.Element => {
                 : node.deviceMetrics?.voltage === 0
                   ? "PWD"
                   : "—";
-          return <Mono className="text-xs">{text}</Mono>;
+          return <Mono className="text-xs md:text-sm">{text}</Mono>;
         },
       },
       altitude: {
@@ -236,7 +236,7 @@ const NodesPage = (): JSX.Element => {
         render: (node) => {
           const altitude = node.position?.altitude;
           const text = altitude ? `${altitude} m MSL` : "—";
-          return <Mono className="text-xs">{text}</Mono>;
+          return <Mono className="text-xs md:text-sm">{text}</Mono>;
         },
       },
       hops: {
@@ -244,7 +244,7 @@ const NodesPage = (): JSX.Element => {
         sortable: true,
         sortKey: "connection",
         render: (node) => (
-          <Mono className="text-xs">
+          <Mono className="text-xs md:text-sm">
             {node.hopsAway !== undefined
               ? node?.viaMqtt === false && node.hopsAway === 0
                 ? t("nodesTable.connectionStatus.direct")
@@ -264,7 +264,7 @@ const NodesPage = (): JSX.Element => {
         render: (_node) => {
           // Environment metrics not stored in nodes table, available via telemetryLogs
           const text = "—";
-          return <Mono className="text-xs">{text}</Mono>;
+          return <Mono className="text-xs md:text-sm">{text}</Mono>;
         },
       },
       chUtil: {
@@ -277,7 +277,7 @@ const NodesPage = (): JSX.Element => {
             chUtil !== undefined || airUtil !== undefined
               ? `Ch ${chUtil?.toFixed(1) ?? "—"}%${airUtil !== undefined ? ` / Air ${airUtil.toFixed(1)}%` : ""}`
               : "—";
-          return <Mono className="text-xs">{text}</Mono>;
+          return <Mono className="text-xs md:text-sm">{text}</Mono>;
         },
       },
       model: {
@@ -285,7 +285,7 @@ const NodesPage = (): JSX.Element => {
         sortable: true,
         sortKey: "model",
         render: (node) => (
-          <Mono className="text-xs">
+          <Mono className="text-xs md:text-sm">
             {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}
           </Mono>
         ),
@@ -297,7 +297,7 @@ const NodesPage = (): JSX.Element => {
           const role = node.user?.role
             ? Protobuf.Config.Config_DeviceConfig_Role[node.user.role]
             : "—";
-          return <Mono className="text-xs">{role}</Mono>;
+          return <Mono className="text-xs md:text-sm">{role}</Mono>;
         },
       },
       nodeId: {
@@ -305,7 +305,7 @@ const NodesPage = (): JSX.Element => {
         sortable: false,
         render: (node) => {
           const nodeId = `!${numberToHexUnpadded(node.num)}`;
-          return <Mono className="text-xs">{nodeId}</Mono>;
+          return <Mono className="text-xs md:text-sm">{nodeId}</Mono>;
         },
       },
     }),

@@ -1,3 +1,3 @@
 export const SectionHeader = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="text-lg font-semibold mb-3">{children}</h3>
+  <h3 className="text-lg md:text-xl font-semibold mb-3">{children}</h3>
 );

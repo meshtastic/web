@@ -1,7 +1,7 @@
 import type { NewConnectionInput } from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
 import { testHttpReachable } from "@app/pages/Connections/utils";
 import { router } from "@app/routes";
-import { useAppStore, useDeviceStore } from "@core/stores";
+import { clearConnectionCache, useDeviceStore } from "@core/stores";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice, Types } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
@@ -36,9 +36,9 @@ export function useConnections() {
 
   // DeviceStore methods
   const setActiveConnectionId = useDeviceStore((s) => s.setActiveConnectionId);
+  const setActiveDeviceId = useDeviceStore((s) => s.setActiveDeviceId);
+  const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
   const { addDevice } = useDeviceStore();
-  const { setSelectedDevice } = useAppStore();
-  const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
 
   const refresh = useCallback(async (): Promise<
     Result<Connection[], ConnectionError>
@@ -222,7 +222,7 @@ export function useConnections() {
       const device = addDevice(deviceId);
       const meshDevice = new MeshDevice(transport, deviceId);
 
-      setSelectedDevice(deviceId);
+      setActiveDeviceId(deviceId);
       device.addConnection(meshDevice);
 
       // Subscribe to node info events - updates device store and sets up DB subscriptions
@@ -245,10 +245,18 @@ export function useConnections() {
 
       // Subscribe to config events
       meshDevice.events.onConfigPacket.subscribe((config) => {
+        console.log(
+          `[useConnections] Received config packet: ${config.payloadVariant.case}`,
+          config.payloadVariant.value,
+        );
         device.setConfig(config);
       });
 
       meshDevice.events.onModuleConfigPacket.subscribe((config) => {
+        console.log(
+          `[useConnections] Received module config packet: ${config.payloadVariant.case}`,
+          config.payloadVariant.value,
+        );
         device.setModuleConfig(config);
       });
 
@@ -320,7 +328,7 @@ export function useConnections() {
     },
     [
       addDevice,
-      setSelectedDevice,
+      setActiveDeviceId,
       setActiveConnectionId,
       updateStatus,
       linkMeshDevice,
@@ -523,6 +531,9 @@ export function useConnections() {
           device?.connection?.disconnect();
         } catch {}
 
+        // Clear from HMR cache
+        clearConnectionCache(conn.meshDeviceId);
+
         const transport = transports.get(id);
         if (transport) {
           if (conn.type === "bluetooth") {
@@ -561,6 +572,10 @@ export function useConnections() {
         try {
           device?.connection?.disconnect();
         } catch {}
+
+        // Clear from HMR cache
+        clearConnectionCache(conn.meshDeviceId);
+
         try {
           removeDevice(conn.meshDeviceId);
         } catch {}
@@ -726,7 +741,7 @@ export function useConnections() {
 
   const syncConnectionStatuses = useCallback(async () => {
     const activeConnection = connections.find(
-      (c) => c.meshDeviceId === selectedDeviceId,
+      (c) => c.meshDeviceId === activeDeviceId,
     );
     for (const conn of connections) {
       const shouldBeConnected = activeConnection?.id === conn.id;
@@ -740,7 +755,7 @@ export function useConnections() {
       }
     }
     await refresh();
-  }, [connections, selectedDeviceId, refresh]);
+  }, [connections, activeDeviceId, refresh]);
 
   return {
     connections,

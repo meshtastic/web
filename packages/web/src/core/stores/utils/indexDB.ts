@@ -55,7 +55,15 @@ const uint8ArrayHandler: Handler<Uint8Array, "Uint8Array", number[]> = {
   revive: (arr) => new Uint8Array(arr),
 };
 
-const defaultHandlers = [mapHandler, uint8ArrayHandler] as const;
+// BigInt handler - protobuf objects often contain BigInt values
+const bigIntHandler: Handler<bigint, "BigInt", string> = {
+  tag: "BigInt",
+  test: (val): val is bigint => typeof val === "bigint",
+  serialize: (bigint) => bigint.toString(),
+  revive: (str) => BigInt(str),
+};
+
+const defaultHandlers = [mapHandler, uint8ArrayHandler, bigIntHandler] as const;
 
 function makeJson<H extends Handler<unknown, string, unknown>>(
   handlers: readonly H[],

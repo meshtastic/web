@@ -1,4 +1,4 @@
-import React, { Suspense, use } from "react";
+import React, { Suspense, use, useState } from "react";
 import "@app/index.css";
 
 // feature flags and dev overrides
@@ -32,12 +32,12 @@ async function checkDatabaseExists(): Promise<boolean> {
 // Initialize database before React mounts
 const dbPromise = initDatabase()
   .then(() => resetConnectionStatuses())
-  .catch((error) => {
+.catch((error) => {
     console.error("[App] Failed to initialize database:", error);
     throw error;
   });
 
-// This Promise will be resolved when the WelcomeSplash is complete
+// This Promise will be resolved when the WelcomeSplash is "done"
 let resolveWelcomeSplashPromise: () => void;
 const welcomeSplashCompletionPromise = new Promise<void>((resolve) => {
   resolveWelcomeSplashPromise = resolve;
@@ -55,16 +55,39 @@ function AppContent() {
   );
 }
 
-// Render the WelcomeSplash with an onComplete handler
-function WelcomeFlow() {
-  return <WelcomeSplash onComplete={resolveWelcomeSplashPromise} />;
-}
-
 function MinimalLoader() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
     </div>
+  );
+}
+
+function RootApp({ initialReturningUser }: { initialReturningUser: boolean }) {
+  const [showSplash, setShowSplash] = useState(!initialReturningUser);
+
+  // If returning user, resolve promise immediately
+  if (initialReturningUser) {
+    resolveWelcomeSplashPromise();
+  }
+
+  const handleSplashComplete = () => {
+    resolveWelcomeSplashPromise();
+    setShowSplash(false);
+  };
+
+  if (showSplash) {
+    return (
+      <Suspense fallback={<MinimalLoader />}>
+        <WelcomeSplash onComplete={handleSplashComplete} />
+      </Suspense>
+    );
+  }
+
+  return (
+    <Suspense fallback={<MinimalLoader />}>
+      <AppContent />
+    </Suspense>
   );
 }
 
@@ -76,23 +99,5 @@ root.render(<MinimalLoader />);
 
 // After the database check, determine what to render
 checkDatabaseExists().then((exists) => {
-  if (exists) {
-    // Returning user: Resolve splash promise immediately since we skip it
-    resolveWelcomeSplashPromise();
-    // Render app content directly, DB init is awaited by AppContent
-    root.render(
-      <Suspense fallback={<MinimalLoader />}>
-        <AppContent />
-      </Suspense>,
-    );
-  } else {
-    // First-time user: Render WelcomeFlow (which includes WelcomeSplash)
-    // WelcomeFlow will call resolveWelcomeSplashPromise when it's done.
-    // AppContent will then render once both dbPromise and welcomeSplashCompletionPromise resolve.
-    root.render(
-      <Suspense fallback={<MinimalLoader />}>
-        <WelcomeFlow />
-      </Suspense>,
-    );
-  }
+  root.render(<RootApp initialReturningUser={exists} />);
 });

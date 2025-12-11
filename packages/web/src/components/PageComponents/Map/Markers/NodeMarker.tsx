@@ -1,6 +1,6 @@
 import { cn } from "@app/core/utils/cn";
+import { NodeAvatar } from "@components/NodeAvatar";
 import type { PxOffset } from "@components/PageComponents/Map/cluster.ts";
-import { Avatar } from "@components/ui/avatar.tsx";
 import {
   Tooltip,
   TooltipArrow,
@@ -66,7 +66,7 @@ export const NodeMarker = memo(function NodeMarker({
               style={style}
               onClick={(e) => onClick(id, { originalEvent: e.nativeEvent })}
             >
-              <Avatar
+              <NodeAvatar
                 nodeNum={id}
                 className={cn(
                   "border-[1.5px] border-slate-600 shadow-m shadow-slate-600",
@@ -74,6 +74,7 @@ export const NodeMarker = memo(function NodeMarker({
                 )}
                 showError={hasError}
                 showFavorite={isFavorite}
+                clickable={false}
               />
             </button>
           </TooltipTrigger>

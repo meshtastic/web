@@ -67,11 +67,10 @@ export const CommandPalette = () => {
     commandPaletteOpen,
     setCommandPaletteOpen,
     setConnectDialogOpen,
-    setSelectedDevice,
   } = useAppStore();
   const { deviceId } = useDeviceContext();
   const { nodes: allNodes } = useNodes(deviceId);
-  const { getDevices } = useDeviceStore();
+  const { getDevices, setActiveDeviceId } = useDeviceStore();
   const { setDialogOpen, connection } = useDevice();
 
   // Create getNode function from database nodes
@@ -136,7 +135,7 @@ export const CommandPalette = () => {
               t("unknown.shortName"),
             icon: <NodeAvatar nodeNum={device.hardware.myNodeNum} />,
             action() {
-              setSelectedDevice(device.id);
+              setActiveDeviceId(device.id);
             },
           })),
         },

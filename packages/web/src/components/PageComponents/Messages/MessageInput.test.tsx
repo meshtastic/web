@@ -52,7 +52,7 @@ describe("MessageInput", () => {
 
     mockDevice = {
       id: 1,
-      myNodeNum: 100,
+      getMyNodeNum: vi.fn().mockReturnValue(100),
       connection: {
         sendText: vi.fn().mockResolvedValue(12345),
       },

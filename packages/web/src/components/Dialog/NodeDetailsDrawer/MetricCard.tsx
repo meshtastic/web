@@ -12,8 +12,8 @@ export const MetricCard = ({
   <Card className="bg-muted/40">
     <CardContent className="flex flex-col items-center justify-center p-4 space-y-2">
       <Icon className="h-6 w-6 text-muted-foreground" />
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-lg font-semibold">{value}</span>
+      <span className="text-xs md:text-sm text-muted-foreground">{label}</span>
+      <span className="text-lg md:text-xl font-semibold">{value}</span>
     </CardContent>
   </Card>
 );

@@ -4,9 +4,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import type { Message } from "@db/schema";
 import { cn } from "@core/utils/cn";
-import { Check, Clock, Cloud, Loader2, X } from "lucide-react";
+import type { Message } from "@db/schema";
+import { Check, Clock, CloudCheck, Loader2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface MessageStatusIndicatorProps {
@@ -33,32 +33,29 @@ export const MessageStatusIndicator = ({
   const getStatusIcon = () => {
     switch (message.state) {
       case "waiting":
-        return <Clock className="size-4 text-muted-foreground" />;
+        return <Clock className="size-4 md:size-5 text-muted-foreground" />;
 
       case "sending":
-        return <Loader2 className="size-4 text-blue-500 animate-spin" />;
+        return (
+          <Loader2 className="size-4 md:size-5 text-blue-500 animate-spin [animation-duration:4s]" />
+        );
 
       case "sent":
-        return <Check className="size-4 text-muted-foreground" />;
+        return (
+          <div className="relative opacity-80">
+            <Check className="md:size-5 size-4" />
+          </div>
+        );
 
       case "ack":
-        if (message.realACK) {
-          return (
-            <div className="relative">
-              <Cloud className="size-4 text-green-500" />
-              <Check className="size-2 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-            </div>
-          );
-        }
         return (
-          <div className="relative">
-            <Cloud className="size-4 text-blue-500" />
-            <Check className="size-2 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+          <div className="relative opacity-80">
+            <CloudCheck className="md:size-5 size-4" />
           </div>
         );
 
       case "failed":
-        return <X className="size-3 text-red-500" />;
+        return <X className="size-4 md:size-5 text-red-500" />;
 
       default:
         return null;
@@ -68,27 +65,26 @@ export const MessageStatusIndicator = ({
   const getStatusText = () => {
     switch (message.state) {
       case "waiting":
-        return t("deliveryStatus.waiting.text");
+        return t("deliveryStatus.waiting");
       case "sending":
-        return t("deliveryStatus.sending.text");
+        return t("deliveryStatus.sending");
       case "sent":
-        return t("deliveryStatus.sent.text");
+        return t("deliveryStatus.sent");
       case "ack":
         return message.realACK
           ? t("deliveryStatus.ack.delivered")
           : t("deliveryStatus.ack.acknowledged");
       case "failed":
         return message.ackError && message.ackError !== 0
-          ? t("deliveryStatus.failed.text", {
+          ? t("deliveryStatus.failed", {
               error: `Error ${message.ackError}`,
             })
-          : t("deliveryStatus.failed.text", { error: "" });
+          : t("deliveryStatus.failed", { error: "" });
       default:
         return "";
     }
   };
 
-  // Always show - the parent component (MessageBubble) already filters by isMine
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>

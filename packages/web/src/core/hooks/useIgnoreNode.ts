@@ -1,8 +1,7 @@
-import { create } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast.ts";
+import { AdminMessageService } from "@core/services/adminMessageService";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { nodeRepo } from "@db/index";
-import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -12,32 +11,26 @@ interface IgnoreNodeOptions {
 }
 
 export function useIgnoreNode() {
-  const { sendAdminMessage } = useDevice();
+  const device = useDevice();
   const { deviceId } = useDeviceContext();
-
   const { t } = useTranslation();
-
   const { toast } = useToast();
 
   const updateIgnoredCB = useCallback(
     async ({ nodeNum, isIgnored }: IgnoreNodeOptions) => {
-      // Get node from database
+      // Get node from database for toast message
       const node = await nodeRepo.getNode(deviceId, nodeNum);
       if (!node) {
         return;
       }
 
-      sendAdminMessage(
-        create(Protobuf.Admin.AdminMessageSchema, {
-          payloadVariant: {
-            case: isIgnored ? "setIgnoredNode" : "removeIgnoredNode",
-            value: nodeNum,
-          },
-        }),
+      // Send admin message and update local database
+      await AdminMessageService.setIgnoredNode(
+        device,
+        deviceId,
+        nodeNum,
+        isIgnored,
       );
-
-      // Update ignored status in database
-      await nodeRepo.updateIgnored(deviceId, nodeNum, isIgnored);
 
       toast({
         title: t("toast.ignoreNode.title", {
@@ -51,7 +44,7 @@ export function useIgnoreNode() {
         }),
       });
     },
-    [sendAdminMessage, deviceId, t, toast],
+    [device, deviceId, t, toast],
   );
 
   return { updateIgnored: updateIgnoredCB };

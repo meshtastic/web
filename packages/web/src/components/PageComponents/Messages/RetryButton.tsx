@@ -1,11 +1,11 @@
+import { Button } from "@components/ui/button";
+import { useDevice } from "@core/stores";
+import { cn } from "@core/utils/cn";
+import { DB_EVENTS, dbEvents } from "@db/events";
 import { messageRepo } from "@db/index";
 import type { Message } from "@db/schema";
 import { RefreshCw } from "lucide-react";
-import { Button } from "@components/ui/button";
-import { cn } from "@core/utils/cn";
-import { useState, useEffect } from "react";
-import { dbEvents, DB_EVENTS } from "@db/events";
-import { useDevice } from "@core/stores";
+import { useEffect, useState } from "react";
 
 interface RetryButtonProps {
   message: Message;
@@ -15,10 +15,7 @@ interface RetryButtonProps {
 /**
  * RetryButton - Button to retry failed messages
  */
-export const RetryButton = ({
-  message,
-  className
-}: RetryButtonProps) => {
+export const RetryButton = ({ message, className }: RetryButtonProps) => {
   const [isRetrying, setIsRetrying] = useState(false);
   const [currentMessage, setCurrentMessage] = useState(message);
   const device = useDevice();
@@ -29,7 +26,9 @@ export const RetryButton = ({
   }, [message]);
 
   const handleRetry = async () => {
-    if (isRetrying || !device.connection) return;
+    if (isRetrying || !device.connection) {
+      return;
+    }
 
     setIsRetrying(true);
     try {
@@ -52,31 +51,36 @@ export const RetryButton = ({
         // Increment retry count and update state in database
         await messageRepo.incrementRetryCount(
           currentMessage.id,
-          currentMessage.deviceId
+          currentMessage.deviceId,
         );
         await messageRepo.updateMessageState(
           currentMessage.id,
           currentMessage.deviceId,
-          "sent"
+          "sent",
         );
 
         // Emit event to trigger UI refresh
         dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
 
-        console.log(`[RetryButton] Message ${currentMessage.id} retried successfully with new ID ${newMessageId}`);
+        console.log(
+          `[RetryButton] Message ${currentMessage.id} retried successfully with new ID ${newMessageId}`,
+        );
       }
     } catch (error) {
-      console.error(`[RetryButton] Failed to retry message ${currentMessage.id}:`, error);
+      console.error(
+        `[RetryButton] Failed to retry message ${currentMessage.id}:`,
+        error,
+      );
 
       // Increment retry count and mark as failed again
       await messageRepo.incrementRetryCount(
         currentMessage.id,
-        currentMessage.deviceId
+        currentMessage.deviceId,
       );
       await messageRepo.updateMessageState(
         currentMessage.id,
         currentMessage.deviceId,
-        "failed"
+        "failed",
       );
       dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
     } finally {

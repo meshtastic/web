@@ -14,7 +14,6 @@ import type { Device } from "./index.ts";
  */
 export const mockDeviceStore: Device = {
   id: 0,
-  myNodeNum: 123456,
   status: 5 as const,
   connectionPhase: "disconnected" as const,
   connectionId: null,
@@ -83,6 +82,7 @@ export const mockDeviceStore: Device = {
   getUnreadCount: vi.fn().mockReturnValue(0),
   getNeighborInfo: vi.fn(),
   addNeighborInfo: vi.fn(),
+  getMyNodeNum: vi.fn().mockReturnValue(123456),
 
   // Change tracking methods
   setChange: vi.fn(),

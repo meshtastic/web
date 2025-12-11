@@ -1,4 +1,5 @@
 import { SettingsSearchBar } from "@app/components/Settings/SettingsSearchBar";
+import { Separator } from "@app/components/ui/separator.tsx";
 import { useSettingsSave } from "@app/pages/Settings/hooks/useSaveSettings";
 import { ActivityPanel } from "@components/Settings/Activity";
 import { ImportExport } from "@components/Settings/ImportExport";
@@ -11,6 +12,7 @@ import { cn } from "@core/utils/cn";
 import { DeviceConfig } from "@pages/Settings/DeviceConfig";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig";
 import { RadioConfig } from "@pages/Settings/RadioConfig";
+import { t } from "i18next";
 import {
   FileEdit,
   LayersIcon,
@@ -64,7 +66,7 @@ export default function SettingsPage() {
   const sidebarContent = (
     <>
       <div className="p-4 border-b">
-        <h2 className="font-semibold">Configuration</h2>
+        <h2 className="font-semibold">{t("sidebar.configuration")}</h2>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
@@ -81,10 +83,12 @@ export default function SettingsPage() {
               )}
             >
               <section.icon className="h-4 w-4" />
-              <span className="text-sm">{section.label}</span>
+              <span className="text-sm md:text-base">{section.label}</span>
             </button>
           ))}
         </div>
+        <Separator className="my-2" />
+        <ImportExport variant="sidebar" />
       </ScrollArea>
     </>
   );
@@ -148,7 +152,7 @@ export default function SettingsPage() {
               disabled={!hasPending}
             >
               <RotateCcw className="h-4 w-4 mr-2" />
-              Reset
+              {t("button.reset")}
             </Button>
             <Button
               size="sm"
@@ -157,11 +161,8 @@ export default function SettingsPage() {
               disabled={saveDisabled}
             >
               <Save className="h-4 w-4 mr-2" />
-              {isSaving ? "Saving..." : "Save"}
+              {isSaving ? `${t("button.saving")}...` : t("button.save")}
             </Button>
-            <div className="hidden lg:block">
-              <ImportExport />
-            </div>
           </div>
         </div>
 

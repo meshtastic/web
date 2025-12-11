@@ -6,21 +6,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import { messageRepo } from "@db/index";
-import { dbEvents, DB_EVENTS } from "@db/events";
-import type { NewMessage } from "@db/schema";
 import type { Device } from "@core/stores/deviceStore";
-import { autoFavoriteDMHandler } from "@core/utils/messagePipelineHandlers";
 import type {
   OutgoingMessage,
   PipelineContext,
 } from "@core/utils/messagePipelineHandlers";
+import { autoFavoriteDMHandler } from "@core/utils/messagePipelineHandlers";
+import { DB_EVENTS, dbEvents } from "@db/events";
+import { useMessageDraft } from "@db/hooks";
+import { messageRepo } from "@db/index";
+import type { NewMessage } from "@db/schema";
 import type { Types } from "@meshtastic/core";
 import type { Contact } from "@pages/Messages";
-import { useMessageDraft } from "@db/hooks";
 import { Label } from "@radix-ui/react-label";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, WifiOff } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 const MAX_MESSAGE_BYTES = 200;
 
@@ -33,6 +34,12 @@ export const MessageInput = ({
   selectedContact,
   device,
 }: MessageInputProps) => {
+  const { t } = useTranslation("messages");
+  const myNodeNum = device.getMyNodeNum();
+
+  // Check if device is connected
+  // const isConnected = !!device.connection;
+
   // Use database drafts
   const { draft, setDraft, clearDraft } = useMessageDraft(
     device.id,
@@ -40,8 +47,14 @@ export const MessageInput = ({
     selectedContact.id,
   );
 
-  const calculateBytes = (text: string) => new Blob([text]).size;
-  const messageBytes = useMemo(() => calculateBytes(draft), [draft]);
+  const calculateBytes = useMemo(
+    () => (text: string) => new Blob([text]).size,
+    [],
+  );
+  const messageBytes = useMemo(
+    () => calculateBytes(draft),
+    [draft, calculateBytes],
+  );
 
   const handleMessageChange = (text: string) => {
     const byteLength = calculateBytes(text);
@@ -51,20 +64,7 @@ export const MessageInput = ({
   };
 
   const sendMessage = async () => {
-    console.log("[sendMessage] Attempting to send:", {
-      hasSelectedContact: !!selectedContact,
-      hasConnection: !!device.connection,
-      myNodeNum: device.myNodeNum,
-      deviceId: device.id,
-      draft,
-    });
-
-    if (!selectedContact || !device.connection || !device.myNodeNum) {
-      console.log("[sendMessage] Missing required values:", {
-        selectedContact: selectedContact ? "present" : "MISSING",
-        connection: device.connection ? "present" : "MISSING",
-        myNodeNum: device.myNodeNum ?? "MISSING",
-      });
+    if (!selectedContact || !device.connection || !myNodeNum) {
       return;
     }
 
@@ -75,7 +75,6 @@ export const MessageInput = ({
     }
 
     const isDirect = selectedContact.type === "direct";
-    const isBroadcast = selectedContact.type === "channel";
 
     // Determine destination and channel based on contact type
     const toValue = isDirect
@@ -85,16 +84,6 @@ export const MessageInput = ({
     const channelValue = isDirect
       ? 0
       : (selectedContact.id as Types.ChannelNumber);
-
-    console.log("[sendMessage] Sending:", {
-      message: trimmedMessage,
-      isDirect,
-      isBroadcast,
-      toValue,
-      channelValue,
-      selectedContact: selectedContact.name,
-      nodeNum: selectedContact.nodeNum,
-    });
 
     // Clear draft immediately
     await clearDraft();
@@ -109,8 +98,9 @@ export const MessageInput = ({
       };
 
       const pipelineContext: PipelineContext = {
+        device,
         deviceId: device.id,
-        myNodeNum: device.myNodeNum,
+        myNodeNum,
       };
 
       await autoFavoriteDMHandler(outgoingMessage, pipelineContext);
@@ -123,8 +113,6 @@ export const MessageInput = ({
         isDirect ? undefined : channelValue,
       );
 
-      console.log("[sendMessage] Message sent, ID:", messageId);
-
       // Save message to database
       if (messageId !== undefined) {
         const newMessage: NewMessage = {
@@ -132,7 +120,7 @@ export const MessageInput = ({
           messageId,
           type: isDirect ? "direct" : "broadcast",
           channelId: channelValue,
-          fromNode: device.myNodeNum,
+          fromNode: myNodeNum,
           toNode: isDirect ? (selectedContact.nodeNum as number) : 0xffffffff,
           message: trimmedMessage,
           date: new Date(),
@@ -148,15 +136,10 @@ export const MessageInput = ({
           realACK: false,
         };
 
-        console.log("[sendMessage] Saving message to database:", newMessage);
         await messageRepo.saveMessage(newMessage);
-        console.log("[sendMessage] Message saved, emitting event");
 
         // Emit event to trigger UI refresh
         dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
-        console.log("[sendMessage] Event emitted");
-      } else {
-        console.log("[sendMessage] messageId was undefined, message not saved");
       }
     } catch (error) {
       console.error("[sendMessage] Failed to send message:", error);
@@ -165,7 +148,7 @@ export const MessageInput = ({
   };
 
   return (
-    <div className="border-t p-4">
+    <div className="border-t p-4 shrink-0">
       <form
         className="flex items-center gap-2"
         onSubmit={(e) => {
@@ -184,26 +167,33 @@ export const MessageInput = ({
             {messageBytes}/{MAX_MESSAGE_BYTES}
           </span>
         </div>
-        {/** biome-ignore lint/correctness/useUniqueElementIds: this improves the accessability of the element */}
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
+              {/** biome-ignore lint/correctness/useUniqueElementIds: its a single button and can have a static id*/}
               <Button
                 size="icon"
                 type="submit"
                 className="rounded-full"
                 id="send-message"
+                // disabled={!isConnected}
+                // variant={isConnected ? "default" : "secondary"}
               >
+                {/* {isConnected ? (
+                  <ArrowUp className="h-5 w-5" />
+                ) : (
+                  <WifiOff className="h-4 w-4" />
+                )} */}
                 <ArrowUp className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
             <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-2 py-1 rounded text-xs">
-              Send message
+              {/* {isConnected ? t("input.toolitp") : t("input.notConnected")} */}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <Label htmlFor="send-message" className="sr-only">
-          Send
+          {t("input.tooltip", "Send Message")}
         </Label>
       </form>
     </div>

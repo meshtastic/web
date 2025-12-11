@@ -13,21 +13,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import { useChannels, useNodes } from "@db/hooks";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { cn } from "@core/utils/cn";
 import { sortNodes } from "@core/utils/nodeSort";
+import { useChannels, useNodes } from "@db/hooks";
 import { ChatPanel } from "@pages/Messages/ChatPanel";
 import { useSearch } from "@tanstack/react-router";
-import {
-  Columns,
-  Hash,
-  Plus,
-  Rows,
-  Search,
-  Users,
-  X,
-} from "lucide-react";
+import { Columns, Hash, Plus, Rows, Search, Users, X } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -208,9 +200,7 @@ export default function MessagesPage() {
         (c) => c.type === "channel" && c.nodeId === "#0",
       );
       if (primaryChannel) {
-        setOpenTabs([
-          { id: 1, contactId: primaryChannel.id, type: "channel" },
-        ]);
+        setOpenTabs([{ id: 1, contactId: primaryChannel.id, type: "channel" }]);
         setActiveTabId(1);
       }
     }
@@ -357,7 +347,7 @@ export default function MessagesPage() {
                       )}
                     </div>
                   )}
-                  <span className="text-sm truncate flex-1">
+                  <span className="text-sm md:text-base truncate flex-1">
                     {tabContact.name}
                   </span>
                   {tab.unreadCount > 0 && (
@@ -402,7 +392,10 @@ export default function MessagesPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn("h-9 w-9 shrink-0", splitMode === "vertical" && "bg-accent")}
+                  className={cn(
+                    "h-9 w-9 shrink-0",
+                    splitMode === "vertical" && "bg-accent",
+                  )}
                   onClick={() => toggleSplitMode("vertical")}
                 >
                   <Columns className="h-4 w-4" />
@@ -415,7 +408,10 @@ export default function MessagesPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn("h-9 w-9 shrink-0 mr-1", splitMode === "horizontal" && "bg-accent")}
+                  className={cn(
+                    "h-9 w-9 shrink-0 mr-1",
+                    splitMode === "horizontal" && "bg-accent",
+                  )}
                   onClick={() => toggleSplitMode("horizontal")}
                 >
                   <Rows className="h-4 w-4" />
@@ -440,10 +436,7 @@ export default function MessagesPage() {
     }
 
     return (
-      <ResizablePanelGroup
-        direction={splitMode}
-        className="flex-1"
-      >
+      <ResizablePanelGroup direction={splitMode} className="flex-1">
         <ResizablePanel defaultSize={50} minSize={25}>
           <div className="flex flex-col h-full overflow-hidden">
             {renderTabBar(false, activeTabId)}
@@ -462,10 +455,10 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]">
+    <div className="flex h-full">
       {/* Contacts Sidebar */}
-      <div className="w-80 border-r flex flex-col">
-        <div className="p-4 border-b space-y-3">
+      <div className="w-80 border-r flex flex-col min-h-0">
+        <div className="p-4 border-b space-y-3 shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -539,12 +532,12 @@ export default function MessagesPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="font-medium truncate">{contact.name}</span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs md:text-sm text-muted-foreground">
                       {contact.time}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground truncate">
+                    <span className="text-sm md:text-base text-muted-foreground truncate">
                       {contact.lastMessage}
                     </span>
                     {contact.unread > 0 && (

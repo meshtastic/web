@@ -1,43 +1,29 @@
-import { Button } from "@components/ui/button";
-import { useToast } from "@core/hooks/useToast";
-import * as yaml from "js-yaml";
+import { ImportConfigDialog } from "@components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
+import { Button } from "@components/ui/button.tsx";
+import { useToast } from "@core/hooks/useToast.ts";
+import {
+  type ParsedYAMLField,
+  YAMLService,
+} from "@core/services/yamlService.ts";
+import { useDevice } from "@core/stores";
+import { cn } from "@core/utils/cn.ts";
 import { Download, Upload } from "lucide-react";
-import { useRef } from "react";
+import { useState } from "react";
 
-export const ImportExport = () => {
+interface ImportExportProps {
+  variant?: "default" | "sidebar";
+}
+
+export const ImportExport = ({ variant = "default" }: ImportExportProps) => {
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const device = useDevice();
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const exportConfig = async () => {
     try {
-      // TODO: Implement actual config export from device store
-      const config = {
-        version: "1.0",
-        metadata: {
-          exportedAt: new Date().toISOString(),
-          deviceName: "Meshtastic Device",
-          hardwareModel: "Unknown",
-        },
-        config: {},
-        moduleConfig: {},
-        channels: [],
-      };
-
-      const yamlContent = yaml.dump(config, {
-        indent: 2,
-        lineWidth: 120,
-      });
-
-      // Download file
-      const blob = new Blob([yamlContent], { type: "text/yaml" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "meshtastic-config.yaml";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const yamlContent = await YAMLService.exportToYAML(device);
+      const filename = `meshtastic_${device.hardware?.myNodeNum || "config"}.yaml`;
+      YAMLService.downloadYAML(yamlContent, filename);
 
       toast({
         title: "Export Successful",
@@ -52,13 +38,13 @@ export const ImportExport = () => {
     }
   };
 
-  const importConfig = async (file: File) => {
+  const handleImport = async (
+    fields: ParsedYAMLField[],
+    onProgress: (percent: number, status: string) => void,
+  ) => {
     try {
-      const yamlText = await file.text();
-      const config = yaml.load(yamlText) as any;
-
-      // TODO: Implement actual config validation and application
-      console.log("Imported config:", config);
+      // The first argument _parsedData is unused in applyToDevice
+      await YAMLService.applyToDevice({} as any, fields, device, onProgress);
 
       toast({
         title: "Import Successful",
@@ -70,33 +56,57 @@ export const ImportExport = () => {
         description: (error as Error).message,
         variant: "destructive",
       });
+      throw error; // Re-throw to let the dialog handle/show error if needed
     }
   };
 
   return (
-    <div className="flex gap-2">
-      <Button variant="outline" onClick={exportConfig}>
-        <Download className="h-4 w-4 mr-2" />
-        Export
-      </Button>
+    <>
+      {variant === "sidebar" ? (
+        <div className="flex flex-col gap-2 p-2">
+          <Button
+            variant={"outline"}
+            onClick={exportConfig}
+            className={cn(
+              "flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
+              "hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Download className="h-4 w-4" />
+            <span className="text-sm md:text-base">Export Config</span>
+          </Button>
+          <Button
+            variant={"outline"}
+            type="button"
+            onClick={() => setImportDialogOpen(true)}
+            className={cn(
+              "flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
+              "hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Upload className="h-4 w-4" />
+            <span className="text-sm md:text-base">Import Config</span>
+          </Button>
+        </div>
+      ) : (
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportConfig}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
 
-      <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-        <Upload className="h-4 w-4 mr-2" />
-        Import
-      </Button>
+          <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Import
+          </Button>
+        </div>
+      )}
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".yaml,.yml"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) {
-            importConfig(file);
-          }
-        }}
+      <ImportConfigDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+        onImport={handleImport}
       />
-    </div>
+    </>
   );
 };

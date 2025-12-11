@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: <explanation> */
+import { toJson } from "@bufbuild/protobuf";
 import { fromByteArray } from "base64-js";
-import type { MeshDevice } from "@meshtastic/core";
+import { type MeshDevice, Protobuf } from "@meshtastic/core";
 import { channelRepo, messageRepo, nodeRepo, packetLogRepo } from "./repositories";
 import type {
   NewMessage,
@@ -10,6 +11,7 @@ import type {
   NewTelemetryLog,
 } from "./schema";
 import { dbEvents, DB_EVENTS } from "./events";
+import { packetWriteQueue } from "./writeQueue";
 
 /**
  * Service to subscribe to mesh device events and write to database
@@ -210,21 +212,51 @@ export class SubscriptionService {
       }),
     );
 
-    // Subscribe to mesh packets (for lastHeard updates)
+    // Subscribe to mesh packets (for lastHeard updates and packet logging)
     unsubscribers.push(
-      connection.events.onMeshPacket.subscribe(async (meshPacket) => {
-        try {
-          await nodeRepo.updateLastHeard(
+      connection.events.onMeshPacket.subscribe((meshPacket) => {
+        // Update last heard for the node (higher priority, don't queue)
+        nodeRepo
+          .updateLastHeard(
             deviceId,
             meshPacket.from,
             meshPacket.rxTime,
             meshPacket.rxSnr,
-          );
+          )
+          .then(() => {
+            dbEvents.emit(DB_EVENTS.NODE_UPDATED);
+          })
+          .catch((error) => {
+            console.error("[DB Subscriptions] Error updating lastHeard:", error);
+          });
 
-          dbEvents.emit(DB_EVENTS.NODE_UPDATED);
-        } catch (error) {
-          console.error("[DB Subscriptions] Error updating lastHeard:", error);
-        }
+        // Log the packet to packet_logs table via queue (batched for performance)
+        const packetLog: NewPacketLog = {
+          deviceId,
+          fromNode: meshPacket.from,
+          toNode: meshPacket.to,
+          channel: meshPacket.channel,
+          packetId: meshPacket.id,
+          hopLimit: meshPacket.hopLimit,
+          hopStart: meshPacket.hopStart,
+          wantAck: meshPacket.wantAck,
+          rxSnr: meshPacket.rxSnr,
+          rxRssi: meshPacket.rxRssi,
+          rxTime: meshPacket.rxTime
+            ? new Date(
+                meshPacket.rxTime > 100000000000
+                  ? meshPacket.rxTime
+                  : meshPacket.rxTime * 1000,
+              )
+            : new Date(),
+          rawPacket: toJson(Protobuf.Mesh.MeshPacketSchema, meshPacket),
+        };
+
+        packetWriteQueue
+          .enqueue(() => packetLogRepo.logPacket(packetLog))
+          .catch((error) => {
+            console.error("[DB Subscriptions] Error logging packet:", error);
+          });
       }),
     );
 

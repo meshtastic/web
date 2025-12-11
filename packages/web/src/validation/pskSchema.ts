@@ -7,9 +7,7 @@ export function makePskHelpers(allowedByteLengths: readonly number[]) {
   const msgs = {
     format: t("formValidation.invalidFormat.key"),
     required: t("formValidation.required.key"),
-    length: t(
-      `formValidation.pskLength.${bitsLabel.replace(/ \| /g, "_")}bit`,
-    ),
+    length: t(`formValidation.pskLength.${bitsLabel.replace(/ \| /g, "_")}bit`),
   } as const;
 
   function tryParse(str: string): Uint8Array | null {

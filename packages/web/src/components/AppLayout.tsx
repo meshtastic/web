@@ -25,12 +25,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </TooltipTrigger>
               <TooltipContent>
                 <p>{t("sidebar.collapse")}</p>
-               </TooltipContent>
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <Separator orientation="vertical" className="mr-2 h-14" />
         </header>
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 min-h-0">{children}</div>
       </SidebarInset>
     </>
   );

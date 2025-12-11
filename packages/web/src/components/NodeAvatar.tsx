@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback } from "@components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@components/ui/tooltip";
 import { useAppStore, useDevice } from "@core/stores";
@@ -88,38 +87,34 @@ export const NodeAvatar = ({
       </Avatar>
 
       {showFavorite && (
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <StarIcon
-                className="absolute -top-0.5 -right-0.5 z-10 h-4 w-4 stroke-1 fill-yellow-400"
-                aria-hidden="true"
-                style={{
-                  color: bgColor, // Use the generated background color for the star stroke
-                }}
-              />
-            </TooltipTrigger>
-            <TooltipContent className="bg-slate-800 dark:bg-slate-600 px-4 py-1 text-xs text-white rounded">
-              {t("nodeDetail.favorite.label", { ns: "nodes" })}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <StarIcon
+              className="absolute -top-0.5 -right-0.5 z-10 h-4 w-4 stroke-1 fill-yellow-400"
+              aria-hidden="true"
+              style={{
+                color: bgColor, // Use the generated background color for the star stroke
+              }}
+            />
+          </TooltipTrigger>
+          <TooltipContent className="bg-slate-800 dark:bg-slate-600 px-4 py-1 text-xs text-white rounded">
+            {t("nodeDetail.favorite.label", { ns: "nodes" })}
+          </TooltipContent>
+        </Tooltip>
       )}
 
       {showError && (
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <LockKeyholeOpenIcon
-                className="absolute -bottom-0.5 -right-0.5 z-10 h-4 w-4 stroke-3 text-red-500"
-                aria-hidden="true"
-              />
-            </TooltipTrigger>
-            <TooltipContent className="bg-slate-800 dark:bg-slate-600 px-4 py-1 text-xs text-white rounded">
-              {t("nodeDetail.error.label", { ns: "nodes" })}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <LockKeyholeOpenIcon
+              className="absolute -bottom-0.5 -right-0.5 z-10 h-4 w-4 stroke-3 text-red-500"
+              aria-hidden="true"
+            />
+          </TooltipTrigger>
+          <TooltipContent className="bg-slate-800 dark:bg-slate-600 px-4 py-1 text-xs text-white rounded">
+            {t("nodeDetail.error.label", { ns: "nodes" })}
+          </TooltipContent>
+        </Tooltip>
       )}
     </div>
   );

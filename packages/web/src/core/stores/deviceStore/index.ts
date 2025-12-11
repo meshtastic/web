@@ -48,10 +48,34 @@ const TRACEROUTE_TARGET_RETENTION_NUM = 100; // Number of traceroutes targets to
 const TRACEROUTE_ROUTE_RETENTION_NUM = 100; // Number of traceroutes to keep per target
 const WAYPOINT_RETENTION_NUM = 100;
 
+// HMR-safe connection cache - survives hot module replacement
+// This is stored on the window object to persist across module reloads
+declare global {
+  interface Window {
+    __meshtastic_connections?: Map<number, MeshDevice>;
+  }
+}
+
+function getConnectionCache(): Map<number, MeshDevice> {
+  if (typeof window === "undefined") {
+    return new Map();
+  }
+  if (!window.__meshtastic_connections) {
+    window.__meshtastic_connections = new Map();
+  }
+  return window.__meshtastic_connections;
+}
+
+/**
+ * Clear a connection from the HMR cache (call on disconnect)
+ */
+export function clearConnectionCache(deviceId: number): void {
+  getConnectionCache().delete(deviceId);
+}
+
 type DeviceData = {
   // Persisted data
   id: number;
-  myNodeNum: number | undefined;
   traceroutes: Map<
     number,
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
@@ -133,6 +157,7 @@ export interface Device extends DeviceData {
     neighborInfo: Protobuf.Mesh.NeighborInfo,
   ) => void;
   getNeighborInfo: (nodeNum: number) => Protobuf.Mesh.NeighborInfo | undefined;
+  getMyNodeNum: () => number | undefined;
   setChange: (
     key: ConfigChangeKey,
     value: unknown,
@@ -160,6 +185,11 @@ export interface deviceState {
   getDevices: () => Device[];
   getDevice: (id: number) => Device | undefined;
 
+  // Active device tracking
+  activeDeviceId: number;
+  setActiveDeviceId: (id: number) => void;
+  getActiveDeviceId: () => number;
+
   // Active connection tracking (connections now stored in SQLite)
   activeConnectionId: ConnectionId | null;
   setActiveConnectionId: (id: ConnectionId | null) => void;
@@ -180,7 +210,6 @@ function deviceFactory(
   set: typeof useDeviceStore.setState,
   data?: Partial<DeviceData>,
 ): Device {
-  const myNodeNum = data?.myNodeNum;
   const traceroutes =
     data?.traceroutes ??
     new Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>();
@@ -189,7 +218,6 @@ function deviceFactory(
     data?.neighborInfo ?? new Map<number, Protobuf.Mesh.NeighborInfo>();
   return {
     id,
-    myNodeNum,
     traceroutes,
     waypoints,
     neighborInfo,
@@ -261,44 +289,58 @@ function deviceFactory(
       );
     },
     setConfig: (config: Protobuf.Config.Config) => {
+      console.log(
+        `[DeviceStore] setConfig called for device ${id}, variant: ${config.payloadVariant.case}`,
+      );
       set(
         produce<PrivateDeviceState>((draft) => {
           const device = draft.devices.get(id);
-          if (device) {
-            switch (config.payloadVariant.case) {
-              case "device": {
-                device.config.device = config.payloadVariant.value;
-                break;
-              }
-              case "position": {
-                device.config.position = config.payloadVariant.value;
-                break;
-              }
-              case "power": {
-                device.config.power = config.payloadVariant.value;
-                break;
-              }
-              case "network": {
-                device.config.network = config.payloadVariant.value;
-                break;
-              }
-              case "display": {
-                device.config.display = config.payloadVariant.value;
-                break;
-              }
-              case "lora": {
-                device.config.lora = config.payloadVariant.value;
-                break;
-              }
-              case "bluetooth": {
-                device.config.bluetooth = config.payloadVariant.value;
-                break;
-              }
-              case "security": {
-                device.config.security = config.payloadVariant.value;
-              }
+          if (!device) {
+            console.warn(
+              `[DeviceStore] setConfig: device ${id} not found in store`,
+            );
+            return;
+          }
+          switch (config.payloadVariant.case) {
+            case "device": {
+              device.config.device = config.payloadVariant.value;
+              break;
+            }
+            case "position": {
+              device.config.position = config.payloadVariant.value;
+              break;
+            }
+            case "power": {
+              device.config.power = config.payloadVariant.value;
+              break;
+            }
+            case "network": {
+              device.config.network = config.payloadVariant.value;
+              break;
+            }
+            case "display": {
+              device.config.display = config.payloadVariant.value;
+              break;
+            }
+            case "lora": {
+              device.config.lora = config.payloadVariant.value;
+              break;
+            }
+            case "bluetooth": {
+              device.config.bluetooth = config.payloadVariant.value;
+              break;
+            }
+            case "security": {
+              device.config.security = config.payloadVariant.value;
             }
           }
+          console.log(
+            `[DeviceStore] Config updated for device ${id}, config keys:`,
+            Object.keys(device.config).filter(
+              (k) =>
+                device.config[k as keyof typeof device.config] !== undefined,
+            ),
+          );
         }),
       );
     },
@@ -409,10 +451,9 @@ function deviceFactory(
           if (!newDevice) {
             throw new Error(`No DeviceStore found for id: ${id}`);
           }
-          newDevice.myNodeNum = hardware.myNodeNum;
 
           for (const [otherId, oldStore] of draft.devices) {
-            if (otherId === id || oldStore.myNodeNum !== hardware.myNodeNum) {
+            if (otherId === id || oldStore.hardware.myNodeNum !== hardware.myNodeNum) {
               continue;
             }
             newDevice.traceroutes = oldStore.traceroutes;
@@ -570,6 +611,9 @@ function deviceFactory(
       );
     },
     addConnection: (connection) => {
+      // Store in HMR-safe cache
+      getConnectionCache().set(id, connection);
+
       set(
         produce<PrivateDeviceState>((draft) => {
           const device = draft.devices.get(id);
@@ -749,6 +793,11 @@ function deviceFactory(
         return;
       }
       return device.neighborInfo.get(nodeNum);
+    },
+
+    getMyNodeNum: () => {
+      const device = get().devices.get(id);
+      return device?.hardware.myNodeNum;
     },
 
     // Change tracking methods
@@ -956,6 +1005,7 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   get,
 ) => ({
   devices: new Map(),
+  activeDeviceId: 0,
   activeConnectionId: null,
 
   addDevice: (id) => {
@@ -988,6 +1038,15 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   getDevices: () => Array.from(get().devices.values()),
   getDevice: (id) => get().devices.get(id),
 
+  setActiveDeviceId: (id) => {
+    set(
+      produce<PrivateDeviceState>((draft) => {
+        draft.activeDeviceId = id;
+      }),
+    );
+  },
+  getActiveDeviceId: () => get().activeDeviceId,
+
   setActiveConnectionId: (id) => {
     set(
       produce<PrivateDeviceState>((draft) => {
@@ -1004,29 +1063,37 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
   version: CURRENT_STORE_VERSION,
   partialize: (s): DevicePersisted => ({
     devices: new Map(
-      Array.from(s.devices.entries()).map(([id, db]) => [
-        id,
-        {
-          id: db.id,
-          myNodeNum: db.myNodeNum,
-          traceroutes: db.traceroutes,
-          waypoints: db.waypoints,
-          neighborInfo: db.neighborInfo,
-          config: db.config,
-          moduleConfig: db.moduleConfig,
-        },
-      ]),
+      Array.from(s.devices.entries())
+        // Only persist devices that have been connected (have hardware.myNodeNum)
+        .filter(([, db]) => db.hardware.myNodeNum !== 0)
+        .map(([id, db]) => [
+          id,
+          {
+            id: db.id,
+            traceroutes: db.traceroutes,
+            waypoints: db.waypoints,
+            neighborInfo: db.neighborInfo,
+            config: db.config,
+            moduleConfig: db.moduleConfig,
+          },
+        ]),
     ),
   }),
   onRehydrateStorage: () => (state) => {
     if (!state) {
       return;
     }
+
+    // Get cached connections (survives HMR)
+    const connectionCache = getConnectionCache();
+
     console.debug(
       "DeviceStore: Rehydrating state with ",
       state.devices.size,
       " devices -",
       state.devices,
+      "| Cached connections:",
+      connectionCache.size,
     );
 
     useDeviceStore.setState(
@@ -1035,18 +1102,23 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
         for (const [id, data] of (
           draft.devices as unknown as Map<number, DeviceData>
         ).entries()) {
-          if (data.myNodeNum !== undefined) {
-            // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
-            rebuilt.set(
-              id,
-              deviceFactory(
-                id,
-                useDeviceStore.getState,
-                useDeviceStore.setState,
-                data,
-              ),
+          const device = deviceFactory(
+            id,
+            useDeviceStore.getState,
+            useDeviceStore.setState,
+            data,
+          );
+
+          // Restore connection from HMR cache if available
+          const cachedConnection = connectionCache.get(id);
+          if (cachedConnection) {
+            device.connection = cachedConnection;
+            console.debug(
+              `DeviceStore: Restored connection for device ${id} from HMR cache`,
             );
           }
+
+          rebuilt.set(id, device);
         }
         draft.devices = rebuilt;
       }),

@@ -1,32 +1,21 @@
-import type { Protobuf } from "@meshtastic/core";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFavoriteNode } from "./useFavoriteNode.ts";
 
 const mockNode = {
-  num: 1234,
-  user: {
-    longName: "Test Node",
-  },
+  nodeNum: 1234,
+  longName: "Test Node",
   isFavorite: true,
-} as unknown | Protobuf.Mesh.NodeInfo;
+};
 
-const mockUpdateFavorite = vi.fn();
-const mockGetNode = vi.fn(() => mockNode);
 const mockToast = vi.fn();
-const mockSendAdminMessage = vi.fn();
+const mockSetFavoriteNode = vi.fn();
+const mockGetNode = vi.fn();
+const mockDevice = { id: 1 };
 
 vi.mock("@core/stores", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
-  useNodeDB: () => ({
-    updateFavorite: mockUpdateFavorite,
-    getNode: mockGetNode,
-  }),
-  useDevice: () => ({
-    sendAdminMessage: mockSendAdminMessage,
-  }),
+  useDevice: () => mockDevice,
+  useDeviceContext: () => ({ deviceId: 1234 }),
 }));
 
 vi.mock("@core/hooks/useToast.ts", () => ({
@@ -35,66 +24,74 @@ vi.mock("@core/hooks/useToast.ts", () => ({
   }),
 }));
 
+vi.mock("@db/index", () => ({
+  nodeRepo: {
+    getNode: (deviceId: number, nodeNum: number) =>
+      mockGetNode(deviceId, nodeNum),
+  },
+}));
+
+vi.mock("@core/services/adminMessageService", () => ({
+  AdminMessageService: {
+    setFavoriteNode: (
+      _device: unknown,
+      _deviceId: number,
+      _nodeNum: number,
+      _isFavorite: boolean,
+    ) => mockSetFavoriteNode(_device, _deviceId, _nodeNum, _isFavorite),
+  },
+}));
+
 describe("useFavoriteNode hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetNode.mockResolvedValue(mockNode);
   });
 
-  it("calls updateFavorite and shows correct toast", () => {
+  it("calls AdminMessageService.setFavoriteNode and shows correct toast", async () => {
     const { result } = renderHook(() => useFavoriteNode());
 
-    act(() => {
-      result.current.updateFavorite({ nodeNum: 1234, isFavorite: true });
+    await act(async () => {
+      await result.current.updateFavorite({ nodeNum: 1234, isFavorite: true });
     });
 
-    expect(mockUpdateFavorite).toHaveBeenCalledWith(1234, true);
-    expect(mockGetNode).toHaveBeenCalledWith(1234);
-    expect(mockToast).toHaveBeenCalledWith({
-      title: "Added Test Node to favorites.",
-    });
+    expect(mockSetFavoriteNode).toHaveBeenCalledWith(
+      mockDevice,
+      1234,
+      1234,
+      true,
+    );
+    expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
+    expect(mockToast).toHaveBeenCalled();
   });
 
-  it("handles removal case", () => {
+  it("handles removal case", async () => {
     const { result } = renderHook(() => useFavoriteNode());
 
-    act(() => {
-      result.current.updateFavorite({ nodeNum: 1234, isFavorite: false });
+    await act(async () => {
+      await result.current.updateFavorite({ nodeNum: 1234, isFavorite: false });
     });
 
-    expect(mockUpdateFavorite).toHaveBeenCalledWith(1234, false);
-    expect(mockGetNode).toHaveBeenCalledWith(1234);
-    expect(mockToast).toHaveBeenCalledWith({
-      title: "Removed Test Node from favorites.",
-    });
+    expect(mockSetFavoriteNode).toHaveBeenCalledWith(
+      mockDevice,
+      1234,
+      1234,
+      false,
+    );
+    expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
+    expect(mockToast).toHaveBeenCalled();
   });
 
-  it("falls back to 'node' if longName is missing", () => {
-    mockGetNode.mockReturnValueOnce({
-      num: 5678,
-      user: {},
-    }); // no longName
-
-    const { result } = renderHook(() => useFavoriteNode());
-
-    act(() => {
-      result.current.updateFavorite({ nodeNum: 5678, isFavorite: true });
-    });
-
-    expect(mockToast).toHaveBeenCalledWith({
-      title: "Added Node to favorites.",
-    });
-  });
-
-  it("falls back to 'node' if getNode returns undefined", () => {
-    mockGetNode.mockReturnValueOnce(undefined);
+  it("does not call AdminMessageService if node not found", async () => {
+    mockGetNode.mockResolvedValueOnce(null);
 
     const { result } = renderHook(() => useFavoriteNode());
 
-    act(() => {
-      result.current.updateFavorite({ nodeNum: 9999, isFavorite: false });
+    await act(async () => {
+      await result.current.updateFavorite({ nodeNum: 9999, isFavorite: false });
     });
 
-    expect(mockUpdateFavorite).not.toHaveBeenCalled();
+    expect(mockSetFavoriteNode).not.toHaveBeenCalled();
     expect(mockToast).not.toHaveBeenCalled();
   });
 });

@@ -1,3 +1,5 @@
+import { AdminMessageService } from "@core/services/adminMessageService";
+import type { Device } from "@core/stores/deviceStore";
 import { nodeRepo } from "@db/index";
 
 export interface OutgoingMessage {
@@ -8,6 +10,7 @@ export interface OutgoingMessage {
 }
 
 export interface PipelineContext {
+  device: Device;
   deviceId: number;
   myNodeNum?: number;
 }
@@ -19,6 +22,7 @@ export type PipelineHandler = (
 
 /**
  * Pipeline handler that automatically marks nodes as favorites when sending them a DM.
+ * This sends an admin message to the device AND updates the local database.
  */
 export const autoFavoriteDMHandler: PipelineHandler = async (
   message: OutgoingMessage,
@@ -36,28 +40,20 @@ export const autoFavoriteDMHandler: PipelineHandler = async (
     return;
   }
 
-  console.log(
-    `[autoFavoriteDMHandler] Auto-favoriting node ${recipientNodeNum} for DM`,
-  );
-
   // Check if node exists and is not already favorited
   const node = await nodeRepo.getNode(context.deviceId, recipientNodeNum);
   if (!node) {
-    console.warn(
-      `[autoFavoriteDMHandler] Node ${recipientNodeNum} not found in database`,
-    );
     return;
   }
 
   // Only update if not already favorited
   if (!node.isFavorite) {
-    await nodeRepo.updateFavorite(context.deviceId, recipientNodeNum, true);
-    console.log(
-      `[autoFavoriteDMHandler] Node ${recipientNodeNum} marked as favorite`,
-    );
-  } else {
-    console.log(
-      `[autoFavoriteDMHandler] Node ${recipientNodeNum} already favorited`,
+    // Send admin message to device AND update local database
+    await AdminMessageService.setFavoriteNode(
+      context.device,
+      context.deviceId,
+      recipientNodeNum,
+      true,
     );
   }
 };
