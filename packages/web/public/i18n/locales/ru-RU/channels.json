@@ -30,7 +30,7 @@
   },
   "name": {
     "label": "Имя",
-    "description": "ЗАПРЕЩЕННЫЙ"
+    "description": "Уникальное имя канала <12 байт, оставьте пустым для значения по умолчанию"
   },
   "uplinkEnabled": {
     "label": "Выгрузка Разрешена",
@@ -48,8 +48,8 @@
       "precise": "Точная позиция",
       "metric_km23": "Около 23 километров",
       "metric_km12": "Около 12 километров",
-      "metric_km5_8": "Within 5.8 kilometers",
-      "metric_km2_9": "Within 2.9 kilometers",
+      "metric_km5_8": "В пределах 5,8 км",
+      "metric_km2_9": "В пределах 2,9 км",
       "metric_km1_5": "Около 1,5 километров",
       "metric_m700": "Около 700 метров",
       "metric_m350": "Около 350 метров",
@@ -57,11 +57,11 @@
       "metric_m90": "Около 90 метров",
       "metric_m50": "Около 50 метров",
       "imperial_mi15": "Около 15 миль",
-      "imperial_mi7_3": "Within 7.3 miles",
-      "imperial_mi3_6": "Within 3.6 miles",
-      "imperial_mi1_8": "Within 1.8 miles",
-      "imperial_mi0_9": "Within 0.9 miles",
-      "imperial_mi0_5": "Within 0.5 miles",
+      "imperial_mi7_3": "В пределах 7,3 миль",
+      "imperial_mi3_6": "В пределах 3,6 миль",
+      "imperial_mi1_8": "В пределах 1,8 миль",
+      "imperial_mi0_9": "В пределах 0,9 миль",
+      "imperial_mi0_5": "В пределах 0,5 миль",
       "imperial_mi0_2": "Около 0,2 миль",
       "imperial_ft600": "Около 600 футов",
       "imperial_ft300": "Около 300 футов",

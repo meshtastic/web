@@ -124,7 +124,7 @@
     "title": "Настройки на Mesh",
     "description": "Настройки за LoRa mesh",
     "bandwidth": {
-      "description": "Широчина на канала в kHz",
+      "description": "Широчина на канала в MHz",
       "label": "Широчина на честотната лента"
     },
     "boostedRxGain": {
