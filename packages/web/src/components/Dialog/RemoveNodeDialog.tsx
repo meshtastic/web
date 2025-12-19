@@ -1,7 +1,7 @@
 import { Label } from "@shared/components/ui/label";
 import { useDevice, useDeviceContext, useUIStore } from "@core/stores";
-import { useNodes } from "@db/hooks";
-import { nodeRepo } from "@db/index";
+import { useNodes } from "@data/hooks";
+import { nodeRepo } from "@data/index";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
 

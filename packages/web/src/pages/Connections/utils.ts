@@ -1,6 +1,6 @@
 import logger from "@core/services/logger";
-import type { Connection } from "@db/index";
-import type { ConnectionType } from "@db/repositories/ConnectionRepository";
+import type { Connection } from "@data/index";
+import type { ConnectionType } from "@data/repositories/ConnectionRepository";
 import { Bluetooth, Cable, Globe, type LucideIcon } from "lucide-react";
 
 async function tryFetch(url: string, timeoutMs: number): Promise<boolean> {

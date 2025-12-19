@@ -1,5 +1,5 @@
 import { Channel } from "@components/PageComponents/Channels/Channel";
-import { type Channel as DbChannel, useChannels } from "@app/db";
+import { type Channel as DbChannel, useChannels } from "@data/index";
 import { Button } from "@shared/components/ui/button";
 import { Spinner } from "@shared/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs";

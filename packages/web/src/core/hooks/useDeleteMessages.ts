@@ -1,6 +1,6 @@
-import { messageRepo } from "@app/db";
+import { messageRepo } from "@data/index";
 import { useDeviceContext } from "@core/hooks/useDeviceContext";
-import { DB_EVENTS, dbEvents } from "@db/events";
+import { DB_EVENTS, dbEvents } from "@data/events";
 import { useCallback } from "react";
 
 /**

@@ -25,8 +25,8 @@ import {
 } from "@core/stores";
 import { cn } from "@shared/utils/cn";
 import { sortNodes } from "@core/utils/nodeSort";
-import { useChannels, useConversations, useNodes } from "@db/hooks";
-import type { ConversationType } from "@db/types";
+import { useChannels, useConversations, useNodes } from "@data/hooks";
+import type { ConversationType } from "@data/types";
 import { ChatPanel } from "@pages/Messages/ChatPanel";
 import { useSearch } from "@tanstack/react-router";
 import { Columns, Hash, Plus, Rows, Search, Users, X } from "lucide-react";

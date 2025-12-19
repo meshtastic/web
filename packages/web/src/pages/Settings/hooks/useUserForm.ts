@@ -6,7 +6,7 @@ import { create } from "@bufbuild/protobuf";
 import { createZodResolver } from "@components/Form/createZodResolver";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";

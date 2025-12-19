@@ -1,6 +1,6 @@
-import { DB_EVENTS, dbEvents } from "@db/events";
-import { messageRepo } from "@db/index";
-import type { ConversationType } from "@db/types";
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { messageRepo } from "@data/index";
+import type { ConversationType } from "@data/types";
 import { useCallback, useEffect, useState } from "react";
 
 /**

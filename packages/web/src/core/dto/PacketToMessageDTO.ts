@@ -1,5 +1,5 @@
-import type { NewMessage } from "@db/schema";
-import type { ConversationType } from "@db/types";
+import type { NewMessage } from "@data/schema";
+import type { ConversationType } from "@data/types";
 import type { Types } from "@meshtastic/core";
 
 class PacketToMessageDTO {

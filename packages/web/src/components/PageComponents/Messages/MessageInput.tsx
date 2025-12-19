@@ -12,10 +12,10 @@ import type {
   PipelineContext,
 } from "@core/utils/messagePipelineHandlers";
 import { autoFavoriteDMHandler } from "@core/utils/messagePipelineHandlers";
-import { DB_EVENTS, dbEvents } from "@db/events";
-import { useMessageDraft } from "@db/hooks";
-import { messageRepo } from "@db/index";
-import type { NewMessage } from "@db/schema";
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { useMessageDraft } from "@data/hooks";
+import { messageRepo } from "@data/index";
+import type { NewMessage } from "@data/schema";
 import type { Types } from "@meshtastic/core";
 import type { Contact } from "@pages/Messages";
 import { Label } from "@radix-ui/react-label";

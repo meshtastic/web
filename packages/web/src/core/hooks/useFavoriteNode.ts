@@ -1,7 +1,7 @@
 import { useToast } from "@core/hooks/useToast.ts";
 import { AdminMessageService } from "@core/services/adminMessageService";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { nodeRepo } from "@db/index";
+import { nodeRepo } from "@data/index";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 

@@ -9,7 +9,7 @@ import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
 import { WelcomeSplash } from "@components/WelcomeSplash.tsx";
-import { initDatabase, packetBatcher, resetConnectionStatuses } from "@db/index";
+import { initDatabase, packetBatcher, resetConnectionStatuses } from "@data/index";
 import { RouterProvider } from "@tanstack/react-router";
 
 declare module "@tanstack/react-router" {

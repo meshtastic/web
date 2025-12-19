@@ -2,9 +2,9 @@ import logger from "../../../core/services/logger.ts";
 import { Button } from "@shared/components/ui/button";
 import { useDevice } from "@core/stores";
 import { cn } from "@shared/utils/cn";
-import { DB_EVENTS, dbEvents } from "@db/events";
-import { messageRepo } from "@db/index";
-import type { Message } from "@db/schema";
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { messageRepo } from "@data/index";
+import type { Message } from "@data/schema";
 import { RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 

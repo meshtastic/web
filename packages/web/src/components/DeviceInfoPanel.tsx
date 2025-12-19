@@ -2,7 +2,7 @@ import { Avatar } from "@shared/components/ui/avatar";
 import { Button } from "@shared/components/ui/button";
 import { Subtle } from "@shared/components/ui/typography/subtle";
 import { cn } from "@shared/utils/cn";
-import type { ConnectionStatus } from "@db/repositories/ConnectionRepository";
+import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
 import type { Protobuf } from "@meshtastic/core";
 import { useNavigate } from "@tanstack/react-router";
 import {

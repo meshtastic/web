@@ -1,4 +1,4 @@
-import type { Message } from "@db/schema";
+import type { Message } from "@data/schema";
 import { render, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -37,7 +37,7 @@ const createMockMessage = (
 const mockMarkConversationAsRead = vi.fn();
 
 // Mock database hooks
-vi.mock("@db/hooks", () => ({
+vi.mock("@data/hooks", () => ({
   useNodes: () => ({ nodeMap: new Map() }),
   useDirectMessages: () => ({ messages: [] }),
   useChannelMessages: () => ({

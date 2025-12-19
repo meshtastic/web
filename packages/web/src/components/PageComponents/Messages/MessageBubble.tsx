@@ -8,7 +8,7 @@ import {
 } from "@shared/components/ui/tooltip";
 import { cn } from "@shared/utils/cn";
 import { getAvatarColors } from "@shared/utils/color";
-import type { Message } from "@db/schema";
+import type { Message } from "@data/schema";
 import { Reply } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";

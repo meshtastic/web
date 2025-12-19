@@ -8,7 +8,7 @@ import {
   hasPos,
   toLngLat,
 } from "@core/utils/geo";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 import type { Protobuf } from "@meshtastic/core";
 import {
   ClockFadingIcon,

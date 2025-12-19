@@ -12,7 +12,7 @@ import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { TracerouteResponseDialog } from "@components/Dialog/TracerouteResponseDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 import { useDevice } from "@core/stores";
-import { useChannels } from "@db/hooks";
+import { useChannels } from "@data/hooks";
 import { toByteArray } from "base64-js";
 import { Activity, useMemo } from "react";
 

@@ -35,8 +35,8 @@ import {
 } from "@shared/components/ui/dropdown-menu";
 import { Separator } from "@shared/components/ui/separator";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useConnections } from "@db/hooks";
-import type { Connection } from "@db/index";
+import { useConnections } from "@data/hooks";
+import type { Connection } from "@data/index";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,

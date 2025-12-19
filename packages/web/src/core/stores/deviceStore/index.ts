@@ -355,7 +355,7 @@ function deviceFactory(
             case "display": {
               device.config.display = config.payloadVariant.value;
               // Persist display units to preferences for easy access across UI
-              import("@db/repositories/index.ts").then(
+              import("@data/repositories/index.ts").then(
                 ({ preferencesRepo }) => {
                   preferencesRepo.set(
                     `device:${id}:displayUnits`,
@@ -543,7 +543,7 @@ function deviceFactory(
     },
     addChannel: async (channel: Protobuf.Channel.Channel) => {
       // Channels are now stored in the database
-      const { channelRepo } = await import("@db");
+      const { channelRepo } = await import("@data/index");
       const { fromByteArray } = await import("base64-js");
 
       await channelRepo.upsertChannel({

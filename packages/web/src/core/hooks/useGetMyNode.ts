@@ -1,5 +1,5 @@
 import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 
 /**
  * Hook to get the current device's node details from the database.

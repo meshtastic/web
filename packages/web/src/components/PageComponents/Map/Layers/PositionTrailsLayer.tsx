@@ -1,5 +1,5 @@
 import { useDevice } from "@core/stores";
-import { usePositionTrails } from "@db/hooks";
+import { usePositionTrails } from "@data/hooks";
 import type { Protobuf } from "@meshtastic/core";
 import type { Feature, FeatureCollection } from "geojson";
 import { useMemo } from "react";

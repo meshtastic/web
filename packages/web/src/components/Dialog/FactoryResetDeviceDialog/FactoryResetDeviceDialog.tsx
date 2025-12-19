@@ -1,6 +1,6 @@
 import { toast } from "@core/hooks/useToast.ts";
 import { useDevice, useDeviceStore } from "@core/stores";
-import { MigrationService } from "@db";
+import { MigrationService } from "@data/index";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 

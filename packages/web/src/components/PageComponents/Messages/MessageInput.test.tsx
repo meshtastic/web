@@ -1,19 +1,19 @@
 import type { Device } from "@core/stores/deviceStore";
-import * as dbEventsModule from "@db/events";
-import * as dbIndex from "@db/index";
+import * as dbEventsModule from "@data/events";
+import * as dbIndex from "@data/index";
 import type { Contact } from "@pages/Messages";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MessageInput } from "./MessageInput.tsx";
 
 // Mock the database modules
-vi.mock("@db/index", () => ({
+vi.mock("@data/index", () => ({
   messageRepo: {
     saveMessage: vi.fn(),
   },
 }));
 
-vi.mock("@db/events", () => ({
+vi.mock("@data/events", () => ({
   dbEvents: {
     emit: vi.fn(),
   },

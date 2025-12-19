@@ -9,7 +9,7 @@ import {
   useChannelMessages,
   useDirectMessages,
   useNodes,
-} from "@db/hooks";
+} from "@data/hooks";
 import type { Contact } from "@pages/Messages/index";
 import { groupMessagesByDay, toTimestamp } from "@pages/Messages/MessageUtils";
 import { Hash } from "lucide-react";

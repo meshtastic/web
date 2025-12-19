@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@shared/components/ui/dialog";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";

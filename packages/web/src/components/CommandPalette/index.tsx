@@ -14,7 +14,7 @@ import {
   useUIStore,
 } from "@core/stores";
 import { cn } from "@shared/utils/cn";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 import { useNavigate } from "@tanstack/react-router";
 import { useCommandState } from "cmdk";
 import {

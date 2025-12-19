@@ -24,7 +24,7 @@ vi.mock("@core/hooks/useToast.ts", () => ({
   }),
 }));
 
-vi.mock("@db/index", () => ({
+vi.mock("@data/index", () => ({
   nodeRepo: {
     getNode: (deviceId: number, nodeNum: number) =>
       mockGetNode(deviceId, nodeNum),

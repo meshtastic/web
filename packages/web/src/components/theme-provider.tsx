@@ -1,4 +1,4 @@
-import { preferencesRepo } from "@db/repositories";
+import { preferencesRepo } from "@data/repositories";
 import { createContext, use, useContext, useEffect, useMemo, useState } from "react";
 
 type Theme = "dark" | "light" | "system";

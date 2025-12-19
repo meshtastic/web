@@ -10,7 +10,7 @@ import {
   updateNodeCleanupSettings,
 } from "@core/services/maintenanceService";
 import { useDeviceContext } from "@core/stores";
-import { nodeRepo } from "@db/index";
+import { nodeRepo } from "@data/index";
 import { Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

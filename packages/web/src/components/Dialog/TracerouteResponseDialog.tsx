@@ -8,9 +8,9 @@ import {
 } from "@shared/components/ui/dialog";
 import { useGetMyNode } from "@core/hooks/useGetMyNode";
 import { useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
-import { tracerouteRepo } from "@db/repositories";
-import type { TracerouteLog } from "@db/schema";
+import { useNodes } from "@data/hooks";
+import { tracerouteRepo } from "@data/repositories";
+import type { TracerouteLog } from "@data/schema";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";

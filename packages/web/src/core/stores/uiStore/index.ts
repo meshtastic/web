@@ -1,4 +1,4 @@
-import type { ConversationType } from "@db/types";
+import type { ConversationType } from "@data/types";
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 

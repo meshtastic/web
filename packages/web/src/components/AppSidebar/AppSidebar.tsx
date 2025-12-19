@@ -15,7 +15,7 @@ import {
   SidebarMenuItem,
 } from "@shared/components/ui/sidebar";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { useConversations, useNodes } from "@db/hooks";
+import { useConversations, useNodes } from "@data/hooks";
 import { useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard,

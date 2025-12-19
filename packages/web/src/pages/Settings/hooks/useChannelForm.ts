@@ -1,4 +1,4 @@
-import type { Channel as DbChannel } from "@app/db";
+import type { Channel as DbChannel } from "@data/index";
 import {
   type ChannelValidation,
   makeChannelSchema,

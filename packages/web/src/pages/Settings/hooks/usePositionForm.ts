@@ -7,7 +7,7 @@ import { usePositionFlags } from "@core/hooks/usePositionFlags";
 import { AdminMessageService } from "@core/services/adminMessageService";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 

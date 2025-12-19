@@ -24,7 +24,7 @@ import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { cn } from "@shared/utils/cn";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { toByteArray } from "base64-js";

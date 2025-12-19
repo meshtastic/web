@@ -17,7 +17,7 @@ import {
 } from "@shared/components/ui/tooltip";
 import useLang from "@core/hooks/useLang";
 import { useDevice } from "@core/stores";
-import { usePacketLogs } from "@db/hooks/usePacketLogs";
+import { usePacketLogs } from "@data/hooks/usePacketLogs";
 import { Protobuf } from "@meshtastic/core";
 import {
   ClipboardCopyIcon,

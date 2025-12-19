@@ -7,7 +7,7 @@ import { z } from "zod/v4";
 
 const mockGetChannels = vi.fn();
 const mockGetNode = vi.fn();
-vi.mock("@db/index", () => ({
+vi.mock("@data/index", () => ({
   channelRepo: {
     getChannels: (...args: unknown[]) => mockGetChannels(...args),
   },

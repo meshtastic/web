@@ -1,5 +1,5 @@
 import { useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
 

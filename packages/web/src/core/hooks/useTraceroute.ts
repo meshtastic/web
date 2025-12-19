@@ -1,7 +1,7 @@
 import logger from "../services/logger.ts";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { DB_EVENTS, dbEvents } from "@db/events";
-import { tracerouteRepo } from "@db/index";
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { tracerouteRepo } from "@data/index";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";

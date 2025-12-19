@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { useDevice } from "@core/stores";
-import { getSql } from "@db/index";
+import { getSql } from "@data/index";
 import {
   ActivityIcon,
   MapPinIcon,

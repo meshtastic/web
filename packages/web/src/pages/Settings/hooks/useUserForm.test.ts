@@ -1,6 +1,6 @@
 import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
+import { useNodes } from "@data/hooks";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useUserForm } from "./useUserForm.ts";
@@ -10,7 +10,7 @@ vi.mock("@core/stores", () => ({
   useDeviceContext: vi.fn(),
 }));
 
-vi.mock("@db/hooks", () => ({
+vi.mock("@data/hooks", () => ({
   useNodes: vi.fn(),
 }));
 

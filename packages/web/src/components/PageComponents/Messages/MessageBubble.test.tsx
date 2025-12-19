@@ -1,4 +1,4 @@
-import type { Message } from "@db/schema";
+import type { Message } from "@data/schema";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { MessageBubble } from "./MessageBubble.tsx";

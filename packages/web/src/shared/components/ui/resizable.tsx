@@ -1,5 +1,5 @@
 import { cn } from "@shared/utils/cn";
-import { usePanelSizes } from "@db/hooks";
+import { usePanelSizes } from "@data/hooks";
 import { GripVertical } from "lucide-react";
 import { useCallback, useEffectEvent, useRef } from "react";
 import {

@@ -16,7 +16,7 @@ import {
   useBrowserFeatureDetection,
 } from "@core/hooks/useBrowserFeatureDetection.ts";
 import { useToast } from "@core/hooks/useToast.ts";
-import type { ConnectionType } from "@db/repositories/ConnectionRepository";
+import type { ConnectionType } from "@data/repositories/ConnectionRepository";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import {
   AlertCircle,
