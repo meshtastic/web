@@ -46,8 +46,8 @@ import {
   ZapIcon,
 } from "lucide-react";
 import React, { Activity, lazy, Suspense } from "react";
-import { ActionItem } from "../../generic/ActionItem.tsx";
-import { ActionToggle } from "../../generic/ActionToggle.tsx";
+import { ActionItem } from "@components/generic/ActionItem";
+import { ActionToggle } from "@components/generic/ActionToggle";
 import { TraceRoute } from "@features/messages/components/TraceRoute";
 import { SectionHeader } from "./SectionHeader.tsx";
 

@@ -1,10 +1,10 @@
 import type { Result } from "neverthrow";
 import { ResultAsync } from "neverthrow";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { NodeError } from "../errors.ts";
-import { DB_EVENTS, dbEvents } from "../events.ts";
-import { nodeRepo } from "../repositories/index.ts";
-import type { Node, PositionLog, TelemetryLog } from "../schema.ts";
+import { NodeError } from "@data/errors";
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { nodeRepo } from "@data/repositories";
+import type { Node, PositionLog, TelemetryLog } from "@data/schema";
 
 /**
  * Hook to fetch all nodes for a device

@@ -1,6 +1,6 @@
 import { cn } from "@shared/utils/cn";
 import { NodeAvatar } from "@components/NodeAvatar";
-import type { PxOffset } from "@components/PageComponents/Map/cluster.ts";
+import type { PxOffset } from "../cluster.ts";
 import {
   Tooltip,
   TooltipArrow,

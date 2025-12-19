@@ -2,7 +2,7 @@ import { FactoryResetConfigDialog } from "@components/Dialog/FactoryResetConfigD
 import { FactoryResetDeviceDialog } from "@components/Dialog/FactoryResetDeviceDialog/FactoryResetDeviceDialog";
 import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
-import { NodeDetailsDrawer } from "@components/Dialog/NodeDetailsDrawer";
+import { NodeDetailsDrawer } from "@features/nodes/components/NodeDetailsDrawer";
 import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";

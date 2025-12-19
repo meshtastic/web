@@ -1,4 +1,4 @@
-import type { PxOffset } from "@components/PageComponents/Map/cluster.ts";
+import type { PxOffset } from "../cluster.ts";
 import type { WaypointWithMetadata } from "@core/stores";
 import { memo } from "react";
 import { Popup } from "react-map-gl/maplibre";

@@ -29,7 +29,7 @@ export {
   useDirectMessages,
   usePendingMessages,
 } from "@features/messages/hooks/useMessages";
-// Node hooks
+// Node hooks - re-exported from features/nodes for backwards compatibility
 export {
   useFavoriteNodes,
   useNode,
@@ -38,7 +38,7 @@ export {
   usePositionTrails,
   useRecentNodes,
   useTelemetryHistory,
-} from "./useNodes.ts";
+} from "@features/nodes/hooks/useNodes";
 // Packet log hooks
 export { invalidatePacketLogsCache, usePacketLogs } from "./usePacketLogs.ts";
 // Preferences hooks

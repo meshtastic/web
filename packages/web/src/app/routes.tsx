@@ -3,7 +3,6 @@ import { ErrorPage } from "@shared/components/ui/error-page";
 import { Spinner } from "@shared/components/ui/spinner";
 import { useDeviceStore } from "@core/stores";
 import { Connections } from "@features/connections";
-import MapPage from "@pages/Map/index.tsx";
 import {
   createRootRoute,
   createRoute,
@@ -12,16 +11,25 @@ import {
 } from "@tanstack/react-router";
 import { Activity, lazy, Suspense } from "react";
 import { z } from "zod/v4";
-import { App } from "./App.tsx";
+import { App } from "./App";
 
 // Lazy loaded routes
-const NodesPage = lazy(() => import("@pages/Nodes/index.tsx"));
+const MapPage = lazy(() =>
+  import("@features/map/pages/MapPage").then((m) => ({
+    default: m.MapPage,
+  })),
+);
+const NodesPage = lazy(() =>
+  import("@features/nodes/pages/NodesPage").then((m) => ({
+    default: m.NodesPage,
+  })),
+);
 const SettingsPage = lazy(() =>
   import("@features/settings/pages/SettingsPage").then((m) => ({
     default: m.default,
   })),
 );
-const StatisticsPage = lazy(() => import("@app/pages/Statistics/index.tsx"));
+const StatisticsPage = lazy(() => import("@pages/Statistics/index.tsx"));
 const RadioConfig = lazy(() =>
   import("@features/settings/pages/RadioConfig").then((m) => ({
     default: m.RadioConfig,

@@ -6,7 +6,7 @@ import {
   getSignalColorForGrade,
   getSignalGrade,
   getSnrLimit,
-} from "@core/utils/signalColor";
+} from "@features/nodes/utils/signalColor";
 import { type SignalLog, useSignalLogs } from "@data/hooks/useSignalLogs";
 import { Protobuf } from "@meshtastic/core";
 import { ArrowLeftIcon, ChevronLeftIcon, InfoIcon } from "lucide-react";

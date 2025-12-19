@@ -1,7 +1,7 @@
-import { NodeMarker } from "@components/PageComponents/Map/Markers/NodeMarker.tsx";
-import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
-import { PopupWrapper } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
-import { WaypointDetail } from "@components/PageComponents/Map/Popups/WaypointDetail.tsx";
+import { NodeMarker } from "../Markers/NodeMarker.tsx";
+import type { PopupState } from "../Popups/PopupWrapper.tsx";
+import { PopupWrapper } from "../Popups/PopupWrapper.tsx";
+import { WaypointDetail } from "../Popups/WaypointDetail.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting";
 import { useDevice, type WaypointWithMetadata } from "@core/stores";
 import type { Protobuf } from "@meshtastic/core";

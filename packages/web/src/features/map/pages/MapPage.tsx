@@ -2,24 +2,24 @@ import {
   defaultVisibilityState,
   MapLayerTool,
   type VisibilityState,
-} from "@components/PageComponents/Map/Tools/MapLayerTool.tsx";
+} from "../components/Tools/MapLayerTool";
 import { create } from "@bufbuild/protobuf";
-import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
+import { FilterControl } from "@components/generic/Filter/FilterControl";
 import {
   type FilterState,
   useFilterNode,
-} from "@components/generic/Filter/useFilterNode.ts";
-import { BaseMap } from "@components/Map.tsx";
-import { NodesLayer } from "@components/PageComponents/Map/Layers/NodesLayer.tsx";
-import { PositionTrailsLayer } from "@components/PageComponents/Map/Layers/PositionTrailsLayer.tsx";
-import { PrecisionLayer } from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
+} from "@components/generic/Filter/useFilterNode";
+import { BaseMap } from "../components/Map";
+import { NodesLayer } from "../components/Layers/NodesLayer";
+import { PositionTrailsLayer } from "../components/Layers/PositionTrailsLayer";
+import { PrecisionLayer } from "../components/Layers/PrecisionLayer";
 import {
   SNRLayer,
   SNRTooltip,
   type SNRTooltipProps,
-} from "@components/PageComponents/Map/Layers/SNRLayer.tsx";
-import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
-import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
+} from "../components/Layers/SNRLayer";
+import { WaypointLayer } from "../components/Layers/WaypointLayer";
+import type { PopupState } from "../components/Popups/PopupWrapper";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { cn } from "@shared/utils/cn";

@@ -1,4 +1,4 @@
-import { BaseMap } from "@components/Map";
+import { BaseMap } from "@features/map/components/Map";
 import { useDevice } from "@core/stores";
 import { cn } from "@shared/utils/cn";
 import { useDevicePreference } from "@data/hooks";

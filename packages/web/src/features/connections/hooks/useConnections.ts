@@ -1,6 +1,6 @@
 import type { NewConnectionInput } from "../components/AddConnectionDialog/AddConnectionDialog";
 import { testHttpReachable } from "../utils";
-import { router } from "@app/routes";
+import { router } from "@app/app/routes";
 import logger from "@core/services/logger";
 import { useDeviceStore } from "@core/stores";
 import { randId } from "@shared/utils/randId";

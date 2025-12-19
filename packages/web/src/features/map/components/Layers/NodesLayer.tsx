@@ -2,15 +2,15 @@ import {
   fanOutOffsetsPx,
   groupNodesByIdenticalCoords,
   type PxOffset,
-} from "@components/PageComponents/Map/cluster.ts";
+} from "../cluster.ts";
 import {
   generatePrecisionCircles,
   SourcePrecisionCircles,
-} from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
-import { NodeMarker } from "@components/PageComponents/Map/Markers/NodeMarker.tsx";
-import { StackBadge } from "@components/PageComponents/Map/Markers/StackBadge.tsx";
-import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
-import { PopupWrapper } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
+} from "../Layers/PrecisionLayer.tsx";
+import { NodeMarker } from "../Markers/NodeMarker.tsx";
+import { StackBadge } from "../Markers/StackBadge.tsx";
+import type { PopupState } from "../Popups/PopupWrapper.tsx";
+import { PopupWrapper } from "../Popups/PopupWrapper.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/core";

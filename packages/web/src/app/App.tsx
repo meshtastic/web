@@ -1,5 +1,5 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
-import AppLayout from "@components/AppLayout";
+import AppLayout from "./layouts/AppLayout";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ThemeProvider } from "@components/theme-provider";

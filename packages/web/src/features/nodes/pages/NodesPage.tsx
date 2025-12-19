@@ -44,7 +44,7 @@ import {
   useUIStore,
 } from "@core/stores";
 import { cn } from "@shared/utils/cn";
-import { sortNodes } from "@core/utils/nodeSort.ts";
+import { sortNodes } from "../utils/nodeSort";
 import { useNodes } from "@data/hooks";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";

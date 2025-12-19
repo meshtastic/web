@@ -1,7 +1,7 @@
 import { Mono } from "@shared/components/generic/Mono";
 import { cn } from "@shared/utils/cn";
-import { getSignalColor } from "@app/core/utils/signalColor";
-import type { VisibilityState } from "@components/PageComponents/Map/Tools/MapLayerTool";
+import { getSignalColor } from "@features/nodes/utils/signalColor";
+import type { VisibilityState } from "../Tools/MapLayerTool";
 import { useDevice } from "@core/stores";
 import {
   distanceMeters,

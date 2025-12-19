@@ -24,7 +24,7 @@ import {
   useUIStore,
 } from "@core/stores";
 import { cn } from "@shared/utils/cn";
-import { sortNodes } from "@core/utils/nodeSort";
+import { sortNodes } from "@features/nodes/utils/nodeSort";
 import { useChannels, useConversations, useNodes } from "@data/hooks";
 import type { ConversationType } from "@data/types";
 import { ChatPanel } from "../components/ChatPanel";

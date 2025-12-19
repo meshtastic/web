@@ -5,7 +5,7 @@ import {
   getSnrLimit,
   type SignalGrade,
   type SignalGradeResult,
-} from "@core/utils/signalColor";
+} from "@features/nodes/utils/signalColor";
 import { Protobuf } from "@meshtastic/core";
 
 interface SignalIndicatorProps {
