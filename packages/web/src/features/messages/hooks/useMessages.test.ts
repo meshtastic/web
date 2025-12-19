@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DB_EVENTS, dbEvents } from "../events.ts";
-import { messageRepo } from "../repositories/index.ts";
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { messageRepo } from "@data/repositories";
 import {
   useAllMessages,
   useBroadcastMessages,
@@ -11,7 +11,7 @@ import {
 } from "./useMessages.ts";
 
 // Mock dependencies
-vi.mock("../repositories", () => ({
+vi.mock("@data/repositories", () => ({
   messageRepo: {
     getDirectMessages: vi.fn(),
     getBroadcastMessages: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock("../repositories", () => ({
   },
 }));
 
-vi.mock("../events", () => ({
+vi.mock("@data/events", () => ({
   dbEvents: {
     subscribe: vi.fn(),
   },

@@ -48,7 +48,7 @@ import {
 import React, { Activity, lazy, Suspense } from "react";
 import { ActionItem } from "../../generic/ActionItem.tsx";
 import { ActionToggle } from "../../generic/ActionToggle.tsx";
-import { TraceRoute } from "../../PageComponents/Messages/TraceRoute.tsx";
+import { TraceRoute } from "@features/messages/components/TraceRoute";
 import { SectionHeader } from "./SectionHeader.tsx";
 
 const MiniMap = lazy(() =>

@@ -1,11 +1,11 @@
 import type { Result } from "neverthrow";
 import { ResultAsync } from "neverthrow";
 import { useCallback, useEffect, useState } from "react";
-import { MessageError } from "../errors.ts";
-import { DB_EVENTS, dbEvents } from "../events.ts";
-import { messageRepo } from "../repositories/index.ts";
-import type { Message } from "../schema.ts";
-import type { ConversationType } from "../types.ts";
+import { MessageError } from "@data/errors";
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { messageRepo } from "@data/repositories";
+import type { Message } from "@data/schema";
+import type { ConversationType } from "@data/types";
 
 /**
  * Hook to fetch direct messages between two nodes

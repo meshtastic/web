@@ -1,4 +1,4 @@
-import logger from "../../../core/services/logger.ts";
+import logger from "@core/services/logger";
 import { Button } from "@shared/components/ui/button";
 import { useDevice } from "@core/stores";
 import { cn } from "@shared/utils/cn";

@@ -1,4 +1,4 @@
-import MessagesPage from "@app/pages/Messages/index.tsx";
+import { MessagesPage } from "@features/messages";
 import { ErrorPage } from "@shared/components/ui/error-page";
 import { Spinner } from "@shared/components/ui/spinner";
 import { useDeviceStore } from "@core/stores";

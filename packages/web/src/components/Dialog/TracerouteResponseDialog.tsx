@@ -15,7 +15,7 @@ import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TraceRoute } from "../PageComponents/Messages/TraceRoute.tsx";
+import { TraceRoute } from "@features/messages/components/TraceRoute";
 
 export const TracerouteResponseDialog = () => {
   const { t } = useTranslation("dialog");

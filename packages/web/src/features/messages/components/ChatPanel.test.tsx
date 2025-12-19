@@ -63,13 +63,13 @@ vi.mock("react-i18next", () => ({
 }));
 
 // Mock components to simplify rendering
-vi.mock("@components/PageComponents/Messages/MessageBubble", () => ({
+vi.mock("./MessageBubble", () => ({
   MessageBubble: ({ message }: { message: Message }) => (
     <div data-testid={`message-${message.id}`}>{message.message}</div>
   ),
 }));
 
-vi.mock("@components/PageComponents/Messages/MessageInput", () => ({
+vi.mock("./MessageInput", () => ({
   MessageInput: () => <div data-testid="message-input">Input</div>,
 }));
 

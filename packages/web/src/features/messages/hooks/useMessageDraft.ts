@@ -1,7 +1,7 @@
 import { useDebounce } from "@shared/hooks/useDebounce";
 import { useCallback, useEffect, useState } from "react";
-import { messageRepo } from "../repositories/index.ts";
-import type { ConversationType } from "../types.ts";
+import { messageRepo } from "@data/repositories";
+import type { ConversationType } from "@data/types";
 
 /**
  * Hook to manage message drafts for a conversation

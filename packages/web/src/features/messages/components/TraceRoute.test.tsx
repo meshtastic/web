@@ -1,4 +1,4 @@
-import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
+import { TraceRoute } from "./TraceRoute";
 import { useDeviceContext } from "@core/stores";
 import { useNodes } from "@data/hooks";
 import type { Node } from "@data/schema";

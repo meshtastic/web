@@ -20,16 +20,15 @@ export {
   invalidateDevicePreferenceCache,
   useDevicePreference,
 } from "./useDevicePreference.ts";
-// Message draft hook
-export { useMessageDraft } from "./useMessageDraft.ts";
-// Message hooks
+// Message hooks - re-exported from features/messages for backwards compatibility
+export { useMessageDraft } from "@features/messages/hooks/useMessageDraft";
 export {
   useAllMessages,
   useChannelMessages,
   useConversations,
   useDirectMessages,
   usePendingMessages,
-} from "./useMessages.ts";
+} from "@features/messages/hooks/useMessages";
 // Node hooks
 export {
   useFavoriteNodes,
@@ -44,9 +43,9 @@ export {
 export { invalidatePacketLogsCache, usePacketLogs } from "./usePacketLogs.ts";
 // Preferences hooks
 export { usePanelSizes, usePreference } from "./usePreferences.ts";
-// Unread count hooks
+// Unread count hooks - re-exported from features/messages for backwards compatibility
 export {
   markConversationAsRead,
   useUnreadCountBroadcast,
   useUnreadCountDirect,
-} from "./useUnreadCount.ts";
+} from "@features/messages/hooks/useUnreadCount";

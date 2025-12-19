@@ -1,7 +1,7 @@
 import { OnlineIndicator } from "@shared/components/generic/OnlineIndicator";
 import { NodeAvatar } from "@components/NodeAvatar";
-import { MessageBubble } from "@components/PageComponents/Messages/MessageBubble";
-import { MessageInput } from "@components/PageComponents/Messages/MessageInput";
+import { MessageBubble } from "./MessageBubble";
+import { MessageInput } from "./MessageInput";
 import { TooltipProvider } from "@shared/components/ui/tooltip";
 import type { Device } from "@core/stores";
 import {
@@ -11,7 +11,7 @@ import {
   useNodes,
 } from "@data/hooks";
 import type { Contact } from "@pages/Messages/index";
-import { groupMessagesByDay, toTimestamp } from "@pages/Messages/MessageUtils";
+import { groupMessagesByDay, toTimestamp } from "./MessageUtils";
 import { Hash } from "lucide-react";
 import { Fragment, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
