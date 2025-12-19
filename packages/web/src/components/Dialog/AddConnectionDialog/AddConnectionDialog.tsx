@@ -1,16 +1,16 @@
 import { SupportBadge } from "@app/components/Badge/SupportedBadge.tsx";
-import { Link } from "@app/components/ui/link.tsx";
+import { Link } from "@shared/components/ui/link.tsx";
 import { testHttpReachable } from "@app/pages/Connections/utils";
-import { Button } from "@components/ui/button.tsx";
-import { Input } from "@components/ui/input.tsx";
-import { Label } from "@components/ui/label.tsx";
-import { Switch } from "@components/ui/switch.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
+import { Input } from "@shared/components/ui/input.tsx";
+import { Label } from "@shared/components/ui/label.tsx";
+import { Switch } from "@shared/components/ui/switch.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/ui/tabs.tsx";
+} from "@shared/components/ui/tabs.tsx";
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,

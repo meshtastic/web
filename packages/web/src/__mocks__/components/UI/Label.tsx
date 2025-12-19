@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-vi.mock("@components/ui/label.tsx", () => ({
+vi.mock("@shared/components/ui/label.tsx", () => ({
   Label: ({
     children,
     htmlFor,

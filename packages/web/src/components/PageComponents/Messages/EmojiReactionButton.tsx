@@ -3,13 +3,13 @@ import {
   EmojiPickerContent,
   EmojiPickerFooter,
   EmojiPickerSearch,
-} from "@components/ui/emoji-picker";
+} from "@shared/components/ui/emoji-picker";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@components/ui/popover";
-import { cn } from "@core/utils/cn";
+} from "@shared/components/ui/popover";
+import { cn } from "@shared/utils/cn";
 import type { Emoji } from "frimousse";
 import { Smile } from "lucide-react";
 import { forwardRef, useState } from "react";

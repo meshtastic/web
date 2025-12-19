@@ -1,6 +1,6 @@
 import { ImportConfigDialog } from "@components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
-import { Button } from "@components/ui/button";
-import { Label } from "@components/ui/label";
+import { Button } from "@shared/components/ui/button";
+import { Label } from "@shared/components/ui/label";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
   type ParsedConfigBackupField,

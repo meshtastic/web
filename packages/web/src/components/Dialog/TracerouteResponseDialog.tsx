@@ -5,7 +5,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@components/ui/dialog.tsx";
+} from "@shared/components/ui/dialog.tsx";
 import { useGetMyNode } from "@core/hooks/useGetMyNode";
 import { useDeviceContext } from "@core/stores";
 import { useNodes } from "@db/hooks";

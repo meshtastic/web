@@ -1,4 +1,4 @@
-import { Separator } from "@components/ui/separator";
+import { Separator } from "@shared/components/ui/separator";
 import type { Message } from "@db/schema";
 
 export type DayGroup = { dayKey: number; label: string; items: Message[] };

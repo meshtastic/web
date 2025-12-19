@@ -1,4 +1,4 @@
-import { Button } from "@components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
 import {
   Dialog,
   DialogClose,
@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/ui/dialog.tsx";
+} from "@shared/components/ui/dialog.tsx";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { useNodes } from "@db/hooks";
 import { fromByteArray } from "base64-js";

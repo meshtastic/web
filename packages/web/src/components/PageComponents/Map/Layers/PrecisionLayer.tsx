@@ -1,4 +1,4 @@
-import { getColorFromNodeNum, isLightColor } from "@app/core/utils/color";
+import { getColorFromNodeNum, isLightColor } from "@shared/utils/color";
 import { precisionBitsToMeters, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { circle } from "@turf/turf";

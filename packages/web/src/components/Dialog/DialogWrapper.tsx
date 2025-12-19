@@ -1,4 +1,4 @@
-import { Button } from "@components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
 import {
   Dialog,
   DialogClose,
@@ -7,8 +7,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/ui/dialog.tsx";
-import { Separator } from "@components/ui/separator.tsx";
+} from "@shared/components/ui/dialog.tsx";
+import { Separator } from "@shared/components/ui/separator.tsx";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 

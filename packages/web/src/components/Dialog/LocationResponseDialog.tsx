@@ -5,7 +5,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@components/ui/Dialog.tsx";
+} from "@shared/components/ui/dialog";
 import { useDeviceContext } from "@core/stores";
 import { useNodes } from "@db/hooks";
 import type { Protobuf, Types } from "@meshtastic/core";

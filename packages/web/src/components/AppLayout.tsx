@@ -1,12 +1,12 @@
 import { AppSidebar } from "@components/AppSidebar/AppSidebar";
-import { Separator } from "@components/ui/separator";
-import { SidebarInset, SidebarTrigger } from "@components/ui/sidebar";
+import { Separator } from "@shared/components/ui/separator";
+import { SidebarInset, SidebarTrigger } from "@shared/components/ui/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/ui/tooltip";
+} from "@shared/components/ui/tooltip";
 import type React from "react";
 import { useTranslation } from "react-i18next";
 

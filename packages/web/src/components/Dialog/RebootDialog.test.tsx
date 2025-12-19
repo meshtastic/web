@@ -27,8 +27,8 @@ vi.mock("@core/stores", () => ({
   }),
 }));
 
-vi.mock("@components/ui/button.tsx", async () => {
-  const actual = await vi.importActual("@components/ui/button.tsx");
+vi.mock("@shared/components/ui/button.tsx", async () => {
+  const actual = await vi.importActual("@shared/components/ui/button.tsx");
   return {
     ...actual,
     Button: (
@@ -39,8 +39,8 @@ vi.mock("@components/ui/button.tsx", async () => {
   };
 });
 
-vi.mock("@components/ui/input.tsx", async () => {
-  const actual = await vi.importActual("@components/ui/input.tsx");
+vi.mock("@shared/components/ui/input.tsx", async () => {
+  const actual = await vi.importActual("@shared/components/ui/input.tsx");
   return {
     ...actual,
     Input: (
@@ -51,7 +51,7 @@ vi.mock("@components/ui/input.tsx", async () => {
   };
 });
 
-vi.mock("@components/ui/dialog.tsx", () => {
+vi.mock("@shared/components/ui/dialog.tsx", () => {
   return {
     Dialog: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     DialogContent: ({ children }: { children: ReactNode }) => (

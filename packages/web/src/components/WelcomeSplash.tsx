@@ -1,4 +1,4 @@
-import { Button } from "@components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
 import { useEffect, useState } from "react";
 import { MeshNetwork } from "./MeshNetwork.tsx";
 

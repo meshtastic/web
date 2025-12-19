@@ -16,13 +16,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@components/ui/card";
+} from "@shared/components/ui/card";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/ui/tabs.tsx";
+} from "@shared/components/ui/tabs.tsx";
 import { useDevice, type ValidModuleConfigType } from "@core/stores";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";

@@ -1,8 +1,8 @@
 import { Channel } from "@app/components/PageComponents/Channels/Channel";
 import { type Channel as DbChannel, useChannels } from "@app/db";
-import { Button } from "@components/ui/button";
-import { Spinner } from "@components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
+import { Button } from "@shared/components/ui/button";
+import { Spinner } from "@shared/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs";
 import { useDevice, useDeviceContext } from "@core/stores";
 import i18next from "i18next";
 import { QrCodeIcon, UploadIcon } from "lucide-react";

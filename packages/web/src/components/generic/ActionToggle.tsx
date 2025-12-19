@@ -1,5 +1,5 @@
-import { Switch } from "@components/ui/switch";
-import { cn } from "@core/utils/cn";
+import { Switch } from "@shared/components/ui/switch";
+import { cn } from "@shared/utils/cn";
 
 export const ActionToggle = ({
   icon: Icon,

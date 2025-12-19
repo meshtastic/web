@@ -1,7 +1,7 @@
-import { Link } from "@app/components/ui/link";
-import { ONLINE_THRESHOLD_SECONDS } from "@components/generic/OnlineIndicator";
+import { Link } from "@shared/components/ui/link";
+import { ONLINE_THRESHOLD_SECONDS } from "@shared/components/generic/OnlineIndicator";
 import { NodeAvatar } from "@components/NodeAvatar";
-import { Badge } from "@components/ui/badge";
+import { Badge } from "@shared/components/ui/badge";
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@components/ui/sidebar.tsx";
+} from "@shared/components/ui/sidebar.tsx";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { useConversations, useNodes } from "@db/hooks";
 import { useLocation } from "@tanstack/react-router";

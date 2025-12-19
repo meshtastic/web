@@ -1,8 +1,8 @@
-import { Badge } from "@components/ui/badge";
-import { Button } from "@components/ui/button";
-import { Card } from "@components/ui/card";
-import { ScrollArea } from "@components/ui/scroll-area";
-import { cn } from "@core/utils/cn";
+import { Badge } from "@shared/components/ui/badge";
+import { Button } from "@shared/components/ui/button";
+import { Card } from "@shared/components/ui/card";
+import { ScrollArea } from "@shared/components/ui/scroll-area";
+import { cn } from "@shared/utils/cn";
 
 interface NavigationItem {
   key: string;

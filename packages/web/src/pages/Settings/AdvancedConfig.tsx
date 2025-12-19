@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@components/ui/card";
+} from "@shared/components/ui/card";
 import { Activity } from "react";
 import { useTranslation } from "react-i18next";
 

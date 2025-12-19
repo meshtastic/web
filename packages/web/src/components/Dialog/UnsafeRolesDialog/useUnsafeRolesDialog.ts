@@ -1,5 +1,5 @@
 import { useDevice } from "@core/stores";
-import { eventBus } from "@core/utils/eventBus.ts";
+import { eventBus } from "@shared/utils/eventBus.ts";
 import { useCallback } from "react";
 
 export const UNSAFE_ROLES = ["ROUTER", "ROUTER_LATE", "REPEATER"];

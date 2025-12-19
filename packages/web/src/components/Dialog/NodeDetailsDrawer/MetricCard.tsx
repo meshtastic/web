@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@app/components/ui/card";
+import { Card, CardContent } from "@shared/components/ui/card";
 
 export const MetricCard = ({
   icon: Icon,

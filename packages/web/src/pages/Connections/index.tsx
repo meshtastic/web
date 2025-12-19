@@ -1,5 +1,5 @@
 import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
-import { TimeAgo } from "@app/components/generic/TimeAgo";
+import { TimeAgo } from "@shared/components/generic/TimeAgo";
 import LanguageSwitcher from "@app/components/LanguageSwitcher";
 import { ConfigProgressIndicator } from "@app/components/PageComponents/Connections/ConfigProgressIndicator";
 import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
@@ -17,23 +17,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@components/ui/alert-dialog.tsx";
-import { Badge } from "@components/ui/badge.tsx";
-import { Button } from "@components/ui/button.tsx";
+} from "@shared/components/ui/alert-dialog.tsx";
+import { Badge } from "@shared/components/ui/badge.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@components/ui/card.tsx";
+} from "@shared/components/ui/card.tsx";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@components/ui/dropdown-menu.tsx";
-import { Separator } from "@components/ui/separator.tsx";
+} from "@shared/components/ui/dropdown-menu.tsx";
+import { Separator } from "@shared/components/ui/separator.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useConnections } from "@db/hooks";
 import type { Connection } from "@db/index";

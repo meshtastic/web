@@ -5,9 +5,9 @@ import {
   TooltipArrow,
   TooltipContent,
   TooltipTrigger,
-} from "@components/ui/tooltip";
-import { cn } from "@core/utils/cn";
-import { getAvatarColors } from "@core/utils/color";
+} from "@shared/components/ui/tooltip";
+import { cn } from "@shared/utils/cn";
+import { getAvatarColors } from "@shared/utils/color";
 import type { Message } from "@db/schema";
 import { Reply } from "lucide-react";
 import { memo, useMemo } from "react";

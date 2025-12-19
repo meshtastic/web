@@ -1,4 +1,4 @@
-import { cn } from "@app/core/utils/cn";
+import { cn } from "@shared/utils/cn";
 import { NodeAvatar } from "@components/NodeAvatar";
 import type { PxOffset } from "@components/PageComponents/Map/cluster.ts";
 import {
@@ -8,7 +8,7 @@ import {
   TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/ui/tooltip.tsx";
+} from "@shared/components/ui/tooltip.tsx";
 import { memo } from "react";
 import { Marker } from "react-map-gl/maplibre";
 

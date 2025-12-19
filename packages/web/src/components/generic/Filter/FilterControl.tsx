@@ -5,17 +5,17 @@ import {
   FilterToggle,
 } from "@components/generic/Filter/FilterComponents.tsx";
 import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { Accordion } from "@components/ui/accordion.tsx";
-import { Button } from "@components/ui/button.tsx";
-import { Input } from "@components/ui/input.tsx";
+import { TimeAgo } from "@shared/components/generic/TimeAgo.tsx";
+import { Accordion } from "@shared/components/ui/accordion.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
+import { Input } from "@shared/components/ui/input.tsx";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@components/ui/popover.tsx";
-import { cn } from "@core/utils/cn.ts";
-import { debounce } from "@core/utils/debounce.ts";
+} from "@shared/components/ui/popover.tsx";
+import { cn } from "@shared/utils/cn.ts";
+import { debounce } from "@shared/utils/debounce.ts";
 import { Protobuf } from "@meshtastic/core";
 import { FunnelIcon } from "lucide-react";
 import {

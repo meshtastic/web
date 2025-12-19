@@ -1,4 +1,4 @@
-import { Button } from "@components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
 import {
   Dialog,
   DialogClose,
@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/ui/dialog.tsx";
+} from "@shared/components/ui/dialog.tsx";
 import { useTranslation } from "react-i18next";
 
 export interface PkiRegenerateDialogProps {

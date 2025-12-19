@@ -73,13 +73,13 @@ vi.mock("@components/PageComponents/Messages/MessageInput", () => ({
   MessageInput: () => <div data-testid="message-input">Input</div>,
 }));
 
-vi.mock("@components/ui/tooltip", () => ({
+vi.mock("@shared/components/ui/tooltip", () => ({
   TooltipProvider: ({ children }: { children: React.ReactNode }) => (
     <>{children}</>
   ),
 }));
 
-vi.mock("@components/generic/OnlineIndicator", () => ({
+vi.mock("@shared/components/generic/OnlineIndicator", () => ({
   OnlineIndicator: () => null,
 }));
 

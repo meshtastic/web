@@ -1,26 +1,26 @@
-import { Mono } from "@components/generic/Mono";
-import { TimeAgo } from "@components/generic/TimeAgo";
-import { Badge } from "@components/ui/badge";
-import { Button } from "@components/ui/button";
-import { Card, CardContent } from "@components/ui/card";
-import { CircularProgress } from "@components/ui/circular-progress";
-import { Input } from "@components/ui/input";
-import { ScrollArea } from "@components/ui/scroll-area";
-import { Separator } from "@components/ui/separator";
+import { Mono } from "@shared/components/generic/Mono";
+import { TimeAgo } from "@shared/components/generic/TimeAgo";
+import { Badge } from "@shared/components/ui/badge";
+import { Button } from "@shared/components/ui/button";
+import { Card, CardContent } from "@shared/components/ui/card";
+import { CircularProgress } from "@shared/components/ui/circular-progress";
+import { Input } from "@shared/components/ui/input";
+import { ScrollArea } from "@shared/components/ui/scroll-area";
+import { Separator } from "@shared/components/ui/separator";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@components/ui/sheet";
-import { Skeleton } from "@components/ui/skeleton";
+} from "@shared/components/ui/sheet";
+import { Skeleton } from "@shared/components/ui/skeleton";
 import { useFavoriteNode } from "@core/hooks/useFavoriteNode";
 import { useGetMyNode } from "@core/hooks/useGetMyNode";
 import { useIgnoreNode } from "@core/hooks/useIgnoreNode";
 import useLang from "@core/hooks/useLang";
 import { useTraceroute } from "@core/hooks/useTraceroute";
 import { useDevice, useDeviceContext, useUIStore } from "@core/stores";
-import { isDefined } from "@core/utils/typeGuards";
+import { isDefined } from "@shared/utils/typeGuards";
 import { useNodes } from "@db/hooks";
 import { nodeRepo } from "@db/repositories";
 import { Protobuf } from "@meshtastic/core";

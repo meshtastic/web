@@ -1,8 +1,8 @@
-import { OnlineIndicator } from "@components/generic/OnlineIndicator";
+import { OnlineIndicator } from "@shared/components/generic/OnlineIndicator";
 import { NodeAvatar } from "@components/NodeAvatar";
 import { MessageBubble } from "@components/PageComponents/Messages/MessageBubble";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput";
-import { TooltipProvider } from "@components/ui/tooltip";
+import { TooltipProvider } from "@shared/components/ui/tooltip";
 import type { Device } from "@core/stores";
 import {
   markConversationAsRead,

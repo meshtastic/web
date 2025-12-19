@@ -2,7 +2,7 @@ import {
   UNSAFE_ROLES,
   useUnsafeRolesDialog,
 } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
-import { eventBus } from "@core/utils/eventBus.ts";
+import { eventBus } from "@shared/utils/eventBus.ts";
 import { renderHook } from "@testing-library/react";
 import {
   afterEach,
@@ -24,7 +24,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   };
 });
 
-vi.mock("@core/utils/eventBus", () => ({
+vi.mock("@shared/utils/eventBus", () => ({
   eventBus: {
     on: vi.fn(),
     off: vi.fn(),

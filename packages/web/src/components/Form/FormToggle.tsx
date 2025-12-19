@@ -2,8 +2,8 @@ import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "@components/Form/FormTypes";
-import { Switch } from "@components/ui/switch.tsx";
-import { cn } from "@core/utils/cn.ts";
+import { Switch } from "@shared/components/ui/switch.tsx";
+import { cn } from "@shared/utils/cn.ts";
 import { Controller, type FieldValues } from "react-hook-form";
 
 export interface ToggleFieldProps<T> extends BaseFormBuilderProps<T> {

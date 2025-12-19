@@ -7,18 +7,18 @@ import {
   type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
-import { Mono } from "@components/generic/Mono.tsx";
-import { SignalIndicator } from "@components/generic/SignalIndicator.tsx";
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { Badge } from "@components/ui/badge.tsx";
-import { Button } from "@components/ui/button.tsx";
+import { Mono } from "@shared/components/generic/Mono.tsx";
+import { SignalIndicator } from "@shared/components/generic/SignalIndicator.tsx";
+import { TimeAgo } from "@shared/components/generic/TimeAgo.tsx";
+import { Badge } from "@shared/components/ui/badge.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@components/ui/card.tsx";
+} from "@shared/components/ui/card.tsx";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -26,8 +26,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@components/ui/dropdown-menu.tsx";
-import { Input } from "@components/ui/input.tsx";
+} from "@shared/components/ui/dropdown-menu.tsx";
+import { Input } from "@shared/components/ui/input.tsx";
 import {
   Table,
   TableBody,
@@ -35,7 +35,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@components/ui/table.tsx";
+} from "@shared/components/ui/table.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import {
   type NodeColumnKey,
@@ -43,7 +43,7 @@ import {
   useDeviceContext,
   useUIStore,
 } from "@core/stores";
-import { cn } from "@core/utils/cn.ts";
+import { cn } from "@shared/utils/cn.ts";
 import { sortNodes } from "@core/utils/nodeSort.ts";
 import { useNodes } from "@db/hooks";
 import { Protobuf, type Types } from "@meshtastic/core";

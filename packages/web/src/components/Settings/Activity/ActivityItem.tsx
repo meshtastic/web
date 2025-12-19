@@ -1,5 +1,5 @@
 import type { ConfigChangeKey } from "@components/Settings/types.ts";
-import { Badge } from "@components/ui/badge";
+import { Badge } from "@shared/components/ui/badge";
 import { Hash, Layers, RadioTower } from "lucide-react";
 import type { ActivityItem as ActivityItemType } from "./types.ts";
 import { formatRelativeTime } from "./utils.ts";

@@ -1,11 +1,11 @@
-import { Button } from "@components/ui/button";
-import { Input } from "@components/ui/input";
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/ui/tooltip";
+} from "@shared/components/ui/tooltip";
 import type { Device } from "@core/stores/deviceStore";
 import type {
   OutgoingMessage,

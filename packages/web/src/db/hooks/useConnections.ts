@@ -3,7 +3,7 @@ import { testHttpReachable } from "@app/pages/Connections/utils";
 import { router } from "@app/routes";
 import logger from "@core/services/logger";
 import { useDeviceStore } from "@core/stores";
-import { randId } from "@core/utils/randId.ts";
+import { randId } from "@shared/utils/randId.ts";
 import { MeshDevice, Types } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";

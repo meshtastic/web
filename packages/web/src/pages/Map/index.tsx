@@ -22,7 +22,7 @@ import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLay
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { cn } from "@core/utils/cn.ts";
+import { cn } from "@shared/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import { useNodes } from "@db/hooks";
 import { Protobuf } from "@meshtastic/core";

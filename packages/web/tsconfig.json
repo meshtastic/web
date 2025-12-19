@@ -22,6 +22,10 @@
       "@layouts/*": ["./src/layouts/*"],
       "@db/*": ["./src/db/*"],
       "@validation/*": ["./src/validation/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@features/*": ["./src/features/*"],
+      "@state/*": ["./src/state/*"],
+      "@data/*": ["./src/data/*"]
     }
   },
   "include": ["src", ".d.ts"],

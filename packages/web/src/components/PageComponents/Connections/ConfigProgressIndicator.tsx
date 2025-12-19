@@ -1,4 +1,4 @@
-import { Progress } from "@components/ui/progress";
+import { Progress } from "@shared/components/ui/progress";
 import {
   TOTAL_CONFIG_COUNT,
   getConfigProgressPercent,

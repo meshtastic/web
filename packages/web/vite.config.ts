@@ -82,6 +82,10 @@ export default defineConfig(({ mode }) => {
         "@db": path.resolve(process.cwd(), "./src/db"),
         "@layouts": path.resolve(process.cwd(), "./src/layouts"),
         "@meshtastic/ui": path.resolve(process.cwd(), "../ui"),
+        "@shared": path.resolve(process.cwd(), "./src/shared"),
+        "@features": path.resolve(process.cwd(), "./src/features"),
+        "@state": path.resolve(process.cwd(), "./src/state"),
+        "@data": path.resolve(process.cwd(), "./src/data"),
       },
     },
     server: {

@@ -1,7 +1,7 @@
 import logger from "../../../core/services/logger.ts";
-import { Button } from "@components/ui/button";
+import { Button } from "@shared/components/ui/button";
 import { useDevice } from "@core/stores";
-import { cn } from "@core/utils/cn";
+import { cn } from "@shared/utils/cn";
 import { DB_EVENTS, dbEvents } from "@db/events";
 import { messageRepo } from "@db/index";
 import type { Message } from "@db/schema";

@@ -1,24 +1,24 @@
 import { useTheme } from "@components/theme-provider";
-import { Button } from "@components/ui/button";
+import { Button } from "@shared/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@components/ui/card";
-import { Label } from "@components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@components/ui/radio-group.tsx";
+} from "@shared/components/ui/card";
+import { Label } from "@shared/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@shared/components/ui/radio-group.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@components/ui/select";
-import { Separator } from "@components/ui/separator";
-import { Slider } from "@components/ui/slider";
-import { Switch } from "@components/ui/switch";
+} from "@shared/components/ui/select";
+import { Separator } from "@shared/components/ui/separator";
+import { Slider } from "@shared/components/ui/slider";
+import { Switch } from "@shared/components/ui/switch";
 import { useUIStore } from "@core/stores";
 import {
   Database,

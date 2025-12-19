@@ -1,8 +1,8 @@
 import logger from "../../../core/services/logger.ts";
-import { Button } from "@components/ui/button";
-import { Label } from "@components/ui/label";
-import { Slider } from "@components/ui/slider";
-import { Switch } from "@components/ui/switch";
+import { Button } from "@shared/components/ui/button";
+import { Label } from "@shared/components/ui/label";
+import { Slider } from "@shared/components/ui/slider";
+import { Switch } from "@shared/components/ui/switch";
 import {
   getNodeCleanupSettings,
   type NodeCleanupSettings,

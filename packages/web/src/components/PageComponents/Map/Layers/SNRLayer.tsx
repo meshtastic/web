@@ -1,5 +1,5 @@
-import { Mono } from "@app/components/generic/Mono";
-import { cn } from "@app/core/utils/cn";
+import { Mono } from "@shared/components/generic/Mono";
+import { cn } from "@shared/utils/cn";
 import { getSignalColor } from "@app/core/utils/signalColor";
 import type { VisibilityState } from "@components/PageComponents/Map/Tools/MapLayerTool";
 import { useDevice } from "@core/stores";

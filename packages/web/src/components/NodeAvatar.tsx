@@ -1,12 +1,12 @@
-import { Avatar, AvatarFallback } from "@components/ui/avatar";
+import { Avatar, AvatarFallback } from "@shared/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@components/ui/tooltip";
+} from "@shared/components/ui/tooltip";
 import { useDevice, useUIStore } from "@core/stores";
-import { cn } from "@core/utils/cn";
-import { getAvatarColors } from "@core/utils/color";
+import { cn } from "@shared/utils/cn";
+import { getAvatarColors } from "@shared/utils/color";
 import { LockKeyholeOpenIcon, StarIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 

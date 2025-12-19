@@ -1,12 +1,12 @@
 import { formatQuantity } from "@app/core/utils/string.ts";
-import { Button } from "@components/ui/button";
+import { Button } from "@shared/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@components/ui/sheet";
+} from "@shared/components/ui/sheet";
 import { FileEdit, RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ActivityList } from "./ActivityList.tsx";

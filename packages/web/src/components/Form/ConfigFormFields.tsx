@@ -6,7 +6,7 @@ import {
 import { PasswordGenerator } from "@components/Form/FormPasswordGenerator";
 import { SelectInput } from "@components/Form/FormSelect";
 import { ToggleInput } from "@components/Form/FormToggle";
-import type { ButtonVariant } from "@components/ui/button";
+import type { ButtonVariant } from "@shared/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,9 +15,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@components/ui/form";
-import { Heading } from "@components/ui/typography/heading";
-import { Subtle } from "@components/ui/typography/subtle";
+} from "@shared/components/ui/form";
+import { Heading } from "@shared/components/ui/typography/heading";
+import { Subtle } from "@shared/components/ui/typography/subtle";
 import type { ChangeEventHandler, ComponentType, ReactNode } from "react";
 import type {
   Control,

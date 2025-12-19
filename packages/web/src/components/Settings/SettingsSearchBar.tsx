@@ -1,4 +1,4 @@
-import { Input } from "@components/ui/input";
+import { Input } from "@shared/components/ui/input";
 import { Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 

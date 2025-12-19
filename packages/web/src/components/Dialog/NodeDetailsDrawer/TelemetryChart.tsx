@@ -1,6 +1,6 @@
 import { useGetMyNode } from "@app/core/hooks/useGetMyNode";
-import { Card, CardContent } from "@components/ui/card";
-import { isDefined } from "@core/utils/typeGuards";
+import { Card, CardContent } from "@shared/components/ui/card";
+import { isDefined } from "@shared/utils/typeGuards";
 import { useTelemetryHistory } from "@db/hooks";
 import {
   BatteryIcon,

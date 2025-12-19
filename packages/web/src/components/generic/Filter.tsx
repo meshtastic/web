@@ -4,8 +4,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@components/ui/dropdown-menu";
-import { cn } from "@core/utils/cn";
+} from "@shared/components/ui/dropdown-menu";
+import { cn } from "@shared/utils/cn";
 import type { LucideIcon } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 

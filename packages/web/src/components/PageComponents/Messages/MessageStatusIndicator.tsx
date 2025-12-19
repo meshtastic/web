@@ -3,8 +3,8 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/ui/tooltip";
-import { cn } from "@core/utils/cn";
+} from "@shared/components/ui/tooltip";
+import { cn } from "@shared/utils/cn";
 import type { Message } from "@db/schema";
 import { Check, Clock, CloudCheck, Loader2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";

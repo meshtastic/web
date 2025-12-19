@@ -1,7 +1,7 @@
-import { Avatar } from "@components/ui/avatar.tsx";
-import { Button } from "@components/ui/button.tsx";
-import { Subtle } from "@components/ui/typography/subtle.tsx";
-import { cn } from "@core/utils/cn.ts";
+import { Avatar } from "@shared/components/ui/avatar.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
+import { Subtle } from "@shared/components/ui/typography/subtle.tsx";
+import { cn } from "@shared/utils/cn.ts";
 import type { ConnectionStatus } from "@db/repositories/ConnectionRepository";
 import type { Protobuf } from "@meshtastic/core";
 import { useNavigate } from "@tanstack/react-router";

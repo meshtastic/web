@@ -1,4 +1,4 @@
-import { cn } from "@core/utils/cn.ts";
+import { cn } from "@shared/utils/cn.ts";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import React, { useMemo, useState } from "react";
 

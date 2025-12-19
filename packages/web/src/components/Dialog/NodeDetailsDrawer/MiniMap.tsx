@@ -1,6 +1,6 @@
 import { BaseMap } from "@components/Map";
 import { useDevice } from "@core/stores";
-import { cn } from "@core/utils/cn";
+import { cn } from "@shared/utils/cn";
 import { useDevicePreference } from "@db/hooks";
 import { Protobuf } from "@meshtastic/core";
 import { useMemo } from "react";

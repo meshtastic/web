@@ -1,7 +1,7 @@
-import { SignalBars } from "@components/generic/SignalIndicator";
-import { Button } from "@components/ui/button";
-import { ScrollArea } from "@components/ui/scroll-area";
-import { Skeleton } from "@components/ui/skeleton";
+import { SignalBars } from "@shared/components/generic/SignalIndicator";
+import { Button } from "@shared/components/ui/button";
+import { ScrollArea } from "@shared/components/ui/scroll-area";
+import { Skeleton } from "@shared/components/ui/skeleton";
 import {
   getSignalColorForGrade,
   getSignalGrade,

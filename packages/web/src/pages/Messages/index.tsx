@@ -1,29 +1,29 @@
 import {
   ONLINE_THRESHOLD_SECONDS,
   OnlineIndicator,
-} from "@components/generic/OnlineIndicator";
+} from "@shared/components/generic/OnlineIndicator";
 import { NodeAvatar } from "@components/NodeAvatar";
-import { Badge } from "@components/ui/badge";
-import { Button } from "@components/ui/button";
-import { Input } from "@components/ui/input";
+import { Badge } from "@shared/components/ui/badge";
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from "@components/ui/resizable";
-import { ScrollArea } from "@components/ui/scroll-area";
+} from "@shared/components/ui/resizable";
+import { ScrollArea } from "@shared/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@components/ui/tooltip";
+} from "@shared/components/ui/tooltip";
 import {
   type SplitMode,
   useDevice,
   useDeviceContext,
   useUIStore,
 } from "@core/stores";
-import { cn } from "@core/utils/cn";
+import { cn } from "@shared/utils/cn";
 import { sortNodes } from "@core/utils/nodeSort";
 import { useChannels, useConversations, useNodes } from "@db/hooks";
 import type { ConversationType } from "@db/types";

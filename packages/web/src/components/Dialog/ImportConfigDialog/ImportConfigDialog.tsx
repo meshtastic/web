@@ -1,22 +1,22 @@
-import { Button } from "@components/ui/button.tsx";
-import { Input } from "@components/ui/input.tsx";
-import { Label } from "@components/ui/label.tsx";
-import { Progress } from "@components/ui/progress.tsx";
-import { ScrollArea } from "@components/ui/scroll-area.tsx";
+import { Button } from "@shared/components/ui/button.tsx";
+import { Input } from "@shared/components/ui/input.tsx";
+import { Label } from "@shared/components/ui/label.tsx";
+import { Progress } from "@shared/components/ui/progress.tsx";
+import { ScrollArea } from "@shared/components/ui/scroll-area.tsx";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@components/ui/sheet.tsx";
-import { Switch } from "@components/ui/switch.tsx";
+} from "@shared/components/ui/sheet.tsx";
+import { Switch } from "@shared/components/ui/switch.tsx";
 import {
   type ParsedConfigBackupField,
   ConfigBackupService,
 } from "@core/services/configBackupService.ts";
-import { cn } from "@core/utils/cn.ts";
-import { debounce } from "@core/utils/debounce.ts";
+import { cn } from "@shared/utils/cn.ts";
+import { debounce } from "@shared/utils/debounce.ts";
 import { FileText, Search, Upload, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";

@@ -1,4 +1,4 @@
-import { useDebounce } from "@core/hooks/useDebounce";
+import { useDebounce } from "@shared/hooks/useDebounce";
 import { useCallback, useEffect, useState } from "react";
 import { messageRepo } from "../repositories/index.ts";
 import type { ConversationType } from "../types.ts";

@@ -1,4 +1,4 @@
-import { Skeleton } from "@app/components/ui/skeleton";
+import { Skeleton } from "@shared/components/ui/skeleton";
 
 /**
  * Full page skeleton with tabs - for page-level loading

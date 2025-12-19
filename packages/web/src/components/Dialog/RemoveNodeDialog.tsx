@@ -1,4 +1,4 @@
-import { Label } from "@components/ui/label.tsx";
+import { Label } from "@shared/components/ui/label.tsx";
 import { useDevice, useDeviceContext, useUIStore } from "@core/stores";
 import { useNodes } from "@db/hooks";
 import { nodeRepo } from "@db/index";
