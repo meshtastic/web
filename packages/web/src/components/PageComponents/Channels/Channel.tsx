@@ -4,9 +4,9 @@ import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog";
 import {
   ConfigFormFields,
   type FieldGroup,
-} from "@components/Form/ConfigFormFields";
+} from "@features/settings/components/form/ConfigFormFields";
 import { useDevice } from "@core/stores";
-import { useChannelForm } from "@pages/Settings/hooks";
+import { useChannelForm } from "@features/settings/hooks";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

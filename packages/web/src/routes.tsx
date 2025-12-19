@@ -16,20 +16,24 @@ import { App } from "./App.tsx";
 
 // Lazy loaded routes
 const NodesPage = lazy(() => import("@pages/Nodes/index.tsx"));
-const SettingsPage = lazy(() => import("@app/pages/Settings/index.tsx"));
+const SettingsPage = lazy(() =>
+  import("@features/settings/pages/SettingsPage").then((m) => ({
+    default: m.default,
+  })),
+);
 const StatisticsPage = lazy(() => import("@app/pages/Statistics/index.tsx"));
 const RadioConfig = lazy(() =>
-  import("./pages/Settings/RadioConfig.tsx").then((m) => ({
+  import("@features/settings/pages/RadioConfig").then((m) => ({
     default: m.RadioConfig,
   })),
 );
 const DeviceConfig = lazy(() =>
-  import("./pages/Settings/DeviceConfig.tsx").then((m) => ({
+  import("@features/settings/pages/DeviceConfig").then((m) => ({
     default: m.DeviceConfig,
   })),
 );
 const ModuleConfig = lazy(() =>
-  import("./pages/Settings/ModuleConfig.tsx").then((m) => ({
+  import("@features/settings/pages/ModuleConfig").then((m) => ({
     default: m.ModuleConfig,
   })),
 );

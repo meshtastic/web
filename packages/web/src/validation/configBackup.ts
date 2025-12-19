@@ -1,25 +1,25 @@
-import { BluetoothValidationSchema } from "./config/bluetooth.ts";
-import { DeviceValidationSchema } from "./config/device.ts";
-import { DisplayValidationSchema } from "./config/display.ts";
-import { LoRaValidationSchema } from "./config/lora.ts";
-import { NetworkValidationSchema } from "./config/network.ts";
-import { PositionValidationSchema } from "./config/position.ts";
-import { PowerValidationSchema } from "./config/power.ts";
-import { UserValidationSchema } from "./config/user.ts";
-import { RawSecuritySchema } from "./config/security.ts"; // Keep for reference, but rebuild for ConfigBackup
+import { BluetoothValidationSchema } from "@features/settings/validation/config/bluetooth";
+import { DeviceValidationSchema } from "@features/settings/validation/config/device";
+import { DisplayValidationSchema } from "@features/settings/validation/config/display";
+import { LoRaValidationSchema } from "@features/settings/validation/config/lora";
+import { NetworkValidationSchema } from "@features/settings/validation/config/network";
+import { PositionValidationSchema } from "@features/settings/validation/config/position";
+import { PowerValidationSchema } from "@features/settings/validation/config/power";
+import { UserValidationSchema } from "@features/settings/validation/config/user";
+import { RawSecuritySchema } from "@features/settings/validation/config/security"; // Keep for reference, but rebuild for ConfigBackup
 
-import { AmbientLightingValidationSchema } from "./moduleConfig/ambientLighting.ts";
-import { AudioValidationSchema } from "./moduleConfig/audio.ts";
-import { CannedMessageValidationSchema } from "./moduleConfig/cannedMessage.ts";
-import { DetectionSensorValidationSchema } from "./moduleConfig/detectionSensor.ts";
-import { ExternalNotificationValidationSchema } from "./moduleConfig/externalNotification.ts";
-import { MqttValidationSchema } from "./moduleConfig/mqtt.ts";
-import { NeighborInfoValidationSchema } from "./moduleConfig/neighborInfo.ts";
-import { PaxcounterValidationSchema } from "./moduleConfig/paxcounter.ts";
-import { RangeTestValidationSchema } from "./moduleConfig/rangeTest.ts";
-import { SerialValidationSchema } from "./moduleConfig/serial.ts";
-import { StoreForwardValidationSchema } from "./moduleConfig/storeForward.ts";
-import { TelemetryValidationSchema } from "./moduleConfig/telemetry.ts";
+import { AmbientLightingValidationSchema } from "@features/settings/validation/moduleConfig/ambientLighting";
+import { AudioValidationSchema } from "@features/settings/validation/moduleConfig/audio";
+import { CannedMessageValidationSchema } from "@features/settings/validation/moduleConfig/cannedMessage";
+import { DetectionSensorValidationSchema } from "@features/settings/validation/moduleConfig/detectionSensor";
+import { ExternalNotificationValidationSchema } from "@features/settings/validation/moduleConfig/externalNotification";
+import { MqttValidationSchema } from "@features/settings/validation/moduleConfig/mqtt";
+import { NeighborInfoValidationSchema } from "@features/settings/validation/moduleConfig/neighborInfo";
+import { PaxcounterValidationSchema } from "@features/settings/validation/moduleConfig/paxcounter";
+import { RangeTestValidationSchema } from "@features/settings/validation/moduleConfig/rangeTest";
+import { SerialValidationSchema } from "@features/settings/validation/moduleConfig/serial";
+import { StoreForwardValidationSchema } from "@features/settings/validation/moduleConfig/storeForward";
+import { TelemetryValidationSchema } from "@features/settings/validation/moduleConfig/telemetry";
 
 import { z } from "zod/v4";
 import type { ParsedConfigBackupField, ConfigBackupData } from "@core/services/configBackupService.ts";
