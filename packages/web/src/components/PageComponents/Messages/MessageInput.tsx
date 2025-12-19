@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
-import type { Device } from "@core/stores/deviceStore";
+import type { Device } from "@state/device";
 import type {
   OutgoingMessage,
   PipelineContext,

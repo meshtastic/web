@@ -1,5 +1,5 @@
 import logger from "../core/services/logger.ts";
-import { useUIStore } from "../core/stores/uiStore/index.ts";
+import { useUIStore } from "@state/ui";
 import { packetLogRepo } from "./repositories/index.ts";
 import type { NewPacketLog } from "./schema.ts";
 

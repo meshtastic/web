@@ -3,7 +3,7 @@ import type {
   ValidConfigType,
   ValidModuleConfigType,
 } from "@components/Settings/types.ts";
-import type { Device } from "@core/stores/deviceStore/index.ts";
+import type { Device } from "@state/device";
 import { channelRepo, nodeRepo } from "@data/index";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";

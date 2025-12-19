@@ -3,7 +3,7 @@ import {
   TOTAL_CONFIG_COUNT,
   getConfigProgressPercent,
   useDeviceStore,
-} from "@core/stores/deviceStore";
+} from "@state/device";
 import { useTranslation } from "react-i18next";
 
 interface ConfigProgressIndicatorProps {

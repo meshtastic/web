@@ -1,4 +1,4 @@
-import type { Device } from "@core/stores/deviceStore";
+import type { Device } from "@state/device";
 import * as dbEventsModule from "@data/events";
 import * as dbIndex from "@data/index";
 import type { Contact } from "@pages/Messages";

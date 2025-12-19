@@ -1,4 +1,4 @@
-import logger from "../../services/logger.ts";
+import logger from "@core/services/logger";
 import { create, toBinary } from "@bufbuild/protobuf";
 import type {
   ChangeEntry,

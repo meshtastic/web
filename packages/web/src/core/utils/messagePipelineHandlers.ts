@@ -1,5 +1,5 @@
 import { AdminMessageService } from "@core/services/adminMessageService";
-import type { Device } from "@core/stores/deviceStore";
+import type { Device } from "@state/device";
 import { nodeRepo } from "@data/index";
 
 export interface OutgoingMessage {
