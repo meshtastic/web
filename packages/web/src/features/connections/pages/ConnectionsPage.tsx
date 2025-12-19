@@ -1,12 +1,12 @@
-import AddConnectionDialog from "@components/Dialog/AddConnectionDialog/AddConnectionDialog";
+import AddConnectionDialog from "../components/AddConnectionDialog/AddConnectionDialog";
 import { TimeAgo } from "@shared/components/generic/TimeAgo";
 import LanguageSwitcher from "@components/LanguageSwitcher";
-import { ConfigProgressIndicator } from "@components/PageComponents/Connections/ConfigProgressIndicator";
-import { ConnectionStatusBadge } from "@components/PageComponents/Connections/ConnectionStatusBadge";
+import { ConfigProgressIndicator } from "../components/ConfigProgressIndicator";
+import { ConnectionStatusBadge } from "../components/ConnectionStatusBadge";
 import {
   connectionTypeIcon,
   formatConnectionSubtext,
-} from "@app/pages/Connections/utils";
+} from "../utils";
 import {
   AlertDialog,
   AlertDialogAction,

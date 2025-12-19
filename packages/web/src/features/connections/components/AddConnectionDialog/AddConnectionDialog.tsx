@@ -1,6 +1,6 @@
 import { SupportBadge } from "@components/Badge/SupportedBadge.tsx";
 import { Link } from "@shared/components/ui/link";
-import { testHttpReachable } from "@app/pages/Connections/utils";
+import { testHttpReachable } from "../../utils";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import { Label } from "@shared/components/ui/label";
@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { DialogWrapper } from "../DialogWrapper.tsx";
+import { DialogWrapper } from "@components/Dialog/DialogWrapper";
 import { urlOrIpv4Schema } from "./validation.ts";
 
 export type NewConnectionInput =

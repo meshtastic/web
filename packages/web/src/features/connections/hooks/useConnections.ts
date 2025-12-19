@@ -1,5 +1,5 @@
-import type { NewConnectionInput } from "@components/Dialog/AddConnectionDialog/AddConnectionDialog";
-import { testHttpReachable } from "@app/pages/Connections/utils";
+import type { NewConnectionInput } from "../components/AddConnectionDialog/AddConnectionDialog";
+import { testHttpReachable } from "../utils";
 import { router } from "@app/routes";
 import logger from "@core/services/logger";
 import { useDeviceStore } from "@core/stores";
@@ -10,14 +10,14 @@ import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { type Result, ResultAsync } from "neverthrow";
 import { useCallback, useEffect, useEffectEvent, useState } from "react";
-import { ConnectionError } from "../errors.ts";
+import { ConnectionError } from "@data/errors";
 import type {
   ConnectionStatus,
   ConnectionType,
-} from "../repositories/ConnectionRepository.ts";
-import { connectionRepo } from "../repositories/index.ts";
-import type { Connection } from "../schema.ts";
-import { SubscriptionService } from "../subscriptionService.ts";
+} from "@data/repositories/ConnectionRepository";
+import { connectionRepo } from "@data/repositories";
+import type { Connection } from "@data/schema";
+import { SubscriptionService } from "@data/subscriptionService";
 
 export type { ConnectionStatus, ConnectionType };
 

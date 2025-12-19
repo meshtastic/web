@@ -1,7 +1,7 @@
 import { useDeviceStore } from "@core/stores";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { connectionRepo } from "../repositories/index.ts";
+import { connectionRepo } from "@data/repositories";
 import {
   useConnection,
   useConnections,
@@ -9,7 +9,7 @@ import {
 } from "./useConnections.ts";
 
 // Mock Repositories
-vi.mock("../repositories", () => ({
+vi.mock("@data/repositories", () => ({
   connectionRepo: {
     getConnections: vi.fn(),
     createConnection: vi.fn(),
@@ -64,9 +64,9 @@ vi.mock("@meshtastic/core", () => ({
   MeshDevice: vi.fn(),
   Types: { DeviceStatusEnum: {} },
 }));
-vi.mock("@app/pages/Connections/utils", () => ({ testHttpReachable: vi.fn() }));
+vi.mock("../utils", () => ({ testHttpReachable: vi.fn() }));
 vi.mock("@app/routes", () => ({ router: { navigate: vi.fn() } }));
-vi.mock("../subscriptionService", () => ({
+vi.mock("@data/subscriptionService", () => ({
   SubscriptionService: { subscribeToDevice: vi.fn() },
 }));
 

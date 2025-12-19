@@ -4,14 +4,17 @@ export {
   useChannels,
   usePrimaryChannel,
 } from "./useChannels.ts";
-export type { ConnectionStatus, ConnectionType } from "./useConnections.ts";
-// Connection hooks
+// Connection hooks - re-exported from features/connections for backwards compatibility
+export type {
+  ConnectionStatus,
+  ConnectionType,
+} from "@features/connections/hooks/useConnections";
 export {
   resetConnectionStatuses,
   useConnection,
   useConnections,
   useDefaultConnection,
-} from "./useConnections.ts";
+} from "@features/connections/hooks/useConnections";
 // Device-specific preferences hooks
 export {
   invalidateDevicePreferenceCache,
