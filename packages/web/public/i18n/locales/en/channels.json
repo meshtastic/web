@@ -1,4 +1,18 @@
 {
+  "user": {
+    "longName": {
+      "validation": {
+        "min": "Long name must be at least 1 character",
+        "max": "Long name must be at most 39 characters"
+      }
+    },
+    "shortName": {
+      "validation": {
+        "min": "Short name must be at least 1 character",
+        "max": "Short name must be at most 4 characters"
+      }
+    }
+  },
   "page": {
     "sectionLabel": "Channels",
     "channelName": "Channel: {{channelName}}",

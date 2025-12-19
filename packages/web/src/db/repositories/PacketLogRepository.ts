@@ -23,6 +23,18 @@ export class PacketLogRepository {
   }
 
   /**
+   * Log multiple packets in a single transaction
+   * Much more efficient than individual inserts
+   */
+  async logPacketsBatch(packets: NewPacketLog[]): Promise<void> {
+    if (packets.length === 0) return;
+
+    await this.db.transaction(async (tx) => {
+      await tx.insert(packetLogs).values(packets);
+    });
+  }
+
+  /**
    * Get recent packets for a device
    */
   async getPackets(

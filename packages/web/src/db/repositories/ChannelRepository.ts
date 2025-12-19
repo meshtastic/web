@@ -1,6 +1,6 @@
 import { and, asc, eq } from "drizzle-orm";
-import { dbClient } from "../client";
-import { channels, type Channel, type NewChannel } from "../schema";
+import { dbClient } from "../client.ts";
+import { type Channel, channels, type NewChannel } from "../schema.ts";
 
 /**
  * Repository for channel operations

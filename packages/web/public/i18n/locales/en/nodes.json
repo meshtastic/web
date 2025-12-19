@@ -50,6 +50,7 @@
       "longName": "Name",
       "encryption": "Enc",
       "lastHeard": "Last Heard",
+      "signal": "Signal",
       "battery": "Battery",
       "altitude": "Altitude",
       "hopsAway": "Hops",

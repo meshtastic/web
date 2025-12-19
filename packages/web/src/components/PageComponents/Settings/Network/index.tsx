@@ -1,11 +1,11 @@
-import { useNetworkForm } from "@pages/Settings/hooks";
 import type { NetworkValidation } from "@app/validation/config/network";
 import {
   ConfigFormFields,
   type FieldGroup,
 } from "@components/Form/ConfigFormFields";
-import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { Protobuf } from "@meshtastic/core";
+import { useNetworkForm } from "@pages/Settings/hooks";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useTranslation } from "react-i18next";
 
 export const Network = () => {

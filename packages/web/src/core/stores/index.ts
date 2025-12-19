@@ -7,7 +7,6 @@ export {
   useDeviceContext,
 } from "@core/hooks/useDeviceContext";
 export {
-  clearConnectionCache,
   type Device,
   useDeviceStore,
 } from "@core/stores/deviceStore/index.ts";
@@ -18,26 +17,19 @@ export type {
   WaypointWithMetadata,
 } from "@core/stores/deviceStore/types.ts";
 export type {
-  AppState,
   CoordinateFormat,
   DistanceUnits,
   Language,
   MapStyle,
+  MessageTab,
   NodeColumnKey,
-  PreferencesState,
   RasterSource,
+  SplitMode,
   Theme,
   TimeFormat,
   UIState,
 } from "@core/stores/uiStore/index.ts";
-export {
-  useAppStore,
-  usePreferencesStore,
-  useUIStore,
-} from "@core/stores/uiStore/index.ts";
-
-// Re-export idb-keyval functions for clearing allstores, expand this if we add more local storage types
-export { clear as clearAllStores } from "idb-keyval";
+export { useUIStore } from "@core/stores/uiStore/index.ts";
 
 // Define hooks to access the stores
 export const useDevice = (): Device => {

@@ -22,10 +22,7 @@ export interface SortConfig<T> {
  * @param items - Array of items to sort
  * @param config - Configuration for extracting sort properties from items
  */
-export function sortNodes<T>(
-  items: T[],
-  config: SortConfig<T>,
-): T[] {
+export function sortNodes<T>(items: T[], config: SortConfig<T>): T[] {
   const { getName, getLastHeard, isFavorite, isChannel } = config;
 
   const byName = (a: T, b: T) =>

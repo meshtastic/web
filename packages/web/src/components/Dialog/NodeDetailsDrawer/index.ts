@@ -1,2 +1,2 @@
-export { NodeDetailsDrawer } from "./NodeDetailsDrawer";
-export type { NodeDetailsDrawerProps } from "./NodeDetailsDrawer";
+export type { NodeDetailsDrawerProps } from "./NodeDetailsDrawer.tsx";
+export { NodeDetailsDrawer } from "./NodeDetailsDrawer.tsx";

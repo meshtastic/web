@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { useTheme } from "./useTheme";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useTheme } from "./useTheme.ts";
 
 describe("useTheme", () => {
   const originalLocalStorage = global.localStorage;
@@ -31,7 +31,7 @@ describe("useTheme", () => {
     Object.defineProperty(global, "matchMedia", {
       writable: true,
       value: vi.fn().mockImplementation((query) => ({
-        matches: query.includes("dark") ? false : true, // Default to light system theme
+        matches: !query.includes("dark"), // Default to light system theme
         media: query,
         onchange: null,
         addListener: vi.fn(),
@@ -45,11 +45,13 @@ describe("useTheme", () => {
     // Use the actual document.documentElement from the test environment (happy-dom)
     // and spy on its setAttribute method.
     htmlElement = document.documentElement;
-    vi.spyOn(htmlElement, 'setAttribute');
+    vi.spyOn(htmlElement, "setAttribute");
   });
 
   afterEach(() => {
-    Object.defineProperty(global, "localStorage", { value: originalLocalStorage });
+    Object.defineProperty(global, "localStorage", {
+      value: originalLocalStorage,
+    });
     Object.defineProperty(global, "matchMedia", { value: originalMatchMedia });
     vi.restoreAllMocks(); // Restore all spies
     localStorageMock = {};
@@ -57,8 +59,9 @@ describe("useTheme", () => {
 
   it("should initialize with 'system' preference if no stored value and default to light system theme", () => {
     (global.matchMedia as vi.Mock).mockImplementation((query) => ({
-        matches: query.includes("dark") ? false : true,
-        addEventListener: vi.fn(), removeEventListener: vi.fn(), // Minimal mock
+      matches: !query.includes("dark"),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(), // Minimal mock
     }));
     const { result } = renderHook(() => useTheme());
     expect(result.current.preference).toBe("system");
@@ -74,7 +77,7 @@ describe("useTheme", () => {
 
   it("should set new preference and update localStorage", () => {
     const { result } = renderHook(() => useTheme());
-    
+
     act(() => {
       result.current.setPreference("dark");
     });
@@ -87,29 +90,33 @@ describe("useTheme", () => {
   it("should update theme when system preference changes if preference is 'system'", () => {
     let listeners: ((event: { matches: boolean }) => void)[] = [];
     (global.matchMedia as vi.Mock).mockImplementation((query) => ({
-        matches: query.includes("dark") ? false : true, // Initial: light system
-        addEventListener: vi.fn((event, callback) => {
-            if (event === "change") listeners.push(callback);
-        }),
-        removeEventListener: vi.fn((event, callback) => {
-            if (event === "change") listeners = listeners.filter(l => l !== callback);
-        }),
+      matches: !query.includes("dark"), // Initial: light system
+      addEventListener: vi.fn((event, callback) => {
+        if (event === "change") {
+          listeners.push(callback);
+        }
+      }),
+      removeEventListener: vi.fn((event, callback) => {
+        if (event === "change") {
+          listeners = listeners.filter((l) => l !== callback);
+        }
+      }),
     }));
 
     const { result } = renderHook(() => useTheme());
-    
+
     expect(result.current.preference).toBe("system");
     expect(result.current.theme).toBe("light");
 
     // Simulate system theme change to dark
     act(() => {
-        listeners.forEach(l => l({ matches: true })); // Trigger listeners for dark
+      listeners.forEach((l) => l({ matches: true })); // Trigger listeners for dark
     });
     expect(result.current.theme).toBe("dark");
 
     // Simulate system theme change back to light
     act(() => {
-        listeners.forEach(l => l({ matches: false })); // Trigger listeners for light
+      listeners.forEach((l) => l({ matches: false })); // Trigger listeners for light
     });
     expect(result.current.theme).toBe("light");
   });
@@ -117,40 +124,47 @@ describe("useTheme", () => {
   it("should not update theme when system preference changes if preference is not 'system'", () => {
     let listeners: ((event: { matches: boolean }) => void)[] = [];
     (global.matchMedia as vi.Mock).mockImplementation((query) => ({
-        matches: query.includes("dark") ? false : true, // Initial: light system
-        addEventListener: vi.fn((event, callback) => {
-            if (event === "change") listeners.push(callback);
-        }),
-        removeEventListener: vi.fn((event, callback) => {
-            if (event === "change") listeners = listeners.filter(l => l !== callback);
-        }),
+      matches: !query.includes("dark"), // Initial: light system
+      addEventListener: vi.fn((event, callback) => {
+        if (event === "change") {
+          listeners.push(callback);
+        }
+      }),
+      removeEventListener: vi.fn((event, callback) => {
+        if (event === "change") {
+          listeners = listeners.filter((l) => l !== callback);
+        }
+      }),
     }));
 
     const { result } = renderHook(() => useTheme());
-    
+
     // Set preference to dark
     act(() => {
-        result.current.setPreference("dark");
+      result.current.setPreference("dark");
     });
     expect(result.current.preference).toBe("dark");
     expect(result.current.theme).toBe("dark");
 
     // Simulate system theme change to light - should not affect the preference
     act(() => {
-        listeners.forEach(l => l({ matches: false })); // Trigger listeners for light
+      listeners.forEach((l) => l({ matches: false })); // Trigger listeners for light
     });
     expect(result.current.preference).toBe("dark"); // Still dark
     expect(result.current.theme).toBe("dark"); // Still dark
   });
 
   it("should set data-theme attribute on document.documentElement", () => {
-      const { result } = renderHook(() => useTheme());
-      
-      expect(htmlElement.setAttribute).toHaveBeenCalledWith("data-theme", "light"); // Initial system light
-      
-      act(() => {
-          result.current.setPreference("dark");
-      });
-      expect(htmlElement.setAttribute).toHaveBeenCalledWith("data-theme", "dark");
+    const { result } = renderHook(() => useTheme());
+
+    expect(htmlElement.setAttribute).toHaveBeenCalledWith(
+      "data-theme",
+      "light",
+    ); // Initial system light
+
+    act(() => {
+      result.current.setPreference("dark");
+    });
+    expect(htmlElement.setAttribute).toHaveBeenCalledWith("data-theme", "dark");
   });
 });

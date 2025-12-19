@@ -15,6 +15,15 @@ vi.mock("idb-keyval", () => ({
   }),
 }));
 
+// Mock localStorage for logger
+const localStorageMock = new Map<string, string>();
+vi.stubGlobal("localStorage", {
+  getItem: (key: string) => localStorageMock.get(key) ?? null,
+  setItem: (key: string, value: string) => localStorageMock.set(key, value),
+  removeItem: (key: string) => localStorageMock.delete(key),
+  clear: () => localStorageMock.clear(),
+});
+
 // Helper to load a fresh copy of the store with persist flag on/off
 async function freshStore(persist = false) {
   vi.resetModules();
@@ -519,5 +528,186 @@ describe("DeviceStore – connection & sendAdminMessage", () => {
 
     // compare content length as minimal assertion (exact byte-for-byte is fine too)
     expect((bytes as Uint8Array).length).toBe(expected.length);
+  });
+});
+
+describe("DeviceStore – config progress tracking", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("initializes configProgress with empty set and correct total", async () => {
+    const { useDeviceStore, TOTAL_CONFIG_COUNT } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(1);
+
+    expect(device.configProgress.receivedConfigs.size).toBe(0);
+    expect(device.configProgress.total).toBe(TOTAL_CONFIG_COUNT);
+    expect(TOTAL_CONFIG_COUNT).toBe(20); // 8 device configs + 12 module configs
+  });
+
+  it("tracks config progress when setConfig is called", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(2);
+
+    // Set device config
+    device.setConfig(
+      create(Protobuf.Config.ConfigSchema, {
+        payloadVariant: {
+          case: "device",
+          value: create(Protobuf.Config.Config_DeviceConfigSchema, {}),
+        },
+      }),
+    );
+
+    const updatedDevice = state.getDevice(2)!;
+    expect(updatedDevice.configProgress.receivedConfigs.has("config:device")).toBe(true);
+    expect(updatedDevice.configProgress.receivedConfigs.size).toBe(1);
+
+    // Set lora config
+    device.setConfig(
+      create(Protobuf.Config.ConfigSchema, {
+        payloadVariant: {
+          case: "lora",
+          value: create(Protobuf.Config.Config_LoRaConfigSchema, {}),
+        },
+      }),
+    );
+
+    const afterLora = state.getDevice(2)!;
+    expect(afterLora.configProgress.receivedConfigs.has("config:lora")).toBe(true);
+    expect(afterLora.configProgress.receivedConfigs.size).toBe(2);
+  });
+
+  it("tracks module config progress when setModuleConfig is called", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(3);
+
+    // Set mqtt module config
+    device.setModuleConfig(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: {
+          case: "mqtt",
+          value: create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, {}),
+        },
+      }),
+    );
+
+    const updatedDevice = state.getDevice(3)!;
+    expect(updatedDevice.configProgress.receivedConfigs.has("moduleConfig:mqtt")).toBe(true);
+    expect(updatedDevice.configProgress.receivedConfigs.size).toBe(1);
+
+    // Set telemetry module config
+    device.setModuleConfig(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: {
+          case: "telemetry",
+          value: create(Protobuf.ModuleConfig.ModuleConfig_TelemetryConfigSchema, {}),
+        },
+      }),
+    );
+
+    const afterTelemetry = state.getDevice(3)!;
+    expect(afterTelemetry.configProgress.receivedConfigs.has("moduleConfig:telemetry")).toBe(true);
+    expect(afterTelemetry.configProgress.receivedConfigs.size).toBe(2);
+  });
+
+  it("resetConfigProgress clears received configs", async () => {
+    const { useDeviceStore, TOTAL_CONFIG_COUNT } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(4);
+
+    // Add some configs
+    device.setConfig(
+      create(Protobuf.Config.ConfigSchema, {
+        payloadVariant: {
+          case: "device",
+          value: create(Protobuf.Config.Config_DeviceConfigSchema, {}),
+        },
+      }),
+    );
+    device.setModuleConfig(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: {
+          case: "mqtt",
+          value: create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, {}),
+        },
+      }),
+    );
+
+    expect(state.getDevice(4)!.configProgress.receivedConfigs.size).toBe(2);
+
+    // Reset progress
+    device.resetConfigProgress();
+
+    const afterReset = state.getDevice(4)!;
+    expect(afterReset.configProgress.receivedConfigs.size).toBe(0);
+    expect(afterReset.configProgress.total).toBe(TOTAL_CONFIG_COUNT);
+  });
+
+  it("getConfigProgressPercent calculates correct percentage", async () => {
+    const { useDeviceStore, getConfigProgressPercent, TOTAL_CONFIG_COUNT } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(5);
+
+    // Initially 0%
+    expect(getConfigProgressPercent(device.configProgress)).toBe(0);
+
+    // Add 10 configs (half of 20)
+    const deviceConfigs = ["device", "position", "power", "network", "display", "lora", "bluetooth", "security"] as const;
+    for (const variant of deviceConfigs) {
+      device.setConfig(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: variant,
+            value: {},
+          },
+        } as any),
+      );
+    }
+
+    // 8 configs out of 20 = 40%
+    const afterDeviceConfigs = state.getDevice(5)!;
+    expect(getConfigProgressPercent(afterDeviceConfigs.configProgress)).toBe(40);
+
+    // Add 2 module configs to get to 10/20 = 50%
+    device.setModuleConfig(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: { case: "mqtt", value: {} },
+      } as any),
+    );
+    device.setModuleConfig(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: { case: "serial", value: {} },
+      } as any),
+    );
+
+    const afterModuleConfigs = state.getDevice(5)!;
+    expect(getConfigProgressPercent(afterModuleConfigs.configProgress)).toBe(50);
+  });
+
+  it("does not duplicate config entries on repeated setConfig calls", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(6);
+
+    // Set same config multiple times
+    for (let i = 0; i < 5; i++) {
+      device.setConfig(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: "device",
+            value: create(Protobuf.Config.Config_DeviceConfigSchema, {}),
+          },
+        }),
+      );
+    }
+
+    const updatedDevice = state.getDevice(6)!;
+    expect(updatedDevice.configProgress.receivedConfigs.size).toBe(1);
+    expect(updatedDevice.configProgress.receivedConfigs.has("config:device")).toBe(true);
   });
 });

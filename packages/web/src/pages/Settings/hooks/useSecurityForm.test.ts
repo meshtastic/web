@@ -1,10 +1,10 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { useSecurityForm } from "./useSecurityForm";
-import { useDevice } from "@core/stores";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { useDevice } from "@core/stores";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519";
+import { act, renderHook } from "@testing-library/react";
 import { fromByteArray } from "base64-js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useSecurityForm } from "./useSecurityForm.ts";
 
 vi.mock("@core/stores", () => ({
   useDevice: vi.fn(),
@@ -20,12 +20,18 @@ vi.mock("@core/utils/x25519", () => ({
 }));
 
 vi.mock("@app/validation/config/security", () => ({
-  RawSecuritySchema: { parse: vi.fn(), safeParse: vi.fn().mockReturnValue({ success: true }) },
+  RawSecuritySchema: {
+    parse: vi.fn(),
+    safeParse: vi.fn().mockReturnValue({ success: true }),
+  },
 }));
 
 // Mock resolver
 vi.mock("@components/Form/createZodResolver", () => ({
-  createZodResolver: vi.fn(() => async (data: any) => ({ values: data, errors: {} })),
+  createZodResolver: vi.fn(() => async (data: any) => ({
+    values: data,
+    errors: {},
+  })),
 }));
 
 describe("useSecurityForm", () => {
@@ -40,8 +46,16 @@ describe("useSecurityForm", () => {
     vi.clearAllMocks();
 
     (useDevice as vi.Mock).mockReturnValue({
-      config: { security: { privateKey: mockKeys, publicKey: mockKeys, adminKey: [] } },
-      getEffectiveConfig: vi.fn().mockReturnValue({ privateKey: mockKeys, publicKey: mockKeys, adminKey: [] }),
+      config: {
+        security: { privateKey: mockKeys, publicKey: mockKeys, adminKey: [] },
+      },
+      getEffectiveConfig: vi
+        .fn()
+        .mockReturnValue({
+          privateKey: mockKeys,
+          publicKey: mockKeys,
+          adminKey: [],
+        }),
       setChange: mockSetChange,
     });
 
@@ -64,7 +78,7 @@ describe("useSecurityForm", () => {
     const { result } = renderHook(() => useSecurityForm());
 
     await act(async () => {
-        result.current.regenerateKeys();
+      result.current.regenerateKeys();
     });
 
     const priv = result.current.form.getValues("privateKey");

@@ -58,6 +58,7 @@ type DialogState = {
   protocol: "http" | "https";
   url: string;
   testStatus: TestingStatus;
+  testAttempt: { current: number; total: number } | null;
   btSelected:
     | { id: string; name?: string; device?: BluetoothDevice }
     | undefined;
@@ -71,6 +72,7 @@ type DialogAction =
   | { type: "SET_PROTOCOL"; payload: "http" | "https" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
+  | { type: "SET_TEST_ATTEMPT"; payload: { current: number; total: number } | null }
   | {
       type: "SET_BT_SELECTED";
       payload:
@@ -131,7 +133,10 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
   return (
     <div className="flex flex-col items-start gap-2 bg-destructive p-4 rounded-md text-sm mt-4">
       <div className="flex items-center gap-2 w-full">
-        <AlertCircle size={40} className="mr-2 shrink-0 text-destructive-foreground" />
+        <AlertCircle
+          size={40}
+          className="mr-2 shrink-0 text-destructive-foreground"
+        />
         <div className="flex flex-col gap-3">
           <div className="text-sm text-destructive-foreground">
             {needsFeature && (
@@ -177,6 +182,7 @@ const initialState: DialogState = {
   protocol: "http",
   url: "",
   testStatus: "idle",
+  testAttempt: null,
   btSelected: undefined,
   serialSelected: undefined,
 };
@@ -205,13 +211,19 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
     case "SET_URL":
       return { ...state, url: action.payload };
     case "SET_TEST_STATUS":
-      return { ...state, testStatus: action.payload };
+      return {
+        ...state,
+        testStatus: action.payload,
+        testAttempt: action.payload === "testing" ? state.testAttempt : null,
+      };
+    case "SET_TEST_ATTEMPT":
+      return { ...state, testAttempt: action.payload };
     case "SET_BT_SELECTED":
       return { ...state, btSelected: action.payload };
     case "SET_SERIAL_SELECTED":
       return { ...state, serialSelected: action.payload };
     case "SET_URL_AND_RESET_TEST":
-      return { ...state, url: action.payload, testStatus: "idle" };
+      return { ...state, url: action.payload, testStatus: "idle", testAttempt: null };
     default:
       return state;
   }
@@ -245,9 +257,7 @@ function PickerRow({
           <MousePointerClick className="h-4 w-4" />
           {buttonText}
         </Button>
-        <div className="text-sm text-muted-foreground truncate">
-          {display}
-        </div>
+        <div className="text-sm text-muted-foreground truncate">{display}</div>
       </div>
       {helper ? (
         <p className="text-xs text-muted-foreground">{helper}</p>
@@ -403,7 +413,14 @@ export default function AddConnectionDialog({
       return;
     }
     dispatch({ type: "SET_TEST_STATUS", payload: "testing" });
-    const reachable = await testHttpReachable(validatedURL.data);
+    const reachable = await testHttpReachable(
+      validatedURL.data,
+      4000,
+      2,
+      (current, total) => {
+        dispatch({ type: "SET_TEST_ATTEMPT", payload: { current, total } });
+      },
+    );
     if (reachable) {
       dispatch({ type: "SET_TEST_STATUS", payload: "success" });
     } else {
@@ -468,9 +485,18 @@ export default function AddConnectionDialog({
                 {state.testStatus === "testing" ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {t(
-                      "addConnection.httpConnection.connectionTest.button.loading",
-                    )}
+                    {state.testAttempt
+                      ? t(
+                          "addConnection.httpConnection.connectionTest.button.testing",
+                          {
+                            current: state.testAttempt.current,
+                            total: state.testAttempt.total,
+                            defaultValue: `Testing ${state.testAttempt.current}/${state.testAttempt.total}`,
+                          },
+                        )
+                      : t(
+                          "addConnection.httpConnection.connectionTest.button.loading",
+                        )}
                   </>
                 ) : (
                   <>
@@ -610,18 +636,17 @@ export default function AddConnectionDialog({
   const currentPane = PANES[state.tab];
   const canCreate = useMemo(() => currentPane.validate(), [currentPane]);
 
-  const submit =
-    (fn: (p: NewConnectionInput) => Promise<void>) => async () => {
-      if (!canCreate) {
-        return;
-      }
-      const payload = currentPane.build();
+  const submit = (fn: (p: NewConnectionInput) => Promise<void>) => async () => {
+    if (!canCreate) {
+      return;
+    }
+    const payload = currentPane.build();
 
-      if (!payload) {
-        return;
-      }
-      await fn(payload);
-    };
+    if (!payload) {
+      return;
+    }
+    await fn(payload);
+  };
 
   return (
     <DialogWrapper
@@ -665,16 +690,10 @@ export default function AddConnectionDialog({
                 </div>
                 {PANES[key].children()}
                 <div className="flex justify-end gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => onOpenChange(false)}
-                  >
+                  <Button variant="outline" onClick={() => onOpenChange(false)}>
                     {t("button.cancel")}
                   </Button>
-                  <Button
-                    onClick={submit(onSave)}
-                    disabled={!canCreate}
-                  >
+                  <Button onClick={submit(onSave)} disabled={!canCreate}>
                     {t("button.saveConnection")}
                   </Button>
                 </div>

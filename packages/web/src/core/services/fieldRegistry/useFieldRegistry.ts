@@ -1,11 +1,11 @@
 import { useSyncExternalStore } from "react";
-import { fieldRegistry } from "./FieldRegistry";
+import { fieldRegistry } from "./FieldRegistry.ts";
 import type {
   ConfigSection,
   FieldChangeEntry,
   FieldMetadata,
   FieldSearchResult,
-} from "./types";
+} from "./types.ts";
 
 /**
  * A wrapper store that adds reactivity to the static fieldRegistry.

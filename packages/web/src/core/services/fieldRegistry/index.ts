@@ -1,5 +1,4 @@
 export { FieldRegistry, fieldRegistry } from "./FieldRegistry.ts";
-export { createFieldMetadata } from "./registerFieldsFromGroups.ts";
 export type {
   ConfigSection,
   FieldChangeEntry,

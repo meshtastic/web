@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import { useFilter } from "./useFilter";
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { useFilter } from "./useFilter.ts";
 
 describe("useFilter", () => {
   const options = [
@@ -10,14 +10,14 @@ describe("useFilter", () => {
 
   it("should initialize with default filter", () => {
     const { result } = renderHook(() =>
-      useFilter({ options, defaultFilter: "opt1" })
+      useFilter({ options, defaultFilter: "opt1" }),
     );
     expect(result.current.activeFilter).toBe("opt1");
   });
 
   it("should change filter in radio mode", () => {
     const { result } = renderHook(() =>
-      useFilter({ options, defaultFilter: "opt1", variant: "radio" })
+      useFilter({ options, defaultFilter: "opt1", variant: "radio" }),
     );
 
     act(() => {
@@ -29,7 +29,7 @@ describe("useFilter", () => {
 
   it("should toggle filter in multiselect mode (single toggle)", () => {
     const { result } = renderHook(() =>
-      useFilter({ options, defaultFilter: "opt1", variant: "multiselect" })
+      useFilter({ options, defaultFilter: "opt1", variant: "multiselect" }),
     );
 
     // Toggle off
@@ -44,21 +44,21 @@ describe("useFilter", () => {
     });
     expect(result.current.activeFilter).toBe("opt2");
   });
-  
+
   it("should return the selected option in filteredData", () => {
     const { result } = renderHook(() =>
-        useFilter({ options, defaultFilter: "opt1" })
-      );
-      
-      expect(result.current.filteredData).toHaveLength(1);
-      expect(result.current.filteredData[0].id).toBe("opt1");
+      useFilter({ options, defaultFilter: "opt1" }),
+    );
+
+    expect(result.current.filteredData).toHaveLength(1);
+    expect(result.current.filteredData[0].id).toBe("opt1");
   });
 
   it("should return all options in filteredData if no filter active", () => {
     const { result } = renderHook(() =>
-        useFilter({ options, defaultFilter: undefined })
-      );
-      
-      expect(result.current.filteredData).toHaveLength(2);
+      useFilter({ options, defaultFilter: undefined }),
+    );
+
+    expect(result.current.filteredData).toHaveLength(2);
   });
 });

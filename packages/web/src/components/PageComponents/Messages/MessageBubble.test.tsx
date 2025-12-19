@@ -1,11 +1,17 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { MessageBubble } from "./MessageBubble";
 import type { Message } from "@db/schema";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { MessageBubble } from "./MessageBubble.tsx";
 
 // Mock MessageStatusIndicator
 vi.mock("./MessageStatusIndicator", () => ({
-  MessageStatusIndicator: ({ message, className }: { message: Message; className?: string }) => (
+  MessageStatusIndicator: ({
+    message,
+    className,
+  }: {
+    message: Message;
+    className?: string;
+  }) => (
     <div data-testid="message-status" className={className}>
       Status: {message.state}
     </div>
@@ -14,7 +20,15 @@ vi.mock("./MessageStatusIndicator", () => ({
 
 // Mock RetryButton
 vi.mock("./RetryButton", () => ({
-  RetryButton: ({ messageId, deviceId, className }: { messageId: number; deviceId: number; className?: string }) => (
+  RetryButton: ({
+    messageId,
+    deviceId,
+    className,
+  }: {
+    messageId: number;
+    deviceId: number;
+    className?: string;
+  }) => (
     <button
       data-testid="retry-button"
       className={className}
@@ -34,7 +48,10 @@ vi.mock("@components/NodeAvatar", () => ({
   ),
 }));
 
-const createMockMessage = (state: Message["state"], overrides: Partial<Message> = {}): Message => ({
+const createMockMessage = (
+  state: Message["state"],
+  overrides: Partial<Message> = {},
+): Message => ({
   id: 1,
   deviceId: 1,
   messageId: 123,
@@ -73,7 +90,7 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={true}
         deviceId={1}
-      />
+      />,
     );
 
     expect(screen.getByText("Test message")).toBeInTheDocument();
@@ -91,7 +108,7 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={false}
         deviceId={1}
-      />
+      />,
     );
 
     expect(screen.getByText("Test message")).toBeInTheDocument();
@@ -104,7 +121,7 @@ describe("MessageBubble", () => {
     const message = createMockMessage("failed", {
       fromNode: 789012,
       retryCount: 1,
-      maxRetries: 3
+      maxRetries: 3,
     });
 
     render(
@@ -114,7 +131,7 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={true}
         deviceId={1}
-      />
+      />,
     );
 
     expect(screen.getByTestId("retry-button")).toBeInTheDocument();
@@ -130,7 +147,7 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={true}
         deviceId={1}
-      />
+      />,
     );
 
     // The mock RetryButton always renders, so we need to check the actual logic
@@ -141,7 +158,7 @@ describe("MessageBubble", () => {
   it("should show MQTT indicator for messages via MQTT", () => {
     const message = createMockMessage("ack", {
       fromNode: 123456,
-      viaMqtt: true
+      viaMqtt: true,
     });
 
     render(
@@ -151,7 +168,7 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={false}
         deviceId={1}
-      />
+      />,
     );
 
     expect(screen.getByText("☁️")).toBeInTheDocument();
@@ -168,7 +185,7 @@ describe("MessageBubble", () => {
         isMine={false}
         showAvatar={false}
         deviceId={1}
-      />
+      />,
     );
 
     expect(screen.queryByTestId("node-avatar")).not.toBeInTheDocument();
@@ -185,7 +202,7 @@ describe("MessageBubble", () => {
         isMine={true}
         showTimestamp={false}
         deviceId={1}
-      />
+      />,
     );
 
     // Should not show time (regex for HH:MM format)
@@ -202,7 +219,7 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={true}
         deviceId={1}
-      />
+      />,
     );
 
     const container = screen.getByText("Test message").closest("div");
@@ -219,7 +236,7 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={false}
         deviceId={1}
-      />
+      />,
     );
 
     const container = screen.getByText("Test message").closest("div");
@@ -230,7 +247,7 @@ describe("MessageBubble", () => {
     const testDate = new Date(2023, 0, 1, 14, 30); // 2:30 PM
     const message = createMockMessage("sent", {
       fromNode: 789012,
-      date: testDate
+      date: testDate,
     });
 
     render(
@@ -240,7 +257,7 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={true}
         deviceId={1}
-      />
+      />,
     );
 
     expect(screen.getByText("02:30 p.m.")).toBeInTheDocument();

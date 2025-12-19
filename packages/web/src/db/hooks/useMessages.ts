@@ -1,10 +1,11 @@
 import type { Result } from "neverthrow";
 import { ResultAsync } from "neverthrow";
 import { useCallback, useEffect, useState } from "react";
-import { MessageError } from "../errors";
-import { DB_EVENTS, dbEvents } from "../events";
-import { messageRepo } from "../repositories";
-import type { Message } from "../schema";
+import { MessageError } from "../errors.ts";
+import { DB_EVENTS, dbEvents } from "../events.ts";
+import { messageRepo } from "../repositories/index.ts";
+import type { Message } from "../schema.ts";
+import type { ConversationType } from "../types.ts";
 
 /**
  * Hook to fetch direct messages between two nodes
@@ -45,7 +46,7 @@ export function useDirectMessages(
  * Hook to fetch broadcast messages for a channel
  * Auto-refreshes when new messages are saved
  */
-export function useBroadcastMessages(
+export function useChannelMessages(
   deviceId: number,
   channelId: number,
   limit = 50,
@@ -134,7 +135,7 @@ export function usePendingMessages(deviceId: number) {
 }
 
 type Conversation = {
-  type: "direct" | "broadcast";
+  type: ConversationType;
   id: number;
   lastMessage: Message | null;
   unreadCount: number;
@@ -142,23 +143,24 @@ type Conversation = {
 
 /**
  * Hook to get conversations list (for contact sidebar)
- * Returns a list of unique conversations with their last message
+ * Returns a list of unique conversations with their last message and unread counts
+ * @param myNodeNum - The current user's node number (needed for unread count calculations)
  */
-export function useConversations(deviceId: number) {
+export function useConversations(deviceId: number, myNodeNum: number) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
   const refresh = useCallback(async (): Promise<
     Result<Conversation[], MessageError>
   > => {
     const result = await ResultAsync.fromPromise(
-      messageRepo.getConversations(deviceId),
+      messageRepo.getConversations(deviceId, myNodeNum),
       (cause) => MessageError.getConversations(deviceId, cause),
     );
     if (result.isOk()) {
       setConversations(result.value);
     }
     return result;
-  }, [deviceId]);
+  }, [deviceId, myNodeNum]);
 
   useEffect(() => {
     refresh();

@@ -1,5 +1,5 @@
-import type { FilterOption } from "./Filter";
-import type { ContactFilterType } from "./FilterTypes";
+import type { FilterOption } from "./Filter.tsx";
+import type { ContactFilterType } from "./FilterTypes.ts";
 
 export const contactFilterOptions: FilterOption<ContactFilterType>[] = [
   { id: "all", label: "All Contacts", icon: "Users" },

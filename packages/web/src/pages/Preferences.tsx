@@ -19,7 +19,7 @@ import {
 import { Separator } from "@components/ui/separator";
 import { Slider } from "@components/ui/slider";
 import { Switch } from "@components/ui/switch";
-import { usePreferencesStore } from "@core/stores";
+import { useUIStore } from "@core/stores";
 import {
   Globe,
   MapPin,
@@ -63,13 +63,51 @@ export default function PreferencesPage() {
     setMessageSoundEnabled,
     setAlertSoundEnabled,
     resetToDefaults,
-  } = usePreferencesStore();
+  } = useUIStore();
+
+  const themeMap = new Map([
+    [
+      "light",
+      { id: "light", labelKey: "preferences.appearance.light", Icon: Sun },
+    ],
+    [
+      "dark",
+      { id: "dark", labelKey: "preferences.appearance.dark", Icon: Moon },
+    ],
+    [
+      "system",
+      {
+        id: "system",
+        labelKey: "preferences.appearance.system",
+        Icon: Monitor,
+      },
+    ],
+  ]);
+
+  function renderThemeOptions(t: (k: string) => string) {
+    return Array.from(themeMap.values()).map(({ id, labelKey, Icon }) => (
+      <div key={id}>
+        <RadioGroupItem value={id} id={id} className="peer sr-only" />
+        <Label
+          htmlFor={id}
+          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+        >
+          <Icon className="mb-3 h-6 w-6" />
+          {t(labelKey)}
+        </Label>
+      </div>
+    ));
+  }
 
   return (
     <div className="p-6 max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">{t("preferences.title")}</h1>
-        <p className="text-sm md:text-base text-muted-foreground">{t("preferences.description")}</p>
+        <h1 className="text-2xl md:text-3xl font-bold">
+          {t("preferences.title")}
+        </h1>
+        <p className="text-sm md:text-base text-muted-foreground">
+          {t("preferences.description")}
+        </p>
       </div>
 
       {/* Appearance */}
@@ -93,51 +131,7 @@ export default function PreferencesPage() {
               }
               className="grid grid-cols-3 gap-4"
             >
-              <div>
-                {/** biome-ignore lint/correctness/useUniqueElementIds: you're being too picky */}
-                <RadioGroupItem
-                  value="light"
-                  id="light"
-                  className="peer sr-only"
-                />
-                <Label
-                  htmlFor="light"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                >
-                  <Sun className="mb-3 h-6 w-6" />
-                  {t("preferences.appearance.light")}
-                </Label>
-              </div>
-              <div>
-                {/** biome-ignore lint/correctness/useUniqueElementIds: you're being too picky */}
-                <RadioGroupItem
-                  value="dark"
-                  id="dark"
-                  className="peer sr-only"
-                />
-                <Label
-                  htmlFor="dark"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                >
-                  <Moon className="mb-3 h-6 w-6" />
-                  {t("preferences.appearance.dark")}
-                </Label>
-              </div>
-              <div>
-                {/** biome-ignore lint/correctness/useUniqueElementIds: you're being too picky */}
-                <RadioGroupItem
-                  value="system"
-                  id="system"
-                  className="peer sr-only"
-                />
-                <Label
-                  htmlFor="system"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                >
-                  <Monitor className="mb-3 h-6 w-6" />
-                  {t("preferences.appearance.system")}
-                </Label>
-              </div>
+              {renderThemeOptions(t)}
             </RadioGroup>
           </div>
           <Separator />

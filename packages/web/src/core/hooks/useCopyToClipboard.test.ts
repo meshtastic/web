@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { useCopyToClipboard } from "./useCopyToClipboard";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useCopyToClipboard } from "./useCopyToClipboard.ts";
 
 describe("useCopyToClipboard", () => {
   const mockWriteText = vi.fn();
@@ -35,7 +35,7 @@ describe("useCopyToClipboard", () => {
 
   it("should set isCopied to true and then false after timeout on successful copy", async () => {
     const { result } = renderHook(() => useCopyToClipboard({ timeout: 1000 }));
-    
+
     let copyResult;
     await act(async () => {
       copyResult = await result.current.copy("test text");
@@ -54,10 +54,12 @@ describe("useCopyToClipboard", () => {
 
   it("should set isCopied to false and return false on failed copy", async () => {
     mockWriteText.mockRejectedValueOnce(new Error("Permission denied"));
-    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     const { result } = renderHook(() => useCopyToClipboard({ timeout: 1000 }));
-    
+
     let copyResult;
     await act(async () => {
       copyResult = await result.current.copy("test text");
@@ -78,10 +80,12 @@ describe("useCopyToClipboard", () => {
         clipboard: undefined, // Simulate no clipboard API
       },
     });
-    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const consoleWarnSpy = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => {});
 
     const { result } = renderHook(() => useCopyToClipboard());
-    
+
     let copyResult;
     await act(async () => {
       copyResult = await result.current.copy("test text");
@@ -96,7 +100,7 @@ describe("useCopyToClipboard", () => {
 
   it("should clear previous timeout if copy is called again before timeout expires", async () => {
     const { result } = renderHook(() => useCopyToClipboard({ timeout: 1000 }));
-    
+
     await act(async () => {
       await result.current.copy("text1");
     });

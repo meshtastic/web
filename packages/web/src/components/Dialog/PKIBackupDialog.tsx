@@ -8,8 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/ui/dialog.tsx";
-import { useNodes } from "@db/hooks";
 import { useDevice, useDeviceContext } from "@core/stores";
+import { useNodes } from "@db/hooks";
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
@@ -33,7 +33,9 @@ export const PkiBackupDialog = ({
 
   const myNode = React.useMemo(() => {
     const myNodeNum = hardware.myNodeNum;
-    if (!myNodeNum) return undefined;
+    if (!myNodeNum) {
+      return undefined;
+    }
     return allNodes.find((n) => n.nodeNum === myNodeNum);
   }, [allNodes, hardware.myNodeNum]);
 

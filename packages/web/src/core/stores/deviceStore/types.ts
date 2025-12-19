@@ -1,8 +1,8 @@
-import type { Protobuf } from "@meshtastic/core";
 import type {
   ValidConfigType,
   ValidModuleConfigType,
 } from "@components/Settings/types.ts";
+import type { Protobuf } from "@meshtastic/core";
 
 interface Dialogs {
   import: boolean;
@@ -19,9 +19,9 @@ interface Dialogs {
   managedMode: boolean;
   clientNotification: boolean;
   resetNodeDb: boolean;
-  clearAllStores: boolean;
   factoryResetDevice: boolean;
   factoryResetConfig: boolean;
+  tracerouteResponse: boolean;
 }
 
 type DialogVariant = keyof Dialogs;

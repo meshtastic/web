@@ -1,28 +1,27 @@
 import { FactoryResetConfigDialog } from "@app/components/Dialog/FactoryResetConfigDialog/FactoryResetConfigDialog";
 import { FactoryResetDeviceDialog } from "@app/components/Dialog/FactoryResetDeviceDialog/FactoryResetDeviceDialog";
-import { ClearAllStoresDialog } from "@components/Dialog/ClearAllStoresDialog/ClearAllStoresDialog.tsx";
 import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 import { NodeDetailsDrawer } from "@components/Dialog/NodeDetailsDrawer";
 import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
-import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
 import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
 import { ResetNodeDbDialog } from "@components/Dialog/ResetNodeDbDialog/ResetNodeDbDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
+import { TracerouteResponseDialog } from "@components/Dialog/TracerouteResponseDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 import { useDevice } from "@core/stores";
 import { useChannels } from "@db/hooks";
 import { toByteArray } from "base64-js";
-import { useMemo } from "react";
+import { Activity, useMemo } from "react";
 
 export const DialogManager = () => {
-  const { config, dialog, setDialogOpen, id: deviceId } = useDevice();
+  const { dialog, setDialogOpen, id: deviceId } = useDevice();
   const { channels: dbChannels } = useChannels(deviceId);
 
   // Convert DB channels to Map format for QRDialog
-  const channelsMap = useMemo(() => {
+  const _channelsMap = useMemo(() => {
     const map = new Map();
     for (const ch of dbChannels) {
       map.set(ch.channelIndex, {
@@ -109,12 +108,6 @@ export const DialogManager = () => {
           setDialogOpen("resetNodeDb", open);
         }}
       />
-      <ClearAllStoresDialog
-        open={dialog.clearAllStores}
-        onOpenChange={(open) => {
-          setDialogOpen("clearAllStores", open);
-        }}
-      />
       <FactoryResetDeviceDialog
         open={dialog.factoryResetDevice}
         onOpenChange={(open) => {
@@ -127,12 +120,15 @@ export const DialogManager = () => {
           setDialogOpen("factoryResetConfig", open);
         }}
       />
-      <NodeDetailsDrawer
-        open={dialog.nodeDetails}
-        onOpenChange={(open) => {
-          setDialogOpen("nodeDetails", open);
-        }}
-      />
+      <Activity>
+        <NodeDetailsDrawer
+          open={dialog.nodeDetails}
+          onOpenChange={(open) => {
+            setDialogOpen("nodeDetails", open);
+          }}
+        />
+      </Activity>
+      <TracerouteResponseDialog />
     </>
   );
 };

@@ -1,21 +1,23 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf, Types } from "@meshtastic/core";
 import type {
   ValidConfigType,
   ValidModuleConfigType,
 } from "@components/Settings/types.ts";
 import type { Device } from "@core/stores/deviceStore/index.ts";
 import { channelRepo, nodeRepo } from "@db/index";
+import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import yaml from "js-yaml";
+import { ConfigBackupValidationService } from "../../validation/configBackup.ts";
 
-export interface YAMLUserConfig {
+export interface ConfigBackupUserConfig {
   longName?: string;
   shortName?: string;
   isLicensed?: boolean;
+  isUnmessageable?: boolean;
 }
 
-export interface YAMLExportData {
+export interface ConfigBackupData {
   version: string;
   metadata: {
     exportedAt: string;
@@ -24,13 +26,13 @@ export interface YAMLExportData {
     firmwareVersion?: string;
     nodeId?: number;
   };
-  user?: YAMLUserConfig;
+  user?: ConfigBackupUserConfig;
   config: Record<string, unknown>;
   moduleConfig: Record<string, unknown>;
   channels: unknown[];
 }
 
-export interface ParsedYAMLField {
+export interface ParsedConfigBackupField {
   path: string[];
   value: unknown;
   type: "config" | "moduleConfig" | "channel" | "user";
@@ -40,7 +42,7 @@ export interface ParsedYAMLField {
 }
 
 // Helper to recursively convert Uint8Array to Base64 and BigInt to number
-function serializeForYAML(obj: unknown): unknown {
+function serializeForConfigBackup(obj: unknown): unknown {
   if (obj instanceof Uint8Array) {
     return fromByteArray(obj);
   }
@@ -49,13 +51,15 @@ function serializeForYAML(obj: unknown): unknown {
     return Number(obj);
   }
   if (Array.isArray(obj)) {
-    return obj.map(serializeForYAML);
+    return obj.map(serializeForConfigBackup);
   }
   if (obj && typeof obj === "object") {
     const newObj: Record<string, unknown> = {};
     for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        newObj[key] = serializeForYAML((obj as Record<string, unknown>)[key]);
+      if (Object.hasOwn(obj, key)) {
+        newObj[key] = serializeForConfigBackup(
+          (obj as Record<string, unknown>)[key],
+        );
       }
     }
     return newObj;
@@ -63,15 +67,15 @@ function serializeForYAML(obj: unknown): unknown {
   return obj;
 }
 
-export class YAMLService {
-  static async exportToYAML(device: Device): Promise<string> {
+export class ConfigBackupService {
+  static async createBackup(device: Device): Promise<string> {
     const myNodeNum = device.getMyNodeNum();
 
     // Fetch channels from database
     const dbChannels = await channelRepo.getChannels(device.id);
 
     // Fetch user info from the device's own node
-    let userConfig: YAMLUserConfig | undefined;
+    let userConfig: ConfigBackupUserConfig | undefined;
     if (myNodeNum) {
       const myNode = await nodeRepo.getNode(device.id, myNodeNum);
       if (myNode) {
@@ -79,6 +83,7 @@ export class YAMLService {
           longName: myNode.longName ?? undefined,
           shortName: myNode.shortName ?? undefined,
           isLicensed: myNode.isLicensed ?? undefined,
+          isUnmessageable: myNode.isUnmessageable ?? undefined,
         };
       }
     }
@@ -91,15 +96,17 @@ export class YAMLService {
         psk: ch.psk || undefined, // Keep as string (Base64) for export
         uplinkEnabled: ch.uplinkEnabled,
         downlinkEnabled: ch.downlinkEnabled,
+        moduleSettings: ch.moduleSettings,
       },
       role: ch.role,
     }));
 
-    const exportData: YAMLExportData = {
+    const exportData: ConfigBackupData = {
       version: "1.0",
       metadata: {
         exportedAt: new Date().toISOString(),
-        deviceName: userConfig?.longName ?? device.hardware.myNodeNum?.toString(),
+        deviceName:
+          userConfig?.longName ?? device.hardware.myNodeNum?.toString(),
         hardwareModel: undefined, // MyNodeInfo doesn't have model property
         firmwareVersion: device.hardware.firmwareEdition
           ? Protobuf.Mesh.FirmwareEdition[device.hardware.firmwareEdition]
@@ -128,7 +135,7 @@ export class YAMLService {
       const config = device.getEffectiveConfig(configType);
       // Only export if config has meaningful data (not just an empty object)
       if (config && Object.keys(config).length > 0) {
-        exportData.config[configType] = serializeForYAML(config);
+        exportData.config[configType] = serializeForConfigBackup(config);
       }
     });
 
@@ -152,7 +159,7 @@ export class YAMLService {
       const config = device.getEffectiveModuleConfig(moduleType);
       // Only export if config has meaningful data (not just an empty object)
       if (config && Object.keys(config).length > 0) {
-        exportData.moduleConfig[moduleType] = serializeForYAML(config);
+        exportData.moduleConfig[moduleType] = serializeForConfigBackup(config);
       }
     });
 
@@ -165,31 +172,17 @@ export class YAMLService {
     });
   }
 
-  static parseYAML(yamlContent: string): YAMLExportData {
-    const parsed = yaml.load(yamlContent) as YAMLExportData;
-
-    // Validate basic structure
-    if (!parsed.version) {
-      throw new Error("Invalid YAML: missing version");
-    }
-
-    if (!parsed.config) {
-      throw new Error("Invalid YAML: missing config section");
-    }
-
-    if (!parsed.moduleConfig) {
-      throw new Error("Invalid YAML: missing moduleConfig section");
-    }
-
-    if (!Array.isArray(parsed.channels)) {
-      throw new Error("Invalid YAML: channels must be an array");
-    }
-
-    return parsed;
+  static parseBackup(yamlContent: string): ConfigBackupData {
+    const parsed = yaml.load(yamlContent);
+    return ConfigBackupValidationService.validateConfigBackupStructure(
+      parsed,
+    ) as ConfigBackupData;
   }
 
-  static extractFields(parsedData: YAMLExportData): ParsedYAMLField[] {
-    const fields: ParsedYAMLField[] = [];
+  static extractFields(
+    parsedData: ConfigBackupData,
+  ): ParsedConfigBackupField[] {
+    const fields: ParsedConfigBackupField[] = [];
 
     // Extract config fields
     Object.entries(parsedData.config).forEach(([section, config]) => {
@@ -228,7 +221,12 @@ export class YAMLService {
     });
 
     // Extract channel fields
-    (parsedData.channels as Array<{ index: number; settings?: Record<string, unknown> }>).forEach((channel, index) => {
+    (
+      parsedData.channels as Array<{
+        index: number;
+        settings?: Record<string, unknown>;
+      }>
+    ).forEach((channel, index) => {
       if (channel.settings) {
         Object.entries(channel.settings).forEach(([field, value]) => {
           if (value !== undefined) {
@@ -265,8 +263,8 @@ export class YAMLService {
   }
 
   static async applyToDevice(
-    _parsedData: YAMLExportData,
-    selectedFields: ParsedYAMLField[],
+    _parsedData: ConfigBackupData,
+    selectedFields: ParsedConfigBackupField[],
     device: Device,
     onProgress?: (percent: number, status: string) => void,
   ): Promise<void> {
@@ -307,7 +305,7 @@ export class YAMLService {
         }
         moduleConfigUpdates.get(moduleType)![field.field] = processedValue;
       } else if (field.type === "channel") {
-        const channelIndex = parseInt(field.path[1] || "0");
+        const channelIndex = parseInt(field.path[1] || "0", 10);
         if (!channelUpdates.has(channelIndex)) {
           channelUpdates.set(channelIndex, {});
         }
@@ -319,7 +317,10 @@ export class YAMLService {
 
     const hasUserUpdates = Object.keys(userUpdates).length > 0;
     const totalSteps =
-      configUpdates.size + moduleConfigUpdates.size + channelUpdates.size + (hasUserUpdates ? 1 : 0);
+      configUpdates.size +
+      moduleConfigUpdates.size +
+      channelUpdates.size +
+      (hasUserUpdates ? 1 : 0);
     let currentStep = 0;
 
     const updateProgress = (stepName: string) => {
@@ -424,7 +425,7 @@ export class YAMLService {
       updateProgress("Applying user config...");
 
       // Get current user data from node
-      let currentUser: YAMLUserConfig = {};
+      let currentUser: ConfigBackupUserConfig = {};
       const myNodeNum = device.getMyNodeNum();
       if (myNodeNum) {
         const myNode = await nodeRepo.getNode(device.id, myNodeNum);
@@ -433,6 +434,7 @@ export class YAMLService {
             longName: myNode.longName ?? undefined,
             shortName: myNode.shortName ?? undefined,
             isLicensed: myNode.isLicensed ?? undefined,
+            isUnmessageable: myNode.isUnmessageable ?? undefined,
           };
         }
       }
@@ -449,7 +451,7 @@ export class YAMLService {
     }
   }
 
-  static downloadYAML(content: string, filename: string): void {
+  static downloadBackup(content: string, filename: string): void {
     const blob = new Blob([content], { type: "text/yaml;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -461,7 +463,7 @@ export class YAMLService {
     URL.revokeObjectURL(url);
   }
 
-  static readYAMLFile(file: File): Promise<string> {
+  static readBackupFile(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {

@@ -25,7 +25,7 @@ export const useFilter = <T>({
       return options;
     }
     return options.filter((option) => option.id === activeFilter);
-  }, [activeFilter]);
+  }, [activeFilter, options]);
 
   const handleFilterChange = (filter: T) => {
     if (variant === "radio") {

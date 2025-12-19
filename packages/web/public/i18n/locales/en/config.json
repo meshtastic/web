@@ -1,4 +1,84 @@
 {
+  "settings": {
+    "advanced": {
+      "administration": {
+        "title": "Administration",
+        "description": "Device management actions including reboot, shutdown, and reset options",
+        "reboot": {
+          "title": "Reboot",
+          "description": "Restart the connected device",
+          "button": "Reboot"
+        },
+        "shutdown": {
+          "title": "Shutdown",
+          "description": "Turn off the connected device",
+          "button": "Shutdown"
+        },
+        "resetNodeDb": {
+          "title": "Reset Node Database",
+          "description": "Clear all nodes from the device's node database",
+          "button": "Reset"
+        },
+        "factoryReset": {
+          "title": "Factory Reset",
+          "description": "Reset the device to factory defaults, erasing all configurations and data",
+          "button": "Factory Reset"
+        }
+      },
+      "database": {
+        "title": "Database",
+        "description": "Manage local database storage and cleanup settings",
+        "cleanNodes": {
+          "title": "Clean Node Database",
+          "description": "Automatically remove nodes from the local database that haven't been heard from recently. Runs weekly.",
+          "daysLabel": "Clean up nodes last seen older than {{days}} days",
+          "unknownOnly": "Clean up only unknown nodes",
+          "queuedCount": "{{count}} nodes queued for deletion",
+          "lastRun": "Last run: {{- time}}",
+          "cleanNow": "Clean Now"
+        }
+      },
+      "debugLog": {
+        "title": "Debug Log",
+        "description": "View raw packet log for debugging and troubleshooting",
+        "button": { "open": "View Debug Log" },
+        "packetCount": "{{count}} packets",
+        "refresh": "Refresh",
+        "noPackets": "No packets logged"
+      },
+      "backupRestore": {
+        "title": "Backup & Restore",
+        "description": "Export and import device configuration and encryption keys",
+        "export": {
+          "title": "Export Configuration",
+          "description": "Download device configuration as a YAML file",
+          "button": "Export",
+          "successTitle": "Export Successful",
+          "successDescription": "Configuration exported successfully.",
+          "failedTitle": "Export Failed"
+        },
+        "import": {
+          "title": "Import Configuration",
+          "description": "Restore device configuration from a YAML file",
+          "button": "Import",
+          "successTitle": "Import Successful",
+          "successDescription": "Configuration imported successfully.",
+          "failedTitle": "Import Failed"
+        },
+        "backupKeys": {
+          "title": "Backup Keys",
+          "description": "Download your encryption keys for safekeeping",
+          "button": "Backup"
+        }
+      }
+    }
+  },
+  "database": {
+    "cleanNodes": "Clean Node Database",
+    "noResults": "No seetings found matching {{search}}",
+    "title": "Database",
+    "description": "Manage local database storage and cleanup settings"
+  },
   "page": {
     "title": "Settings",
     "tabUser": "User",
@@ -480,13 +560,16 @@
     }
   },
   "importConfig": {
+    "title": "Import Configuration",
+    "description": "Import configuration settings from a YAML file",
+    "selectFile": "Select YAML File",
     "yamlContent": "YAML Content",
-    "placeholder": "Paste or upload YAML content here",
+    "placeholder": "Paste or upload YAML content here...",
     "searchPlaceholder": "Search configuration fields",
     "fieldCount": "{{count}} fields found",
     "selectedCount": "{{count}} selected",
     "importSelected": "Import Selected {{count}}",
-    "selectAll": "Select ALl",
+    "selectAll": "Select All",
     "deselectAll": "Deselect All"
   },
   "user": {

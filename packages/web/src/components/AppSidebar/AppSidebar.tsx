@@ -1,4 +1,5 @@
 import { Link } from "@app/components/ui/link";
+import { ONLINE_THRESHOLD_SECONDS } from "@components/generic/OnlineIndicator";
 import { NodeAvatar } from "@components/NodeAvatar";
 import { Badge } from "@components/ui/badge";
 import {
@@ -14,17 +15,17 @@ import {
   SidebarMenuItem,
 } from "@components/ui/sidebar.tsx";
 import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
+import { useConversations, useNodes } from "@db/hooks";
 import { useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   MapIcon,
   MessageSquare,
   Settings,
-  SlidersHorizontal,
   Users,
 } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 const getMainNavItems = (unreadCount: number) => [
   {
@@ -56,20 +57,16 @@ const configNavItems = [
     url: "/settings",
     icon: Settings,
   },
-  {
-    title: "Preferences",
-    url: "/preferences",
-    icon: SlidersHorizontal,
-  },
 ];
 
 export function AppSidebar() {
   const pathname = useLocation().pathname;
+
   const { deviceId } = useDeviceContext();
   const device = useDevice();
+  const { t } = useTranslation();
   const { nodes: allNodes } = useNodes(deviceId);
 
-  // Get myNode from database
   const myNode = useMemo(() => {
     const myNodeNum = device.hardware?.myNodeNum;
     if (!myNodeNum) {
@@ -78,14 +75,20 @@ export function AppSidebar() {
     return allNodes.find((n) => n.nodeNum === myNodeNum);
   }, [allNodes, device.hardware?.myNodeNum]);
 
-  // TODO: Implement total unread count from database
-  // Calculate total unread messages
-  const totalUnread = 0;
+  const { conversations } = useConversations(deviceId);
 
-  const mainNavItems = useMemo(() => getMainNavItems(totalUnread), []);
+  // Calculate total unread messages
+  const totalUnread = useMemo(() => {
+    return conversations.reduce((acc, conv) => acc + conv.unreadCount, 0);
+  }, [conversations]);
+
+  const mainNavItems = useMemo(
+    () => getMainNavItems(totalUnread),
+    [totalUnread],
+  );
 
   const nodeStats = useMemo(() => {
-    const onlineThreshold = Date.now() / 1000 - 900; // heard in the last 15 minutes
+    const onlineThreshold = Date.now() / 1000 - ONLINE_THRESHOLD_SECONDS;
 
     const onlineCount = allNodes.filter((node) => {
       const lastHeardSec = node.lastHeard
@@ -109,16 +112,16 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-semibold text-sidebar-foreground">
-              Meshtastic
+              {t("app.title")}
             </span>
-            <span className="text-xs text-muted-foreground">Web Client</span>
+            <span className="text-sm text-muted-foreground">Web Client</span>
           </div>
         </Link>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("navigation.title")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavItems.map((item) => (

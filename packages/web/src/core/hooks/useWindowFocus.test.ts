@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { useWindowFocus } from "./useWindowFocus";
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { useWindowFocus } from "./useWindowFocus.ts";
 
 describe("useWindowFocus", () => {
   it("should initialize with true (focused)", () => {

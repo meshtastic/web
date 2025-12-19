@@ -1,8 +1,8 @@
-import type { ConnectionStatus } from "@db/repositories/ConnectionRepository";
 import { Avatar } from "@components/ui/avatar.tsx";
 import { Button } from "@components/ui/button.tsx";
 import { Subtle } from "@components/ui/typography/subtle.tsx";
 import { cn } from "@core/utils/cn.ts";
+import type { ConnectionStatus } from "@db/repositories/ConnectionRepository";
 import type { Protobuf } from "@meshtastic/core";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -221,7 +221,10 @@ export const DeviceInfoPanel = ({
         {deviceInfoItems.map((item) => {
           const IconComponent = item.icon;
           return (
-            <div key={item.id} className="flex items-center gap-2.5 text-sm md:text-base">
+            <div
+              key={item.id}
+              className="flex items-center gap-2.5 text-sm md:text-base"
+            >
               {IconComponent && (
                 <IconComponent
                   size={16}

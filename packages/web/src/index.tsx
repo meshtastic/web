@@ -9,7 +9,7 @@ import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
 import { WelcomeSplash } from "@components/WelcomeSplash.tsx";
-import { initDatabase, resetConnectionStatuses } from "@db/index";
+import { initDatabase, packetBatcher, resetConnectionStatuses } from "@db/index";
 import { RouterProvider } from "@tanstack/react-router";
 
 declare module "@tanstack/react-router" {
@@ -31,8 +31,11 @@ async function checkDatabaseExists(): Promise<boolean> {
 
 // Initialize database before React mounts
 const dbPromise = initDatabase()
-  .then(() => resetConnectionStatuses())
-.catch((error) => {
+  .then(() => {
+    packetBatcher.init();
+    return resetConnectionStatuses();
+  })
+  .catch((error) => {
     console.error("[App] Failed to initialize database:", error);
     throw error;
   });

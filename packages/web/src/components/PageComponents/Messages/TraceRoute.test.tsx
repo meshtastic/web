@@ -1,6 +1,6 @@
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
-import { useNodes } from "@db/hooks";
 import { useDeviceContext } from "@core/stores";
+import { useNodes } from "@db/hooks";
 import type { Node } from "@db/schema";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";

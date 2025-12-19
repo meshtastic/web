@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import type { FilterOption } from "./Filter";
+import type { FilterOption } from "./Filter.tsx";
 
 export type ContactFilterType =
   | "all"

@@ -1,4 +1,5 @@
 import type { NewMessage } from "@db/schema";
+import type { ConversationType } from "@db/types";
 import type { Types } from "@meshtastic/core";
 
 class PacketToMessageDTO {
@@ -9,7 +10,7 @@ class PacketToMessageDTO {
   messageId: number;
   state: "waiting" | "sending" | "sent" | "ack" | "failed";
   message: string;
-  type: "direct" | "broadcast";
+  type: ConversationType;
   hops: number;
   rxRssi: number;
   rxSnr: number;
@@ -22,7 +23,7 @@ class PacketToMessageDTO {
     this.messageId = data.id;
     this.state = data.from !== nodeNum ? "ack" : "waiting";
     this.message = data.data;
-    this.type = data.type === "direct" ? "direct" : "broadcast";
+    this.type = data.type === "direct" ? "direct" : "channel";
 
     let dateTimestamp = Date.now();
     if (data.rxTime instanceof Date) {

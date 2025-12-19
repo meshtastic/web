@@ -1,4 +1,5 @@
 import { NodeAvatar } from "@components/NodeAvatar";
+import logger from "../../../core/services/logger.ts";
 import {
   Tooltip,
   TooltipArrow,
@@ -9,9 +10,9 @@ import { cn } from "@core/utils/cn";
 import { getAvatarColors } from "@core/utils/color";
 import type { Message } from "@db/schema";
 import { Reply } from "lucide-react";
-import { EmojiReactionButton } from "./EmojiReactionButton.tsx";
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { EmojiReactionButton } from "./EmojiReactionButton.tsx";
 import { MessageStatusIndicator } from "./MessageStatusIndicator.tsx";
 import { RetryButton } from "./RetryButton.tsx";
 
@@ -39,7 +40,7 @@ export const MessageBubble = memo(function MessageBubble({
   // Memoize the background color style to prevent new object creation on every render
   const bubbleStyle = useMemo(
     () => ({
-      backgroundColor: `color-mix(in srgb, ${avatarColors.bgColor} 70%, black)`,
+      backgroundColor: `color-mix(in srgb, ${avatarColors.bgColor} 40%, black)`,
     }),
     [avatarColors.bgColor],
   );
@@ -47,7 +48,7 @@ export const MessageBubble = memo(function MessageBubble({
   // Darker version of avatar color for metadata (hops, SNR, RSSI)
   const metadataColorStyle = useMemo(
     () => ({
-      color: `color-mix(in srgb, ${avatarColors.bgColor} 40%, white)`,
+      color: `color-mix(in srgb, ${avatarColors.bgColor} 20%, white)`,
     }),
     [avatarColors.bgColor],
   );
@@ -76,7 +77,7 @@ export const MessageBubble = memo(function MessageBubble({
       )}
     >
       {/* Avatar */}
-      {showAvatar && !isMine && (
+      {showAvatar && (
         <NodeAvatar
           nodeNum={message.fromNode}
           longName={senderName}
@@ -86,7 +87,7 @@ export const MessageBubble = memo(function MessageBubble({
 
       {/* Message Bubble */}
       <div
-        className="max-w-[70%] rounded-2xl px-3 py-2 relative group flex-shrink-0 text-white"
+        className="max-w-[70%] rounded-2xl px-3 py-2 relative group shrink-0 text-white"
         style={bubbleStyle}
       >
         {/* Top Row: Sender Name (longName + nodeNum) and Action Buttons */}
@@ -102,7 +103,7 @@ export const MessageBubble = memo(function MessageBubble({
                   <span className="text-base">☁️</span>
                 </TooltipTrigger>
                 <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                  MQTT
+                  {t("MQTT")}
                 </TooltipContent>
               </Tooltip>
             )}
@@ -113,7 +114,7 @@ export const MessageBubble = memo(function MessageBubble({
               <TooltipTrigger asChild>
                 <EmojiReactionButton
                   onEmojiSelect={(emoji) => {
-                    console.log("Selected emoji:", emoji.emoji);
+                    logger.debug("Selected emoji:", emoji.emoji);
                   }}
                 />
               </TooltipTrigger>
@@ -127,13 +128,13 @@ export const MessageBubble = memo(function MessageBubble({
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="p-1 rounded transition-colors hover:bg-white/20"
+                  className="p-2 rounded transition-colors hover:bg-white/20"
                   aria-label={t("actionsMenu.reply", "Reply")}
                   onClick={() => {
                     // TODO: Implement reply
                   }}
                 >
-                  <Reply className="size-4 opacity-80" />
+                  <Reply className="size-5 opacity-90" />
                 </button>
               </TooltipTrigger>
               <TooltipContent className="bg-slate-800 text-white px-2 py-1 rounded text-xs">
@@ -158,20 +159,29 @@ export const MessageBubble = memo(function MessageBubble({
         {/* Bottom Row: Timestamp (am/pm), Hops, SNR, RSSI */}
         <div
           className={cn(
-            "flex items-center flex-wrap mt-1 gap-x-2 gap-y-0.5 text-xs md:text-sm opacity-90",
+            "flex items-center flex-wrap mt-1 gap-x-2 gap-y-0.5 text-xs md:text-sm",
             isMine ? "justify-end" : "justify-start",
           )}
         >
           {message.hops > 0 && (
-            <span style={metadataColorStyle}>{message.hops} hops</span>
+            <span style={metadataColorStyle}>
+              {message.hops} {t("unit.hops", "hops")}
+            </span>
           )}
           {message.rxSnr !== 0 && (
-            <span style={metadataColorStyle}>SNR {message.rxSnr}dB</span>
+            <span style={metadataColorStyle}>
+              {t("unit.snr", "SNR")} {message.rxSnr}
+              {t("unit.db", "dB")}
+            </span>
           )}
           {message.rxRssi !== 0 && (
             <span style={metadataColorStyle}>RSSI {message.rxRssi}dBm</span>
           )}
-          {showTimestamp && <time dateTime={isoDate}>{formattedTime}</time>}
+          {showTimestamp && (
+            <time dateTime={isoDate} className="ml-auto">
+              {formattedTime}
+            </time>
+          )}
         </div>
 
         {/* Retry Button for Failed Messages */}

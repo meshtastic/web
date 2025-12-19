@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { useBrowserFeatureDetection } from "./useBrowserFeatureDetection";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { useBrowserFeatureDetection } from "./useBrowserFeatureDetection.ts";
 
 describe("useBrowserFeatureDetection", () => {
   const originalNavigator = { ...global.navigator };
@@ -13,7 +13,11 @@ describe("useBrowserFeatureDetection", () => {
       writable: true,
     });
     delete (global as any).location;
-    global.location = { ...originalLocation, protocol: "http:", hostname: "example.com" } as any;
+    global.location = {
+      ...originalLocation,
+      protocol: "http:",
+      hostname: "example.com",
+    } as any;
   });
 
   afterEach(() => {
@@ -30,7 +34,7 @@ describe("useBrowserFeatureDetection", () => {
     global.location.protocol = "https:";
 
     const { result } = renderHook(() => useBrowserFeatureDetection());
-    
+
     expect(result.current.supported).toContain("Web Bluetooth");
     expect(result.current.supported).toContain("Web Serial");
     expect(result.current.supported).toContain("Secure Context");
@@ -44,21 +48,21 @@ describe("useBrowserFeatureDetection", () => {
     global.location.hostname = "example.com";
 
     const { result } = renderHook(() => useBrowserFeatureDetection());
-    
+
     expect(result.current.unsupported).toContain("Web Bluetooth");
     expect(result.current.unsupported).toContain("Web Serial");
     expect(result.current.unsupported).toContain("Secure Context");
     expect(result.current.supported).toHaveLength(0);
   });
-  
+
   it("should detect Secure Context on localhost http", () => {
-      (navigator as any).bluetooth = undefined;
-      (navigator as any).serial = undefined;
-      global.location.protocol = "http:";
-      global.location.hostname = "localhost";
-  
-      const { result } = renderHook(() => useBrowserFeatureDetection());
-      
-      expect(result.current.supported).toContain("Secure Context");
-    });
+    (navigator as any).bluetooth = undefined;
+    (navigator as any).serial = undefined;
+    global.location.protocol = "http:";
+    global.location.hostname = "localhost";
+
+    const { result } = renderHook(() => useBrowserFeatureDetection());
+
+    expect(result.current.supported).toContain("Secure Context");
+  });
 });

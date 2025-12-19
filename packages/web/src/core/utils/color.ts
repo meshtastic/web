@@ -64,8 +64,21 @@ export const getColorFromText = (text: string): RGBColor => {
 export const getAvatarColors = (
   text: string | number | undefined,
 ): { bgColor: string; textColor: string } => {
-  const safeText = text?.toString() || "";
-  const bgColorRGB = getColorFromText(safeText);
+  let bgColorRGB: RGBColor;
+  const num = Number(text);
+
+  if (
+    typeof text !== "undefined" &&
+    text !== null &&
+    text !== "" &&
+    !Number.isNaN(num)
+  ) {
+    bgColorRGB = getColorFromNodeNum(num);
+  } else {
+    const safeText = text?.toString() || "";
+    bgColorRGB = getColorFromText(safeText);
+  }
+
   const isLight = isLightColor(bgColorRGB);
   const textColor = isLight ? "#000000" : "#FFFFFF";
   const bgColor = `rgb(${bgColorRGB.r}, ${bgColorRGB.g}, ${bgColorRGB.b})`;

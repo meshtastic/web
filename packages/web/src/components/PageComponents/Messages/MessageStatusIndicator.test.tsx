@@ -1,10 +1,13 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import { MessageStatusIndicator } from "./MessageStatusIndicator";
 import type { Message } from "@db/schema";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { MessageStatusIndicator } from "./MessageStatusIndicator.tsx";
 
 // Mock message for different states
-const createMockMessage = (state: Message["state"], overrides: Partial<Message> = {}): Message => ({
+const createMockMessage = (
+  state: Message["state"],
+  overrides: Partial<Message> = {},
+): Message => ({
   id: 1,
   messageId: 123,
   channelId: 0,
@@ -61,7 +64,7 @@ describe("MessageStatusIndicator", () => {
   it("should show cloud with check for acknowledged messages with real ACK", () => {
     const message = createMockMessage("ack", {
       realACK: true,
-      ackSNR: 5.5
+      ackSNR: 5.5,
     });
     render(<MessageStatusIndicator message={message} />);
 
@@ -75,7 +78,7 @@ describe("MessageStatusIndicator", () => {
   it("should show cloud with check for acknowledged messages without real ACK", () => {
     const message = createMockMessage("ack", {
       realACK: false,
-      ackSNR: 3.2
+      ackSNR: 3.2,
     });
     render(<MessageStatusIndicator message={message} />);
 
@@ -89,7 +92,7 @@ describe("MessageStatusIndicator", () => {
   it("should show X icon for failed state", () => {
     const message = createMockMessage("failed", {
       ackError: 1,
-      retryCount: 2
+      retryCount: 2,
     });
     render(<MessageStatusIndicator message={message} />);
 
@@ -103,7 +106,7 @@ describe("MessageStatusIndicator", () => {
   it("should show failed without retry info when retryCount is 0", () => {
     const message = createMockMessage("failed", {
       ackError: 0,
-      retryCount: 0
+      retryCount: 0,
     });
     render(<MessageStatusIndicator message={message} />);
 
@@ -116,7 +119,7 @@ describe("MessageStatusIndicator", () => {
 
   it("should not show SNR when ackSNR is 0", () => {
     const message = createMockMessage("ack", {
-      ackSNR: 0
+      ackSNR: 0,
     });
     render(<MessageStatusIndicator message={message} />);
 
@@ -125,7 +128,9 @@ describe("MessageStatusIndicator", () => {
 
   it("should apply custom className", () => {
     const message = createMockMessage("sent");
-    const { container } = render(<MessageStatusIndicator message={message} className="custom-class" />);
+    const { container } = render(
+      <MessageStatusIndicator message={message} className="custom-class" />,
+    );
 
     const wrapper = container.firstChild;
     expect(wrapper).toHaveClass("custom-class");

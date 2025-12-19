@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { useDebounce } from "./useDebounce";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useDebounce } from "./useDebounce.ts";
 
 describe("useDebounce", () => {
   beforeEach(() => {
@@ -19,14 +19,14 @@ describe("useDebounce", () => {
   it("should update the value after the delay", () => {
     const { result, rerender } = renderHook(
       ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: "initial", delay: 500 } }
+      { initialProps: { value: "initial", delay: 500 } },
     );
 
     expect(result.current).toBe("initial");
 
     // Change value
     rerender({ value: "updated", delay: 500 });
-    
+
     // Should still be initial immediately
     expect(result.current).toBe("initial");
 
@@ -41,7 +41,7 @@ describe("useDebounce", () => {
   it("should reset timer if value changes before delay", () => {
     const { result, rerender } = renderHook(
       ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: "initial", delay: 500 } }
+      { initialProps: { value: "initial", delay: 500 } },
     );
 
     rerender({ value: "update1", delay: 500 });
@@ -49,7 +49,7 @@ describe("useDebounce", () => {
     act(() => {
       vi.advanceTimersByTime(250);
     });
-    
+
     // Change again before timeout
     rerender({ value: "update2", delay: 500 });
 

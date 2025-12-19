@@ -1,12 +1,9 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import useLang from "./useLang";
+import { FALLBACK_LANGUAGE_CODE } from "@app/i18n-config";
+import { act, renderHook } from "@testing-library/react";
 import { useTranslation } from "react-i18next";
-import useLocalStorage from "./useLocalStorage";
-import {
-  FALLBACK_LANGUAGE_CODE,
-  supportedLanguages,
-} from "@app/i18n-config";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import useLang from "./useLang.ts";
+import useLocalStorage from "./useLocalStorage.ts";
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({
@@ -45,7 +42,10 @@ describe("useLang", () => {
     });
 
     // Mock useLocalStorage
-    (useLocalStorage as vi.Mock).mockReturnValue([null, mockSetLanguageInStorage]);
+    (useLocalStorage as vi.Mock).mockReturnValue([
+      null,
+      mockSetLanguageInStorage,
+    ]);
 
     // Mock Intl.Collator as a class-like constructor
     class MockCollator {
@@ -57,9 +57,10 @@ describe("useLang", () => {
         this.options = options;
       }
 
-      compare = (a: string, b: string) => a.localeCompare(b, this.locale, this.options);
+      compare = (a: string, b: string) =>
+        a.localeCompare(b, this.locale, this.options);
     }
-    vi.spyOn(global.Intl, 'Collator' as any).mockImplementation(MockCollator);
+    vi.spyOn(global.Intl, "Collator" as any).mockImplementation(MockCollator);
   });
 
   it("should return the current language", () => {
@@ -117,7 +118,9 @@ describe("useLang", () => {
 
   it("should handle language change failure gracefully", async () => {
     mockChangeLanguage.mockRejectedValueOnce(new Error("Failed to load lang"));
-    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const consoleWarnSpy = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => {});
 
     const { result } = renderHook(() => useLang());
 
@@ -126,18 +129,21 @@ describe("useLang", () => {
     });
 
     expect(mockChangeLanguage).toHaveBeenCalledWith("es");
-    expect(consoleWarnSpy).toHaveBeenCalledWith("Failed to change language:", expect.any(Error));
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      "Failed to change language:",
+      expect.any(Error),
+    );
     consoleWarnSpy.mockRestore();
   });
 
   it("should fallback to FALLBACK_LANGUAGE_CODE if current i18n language is not supported", () => {
     (useTranslation as vi.Mock).mockReturnValue({
-        i18n: {
-          language: "fr", // Unsupported language
-          changeLanguage: mockChangeLanguage.mockResolvedValue(undefined),
-        },
-        t: (key: string) => key,
-      });
+      i18n: {
+        language: "fr", // Unsupported language
+        changeLanguage: mockChangeLanguage.mockResolvedValue(undefined),
+      },
+      t: (key: string) => key,
+    });
 
     const { result } = renderHook(() => useLang());
     expect(result.current.current?.code).toBe(FALLBACK_LANGUAGE_CODE);

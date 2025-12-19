@@ -1,9 +1,9 @@
-import { useUserForm } from "@pages/Settings/hooks";
 import type { UserValidation } from "@app/validation/config/user";
 import {
   ConfigFormFields,
   type FieldGroup,
 } from "@components/Form/ConfigFormFields";
+import { useUserForm } from "@pages/Settings/hooks";
 import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useTranslation } from "react-i18next";
 

@@ -7,14 +7,14 @@ import {
   CommandList,
 } from "@components/ui/command.tsx";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
-import { useNodes } from "@db/hooks";
 import {
-  useAppStore,
   useDevice,
   useDeviceContext,
   useDeviceStore,
+  useUIStore,
 } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
+import { useNodes } from "@db/hooks";
 import { useNavigate } from "@tanstack/react-router";
 import { useCommandState } from "cmdk";
 import {
@@ -63,11 +63,8 @@ export interface SubItem {
 }
 
 export const CommandPalette = () => {
-  const {
-    commandPaletteOpen,
-    setCommandPaletteOpen,
-    setConnectDialogOpen,
-  } = useAppStore();
+  const { commandPaletteOpen, setCommandPaletteOpen, setConnectDialogOpen } =
+    useUIStore();
   const { deviceId } = useDeviceContext();
   const { nodes: allNodes } = useNodes(deviceId);
   const { getDevices, setActiveDeviceId } = useDeviceStore();
@@ -243,13 +240,6 @@ export const CommandPalette = () => {
           icon: EraserIcon,
           action() {
             setDialogOpen("deleteMessages", true);
-          },
-        },
-        {
-          label: t("debug.command.clearAllStores"),
-          icon: EraserIcon,
-          action() {
-            setDialogOpen("clearAllStores", true);
           },
         },
       ],

@@ -1,14 +1,17 @@
+import { DB_EVENTS, dbEvents } from "@db/events";
 import { messageRepo } from "@db/index";
-import { dbEvents, DB_EVENTS } from "@db/events";
+import type { ConversationType } from "@db/types";
 import { useCallback, useEffect, useState } from "react";
 
 /**
  * Hook to get unread count for a direct conversation
+ * @param myNodeNum - The current user's node number
+ * @param otherNodeNum - The other party's node number
  */
 export function useUnreadCountDirect(
   deviceId: number,
-  nodeA: number,
-  nodeB: number,
+  myNodeNum: number,
+  otherNodeNum: number,
 ) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -16,14 +19,18 @@ export function useUnreadCountDirect(
   const refresh = useCallback(async () => {
     try {
       setLoading(true);
-      const count = await messageRepo.getUnreadCountDirect(deviceId, nodeA, nodeB);
+      const count = await messageRepo.getUnreadCountDirect(
+        deviceId,
+        myNodeNum,
+        otherNodeNum,
+      );
       setUnreadCount(count);
     } catch (error) {
       console.error("[useUnreadCountDirect] Error:", error);
     } finally {
       setLoading(false);
     }
-  }, [deviceId, nodeA, nodeB]);
+  }, [deviceId, myNodeNum, otherNodeNum]);
 
   useEffect(() => {
     refresh();
@@ -37,19 +44,19 @@ export function useUnreadCountDirect(
 }
 
 /**
- * Hook to get unread count for a broadcast channel
+ * Hook to get unread count for a channel
  */
-export function useUnreadCountBroadcast(
-  deviceId: number,
-  channelId: number,
-) {
+export function useUnreadCountBroadcast(deviceId: number, channelId: number) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     try {
       setLoading(true);
-      const count = await messageRepo.getUnreadCountBroadcast(deviceId, channelId);
+      const count = await messageRepo.getUnreadCountBroadcast(
+        deviceId,
+        channelId,
+      );
       setUnreadCount(count);
     } catch (error) {
       console.error("[useUnreadCountBroadcast] Error:", error);
@@ -74,13 +81,14 @@ export function useUnreadCountBroadcast(
  */
 export async function markConversationAsRead(
   deviceId: number,
-  type: "direct" | "broadcast",
+  type: ConversationType,
   conversationId: string | number,
   lastMessageId: number,
 ): Promise<void> {
-  const convId = typeof conversationId === "number"
-    ? conversationId.toString()
-    : conversationId;
+  const convId =
+    typeof conversationId === "number"
+      ? conversationId.toString()
+      : conversationId;
 
   await messageRepo.markAsRead(deviceId, type, convId, lastMessageId);
   dbEvents.emit(DB_EVENTS.MESSAGE_SAVED); // Trigger unread count refresh

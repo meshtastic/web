@@ -6,8 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/ui/Dialog.tsx";
-import { useNodes } from "@db/hooks";
 import { useDeviceContext } from "@core/stores";
+import { useNodes } from "@db/hooks";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";

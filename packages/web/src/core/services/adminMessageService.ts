@@ -1,7 +1,7 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/core";
 import type { Device } from "@core/stores/deviceStore";
 import { nodeRepo } from "@db/index";
+import { Protobuf } from "@meshtastic/core";
 
 /**
  * AdminMessageService - Centralized service for sending admin messages to devices
@@ -55,10 +55,7 @@ export class AdminMessageService {
    * Used by useSaveSettings to send all queued admin messages at once
    */
   static async sendQueuedMessages(
-    connection: Pick<
-      import("@meshtastic/core").MeshDevice,
-      "sendPacket"
-    >,
+    connection: Pick<import("@meshtastic/core").MeshDevice, "sendPacket">,
     messages: Protobuf.Admin.AdminMessage[],
   ): Promise<void> {
     const { toBinary } = await import("@bufbuild/protobuf");

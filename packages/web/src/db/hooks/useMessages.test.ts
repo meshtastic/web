@@ -1,9 +1,14 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { useDirectMessages, useBroadcastMessages, useAllMessages, usePendingMessages, useConversations } from "./useMessages";
-import { messageRepo } from "../repositories";
-import { dbEvents, DB_EVENTS } from "../events";
-import { ok } from "neverthrow";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DB_EVENTS, dbEvents } from "../events.ts";
+import { messageRepo } from "../repositories/index.ts";
+import {
+  useAllMessages,
+  useBroadcastMessages,
+  useConversations,
+  useDirectMessages,
+  usePendingMessages,
+} from "./useMessages.ts";
 
 // Mock dependencies
 vi.mock("../repositories", () => ({
@@ -36,7 +41,9 @@ describe("useMessages hooks", () => {
 
   describe("useDirectMessages", () => {
     it("should fetch direct messages and subscribe to updates", async () => {
-      (messageRepo.getDirectMessages as vi.Mock).mockResolvedValue(mockMessages);
+      (messageRepo.getDirectMessages as vi.Mock).mockResolvedValue(
+        mockMessages,
+      );
 
       const { result } = renderHook(() => useDirectMessages(deviceId, 1, 2));
 
@@ -44,14 +51,24 @@ describe("useMessages hooks", () => {
         expect(result.current.messages).toEqual(mockMessages);
       });
 
-      expect(messageRepo.getDirectMessages).toHaveBeenCalledWith(deviceId, 1, 2, 50);
-      expect(dbEvents.subscribe).toHaveBeenCalledWith(DB_EVENTS.MESSAGE_SAVED, expect.any(Function));
+      expect(messageRepo.getDirectMessages).toHaveBeenCalledWith(
+        deviceId,
+        1,
+        2,
+        50,
+      );
+      expect(dbEvents.subscribe).toHaveBeenCalledWith(
+        DB_EVENTS.MESSAGE_SAVED,
+        expect.any(Function),
+      );
     });
   });
 
   describe("useBroadcastMessages", () => {
     it("should fetch broadcast messages and subscribe to updates", async () => {
-      (messageRepo.getBroadcastMessages as vi.Mock).mockResolvedValue(mockMessages);
+      (messageRepo.getBroadcastMessages as vi.Mock).mockResolvedValue(
+        mockMessages,
+      );
 
       const { result } = renderHook(() => useBroadcastMessages(deviceId, 0));
 
@@ -59,8 +76,15 @@ describe("useMessages hooks", () => {
         expect(result.current.messages).toEqual(mockMessages);
       });
 
-      expect(messageRepo.getBroadcastMessages).toHaveBeenCalledWith(deviceId, 0, 50);
-      expect(dbEvents.subscribe).toHaveBeenCalledWith(DB_EVENTS.MESSAGE_SAVED, expect.any(Function));
+      expect(messageRepo.getBroadcastMessages).toHaveBeenCalledWith(
+        deviceId,
+        0,
+        50,
+      );
+      expect(dbEvents.subscribe).toHaveBeenCalledWith(
+        DB_EVENTS.MESSAGE_SAVED,
+        expect.any(Function),
+      );
     });
   });
 
@@ -80,7 +104,9 @@ describe("useMessages hooks", () => {
 
   describe("usePendingMessages", () => {
     it("should fetch pending messages", async () => {
-      (messageRepo.getPendingMessages as vi.Mock).mockResolvedValue(mockMessages);
+      (messageRepo.getPendingMessages as vi.Mock).mockResolvedValue(
+        mockMessages,
+      );
 
       const { result } = renderHook(() => usePendingMessages(deviceId));
 
@@ -95,7 +121,9 @@ describe("useMessages hooks", () => {
   describe("useConversations", () => {
     it("should fetch conversations", async () => {
       const mockConversations = [{ id: 1, type: "direct", unreadCount: 0 }];
-      (messageRepo.getConversations as vi.Mock).mockResolvedValue(mockConversations);
+      (messageRepo.getConversations as vi.Mock).mockResolvedValue(
+        mockConversations,
+      );
 
       const { result } = renderHook(() => useConversations(deviceId));
 

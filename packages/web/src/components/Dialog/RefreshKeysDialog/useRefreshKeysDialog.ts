@@ -1,5 +1,4 @@
 import { useDevice, useDeviceContext } from "@core/stores";
-import { nodeRepo } from "@db/index";
 import { useCallback } from "react";
 
 export function useRefreshKeysDialog() {
@@ -8,7 +7,7 @@ export function useRefreshKeysDialog() {
 
   // TODO: Implement activeChat state management
   // This was previously in the message store, needs to be moved to UI store or similar
-  const activeChat = 0; // Placeholder
+  const _activeChat = 0; // Placeholder
 
   // Note: Node error tracking has been removed, so this dialog may not function as intended
   // The nodeErrors map that previously tracked key mismatch errors is no longer available

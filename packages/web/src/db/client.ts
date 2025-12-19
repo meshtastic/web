@@ -1,20 +1,15 @@
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import { SQLocalDrizzle } from "sqlocal/drizzle";
-import migration0000 from "./migrations/0000_fair_arclight.sql?raw";
-import migration0001 from "./migrations/0001_good_warbird.sql?raw";
+import logger from "../core/services/logger.ts";
+import migration0000 from "./migrations/0000_same_peter_quill.sql?raw";
+import migration0001 from "./migrations/0001_strange_scream.sql?raw";
 import * as schema from "./schema.ts";
 
-/**
- * Migration definitions with their SQL content
- */
 const migrations = [
-  { id: "0000_fair_arclight", sql: migration0000 },
-  { id: "0001_good_warbird", sql: migration0001 },
+  { id: "0000_same_peter_quill", sql: migration0000 },
+  { id: "0001_strange_scream", sql: migration0001 },
 ];
 
-/**
- * Database client singleton
- */
 class DatabaseClient {
   private static instance: DatabaseClient;
   private sqlocalDrizzle: SQLocalDrizzle | null = null;
@@ -30,17 +25,12 @@ class DatabaseClient {
     return DatabaseClient.instance;
   }
 
-  /**
-   * Initialize the database
-   * This creates the sqlocal instance and runs migrations
-   */
   async init(): Promise<void> {
     // If already initialized, return
     if (this.drizzleDb) {
       return;
     }
 
-    // If initialization is in progress, wait for it
     if (this.initPromise) {
       return this.initPromise;
     }
@@ -52,7 +42,7 @@ class DatabaseClient {
   }
 
   private async _init(): Promise<void> {
-    console.log("[DB] Initializing database...");
+    logger.debug("[DB] Initializing database...");
 
     // Create SQLocalDrizzle instance and get the driver
     this.sqlocalDrizzle = new SQLocalDrizzle("meshtastic.db");
@@ -64,7 +54,7 @@ class DatabaseClient {
     // Run migrations
     await this.runMigrations();
 
-    console.log("[DB] Database initialized successfully");
+    logger.debug("[DB] Database initialized successfully");
   }
 
   /**
@@ -76,7 +66,7 @@ class DatabaseClient {
       throw new Error("Database not initialized");
     }
 
-    console.log("[DB] Running migrations...");
+    logger.debug("[DB] Running migrations...");
 
     const { sql } = this.sqlocalDrizzle;
 
@@ -101,7 +91,7 @@ class DatabaseClient {
     // If tables exist but no migrations are recorded, we need to seed the migration table
     // This handles databases created before we added migration tracking
     if (existingTables.length > 0 && appliedMigrations.length === 0) {
-      console.log(
+      logger.debug(
         "[DB] Detected existing database without migration tracking, seeding migration history...",
       );
 
@@ -111,7 +101,7 @@ class DatabaseClient {
           `INSERT INTO __drizzle_migrations (migration_id) VALUES ('${migration.id}')`,
         );
       }
-      console.log("[DB] Migration history seeded");
+      logger.debug("[DB] Migration history seeded");
     }
 
     const appliedSet = new Set(
@@ -121,11 +111,11 @@ class DatabaseClient {
     // Run each migration that hasn't been applied yet
     for (const migration of migrations) {
       if (appliedSet.has(migration.id)) {
-        console.log(`[DB] Migration ${migration.id} already applied, skipping`);
+        logger.debug(`[DB] Migration ${migration.id} already applied, skipping`);
         continue;
       }
 
-      console.log(`[DB] Applying migration ${migration.id}...`);
+      logger.debug(`[DB] Applying migration ${migration.id}...`);
 
       // Split by statement breakpoint and execute each statement
       const statements = migration.sql
@@ -142,11 +132,10 @@ class DatabaseClient {
         `INSERT INTO __drizzle_migrations (migration_id) VALUES ('${migration.id}')`,
       );
 
-      console.log(`[DB] Migration ${migration.id} applied successfully`);
-      return;
+      logger.debug(`[DB] Migration ${migration.id} applied successfully`);
     }
 
-    console.log("[DB] Migrations completed");
+    logger.debug("[DB] Migrations completed");
   }
 
   /**
@@ -174,7 +163,7 @@ class DatabaseClient {
       // sqlocal doesn't have a close method, but we can cleanup
       this.sqlocalDrizzle = null;
       this.drizzleDb = null;
-      console.log("[DB] Database closed");
+      logger.debug("[DB] Database closed");
     }
   }
 
@@ -184,7 +173,7 @@ class DatabaseClient {
   async deleteAll(): Promise<void> {
     const { sql } = this;
 
-    console.log("[DB] Deleting all data...");
+    logger.debug("[DB] Deleting all data...");
 
     const tables = [
       "messages",
@@ -201,7 +190,7 @@ class DatabaseClient {
       await sql(`DELETE FROM ${table}`);
     }
 
-    console.log("[DB] All data deleted");
+    logger.debug("[DB] All data deleted");
   }
 }
 

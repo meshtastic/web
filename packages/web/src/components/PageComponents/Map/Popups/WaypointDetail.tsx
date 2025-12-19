@@ -1,6 +1,5 @@
 import { TimeAgo } from "@components/generic/TimeAgo";
 import { Separator } from "@components/ui/separator.tsx";
-import { useNodes } from "@db/hooks";
 import type { WaypointWithMetadata } from "@core/stores";
 import { useDeviceContext } from "@core/stores";
 import {
@@ -9,6 +8,7 @@ import {
   hasPos,
   toLngLat,
 } from "@core/utils/geo";
+import { useNodes } from "@db/hooks";
 import type { Protobuf } from "@meshtastic/core";
 import {
   ClockFadingIcon,

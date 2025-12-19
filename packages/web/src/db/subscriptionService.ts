@@ -1,17 +1,22 @@
-/** biome-ignore-all lint/complexity/noStaticOnlyClass: <explanation> */
+/** biome-ignore-all lint/complexity/noStaticOnlyClass: Its fine having */
 import { toJson } from "@bufbuild/protobuf";
-import { fromByteArray } from "base64-js";
 import { type MeshDevice, Protobuf } from "@meshtastic/core";
-import { channelRepo, messageRepo, nodeRepo, packetLogRepo } from "./repositories";
+import { fromByteArray } from "base64-js";
+import logger from "../core/services/logger.ts";
+import { DB_EVENTS, dbEvents } from "./events.ts";
+import { packetBatcher } from "./packetBatcher.ts";
+import {
+  channelRepo,
+  messageRepo,
+  nodeRepo,
+} from "./repositories/index.ts";
 import type {
   NewMessage,
   NewNode,
   NewPacketLog,
   NewPositionLog,
   NewTelemetryLog,
-} from "./schema";
-import { dbEvents, DB_EVENTS } from "./events";
-import { packetWriteQueue } from "./writeQueue";
+} from "./schema.ts";
 
 /**
  * Service to subscribe to mesh device events and write to database
@@ -25,7 +30,7 @@ export class SubscriptionService {
     myNodeNum: number,
     connection: MeshDevice,
   ): () => void {
-    console.log(`[DB Subscriptions] Subscribing to device ${deviceId}...`);
+    logger.debug(`[DB Subscriptions] Subscribing to device ${deviceId}...`);
 
     // Store unsubscribe functions
     const unsubscribers: Array<() => void> = [];
@@ -70,7 +75,7 @@ export class SubscriptionService {
 
           dbEvents.emit(DB_EVENTS.POSITION_UPDATED);
         } catch (error) {
-          console.error("[DB Subscriptions] Error saving position:", error);
+          logger.error("[DB Subscriptions] Error saving position:", error);
         }
       }),
     );
@@ -96,7 +101,7 @@ export class SubscriptionService {
 
           dbEvents.emit(DB_EVENTS.NODE_UPDATED);
         } catch (error) {
-          console.error("[DB Subscriptions] Error saving user:", error);
+          logger.error("[DB Subscriptions] Error saving user:", error);
         }
       }),
     );
@@ -156,7 +161,7 @@ export class SubscriptionService {
           // Emit event to notify listeners
           dbEvents.emit(DB_EVENTS.NODE_UPDATED);
         } catch (error) {
-          console.error("[DB Subscriptions] Error saving node:", error);
+          logger.error("[DB Subscriptions] Error saving node:", error);
         }
       }),
     );
@@ -207,7 +212,7 @@ export class SubscriptionService {
 
           dbEvents.emit(DB_EVENTS.TELEMETRY_UPDATED);
         } catch (error) {
-          console.error("[DB Subscriptions] Error saving telemetry:", error);
+          logger.error("[DB Subscriptions] Error saving telemetry:", error);
         }
       }),
     );
@@ -227,7 +232,10 @@ export class SubscriptionService {
             dbEvents.emit(DB_EVENTS.NODE_UPDATED);
           })
           .catch((error) => {
-            console.error("[DB Subscriptions] Error updating lastHeard:", error);
+            logger.error(
+              "[DB Subscriptions] Error updating lastHeard:",
+              error,
+            );
           });
 
         // Log the packet to packet_logs table via queue (batched for performance)
@@ -252,11 +260,7 @@ export class SubscriptionService {
           rawPacket: toJson(Protobuf.Mesh.MeshPacketSchema, meshPacket),
         };
 
-        packetWriteQueue
-          .enqueue(() => packetLogRepo.logPacket(packetLog))
-          .catch((error) => {
-            console.error("[DB Subscriptions] Error logging packet:", error);
-          });
+        packetBatcher.add(packetLog);
       }),
     );
 
@@ -264,16 +268,22 @@ export class SubscriptionService {
     unsubscribers.push(
       connection.events.onMessagePacket.subscribe(async (messagePacket) => {
         try {
+          // Skip messages from our own node - these are already saved by MessageInput
+          // when the user sends them. We only want to save incoming messages here.
+          if (messagePacket.from === myNodeNum) {
+            return;
+          }
+
           // messagePacket.data is already a decoded string from the core library
           const messageText = messagePacket.data;
 
           // Skip empty messages (can happen with certain packet types)
           if (!messageText) {
-            console.log("[DB Subscriptions] Skipping empty message packet");
+            logger.debug("[DB Subscriptions] Skipping empty message packet");
             return;
           }
 
-          const type = messagePacket.to === 0xffffffff ? "broadcast" : "direct";
+          const type = messagePacket.to === 0xffffffff ? "channel" : "direct";
 
           // Calculate hops safely (both values must be defined)
           const hops =
@@ -305,7 +315,7 @@ export class SubscriptionService {
             toNode: messagePacket.to,
             message: messageText,
             date: new Date(dateMs),
-            state: messagePacket.from === myNodeNum ? "sent" : "ack",
+            state: "ack", // All messages here are from other nodes (own messages filtered above)
             rxSnr: messagePacket.rxSnr ?? 0,
             rxRssi: messagePacket.rxRssi ?? 0,
             viaMqtt: messagePacket.viaMqtt ?? false,
@@ -322,7 +332,7 @@ export class SubscriptionService {
           // Emit event to notify listeners
           dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
         } catch (error) {
-          console.error("[DB Subscriptions] Error saving message:", error);
+          logger.error("[DB Subscriptions] Error saving message:", error);
         }
       }),
     );
@@ -347,14 +357,14 @@ export class SubscriptionService {
 
           dbEvents.emit(DB_EVENTS.CHANNEL_UPDATED);
         } catch (error) {
-          console.error("[DB Subscriptions] Error saving channel:", error);
+          logger.error("[DB Subscriptions] Error saving channel:", error);
         }
       }),
     );
 
     // Return unsubscribe function
     return () => {
-      console.log(
+      logger.debug(
         `[DB Subscriptions] Unsubscribing from device ${deviceId}...`,
       );
       for (const unsubscribe of unsubscribers) {

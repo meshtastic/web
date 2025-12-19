@@ -1,5 +1,5 @@
 import { use, useCallback, useMemo, useState } from "react";
-import { preferencesRepo } from "../repositories";
+import { preferencesRepo } from "../repositories/index.ts";
 
 // Cache for preference promises to ensure stable references
 const preferencePromiseCache = new Map<string, Promise<unknown>>();

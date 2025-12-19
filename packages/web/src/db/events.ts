@@ -13,7 +13,7 @@ class DatabaseEvents {
       this.listeners.set(event, new Set());
     }
 
-    this.listeners.get(event)!.add(callback);
+    this.listeners.get(event)?.add(callback);
 
     // Return unsubscribe function
     return () => {
@@ -49,4 +49,5 @@ export const DB_EVENTS = {
   POSITION_UPDATED: "position:updated",
   TELEMETRY_UPDATED: "telemetry:updated",
   CHANNEL_UPDATED: "channel:updated",
+  TRACEROUTE_COMPLETED: "traceroute:completed",
 } as const;

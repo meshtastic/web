@@ -21,6 +21,8 @@ interface MapProps {
     longitude?: number;
     zoom?: number;
   };
+  /** When false, disables all user interaction and hides controls */
+  interactive?: boolean;
 }
 
 export const BaseMap = ({
@@ -30,6 +32,7 @@ export const BaseMap = ({
   onMouseMove,
   interactiveLayerIds,
   initialViewState,
+  interactive = true,
 }: MapProps) => {
   const { theme } = useTheme();
   const { t } = useTranslation("map");
@@ -88,6 +91,10 @@ export const BaseMap = ({
         maxPitch={0}
         dragRotate={false}
         touchZoomRotate={false}
+        scrollZoom={interactive}
+        doubleClickZoom={interactive}
+        dragPan={interactive}
+        keyboard={interactive}
         initialViewState={
           initialViewState ?? {
             zoom: 1.8,
@@ -97,26 +104,30 @@ export const BaseMap = ({
         }
         style={{ filter: darkMode ? "brightness(0.9)" : undefined }}
         locale={locale}
-        interactiveLayerIds={interactiveLayerIds}
-        onMouseMove={handleMouseMove}
-        onClick={handleClick}
+        interactiveLayerIds={interactive ? interactiveLayerIds : undefined}
+        onMouseMove={interactive ? handleMouseMove : undefined}
+        onClick={interactive ? handleClick : undefined}
         onLoad={handleLoad}
       >
-        <AttributionControl
-          style={{
-            background: darkMode ? "#ffffff" : undefined,
-            color: darkMode ? "black" : undefined,
-          }}
-        />
-        {/* { Disabled for now until we can use i18n for the geolocate control} */}
-        {/* <GeolocateControl
-          position="top-right"
-          i18nIsDynamicList
-          positionOptions={{ enableHighAccuracy: true }}
-          trackUserLocation
-        />  */}
-        <NavigationControl position="top-right" showCompass={false} />
-        <ScaleControl />
+        {interactive && (
+          <>
+            <AttributionControl
+              style={{
+                background: darkMode ? "#ffffff" : undefined,
+                color: darkMode ? "black" : undefined,
+              }}
+            />
+            {/* { Disabled for now until we can use i18n for the geolocate control} */}
+            {/* <GeolocateControl
+              position="top-right"
+              i18nIsDynamicList
+              positionOptions={{ enableHighAccuracy: true }}
+              trackUserLocation
+            />  */}
+            <NavigationControl position="top-right" showCompass={false} />
+            <ScaleControl />
+          </>
+        )}
         {children}
       </MapGl>
     </MapProvider>

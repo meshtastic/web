@@ -1,16 +1,16 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DB_EVENTS, dbEvents } from "../events.ts";
+import { nodeRepo } from "../repositories/index.ts";
 import {
-  useNodes,
-  useNode,
   useFavoriteNodes,
-  useRecentNodes,
+  useNode,
+  useNodes,
   usePositionHistory,
-  useTelemetryHistory,
   usePositionTrails,
-} from "./useNodes";
-import { nodeRepo } from "../repositories";
-import { dbEvents, DB_EVENTS } from "../events";
+  useRecentNodes,
+  useTelemetryHistory,
+} from "./useNodes.ts";
 
 // Mock dependencies
 vi.mock("../repositories", () => ({
@@ -55,7 +55,10 @@ describe("useNodes hooks", () => {
       });
 
       expect(nodeRepo.getNodes).toHaveBeenCalledWith(deviceId);
-      expect(dbEvents.subscribe).toHaveBeenCalledWith(DB_EVENTS.NODE_UPDATED, expect.any(Function));
+      expect(dbEvents.subscribe).toHaveBeenCalledWith(
+        DB_EVENTS.NODE_UPDATED,
+        expect.any(Function),
+      );
     });
   });
 
@@ -107,49 +110,76 @@ describe("useNodes hooks", () => {
       const mockPositions = [{ time: 1000, latitude: 1, longitude: 1 }];
       (nodeRepo.getPositionHistory as vi.Mock).mockResolvedValue(mockPositions);
 
-      const { result } = renderHook(() => usePositionHistory(deviceId, nodeNum));
+      const { result } = renderHook(() =>
+        usePositionHistory(deviceId, nodeNum),
+      );
 
       await waitFor(() => {
         expect(result.current.positions).toEqual(mockPositions);
       });
 
-      expect(nodeRepo.getPositionHistory).toHaveBeenCalledWith(deviceId, nodeNum, undefined, 100);
+      expect(nodeRepo.getPositionHistory).toHaveBeenCalledWith(
+        deviceId,
+        nodeNum,
+        undefined,
+        100,
+      );
     });
   });
 
   describe("useTelemetryHistory", () => {
     it("should fetch telemetry history", async () => {
       const mockTelemetry = [{ time: 1000, batteryLevel: 100 }];
-      (nodeRepo.getTelemetryHistory as vi.Mock).mockResolvedValue(mockTelemetry);
+      (nodeRepo.getTelemetryHistory as vi.Mock).mockResolvedValue(
+        mockTelemetry,
+      );
 
-      const { result } = renderHook(() => useTelemetryHistory(deviceId, nodeNum));
+      const { result } = renderHook(() =>
+        useTelemetryHistory(deviceId, nodeNum),
+      );
 
       await waitFor(() => {
         expect(result.current.telemetry).toEqual(mockTelemetry);
       });
 
-      expect(nodeRepo.getTelemetryHistory).toHaveBeenCalledWith(deviceId, nodeNum, undefined, 100);
+      expect(nodeRepo.getTelemetryHistory).toHaveBeenCalledWith(
+        deviceId,
+        nodeNum,
+        undefined,
+        100,
+      );
     });
   });
 
   describe("usePositionTrails", () => {
     it("should fetch position trails for multiple nodes", async () => {
-      const mockTrails = new Map([[nodeNum, [{ time: 1000, latitude: 1, longitude: 1 }]]]);
-      (nodeRepo.getPositionHistoryForNodes as vi.Mock).mockResolvedValue(mockTrails);
+      const mockTrails = new Map([
+        [nodeNum, [{ time: 1000, latitude: 1, longitude: 1 }]],
+      ]);
+      (nodeRepo.getPositionHistoryForNodes as vi.Mock).mockResolvedValue(
+        mockTrails,
+      );
 
-      const { result } = renderHook(() => usePositionTrails(deviceId, [nodeNum]));
+      const { result } = renderHook(() =>
+        usePositionTrails(deviceId, [nodeNum]),
+      );
 
       await waitFor(() => {
         expect(result.current.trails).toEqual(mockTrails);
       });
 
-      expect(nodeRepo.getPositionHistoryForNodes).toHaveBeenCalledWith(deviceId, [nodeNum], undefined, 100);
+      expect(nodeRepo.getPositionHistoryForNodes).toHaveBeenCalledWith(
+        deviceId,
+        [nodeNum],
+        undefined,
+        100,
+      );
     });
 
     it("should clear trails if nodeNums is empty", async () => {
-        const { result } = renderHook(() => usePositionTrails(deviceId, []));
-        expect(result.current.trails.size).toBe(0);
-        expect(nodeRepo.getPositionHistoryForNodes).not.toHaveBeenCalled();
+      const { result } = renderHook(() => usePositionTrails(deviceId, []));
+      expect(result.current.trails.size).toBe(0);
+      expect(nodeRepo.getPositionHistoryForNodes).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,48 +1,49 @@
 // Channel hooks
 export {
-  useChannels,
   useChannel,
+  useChannels,
   usePrimaryChannel,
-} from "./useChannels";
-
-// Node hooks
-export {
-  useNodes,
-  useNode,
-  useFavoriteNodes,
-  useRecentNodes,
-  usePositionHistory,
-  useTelemetryHistory,
-  usePositionTrails,
-} from "./useNodes";
-
-// Message hooks
-export {
-  useDirectMessages,
-  useBroadcastMessages,
-  useAllMessages,
-  usePendingMessages,
-  useConversations,
-} from "./useMessages";
-
-// Message draft hook
-export { useMessageDraft } from "./useMessageDraft";
-
+} from "./useChannels.ts";
+export type { ConnectionStatus, ConnectionType } from "./useConnections.ts";
 // Connection hooks
 export {
-  useConnections,
-  useConnection,
-  useDefaultConnection,
   resetConnectionStatuses,
-} from "./useConnections";
-export type { ConnectionStatus, ConnectionType } from "./useConnections";
-
+  useConnection,
+  useConnections,
+  useDefaultConnection,
+} from "./useConnections.ts";
+// Device-specific preferences hooks
+export {
+  invalidateDevicePreferenceCache,
+  useDevicePreference,
+} from "./useDevicePreference.ts";
+// Message draft hook
+export { useMessageDraft } from "./useMessageDraft.ts";
+// Message hooks
+export {
+  useAllMessages,
+  useChannelMessages,
+  useConversations,
+  useDirectMessages,
+  usePendingMessages,
+} from "./useMessages.ts";
+// Node hooks
+export {
+  useFavoriteNodes,
+  useNode,
+  useNodes,
+  usePositionHistory,
+  usePositionTrails,
+  useRecentNodes,
+  useTelemetryHistory,
+} from "./useNodes.ts";
+// Packet log hooks
+export { invalidatePacketLogsCache, usePacketLogs } from "./usePacketLogs.ts";
+// Preferences hooks
+export { usePanelSizes, usePreference } from "./usePreferences.ts";
 // Unread count hooks
 export {
-  useUnreadCountDirect,
-  useUnreadCountBroadcast,
   markConversationAsRead,
-} from "./useUnreadCount";
-
-// Preferences hooks
-export { usePreference, usePanelSizes } from "./usePreferences";
+  useUnreadCountBroadcast,
+  useUnreadCountDirect,
+} from "./useUnreadCount.ts";

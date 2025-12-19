@@ -5,9 +5,9 @@ import {
   ConfigFormFields,
   type FieldGroup,
 } from "@components/Form/ConfigFormFields";
-import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
-import { useSecurityForm } from "@pages/Settings/hooks";
 import { useDevice } from "@core/stores";
+import { useSecurityForm } from "@pages/Settings/hooks";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

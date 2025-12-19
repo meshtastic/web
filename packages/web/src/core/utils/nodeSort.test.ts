@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { sortNodes, type SortConfig } from "./nodeSort";
+import { describe, expect, it } from "vitest";
+import { type SortConfig, sortNodes } from "./nodeSort.ts";
 
 describe("sortNodes", () => {
   type TestNode = {
@@ -16,21 +16,66 @@ describe("sortNodes", () => {
     isChannel: (node) => !!node.isChannel,
   };
 
-  const nodeA: TestNode = { name: "Alpha", lastHeard: 100, isFavorite: false, isChannel: false };
-  const nodeB: TestNode = { name: "Beta", lastHeard: 200, isFavorite: true, isChannel: false };
-  const nodeC: TestNode = { name: "Gamma", lastHeard: 300, isFavorite: false, isChannel: true };
-  const nodeD: TestNode = { name: "Delta", lastHeard: 0, isFavorite: false, isChannel: false };
-  const nodeE: TestNode = { name: "Echo", lastHeard: 50, isFavorite: false, isChannel: false };
-  const nodeF: TestNode = { name: "Foxtrot", lastHeard: 150, isFavorite: true, isChannel: false };
-  const nodeG: TestNode = { name: "aChannel", lastHeard: 10, isFavorite: false, isChannel: true };
-  const nodeH: TestNode = { name: "bravo", lastHeard: 120, isFavorite: false, isChannel: false }; // for case-insensitivity
-  const nodeI: TestNode = { name: "India", lastHeard: 0, isFavorite: true, isChannel: false }; // favorite, never heard
+  const nodeA: TestNode = {
+    name: "Alpha",
+    lastHeard: 100,
+    isFavorite: false,
+    isChannel: false,
+  };
+  const nodeB: TestNode = {
+    name: "Beta",
+    lastHeard: 200,
+    isFavorite: true,
+    isChannel: false,
+  };
+  const nodeC: TestNode = {
+    name: "Gamma",
+    lastHeard: 300,
+    isFavorite: false,
+    isChannel: true,
+  };
+  const nodeD: TestNode = {
+    name: "Delta",
+    lastHeard: 0,
+    isFavorite: false,
+    isChannel: false,
+  };
+  const nodeE: TestNode = {
+    name: "Echo",
+    lastHeard: 50,
+    isFavorite: false,
+    isChannel: false,
+  };
+  const nodeF: TestNode = {
+    name: "Foxtrot",
+    lastHeard: 150,
+    isFavorite: true,
+    isChannel: false,
+  };
+  const nodeG: TestNode = {
+    name: "aChannel",
+    lastHeard: 10,
+    isFavorite: false,
+    isChannel: true,
+  };
+  const nodeH: TestNode = {
+    name: "bravo",
+    lastHeard: 120,
+    isFavorite: false,
+    isChannel: false,
+  }; // for case-insensitivity
+  const nodeI: TestNode = {
+    name: "India",
+    lastHeard: 0,
+    isFavorite: true,
+    isChannel: false,
+  }; // favorite, never heard
 
   it("should sort channels first, then favorites, then recently heard, then never heard", () => {
     const nodes = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG];
     const sorted = sortNodes(nodes, config);
 
-    const expectedOrder = [nodeG, nodeC, nodeB, nodeF, nodeE, nodeA, nodeD]; // Manual expected order based on groups and internal sort
+    const _expectedOrder = [nodeG, nodeC, nodeB, nodeF, nodeE, nodeA, nodeD]; // Manual expected order based on groups and internal sort
     // Channels: C, G -> sorted by name: G, C (aChannel, Gamma)
     // Favorites: B, F -> sorted by name: B, F (Beta, Foxtrot)
     // Recently Heard: A, E -> sorted by lastHeardDesc: A(100), E(50) -> No, E(50), A(100) -> A(100), E(50)
@@ -52,7 +97,17 @@ describe("sortNodes", () => {
   });
 
   it("should sort channels first, then favorites, then recently heard, then never heard", () => {
-    const nodes = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH, nodeI];
+    const nodes = [
+      nodeA,
+      nodeB,
+      nodeC,
+      nodeD,
+      nodeE,
+      nodeF,
+      nodeG,
+      nodeH,
+      nodeI,
+    ];
     const sorted = sortNodes(nodes, config);
 
     // Expected order: Channels (aChannel, Gamma) -> Favorites (Beta, Foxtrot, India) -> Recently Heard (bravo, Alpha, Echo) -> Never Heard (Delta)
@@ -100,7 +155,7 @@ describe("sortNodes", () => {
 
   it("should handle case-insensitive sorting for names in alphabetical groups", () => {
     const nodes = [{ ...nodeA, name: "alpha" }, nodeG]; // "alpha", "aChannel"
-    const sorted = sortNodes(nodes, config);
+    const _sorted = sortNodes(nodes, config);
     // aChannel is channel, then alpha is recently heard. So it's about groups.
 
     // Let's create a specific scenario for case-insensitive within a group.
@@ -108,10 +163,10 @@ describe("sortNodes", () => {
       { name: "zebra", lastHeard: 100, isFavorite: false, isChannel: false },
       { name: "apple", lastHeard: 110, isFavorite: false, isChannel: false },
       { name: "Apple", lastHeard: 120, isFavorite: false, isChannel: false },
-      { name: "Zebra", lastHeard: 90, isFavorite: false, isChannel: false }
+      { name: "Zebra", lastHeard: 90, isFavorite: false, isChannel: false },
     ];
     // All are "recently heard"
-    const sortedCaseTest = sortNodes(nodesForCaseTest, config);
+    const _sortedCaseTest = sortNodes(nodesForCaseTest, config);
 
     // Should be sorted by lastHeard Desc: Apple(120), apple(110), zebra(100), Zebra(90)
     // No, byName for recentlyHeard: if there were no two with same lastHeard.
@@ -122,8 +177,18 @@ describe("sortNodes", () => {
     // It should keep original order? Or consistent order.
 
     // The code uses byLastHeardDesc for RecentlyHeard. So `nodeH (bravo, 120), { ...nodeA, name: "alpha" } (alpha, 100)` -> bravo, alpha.
-    const alphaNode: TestNode = { name: "alpha", lastHeard: 100, isFavorite: false, isChannel: false };
-    const bravoNode: TestNode = { name: "bravo", lastHeard: 120, isFavorite: false, isChannel: false };
+    const alphaNode: TestNode = {
+      name: "alpha",
+      lastHeard: 100,
+      isFavorite: false,
+      isChannel: false,
+    };
+    const bravoNode: TestNode = {
+      name: "bravo",
+      lastHeard: 120,
+      isFavorite: false,
+      isChannel: false,
+    };
     const nodesToTestCaseInsensitive = [alphaNode, bravoNode];
 
     const sortedRecent = sortNodes(nodesToTestCaseInsensitive, config);
@@ -131,8 +196,18 @@ describe("sortNodes", () => {
     expect(sortedRecent[1]).toBe(alphaNode);
 
     // Let's test case-insensitive sorting within Channels for instance.
-    const channel1: TestNode = { name: "ZChannel", lastHeard: 10, isFavorite: false, isChannel: true };
-    const channel2: TestNode = { name: "achannel", lastHeard: 10, isFavorite: false, isChannel: true };
+    const channel1: TestNode = {
+      name: "ZChannel",
+      lastHeard: 10,
+      isFavorite: false,
+      isChannel: true,
+    };
+    const channel2: TestNode = {
+      name: "achannel",
+      lastHeard: 10,
+      isFavorite: false,
+      isChannel: true,
+    };
     const sortedChannels = sortNodes([channel1, channel2], config);
     expect(sortedChannels[0]).toBe(channel2); // achannel
     expect(sortedChannels[1]).toBe(channel1); // ZChannel

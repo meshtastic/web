@@ -17,10 +17,7 @@ export interface BaseFormBuilderProps<T> {
   properties?: Record<string, unknown>;
 }
 
-export interface GenericFormElementProps<
-  T extends FieldValues,
-  F = unknown,
-> {
+export interface GenericFormElementProps<T extends FieldValues, F = unknown> {
   control: Control<T>;
   disabled?: boolean;
   field: F;

@@ -1,4 +1,3 @@
-import type { FilterOption } from "./Filter";
 import type { LucideIcon } from "lucide-react";
 
 export type SortOption =

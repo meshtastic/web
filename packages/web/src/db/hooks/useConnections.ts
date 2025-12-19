@@ -1,7 +1,8 @@
 import type { NewConnectionInput } from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
 import { testHttpReachable } from "@app/pages/Connections/utils";
 import { router } from "@app/routes";
-import { clearConnectionCache, useDeviceStore } from "@core/stores";
+import logger from "@core/services/logger";
+import { useDeviceStore } from "@core/stores";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice, Types } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
@@ -261,17 +262,24 @@ export function useConnections() {
       });
 
       // Navigate to messages when config-only stage completes (nonce 69420)
+      // NodeDB (nonce 69421) loads in background - cached nodes show immediately
       const configCompleteUnsub = meshDevice.events.onConfigComplete.subscribe(
         async (configCompleteId) => {
-          console.log(
+          logger.debug(
             `[useConnections] Config complete (nonce: ${configCompleteId})`,
           );
           if (configCompleteId === 69420) {
-            configCompleteUnsub();
+            // Stage 1 complete - device config loaded, ready to navigate
             // Set phase to "connected" so route guard allows navigation
             device.setConnectionPhase("connected");
             await updateStatus(id, "connected");
             router.navigate({ to: "/messages", search: { channel: 0 } });
+          } else if (configCompleteId === 69421) {
+            // Stage 2 complete - nodeDB fully synced (background)
+            configCompleteUnsub();
+            device.setConnectionPhase("configured");
+            await updateStatus(id, "configured");
+            logger.debug("[useConnections] NodeDB sync complete (background)");
           }
         },
       );
@@ -301,14 +309,16 @@ export function useConnections() {
       setActiveConnectionId(id);
       device.setConnectionId(id);
       device.setConnectionPhase("configuring");
+      device.resetConfigProgress();
       await updateStatus(id, "configuring");
 
+      // configureTwoStage handles both stages:
+      // - Stage 1 (nonce 69420): config loaded -> onConfigComplete navigates to /messages
+      // - Stage 2 (nonce 69421): nodeDB synced in background -> onConfigComplete sets "configured"
       meshDevice
         .configureTwoStage()
-        .then(async () => {
-          device.setConnectionPhase("configured");
-          await updateStatus(id, "configured");
-
+        .then(() => {
+          // Both stages complete - start heartbeat
           meshDevice
             .heartbeat()
             .then(() => {
@@ -531,14 +541,13 @@ export function useConnections() {
           device?.connection?.disconnect();
         } catch {}
 
-        // Clear from HMR cache
-        clearConnectionCache(conn.meshDeviceId);
-
         const transport = transports.get(id);
         if (transport) {
           if (conn.type === "bluetooth") {
             const dev = transport as BluetoothDevice;
-            if (dev.gatt?.connected) dev.gatt.disconnect();
+            if (dev.gatt?.connected) {
+              dev.gatt.disconnect();
+            }
           }
           if (conn.type === "serial") {
             const port = transport as SerialPort & {
@@ -572,9 +581,6 @@ export function useConnections() {
         try {
           device?.connection?.disconnect();
         } catch {}
-
-        // Clear from HMR cache
-        clearConnectionCache(conn.meshDeviceId);
 
         try {
           removeDevice(conn.meshDeviceId);
@@ -610,7 +616,7 @@ export function useConnections() {
         const sp = transport as SerialPort & { close?: () => Promise<void> };
         if (sp.close) {
           try {
-            sp.close();
+            await sp.close();
           } catch {}
         }
         transports.delete(id);

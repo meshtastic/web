@@ -1,4 +1,4 @@
-import { create, fromBinary } from "@bufbuild/protobuf";
+import { fromBinary } from "@bufbuild/protobuf";
 import { Button } from "@components/ui/button.tsx";
 import {
   Dialog,
@@ -20,7 +20,6 @@ import {
 } from "@components/ui/select.tsx";
 import { Switch } from "@components/ui/switch.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
@@ -83,12 +82,12 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
 
   const apply = () => {
     channelSet?.settings.forEach(
-      (ch: Protobuf.Channel.ChannelSettings, index: number) => {
+      (_ch: Protobuf.Channel.ChannelSettings, index: number) => {
         if (importIndex[index] === -1) {
           return;
         }
         // TODO: Implement channel settings import logic
-      }
+      },
     );
 
     if (channelSet?.loraConfig && updateConfig) {

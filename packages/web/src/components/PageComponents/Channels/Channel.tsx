@@ -1,12 +1,12 @@
-import type { ChannelValidation } from "@app/validation/channel";
 import type { Channel as DbChannel } from "@app/db";
+import type { ChannelValidation } from "@app/validation/channel";
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog";
 import {
   ConfigFormFields,
   type FieldGroup,
 } from "@components/Form/ConfigFormFields";
-import { useChannelForm } from "@pages/Settings/hooks";
 import { useDevice } from "@core/stores";
+import { useChannelForm } from "@pages/Settings/hooks";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

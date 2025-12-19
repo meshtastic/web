@@ -23,6 +23,7 @@ export default defineProject({
       "@components": path.resolve(srcDir, "components"),
       "@layouts": path.resolve(srcDir, "layouts"),
       "@db": path.resolve(srcDir, "db"),
+      "@validation": path.resolve(srcDir, "validation"),
     },
   },
   test: {

@@ -1,7 +1,8 @@
 import { featureFlags } from "@core/services/featureFlags";
+import logger from "./logger.ts";
 
 const isDev = typeof import.meta !== "undefined" && import.meta.env?.DEV;
-console.log(`Dev mode: ${isDev}`);
+logger.debug(`Dev mode: ${isDev}`);
 
 if (isDev) {
   featureFlags.setOverrides({

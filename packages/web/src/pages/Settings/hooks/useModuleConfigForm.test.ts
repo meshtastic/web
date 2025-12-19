@@ -1,9 +1,9 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { useModuleConfigForm } from "./useModuleConfigForm";
-import { useDevice } from "@core/stores";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { useDevice } from "@core/stores";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod/v4";
+import { useModuleConfigForm } from "./useModuleConfigForm.ts";
 
 vi.mock("@core/stores", () => ({
   useDevice: vi.fn(),
@@ -15,7 +15,10 @@ vi.mock("@core/services/fieldRegistry", () => ({
 
 // Mock resolver
 vi.mock("@components/Form/createZodResolver", () => ({
-  createZodResolver: vi.fn(() => async (data: any) => ({ values: data, errors: {} })),
+  createZodResolver: vi.fn(() => async (data: any) => ({
+    values: data,
+    errors: {},
+  })),
 }));
 
 describe("useModuleConfigForm", () => {
@@ -42,32 +45,36 @@ describe("useModuleConfigForm", () => {
   });
 
   it("should initialize form", () => {
-    const { result } = renderHook(() => useModuleConfigForm({
+    const { result } = renderHook(() =>
+      useModuleConfigForm({
         moduleConfigType: "mqtt",
-        schema
-    }));
+        schema,
+      }),
+    );
     expect(result.current.isReady).toBe(true);
     expect(result.current.form.getValues("enabled")).toBe(true);
   });
 
   it("should track changes", async () => {
-    const { result } = renderHook(() => useModuleConfigForm({
+    const { result } = renderHook(() =>
+      useModuleConfigForm({
         moduleConfigType: "mqtt",
-        schema
-    }));
+        schema,
+      }),
+    );
 
     await act(async () => {
-        result.current.form.setValue("enabled", false);
+      result.current.form.setValue("enabled", false);
     });
 
     await waitFor(() => {
-        expect(mockTrackChange).toHaveBeenCalledWith(
-            expect.objectContaining({ type: "moduleConfig", variant: "mqtt" }),
-            "enabled",
-            false,
-            true
-        );
-        expect(mockSetChange).toHaveBeenCalled();
+      expect(mockTrackChange).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "moduleConfig", variant: "mqtt" }),
+        "enabled",
+        false,
+        true,
+      );
+      expect(mockSetChange).toHaveBeenCalled();
     });
   });
 });

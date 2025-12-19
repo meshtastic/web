@@ -1,12 +1,14 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
 import { NodeAvatar } from "@app/components/NodeAvatar";
+import { create } from "@bufbuild/protobuf";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
 import { Mono } from "@components/generic/Mono.tsx";
+import { SignalIndicator } from "@components/generic/SignalIndicator.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Badge } from "@components/ui/badge.tsx";
 import { Button } from "@components/ui/button.tsx";
@@ -37,15 +39,13 @@ import {
 import useLang from "@core/hooks/useLang.ts";
 import {
   type NodeColumnKey,
-  useAppStore,
   useDevice,
   useDeviceContext,
-  usePreferencesStore,
+  useUIStore,
 } from "@core/stores";
-import { useNodes } from "@db/hooks";
-import { create } from "@bufbuild/protobuf";
 import { cn } from "@core/utils/cn.ts";
 import { sortNodes } from "@core/utils/nodeSort.ts";
+import { useNodes } from "@db/hooks";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { toByteArray } from "base64-js";
@@ -105,7 +105,9 @@ const SortIcon = ({
 // Helper to convert hex string to Uint8Array
 function hexToUint8Array(hex: string): Uint8Array {
   const matches = hex.match(/.{1,2}/g);
-  return matches ? new Uint8Array(matches.map(byte => parseInt(byte, 16))) : new Uint8Array();
+  return matches
+    ? new Uint8Array(matches.map((byte) => parseInt(byte, 16)))
+    : new Uint8Array();
 }
 
 const NodesPage = (): JSX.Element => {
@@ -115,13 +117,13 @@ const NodesPage = (): JSX.Element => {
   const { deviceId } = useDeviceContext();
   const { nodes: allNodes } = useNodes(deviceId);
 
-  const { setNodeNumDetails } = useAppStore();
   const {
+    setNodeNumDetails,
     nodesTableColumnVisibility: columnVisibility,
     nodesTableColumnOrder: columnOrder,
     setNodesTableColumnVisibility: setColumnVisibility,
     setNodesTableColumnOrder: setColumnOrder,
-  } = usePreferencesStore();
+  } = useUIStore();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
   const [selectedTraceroute, setSelectedTraceroute] = useState<
@@ -212,6 +214,32 @@ const NodesPage = (): JSX.Element => {
             )}
           </Mono>
         ),
+      },
+      signal: {
+        label: t("nodesTable.headings.signal"),
+        sortable: true,
+        sortKey: "snr",
+        render: (node) => {
+          if (node.snr === 0 && node.lastHeard === 0) {
+            return <Mono className="text-xs md:text-sm">—</Mono>;
+          }
+          // Use a default RSSI estimate based on SNR for grading
+          // In practice, RSSI would be stored separately
+          const estimatedRssi =
+            node.snr > 0 ? -60 : node.snr > -10 ? -90 : -120;
+          return (
+            <div className="flex flex-col gap-0.5">
+              <SignalIndicator
+                snr={node.snr}
+                rssi={estimatedRssi}
+                showLabel={true}
+              />
+              <Mono className="text-xs text-muted-foreground">
+                {node.snr.toFixed(1)} dB
+              </Mono>
+            </div>
+          );
+        },
       },
       battery: {
         label: t("nodesTable.headings.battery"),
@@ -319,7 +347,9 @@ const NodesPage = (): JSX.Element => {
         $typeName: "meshtastic.NodeInfo",
         num: node.nodeNum,
         snr: node.snr ?? 0,
-        lastHeard: node.lastHeard ? Math.floor(node.lastHeard.getTime() / 1000) : 0,
+        lastHeard: node.lastHeard
+          ? Math.floor(node.lastHeard.getTime() / 1000)
+          : 0,
         channel: 0,
         viaMqtt: false,
         isFavorite: node.isFavorite ?? false,
@@ -331,22 +361,30 @@ const NodesPage = (): JSX.Element => {
           id: node.userId ?? "",
           longName: node.longName ?? "",
           shortName: node.shortName ?? "",
-          macaddr: node.macaddr ? hexToUint8Array(node.macaddr) : new Uint8Array(),
+          macaddr: node.macaddr
+            ? hexToUint8Array(node.macaddr)
+            : new Uint8Array(),
           hwModel: node.hwModel ?? 0,
           role: node.role ?? 0,
-          publicKey: node.publicKey ? toByteArray(node.publicKey) : new Uint8Array(),
+          publicKey: node.publicKey
+            ? toByteArray(node.publicKey)
+            : new Uint8Array(),
           isLicensed: node.isLicensed ?? false,
         },
-        position: node.latitudeI ? create(Protobuf.Mesh.PositionSchema, {
-          latitudeI: node.latitudeI,
-          longitudeI: node.longitudeI ?? 0,
-          altitude: node.altitude ?? 0,
-          time: node.positionTime ? Math.floor(node.positionTime.getTime() / 1000) : 0,
-          precisionBits: node.positionPrecisionBits ?? 32,
-          groundSpeed: node.groundSpeed ?? 0,
-          groundTrack: node.groundTrack ?? 0,
-          satsInView: node.satsInView ?? 0,
-        }) : undefined,
+        position: node.latitudeI
+          ? create(Protobuf.Mesh.PositionSchema, {
+              latitudeI: node.latitudeI,
+              longitudeI: node.longitudeI ?? 0,
+              altitude: node.altitude ?? 0,
+              time: node.positionTime
+                ? Math.floor(node.positionTime.getTime() / 1000)
+                : 0,
+              precisionBits: node.positionPrecisionBits ?? 32,
+              groundSpeed: node.groundSpeed ?? 0,
+              groundTrack: node.groundTrack ?? 0,
+              satsInView: node.satsInView ?? 0,
+            })
+          : undefined,
         deviceMetrics: {
           $typeName: "meshtastic.DeviceMetrics",
           batteryLevel: node.batteryLevel ?? 0,
@@ -361,7 +399,9 @@ const NodesPage = (): JSX.Element => {
 
   // Apply filter to converted nodes
   const filteredNodes = useMemo(() => {
-    return convertedNodes.filter((node) => nodeFilter(node, deferredFilterState));
+    return convertedNodes.filter((node) =>
+      nodeFilter(node, deferredFilterState),
+    );
   }, [convertedNodes, nodeFilter, deferredFilterState]);
 
   // Stub for hasNodeError - no longer tracking node errors
@@ -426,7 +466,8 @@ const NodesPage = (): JSX.Element => {
 
   const getName = useCallback(
     (node: Protobuf.Mesh.NodeInfo) =>
-      node.user?.longName ?? numberToHexUnpadded(node.num).slice(-4).toUpperCase(),
+      node.user?.longName ??
+      numberToHexUnpadded(node.num).slice(-4).toUpperCase(),
     [],
   );
 
@@ -555,6 +596,17 @@ const NodesPage = (): JSX.Element => {
                     }
                   >
                     {t("nodesTable.headings.lastHeard")}
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={columnVisibility.signal}
+                    onCheckedChange={(checked) =>
+                      setColumnVisibility((prev) => ({
+                        ...prev,
+                        signal: checked,
+                      }))
+                    }
+                  >
+                    {t("nodesTable.headings.signal")}
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.battery}

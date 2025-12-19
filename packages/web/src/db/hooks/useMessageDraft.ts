@@ -1,13 +1,14 @@
 import { useDebounce } from "@core/hooks/useDebounce";
 import { useCallback, useEffect, useState } from "react";
-import { messageRepo } from "../repositories";
+import { messageRepo } from "../repositories/index.ts";
+import type { ConversationType } from "../types.ts";
 
 /**
  * Hook to manage message drafts for a conversation
  */
 export function useMessageDraft(
   deviceId: number,
-  type: "direct" | "broadcast",
+  type: ConversationType,
   targetId: number,
 ) {
   const [draft, setDraft] = useState("");

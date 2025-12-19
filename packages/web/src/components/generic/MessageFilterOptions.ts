@@ -1,6 +1,6 @@
 import { Mail, MessageSquare } from "lucide-react";
-import type { FilterOption } from "./Filter";
-import type { MessageFilterType } from "./FilterTypes";
+import type { FilterOption } from "./Filter.tsx";
+import type { MessageFilterType } from "./FilterTypes.ts";
 
 export const messageFilterOptions: FilterOption<MessageFilterType>[] = [
   { id: "default", label: "default", icon: MessageSquare },

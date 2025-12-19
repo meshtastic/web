@@ -45,7 +45,6 @@ export const mockDeviceStore: Device = {
     managedMode: false,
     clientNotification: false,
     resetNodeDb: false,
-    clearAllStores: false,
     factoryResetConfig: false,
     factoryResetDevice: false,
   },

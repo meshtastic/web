@@ -2,9 +2,9 @@ import { ImportConfigDialog } from "@components/Dialog/ImportConfigDialog/Import
 import { Button } from "@components/ui/button.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
-  type ParsedYAMLField,
-  YAMLService,
-} from "@core/services/yamlService.ts";
+  type ParsedConfigBackupField,
+  ConfigBackupService,
+} from "@core/services/configBackupService.ts";
 import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Download, Upload } from "lucide-react";
@@ -21,9 +21,9 @@ export const ImportExport = ({ variant = "default" }: ImportExportProps) => {
 
   const exportConfig = async () => {
     try {
-      const yamlContent = await YAMLService.exportToYAML(device);
+      const yamlContent = await ConfigBackupService.createBackup(device);
       const filename = `meshtastic_${device.hardware?.myNodeNum || "config"}.yaml`;
-      YAMLService.downloadYAML(yamlContent, filename);
+      ConfigBackupService.downloadBackup(yamlContent, filename);
 
       toast({
         title: "Export Successful",
@@ -39,12 +39,12 @@ export const ImportExport = ({ variant = "default" }: ImportExportProps) => {
   };
 
   const handleImport = async (
-    fields: ParsedYAMLField[],
+    fields: ParsedConfigBackupField[],
     onProgress: (percent: number, status: string) => void,
   ) => {
     try {
       // The first argument _parsedData is unused in applyToDevice
-      await YAMLService.applyToDevice({} as any, fields, device, onProgress);
+      await ConfigBackupService.applyToDevice({} as any, fields, device, onProgress);
 
       toast({
         title: "Import Successful",

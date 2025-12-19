@@ -1,11 +1,11 @@
-import { createZodResolver } from "@components/Form/createZodResolver";
-import { useFieldRegistry } from "@core/services/fieldRegistry";
-import { useDevice } from "@core/stores";
 import {
   type ParsedSecurity,
   type RawSecurity,
   RawSecuritySchema,
 } from "@app/validation/config/security";
+import { createZodResolver } from "@components/Form/createZodResolver";
+import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { useDevice } from "@core/stores";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -23,7 +23,9 @@ export function useSecurityForm() {
   // Convert Uint8Array to base64 strings for form
   const toFormValues = useCallback(
     (cfg: ParsedSecurity | undefined): RawSecurity | undefined => {
-      if (!cfg) return undefined;
+      if (!cfg) {
+        return undefined;
+      }
       return {
         ...cfg,
         privateKey: fromByteArray(cfg.privateKey ?? new Uint8Array(0)),
@@ -81,7 +83,9 @@ export function useSecurityForm() {
   // Sync form changes to store and field registry
   useEffect(() => {
     const subscription = watch((formData) => {
-      if (!baseConfig || !formData || !defaultValues) return;
+      if (!baseConfig || !formData || !defaultValues) {
+        return;
+      }
 
       const currentValues = formData as RawSecurity;
       const prevValues = prevValuesRef.current;
@@ -96,7 +100,9 @@ export function useSecurityForm() {
       const parsed = fromFormValues(currentValues);
 
       // Track per-field changes for Activity panel
-      for (const key of Object.keys(currentValues) as Array<keyof RawSecurity>) {
+      for (const key of Object.keys(currentValues) as Array<
+        keyof RawSecurity
+      >) {
         const newValue = currentValues[key];
         const originalValue = defaultValues[key];
 
@@ -108,8 +114,7 @@ export function useSecurityForm() {
       }
 
       // Send full config to device store
-      const hasChanges =
-        JSON.stringify(parsed) !== JSON.stringify(baseConfig);
+      const hasChanges = JSON.stringify(parsed) !== JSON.stringify(baseConfig);
 
       if (hasChanges) {
         setChange(SECTION, parsed, baseConfig);
@@ -117,7 +122,15 @@ export function useSecurityForm() {
     });
 
     return () => subscription.unsubscribe();
-  }, [watch, baseConfig, defaultValues, fromFormValues, setChange, trackChange, removeChange]);
+  }, [
+    watch,
+    baseConfig,
+    defaultValues,
+    fromFormValues,
+    setChange,
+    trackChange,
+    removeChange,
+  ]);
 
   // Generate new private/public key pair
   const regenerateKeys = useCallback(() => {
@@ -156,8 +169,12 @@ export function useSecurityForm() {
       }>,
       disabled?: boolean,
     ): boolean => {
-      if (disabled) return true;
-      if (!disabledBy) return false;
+      if (disabled) {
+        return true;
+      }
+      if (!disabledBy) {
+        return false;
+      }
 
       return disabledBy.some((field) => {
         const value = form.getValues(field.fieldName);

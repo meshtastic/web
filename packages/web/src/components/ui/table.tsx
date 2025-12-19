@@ -1,6 +1,5 @@
-import * as React from "react";
-
 import { cn } from "@core/utils/cn";
+import * as React from "react";
 
 const Table = React.forwardRef<
   HTMLTableElement,

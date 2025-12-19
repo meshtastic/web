@@ -12,21 +12,21 @@ import {
 } from "@components/ui/sheet.tsx";
 import { Switch } from "@components/ui/switch.tsx";
 import {
-  type ParsedYAMLField,
-  YAMLService,
-} from "@core/services/yamlService.ts";
+  type ParsedConfigBackupField,
+  ConfigBackupService,
+} from "@core/services/configBackupService.ts";
 import { cn } from "@core/utils/cn.ts";
 import { debounce } from "@core/utils/debounce.ts";
 import { FileText, Search, Upload, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { YAMLValidationService } from "../../../validation/yaml.ts";
+import { ConfigBackupValidationService } from "../../../validation/configBackup.ts";
 
 interface ImportConfigDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onImport: (
-    fields: ParsedYAMLField[],
+    fields: ParsedConfigBackupField[],
     onProgress: (percent: number, status: string) => void,
   ) => Promise<void>;
 }
@@ -42,7 +42,7 @@ export function ImportConfigDialog({
   const [yamlContent, setYamlContent] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
-  const [allFields, setAllFields] = useState<ParsedYAMLField[]>([]);
+  const [allFields, setAllFields] = useState<ParsedConfigBackupField[]>([]);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -58,19 +58,23 @@ export function ImportConfigDialog({
       return;
     }
 
-    const validation = YAMLValidationService.validateYAMLContent(yamlContent);
-
-    if (!validation.isValid) {
-      setValidationError(validation.error || "Invalid YAML");
-      setAllFields([]);
-      setSelectedFields(new Set());
-      return;
-    }
-
     try {
-      const fields = YAMLService.extractFields(validation.data!);
+      // Validate structure first (ConfigBackupService.parseBackup does this internally, but we might want explicit validation step here if we were separating them, but parseBackup returns typed data)
+      // Actually ConfigBackupService.parseBackup parses AND validates structure.
+      // But here we want to handle the result.
+      
+      // Let's use ConfigBackupService.parseBackup directly to get the data, 
+      // catching any structure validation errors.
+      // Wait, the original code used YAMLValidationService.validateYAMLContent separately.
+      // Let's see if we should keep that pattern. 
+      // ConfigBackupService.parseBackup(content) returns ConfigBackupData.
+      
+      const data = ConfigBackupService.parseBackup(yamlContent);
+      
+      // If we got here, structure is valid.
+      const fields = ConfigBackupService.extractFields(data);
       const validationErrors =
-        YAMLValidationService.getFieldValidationErrors(fields);
+        ConfigBackupValidationService.getFieldValidationErrors(fields);
 
       if (validationErrors.length > 0) {
         setValidationError(
@@ -83,12 +87,14 @@ export function ImportConfigDialog({
       setAllFields(fields);
       // Select all fields by default
       setSelectedFields(new Set(fields.map((f) => f.originalPath)));
+
     } catch (error) {
-      setValidationError(
-        error instanceof Error ? error.message : "Parse error",
-      );
-      setAllFields([]);
-      setSelectedFields(new Set());
+        // If ConfigBackupService.parseBackup fails, it throws an error (likely from Zod)
+        setValidationError(
+            error instanceof Error ? error.message : "Invalid ConfigBackup structure",
+        );
+        setAllFields([]);
+        setSelectedFields(new Set());
     }
   }, [yamlContent]);
 
@@ -116,7 +122,7 @@ export function ImportConfigDialog({
 
   // Group fields by type and section for better organization
   const groupedFields = useMemo(() => {
-    const groups: Record<string, ParsedYAMLField[]> = {};
+    const groups: Record<string, ParsedConfigBackupField[]> = {};
 
     filteredFields.forEach((field) => {
       const groupKey = `${field.type}.${field.section}`;
@@ -146,7 +152,7 @@ export function ImportConfigDialog({
 
       setIsLoading(true);
       try {
-        const content = await YAMLService.readYAMLFile(file);
+        const content = await ConfigBackupService.readBackupFile(file);
         setYamlContent(content);
       } catch (error) {
         setValidationError(
@@ -160,7 +166,7 @@ export function ImportConfigDialog({
   );
 
   const handleSelectAll = useCallback(
-    (groupFields: ParsedYAMLField[], checked: boolean) => {
+    (groupFields: ParsedConfigBackupField[], checked: boolean) => {
       setSelectedFields((prev) => {
         const newSet = new Set(prev);
         groupFields.forEach((field) => {
@@ -192,7 +198,7 @@ export function ImportConfigDialog({
       );
 
       const validationErrors =
-        YAMLValidationService.getFieldValidationErrors(fieldsToImport);
+        ConfigBackupValidationService.getFieldValidationErrors(fieldsToImport);
       if (validationErrors.length > 0) {
         setValidationError(
           `Validation errors:\n${validationErrors.map((e: any) => e.error).join("\n")}`,
@@ -220,7 +226,7 @@ export function ImportConfigDialog({
   }, [selectedFields, allFields, onImport, onOpenChange]);
 
   const isGroupSelected = useCallback(
-    (groupFields: ParsedYAMLField[]) => {
+    (groupFields: ParsedConfigBackupField[]) => {
       return groupFields.every((field) =>
         selectedFields.has(field.originalPath),
       );

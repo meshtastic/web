@@ -6,19 +6,16 @@ import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import {
   createRootRoute,
-  createRootRouteWithContext,
   createRoute,
   createRouter,
   redirect,
 } from "@tanstack/react-router";
 import { Activity, lazy, Suspense } from "react";
-import type { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
 
 // Lazy loaded routes
 const NodesPage = lazy(() => import("@pages/Nodes/index.tsx"));
-const PreferencesPage = lazy(() => import("@app/pages/Preferences.tsx"));
 const SettingsPage = lazy(() => import("@app/pages/Settings/index.tsx"));
 const StatisticsPage = lazy(() => import("@app/pages/Statistics/index.tsx"));
 const RadioConfig = lazy(() =>
@@ -66,6 +63,10 @@ function requireActiveConnection() {
 export const rootRoute = createRootRoute({
   component: () => <App />,
   errorComponent: ErrorPage,
+  validateSearch: z.object({
+    // Traceroute dialog: ?traceroute=123456789 (target node number)
+    traceroute: z.coerce.number().int().min(0).max(4294967294).optional(),
+  }),
 });
 
 const indexRoute = createRoute({
@@ -221,20 +222,6 @@ const connectionsRoute = createRoute({
   errorComponent: ErrorPage,
 });
 
-const preferencesRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/preferences",
-  component: () => (
-    <Suspense fallback={<RouteLoader />}>
-      <PreferencesPage />
-    </Suspense>
-  ),
-  errorComponent: ErrorPage,
-  beforeLoad: ({ context }) => {
-    requireActiveConnection(context);
-  },
-});
-
 const statisticsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/statistics",
@@ -259,7 +246,6 @@ const routeTree = rootRoute.addChildren([
   settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
   nodesRoute,
   connectionsRoute,
-  preferencesRoute,
   statisticsRoute,
 ]);
 

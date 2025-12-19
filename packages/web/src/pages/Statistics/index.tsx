@@ -2,7 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
 import { ScrollArea } from "@components/ui/scroll-area";
 import { useDevice } from "@core/stores";
 import { getSql } from "@db/index";
-import { MessageSquareIcon, MapPinIcon, ActivityIcon, UsersIcon } from "lucide-react";
+import {
+  ActivityIcon,
+  MapPinIcon,
+  MessageSquareIcon,
+  UsersIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Statistics {
@@ -32,10 +37,14 @@ const StatCard = ({
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <p className="text-sm md:text-base font-medium text-muted-foreground">{title}</p>
+          <p className="text-sm md:text-base font-medium text-muted-foreground">
+            {title}
+          </p>
           <p className="text-3xl md:text-4xl font-bold">{value}</p>
           {subtitle && (
-            <p className="text-xs md:text-sm text-muted-foreground">{subtitle}</p>
+            <p className="text-xs md:text-sm text-muted-foreground">
+              {subtitle}
+            </p>
           )}
         </div>
         <Icon className="h-8 w-8 text-muted-foreground" />
@@ -62,62 +71,62 @@ const StatisticsPage = () => {
         // Total messages
         const messageCountResult = await sql(
           "SELECT COUNT(*) as count FROM messages WHERE device_id = ?",
-          [deviceId]
+          [deviceId],
         );
         const messageCount = messageCountResult[0]?.count || 0;
 
         // Direct vs broadcast
         const directMessageResult = await sql(
           "SELECT COUNT(*) as count FROM messages WHERE device_id = ? AND type = 'direct'",
-          [deviceId]
+          [deviceId],
         );
         const directMessageCount = directMessageResult[0]?.count || 0;
 
         const broadcastMessageResult = await sql(
           "SELECT COUNT(*) as count FROM messages WHERE device_id = ? AND type = 'broadcast'",
-          [deviceId]
+          [deviceId],
         );
         const broadcastMessageCount = broadcastMessageResult[0]?.count || 0;
 
         // Position updates
         const positionUpdateResult = await sql(
           "SELECT COUNT(*) as count FROM position_logs WHERE device_id = ?",
-          [deviceId]
+          [deviceId],
         );
         const positionUpdateCount = positionUpdateResult[0]?.count || 0;
 
         // Telemetry updates
         const telemetryUpdateResult = await sql(
           "SELECT COUNT(*) as count FROM telemetry_logs WHERE device_id = ?",
-          [deviceId]
+          [deviceId],
         );
         const telemetryUpdateCount = telemetryUpdateResult[0]?.count || 0;
 
         // Total nodes
         const totalNodeResult = await sql(
           "SELECT COUNT(*) as count FROM nodes WHERE device_id = ?",
-          [deviceId]
+          [deviceId],
         );
         const totalNodeCount = totalNodeResult[0]?.count || 0;
 
         // Active nodes (heard in last 24h)
         const activeNodeResult = await sql(
           "SELECT COUNT(*) as count FROM nodes WHERE device_id = ? AND last_heard > ?",
-          [deviceId, last24h]
+          [deviceId, last24h],
         );
         const activeNodeCount = activeNodeResult[0]?.count || 0;
 
         // Messages in last 24h
         const messagesLast24hResult = await sql(
           "SELECT COUNT(*) as count FROM messages WHERE device_id = ? AND date > datetime(?, 'unixepoch')",
-          [deviceId, last24h]
+          [deviceId, last24h],
         );
         const messagesLast24h = messagesLast24hResult[0]?.count || 0;
 
         // Positions in last 24h
         const positionsLast24hResult = await sql(
           "SELECT COUNT(*) as count FROM position_logs WHERE device_id = ? AND time > ?",
-          [deviceId, last24h]
+          [deviceId, last24h],
         );
         const positionsLast24h = positionsLast24hResult[0]?.count || 0;
 
@@ -214,7 +223,7 @@ const StatisticsPage = () => {
                   {stats.directMessageCount.toLocaleString()} (
                   {stats.messageCount > 0
                     ? Math.round(
-                        (stats.directMessageCount / stats.messageCount) * 100
+                        (stats.directMessageCount / stats.messageCount) * 100,
                       )
                     : 0}
                   %)
@@ -236,13 +245,16 @@ const StatisticsPage = () => {
               <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full" />
-                  <span className="text-sm md:text-base">Broadcast Messages</span>
+                  <span className="text-sm md:text-base">
+                    Broadcast Messages
+                  </span>
                 </div>
                 <span className="text-sm md:text-base font-medium">
                   {stats.broadcastMessageCount.toLocaleString()} (
                   {stats.messageCount > 0
                     ? Math.round(
-                        (stats.broadcastMessageCount / stats.messageCount) * 100
+                        (stats.broadcastMessageCount / stats.messageCount) *
+                          100,
                       )
                     : 0}
                   %)
@@ -295,7 +307,7 @@ const StatisticsPage = () => {
                 <span className="text-sm md:text-base font-medium">
                   {stats.totalNodeCount > 0
                     ? Math.round(
-                        (stats.activeNodeCount / stats.totalNodeCount) * 100
+                        (stats.activeNodeCount / stats.totalNodeCount) * 100,
                       )
                     : 0}
                   %

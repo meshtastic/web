@@ -1,9 +1,9 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { useUserForm } from "./useUserForm";
+import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { useNodes } from "@db/hooks";
-import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useUserForm } from "./useUserForm.ts";
 
 vi.mock("@core/stores", () => ({
   useDevice: vi.fn(),
@@ -19,15 +19,18 @@ vi.mock("@core/services/fieldRegistry", () => ({
 }));
 
 vi.mock("@app/validation/config/user", () => ({
-  UserValidationSchema: { parse: vi.fn(), safeParse: vi.fn().mockReturnValue({ success: true }) },
+  UserValidationSchema: {
+    parse: vi.fn(),
+    safeParse: vi.fn().mockReturnValue({ success: true }),
+  },
 }));
 
 // Mock protobuf
 vi.mock("@bufbuild/protobuf", () => ({
-  create: vi.fn((schema, data) => data),
+  create: vi.fn((_schema, data) => data),
 }));
 vi.mock("@meshtastic/core", () => ({
-  Protobuf: { Mesh: { UserSchema: {} } }
+  Protobuf: { Mesh: { UserSchema: {} } },
 }));
 
 describe("useUserForm", () => {
@@ -38,7 +41,12 @@ describe("useUserForm", () => {
 
   const myNodeNum = 123;
   const mockNodes = [
-    { nodeNum: myNodeNum, longName: "Long", shortName: "Short", isLicensed: true },
+    {
+      nodeNum: myNodeNum,
+      longName: "Long",
+      shortName: "Short",
+      isLicensed: true,
+    },
   ];
 
   beforeEach(() => {
@@ -52,8 +60,8 @@ describe("useUserForm", () => {
       setChange: mockSetChange,
     });
     (useFieldRegistry as vi.Mock).mockReturnValue({
-        trackChange: mockTrackChange,
-        removeChange: mockRemoveChange,
+      trackChange: mockTrackChange,
+      removeChange: mockRemoveChange,
     });
   });
 
@@ -67,30 +75,32 @@ describe("useUserForm", () => {
     const { result } = renderHook(() => useUserForm());
 
     await act(async () => {
-        result.current.form.setValue("longName", "New Name");
+      result.current.form.setValue("longName", "New Name");
     });
 
     await waitFor(() => {
-        expect(mockTrackChange).toHaveBeenCalledWith(
-            expect.anything(),
-            "longName",
-            "New Name",
-            "Long"
-        );
-        expect(mockSetChange).toHaveBeenCalled();
+      expect(mockTrackChange).toHaveBeenCalledWith(
+        expect.anything(),
+        "longName",
+        "New Name",
+        "Long",
+      );
+      expect(mockSetChange).toHaveBeenCalled();
     });
   });
 
   it("should send to device", () => {
     const { result } = renderHook(() => useUserForm());
-    
+
     act(() => {
-        result.current.sendToDevice();
+      result.current.sendToDevice();
     });
 
-    expect(mockSetOwner).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockSetOwner).toHaveBeenCalledWith(
+      expect.objectContaining({
         longName: "Long",
-        shortName: "Short"
-    }));
+        shortName: "Short",
+      }),
+    );
   });
 });

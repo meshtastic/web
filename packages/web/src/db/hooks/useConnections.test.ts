@@ -1,8 +1,12 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { useConnections, useConnection, useDefaultConnection } from "./useConnections";
-import { connectionRepo } from "../repositories";
 import { useDeviceStore } from "@core/stores";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { connectionRepo } from "../repositories/index.ts";
+import {
+  useConnection,
+  useConnections,
+  useDefaultConnection,
+} from "./useConnections.ts";
 
 // Mock Repositories
 vi.mock("../repositories", () => ({
@@ -27,63 +31,94 @@ const mockAddDevice = vi.fn();
 vi.mock("@core/stores", () => ({
   useDeviceStore: Object.assign(
     vi.fn((selector) => {
-        if (selector) return selector({
+      if (selector) {
+        return selector({
           setActiveConnectionId: mockSetActiveConnectionId,
           setActiveDeviceId: mockSetActiveDeviceId,
           activeDeviceId: 123,
-          addDevice: mockAddDevice
+          addDevice: mockAddDevice,
         });
-        return {
-          setActiveConnectionId: mockSetActiveConnectionId,
-          setActiveDeviceId: mockSetActiveDeviceId,
-          activeDeviceId: 123,
-          addDevice: mockAddDevice
-        };
+      }
+      return {
+        setActiveConnectionId: mockSetActiveConnectionId,
+        setActiveDeviceId: mockSetActiveDeviceId,
+        activeDeviceId: 123,
+        addDevice: mockAddDevice,
+      };
     }),
-    { getState: vi.fn() }
+    { getState: vi.fn() },
   ),
 }));
 
 // Mock other dependencies
-vi.mock("@meshtastic/transport-http", () => ({ TransportHTTP: { create: vi.fn() } }));
-vi.mock("@meshtastic/transport-web-bluetooth", () => ({ TransportWebBluetooth: { createFromDevice: vi.fn() } }));
-vi.mock("@meshtastic/transport-web-serial", () => ({ TransportWebSerial: { createFromPort: vi.fn() } }));
-vi.mock("@meshtastic/core", () => ({ MeshDevice: vi.fn(), Types: { DeviceStatusEnum: {} } }));
+vi.mock("@meshtastic/transport-http", () => ({
+  TransportHTTP: { create: vi.fn() },
+}));
+vi.mock("@meshtastic/transport-web-bluetooth", () => ({
+  TransportWebBluetooth: { createFromDevice: vi.fn() },
+}));
+vi.mock("@meshtastic/transport-web-serial", () => ({
+  TransportWebSerial: { createFromPort: vi.fn() },
+}));
+vi.mock("@meshtastic/core", () => ({
+  MeshDevice: vi.fn(),
+  Types: { DeviceStatusEnum: {} },
+}));
 vi.mock("@app/pages/Connections/utils", () => ({ testHttpReachable: vi.fn() }));
 vi.mock("@app/routes", () => ({ router: { navigate: vi.fn() } }));
-vi.mock("../subscriptionService", () => ({ SubscriptionService: { subscribeToDevice: vi.fn() } }));
+vi.mock("../subscriptionService", () => ({
+  SubscriptionService: { subscribeToDevice: vi.fn() },
+}));
 
 describe("useConnections", () => {
   const mockConnections = [
-    { id: 1, type: "http", name: "HTTP 1", url: "http://test.com", status: "disconnected" },
-    { id: 2, type: "bluetooth", name: "BT 1", deviceId: "bt-123", status: "disconnected" },
+    {
+      id: 1,
+      type: "http",
+      name: "HTTP 1",
+      url: "http://test.com",
+      status: "disconnected",
+    },
+    {
+      id: 2,
+      type: "bluetooth",
+      name: "BT 1",
+      deviceId: "bt-123",
+      status: "disconnected",
+    },
   ];
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Setup default store mocks
-    (useDeviceStore as unknown as vi.Mock).mockImplementation((selector: any) => {
-        if (selector) return selector({
-          setActiveConnectionId: mockSetActiveConnectionId,
-          setActiveDeviceId: mockSetActiveDeviceId,
-          activeDeviceId: 0,
-          addDevice: mockAddDevice
-        });
+    (useDeviceStore as unknown as vi.Mock).mockImplementation(
+      (selector: any) => {
+        if (selector) {
+          return selector({
+            setActiveConnectionId: mockSetActiveConnectionId,
+            setActiveDeviceId: mockSetActiveDeviceId,
+            activeDeviceId: 0,
+            addDevice: mockAddDevice,
+          });
+        }
         return {
           setActiveConnectionId: mockSetActiveConnectionId,
           setActiveDeviceId: mockSetActiveDeviceId,
           activeDeviceId: 0,
-          addDevice: mockAddDevice
+          addDevice: mockAddDevice,
         };
-    });
+      },
+    );
     (useDeviceStore as any).getState.mockReturnValue({
-        getDevice: vi.fn(),
-        removeDevice: vi.fn(),
+      getDevice: vi.fn(),
+      removeDevice: vi.fn(),
     });
 
     // Default repo mock
-    (connectionRepo.getConnections as vi.Mock).mockResolvedValue(mockConnections);
+    (connectionRepo.getConnections as vi.Mock).mockResolvedValue(
+      mockConnections,
+    );
   });
 
   it("should initialize and fetch connections", async () => {
@@ -96,9 +131,13 @@ describe("useConnections", () => {
   });
 
   it("should add a new connection", async () => {
-    const newConnInput = { type: "http" as const, name: "New HTTP", url: "http://new.com" };
+    const newConnInput = {
+      type: "http" as const,
+      name: "New HTTP",
+      url: "http://new.com",
+    };
     const createdConn = { id: 3, ...newConnInput, status: "disconnected" };
-    
+
     (connectionRepo.createConnection as vi.Mock).mockResolvedValue(createdConn);
     (connectionRepo.getConnections as vi.Mock)
       .mockResolvedValueOnce(mockConnections) // Initial load
@@ -114,19 +153,21 @@ describe("useConnections", () => {
     await waitFor(() => {
       expect(result.current.connections).toHaveLength(3);
     });
-    expect(connectionRepo.createConnection).toHaveBeenCalledWith(expect.objectContaining({
+    expect(connectionRepo.createConnection).toHaveBeenCalledWith(
+      expect.objectContaining({
         type: "http",
         name: "New HTTP",
         url: "http://new.com",
-        status: "disconnected"
-    }));
+        status: "disconnected",
+      }),
+    );
   });
 
   it("should remove a connection", async () => {
     (connectionRepo.deleteConnection as vi.Mock).mockResolvedValue(undefined);
     (connectionRepo.getConnections as vi.Mock)
-        .mockResolvedValueOnce(mockConnections)
-        .mockResolvedValueOnce([mockConnections[1]]); // After delete
+      .mockResolvedValueOnce(mockConnections)
+      .mockResolvedValueOnce([mockConnections[1]]); // After delete
 
     const { result } = renderHook(() => useConnections());
     await waitFor(() => expect(result.current.connections).toHaveLength(2));
@@ -143,7 +184,7 @@ describe("useConnections", () => {
 
   it("should set default connection", async () => {
     (connectionRepo.setDefault as vi.Mock).mockResolvedValue(undefined);
-    
+
     const { result } = renderHook(() => useConnections());
     await waitFor(() => expect(result.current.connections).toHaveLength(2));
 
@@ -157,7 +198,13 @@ describe("useConnections", () => {
 });
 
 describe("useConnection", () => {
-  const mockConnection = { id: 1, type: "http", name: "HTTP 1", url: "http://test.com", status: "disconnected" };
+  const mockConnection = {
+    id: 1,
+    type: "http",
+    name: "HTTP 1",
+    url: "http://test.com",
+    status: "disconnected",
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -175,11 +222,20 @@ describe("useConnection", () => {
 });
 
 describe("useDefaultConnection", () => {
-  const mockConnection = { id: 1, type: "http", name: "Default", url: "http://default.com", status: "disconnected", isDefault: true };
+  const mockConnection = {
+    id: 1,
+    type: "http",
+    name: "Default",
+    url: "http://default.com",
+    status: "disconnected",
+    isDefault: true,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (connectionRepo.getDefaultConnection as vi.Mock).mockResolvedValue(mockConnection);
+    (connectionRepo.getDefaultConnection as vi.Mock).mockResolvedValue(
+      mockConnection,
+    );
   });
 
   it("should fetch the default connection", async () => {

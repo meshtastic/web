@@ -1,6 +1,6 @@
 import { Label } from "@components/ui/label.tsx";
+import { useDevice, useDeviceContext, useUIStore } from "@core/stores";
 import { useNodes } from "@db/hooks";
-import { useAppStore, useDevice, useDeviceContext } from "@core/stores";
 import { nodeRepo } from "@db/index";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
@@ -18,7 +18,7 @@ export const RemoveNodeDialog = ({
   const { connection } = useDevice();
   const { deviceId } = useDeviceContext();
   const { nodes: allNodes } = useNodes(deviceId);
-  const { nodeNumToBeRemoved } = useAppStore();
+  const { nodeNumToBeRemoved } = useUIStore();
 
   // Create getNode function from database nodes
   const getNode = (nodeNum: number) => {

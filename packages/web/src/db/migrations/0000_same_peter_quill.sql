@@ -7,10 +7,10 @@ CREATE TABLE `channels` (
 	`uplink_enabled` integer DEFAULT false,
 	`downlink_enabled` integer DEFAULT false,
 	`position_precision` integer DEFAULT 32,
-	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	PRIMARY KEY(`device_id`, `channel_index`)
 );
 --> statement-breakpoint
-CREATE INDEX `channels_pk` ON `channels` (`device_id`,`channel_index`);--> statement-breakpoint
 CREATE INDEX `channels_device_idx` ON `channels` (`device_id`);--> statement-breakpoint
 CREATE TABLE `connections` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE `last_read` (
 	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX `last_read_unique_idx` ON `last_read` (`device_id`,`type`,`conversation_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `last_read_unique_idx` ON `last_read` (`device_id`,`type`,`conversation_id`);--> statement-breakpoint
 CREATE TABLE `message_drafts` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`device_id` integer NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE `message_drafts` (
 	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX `message_drafts_unique_idx` ON `message_drafts` (`device_id`,`type`,`target_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `message_drafts_unique_idx` ON `message_drafts` (`device_id`,`type`,`target_id`);--> statement-breakpoint
 CREATE TABLE `messages` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`device_id` integer NOT NULL,
@@ -132,7 +132,8 @@ CREATE TABLE `packet_logs` (
 	`want_ack` integer,
 	`rx_snr` real,
 	`rx_rssi` real,
-	`rx_time` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`rx_time` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`raw_packet` text
 );
 --> statement-breakpoint
 CREATE INDEX `packet_logs_from_node_idx` ON `packet_logs` (`device_id`,`from_node`,`rx_time`);--> statement-breakpoint

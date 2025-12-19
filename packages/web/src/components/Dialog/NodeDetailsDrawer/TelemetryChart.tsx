@@ -1,8 +1,13 @@
-import { useTelemetryHistory } from "@db/hooks";
-import { useDevice } from "@core/stores";
-import type { TelemetryLog } from "@db/index";
+import { useGetMyNode } from "@app/core/hooks/useGetMyNode";
 import { Card, CardContent } from "@components/ui/card";
-import { BatteryIcon, ZapIcon, ThermometerIcon, DropletIcon } from "lucide-react";
+import { isDefined } from "@core/utils/typeGuards";
+import { useTelemetryHistory } from "@db/hooks";
+import {
+  BatteryIcon,
+  DropletIcon,
+  ThermometerIcon,
+  ZapIcon,
+} from "lucide-react";
 import { useMemo } from "react";
 
 interface TelemetryChartProps {
@@ -15,22 +20,35 @@ interface DataPoint {
   value: number;
 }
 
-function normalizeData(data: DataPoint[], height: number, margin: number): DataPoint[] {
-  if (data.length === 0) return [];
+function normalizeData(
+  data: DataPoint[],
+  height: number,
+  margin: number,
+): DataPoint[] {
+  if (data.length === 0) {
+    return [];
+  }
 
-  const values = data.map(d => d.value);
+  const values = data.map((d) => d.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = max - min || 1;
 
-  return data.map(d => ({
+  return data.map((d) => ({
     time: d.time,
-    value: height - margin - ((d.value - min) / range) * (height - 2 * margin)
+    value: height - margin - ((d.value - min) / range) * (height - 2 * margin),
   }));
 }
 
-function generatePath(points: DataPoint[], width: number, minTime: number, maxTime: number): string {
-  if (points.length === 0) return "";
+function generatePath(
+  points: DataPoint[],
+  width: number,
+  minTime: number,
+  maxTime: number,
+): string {
+  if (points.length === 0) {
+    return "";
+  }
 
   const timeRange = maxTime - minTime || 1;
 
@@ -59,22 +77,29 @@ function SimpleLineChart({
   const width = 300;
   const margin = 10;
 
-  const { normalizedData, minTime, maxTime, minValue, maxValue } = useMemo(() => {
-    if (data.length === 0) {
-      return { normalizedData: [], minTime: 0, maxTime: 0, minValue: 0, maxValue: 0 };
-    }
+  const { normalizedData, minTime, maxTime, minValue, maxValue } =
+    useMemo(() => {
+      if (data.length === 0) {
+        return {
+          normalizedData: [],
+          minTime: 0,
+          maxTime: 0,
+          minValue: 0,
+          maxValue: 0,
+        };
+      }
 
-    const times = data.map(d => d.time);
-    const values = data.map(d => d.value);
+      const times = data.map((d) => d.time);
+      const values = data.map((d) => d.value);
 
-    return {
-      normalizedData: normalizeData(data, height, margin),
-      minTime: Math.min(...times),
-      maxTime: Math.max(...times),
-      minValue: Math.min(...values),
-      maxValue: Math.max(...values),
-    };
-  }, [data, height]);
+      return {
+        normalizedData: normalizeData(data, height, margin),
+        minTime: Math.min(...times),
+        maxTime: Math.max(...times),
+        minValue: Math.min(...values),
+        maxValue: Math.max(...values),
+      };
+    }, [data, height]);
 
   if (data.length === 0) {
     return (
@@ -100,7 +125,7 @@ function SimpleLineChart({
         className="w-full"
         viewBox={`0 0 ${width} ${height}`}
       >
-        {/* Grid lines */}
+        <title className="sr-only">Telemetry Chart</title>
         <line
           x1={0}
           y1={height / 2}
@@ -111,7 +136,6 @@ function SimpleLineChart({
           strokeDasharray="2,2"
         />
 
-        {/* Data line */}
         <path
           d={path}
           fill="none"
@@ -122,11 +146,11 @@ function SimpleLineChart({
         />
 
         {/* Data points */}
-        {normalizedData.map((point, index) => {
+        {normalizedData.map((point) => {
           const x = ((point.time - minTime) / (maxTime - minTime || 1)) * width;
           return (
             <circle
-              key={index}
+              key={point.time}
               cx={x}
               cy={point.value}
               r={2}
@@ -139,9 +163,12 @@ function SimpleLineChart({
   );
 }
 
-export const TelemetryChart = ({ nodeNum, durationHours = 24 }: TelemetryChartProps) => {
-  const device = useDevice();
-  const deviceId = device.id;
+export function TelemetryChart({
+  nodeNum,
+  durationHours = 24,
+}: TelemetryChartProps) {
+  const { myNodeNum } = useGetMyNode();
+  const deviceId = myNodeNum ?? 0;
 
   const sinceTimestamp = useMemo(() => {
     const now = Date.now();
@@ -149,15 +176,15 @@ export const TelemetryChart = ({ nodeNum, durationHours = 24 }: TelemetryChartPr
     return Math.floor(cutoff / 1000);
   }, [durationHours]);
 
-  const { telemetry, loading } = useTelemetryHistory(
+  const { telemetry } = useTelemetryHistory(
     deviceId,
     nodeNum,
     sinceTimestamp,
-    200
+    200,
   );
 
   const charts = useMemo(() => {
-    if (loading || telemetry.length === 0) {
+    if (telemetry.length === 0) {
       return {
         battery: [],
         voltage: [],
@@ -167,30 +194,42 @@ export const TelemetryChart = ({ nodeNum, durationHours = 24 }: TelemetryChartPr
     }
 
     return {
-      battery: telemetry
-        .filter(t => t.batteryLevel !== undefined && t.batteryLevel !== null)
-        .map(t => ({ time: t.time, value: t.batteryLevel as number })),
-      voltage: telemetry
-        .filter(t => t.voltage !== undefined && t.voltage !== null)
-        .map(t => ({ time: t.time, value: t.voltage as number })),
-      temperature: telemetry
-        .filter(t => t.temperature !== undefined && t.temperature !== null)
-        .map(t => ({ time: t.time, value: t.temperature as number })),
-      humidity: telemetry
-        .filter(t => t.relativeHumidity !== undefined && t.relativeHumidity !== null)
-        .map(t => ({ time: t.time, value: t.relativeHumidity as number })),
+      battery: telemetry.flatMap((t) =>
+        isDefined(t.batteryLevel) && isDefined(t.time)
+          ? [{ time: t.time.getTime(), value: t.batteryLevel }]
+          : [],
+      ),
+      voltage: telemetry.flatMap((t) =>
+        isDefined(t.voltage) && isDefined(t.time)
+          ? [{ time: t.time.getTime(), value: t.voltage }]
+          : [],
+      ),
+      temperature: telemetry.flatMap((t) =>
+        isDefined(t.temperature) && isDefined(t.time)
+          ? [{ time: t.time.getTime(), value: t.temperature }]
+          : [],
+      ),
+      humidity: telemetry.flatMap((t) =>
+        isDefined(t.relativeHumidity) && isDefined(t.time)
+          ? [{ time: t.time.getTime(), value: t.relativeHumidity }]
+          : [],
+      ),
     };
-  }, [telemetry, loading]);
+  }, [telemetry]);
 
-  const hasData = charts.battery.length > 0 || charts.voltage.length > 0 ||
-                  charts.temperature.length > 0 || charts.humidity.length > 0;
+  const hasData =
+    charts.battery.length > 0 ||
+    charts.voltage.length > 0 ||
+    charts.temperature.length > 0 ||
+    charts.humidity.length > 0;
 
-  if (loading) {
+  // Early return if device not connected
+  if (!myNodeNum) {
     return (
       <Card className="bg-muted/20">
         <CardContent className="p-4">
           <div className="text-center text-sm text-muted-foreground">
-            Loading telemetry data...
+            Connect to a device to view telemetry
           </div>
         </CardContent>
       </Card>
@@ -274,4 +313,4 @@ export const TelemetryChart = ({ nodeNum, durationHours = 24 }: TelemetryChartPr
       </CardContent>
     </Card>
   );
-};
+}

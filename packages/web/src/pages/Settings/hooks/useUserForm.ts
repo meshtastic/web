@@ -1,12 +1,12 @@
-import { createZodResolver } from "@components/Form/createZodResolver";
-import { create } from "@bufbuild/protobuf";
-import { useFieldRegistry } from "@core/services/fieldRegistry";
-import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@db/hooks";
 import {
   type UserValidation,
   UserValidationSchema,
 } from "@app/validation/config/user";
+import { create } from "@bufbuild/protobuf";
+import { createZodResolver } from "@components/Form/createZodResolver";
+import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { useDevice, useDeviceContext } from "@core/stores";
+import { useNodes } from "@db/hooks";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
@@ -57,7 +57,9 @@ export function useUserForm() {
   // Sync form changes to store and field registry
   useEffect(() => {
     const subscription = watch((formData) => {
-      if (!formData) return;
+      if (!formData) {
+        return;
+      }
 
       const currentValues = formData as UserValidation;
       const prevValues = prevValuesRef.current;
@@ -72,7 +74,9 @@ export function useUserForm() {
 
       // Track per-field changes for Activity panel
       let hasChanges = false;
-      for (const key of Object.keys(currentValues) as Array<keyof UserValidation>) {
+      for (const key of Object.keys(currentValues) as Array<
+        keyof UserValidation
+      >) {
         const newValue = currentValues[key];
         const originalValue = original[key];
 
@@ -110,8 +114,12 @@ export function useUserForm() {
       }>,
       disabled?: boolean,
     ): boolean => {
-      if (disabled) return true;
-      if (!disabledBy) return false;
+      if (disabled) {
+        return true;
+      }
+      if (!disabledBy) {
+        return false;
+      }
 
       return disabledBy.some((field) => {
         const value = getValues(field.fieldName);

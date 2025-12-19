@@ -1,7 +1,7 @@
+import { fromByteArray } from "base64-js";
 import { t } from "i18next";
 import { describe, expect, it } from "vitest";
 import { makeChannelSchema } from "./channel.ts";
-import { fromByteArray } from "base64-js";
 
 const mockRole = 0;
 
@@ -159,12 +159,11 @@ describe("makeChannelSchema", () => {
       });
       expect(result.success).toBe(false);
       if (!result.success) {
-          // Since it's a union, Zod returns "Invalid input" if all variants fail.
-          // But with custom messages on the number schema, if that's the closest match?
-          // Actually, Zod union errors are complex.
-          // If we coerce to number, it matches the middle schema but fails min/max.
-          
-          // Let's verify what we get.
+        // Since it's a union, Zod returns "Invalid input" if all variants fail.
+        // But with custom messages on the number schema, if that's the closest match?
+        // Actually, Zod union errors are complex.
+        // If we coerce to number, it matches the middle schema but fails min/max.
+        // Let's verify what we get.
       }
     }
   });

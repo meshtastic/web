@@ -1,8 +1,6 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import AppLayout from "@components/AppLayout";
-import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
-import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ThemeProvider } from "@components/theme-provider";
 import { useDeviceStore } from "@core/stores";
@@ -20,8 +18,8 @@ export function App() {
         <DeviceWrapper deviceId={activeDeviceId}>
           <AppLayout>
             <DialogManager />
-            <KeyBackupReminder />
-            <CommandPalette />
+            {/* <KeyBackupReminder /> */}
+            {/* <CommandPalette /> */}
             <Outlet />
           </AppLayout>
         </DeviceWrapper>

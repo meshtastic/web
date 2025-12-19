@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 
 /**
- * Messages table - stores all direct and broadcast messages
+ * Messages table - stores all direct and channel messages
  */
 export const messages = sqliteTable(
   "messages",
@@ -23,12 +23,12 @@ export const messages = sqliteTable(
 
     // Message metadata
     messageId: integer("message_id").notNull(), // Original packet message ID
-    type: text("type", { enum: ["direct", "broadcast"] }).notNull(),
+    type: text("type", { enum: ["direct", "channel"] }).notNull(),
     channelId: integer("channel_id").notNull(),
 
     // Participants
     fromNode: integer("from_node").notNull(),
-    toNode: integer("to_node").notNull(), // For broadcast, this is typically 0xFFFFFFFF
+    toNode: integer("to_node").notNull(), // For channel messages, this is typically 0xFFFFFFFF
 
     // Message content
     message: text("message").notNull(),
@@ -62,6 +62,11 @@ export const messages = sqliteTable(
     realACK: integer("real_ack", { mode: "boolean" }).notNull().default(false),
   },
   (table) => [
+    // Unique constraint for deduplication (same message ID per device)
+    unique("messages_device_message_id_unique").on(
+      table.deviceId,
+      table.messageId,
+    ),
     // Indexes for common query patterns
     index("messages_device_idx").on(table.deviceId),
     index("messages_device_date_idx").on(table.deviceId, table.date),
@@ -74,8 +79,8 @@ export const messages = sqliteTable(
       table.toNode,
       table.date,
     ),
-    // Broadcast queries: device + channel + date
-    index("messages_broadcast_channel_idx").on(
+    // Channel queries: device + channel + date
+    index("messages_channel_idx").on(
       table.deviceId,
       table.type,
       table.channelId,
@@ -135,6 +140,7 @@ export const nodes = sqliteTable(
     channelUtilization: real("channel_utilization"),
     airUtilTx: real("air_util_tx"),
     uptimeSeconds: integer("uptime_seconds"),
+    privateNote: text("private_note"),
 
     // Timestamps
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
@@ -338,10 +344,10 @@ export const messageDrafts = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     deviceId: integer("device_id").notNull(),
-    type: text("type", { enum: ["direct", "broadcast"] }).notNull(),
+    type: text("type", { enum: ["direct", "channel"] }).notNull(),
 
     // For direct: nodeNum of recipient
-    // For broadcast: channelId
+    // For channel: channelId
     targetId: integer("target_id").notNull(),
 
     // Draft content
@@ -455,10 +461,10 @@ export const lastRead = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     deviceId: integer("device_id").notNull(),
-    type: text("type", { enum: ["direct", "broadcast"] }).notNull(),
+    type: text("type", { enum: ["direct", "channel"] }).notNull(),
 
     // For direct: conversation ID (formatted as "nodeA:nodeB")
-    // For broadcast: channelId
+    // For channel: channelId
     conversationId: text("conversation_id").notNull(),
 
     // Last read message ID
@@ -475,6 +481,47 @@ export const lastRead = sqliteTable(
       table.deviceId,
       table.type,
       table.conversationId,
+    ),
+  ],
+);
+
+/**
+ * Traceroute logs - historical traceroute results
+ * Stores route discovery data for analyzing network topology
+ */
+export const tracerouteLogs = sqliteTable(
+  "traceroute_logs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    // Foreign keys
+    deviceId: integer("device_id").notNull(),
+
+    // Target node
+    targetNodeNum: integer("target_node_num").notNull(),
+
+    // Route data (stored as JSON arrays)
+    route: text("route", { mode: "json" }).$type<number[]>().notNull(),
+    routeBack: text("route_back", { mode: "json" }).$type<number[]>(),
+    snrTowards: text("snr_towards", { mode: "json" }).$type<number[]>(),
+    snrBack: text("snr_back", { mode: "json" }).$type<number[]>(),
+
+    // Timing
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (table) => [
+    // Query traceroutes for a specific target
+    index("traceroute_logs_target_idx").on(
+      table.deviceId,
+      table.targetNodeNum,
+      table.createdAt,
+    ),
+    // Query all traceroutes by time
+    index("traceroute_logs_device_time_idx").on(
+      table.deviceId,
+      table.createdAt,
     ),
   ],
 );
@@ -511,3 +558,6 @@ export type NewConnection = typeof connections.$inferInsert;
 
 export type Preference = typeof preferences.$inferSelect;
 export type NewPreference = typeof preferences.$inferInsert;
+
+export type TracerouteLog = typeof tracerouteLogs.$inferSelect;
+export type NewTracerouteLog = typeof tracerouteLogs.$inferInsert;

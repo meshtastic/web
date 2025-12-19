@@ -1,5 +1,5 @@
-import { usePositionTrails } from "@db/hooks";
 import { useDevice } from "@core/stores";
+import { usePositionTrails } from "@db/hooks";
 import type { Protobuf } from "@meshtastic/core";
 import type { Feature, FeatureCollection } from "geojson";
 import { useMemo } from "react";
@@ -16,7 +16,10 @@ export interface PositionTrailsLayerProps {
  * Convert position trails to GeoJSON LineStrings
  */
 function generateTrailLines(
-  trails: Map<number, Array<{ latitudeI: number; longitudeI: number; time: number }>>,
+  trails: Map<
+    number,
+    Array<{ latitudeI: number; longitudeI: number; time: number }>
+  >,
 ): FeatureCollection {
   const features: Feature[] = [];
 

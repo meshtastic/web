@@ -1,6 +1,14 @@
 import { and, desc, eq, gt, or, sql } from "drizzle-orm";
-import { dbClient } from "../client";
-import { messages, lastRead, messageDrafts, type Message, type NewMessage, type MessageDraft } from "../schema";
+import { dbClient } from "../client.ts";
+import {
+  lastRead,
+  type Message,
+  type MessageDraft,
+  messageDrafts,
+  messages,
+  type NewMessage,
+} from "../schema.ts";
+import type { ConversationType } from "../types.ts";
 
 /**
  * Repository for message operations
@@ -37,7 +45,7 @@ export class MessageRepository {
   }
 
   /**
-   * Get broadcast messages for a channel
+   * Get channel messages for a channel
    */
   async getBroadcastMessages(
     deviceId: number,
@@ -50,7 +58,7 @@ export class MessageRepository {
       .where(
         and(
           eq(messages.deviceId, deviceId),
-          eq(messages.type, "broadcast"),
+          eq(messages.type, "channel"),
           eq(messages.channelId, channelId),
         ),
       )
@@ -83,9 +91,23 @@ export class MessageRepository {
   }
 
   /**
-   * Update message state
+   * Update message state by database ID
    */
   async updateMessageState(
+    id: number,
+    deviceId: number,
+    newState: Message["state"],
+  ): Promise<void> {
+    await this.db
+      .update(messages)
+      .set({ state: newState })
+      .where(and(eq(messages.id, id), eq(messages.deviceId, deviceId)));
+  }
+
+  /**
+   * Update message state by packet messageId
+   */
+  async updateMessageStateByMessageId(
     messageId: number,
     deviceId: number,
     newState: Message["state"],
@@ -93,7 +115,9 @@ export class MessageRepository {
     await this.db
       .update(messages)
       .set({ state: newState })
-      .where(and(eq(messages.id, messageId), eq(messages.deviceId, deviceId)));
+      .where(
+        and(eq(messages.messageId, messageId), eq(messages.deviceId, deviceId)),
+      );
   }
 
   /**
@@ -171,7 +195,7 @@ export class MessageRepository {
       .where(
         and(
           eq(messages.deviceId, deviceId),
-          eq(messages.type, "broadcast"),
+          eq(messages.type, "channel"),
           eq(messages.channelId, channelId),
         ),
       );
@@ -181,9 +205,7 @@ export class MessageRepository {
    * Delete all messages for a device
    */
   async deleteAllMessages(deviceId: number): Promise<void> {
-    await this.db
-      .delete(messages)
-      .where(eq(messages.deviceId, deviceId));
+    await this.db.delete(messages).where(eq(messages.deviceId, deviceId));
   }
 
   /**
@@ -218,40 +240,47 @@ export class MessageRepository {
   }
 
   /**
-   * Get conversations list with last message
-   * Returns both direct conversations and broadcast channels
+   * Get conversations list with last message and unread counts
+   * Returns both direct conversations and channel conversations
+   * @param myNodeNum - The current user's node number (needed for unread count calculations)
    */
-  async getConversations(deviceId: number): Promise<Array<{
-    type: "direct" | "broadcast";
-    id: number;
-    lastMessage: Message | null;
-    unreadCount: number;
-  }>> {
+  async getConversations(
+    deviceId: number,
+    myNodeNum: number,
+  ): Promise<
+    Array<{
+      type: ConversationType;
+      id: number;
+      lastMessage: Message | null;
+      unreadCount: number;
+    }>
+  > {
     // 1. Get direct conversations - find unique normalized pairs with last date
     const directConvosSubquery = this.db
       .select({
-        nodeA: sql<number>`CASE WHEN ${messages.fromNode} < ${messages.toNode} THEN ${messages.fromNode} ELSE ${messages.toNode} END`.as('node_a'),
-        nodeB: sql<number>`CASE WHEN ${messages.fromNode} < ${messages.toNode} THEN ${messages.toNode} ELSE ${messages.fromNode} END`.as('node_b'),
-        lastDate: sql<Date>`MAX(${messages.date})`.as('last_date'),
+        nodeA:
+          sql<number>`CASE WHEN ${messages.fromNode} < ${messages.toNode} THEN ${messages.fromNode} ELSE ${messages.toNode} END`.as(
+            "node_a",
+          ),
+        nodeB:
+          sql<number>`CASE WHEN ${messages.fromNode} < ${messages.toNode} THEN ${messages.toNode} ELSE ${messages.fromNode} END`.as(
+            "node_b",
+          ),
+        lastDate: sql<Date>`MAX(${messages.date})`.as("last_date"),
       })
       .from(messages)
-      .where(
-        and(
-          eq(messages.deviceId, deviceId),
-          eq(messages.type, "direct")
-        )
-      )
-      .groupBy(
-        sql`node_a`,
-        sql`node_b`
-      )
-      .as('direct_convos');
+      .where(and(eq(messages.deviceId, deviceId), eq(messages.type, "direct")))
+      .groupBy(sql`node_a`, sql`node_b`)
+      .as("direct_convos");
 
     // 2. Join to get full message details for direct conversations
     const directMessages = await this.db
       .select({
         message: messages,
-        otherNode: sql<number>`CASE WHEN ${messages.fromNode} = ${directConvosSubquery.nodeA} THEN ${directConvosSubquery.nodeB} ELSE ${directConvosSubquery.nodeA} END`.as('other_node'),
+        otherNode:
+          sql<number>`CASE WHEN ${messages.fromNode} = ${directConvosSubquery.nodeA} THEN ${directConvosSubquery.nodeB} ELSE ${directConvosSubquery.nodeA} END`.as(
+            "other_node",
+          ),
       })
       .from(directConvosSubquery)
       .innerJoin(
@@ -263,32 +292,27 @@ export class MessageRepository {
           or(
             and(
               eq(messages.fromNode, directConvosSubquery.nodeA),
-              eq(messages.toNode, directConvosSubquery.nodeB)
+              eq(messages.toNode, directConvosSubquery.nodeB),
             ),
             and(
               eq(messages.fromNode, directConvosSubquery.nodeB),
-              eq(messages.toNode, directConvosSubquery.nodeA)
-            )
-          )
-        )
+              eq(messages.toNode, directConvosSubquery.nodeA),
+            ),
+          ),
+        ),
       )
       .orderBy(desc(messages.date));
 
-    // 3. Get broadcast channels - subquery for max date per channel
+    // 3. Get channel channels - subquery for max date per channel
     const broadcastSubquery = this.db
       .select({
         channelId: messages.channelId,
-        maxDate: sql<Date>`MAX(${messages.date})`.as('max_date'),
+        maxDate: sql<Date>`MAX(${messages.date})`.as("max_date"),
       })
       .from(messages)
-      .where(
-        and(
-          eq(messages.deviceId, deviceId),
-          eq(messages.type, "broadcast")
-        )
-      )
+      .where(and(eq(messages.deviceId, deviceId), eq(messages.type, "channel")))
       .groupBy(messages.channelId)
-      .as('broadcast_max');
+      .as("broadcast_max");
 
     // 4. Join to get full message details for broadcasts
     const broadcastMessages = await this.db
@@ -300,15 +324,15 @@ export class MessageRepository {
         messages,
         and(
           eq(messages.deviceId, deviceId),
-          eq(messages.type, "broadcast"),
+          eq(messages.type, "channel"),
           eq(messages.channelId, broadcastSubquery.channelId),
-          eq(messages.date, broadcastSubquery.maxDate)
-        )
+          eq(messages.date, broadcastSubquery.maxDate),
+        ),
       )
       .orderBy(desc(messages.date));
 
     const conversations: Array<{
-      type: "direct" | "broadcast";
+      type: ConversationType;
       id: number;
       lastMessage: Message | null;
       unreadCount: number;
@@ -316,21 +340,35 @@ export class MessageRepository {
 
     // Process direct conversations
     for (const row of directMessages) {
+      // Determine the other node from myNodeNum's perspective
+      const otherNode =
+        row.message.fromNode === myNodeNum
+          ? row.message.toNode
+          : row.message.fromNode;
+      const unreadCount = await this.getUnreadCountDirect(
+        deviceId,
+        myNodeNum,
+        otherNode,
+      );
       conversations.push({
         type: "direct",
-        id: row.otherNode,
+        id: otherNode,
         lastMessage: row.message,
-        unreadCount: 0, // TODO: Implement unread tracking
+        unreadCount,
       });
     }
 
-    // Process broadcast channels
+    // Process channel conversations
     for (const row of broadcastMessages) {
+      const unreadCount = await this.getUnreadCountBroadcast(
+        deviceId,
+        row.message.channelId,
+      );
       conversations.push({
-        type: "broadcast",
+        type: "channel",
         id: row.message.channelId,
         lastMessage: row.message,
-        unreadCount: 0, // TODO: Implement unread tracking
+        unreadCount,
       });
     }
 
@@ -349,7 +387,7 @@ export class MessageRepository {
    */
   async markAsRead(
     deviceId: number,
-    type: "direct" | "broadcast",
+    type: ConversationType,
     conversationId: string,
     messageId: number,
   ): Promise<void> {
@@ -376,7 +414,7 @@ export class MessageRepository {
    */
   async getLastRead(
     deviceId: number,
-    type: "direct" | "broadcast",
+    type: ConversationType,
     conversationId: string,
   ): Promise<number | null> {
     const result = await this.db
@@ -396,16 +434,22 @@ export class MessageRepository {
 
   /**
    * Get unread count for a direct conversation
+   * @param myNodeNum - The current user's node number (always first in conversationId)
+   * @param otherNodeNum - The other party's node number
    */
   async getUnreadCountDirect(
     deviceId: number,
-    nodeA: number,
-    nodeB: number,
+    myNodeNum: number,
+    otherNodeNum: number,
   ): Promise<number> {
-    // Normalize conversation ID (smaller node number first)
-    const conversationId = nodeA < nodeB ? `${nodeA}:${nodeB}` : `${nodeB}:${nodeA}`;
+    // Conversation ID format: myNodeNum:otherNodeNum (from user's perspective)
+    const conversationId = `${myNodeNum}:${otherNodeNum}`;
 
-    const lastReadId = await this.getLastRead(deviceId, "direct", conversationId);
+    const lastReadId = await this.getLastRead(
+      deviceId,
+      "direct",
+      conversationId,
+    );
 
     if (!lastReadId) {
       // No read marker, all messages are unread
@@ -417,8 +461,14 @@ export class MessageRepository {
             eq(messages.deviceId, deviceId),
             eq(messages.type, "direct"),
             or(
-              and(eq(messages.fromNode, nodeA), eq(messages.toNode, nodeB)),
-              and(eq(messages.fromNode, nodeB), eq(messages.toNode, nodeA)),
+              and(
+                eq(messages.fromNode, myNodeNum),
+                eq(messages.toNode, otherNodeNum),
+              ),
+              and(
+                eq(messages.fromNode, otherNodeNum),
+                eq(messages.toNode, myNodeNum),
+              ),
             ),
           ),
         );
@@ -434,8 +484,14 @@ export class MessageRepository {
           eq(messages.deviceId, deviceId),
           eq(messages.type, "direct"),
           or(
-            and(eq(messages.fromNode, nodeA), eq(messages.toNode, nodeB)),
-            and(eq(messages.fromNode, nodeB), eq(messages.toNode, nodeA)),
+            and(
+              eq(messages.fromNode, myNodeNum),
+              eq(messages.toNode, otherNodeNum),
+            ),
+            and(
+              eq(messages.fromNode, otherNodeNum),
+              eq(messages.toNode, myNodeNum),
+            ),
           ),
           gt(messages.id, lastReadId),
         ),
@@ -444,14 +500,18 @@ export class MessageRepository {
   }
 
   /**
-   * Get unread count for a broadcast channel
+   * Get unread count for a channel channel
    */
   async getUnreadCountBroadcast(
     deviceId: number,
     channelId: number,
   ): Promise<number> {
     const conversationId = channelId.toString();
-    const lastReadId = await this.getLastRead(deviceId, "broadcast", conversationId);
+    const lastReadId = await this.getLastRead(
+      deviceId,
+      "channel",
+      conversationId,
+    );
 
     if (!lastReadId) {
       // No read marker, all messages are unread
@@ -461,7 +521,7 @@ export class MessageRepository {
         .where(
           and(
             eq(messages.deviceId, deviceId),
-            eq(messages.type, "broadcast"),
+            eq(messages.type, "channel"),
             eq(messages.channelId, channelId),
           ),
         );
@@ -475,7 +535,7 @@ export class MessageRepository {
       .where(
         and(
           eq(messages.deviceId, deviceId),
-          eq(messages.type, "broadcast"),
+          eq(messages.type, "channel"),
           eq(messages.channelId, channelId),
           gt(messages.id, lastReadId),
         ),
@@ -488,7 +548,7 @@ export class MessageRepository {
    */
   async saveDraft(
     deviceId: number,
-    type: "direct" | "broadcast",
+    type: ConversationType,
     targetId: number,
     content: string,
   ): Promise<void> {
@@ -502,7 +562,11 @@ export class MessageRepository {
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
-        target: [messageDrafts.deviceId, messageDrafts.type, messageDrafts.targetId],
+        target: [
+          messageDrafts.deviceId,
+          messageDrafts.type,
+          messageDrafts.targetId,
+        ],
         set: {
           content,
           updatedAt: new Date(),
@@ -515,7 +579,7 @@ export class MessageRepository {
    */
   async getDraft(
     deviceId: number,
-    type: "direct" | "broadcast",
+    type: ConversationType,
     targetId: number,
   ): Promise<MessageDraft | null> {
     const result = await this.db
@@ -538,7 +602,7 @@ export class MessageRepository {
    */
   async deleteDraft(
     deviceId: number,
-    type: "direct" | "broadcast",
+    type: ConversationType,
     targetId: number,
   ): Promise<void> {
     await this.db

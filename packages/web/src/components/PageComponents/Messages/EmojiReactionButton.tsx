@@ -11,7 +11,7 @@ import {
 } from "@components/ui/popover";
 import { cn } from "@core/utils/cn";
 import type { Emoji } from "frimousse";
-import { SmilePlus } from "lucide-react";
+import { Smile } from "lucide-react";
 import { forwardRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -44,7 +44,7 @@ export const EmojiReactionButton = forwardRef<
           )}
           aria-label={t("actionsMenu.addReaction", "Add reaction")}
         >
-          <SmilePlus className="size-4 opacity-80" />
+          <Smile className="size-4.5 opacity-90" />
         </button>
       </PopoverTrigger>
       <PopoverContent

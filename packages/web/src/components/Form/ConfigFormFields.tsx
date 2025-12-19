@@ -1,7 +1,7 @@
 import { GenericInput } from "@components/Form/FormInput";
 import {
-  MultiSelectInput,
   type MultiSelectFieldProps,
+  MultiSelectInput,
 } from "@components/Form/FormMultiSelect";
 import { PasswordGenerator } from "@components/Form/FormPasswordGenerator";
 import { SelectInput } from "@components/Form/FormSelect";
@@ -43,7 +43,6 @@ export interface DisabledByConfig<T extends FieldValues> {
   selector?: number;
   invert?: boolean;
 }
-
 
 // Props passed to custom components
 export interface CustomFieldProps<T extends FieldValues> {
@@ -192,7 +191,9 @@ function renderFieldInput<T extends FieldValues>(
 
     case "passwordGenerator": {
       const pg = field.passwordGenerator;
-      if (!pg) return null;
+      if (!pg) {
+        return null;
+      }
       return (
         <PasswordGenerator
           field={{
@@ -203,7 +204,8 @@ function renderFieldInput<T extends FieldValues>(
             hide: pg.hide,
             bits: pg.bits,
             devicePSKBitCount: pg.devicePSKBitCount,
-            inputChange: field.inputChange as React.ChangeEventHandler<HTMLInputElement>,
+            inputChange:
+              field.inputChange as React.ChangeEventHandler<HTMLInputElement>,
             selectChange: pg.selectChange,
             actionButtons: pg.actionButtons,
             properties: field.properties,
@@ -230,10 +232,6 @@ function renderFieldInput<T extends FieldValues>(
         />
       );
     }
-
-    case "text":
-    case "number":
-    case "password":
     default:
       return (
         <GenericInput

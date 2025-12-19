@@ -1,7 +1,7 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
-import { useFeatureFlags, useFeatureFlag } from "./useFeatureFlags";
 import { featureFlags } from "@core/services/featureFlags";
+import { act, renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { useFeatureFlag, useFeatureFlags } from "./useFeatureFlags.ts";
 
 describe("useFeatureFlags", () => {
   beforeEach(() => {
@@ -17,7 +17,7 @@ describe("useFeatureFlags", () => {
   it("should return all flags", () => {
     const { result } = renderHook(() => useFeatureFlags());
     const flags = result.current;
-    
+
     // Check if expected keys exist
     expect(flags).toHaveProperty("persistNodeDB");
     expect(flags).toHaveProperty("persistMessages");
@@ -25,7 +25,7 @@ describe("useFeatureFlags", () => {
 
   it("should update when a flag is overridden", () => {
     const { result } = renderHook(() => useFeatureFlags());
-    
+
     // Assume initial state (might vary based on env, but we can toggle)
     const initialVal = result.current.persistNodeDB;
 
@@ -40,7 +40,7 @@ describe("useFeatureFlags", () => {
 describe("useFeatureFlag", () => {
   beforeEach(() => {
     featureFlags.setOverrides({
-        persistNodeDB: null,
+      persistNodeDB: null,
     } as any);
   });
 

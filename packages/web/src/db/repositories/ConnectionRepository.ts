@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
-import { dbClient } from "../client";
-import { connections, type Connection, type NewConnection } from "../schema";
+import { dbClient } from "../client.ts";
+import { type Connection, connections, type NewConnection } from "../schema.ts";
 
 export type ConnectionType = "http" | "bluetooth" | "serial";
 export type ConnectionStatus =
@@ -79,9 +79,7 @@ export class ConnectionRepository {
    */
   async updateConnection(
     id: number,
-    updates: Partial<
-      Omit<Connection, "id" | "createdAt">
-    >,
+    updates: Partial<Omit<Connection, "id" | "createdAt">>,
   ): Promise<void> {
     await this.db
       .update(connections)
@@ -111,7 +109,10 @@ export class ConnectionRepository {
       updates.lastConnectedAt = new Date();
     }
 
-    await this.db.update(connections).set(updates).where(eq(connections.id, id));
+    await this.db
+      .update(connections)
+      .set(updates)
+      .where(eq(connections.id, id));
   }
 
   /**

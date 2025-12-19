@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getAvatarColors,
   getColorFromNodeNum,
   hexToRgb,
   isLightColor,
@@ -89,5 +90,34 @@ describe("getColorFromNodeNum", () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(255);
     }
+  });
+});
+
+describe("getAvatarColors", () => {
+  it("uses node ID hex for number input", () => {
+    // 0x123456 = 1193046. R=0x12(18), G=0x34(52), B=0x56(86)
+    const result = getAvatarColors(0x123456);
+    expect(result.bgColor).toBe("rgb(18, 52, 86)");
+    // Dark color -> white text
+    expect(result.textColor).toBe("#FFFFFF");
+  });
+
+  it("uses node ID hex for numeric string input", () => {
+    const result = getAvatarColors("1193046"); // 0x123456
+    expect(result.bgColor).toBe("rgb(18, 52, 86)");
+  });
+
+  it("falls back to text hash for non-numeric string", () => {
+    const result = getAvatarColors("Hello");
+    expect(result.bgColor).toMatch(/rgb\(\d+, \d+, \d+\)/);
+    // Ensure it doesn't just return black (default 0) unless the hash happens to be 0
+    expect(result.bgColor).not.toBe("rgb(0, 0, 0)");
+  });
+
+  it("handles undefined/empty input", () => {
+    const result = getAvatarColors(undefined);
+    // undefined -> "" -> hash of "" is 0 -> black
+    expect(result.bgColor).toBe("rgb(0, 0, 0)");
+    expect(result.textColor).toBe("#FFFFFF");
   });
 });

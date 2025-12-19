@@ -1,6 +1,3 @@
-import { cn } from "@core/utils/cn";
-import type { LucideIcon } from "lucide-react";
-import { ChevronDown } from "lucide-react";
 import {
   Button,
   DropdownMenu,
@@ -8,7 +5,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import { Fragment } from "react";
+import { cn } from "@core/utils/cn";
+import type { LucideIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 export interface FilterOption<T = string> {
   id: T;

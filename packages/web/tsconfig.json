@@ -21,7 +21,7 @@
       "@core/*": ["./src/core/*"],
       "@layouts/*": ["./src/layouts/*"],
       "@db/*": ["./src/db/*"],
-      "@meshtastic/ui/*": ["@components/ui/*"]
+      "@validation/*": ["./src/validation/*"],
     }
   },
   "include": ["src", ".d.ts"],

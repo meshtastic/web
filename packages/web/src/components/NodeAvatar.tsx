@@ -4,9 +4,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import { useAppStore, useDevice } from "@core/stores";
-import { getAvatarColors } from "@core/utils/color";
+import { useDevice, useUIStore } from "@core/stores";
 import { cn } from "@core/utils/cn";
+import { getAvatarColors } from "@core/utils/color";
 import { LockKeyholeOpenIcon, StarIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -32,7 +32,7 @@ export const NodeAvatar = ({
   className,
 }: NodeAvatarProps) => {
   const { t } = useTranslation();
-  const { setNodeNumDetails } = useAppStore();
+  const { setNodeNumDetails } = useUIStore();
   const { setDialogOpen } = useDevice();
 
   const { bgColor, textColor } = getAvatarColors(nodeNum);
@@ -47,7 +47,9 @@ export const NodeAvatar = ({
   };
 
   const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
-    if (!clickable) return;
+    if (!clickable) {
+      return;
+    }
 
     // Stop propagation to prevent parent click handlers from firing
     e.stopPropagation();
@@ -56,7 +58,8 @@ export const NodeAvatar = ({
       onClick();
     } else {
       // Default behavior: open node details drawer
-      const nodeNumber = typeof nodeNum === "string" ? parseInt(nodeNum, 10) : nodeNum;
+      const nodeNumber =
+        typeof nodeNum === "string" ? parseInt(nodeNum, 10) : nodeNum;
       setNodeNumDetails(nodeNumber);
       setDialogOpen("nodeDetails", true);
     }
@@ -67,7 +70,7 @@ export const NodeAvatar = ({
       className={cn(
         "relative rounded-full",
         clickable && "cursor-pointer hover:opacity-80 transition-opacity",
-        className
+        className,
       )}
       onClick={handleClick}
       onKeyDown={(e) => {
@@ -90,14 +93,11 @@ export const NodeAvatar = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <StarIcon
-              className="absolute -top-0.5 -right-0.5 z-10 h-4 w-4 stroke-1 fill-yellow-400"
+              className="absolute -top-0.5 -right-0.5 z-10 h-4 w-4 fill-yellow-400 text-yellow-500"
               aria-hidden="true"
-              style={{
-                color: bgColor, // Use the generated background color for the star stroke
-              }}
             />
           </TooltipTrigger>
-          <TooltipContent className="bg-slate-800 dark:bg-slate-600 px-4 py-1 text-xs text-white rounded">
+          <TooltipContent className="px-4 py-1">
             {t("nodeDetail.favorite.label", { ns: "nodes" })}
           </TooltipContent>
         </Tooltip>

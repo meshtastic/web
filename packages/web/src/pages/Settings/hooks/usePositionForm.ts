@@ -1,13 +1,13 @@
+import {
+  type PositionValidation,
+  PositionValidationSchema,
+} from "@app/validation/config/position";
 import { createZodResolver } from "@components/Form/createZodResolver";
 import { usePositionFlags } from "@core/hooks/usePositionFlags";
 import { AdminMessageService } from "@core/services/adminMessageService";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { useNodes } from "@db/hooks";
-import {
-  type PositionValidation,
-  PositionValidationSchema,
-} from "@app/validation/config/position";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 
@@ -30,13 +30,17 @@ export function usePositionForm() {
   // Get current node for position coordinates
   const myNode = useMemo(() => {
     const myNodeNum = hardware.myNodeNum;
-    if (!myNodeNum) return undefined;
+    if (!myNodeNum) {
+      return undefined;
+    }
     return allNodes.find((n) => n.nodeNum === myNodeNum);
   }, [allNodes, hardware.myNodeNum]);
 
   // Merge config with node position data
   const formValues = useMemo((): PositionValidation | undefined => {
-    if (!effectiveConfig) return undefined;
+    if (!effectiveConfig) {
+      return undefined;
+    }
     return {
       ...effectiveConfig,
       latitude: myNode?.latitudeI ? myNode.latitudeI / 1e7 : undefined,
@@ -62,7 +66,9 @@ export function usePositionForm() {
   // Sync form changes to store and field registry (excluding position coordinates)
   useEffect(() => {
     const subscription = watch((formData) => {
-      if (!baseConfig || !formData) return;
+      if (!baseConfig || !formData) {
+        return;
+      }
 
       const currentValues = formData as PositionValidation;
       const prevValues = prevValuesRef.current;
@@ -138,8 +144,12 @@ export function usePositionForm() {
       }>,
       disabled?: boolean,
     ): boolean => {
-      if (disabled) return true;
-      if (!disabledBy) return false;
+      if (disabled) {
+        return true;
+      }
+      if (!disabledBy) {
+        return false;
+      }
 
       return disabledBy.some((field) => {
         const value = getValues(field.fieldName);

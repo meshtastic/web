@@ -33,7 +33,8 @@
     "unsetDefault": "Unset default",
     "scanQr": "Scan QR Code",
     "traceRoute": "Trace Route",
-    "submit": "Submit"
+    "submit": "Submit",
+    "MQTT": "MQTT"
   },
   "app": {
     "title": "Meshtastic",
@@ -42,10 +43,12 @@
   "unit": {
     "cps": "CPS",
     "dbm": "dBm",
+    "db": "dB",
     "hertz": "Hz",
+    "snr": "SNR",
     "hop": {
-      "one": "Hop",
-      "plural": "Hops"
+      "one": "hop",
+      "plural": "hops"
     },
     "hopsAway": {
       "one": "{{count}} hop away",
@@ -73,7 +76,6 @@
     "change": { "one": "change", "plural": "changes" },
     "month": { "one": "Month", "plural": "Months" },
     "year": { "one": "Year", "plural": "Years" },
-    "snr": "SNR",
     "volt": { "one": "Volt", "plural": "Volts", "suffix": "V" },
     "record": { "one": "Records", "plural": "Records" },
     "degree": { "one": "Degree", "plural": "Degrees", "suffix": "°" }

@@ -26,9 +26,9 @@ export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
           sizeClasses[size],
         )}
         role="img"
-        aria-label="Loading spinner"
         viewBox="0 0 256 256"
       >
+        <title className="sr-only">Loading spinner</title>
         <line
           x1="128"
           y1="32"

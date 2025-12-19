@@ -18,8 +18,6 @@ export const Lora = () => {
     schema: LoRaValidationSchema,
   });
 
-  console.log(form);
-
   if (!isReady) {
     return <ConfigFormSkeleton />;
   }

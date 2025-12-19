@@ -1,19 +1,22 @@
 import { SettingsSearchBar } from "@app/components/Settings/SettingsSearchBar";
-import { Separator } from "@app/components/ui/separator.tsx";
+import { AdvancedConfig } from "@app/pages/Settings/AdvancedConfig.tsx";
 import { useSettingsSave } from "@app/pages/Settings/hooks/useSaveSettings";
 import { ActivityPanel } from "@components/Settings/Activity";
-import { ImportExport } from "@components/Settings/ImportExport";
 import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import { ScrollArea } from "@components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@components/ui/sheet";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { cn } from "@core/utils/cn";
+import { AppPreferencesConfig } from "@pages/Settings/AppPreferencesConfig";
+import { BackupRestoreConfig } from "@pages/Settings/BackupRestoreConfig";
 import { DeviceConfig } from "@pages/Settings/DeviceConfig";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig";
 import { RadioConfig } from "@pages/Settings/RadioConfig";
 import { t } from "i18next";
 import {
+  Archive,
+  Database,
   FileEdit,
   LayersIcon,
   Menu,
@@ -21,11 +24,18 @@ import {
   RotateCcw,
   RouterIcon,
   Save,
+  Settings2,
 } from "lucide-react";
 import { Suspense, useState } from "react";
 import { SettingsLoadingSkeleton } from "./SettingsLoading.tsx";
 
-type SettingsSection = "radio" | "device" | "module";
+type SettingsSection =
+  | "radio"
+  | "device"
+  | "module"
+  | "app"
+  | "backup"
+  | "advanced";
 
 const configSections = [
   {
@@ -42,6 +52,21 @@ const configSections = [
     key: "module" as const,
     label: "Module Config",
     icon: LayersIcon,
+  },
+  {
+    key: "backup" as const,
+    label: "Backup & Restore",
+    icon: Archive,
+  },
+  {
+    key: "advanced" as const,
+    label: "Advanced",
+    icon: Database,
+  },
+  {
+    key: "app" as const,
+    label: "App",
+    icon: Settings2,
   },
 ];
 
@@ -66,7 +91,7 @@ export default function SettingsPage() {
   const sidebarContent = (
     <>
       <div className="p-4 border-b">
-        <h2 className="font-semibold">{t("sidebar.configuration")}</h2>
+        <h2 className="font-semibold">{t("navigation.settings")}</h2>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
@@ -76,7 +101,7 @@ export default function SettingsPage() {
               type="button"
               onClick={() => handleSectionChange(section.key)}
               className={cn(
-                "flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
+                "flex items-center gap-3 rounded-lg p-3 text-left transition-colors w-full",
                 activeSection === section.key
                   ? "bg-sidebar-accent"
                   : "hover:bg-sidebar-accent/50",
@@ -87,8 +112,6 @@ export default function SettingsPage() {
             </button>
           ))}
         </div>
-        <Separator className="my-2" />
-        <ImportExport variant="sidebar" />
       </ScrollArea>
     </>
   );
@@ -167,7 +190,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Config Content */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-y-auto [scrollbar-gutter:stable]">
           <div className="p-4 sm:p-6 flex-1 flex flex-col">
             <Suspense fallback={<SettingsLoadingSkeleton />}>
               {activeSection === "radio" && (
@@ -178,6 +201,15 @@ export default function SettingsPage() {
               )}
               {activeSection === "module" && (
                 <ModuleConfig searchQuery={searchQuery} />
+              )}
+              {activeSection === "backup" && (
+                <BackupRestoreConfig searchQuery={searchQuery} />
+              )}
+              {activeSection === "advanced" && (
+                <AdvancedConfig searchQuery={searchQuery} />
+              )}
+              {activeSection === "app" && (
+                <AppPreferencesConfig searchQuery={searchQuery} />
               )}
             </Suspense>
           </div>

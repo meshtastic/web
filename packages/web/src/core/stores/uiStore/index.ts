@@ -1,10 +1,16 @@
-import { featureFlags } from "@core/services/featureFlags";
-import { createStorage } from "@core/stores/utils/indexDB";
+import type { ConversationType } from "@db/types";
 import { create } from "zustand";
-import { persist, subscribeWithSelector } from "zustand/middleware";
+import { subscribeWithSelector } from "zustand/middleware";
 
 // Types
 export type Theme = "light" | "dark" | "system";
+export type SplitMode = "none" | "vertical" | "horizontal";
+
+export interface MessageTab {
+  id: number;
+  contactId: number;
+  type: ConversationType;
+}
 export type Language =
   | "en"
   | "es"
@@ -43,6 +49,7 @@ export interface RasterSource {
 export type NodeColumnKey =
   | "encryption"
   | "lastHeard"
+  | "signal"
   | "battery"
   | "altitude"
   | "hops"
@@ -68,6 +75,7 @@ export interface UIState {
   masterVolume: number;
   messageSoundEnabled: boolean;
   alertSoundEnabled: boolean;
+  packetBatchSize: number;
   nodesTableColumnVisibility: Record<NodeColumnKey, boolean>;
   nodesTableColumnOrder: NodeColumnKey[];
 
@@ -76,7 +84,14 @@ export interface UIState {
   nodeNumToBeRemoved: number; // ephemeral
   connectDialogOpen: boolean; // ephemeral
   nodeNumDetails: number; // ephemeral
+  tracerouteNodeNum: number; // ephemeral - node num for traceroute dialog
   commandPaletteOpen: boolean; // ephemeral
+
+  // Messages page state (ephemeral)
+  messageTabs: MessageTab[];
+  activeMessageTabId: number | null;
+  secondaryMessageTabId: number | null;
+  messageSplitMode: SplitMode;
 
   // Preference actions
   setTheme: (theme: Theme) => void;
@@ -93,6 +108,7 @@ export interface UIState {
   setMasterVolume: (volume: number) => void;
   setMessageSoundEnabled: (enabled: boolean) => void;
   setAlertSoundEnabled: (enabled: boolean) => void;
+  setPacketBatchSize: (size: number) => void;
   setNodesTableColumnVisibility: (
     visibility: Record<NodeColumnKey, boolean>,
   ) => void;
@@ -107,6 +123,14 @@ export interface UIState {
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setConnectDialogOpen: (open: boolean) => void;
   setNodeNumDetails: (nodeNum: number) => void;
+  setTracerouteNodeNum: (nodeNum: number) => void;
+
+  // Messages page actions
+  openMessageTab: (contactId: number, type: ConversationType) => void;
+  closeMessageTab: (tabId: number) => void;
+  setActiveMessageTab: (tabId: number) => void;
+  setSecondaryMessageTab: (tabId: number | null) => void;
+  setMessageSplitMode: (mode: SplitMode) => void;
 }
 
 const defaultState = {
@@ -125,9 +149,11 @@ const defaultState = {
   masterVolume: 75,
   messageSoundEnabled: true,
   alertSoundEnabled: true,
+  packetBatchSize: 25,
   nodesTableColumnVisibility: {
     encryption: true,
     lastHeard: true,
+    signal: true,
     battery: true,
     altitude: true,
     hops: true,
@@ -140,6 +166,7 @@ const defaultState = {
   nodesTableColumnOrder: [
     "encryption",
     "lastHeard",
+    "signal",
     "battery",
     "altitude",
     "hops",
@@ -156,105 +183,136 @@ const defaultState = {
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
+  tracerouteNodeNum: 0,
+
+  // Messages page defaults
+  messageTabs: [] as MessageTab[],
+  activeMessageTabId: null as number | null,
+  secondaryMessageTabId: null as number | null,
+  messageSplitMode: "none" as SplitMode,
 };
 
-const persistApps = featureFlags.get("persistApp");
-
 export const useUIStore = create<UIState>()(
-  subscribeWithSelector(
-    persist(
-      (set) => ({
-        ...defaultState,
+  subscribeWithSelector((set) => ({
+    ...defaultState,
 
-        // Preference actions
-        setTheme: (theme) => set({ theme }),
-        setCompactMode: (enabled) => set({ compactMode: enabled }),
-        setShowNodeAvatars: (enabled) => set({ showNodeAvatars: enabled }),
-        setLanguage: (language) => set({ language }),
-        setTimeFormat: (format) => set({ timeFormat: format }),
-        setDistanceUnits: (units) => set({ distanceUnits: units }),
-        setCoordinateFormat: (format) => set({ coordinateFormat: format }),
-        setMapStyle: (style) => set({ mapStyle: style }),
-        setShowNodeLabels: (enabled) => set({ showNodeLabels: enabled }),
-        setShowConnectionLines: (enabled) =>
-          set({ showConnectionLines: enabled }),
-        setAutoCenterOnPosition: (enabled) =>
-          set({ autoCenterOnPosition: enabled }),
-        setMasterVolume: (volume) => set({ masterVolume: volume }),
-        setMessageSoundEnabled: (enabled) =>
-          set({ messageSoundEnabled: enabled }),
-        setAlertSoundEnabled: (enabled) => set({ alertSoundEnabled: enabled }),
-        setNodesTableColumnVisibility: (visibility) =>
-          set({ nodesTableColumnVisibility: visibility }),
-        setNodesTableColumnOrder: (order) =>
-          set({ nodesTableColumnOrder: order }),
-        resetToDefaults: () =>
-          set({
-            theme: defaultState.theme,
-            compactMode: defaultState.compactMode,
-            showNodeAvatars: defaultState.showNodeAvatars,
-            language: defaultState.language,
-            timeFormat: defaultState.timeFormat,
-            distanceUnits: defaultState.distanceUnits,
-            coordinateFormat: defaultState.coordinateFormat,
-            mapStyle: defaultState.mapStyle,
-            showNodeLabels: defaultState.showNodeLabels,
-            showConnectionLines: defaultState.showConnectionLines,
-            autoCenterOnPosition: defaultState.autoCenterOnPosition,
-            masterVolume: defaultState.masterVolume,
-            messageSoundEnabled: defaultState.messageSoundEnabled,
-            alertSoundEnabled: defaultState.alertSoundEnabled,
-            nodesTableColumnVisibility: defaultState.nodesTableColumnVisibility,
-            nodesTableColumnOrder: defaultState.nodesTableColumnOrder,
-          }),
-
-        // App state actions
-        setRasterSources: (sources) => set({ rasterSources: sources }),
-        addRasterSource: (source) =>
-          set((state) => ({
-            rasterSources: [...state.rasterSources, source],
-          })),
-        removeRasterSource: (index) =>
-          set((state) => ({
-            rasterSources: state.rasterSources.filter((_, i) => i !== index),
-          })),
-        setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
-        setNodeNumToBeRemoved: (nodeNum) =>
-          set({ nodeNumToBeRemoved: nodeNum }),
-        setConnectDialogOpen: (open) => set({ connectDialogOpen: open }),
-        setNodeNumDetails: (nodeNum) => set({ nodeNumDetails: nodeNum }),
+    // Preference actions
+    setTheme: (theme) => set({ theme }),
+    setCompactMode: (enabled) => set({ compactMode: enabled }),
+    setShowNodeAvatars: (enabled) => set({ showNodeAvatars: enabled }),
+    setLanguage: (language) => set({ language }),
+    setTimeFormat: (format) => set({ timeFormat: format }),
+    setDistanceUnits: (units) => set({ distanceUnits: units }),
+    setCoordinateFormat: (format) => set({ coordinateFormat: format }),
+    setMapStyle: (style) => set({ mapStyle: style }),
+    setShowNodeLabels: (enabled) => set({ showNodeLabels: enabled }),
+    setShowConnectionLines: (enabled) => set({ showConnectionLines: enabled }),
+    setAutoCenterOnPosition: (enabled) =>
+      set({ autoCenterOnPosition: enabled }),
+    setMasterVolume: (volume) => set({ masterVolume: volume }),
+    setMessageSoundEnabled: (enabled) => set({ messageSoundEnabled: enabled }),
+    setAlertSoundEnabled: (enabled) => set({ alertSoundEnabled: enabled }),
+    setPacketBatchSize: (size) => set({ packetBatchSize: size }),
+    setNodesTableColumnVisibility: (visibility) =>
+      set({ nodesTableColumnVisibility: visibility }),
+    setNodesTableColumnOrder: (order) => set({ nodesTableColumnOrder: order }),
+    resetToDefaults: () =>
+      set({
+        theme: defaultState.theme,
+        compactMode: defaultState.compactMode,
+        showNodeAvatars: defaultState.showNodeAvatars,
+        language: defaultState.language,
+        timeFormat: defaultState.timeFormat,
+        distanceUnits: defaultState.distanceUnits,
+        coordinateFormat: defaultState.coordinateFormat,
+        mapStyle: defaultState.mapStyle,
+        showNodeLabels: defaultState.showNodeLabels,
+        showConnectionLines: defaultState.showConnectionLines,
+        autoCenterOnPosition: defaultState.autoCenterOnPosition,
+        masterVolume: defaultState.masterVolume,
+        messageSoundEnabled: defaultState.messageSoundEnabled,
+        alertSoundEnabled: defaultState.alertSoundEnabled,
+        packetBatchSize: defaultState.packetBatchSize,
+        nodesTableColumnVisibility: defaultState.nodesTableColumnVisibility,
+        nodesTableColumnOrder: defaultState.nodesTableColumnOrder,
       }),
-      {
-        name: persistApps ? "meshtastic-app-store" : "meshtastic-ui",
-        storage: createStorage(),
-        partialize: (state) => ({
-          // Persist preferences
-          theme: state.theme,
-          compactMode: state.compactMode,
-          showNodeAvatars: state.showNodeAvatars,
-          language: state.language,
-          timeFormat: state.timeFormat,
-          distanceUnits: state.distanceUnits,
-          coordinateFormat: state.coordinateFormat,
-          mapStyle: state.mapStyle,
-          showNodeLabels: state.showNodeLabels,
-          showConnectionLines: state.showConnectionLines,
-          autoCenterOnPosition: state.autoCenterOnPosition,
-          masterVolume: state.masterVolume,
-          messageSoundEnabled: state.messageSoundEnabled,
-          alertSoundEnabled: state.alertSoundEnabled,
-          nodesTableColumnVisibility: state.nodesTableColumnVisibility,
-          nodesTableColumnOrder: state.nodesTableColumnOrder,
-          // Persist rasterSources if persistApps is enabled
-          ...(persistApps && { rasterSources: state.rasterSources }),
-        }),
-      },
-    ),
-  ),
+
+    // App state actions
+    setRasterSources: (sources) => set({ rasterSources: sources }),
+    addRasterSource: (source) =>
+      set((state) => ({
+        rasterSources: [...state.rasterSources, source],
+      })),
+    removeRasterSource: (index) =>
+      set((state) => ({
+        rasterSources: state.rasterSources.filter((_, i) => i !== index),
+      })),
+    setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
+    setNodeNumToBeRemoved: (nodeNum) => set({ nodeNumToBeRemoved: nodeNum }),
+    setConnectDialogOpen: (open) => set({ connectDialogOpen: open }),
+    setNodeNumDetails: (nodeNum) => set({ nodeNumDetails: nodeNum }),
+    setTracerouteNodeNum: (nodeNum) => set({ tracerouteNodeNum: nodeNum }),
+
+    // Messages page actions
+    openMessageTab: (contactId, type) =>
+      set((state) => {
+        const existingTab = state.messageTabs.find(
+          (t) => t.contactId === contactId && t.type === type,
+        );
+        if (existingTab) {
+          return { activeMessageTabId: existingTab.id };
+        }
+        const newTab: MessageTab = {
+          id: Date.now(),
+          contactId,
+          type,
+        };
+        return {
+          messageTabs: [...state.messageTabs, newTab],
+          activeMessageTabId: newTab.id,
+        };
+      }),
+    closeMessageTab: (tabId) =>
+      set((state) => {
+        const newTabs = state.messageTabs.filter((t) => t.id !== tabId);
+        const updates: Partial<UIState> = { messageTabs: newTabs };
+
+        // Update active tab if needed
+        if (state.activeMessageTabId === tabId && newTabs.length > 0) {
+          updates.activeMessageTabId = newTabs[newTabs.length - 1]?.id ?? null;
+        } else if (newTabs.length === 0) {
+          updates.activeMessageTabId = null;
+        }
+
+        // Update secondary tab if needed
+        if (state.secondaryMessageTabId === tabId) {
+          updates.secondaryMessageTabId = null;
+          if (state.messageSplitMode !== "none" && newTabs.length < 2) {
+            updates.messageSplitMode = "none";
+          }
+        }
+
+        return updates;
+      }),
+    setActiveMessageTab: (tabId) => set({ activeMessageTabId: tabId }),
+    setSecondaryMessageTab: (tabId) => set({ secondaryMessageTabId: tabId }),
+    setMessageSplitMode: (mode) =>
+      set((state) => {
+        if (mode === "none") {
+          return { messageSplitMode: mode, secondaryMessageTabId: null };
+        }
+        // Auto-select secondary tab if not set
+        if (!state.secondaryMessageTabId && state.messageTabs.length > 1) {
+          const otherTab = state.messageTabs.find(
+            (t) => t.id !== state.activeMessageTabId,
+          );
+          return {
+            messageSplitMode: mode,
+            secondaryMessageTabId: otherTab?.id ?? null,
+          };
+        }
+        return { messageSplitMode: mode };
+      }),
+  })),
 );
 
-// Backward compatibility exports
-export const useAppStore = useUIStore;
-export const usePreferencesStore = useUIStore;
-export type AppState = UIState;
-export type PreferencesState = UIState;

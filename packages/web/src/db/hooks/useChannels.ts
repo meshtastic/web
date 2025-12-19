@@ -1,9 +1,10 @@
 import type { Result } from "neverthrow";
 import { ResultAsync } from "neverthrow";
 import { useCallback, useEffect, useState } from "react";
-import { ChannelError } from "../errors";
-import type { Channel } from "../schema";
-import { channelRepo } from "../repositories";
+import { ChannelError } from "../errors.ts";
+import { DB_EVENTS, dbEvents } from "../events.ts";
+import { channelRepo } from "../repositories/index.ts";
+import type { Channel } from "../schema.ts";
 
 /**
  * Hook to fetch all channels for a device
@@ -26,6 +27,9 @@ export function useChannels(deviceId: number) {
 
   useEffect(() => {
     refresh();
+
+    const unsubscribe = dbEvents.subscribe(DB_EVENTS.CHANNEL_UPDATED, refresh);
+    return unsubscribe;
   }, [refresh]);
 
   return { channels, refresh };
@@ -52,6 +56,9 @@ export function useChannel(deviceId: number, channelIndex: number) {
 
   useEffect(() => {
     refresh();
+
+    const unsubscribe = dbEvents.subscribe(DB_EVENTS.CHANNEL_UPDATED, refresh);
+    return unsubscribe;
   }, [refresh]);
 
   return { channel, refresh };
@@ -78,6 +85,9 @@ export function usePrimaryChannel(deviceId: number) {
 
   useEffect(() => {
     refresh();
+
+    const unsubscribe = dbEvents.subscribe(DB_EVENTS.CHANNEL_UPDATED, refresh);
+    return unsubscribe;
   }, [refresh]);
 
   return { channel, refresh };

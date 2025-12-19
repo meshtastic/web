@@ -1,11 +1,11 @@
-import { createZodResolver } from "@components/Form/createZodResolver";
-import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
-import { useFieldRegistry } from "@core/services/fieldRegistry";
-import { useDevice } from "@core/stores";
 import {
   type DeviceValidation,
   DeviceValidationSchema,
 } from "@app/validation/config/device";
+import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
+import { createZodResolver } from "@components/Form/createZodResolver";
+import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { useDevice } from "@core/stores";
 import { useCallback, useEffect, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 
@@ -36,7 +36,9 @@ export function useDeviceForm() {
   // Sync form changes to store and field registry
   useEffect(() => {
     const subscription = watch((formData) => {
-      if (!baseConfig || !formData) return;
+      if (!baseConfig || !formData) {
+        return;
+      }
 
       const currentValues = formData as DeviceValidation;
       const prevValues = prevValuesRef.current;
@@ -51,9 +53,9 @@ export function useDeviceForm() {
       const changes: Partial<DeviceValidation> = {};
       let hasChanges = false;
 
-      for (const key of Object.keys(
-        currentValues,
-      ) as Array<keyof DeviceValidation>) {
+      for (const key of Object.keys(currentValues) as Array<
+        keyof DeviceValidation
+      >) {
         const newValue = currentValues[key];
         const originalValue = baseConfig[key];
 
@@ -97,8 +99,12 @@ export function useDeviceForm() {
       }>,
       disabled?: boolean,
     ): boolean => {
-      if (disabled) return true;
-      if (!disabledBy) return false;
+      if (disabled) {
+        return true;
+      }
+      if (!disabledBy) {
+        return false;
+      }
 
       return disabledBy.some((field) => {
         const value = getValues(field.fieldName);

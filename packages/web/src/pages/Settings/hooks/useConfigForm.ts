@@ -1,7 +1,7 @@
 import { createZodResolver } from "@components/Form/createZodResolver";
 import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice, type ValidConfigType } from "@core/stores";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   type DefaultValues,
   type FieldValues,
@@ -36,11 +36,13 @@ export function useConfigForm<T extends FieldValues>({
   const { config, getEffectiveConfig, setChange } = useDevice();
   const { trackChange, removeChange } = useFieldRegistry();
 
-  const section = { type: "config", variant: configType } as const;
+  // Memoize section to prevent effect re-runs on every render
+  const section = useMemo(
+    () => ({ type: "config", variant: configType }) as const,
+    [configType],
+  );
 
   const baseConfig = config[configType] as DefaultValues<T> | undefined;
-  console.log("basee config", baseConfig);
-
   const effectiveConfig = getEffectiveConfig(configType) as T | undefined;
   const isReady = baseConfig !== undefined;
 
@@ -55,15 +57,29 @@ export function useConfigForm<T extends FieldValues>({
 
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<T | undefined>(undefined);
+  // Track whether we've completed initial sync (skip first watch fire)
+  const hasInitialSyncRef = useRef(false);
 
   // Sync form changes to store and field registry
   useEffect(() => {
+    // Reset initial sync flag when effect re-runs
+    hasInitialSyncRef.current = false;
+
     const subscription = watch((formValues) => {
       if (!baseConfig || !formValues) {
         return;
       }
 
       const currentValues = formValues as T;
+
+      // Skip the first watch fire - just capture initial values without tracking
+      // This prevents spurious change detection during form initialization
+      if (!hasInitialSyncRef.current) {
+        prevValuesRef.current = currentValues;
+        hasInitialSyncRef.current = true;
+        return;
+      }
+
       const prevValues = prevValuesRef.current;
 
       // Only process if values actually changed

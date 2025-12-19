@@ -33,7 +33,13 @@ export function useNodes(deviceId: number) {
     return unsubscribe;
   }, [refresh]);
 
-  return { nodes, refresh };
+  // Map nodeNum -> Node
+  const nodeMap = useMemo(
+    () => new Map(nodes.map((node) => [node.nodeNum, node])),
+    [nodes],
+  );
+
+  return { nodes, nodeMap, refresh };
 }
 
 /**
@@ -185,8 +191,8 @@ export function usePositionTrails(
 
   // Stabilize the nodeNums array reference to prevent infinite loops
   // when passing inline arrays (e.g. usePositionTrails(id, [123]))
-  const nodeNumsKey = JSON.stringify(nodeNums);
-  const stableNodeNums = useMemo(() => nodeNums, [nodeNumsKey]);
+  const _nodeNumsKey = JSON.stringify(nodeNums);
+  const stableNodeNums = useMemo(() => nodeNums, [nodeNums]);
 
   const refresh = useCallback(async (): Promise<
     Result<Map<number, PositionLog[]>, NodeError>

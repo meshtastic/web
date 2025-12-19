@@ -1,6 +1,10 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import { usePositionFlags, FLAGS_CONFIG, type FlagName } from "./usePositionFlags";
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import {
+  FLAGS_CONFIG,
+  type FlagName,
+  usePositionFlags,
+} from "./usePositionFlags.ts";
 
 describe("usePositionFlags", () => {
   it("should initialize with default value 0", () => {
@@ -19,7 +23,7 @@ describe("usePositionFlags", () => {
 
   it("should toggle a flag", () => {
     const { result } = renderHook(() => usePositionFlags(0));
-    
+
     act(() => {
       result.current.toggleFlag("ALTITUDE");
     });
@@ -34,7 +38,7 @@ describe("usePositionFlags", () => {
 
   it("should set a flag explicitly", () => {
     const { result } = renderHook(() => usePositionFlags(0));
-    
+
     act(() => {
       result.current.setFlag("DOP", true);
     });
@@ -49,7 +53,7 @@ describe("usePositionFlags", () => {
   it("should set all flags from integer value", () => {
     const { result } = renderHook(() => usePositionFlags());
     const val = FLAGS_CONFIG.ALTITUDE.value | FLAGS_CONFIG.TIMESTAMP.value;
-    
+
     act(() => {
       result.current.setFlags(val);
     });
@@ -60,7 +64,7 @@ describe("usePositionFlags", () => {
 
   it("should clear all flags", () => {
     const { result } = renderHook(() => usePositionFlags(123));
-    
+
     act(() => {
       result.current.clearFlags();
     });
@@ -72,14 +76,17 @@ describe("usePositionFlags", () => {
     // Max value is sum of all flags. Any bit outside that is invalid?
     // Let's assume -1 is invalid or a very large number.
     // The implementation sums all bitmasks to find max value.
-    
-    const maxValue = Object.values(FLAGS_CONFIG).reduce((acc, conf) => acc | conf.value, 0);
+
+    const maxValue = Object.values(FLAGS_CONFIG).reduce(
+      (acc, conf) => acc | conf.value,
+      0,
+    );
     const invalidValue = maxValue + 100000; // Assuming it doesn't wrap or collide with safe integer limit
 
     expect(() => {
-        act(() => {
-            result.current.setFlags(invalidValue);
-        });
+      act(() => {
+        result.current.setFlags(invalidValue);
+      });
     }).toThrowError(/Invalid flags value/);
   });
 
@@ -89,17 +96,25 @@ describe("usePositionFlags", () => {
 
     const flags: FlagName[] = ["ALTITUDE", "VEHICLE_SPEED"];
     const encoded = encode(flags);
-    expect(encoded).toBe(FLAGS_CONFIG.ALTITUDE.value | FLAGS_CONFIG.VEHICLE_SPEED.value);
+    expect(encoded).toBe(
+      FLAGS_CONFIG.ALTITUDE.value | FLAGS_CONFIG.VEHICLE_SPEED.value,
+    );
 
     const decoded = decode(encoded);
     expect(decoded).toContain("ALTITUDE");
     expect(decoded).toContain("VEHICLE_SPEED");
     expect(decoded.length).toBe(2);
   });
-  
+
   it("should handle hasFlag correctly", () => {
-      const { result } = renderHook(() => usePositionFlags(FLAGS_CONFIG.ALTITUDE.value));
-      expect(result.current.hasFlag(result.current.flagsValue, "ALTITUDE")).toBe(true);
-      expect(result.current.hasFlag(result.current.flagsValue, "DOP")).toBe(false);
+    const { result } = renderHook(() =>
+      usePositionFlags(FLAGS_CONFIG.ALTITUDE.value),
+    );
+    expect(result.current.hasFlag(result.current.flagsValue, "ALTITUDE")).toBe(
+      true,
+    );
+    expect(result.current.hasFlag(result.current.flagsValue, "DOP")).toBe(
+      false,
+    );
   });
 });

@@ -1,13 +1,13 @@
-import { usePositionForm } from "@pages/Settings/hooks";
 import type { PositionValidation } from "@app/validation/config/position";
-import type { FlagName } from "@core/hooks/usePositionFlags";
 import {
   ConfigFormFields,
   type FieldGroup,
 } from "@components/Form/ConfigFormFields";
-import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
+import type { FlagName } from "@core/hooks/usePositionFlags";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
+import { usePositionForm } from "@pages/Settings/hooks";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useTranslation } from "react-i18next";
 
 export const Position = () => {

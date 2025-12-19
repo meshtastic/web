@@ -19,7 +19,7 @@ import type { NewMessage } from "@db/schema";
 import type { Types } from "@meshtastic/core";
 import type { Contact } from "@pages/Messages";
 import { Label } from "@radix-ui/react-label";
-import { ArrowUp, WifiOff } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -37,13 +37,9 @@ export const MessageInput = ({
   const { t } = useTranslation("messages");
   const myNodeNum = device.getMyNodeNum();
 
-  // Check if device is connected
-  // const isConnected = !!device.connection;
-
-  // Use database drafts
   const { draft, setDraft, clearDraft } = useMessageDraft(
     device.id,
-    selectedContact.type === "direct" ? "direct" : "broadcast",
+    selectedContact.type === "direct" ? "direct" : "channel",
     selectedContact.id,
   );
 
@@ -88,6 +84,39 @@ export const MessageInput = ({
     // Clear draft immediately
     await clearDraft();
 
+    // Generate a temporary message ID for optimistic UI
+    const tempMessageId = Math.floor(Date.now() / 1000); // Use seconds like Meshtastic does
+
+    // Save message immediately for instant UI feedback
+    const newMessage: NewMessage = {
+      deviceId: device.id,
+      messageId: tempMessageId,
+      type: isDirect ? "direct" : "channel",
+      channelId: channelValue,
+      fromNode: myNodeNum,
+      toNode: isDirect ? (selectedContact.nodeNum as number) : 0xffffffff,
+      message: trimmedMessage,
+      date: new Date(),
+      state: "sending",
+      rxSnr: 0,
+      rxRssi: 0,
+      viaMqtt: false,
+      hops: 0,
+      retryCount: 0,
+      maxRetries: 3,
+      receivedACK: false,
+      ackError: 0,
+      realACK: false,
+    };
+
+    try {
+      await messageRepo.saveMessage(newMessage);
+      dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
+    } catch (error) {
+      console.error("[sendMessage] Failed to save message:", error);
+      return;
+    }
+
     try {
       // Run pipeline handlers (auto-favorite, etc)
       const outgoingMessage: OutgoingMessage = {
@@ -105,45 +134,42 @@ export const MessageInput = ({
 
       await autoFavoriteDMHandler(outgoingMessage, pipelineContext);
 
-      // Send message over radio
-      const messageId = await device.connection.sendText(
-        trimmedMessage,
-        toValue,
-        true,
-        isDirect ? undefined : channelValue,
-      );
-
-      // Save message to database
-      if (messageId !== undefined) {
-        const newMessage: NewMessage = {
-          deviceId: device.id,
-          messageId,
-          type: isDirect ? "direct" : "broadcast",
-          channelId: channelValue,
-          fromNode: myNodeNum,
-          toNode: isDirect ? (selectedContact.nodeNum as number) : 0xffffffff,
-          message: trimmedMessage,
-          date: new Date(),
-          state: "sent", // Optimistically set to sent
-          rxSnr: 0,
-          rxRssi: 0,
-          viaMqtt: false,
-          hops: 0,
-          retryCount: 0,
-          maxRetries: 3,
-          receivedACK: false,
-          ackError: 0,
-          realACK: false,
-        };
-
-        await messageRepo.saveMessage(newMessage);
-
-        // Emit event to trigger UI refresh
-        dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
-      }
+      // Send message - don't await, handle result asynchronously
+      device.connection
+        .sendText(
+          trimmedMessage,
+          toValue,
+          true,
+          isDirect ? undefined : channelValue,
+        )
+        .then(async (realMessageId) => {
+          if (realMessageId !== undefined) {
+            // Update message state to sent
+            await messageRepo.updateMessageStateByMessageId(
+              tempMessageId,
+              device.id,
+              "sent",
+            );
+            dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
+          }
+        })
+        .catch(async (error) => {
+          console.error("[sendMessage] Failed to send:", error);
+          await messageRepo.updateMessageStateByMessageId(
+            tempMessageId,
+            device.id,
+            "failed",
+          );
+          dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
+        });
     } catch (error) {
       console.error("[sendMessage] Failed to send message:", error);
-      // TODO: Update message state to "failed" in database
+      await messageRepo.updateMessageStateByMessageId(
+        tempMessageId,
+        device.id,
+        "failed",
+      );
+      dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
     }
   };
 

@@ -74,8 +74,12 @@ export function MeshNetwork() {
         node.x += node.vx;
         node.y += node.vy;
 
-        if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
-        if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+        if (node.x < 0 || node.x > canvas.width) {
+          node.vx *= -1;
+        }
+        if (node.y < 0 || node.y > canvas.height) {
+          node.vy *= -1;
+        }
 
         node.x = Math.max(0, Math.min(canvas.width, node.x));
         node.y = Math.max(0, Math.min(canvas.height, node.y));

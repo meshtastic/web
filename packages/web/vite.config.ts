@@ -27,7 +27,7 @@ try {
 }
 
 const CONTENT_SECURITY_POLICY =
-  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' data:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://raw.githubusercontent.com https://*.tile.openstreetmap.org https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self';";
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' data:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' http: https:; object-src 'none'; base-uri 'self';";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
@@ -38,7 +38,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      react(),
+      react({
+        babel: {
+          plugins: ["babel-plugin-react-compiler"],
+        },
+      }),
       tailwindcss(),
       ...(useHTTPS ? [basicSsl()] : []),
       createHtmlPlugin({
@@ -85,7 +89,7 @@ export default defineConfig(({ mode }) => {
       headers: {
         "Content-Security-Policy": CONTENT_SECURITY_POLICY,
         "Cross-Origin-Opener-Policy": "same-origin",
-        "Cross-Origin-Embedder-Policy": "require-corp",
+        "Cross-Origin-Embedder-Policy": "credentialless",
         "X-Content-Type-Options": "nosniff",
         "Strict-Transport-Security":
           "max-age=63072000; includeSubDomains; preload",

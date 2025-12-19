@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { useIsMobile } from "./useIsMobile";
+import { renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useIsMobile } from "./useIsMobile.ts";
 
 describe("useIsMobile", () => {
   const originalMatchMedia = window.matchMedia;
@@ -18,9 +18,9 @@ describe("useIsMobile", () => {
       removeEventListener: vi.fn(),
       dispatchEvent: vi.fn(),
     }));
-    
+
     // Default width
-    Object.defineProperty(window, 'innerWidth', {
+    Object.defineProperty(window, "innerWidth", {
       writable: true,
       configurable: true,
       value: 1024,
@@ -29,7 +29,7 @@ describe("useIsMobile", () => {
 
   afterEach(() => {
     window.matchMedia = originalMatchMedia;
-    Object.defineProperty(window, 'innerWidth', {
+    Object.defineProperty(window, "innerWidth", {
       writable: true,
       configurable: true,
       value: originalInnerWidth,
@@ -44,7 +44,7 @@ describe("useIsMobile", () => {
 
   it("should return true if window width is less than breakpoint", () => {
     window.innerWidth = 500; // Less than 768
-    
+
     // Also mock matchMedia to match, just in case implementation changes to rely on it
     window.matchMedia = vi.fn().mockImplementation((query) => ({
       matches: true,

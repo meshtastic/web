@@ -11,8 +11,8 @@ export type { ConnectionStatus, ConnectionType } from "./hooks/index.ts";
 export {
   resetConnectionStatuses,
   useAllMessages,
-  useBroadcastMessages,
   useChannel,
+  useChannelMessages,
   useChannels,
   useConnection,
   useConnections,
@@ -40,6 +40,10 @@ export {
   messageRepo,
   NodeRepository,
   nodeRepo,
+  PreferencesRepository,
+  preferencesRepo,
+  TracerouteRepository,
+  tracerouteRepo,
 } from "./repositories/index.ts";
 // Export schema types
 export type {
@@ -57,10 +61,12 @@ export type {
   NewPacketLog,
   NewPositionLog,
   NewTelemetryLog,
+  NewTracerouteLog,
   Node,
   PacketLog,
   PositionLog,
   TelemetryLog,
+  TracerouteLog,
 } from "./schema.ts";
 // Export schema tables for queries
 export {
@@ -73,15 +79,13 @@ export {
   packetLogs,
   positionLogs,
   telemetryLogs,
+  tracerouteLogs,
 } from "./schema.ts";
 // Export subscription service
 export { SubscriptionService } from "./subscriptionService.ts";
-// Export write queue for performance monitoring
-export {
-  packetWriteQueue,
-  generalWriteQueue,
-  WriteQueue,
-} from "./writeQueue.ts";
+export type { ConversationType } from "./types.ts";
+// Export packet batcher
+export { packetBatcher, PacketBatcher } from "./packetBatcher.ts";
 
 /**
  * Initialize the database

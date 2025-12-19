@@ -195,6 +195,21 @@ export class MessageError extends DBError {
     );
   }
 
+  static getChannelMessages(
+    deviceId: number,
+    channelId: number,
+    cause?: unknown,
+  ): MessageError {
+    return new MessageError(
+      `Failed to fetch channel messages for channel ${channelId} on device ${deviceId}`,
+      "getChannelMessages",
+      deviceId,
+      channelId,
+      undefined,
+      cause,
+    );
+  }
+
   static getBroadcastMessages(
     deviceId: number,
     channelId: number,

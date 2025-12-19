@@ -1,9 +1,8 @@
 import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
 import { TimeAgo } from "@app/components/generic/TimeAgo";
 import LanguageSwitcher from "@app/components/LanguageSwitcher";
+import { ConfigProgressIndicator } from "@app/components/PageComponents/Connections/ConfigProgressIndicator";
 import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
-import { useConnections } from "@db/hooks";
-import type { Connection } from "@db/index";
 import {
   connectionTypeIcon,
   formatConnectionSubtext,
@@ -36,6 +35,8 @@ import {
 } from "@components/ui/dropdown-menu.tsx";
 import { Separator } from "@components/ui/separator.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
+import { useConnections } from "@db/hooks";
+import type { Connection } from "@db/index";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -359,7 +360,9 @@ function ConnectionCard({
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        {connection.error ? (
+        {connection.status === "configuring" ? (
+          <ConfigProgressIndicator meshDeviceId={connection.meshDeviceId} />
+        ) : connection.error ? (
           <p className="text-sm md:text-base text-red-600 dark:text-red-400">
             {connection.error}
           </p>

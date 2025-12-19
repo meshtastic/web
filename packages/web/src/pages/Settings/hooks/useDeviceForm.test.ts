@@ -1,9 +1,9 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { useDeviceForm } from "./useDeviceForm";
-import { useDevice } from "@core/stores";
-import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
+import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { useDevice } from "@core/stores";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useDeviceForm } from "./useDeviceForm.ts";
 
 // Mocks
 vi.mock("@core/stores", () => ({
@@ -20,7 +20,10 @@ vi.mock("@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog", () => ({
 
 // Mock validation schema since it might have external deps
 vi.mock("@app/validation/config/device", () => ({
-  DeviceValidationSchema: { parse: vi.fn(), safeParse: vi.fn().mockReturnValue({ success: true }) },
+  DeviceValidationSchema: {
+    parse: vi.fn(),
+    safeParse: vi.fn().mockReturnValue({ success: true }),
+  },
 }));
 
 describe("useDeviceForm", () => {
@@ -30,7 +33,7 @@ describe("useDeviceForm", () => {
   const mockValidateRoleSelection = vi.fn();
 
   const baseConfig = { role: 1, nodeNum: 123 };
-  
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -64,13 +67,13 @@ describe("useDeviceForm", () => {
     });
 
     await waitFor(() => {
-        expect(mockTrackChange).toHaveBeenCalledWith(
-            expect.anything(), // SECTION
-            "role",
-            2,
-            1
-        );
-        expect(mockSetChange).toHaveBeenCalled();
+      expect(mockTrackChange).toHaveBeenCalledWith(
+        expect.anything(), // SECTION
+        "role",
+        2,
+        1,
+      );
+      expect(mockSetChange).toHaveBeenCalled();
     });
   });
 
@@ -85,7 +88,7 @@ describe("useDeviceForm", () => {
     });
 
     expect(mockValidateRoleSelection).toHaveBeenCalledWith("3");
-    expect(result.current.form.getValues("role")).toBe("3"); // Hook sets it as string without coercion 
+    expect(result.current.form.getValues("role")).toBe("3"); // Hook sets it as string without coercion
     // Wait, the hook casts: `setValue("role", newRole as DeviceValidation["role"]`
     // If input is "3", and DeviceValidation["role"] is number (enum), this casting might be loose or rely on form coercion.
     // Let's assume standard behavior.

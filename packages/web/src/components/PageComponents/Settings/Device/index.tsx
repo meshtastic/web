@@ -1,12 +1,12 @@
-import { useDeviceForm } from "@pages/Settings/hooks";
 import type { DeviceValidation } from "@app/validation/config/device";
 import {
   ConfigFormFields,
   type FieldGroup,
 } from "@components/Form/ConfigFormFields";
-import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
+import { useDeviceForm } from "@pages/Settings/hooks";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useTranslation } from "react-i18next";
 
 export const Device = () => {

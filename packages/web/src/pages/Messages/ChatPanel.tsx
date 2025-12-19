@@ -1,13 +1,14 @@
+import { OnlineIndicator } from "@components/generic/OnlineIndicator";
 import { NodeAvatar } from "@components/NodeAvatar";
 import { MessageBubble } from "@components/PageComponents/Messages/MessageBubble";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput";
-import { ScrollArea } from "@components/ui/scroll-area";
 import { TooltipProvider } from "@components/ui/tooltip";
 import type { Device } from "@core/stores";
 import {
   markConversationAsRead,
-  useBroadcastMessages,
+  useChannelMessages,
   useDirectMessages,
+  useNodes,
 } from "@db/hooks";
 import type { Contact } from "@pages/Messages/index";
 import { groupMessagesByDay, toTimestamp } from "@pages/Messages/MessageUtils";
@@ -29,7 +30,8 @@ export function ChatPanel({
   const { i18n, t } = useTranslation();
   const myNodeNum = device.getMyNodeNum();
 
-  // Fetch messages for this conversation
+  const { nodeMap } = useNodes(device.id);
+
   const directMessages = useDirectMessages(
     device.id,
     myNodeNum ?? 0,
@@ -37,7 +39,7 @@ export function ChatPanel({
     100,
   );
 
-  const broadcastMessages = useBroadcastMessages(
+  const channelMessages = useChannelMessages(
     device.id,
     contact?.type === "channel" ? contact.id : -1,
     100,
@@ -50,11 +52,11 @@ export function ChatPanel({
     }
 
     if (contact.type === "channel") {
-      return broadcastMessages.messages;
+      return channelMessages.messages;
     }
 
     return directMessages.messages;
-  }, [contact, directMessages.messages, broadcastMessages.messages, myNodeNum]);
+  }, [contact, directMessages.messages, channelMessages.messages, myNodeNum]);
 
   // Locale and date formatting for message grouping
   const locale = useMemo(
@@ -74,11 +76,11 @@ export function ChatPanel({
     [locale],
   );
 
-  // Sort messages by date and group by day (oldest first)
+  // Sort messages newest-first (flex-col-reverse will display oldest at top, newest at bottom)
   const sortedMessages = useMemo(
     () =>
       [...currentMessages].sort(
-        (a, b) => toTimestamp(a.date) - toTimestamp(b.date),
+        (a, b) => toTimestamp(b.date) - toTimestamp(a.date),
       ),
     [currentMessages],
   );
@@ -94,28 +96,27 @@ export function ChatPanel({
       return;
     }
 
-    const lastMessage = sortedMessages[sortedMessages.length - 1];
-    if (!lastMessage) {
+    // sortedMessages is newest-first, so index 0 is the most recent message
+    const newestMessage = sortedMessages[0];
+    if (!newestMessage) {
       return;
     }
 
     if (contact.type === "channel") {
       markConversationAsRead(
         device.id,
-        "broadcast",
+        "channel",
         contact.id.toString(),
-        lastMessage.id,
+        newestMessage.id,
       );
     } else {
-      const nodeA = myNodeNum;
-      const nodeB = contact.nodeNum ?? contact.id;
-      const conversationId =
-        nodeA < nodeB ? `${nodeA}:${nodeB}` : `${nodeB}:${nodeA}`;
+      // Conversation ID format: myNodeNum:otherNodeNum (from user's perspective)
+      const otherNode = contact.nodeNum ?? contact.id;
       markConversationAsRead(
         device.id,
         "direct",
-        conversationId,
-        lastMessage.id,
+        `${myNodeNum}:${otherNode}`,
+        newestMessage.id,
       );
     }
   }, [contact, sortedMessages, device.id, myNodeNum]);
@@ -149,7 +150,7 @@ export function ChatPanel({
                   />
                 )}
                 {contact.online && contact.type === "direct" && (
-                  <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-chart-2" />
+                  <OnlineIndicator className="absolute bottom-0 right-0 h-2.5 w-2.5" />
                 )}
               </div>
               <div>
@@ -162,9 +163,8 @@ export function ChatPanel({
           </div>
         )}
 
-        {/* Messages Area */}
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="flex flex-col px-4">
+        {/* Messages Area - flex-col-reverse makes scroll start at bottom showing newest messages */}
+        <div className="flex-1 min-h-0 overflow-y-auto flex flex-col-reverse px-3 xl:px-6 xl:pb-14 lg:pb-10 styled-scrollbar">
             {messageGroups.map((group) => (
               <Fragment key={group.dayKey}>
                 <div className="sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-2">
@@ -174,20 +174,25 @@ export function ChatPanel({
                     </span>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  {group.items.map((message) => (
-                    <MessageBubble
-                      key={message.id}
-                      message={message}
-                      myNodeNum={myNodeNum}
-                      isMine={message.fromNode === myNodeNum}
-                    />
-                  ))}
+                <div className="flex flex-col-reverse gap-3">
+                  {group.items.map((message) => {
+                    const senderNode = nodeMap.get(message.fromNode);
+                    const senderName = senderNode?.longName ?? undefined;
+
+                    return (
+                      <MessageBubble
+                        key={message.id}
+                        message={message}
+                        myNodeNum={myNodeNum}
+                        senderName={senderName}
+                        isMine={message.fromNode === myNodeNum}
+                      />
+                    );
+                  })}
                 </div>
               </Fragment>
             ))}
-          </div>
-        </ScrollArea>
+        </div>
 
         {/* Message Input */}
         <MessageInput selectedContact={contact} device={device} />

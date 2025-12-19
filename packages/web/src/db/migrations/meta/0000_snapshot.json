@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "dcbdbe41-ebab-4e48-bc63-99ba1c8e8b6b",
+  "id": "d1f320c4-2fdc-494d-9c7d-6c31df16d599",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "channels": {
@@ -76,24 +76,19 @@
         }
       },
       "indexes": {
-        "channels_pk": {
-          "name": "channels_pk",
-          "columns": [
-            "device_id",
-            "channel_index"
-          ],
-          "isUnique": false
-        },
         "channels_device_idx": {
           "name": "channels_device_idx",
-          "columns": [
-            "device_id"
-          ],
+          "columns": ["device_id"],
           "isUnique": false
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "channels_device_id_channel_index_pk": {
+          "columns": ["device_id", "channel_index"],
+          "name": "channels_device_id_channel_index_pk"
+        }
+      },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
@@ -220,16 +215,12 @@
       "indexes": {
         "connections_default_idx": {
           "name": "connections_default_idx",
-          "columns": [
-            "is_default"
-          ],
+          "columns": ["is_default"],
           "isUnique": false
         },
         "connections_type_idx": {
           "name": "connections_type_idx",
-          "columns": [
-            "type"
-          ],
+          "columns": ["type"],
           "isUnique": false
         }
       },
@@ -288,12 +279,8 @@
       "indexes": {
         "last_read_unique_idx": {
           "name": "last_read_unique_idx",
-          "columns": [
-            "device_id",
-            "type",
-            "conversation_id"
-          ],
-          "isUnique": false
+          "columns": ["device_id", "type", "conversation_id"],
+          "isUnique": true
         }
       },
       "foreignKeys": {},
@@ -351,12 +338,8 @@
       "indexes": {
         "message_drafts_unique_idx": {
           "name": "message_drafts_unique_idx",
-          "columns": [
-            "device_id",
-            "type",
-            "target_id"
-          ],
-          "isUnique": false
+          "columns": ["device_id", "type", "target_id"],
+          "isUnique": true
         }
       },
       "foreignKeys": {},
@@ -536,54 +519,32 @@
       "indexes": {
         "messages_device_idx": {
           "name": "messages_device_idx",
-          "columns": [
-            "device_id"
-          ],
+          "columns": ["device_id"],
           "isUnique": false
         },
         "messages_device_date_idx": {
           "name": "messages_device_date_idx",
-          "columns": [
-            "device_id",
-            "date"
-          ],
+          "columns": ["device_id", "date"],
           "isUnique": false
         },
         "messages_device_type_idx": {
           "name": "messages_device_type_idx",
-          "columns": [
-            "device_id",
-            "type"
-          ],
+          "columns": ["device_id", "type"],
           "isUnique": false
         },
         "messages_direct_convo_idx": {
           "name": "messages_direct_convo_idx",
-          "columns": [
-            "device_id",
-            "type",
-            "from_node",
-            "to_node",
-            "date"
-          ],
+          "columns": ["device_id", "type", "from_node", "to_node", "date"],
           "isUnique": false
         },
         "messages_broadcast_channel_idx": {
           "name": "messages_broadcast_channel_idx",
-          "columns": [
-            "device_id",
-            "type",
-            "channel_id",
-            "date"
-          ],
+          "columns": ["device_id", "type", "channel_id", "date"],
           "isUnique": false
         },
         "messages_state_idx": {
           "name": "messages_state_idx",
-          "columns": [
-            "device_id",
-            "state"
-          ],
+          "columns": ["device_id", "state"],
           "isUnique": false
         }
       },
@@ -800,43 +761,29 @@
       "indexes": {
         "nodes_device_idx": {
           "name": "nodes_device_idx",
-          "columns": [
-            "device_id"
-          ],
+          "columns": ["device_id"],
           "isUnique": false
         },
         "nodes_last_heard_idx": {
           "name": "nodes_last_heard_idx",
-          "columns": [
-            "device_id",
-            "last_heard"
-          ],
+          "columns": ["device_id", "last_heard"],
           "isUnique": false
         },
         "nodes_spatial_idx": {
           "name": "nodes_spatial_idx",
-          "columns": [
-            "latitude_i",
-            "longitude_i"
-          ],
+          "columns": ["latitude_i", "longitude_i"],
           "isUnique": false
         },
         "nodes_favorite_idx": {
           "name": "nodes_favorite_idx",
-          "columns": [
-            "device_id",
-            "is_favorite"
-          ],
+          "columns": ["device_id", "is_favorite"],
           "isUnique": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "nodes_device_id_node_num_pk": {
-          "columns": [
-            "device_id",
-            "node_num"
-          ],
+          "columns": ["device_id", "node_num"],
           "name": "nodes_device_id_node_num_pk"
         }
       },
@@ -930,24 +877,24 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch() * 1000)"
+        },
+        "raw_packet": {
+          "name": "raw_packet",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
         "packet_logs_from_node_idx": {
           "name": "packet_logs_from_node_idx",
-          "columns": [
-            "device_id",
-            "from_node",
-            "rx_time"
-          ],
+          "columns": ["device_id", "from_node", "rx_time"],
           "isUnique": false
         },
         "packet_logs_device_time_idx": {
           "name": "packet_logs_device_time_idx",
-          "columns": [
-            "device_id",
-            "rx_time"
-          ],
+          "columns": ["device_id", "rx_time"],
           "isUnique": false
         }
       },
@@ -1048,27 +995,17 @@
       "indexes": {
         "position_logs_node_time_idx": {
           "name": "position_logs_node_time_idx",
-          "columns": [
-            "device_id",
-            "node_num",
-            "time"
-          ],
+          "columns": ["device_id", "node_num", "time"],
           "isUnique": false
         },
         "position_logs_device_time_idx": {
           "name": "position_logs_device_time_idx",
-          "columns": [
-            "device_id",
-            "time"
-          ],
+          "columns": ["device_id", "time"],
           "isUnique": false
         },
         "position_logs_spatial_idx": {
           "name": "position_logs_spatial_idx",
-          "columns": [
-            "latitude_i",
-            "longitude_i"
-          ],
+          "columns": ["latitude_i", "longitude_i"],
           "isUnique": false
         }
       },
@@ -1215,19 +1152,12 @@
       "indexes": {
         "telemetry_logs_node_time_idx": {
           "name": "telemetry_logs_node_time_idx",
-          "columns": [
-            "device_id",
-            "node_num",
-            "time"
-          ],
+          "columns": ["device_id", "node_num", "time"],
           "isUnique": false
         },
         "telemetry_logs_device_time_idx": {
           "name": "telemetry_logs_device_time_idx",
-          "columns": [
-            "device_id",
-            "time"
-          ],
+          "columns": ["device_id", "time"],
           "isUnique": false
         }
       },

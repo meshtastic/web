@@ -5,58 +5,85 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@components/ui/Dialog.tsx";
-import { useNodes } from "@db/hooks";
+} from "@components/ui/dialog.tsx";
+import { useGetMyNode } from "@core/hooks/useGetMyNode";
 import { useDeviceContext } from "@core/stores";
-import type { Protobuf, Types } from "@meshtastic/core";
+import { useNodes } from "@db/hooks";
+import { tracerouteRepo } from "@db/repositories";
+import type { TracerouteLog } from "@db/schema";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TraceRoute } from "../PageComponents/Messages/TraceRoute.tsx";
 
-export interface TracerouteResponseDialogProps {
-  traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined;
-  open: boolean;
-  onOpenChange: () => void;
-}
-
-export const TracerouteResponseDialog = ({
-  traceroute,
-  open,
-  onOpenChange,
-}: TracerouteResponseDialogProps) => {
+export const TracerouteResponseDialog = () => {
   const { t } = useTranslation("dialog");
   const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { nodeMap } = useNodes(deviceId);
+  const { myNodeNum, myNode } = useGetMyNode();
+  const navigate = useNavigate();
 
-  const route: number[] = traceroute?.data.route ?? [];
-  const routeBack: number[] = traceroute?.data.routeBack ?? [];
-  const snrTowards = (traceroute?.data.snrTowards ?? []).map((snr) => snr / 4);
-  const snrBack = (traceroute?.data.snrBack ?? []).map((snr) => snr / 4);
+  // Read traceroute param from URL
+  const search = useSearch({ strict: false }) as { traceroute?: number };
+  const tracerouteNodeNum = search.traceroute;
 
-  const from = allNodes.find((n) => n.nodeNum === (traceroute?.to ?? 0)); // The origin of the traceroute = the "to" node of the mesh packet
-  const fromLongName =
-    from?.longName ??
-    (from ? `!${numberToHexUnpadded(from.nodeNum)}` : t("unknown.shortName"));
-  const fromShortName =
-    from?.shortName ??
-    (from
-      ? `${numberToHexUnpadded(from.nodeNum).substring(0, 4)}`
-      : t("unknown.shortName"));
+  const [tracerouteLog, setTracerouteLog] = useState<TracerouteLog | undefined>(
+    undefined,
+  );
 
-  const toUser = allNodes.find((n) => n.nodeNum === (traceroute?.from ?? 0)); // The destination of the traceroute = the "from" node of the mesh packet
+  // Load traceroute from database when param changes
+  useEffect(() => {
+    if (!tracerouteNodeNum) {
+      setTracerouteLog(undefined);
+      return;
+    }
 
-  if (!toUser || !from) {
+    tracerouteRepo
+      .getLatestTraceroute(deviceId, tracerouteNodeNum)
+      .then(setTracerouteLog)
+      .catch((error) => {
+        console.error("Failed to load traceroute:", error);
+        setTracerouteLog(undefined);
+      });
+  }, [deviceId, tracerouteNodeNum]);
+
+  const handleClose = useCallback(() => {
+    // Remove traceroute param from URL
+    const currentSearch = new URLSearchParams(window.location.search);
+    currentSearch.delete("traceroute");
+    navigate({
+      to: ".",
+      search: Object.fromEntries(currentSearch),
+    });
+  }, [navigate]);
+
+  const isOpen = tracerouteNodeNum !== undefined && tracerouteLog !== undefined;
+
+  if (!isOpen) {
     return null;
   }
 
+  const route: number[] = tracerouteLog.route ?? [];
+  const routeBack: number[] = tracerouteLog.routeBack ?? [];
+  const snrTowards = (tracerouteLog.snrTowards ?? []).map((snr) => snr / 4);
+  const snrBack = (tracerouteLog.snrBack ?? []).map((snr) => snr / 4);
+
+  const targetNode = nodeMap.get(tracerouteNodeNum);
+  const targetLongName =
+    targetNode?.longName ?? `!${numberToHexUnpadded(tracerouteNodeNum)}`;
+  const targetShortName =
+    targetNode?.shortName ??
+    `${numberToHexUnpadded(tracerouteNodeNum).slice(-4).toUpperCase()}`;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent>
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
             {t("tracerouteResponse.title", {
-              identifier: `${fromLongName} (${fromShortName})`,
+              identifier: `${targetLongName} (${targetShortName})`,
             })}
           </DialogTitle>
         </DialogHeader>
@@ -64,8 +91,16 @@ export const TracerouteResponseDialog = ({
           <TraceRoute
             route={route}
             routeBack={routeBack}
-            from={{ longName: from.longName, shortName: from.shortName, nodeNum: from.nodeNum }}
-            to={{ longName: toUser.longName, shortName: toUser.shortName, nodeNum: toUser.nodeNum }}
+            from={{
+              longName: myNode?.longName ?? null,
+              shortName: myNode?.shortName ?? null,
+              nodeNum: myNodeNum ?? 0,
+            }}
+            to={{
+              longName: targetNode?.longName ?? null,
+              shortName: targetNode?.shortName ?? null,
+              nodeNum: tracerouteNodeNum,
+            }}
             snrTowards={snrTowards}
             snrBack={snrBack}
           />

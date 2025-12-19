@@ -1,8 +1,8 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { usePinnedItems } from "./usePinnedItems";
-import useLocalStorage from "./useLocalStorage";
-import { useState, useEffect } from "react"; // Import useState and useEffect from react
+import { act, renderHook } from "@testing-library/react";
+import { useState } from "react"; // Import useState and useEffect from react
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import useLocalStorage from "./useLocalStorage.ts";
+import { usePinnedItems } from "./usePinnedItems.ts";
 
 // Mock useLocalStorage
 vi.mock("./useLocalStorage", () => ({
@@ -14,10 +14,10 @@ describe("usePinnedItems", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Mock useLocalStorage to return a useState instance, simulating its behavior
     // This allows `renderHook` to manage the state returned by useLocalStorage correctly.
-    (useLocalStorage as vi.Mock).mockImplementation((key, initialValue) => {
+    (useLocalStorage as vi.Mock).mockImplementation((_key, initialValue) => {
       // Use actual React hooks within the mock implementation to behave like a real hook
       const [state, setState] = useState(initialValue);
       return [state, setState];
@@ -31,7 +31,9 @@ describe("usePinnedItems", () => {
       return [state, setState];
     });
 
-    const { result } = renderHook(() => usePinnedItems({ storageName: STORAGE_KEY }));
+    const { result } = renderHook(() =>
+      usePinnedItems({ storageName: STORAGE_KEY }),
+    );
     expect(result.current.pinnedItems).toEqual([]);
   });
 
@@ -42,17 +44,21 @@ describe("usePinnedItems", () => {
       return [state, setState];
     });
 
-    const { result } = renderHook(() => usePinnedItems({ storageName: STORAGE_KEY }));
+    const { result } = renderHook(() =>
+      usePinnedItems({ storageName: STORAGE_KEY }),
+    );
     expect(result.current.pinnedItems).toEqual(["item1", "item2"]);
   });
 
   it("should add an item if not already pinned", () => {
-    const { result } = renderHook(() => usePinnedItems({ storageName: STORAGE_KEY }));
-    
+    const { result } = renderHook(() =>
+      usePinnedItems({ storageName: STORAGE_KEY }),
+    );
+
     act(() => {
       result.current.togglePinnedItem("itemA");
     });
-    
+
     expect(result.current.pinnedItems).toEqual(["itemA"]);
   });
 
@@ -63,17 +69,21 @@ describe("usePinnedItems", () => {
       return [state, setState];
     });
 
-    const { result } = renderHook(() => usePinnedItems({ storageName: STORAGE_KEY }));
-    
+    const { result } = renderHook(() =>
+      usePinnedItems({ storageName: STORAGE_KEY }),
+    );
+
     act(() => {
       result.current.togglePinnedItem("itemA");
     });
-    
+
     expect(result.current.pinnedItems).toEqual(["itemB"]);
   });
 
   it("should handle multiple toggles correctly", () => {
-    const { result } = renderHook(() => usePinnedItems({ storageName: STORAGE_KEY }));
+    const { result } = renderHook(() =>
+      usePinnedItems({ storageName: STORAGE_KEY }),
+    );
 
     act(() => {
       result.current.togglePinnedItem("itemX");

@@ -44,7 +44,6 @@ export function ActivityPanel({ open, onOpenChange }: ActivityPanelProps) {
                 one: t("unit.change.one"),
                 other: t("unit.change.plural"),
               }),
-            
             })}
           </SheetDescription>
         </SheetHeader>

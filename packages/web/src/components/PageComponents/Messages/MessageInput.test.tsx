@@ -1,10 +1,10 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MessageInput } from "./MessageInput";
-import type { Contact } from "@pages/Messages";
 import type { Device } from "@core/stores/deviceStore";
-import * as dbIndex from "@db/index";
 import * as dbEventsModule from "@db/events";
+import * as dbIndex from "@db/index";
+import type { Contact } from "@pages/Messages";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MessageInput } from "./MessageInput.tsx";
 
 // Mock the database modules
 vi.mock("@db/index", () => ({
@@ -73,24 +73,16 @@ describe("MessageInput", () => {
   });
 
   it("should render input field and send button", () => {
-    render(
-      <MessageInput
-        selectedContact={mockContact}
-        device={mockDevice}
-      />,
-    );
+    render(<MessageInput selectedContact={mockContact} device={mockDevice} />);
 
-    expect(screen.getByPlaceholderText("Message Test Contact...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Message Test Contact..."),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button")).toBeInTheDocument();
   });
 
   it("should call setDraft when typing", () => {
-    render(
-      <MessageInput
-        selectedContact={mockContact}
-        device={mockDevice}
-      />,
-    );
+    render(<MessageInput selectedContact={mockContact} device={mockDevice} />);
 
     const input = screen.getByPlaceholderText("Message Test Contact...");
     fireEvent.change(input, { target: { value: "Hello" } });
@@ -102,14 +94,11 @@ describe("MessageInput", () => {
     // Set up draft with a message
     mockDraftState.draft = "Hello!";
 
-    render(
-      <MessageInput
-        selectedContact={mockContact}
-        device={mockDevice}
-      />,
-    );
+    render(<MessageInput selectedContact={mockContact} device={mockDevice} />);
 
-    const form = screen.getByPlaceholderText("Message Test Contact...").closest("form")!;
+    const form = screen
+      .getByPlaceholderText("Message Test Contact...")
+      .closest("form")!;
     fireEvent.submit(form);
 
     await waitFor(() => {
@@ -131,13 +120,13 @@ describe("MessageInput", () => {
           toNode: 200,
           message: "Hello!",
           state: "sent",
-        })
+        }),
       );
     });
 
     await waitFor(() => {
       expect(dbEventsModule.dbEvents.emit).toHaveBeenCalledWith(
-        dbEventsModule.DB_EVENTS.MESSAGE_SAVED
+        dbEventsModule.DB_EVENTS.MESSAGE_SAVED,
       );
     });
   });
@@ -159,13 +148,12 @@ describe("MessageInput", () => {
     mockDraftState.draft = "Broadcast message";
 
     render(
-      <MessageInput
-        selectedContact={channelContact}
-        device={mockDevice}
-      />,
+      <MessageInput selectedContact={channelContact} device={mockDevice} />,
     );
 
-    const form = screen.getByPlaceholderText("Message Primary...").closest("form")!;
+    const form = screen
+      .getByPlaceholderText("Message Primary...")
+      .closest("form")!;
     fireEvent.submit(form);
 
     await waitFor(() => {
@@ -184,7 +172,7 @@ describe("MessageInput", () => {
           channelId: 0,
           toNode: 0xffffffff,
           message: "Broadcast message",
-        })
+        }),
       );
     });
   });
@@ -193,14 +181,11 @@ describe("MessageInput", () => {
     // Draft is empty by default
     mockDraftState.draft = "";
 
-    render(
-      <MessageInput
-        selectedContact={mockContact}
-        device={mockDevice}
-      />,
-    );
+    render(<MessageInput selectedContact={mockContact} device={mockDevice} />);
 
-    const form = screen.getByPlaceholderText("Message Test Contact...").closest("form")!;
+    const form = screen
+      .getByPlaceholderText("Message Test Contact...")
+      .closest("form")!;
     fireEvent.submit(form);
 
     await waitFor(() => {
@@ -212,14 +197,11 @@ describe("MessageInput", () => {
   it("should call clearDraft after sending message", async () => {
     mockDraftState.draft = "Test message";
 
-    render(
-      <MessageInput
-        selectedContact={mockContact}
-        device={mockDevice}
-      />,
-    );
+    render(<MessageInput selectedContact={mockContact} device={mockDevice} />);
 
-    const form = screen.getByPlaceholderText("Message Test Contact...").closest("form")!;
+    const form = screen
+      .getByPlaceholderText("Message Test Contact...")
+      .closest("form")!;
     fireEvent.submit(form);
 
     await waitFor(() => {
@@ -228,12 +210,7 @@ describe("MessageInput", () => {
   });
 
   it("should not call setDraft when message exceeds byte limit", () => {
-    render(
-      <MessageInput
-        selectedContact={mockContact}
-        device={mockDevice}
-      />,
-    );
+    render(<MessageInput selectedContact={mockContact} device={mockDevice} />);
 
     const input = screen.getByPlaceholderText("Message Test Contact...");
     const longMessage = "a".repeat(201); // Exceeds 200 byte limit

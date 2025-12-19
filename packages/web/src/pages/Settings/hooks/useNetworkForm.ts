@@ -1,15 +1,12 @@
-import { createZodResolver } from "@components/Form/createZodResolver";
-import { create } from "@bufbuild/protobuf";
-import { useFieldRegistry } from "@core/services/fieldRegistry";
-import { useDevice } from "@core/stores";
-import {
-  convertIntToIpAddress,
-  convertIpAddressToInt,
-} from "@core/utils/ip";
 import {
   type NetworkValidation,
   NetworkValidationSchema,
 } from "@app/validation/config/network";
+import { create } from "@bufbuild/protobuf";
+import { createZodResolver } from "@components/Form/createZodResolver";
+import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { useDevice } from "@core/stores";
+import { convertIntToIpAddress, convertIpAddressToInt } from "@core/utils/ip";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
@@ -26,7 +23,9 @@ export function useNetworkForm() {
   // Convert integer IPs to string for form display
   const toFormValues = useCallback(
     (cfg: typeof baseConfig): NetworkValidation | undefined => {
-      if (!cfg) return undefined;
+      if (!cfg) {
+        return undefined;
+      }
       return {
         ...cfg,
         ipv4Config: {
@@ -86,7 +85,9 @@ export function useNetworkForm() {
   // Sync form changes to store and field registry
   useEffect(() => {
     const subscription = watch((formData) => {
-      if (!baseConfig || !formData || !defaultValues) return;
+      if (!baseConfig || !formData || !defaultValues) {
+        return;
+      }
 
       const currentValues = formData as NetworkValidation;
       const prevValues = prevValuesRef.current;
@@ -101,9 +102,9 @@ export function useNetworkForm() {
       const parsed = fromFormValues(currentValues);
 
       // Track per-field changes for Activity panel
-      for (const key of Object.keys(
-        currentValues,
-      ) as Array<keyof NetworkValidation>) {
+      for (const key of Object.keys(currentValues) as Array<
+        keyof NetworkValidation
+      >) {
         const newValue = currentValues[key];
         const originalValue = defaultValues[key];
 
@@ -115,8 +116,7 @@ export function useNetworkForm() {
       }
 
       // Send full config to device store
-      const hasChanges =
-        JSON.stringify(parsed) !== JSON.stringify(baseConfig);
+      const hasChanges = JSON.stringify(parsed) !== JSON.stringify(baseConfig);
 
       if (hasChanges) {
         setChange(SECTION, parsed, baseConfig);
@@ -143,8 +143,12 @@ export function useNetworkForm() {
       }>,
       disabled?: boolean,
     ): boolean => {
-      if (disabled) return true;
-      if (!disabledBy) return false;
+      if (disabled) {
+        return true;
+      }
+      if (!disabledBy) {
+        return false;
+      }
 
       return disabledBy.some((field) => {
         const value = getValues(field.fieldName);

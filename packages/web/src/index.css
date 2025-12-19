@@ -142,6 +142,10 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
@@ -157,5 +161,29 @@
 
   .w-sidebar-icon {
     width: var(--sidebar-width-icon);
+  }
+
+  .styled-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted) transparent;
+  }
+
+  .styled-scrollbar::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .styled-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .styled-scrollbar::-webkit-scrollbar-thumb {
+    background-color: oklch(0.7 0 0);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .dark .styled-scrollbar::-webkit-scrollbar-thumb {
+    background-color: oklch(0.4 0 0);
   }
 }

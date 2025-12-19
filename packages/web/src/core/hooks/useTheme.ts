@@ -4,10 +4,11 @@ type Theme = "light" | "dark" | "system";
 type ActualTheme = "light" | "dark";
 
 export function useTheme() {
-  const getSystemPreferredTheme = useCallback(() =>
-    globalThis.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light",
+  const getSystemPreferredTheme = useCallback(
+    () =>
+      globalThis.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light",
     [],
   );
 
@@ -48,4 +49,3 @@ export function useTheme() {
 
   return { theme, preference, setPreference: setPreferenceValue };
 }
-

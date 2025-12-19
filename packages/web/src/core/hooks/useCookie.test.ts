@@ -1,7 +1,7 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import useCookie from "./useCookie"; // Note: It's a default export
+import { act, renderHook } from "@testing-library/react";
 import Cookies from "js-cookie";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import useCookie from "./useCookie.ts"; // Note: It's a default export
 
 vi.mock("js-cookie", () => ({
   default: {
@@ -39,7 +39,7 @@ describe("useCookie", () => {
 
   it("should set a cookie", () => {
     const { result } = renderHook(() => useCookie(COOKIE_NAME, INITIAL_VALUE));
-    
+
     act(() => {
       result.current.setCookie(NEW_VALUE);
     });
@@ -71,7 +71,7 @@ describe("useCookie", () => {
   it("should remove a cookie", () => {
     (Cookies.get as vi.Mock).mockReturnValue(JSON.stringify(INITIAL_VALUE)); // Simulate existing cookie
     const { result } = renderHook(() => useCookie(COOKIE_NAME, INITIAL_VALUE));
-    
+
     expect(result.current.value).toEqual(INITIAL_VALUE);
 
     act(() => {
@@ -83,9 +83,11 @@ describe("useCookie", () => {
   });
 
   it("should handle error during cookie parsing", () => {
-    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     (Cookies.get as vi.Mock).mockReturnValue("invalid json");
-    
+
     const { result } = renderHook(() => useCookie(COOKIE_NAME, INITIAL_VALUE));
     expect(result.current.value).toEqual(INITIAL_VALUE); // Should fallback to initialValue
     expect(consoleErrorSpy).toHaveBeenCalled();
@@ -93,37 +95,41 @@ describe("useCookie", () => {
   });
 
   it("should handle error during cookie setting", () => {
-    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     (Cookies.set as vi.Mock).mockImplementation(() => {
       throw new Error("Failed to set cookie");
     });
-    
+
     const { result } = renderHook(() => useCookie(COOKIE_NAME, INITIAL_VALUE));
     act(() => {
       result.current.setCookie(NEW_VALUE);
     });
-    
+
     expect(consoleErrorSpy).toHaveBeenCalled();
     // Value should not update if setting failed internally
-    expect(result.current.value).toEqual(INITIAL_VALUE); 
+    expect(result.current.value).toEqual(INITIAL_VALUE);
     consoleErrorSpy.mockRestore();
   });
 
   it("should handle error during cookie removal", () => {
-    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     (Cookies.remove as vi.Mock).mockImplementation(() => {
       throw new Error("Failed to remove cookie");
     });
     (Cookies.get as vi.Mock).mockReturnValue(JSON.stringify(INITIAL_VALUE)); // Simulate existing cookie
     const { result } = renderHook(() => useCookie(COOKIE_NAME, INITIAL_VALUE));
-    
+
     act(() => {
       result.current.removeCookie();
     });
-    
+
     expect(consoleErrorSpy).toHaveBeenCalled();
     // Value should not update if removal failed internally
-    expect(result.current.value).toEqual(INITIAL_VALUE); 
+    expect(result.current.value).toEqual(INITIAL_VALUE);
     consoleErrorSpy.mockRestore();
   });
 });

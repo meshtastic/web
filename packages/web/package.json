@@ -27,7 +27,8 @@
     "docker:build": "docker build -t meshtastic-web:latest -f ./infra/Containerfile .",
     "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ .",
     "db:generate": "drizzle-kit generate",
-    "db:check": "drizzle-kit check"
+    "db:check": "drizzle-kit check",
+    "db:squash": "rm -rf ./src/db/migrations/* && pnpm db:generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -75,7 +76,6 @@
     "i18next": "^25.7.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "i18next-http-backend": "^3.0.2",
-    "idb-keyval": "^6.2.2",
     "immer": "^11.0.1",
     "js-cookie": "^3.0.5",
     "js-yaml": "^4.1.1",
@@ -117,6 +117,7 @@
     "@vitejs/plugin-basic-ssl": "^2.1.0",
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.22",
+    "babel-plugin-react-compiler": "^1.0.0",
     "drizzle-kit": "^0.31.8",
     "gzipper": "^8.2.1",
     "happy-dom": "^20.0.11",

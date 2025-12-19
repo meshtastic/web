@@ -16,10 +16,15 @@ export interface UseChannelFormOptions {
 export function useChannelForm({ channel }: UseChannelFormOptions) {
   const { trackChange, removeChange, getChange } = useFieldRegistry();
 
-  const section = {
-    type: "channel",
-    variant: channel.channelIndex.toString(),
-  } as const;
+  // Memoize section to prevent unnecessary re-renders
+  const section = useMemo(
+    () =>
+      ({
+        type: "channel",
+        variant: channel.channelIndex.toString(),
+      }) as const,
+    [channel.channelIndex],
+  );
   const fieldName = `channel_${channel.channelIndex}`;
 
   // Convert flat DB channel to nested form structure
@@ -109,7 +114,9 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
   // Submit handler that tracks changes
   const submitChanges = useCallback(
     (data: ChannelValidation) => {
-      if (!formState.isReady) return;
+      if (!formState.isReady) {
+        return;
+      }
 
       const payload = formToDbChannel(data);
 
@@ -133,12 +140,28 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
 
   // Track changes on form value updates
   const prevValuesRef = useRef<ChannelValidation | undefined>(undefined);
+  // Track whether we've completed initial sync (skip first watch fire)
+  const hasInitialSyncRef = useRef(false);
 
   useEffect(() => {
+    // Reset initial sync flag when effect re-runs
+    hasInitialSyncRef.current = false;
+
     const subscription = watch((formData) => {
-      if (!formData) return;
+      if (!formData) {
+        return;
+      }
 
       const currentValues = formData as ChannelValidation;
+
+      // Skip the first watch fire - just capture initial values without tracking
+      // This prevents spurious change detection during form initialization
+      if (!hasInitialSyncRef.current) {
+        prevValuesRef.current = currentValues;
+        hasInitialSyncRef.current = true;
+        return;
+      }
+
       const prevValues = prevValuesRef.current;
 
       if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {

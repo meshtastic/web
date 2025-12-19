@@ -1,6 +1,16 @@
-import { and, desc, eq, gt, sql } from "drizzle-orm";
-import { dbClient } from "../client";
-import { nodes, positionLogs, telemetryLogs, type NewNode, type NewPositionLog, type NewTelemetryLog, type Node, type PositionLog, type TelemetryLog } from "../schema";
+import { and, desc, eq, gt, isNull, lt, or, sql } from "drizzle-orm";
+import { dbClient } from "../client.ts";
+import {
+  type NewNode,
+  type NewPositionLog,
+  type NewTelemetryLog,
+  type Node,
+  nodes,
+  type PositionLog,
+  positionLogs,
+  type TelemetryLog,
+  telemetryLogs,
+} from "../schema.ts";
 
 /**
  * Repository for node operations
@@ -191,6 +201,21 @@ export class NodeRepository {
   }
 
   /**
+   *  Add a private note about a node.
+   */
+
+  async updatePrivateNote(
+    deviceId: number,
+    nodeNum: number,
+    privateNote: string | null,
+  ): Promise<void> {
+    await this.db
+      .update(nodes)
+      .set({ privateNote, updatedAt: new Date() })
+      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+  }
+
+  /**
    * Update ignored status
    */
   async updateIgnored(
@@ -218,12 +243,18 @@ export class NodeRepository {
   /**
    * Get recently heard nodes
    */
-  async getRecentNodes(deviceId: number, sinceTimestamp: number): Promise<Node[]> {
+  async getRecentNodes(
+    deviceId: number,
+    sinceTimestamp: number,
+  ): Promise<Node[]> {
     return this.db
       .select()
       .from(nodes)
       .where(
-        and(eq(nodes.deviceId, deviceId), gt(nodes.lastHeard, sinceTimestamp)),
+        and(
+          eq(nodes.deviceId, deviceId),
+          gt(nodes.lastHeard, new Date(sinceTimestamp)),
+        ),
       )
       .orderBy(desc(nodes.lastHeard));
   }
@@ -238,19 +269,99 @@ export class NodeRepository {
   }
 
   /**
-   * Delete stale nodes (not heard from in X days)
+   * Count stale nodes (not heard from in X days)
+   * @param unknownOnly - If true, only count nodes without a longName
    */
-  async deleteStaleNodes(deviceId: number, daysOld: number): Promise<number> {
-    const cutoffTimestamp =
-      Math.floor(Date.now() / 1000) - daysOld * 24 * 60 * 60;
+  async countStaleNodes(
+    deviceId: number,
+    daysOld: number,
+    unknownOnly = false,
+  ): Promise<number> {
+    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
+
+    let baseCondition = and(
+      eq(nodes.deviceId, deviceId),
+      lt(nodes.lastHeard, cutoffDate),
+    );
+
+    if (unknownOnly) {
+      baseCondition = and(
+        baseCondition,
+        or(isNull(nodes.longName), eq(nodes.longName, "")),
+      );
+    }
 
     const result = await this.db
-      .delete(nodes)
-      .where(
-        and(eq(nodes.deviceId, deviceId), gt(cutoffTimestamp, nodes.lastHeard)),
-      );
+      .select({ count: sql<number>`count(*)` })
+      .from(nodes)
+      .where(baseCondition);
 
-    return result.changes || 0;
+    return result[0]?.count ?? 0;
+  }
+
+  /**
+   * Get stale nodes (not heard from in X days)
+   * @param unknownOnly - If true, only return nodes without a longName
+   */
+  async getStaleNodes(
+    deviceId: number,
+    daysOld: number,
+    unknownOnly = false,
+  ): Promise<Node[]> {
+    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
+
+    let baseCondition = and(
+      eq(nodes.deviceId, deviceId),
+      lt(nodes.lastHeard, cutoffDate),
+    );
+
+    if (unknownOnly) {
+      baseCondition = and(
+        baseCondition,
+        or(isNull(nodes.longName), eq(nodes.longName, "")),
+      );
+    }
+
+    return this.db
+      .select()
+      .from(nodes)
+      .where(baseCondition)
+      .orderBy(nodes.lastHeard);
+  }
+
+  /**
+   * Delete stale nodes (not heard from in X days)
+   * @param unknownOnly - If true, only delete nodes without a longName
+   */
+  async deleteStaleNodes(
+    deviceId: number,
+    daysOld: number,
+    unknownOnly = false,
+  ): Promise<number> {
+    // First count the nodes to be deleted (since sqlocal doesn't return changes count)
+    const count = await this.countStaleNodes(deviceId, daysOld, unknownOnly);
+
+    if (count === 0) {
+      return 0;
+    }
+
+    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
+
+    let baseCondition = and(
+      eq(nodes.deviceId, deviceId),
+      lt(nodes.lastHeard, cutoffDate),
+    );
+
+    if (unknownOnly) {
+      baseCondition = and(
+        baseCondition,
+        or(isNull(nodes.longName), eq(nodes.longName, "")),
+      );
+    }
+
+    await this.db.delete(nodes).where(baseCondition);
+
+    return count;
   }
 
   // ==================== Position History ====================
@@ -277,7 +388,7 @@ export class NodeRepository {
     ];
 
     if (since !== undefined) {
-      conditions.push(gt(positionLogs.time, since));
+      conditions.push(gt(positionLogs.time, new Date(since)));
     }
 
     return this.db
@@ -305,7 +416,7 @@ export class NodeRepository {
     const conditions = [eq(positionLogs.deviceId, deviceId)];
 
     if (since !== undefined) {
-      conditions.push(gt(positionLogs.time, since));
+      conditions.push(gt(positionLogs.time, new Date(since)));
     }
 
     // Fetch all positions for all nodes
@@ -336,17 +447,36 @@ export class NodeRepository {
   /**
    * Delete old position logs
    */
-  async deleteOldPositions(deviceId: number, olderThan: number): Promise<number> {
-    const result = await this.db
+  async deleteOldPositions(
+    deviceId: number,
+    olderThan: number,
+  ): Promise<number> {
+    // Count first since sqlocal doesn't return changes count
+    const countResult = await this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(positionLogs)
+      .where(
+        and(
+          eq(positionLogs.deviceId, deviceId),
+          lt(positionLogs.time, new Date(olderThan)),
+        ),
+      );
+
+    const count = countResult[0]?.count ?? 0;
+    if (count === 0) {
+      return 0;
+    }
+
+    await this.db
       .delete(positionLogs)
       .where(
         and(
           eq(positionLogs.deviceId, deviceId),
-          gt(olderThan, positionLogs.time),
+          lt(positionLogs.time, new Date(olderThan)),
         ),
       );
 
-    return result.changes || 0;
+    return count;
   }
 
   // ==================== Telemetry History ====================
@@ -373,7 +503,7 @@ export class NodeRepository {
     ];
 
     if (since !== undefined) {
-      conditions.push(gt(telemetryLogs.time, since));
+      conditions.push(gt(telemetryLogs.time, new Date(since)));
     }
 
     return this.db
@@ -387,16 +517,35 @@ export class NodeRepository {
   /**
    * Delete old telemetry logs
    */
-  async deleteOldTelemetry(deviceId: number, olderThan: number): Promise<number> {
-    const result = await this.db
+  async deleteOldTelemetry(
+    deviceId: number,
+    olderThan: number,
+  ): Promise<number> {
+    // Count first since sqlocal doesn't return changes count
+    const countResult = await this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(telemetryLogs)
+      .where(
+        and(
+          eq(telemetryLogs.deviceId, deviceId),
+          lt(telemetryLogs.time, new Date(olderThan)),
+        ),
+      );
+
+    const count = countResult[0]?.count ?? 0;
+    if (count === 0) {
+      return 0;
+    }
+
+    await this.db
       .delete(telemetryLogs)
       .where(
         and(
           eq(telemetryLogs.deviceId, deviceId),
-          gt(olderThan, telemetryLogs.time),
+          lt(telemetryLogs.time, new Date(olderThan)),
         ),
       );
 
-    return result.changes || 0;
+    return count;
   }
 }

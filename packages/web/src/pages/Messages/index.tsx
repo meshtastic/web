@@ -1,3 +1,7 @@
+import {
+  ONLINE_THRESHOLD_SECONDS,
+  OnlineIndicator,
+} from "@components/generic/OnlineIndicator";
 import { NodeAvatar } from "@components/NodeAvatar";
 import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
@@ -13,15 +17,21 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import { useDevice, useDeviceContext } from "@core/stores";
+import {
+  type SplitMode,
+  useDevice,
+  useDeviceContext,
+  useUIStore,
+} from "@core/stores";
 import { cn } from "@core/utils/cn";
 import { sortNodes } from "@core/utils/nodeSort";
-import { useChannels, useNodes } from "@db/hooks";
+import { useChannels, useConversations, useNodes } from "@db/hooks";
+import type { ConversationType } from "@db/types";
 import { ChatPanel } from "@pages/Messages/ChatPanel";
 import { useSearch } from "@tanstack/react-router";
 import { Columns, Hash, Plus, Rows, Search, Users, X } from "lucide-react";
 import type React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { Activity, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export type Contact = {
@@ -33,19 +43,10 @@ export type Contact = {
   unread: number;
   online: boolean;
   isFavorite: boolean;
-  type: "direct" | "channel";
+  type: ConversationType;
   nodeNum?: number;
   lastHeard?: number;
 };
-
-type Tab = {
-  id: number;
-  contactId: number;
-  type: "direct" | "channel";
-  unreadCount?: number;
-};
-
-type SplitMode = "none" | "vertical" | "horizontal";
 
 export default function MessagesPage() {
   const device = useDevice();
@@ -56,15 +57,29 @@ export default function MessagesPage() {
 
   // Fetch channels from database
   const { channels: dbChannels } = useChannels(device.id);
+  const { conversations } = useConversations(
+    device.id,
+    device.getMyNodeNum() ?? 0,
+  );
 
-  const [openTabs, setOpenTabs] = useState<Tab[]>([]);
-  const [activeTabId, setActiveTabId] = useState<number | null>(null);
-  const [secondaryTabId, setSecondaryTabId] = useState<number | null>(null);
+  // Tab state from store
+  const openTabs = useUIStore((state) => state.messageTabs);
+  const activeTabId = useUIStore((state) => state.activeMessageTabId);
+  const secondaryTabId = useUIStore((state) => state.secondaryMessageTabId);
+  const splitMode = useUIStore((state) => state.messageSplitMode);
+  const openMessageTab = useUIStore((state) => state.openMessageTab);
+  const closeMessageTab = useUIStore((state) => state.closeMessageTab);
+  const setActiveMessageTab = useUIStore((state) => state.setActiveMessageTab);
+  const setSecondaryMessageTab = useUIStore(
+    (state) => state.setSecondaryMessageTab,
+  );
+  const setMessageSplitMode = useUIStore((state) => state.setMessageSplitMode);
+
+  // Local UI state
   const [searchQuery, setSearchQuery] = useState("");
   const [contactFilter, setContactFilter] = useState<
     "all" | "direct" | "channels"
   >("all");
-  const [splitMode, setSplitMode] = useState<SplitMode>("none");
 
   // Open channel or node from URL on mount
   useEffect(() => {
@@ -72,50 +87,18 @@ export default function MessagesPage() {
     const nodeParam = searchParams.node as number | undefined;
 
     // Handle channel param (broadcast messages)
-    if (channelParam !== undefined) {
-      const channelIndex = channelParam;
-      if (dbChannels.length > 0) {
-        const channel = dbChannels.find(
-          (ch) => ch.channelIndex === channelIndex,
-        );
-        if (channel) {
-          const existingTab = openTabs.find(
-            (t) => t.contactId === channelIndex && t.type === "channel",
-          );
-          if (!existingTab) {
-            const newTab: Tab = {
-              id: Date.now(),
-              contactId: channelIndex,
-              type: "channel",
-            };
-            setOpenTabs((prev) => [...prev, newTab]);
-            setActiveTabId(newTab.id);
-          } else {
-            setActiveTabId(existingTab.id);
-          }
-        }
+    if (channelParam !== undefined && dbChannels.length > 0) {
+      const channel = dbChannels.find((ch) => ch.channelIndex === channelParam);
+      if (channel) {
+        openMessageTab(channelParam, "channel");
       }
     }
 
     // Handle node param (direct messages)
     if (nodeParam !== undefined) {
-      const nodeNum = nodeParam;
-      const existingTab = openTabs.find(
-        (t) => t.contactId === nodeNum && t.type === "direct",
-      );
-      if (!existingTab) {
-        const newTab: Tab = {
-          id: Date.now(),
-          contactId: nodeNum,
-          type: "direct",
-        };
-        setOpenTabs((prev) => [...prev, newTab]);
-        setActiveTabId(newTab.id);
-      } else {
-        setActiveTabId(existingTab.id);
-      }
+      openMessageTab(nodeParam, "direct");
     }
-  }, [searchParams.channel, searchParams.node, dbChannels]);
+  }, [searchParams.channel, searchParams.node, dbChannels, openMessageTab]);
 
   // Get active tab info
   const activeTab = openTabs.find((t) => t.id === activeTabId);
@@ -138,7 +121,7 @@ export default function MessagesPage() {
         lastMessage: "",
         time: "",
         unread: 0,
-        online: lastHeardSec > Date.now() / 1000 - 900,
+        online: lastHeardSec > Date.now() / 1000 - ONLINE_THRESHOLD_SECONDS,
         isFavorite: node.isFavorite ?? false,
         type: "direct",
         nodeNum: node.nodeNum,
@@ -176,11 +159,23 @@ export default function MessagesPage() {
 
   // Calculate unread counts for each contact
   const contactsWithUnread = useMemo(() => {
-    return contacts.map((contact) => ({
-      ...contact,
-      unread: 0, // TODO: Query from database
-    }));
-  }, [contacts]);
+    return contacts.map((contact) => {
+      const conversation = conversations.find(
+        (c) => c.type === contact.type && c.id === contact.id,
+      );
+      return {
+        ...contact,
+        unread: conversation?.unreadCount || 0,
+        lastMessage: conversation?.lastMessage?.message || "",
+        time: conversation?.lastMessage?.date
+          ? new Date(conversation.lastMessage.date).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "",
+      };
+    });
+  }, [contacts, conversations]);
 
   // Update tabs with unread counts
   const tabsWithUnread = useMemo(() => {
@@ -200,11 +195,10 @@ export default function MessagesPage() {
         (c) => c.type === "channel" && c.nodeId === "#0",
       );
       if (primaryChannel) {
-        setOpenTabs([{ id: 1, contactId: primaryChannel.id, type: "channel" }]);
-        setActiveTabId(1);
+        openMessageTab(primaryChannel.id, "channel");
       }
     }
-  }, [contacts, openTabs.length]);
+  }, [contacts, openTabs.length, openMessageTab]);
 
   const selectedContact = activeTab
     ? contacts.find((c) => c.id === activeTab.contactId)
@@ -237,17 +231,7 @@ export default function MessagesPage() {
   }, [contactsWithUnread, searchQuery, contactFilter]);
 
   const openChat = (contact: Contact) => {
-    const existingTab = openTabs.find((t) => t.contactId === contact.id);
-    if (existingTab) {
-      setActiveTabId(existingTab.id);
-    } else {
-      const newTabId = Math.max(...openTabs.map((t) => t.id), 0) + 1;
-      setOpenTabs([
-        ...openTabs,
-        { id: newTabId, contactId: contact.id, type: contact.type },
-      ]);
-      setActiveTabId(newTabId);
-    }
+    openMessageTab(contact.id, contact.type);
   };
 
   const closeTab = (tabId: number, e: React.MouseEvent) => {
@@ -255,46 +239,22 @@ export default function MessagesPage() {
     if (openTabs.length === 1) {
       return;
     }
-
-    const newTabs = openTabs.filter((t) => t.id !== tabId);
-    setOpenTabs(newTabs);
-
-    if (activeTabId === tabId && newTabs.length > 0) {
-      const nextTab = newTabs[newTabs.length - 1];
-      if (nextTab) {
-        setActiveTabId(nextTab.id);
-      }
-    }
-
-    if (secondaryTabId === tabId) {
-      setSecondaryTabId(null);
-      if (splitMode !== "none" && newTabs.length < 2) {
-        setSplitMode("none");
-      }
-    }
+    closeMessageTab(tabId);
   };
 
   const handleTabClick = (tabId: number, isSecondaryPanel = false) => {
     if (isSecondaryPanel) {
-      setSecondaryTabId(tabId);
+      setSecondaryMessageTab(tabId);
     } else {
-      setActiveTabId(tabId);
+      setActiveMessageTab(tabId);
     }
   };
 
   const toggleSplitMode = (mode: SplitMode) => {
     if (splitMode === mode) {
-      setSplitMode("none");
-      setSecondaryTabId(null);
+      setMessageSplitMode("none");
     } else {
-      setSplitMode(mode);
-      // Auto-select secondary tab if not set
-      if (!secondaryTabId && openTabs.length > 1) {
-        const otherTab = openTabs.find((t) => t.id !== activeTabId);
-        if (otherTab) {
-          setSecondaryTabId(otherTab.id);
-        }
-      }
+      setMessageSplitMode(mode);
     }
   };
 
@@ -308,7 +268,9 @@ export default function MessagesPage() {
           <div className="flex flex-nowrap">
             {tabsWithUnread.map((tab) => {
               const tabContact = contacts.find((c) => c.id === tab.contactId);
-              if (!tabContact) return null;
+              if (!tabContact) {
+                return null;
+              }
 
               const isActive = currentTabId === tab.id;
 
@@ -343,7 +305,7 @@ export default function MessagesPage() {
                         clickable={false}
                       />
                       {tabContact.online && tabContact.type === "direct" && (
-                        <div className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-background bg-chart-2" />
+                        <OnlineIndicator className="absolute -bottom-0.5 -right-0.5 h-2 w-2 border" />
                       )}
                     </div>
                   )}
@@ -426,31 +388,35 @@ export default function MessagesPage() {
   );
 
   const renderChatArea = () => {
-    if (splitMode === "none") {
-      return (
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {renderTabBar(false, activeTabId)}
-          <ChatPanel contact={selectedContact} device={device} />
-        </div>
-      );
-    }
-
     return (
-      <ResizablePanelGroup direction={splitMode} className="flex-1">
-        <ResizablePanel defaultSize={50} minSize={25}>
-          <div className="flex flex-col h-full overflow-hidden">
+      <>
+        <Activity mode={splitMode === "none" ? "visible" : "hidden"}>
+          <div className="flex-1 flex flex-col overflow-hidden">
             {renderTabBar(false, activeTabId)}
             <ChatPanel contact={selectedContact} device={device} />
           </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={50} minSize={25}>
-          <div className="flex flex-col h-full overflow-hidden">
-            {renderTabBar(true, secondaryTabId)}
-            <ChatPanel contact={secondaryContact} device={device} />
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        </Activity>
+        <Activity mode={splitMode !== "none" ? "visible" : "hidden"}>
+          <ResizablePanelGroup
+            direction={splitMode === "none" ? "horizontal" : splitMode}
+            className="flex-1"
+          >
+            <ResizablePanel defaultSize={50} minSize={25}>
+              <div className="flex flex-col h-full overflow-hidden">
+                {renderTabBar(false, activeTabId)}
+                <ChatPanel contact={selectedContact} device={device} />
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={50} minSize={25}>
+              <div className="flex flex-col h-full overflow-hidden">
+                {renderTabBar(true, secondaryTabId)}
+                <ChatPanel contact={secondaryContact} device={device} />
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </Activity>
+      </>
     );
   };
 
@@ -526,7 +492,7 @@ export default function MessagesPage() {
                     />
                   )}
                   {contact.online && contact.type === "direct" && (
-                    <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-chart-2" />
+                    <OnlineIndicator className="absolute bottom-0 right-0 h-3 w-3" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
