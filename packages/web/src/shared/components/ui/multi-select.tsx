@@ -1,6 +1,6 @@
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
-import { cn } from "../../core/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 
 interface MultiSelectProps {
   children: React.ReactNode;

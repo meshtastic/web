@@ -1,6 +1,6 @@
-import { useCopyToClipboard } from "@shared/hooks/useCopyToClipboard.ts";
+import { useCopyToClipboard } from "@shared/hooks/useCopyToClipboard";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Check, Copy, Eye, EyeOff, type LucideIcon, X } from "lucide-react";
 import * as React from "react";

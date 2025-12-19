@@ -1,4 +1,4 @@
-import { Button } from "@app/components/UI/Button";
+import { Button } from "@shared/components/ui/button";
 import type { Connection } from "@db/index";
 
 export function ConnectionStatusBadge({

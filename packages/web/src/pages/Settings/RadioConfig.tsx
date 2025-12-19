@@ -1,5 +1,5 @@
-import { Channels } from "@app/components/PageComponents/Channels/Channels.tsx";
-import { Lora } from "@app/components/PageComponents/Settings/Lora.tsx";
+import { Channels } from "@components/PageComponents/Channels/Channels.tsx";
+import { Lora } from "@components/PageComponents/Settings/Lora.tsx";
 import { Security } from "@components/PageComponents/Settings/Security/Security.tsx";
 import {
   Card,

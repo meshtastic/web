@@ -1,9 +1,9 @@
-import type { NewConnectionInput } from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
+import type { NewConnectionInput } from "@components/Dialog/AddConnectionDialog/AddConnectionDialog";
 import { testHttpReachable } from "@app/pages/Connections/utils";
 import { router } from "@app/routes";
 import logger from "@core/services/logger";
 import { useDeviceStore } from "@core/stores";
-import { randId } from "@shared/utils/randId.ts";
+import { randId } from "@shared/utils/randId";
 import { MeshDevice, Types } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";

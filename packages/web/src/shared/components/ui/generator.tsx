@@ -1,12 +1,12 @@
-import { Button, type ButtonVariant } from "@shared/components/ui/button.tsx";
-import { Input } from "@shared/components/ui/input.tsx";
+import { Button, type ButtonVariant } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@shared/components/ui/select.tsx";
+} from "@shared/components/ui/select";
 import { useTranslation } from "react-i18next";
 
 export interface ActionButton {

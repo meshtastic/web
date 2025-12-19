@@ -1,4 +1,4 @@
-import { Button } from "@shared/components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button";
 import { useToast } from "@core/hooks/useToast.ts";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

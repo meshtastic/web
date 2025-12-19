@@ -3,7 +3,7 @@ import { act, renderHook } from "@testing-library/react";
 import { useTranslation } from "react-i18next";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import useLang from "./useLang.ts";
-import useLocalStorage from "@shared/hooks/useLocalStorage.ts";
+import useLocalStorage from "@shared/hooks/useLocalStorage";
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({

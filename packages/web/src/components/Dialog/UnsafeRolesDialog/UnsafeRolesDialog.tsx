@@ -1,6 +1,6 @@
 import { Link } from "@shared/components/ui/link";
-import { Button } from "@shared/components/ui/button.tsx";
-import { Checkbox } from "@shared/components/ui/checkbox.tsx";
+import { Button } from "@shared/components/ui/button";
+import { Checkbox } from "@shared/components/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -9,9 +9,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@shared/components/ui/dialog.tsx";
+} from "@shared/components/ui/dialog";
 import { useDevice } from "@core/stores";
-import { eventBus } from "@shared/utils/eventBus.ts";
+import { eventBus } from "@shared/utils/eventBus";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

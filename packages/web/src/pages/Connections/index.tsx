@@ -1,8 +1,8 @@
-import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
+import AddConnectionDialog from "@components/Dialog/AddConnectionDialog/AddConnectionDialog";
 import { TimeAgo } from "@shared/components/generic/TimeAgo";
-import LanguageSwitcher from "@app/components/LanguageSwitcher";
-import { ConfigProgressIndicator } from "@app/components/PageComponents/Connections/ConfigProgressIndicator";
-import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
+import LanguageSwitcher from "@components/LanguageSwitcher";
+import { ConfigProgressIndicator } from "@components/PageComponents/Connections/ConfigProgressIndicator";
+import { ConnectionStatusBadge } from "@components/PageComponents/Connections/ConnectionStatusBadge";
 import {
   connectionTypeIcon,
   formatConnectionSubtext,
@@ -17,23 +17,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@shared/components/ui/alert-dialog.tsx";
-import { Badge } from "@shared/components/ui/badge.tsx";
-import { Button } from "@shared/components/ui/button.tsx";
+} from "@shared/components/ui/alert-dialog";
+import { Badge } from "@shared/components/ui/badge";
+import { Button } from "@shared/components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@shared/components/ui/card.tsx";
+} from "@shared/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@shared/components/ui/dropdown-menu.tsx";
-import { Separator } from "@shared/components/ui/separator.tsx";
+} from "@shared/components/ui/dropdown-menu";
+import { Separator } from "@shared/components/ui/separator";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useConnections } from "@db/hooks";
 import type { Connection } from "@db/index";

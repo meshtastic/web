@@ -1,5 +1,5 @@
-import { Button } from "@shared/components/ui/button.tsx";
-import useLocalStorage from "@shared/hooks/useLocalStorage.ts";
+import { Button } from "@shared/components/ui/button";
+import useLocalStorage from "@shared/hooks/useLocalStorage";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";

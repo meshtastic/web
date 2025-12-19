@@ -2,8 +2,8 @@ import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "@components/Form/FormTypes";
-import type { ButtonVariant } from "@shared/components/ui/Button.tsx";
-import { Generator } from "@shared/components/ui/generator.tsx";
+import type { ButtonVariant } from "@shared/components/ui/button";
+import { Generator } from "@shared/components/ui/generator";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
 import { Controller, type FieldValues } from "react-hook-form";
 

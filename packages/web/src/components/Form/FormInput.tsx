@@ -2,7 +2,7 @@ import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "@components/Form/FormTypes";
-import { Input } from "@shared/components/ui/input.tsx";
+import { Input } from "@shared/components/ui/input";
 import type { ChangeEventHandler } from "react";
 import { type FieldValues, useController } from "react-hook-form";
 

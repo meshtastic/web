@@ -5,7 +5,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@shared/components/ui/dialog.tsx";
+} from "@shared/components/ui/dialog";
 import { useDevice } from "@core/stores";
 import { useTranslation } from "react-i18next";
 

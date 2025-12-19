@@ -1,4 +1,4 @@
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import {
   type EmojiPickerListCategoryHeaderProps,
   type EmojiPickerListEmojiProps,

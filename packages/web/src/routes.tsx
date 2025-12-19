@@ -1,6 +1,6 @@
 import MessagesPage from "@app/pages/Messages/index.tsx";
-import { ErrorPage } from "@shared/components/ui/error-page.tsx";
-import { Spinner } from "@shared/components/ui/spinner.tsx";
+import { ErrorPage } from "@shared/components/ui/error-page";
+import { Spinner } from "@shared/components/ui/spinner";
 import { useDeviceStore } from "@core/stores";
 import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";

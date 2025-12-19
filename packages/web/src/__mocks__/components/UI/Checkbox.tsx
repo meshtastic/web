@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-vi.mock("@shared/components/ui/checkbox.tsx", () => ({
+vi.mock("@shared/components/ui/checkbox", () => ({
   Checkbox: ({
     id,
     checked,

@@ -8,8 +8,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@shared/components/ui/select.tsx";
-import { cn } from "@shared/utils/cn.ts";
+} from "@shared/components/ui/select";
+import { cn } from "@shared/utils/cn";
 import { type FieldValues, useController } from "react-hook-form";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {

@@ -1,24 +1,24 @@
-import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
-import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
-import { NodeAvatar } from "@app/components/NodeAvatar";
+import { LocationResponseDialog } from "@components/Dialog/LocationResponseDialog.tsx";
+import { TracerouteResponseDialog } from "@components/Dialog/TracerouteResponseDialog.tsx";
+import { NodeAvatar } from "@components/NodeAvatar";
 import { create } from "@bufbuild/protobuf";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
-import { Mono } from "@shared/components/generic/Mono.tsx";
-import { SignalIndicator } from "@shared/components/generic/SignalIndicator.tsx";
-import { TimeAgo } from "@shared/components/generic/TimeAgo.tsx";
-import { Badge } from "@shared/components/ui/badge.tsx";
-import { Button } from "@shared/components/ui/button.tsx";
+import { Mono } from "@shared/components/generic/Mono";
+import { SignalIndicator } from "@shared/components/generic/SignalIndicator";
+import { TimeAgo } from "@shared/components/generic/TimeAgo";
+import { Badge } from "@shared/components/ui/badge";
+import { Button } from "@shared/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@shared/components/ui/card.tsx";
+} from "@shared/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -26,8 +26,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@shared/components/ui/dropdown-menu.tsx";
-import { Input } from "@shared/components/ui/input.tsx";
+} from "@shared/components/ui/dropdown-menu";
+import { Input } from "@shared/components/ui/input";
 import {
   Table,
   TableBody,
@@ -35,7 +35,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@shared/components/ui/table.tsx";
+} from "@shared/components/ui/table";
 import useLang from "@core/hooks/useLang.ts";
 import {
   type NodeColumnKey,
@@ -43,7 +43,7 @@ import {
   useDeviceContext,
   useUIStore,
 } from "@core/stores";
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import { sortNodes } from "@core/utils/nodeSort.ts";
 import { useNodes } from "@db/hooks";
 import { Protobuf, type Types } from "@meshtastic/core";

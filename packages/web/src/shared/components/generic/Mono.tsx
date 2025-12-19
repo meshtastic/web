@@ -1,4 +1,4 @@
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 
 interface MonoProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;

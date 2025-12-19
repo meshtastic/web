@@ -1,12 +1,12 @@
 import { ImportConfigDialog } from "@components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
-import { Button } from "@shared/components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
   type ParsedConfigBackupField,
   ConfigBackupService,
 } from "@core/services/configBackupService.ts";
 import { useDevice } from "@core/stores";
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import { Download, Upload } from "lucide-react";
 import { useState } from "react";
 

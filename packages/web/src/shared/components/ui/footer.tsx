@@ -1,4 +1,4 @@
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import React from "react";
 import { Trans } from "react-i18next";
 

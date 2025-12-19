@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { useState } from "react"; // Import useState and useEffect from react
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import useLocalStorage from "@shared/hooks/useLocalStorage.ts";
+import useLocalStorage from "@shared/hooks/useLocalStorage";
 import { usePinnedItems } from "./usePinnedItems.ts";
 
 // Mock useLocalStorage

@@ -5,7 +5,7 @@ import { Toaster } from "@components/Toaster.tsx";
 import { ThemeProvider } from "@components/theme-provider";
 import { useDeviceStore } from "@core/stores";
 import { Outlet } from "@tanstack/react-router";
-import { SidebarProvider } from "@shared/components/ui/sidebar.tsx";
+import { SidebarProvider } from "@shared/components/ui/sidebar";
 
 export function App() {
   const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);

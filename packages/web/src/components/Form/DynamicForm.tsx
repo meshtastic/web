@@ -3,7 +3,7 @@ import {
   DynamicFormField,
   type FieldProps,
 } from "@components/Form/DynamicFormField.tsx";
-import { Button } from "@shared/components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,9 +12,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@shared/components/ui/form.tsx";
-import { Heading } from "@shared/components/ui/typography/heading.tsx";
-import { Subtle } from "@shared/components/ui/typography/subtle.tsx";
+} from "@shared/components/ui/form";
+import { Heading } from "@shared/components/ui/typography/heading";
+import { Subtle } from "@shared/components/ui/typography/subtle";
 import { useEffect } from "react";
 import {
   type DefaultValues,

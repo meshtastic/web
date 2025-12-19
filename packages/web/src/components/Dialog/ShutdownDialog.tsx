@@ -1,5 +1,5 @@
-import { Button } from "@shared/components/ui/button.tsx";
-import { Input } from "@shared/components/ui/input.tsx";
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
 import { useDevice } from "@core/stores";
 import { ClockIcon, PowerIcon } from "lucide-react";
 import { useState } from "react";

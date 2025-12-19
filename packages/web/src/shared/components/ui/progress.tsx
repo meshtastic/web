@@ -1,4 +1,4 @@
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import * as ProgressPrimitive from "@radix-ui/react-progress";
 import * as React from "react";
 

@@ -6,7 +6,7 @@ import {
 } from "@app/i18n-config.ts";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import useLocalStorage from "@shared/hooks/useLocalStorage.ts";
+import useLocalStorage from "@shared/hooks/useLocalStorage";
 
 const STORAGE_KEY = "language";
 

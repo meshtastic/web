@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@shared/components/ui/card";
 import { Label } from "@shared/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@shared/components/ui/radio-group.tsx";
+import { RadioGroup, RadioGroupItem } from "@shared/components/ui/radio-group";
 import {
   Select,
   SelectContent,

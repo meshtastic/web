@@ -13,7 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@shared/components/ui/sidebar.tsx";
+} from "@shared/components/ui/sidebar";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { useConversations, useNodes } from "@db/hooks";
 import { useLocation } from "@tanstack/react-router";

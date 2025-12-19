@@ -1,4 +1,4 @@
-import { SettingsSearchBar } from "@app/components/Settings/SettingsSearchBar";
+import { SettingsSearchBar } from "@components/Settings/SettingsSearchBar";
 import { AdvancedConfig } from "@app/pages/Settings/AdvancedConfig.tsx";
 import { useSettingsSave } from "@app/pages/Settings/hooks/useSaveSettings";
 import { ActivityPanel } from "@components/Settings/Activity";

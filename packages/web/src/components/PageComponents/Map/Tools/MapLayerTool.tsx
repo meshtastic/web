@@ -1,10 +1,10 @@
-import { Checkbox } from "@shared/components/ui/checkbox.tsx";
+import { Checkbox } from "@shared/components/ui/checkbox";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@shared/components/ui/popover.tsx";
-import { cn } from "@shared/utils/cn.ts";
+} from "@shared/components/ui/popover";
+import { cn } from "@shared/utils/cn";
 import { LayersIcon } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";

@@ -5,7 +5,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@shared/components/ui/command.tsx";
+} from "@shared/components/ui/command";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
 import {
   useDevice,
@@ -13,7 +13,7 @@ import {
   useDeviceStore,
   useUIStore,
 } from "@core/stores";
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import { useNodes } from "@db/hooks";
 import { useNavigate } from "@tanstack/react-router";
 import { useCommandState } from "cmdk";

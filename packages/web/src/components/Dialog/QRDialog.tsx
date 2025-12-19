@@ -1,5 +1,5 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { Checkbox } from "@shared/components/ui/checkbox.tsx";
+import { Checkbox } from "@shared/components/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -8,9 +8,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@shared/components/ui/dialog.tsx";
-import { Input } from "@shared/components/ui/input.tsx";
-import { Label } from "@shared/components/ui/label.tsx";
+} from "@shared/components/ui/dialog";
+import { Input } from "@shared/components/ui/input";
+import { Label } from "@shared/components/ui/label";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import { useEffect, useMemo, useState } from "react";

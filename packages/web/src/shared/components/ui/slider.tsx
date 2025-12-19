@@ -1,4 +1,4 @@
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { useId, useState } from "react";
 

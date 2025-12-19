@@ -1,5 +1,5 @@
-import { FactoryResetConfigDialog } from "@app/components/Dialog/FactoryResetConfigDialog/FactoryResetConfigDialog";
-import { FactoryResetDeviceDialog } from "@app/components/Dialog/FactoryResetDeviceDialog/FactoryResetDeviceDialog";
+import { FactoryResetConfigDialog } from "@components/Dialog/FactoryResetConfigDialog/FactoryResetConfigDialog";
+import { FactoryResetDeviceDialog } from "@components/Dialog/FactoryResetDeviceDialog/FactoryResetDeviceDialog";
 import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 import { NodeDetailsDrawer } from "@components/Dialog/NodeDetailsDrawer";

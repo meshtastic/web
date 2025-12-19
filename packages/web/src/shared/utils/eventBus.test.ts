@@ -1,4 +1,4 @@
-import { eventBus } from "@shared/utils/eventBus.ts";
+import { eventBus } from "@shared/utils/eventBus";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("EventBus", () => {

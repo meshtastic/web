@@ -22,7 +22,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@shared/components/ui/tabs.tsx";
+} from "@shared/components/ui/tabs";
 import { useDevice, type ValidModuleConfigType } from "@core/stores";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";

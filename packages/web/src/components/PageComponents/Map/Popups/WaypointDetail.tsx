@@ -1,5 +1,5 @@
 import { TimeAgo } from "@shared/components/generic/TimeAgo";
-import { Separator } from "@shared/components/ui/separator.tsx";
+import { Separator } from "@shared/components/ui/separator";
 import type { WaypointWithMetadata } from "@core/stores";
 import { useDeviceContext } from "@core/stores";
 import {

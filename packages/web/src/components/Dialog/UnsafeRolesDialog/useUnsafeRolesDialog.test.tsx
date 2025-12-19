@@ -2,7 +2,7 @@ import {
   UNSAFE_ROLES,
   useUnsafeRolesDialog,
 } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
-import { eventBus } from "@shared/utils/eventBus.ts";
+import { eventBus } from "@shared/utils/eventBus";
 import { renderHook } from "@testing-library/react";
 import {
   afterEach,

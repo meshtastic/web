@@ -1,4 +1,4 @@
-import useLocalStorage from "@shared/hook@shared/hooks/useLocalStorage.ts";
+import useLocalStorage from "@shared/hooks/useLocalStorage";
 import { useCallback } from "react";
 
 export function usePinnedItems({ storageName }: { storageName: string }) {

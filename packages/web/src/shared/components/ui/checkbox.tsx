@@ -1,4 +1,4 @@
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import { Check } from "lucide-react";
 import { useId, useState } from "react";
 

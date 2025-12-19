@@ -8,7 +8,7 @@ import {
   TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
-} from "@shared/components/ui/tooltip.tsx";
+} from "@shared/components/ui/tooltip";
 import { memo } from "react";
 import { Marker } from "react-map-gl/maplibre";
 

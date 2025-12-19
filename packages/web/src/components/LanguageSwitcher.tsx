@@ -1,14 +1,14 @@
 import type { LangCode } from "@app/i18n-config.ts";
-import { Button } from "@shared/components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@shared/components/ui/dropdown-menu.tsx";
-import { Subtle } from "@shared/components/ui/typography/subtle.tsx";
+} from "@shared/components/ui/dropdown-menu";
+import { Subtle } from "@shared/components/ui/typography/subtle";
 import useLang from "@core/hooks/useLang.ts";
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import { t } from "i18next";
 import { Check, Languages } from "lucide-react";
 import { useCallback } from "react";

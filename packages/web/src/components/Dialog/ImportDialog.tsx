@@ -1,5 +1,5 @@
 import { fromBinary } from "@bufbuild/protobuf";
-import { Button } from "@shared/components/ui/button.tsx";
+import { Button } from "@shared/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -8,17 +8,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@shared/components/ui/dialog.tsx";
-import { Input } from "@shared/components/ui/input.tsx";
-import { Label } from "@shared/components/ui/label.tsx";
+} from "@shared/components/ui/dialog";
+import { Input } from "@shared/components/ui/input";
+import { Label } from "@shared/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@shared/components/ui/select.tsx";
-import { Switch } from "@shared/components/ui/switch.tsx";
+} from "@shared/components/ui/select";
+import { Switch } from "@shared/components/ui/switch";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";

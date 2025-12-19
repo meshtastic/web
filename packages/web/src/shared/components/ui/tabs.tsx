@@ -1,4 +1,4 @@
-import { cn } from "@shared/utils/cn.ts";
+import { cn } from "@shared/utils/cn";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import * as React from "react";
 

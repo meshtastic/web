@@ -2,7 +2,7 @@
 export { cn } from "./cn";
 export * from "./color";
 export { debounce } from "./debounce";
-export { getByPath, setByPath } from "./dotPath";
-export { eventBus, type EventCallback, type EventBus, DB_EVENTS } from "./eventBus";
+export { dotPaths, type DotPath } from "./dotPath";
+export { eventBus, type EventCallback, type EventName, type EventMap } from "./eventBus";
 export { randId } from "./randId";
-export { isDefined, isNonEmptyString, isPositiveNumber } from "./typeGuards";
+export { isDefined } from "./typeGuards";
