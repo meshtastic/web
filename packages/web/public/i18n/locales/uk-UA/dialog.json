@@ -69,30 +69,30 @@
         "title": "Serial port selected",
         "description": "Port permissions granted."
       },
-      "port": "Port",
-      "selectPort": "Select port",
+      "port": "Порт",
+      "selectPort": "Виберіть порт",
       "deviceName": "USB {{vendorId}}:{{productId}}",
       "notSelected": "No port selected"
     },
     "httpConnection": {
       "namePlaceholder": "My HTTP Node",
-      "inputPlaceholder": "192.168.1.10 or meshtastic.local",
-      "heading": "URL or IP",
+      "inputPlaceholder": "192.168.1.10 або meshtastic.local",
+      "heading": "URL або IP",
       "useHttps": "Use HTTTPS",
       "invalidUrl": {
-        "title": "Invalid URL",
+        "title": "Некоректна адреса URL",
         "description": "Please enter a valid HTTP or HTTPS URL."
       },
       "connectionTest": {
         "description": "Test the connetion before saving to verify the device is reachable.",
         "button": {
-          "loading": "Testing...",
-          "label": "Test connection"
+          "loading": "Тестування...",
+          "label": "Перевірка зʼєднання"
         },
         "reachable": "Reachable",
         "notReachable": "Not reachable",
         "success": {
-          "title": "Connection test successful",
+          "title": "Тест з'єднання успішний",
           "description": "The device appears to be reachable."
         },
         "failure": {
@@ -110,22 +110,22 @@
     "allRawMetrics": "All Raw Metrics:",
     "batteryLevel": "Battery level",
     "channelUtilization": "Channel utilization",
-    "details": "Details:",
+    "details": "Подробиці:",
     "deviceMetrics": "Device Metrics:",
     "hardware": "Hardware: ",
     "lastHeard": "Last Heard: ",
     "nodeHexPrefix": "Node Hex: ",
     "nodeNumber": "Node Number: ",
-    "position": "Position:",
-    "role": "Role: ",
-    "uptime": "Uptime: ",
+    "position": "Розташування:",
+    "role": "Роль: ",
+    "uptime": "Час роботи: ",
     "voltage": "Напруга",
     "title": "Node Details for {{identifier}}",
     "ignoreNode": "Ignore node",
     "removeNode": "Remove node",
     "unignoreNode": "Unignore node",
     "security": "Security:",
-    "publicKey": "Public Key: ",
+    "publicKey": "Відкритий ключ: ",
     "messageable": "Messageable: ",
     "KeyManuallyVerifiedTrue": "Public Key has been manually verified",
     "KeyManuallyVerifiedFalse": "Public Key is not manually verified"
@@ -135,24 +135,24 @@
     "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
     "footer": "=== END OF KEYS ===",
     "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-    "privateKey": "Private Key:",
-    "publicKey": "Public Key:",
+    "privateKey": "Приватний Ключ:",
+    "publicKey": "Відкритий ключ:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-    "title": "Backup Keys"
+    "title": "Резервні ключі"
   },
   "pkiBackupReminder": {
     "description": "We recommend backing up your key data regularly. Would you like to back up now?",
     "title": "Backup Reminder",
     "remindLaterPrefix": "Remind me in",
     "remindNever": "Never remind me",
-    "backupNow": "Back up now"
+    "backupNow": "Зробити резервну копію"
   },
   "pkiRegenerate": {
     "description": "Are you sure you want to regenerate key pair?",
     "title": "Regenerate Key Pair"
   },
   "qr": {
-    "addChannels": "Add Channels",
+    "addChannels": "Додайте канали",
     "replaceChannels": "Replace Channels",
     "description": "The current LoRa configuration will also be shared.",
     "sharableUrl": "Sharable URL",
