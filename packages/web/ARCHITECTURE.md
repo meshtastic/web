@@ -56,7 +56,7 @@ src/
 ├── features/                    # Feature modules (colocated code)
 │   ├── connections/             # Device connection management
 │   │   ├── pages/               # ConnectionsPage
-│   │   ├── components/          # AddConnectionDialog, etc.
+│   │   ├── components/          # AddConnectionDialog, SupportedBadge, etc.
 │   │   ├── hooks/               # useConnections
 │   │   └── utils.ts             # Connection utilities
 │   │
@@ -67,7 +67,7 @@ src/
 │   │
 │   ├── nodes/                   # Node management feature
 │   │   ├── pages/               # NodesPage
-│   │   ├── components/          # NodeDetailsDrawer, SignalMetricsLog, TelemetryChart
+│   │   ├── components/          # Node-specific components
 │   │   ├── hooks/               # useNodes
 │   │   └── utils/               # nodeSort, signalColor
 │   │
@@ -75,11 +75,18 @@ src/
 │   │   ├── pages/               # MapPage
 │   │   └── components/          # Map, Layers/, Markers/, Popups/, Tools/
 │   │
+│   ├── preferences/             # App preferences feature
+│   │   └── pages/               # PreferencesPage
+│   │
 │   └── settings/                # Settings feature
 │       ├── pages/               # SettingsPage, RadioConfig, DeviceConfig, ModuleConfig
 │       ├── hooks/               # useChannelForm, useConfigForm, useDeviceForm, etc.
 │       ├── components/
-│       │   ├── panels/          # Bluetooth, Display, LoRa, Device/, Network/, Security/
+│       │   ├── panels/          # Config panels
+│       │   │   ├── Channels/    # Channel configuration (Channel.tsx, Channels.tsx, validation.ts)
+│       │   │   ├── Device/      # Device settings
+│       │   │   ├── Security/    # Security settings
+│       │   │   └── *.tsx        # Bluetooth, Display, LoRa, Network, Position, Power
 │       │   ├── modules/         # MQTT, Telemetry, CannedMessage, etc.
 │       │   ├── form/            # ConfigFormFields, FormInput, FormSelect
 │       │   └── activity/        # ActivityPanel, ActivityItem
@@ -92,57 +99,117 @@ src/
 ├── shared/                      # Truly shared code
 │   ├── components/
 │   │   ├── ui/                  # shadcn/ui primitives (button, card, dialog, etc.)
-│   │   └── generic/             # SignalIndicator, TimeAgo, Mono, OnlineIndicator
-│   ├── hooks/                   # useDebounce, useCopyToClipboard, useIsMobile, etc.
-│   ├── utils/                   # color, randId, typeGuards, cn
-│   └── types/                   # Shared type definitions
+│   │   ├── Badge/               # ConnectionStatusBadge
+│   │   ├── CommandPalette/      # Command palette component
+│   │   ├── Dialog/              # Modal dialogs (PKIBackupDialog, RemoveNodeDialog, etc.)
+│   │   ├── Filter/              # Filter components
+│   │   ├── Table/               # Table component
+│   │   ├── BatteryStatus.tsx    # Battery status indicator
+│   │   ├── DeviceImage.tsx      # Device image component
+│   │   ├── LanguageSwitcher.tsx
+│   │   ├── MeshNetwork.tsx      # Mesh network visualization
+│   │   ├── Mono.tsx             # Monospace text component
+│   │   ├── NodeAvatar.tsx       # Node avatar component
+│   │   ├── OnlineIndicator.tsx  # Online status indicator
+│   │   ├── SignalIndicator.tsx  # Signal strength indicator
+│   │   ├── TimeAgo.tsx          # Relative time display
+│   │   ├── Toaster.tsx          # Toast notifications
+│   │   └── WelcomeSplash.tsx    # Welcome screen
+│   │
+│   ├── hooks/                   # Shared hooks
+│   │   ├── useBrowserFeatureDetection.ts
+│   │   ├── useCopyToClipboard.ts
+│   │   ├── useDebounce.ts
+│   │   ├── useDeleteMessages.ts
+│   │   ├── useDeviceContext.ts
+│   │   ├── useFavoriteNode.ts
+│   │   ├── useFeatureFlags.ts
+│   │   ├── useFilter.ts
+│   │   ├── useGetMyNode.ts
+│   │   ├── useIgnoreNode.ts
+│   │   ├── useIsMobile.ts
+│   │   ├── useLang.ts
+│   │   ├── useLocalStorage.ts
+│   │   ├── useMapFitting.ts
+│   │   ├── usePasswordVisibilityToggle.ts
+│   │   ├── usePinnedItems.ts
+│   │   ├── usePositionFlags.ts
+│   │   ├── useTheme.ts
+│   │   ├── useToast.ts
+│   │   ├── useTraceroute.ts
+│   │   └── useWindowFocus.ts
+│   │
+│   └── utils/                   # Shared utilities
+│       ├── bitwise.ts
+│       ├── cn.ts                # className utility
+│       ├── color.ts
+│       ├── debounce.ts
+│       ├── deepCompareConfig.ts
+│       ├── dotPath.ts
+│       ├── eventBus.ts
+│       ├── geo.ts
+│       ├── github.ts
+│       ├── ip.ts
+│       ├── messagePipelineHandlers.ts
+│       ├── pskSchema.ts
+│       ├── randId.ts
+│       ├── sort.ts
+│       ├── string.ts
+│       ├── typeGuards.ts
+│       └── x25519.ts
 │
 ├── state/                       # Global state management
 │   ├── device/                  # Device store (Zustand)
 │   │   ├── store.ts             # Device state, connection tracking
 │   │   └── types.ts             # Device-related types
 │   └── ui/                      # UI preferences store
-│       └── index.ts             # Theme, language, column visibility
+│       ├── index.ts             # Re-exports
+│       └── store.ts             # Theme, language, column visibility
 │
 ├── data/                        # Data layer
 │   ├── schema.ts                # Drizzle ORM schema definitions
 │   ├── client.ts                # SQLite client initialization
+│   ├── types.ts                 # Data layer types
+│   ├── events.ts                # Data events
+│   ├── errors.ts                # Data error types
+│   ├── packetBatcher.ts         # Packet batching utility
+│   ├── subscriptionService.ts   # Data subscription service
+│   ├── migrationService.ts      # Database migration service
 │   ├── repositories/            # Data access layer
 │   │   ├── MessageRepository.ts
 │   │   ├── NodeRepository.ts
 │   │   ├── ChannelRepository.ts
 │   │   ├── ConnectionRepository.ts
-│   │   └── PacketLogRepository.ts
-│   ├── hooks/                   # Remaining database hooks
+│   │   ├── PacketLogRepository.ts
+│   │   ├── PreferencesRepository.ts
+│   │   └── TracerouteRepository.ts
+│   ├── hooks/                   # Database hooks
 │   │   ├── useChannels.ts
+│   │   ├── useDevicePreference.ts
+│   │   ├── usePacketLogs.ts
 │   │   ├── usePreferences.ts
-│   │   └── usePacketLogs.ts
+│   │   └── useSignalLogs.ts
 │   └── migrations/              # SQL migration files
 │
-├── core/                        # Core utilities and services
-│   ├── hooks/                   # Core hooks (useTraceroute, useFavoriteNode, etc.)
-│   ├── services/                # Business logic services
-│   │   ├── adminMessageService.ts
-│   │   ├── configBackupService.ts
-│   │   └── maintenanceService.ts
-│   ├── stores/                  # Legacy store location (re-exports)
-│   └── utils/                   # Core utilities (geo, string, bitwise, etc.)
+├── core/                        # Core services
+│   ├── dto/                     # Data transfer objects
+│   │   ├── NodeNumToNodeInfoDTO.ts
+│   │   └── PacketToMessageDTO.ts
+│   └── services/                # Business logic services
+│       ├── adminMessageService.ts
+│       ├── configBackupService.ts
+│       ├── maintenanceService.ts
+│       ├── featureFlags.ts
+│       └── logger.ts
 │
-├── components/                  # Remaining shared components
-│   ├── Dialog/                  # Modal dialogs (PKIBackupDialog, etc.)
-│   ├── generic/                 # Filter components, ActionItem
-│   └── PageComponents/          # Remaining page-specific components
-│       ├── Channels/            # Channel configuration components
-│       └── Messages/            # Message-related components
+├── tests/                       # Test configuration
+│   ├── setup.ts
+│   └── test-utils.tsx
 │
-├── pages/                       # Remaining standalone pages
-│   ├── Preferences.tsx          # User preferences page
-│   └── Statistics/              # Network statistics page
-│
-└── validation/                  # Shared validation schemas
-    ├── channel.ts               # Channel validation
-    ├── pskSchema.ts             # PSK validation helpers
-    └── configBackup.ts          # Backup validation
+├── DeviceWrapper.tsx            # Device context provider
+├── i18n-config.ts               # Internationalization config
+├── index.tsx                    # Application entry point
+└── index.css                    # Global styles
 ```
 
 ## Path Aliases
@@ -157,8 +224,7 @@ The project uses TypeScript path aliases for clean imports:
 | `@state/*` | `./src/state/*` |
 | `@data/*` | `./src/data/*` |
 | `@core/*` | `./src/core/*` |
-| `@components/*` | `./src/components/*` |
-| `@pages/*` | `./src/pages/*` |
+| `@public/*` | `./public/*` |
 
 ## State Management
 
@@ -196,6 +262,9 @@ Data access is abstracted through repositories in `src/data/repositories/`:
 - `NodeRepository` - Node upsert with position/telemetry updates
 - `ChannelRepository` - Channel configuration management
 - `ConnectionRepository` - Saved connection management
+- `PacketLogRepository` - Raw packet logging for debugging
+- `PreferencesRepository` - Key-value user preferences
+- `TracerouteRepository` - Route discovery results
 
 ## Feature Modules
 
@@ -220,6 +289,10 @@ Data access is abstracted through repositories in `src/data/repositories/`:
 - Position trails and precision circles
 - SNR visualization layer
 - Waypoint management
+
+### Preferences (`src/features/preferences/`)
+- App-level user preferences
+- Theme and language settings
 
 ### Settings (`src/features/settings/`)
 - Device configuration forms
@@ -313,7 +386,10 @@ pnpm db:check     # Validate migrations
 | `src/app/routes.tsx` | Route definitions with guards |
 | `src/data/schema.ts` | Database schema definitions |
 | `src/state/device/store.ts` | Device state management |
-| `src/state/ui/index.ts` | UI preferences and state |
+| `src/state/ui/store.ts` | UI preferences and state |
 | `src/features/nodes/utils/signalColor.ts` | Signal grading algorithm |
 | `src/shared/utils/typeGuards.ts` | Type guard utilities |
 | `src/DeviceWrapper.tsx` | Device context provider |
+| `src/core/services/adminMessageService.ts` | Admin message handling |
+| `src/data/repositories/NodeRepository.ts` | Node data access |
+| `src/shared/hooks/useFavoriteNode.ts` | Favorite node management |

@@ -1,5 +1,6 @@
-import { Mono } from "@shared/components/generic/Mono";
-import { Badge } from "@shared/components/ui/badge";
+import { usePacketLogs } from "@data/hooks/usePacketLogs";
+import { Protobuf } from "@meshtastic/core";
+import { Mono } from "@shared/components/Mono";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
@@ -15,10 +16,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
-import useLang from "@core/hooks/useLang";
-import { useDevice } from "@core/stores";
-import { usePacketLogs } from "@data/hooks/usePacketLogs";
-import { Protobuf } from "@meshtastic/core";
+import { useLanguage } from "@shared/hooks/useLanguage";
+import { useDevice } from "@state/index.ts";
 import {
   ClipboardCopyIcon,
   DownloadIcon,
@@ -67,7 +66,9 @@ function decodePayload(
   portnum: number,
   payload: Uint8Array | string | undefined,
 ): Record<string, unknown> | null {
-  if (!payload) return null;
+  if (!payload) {
+    return null;
+  }
 
   try {
     const bytes =
@@ -109,10 +110,9 @@ function decodePayload(
           unknown
         >;
       case Protobuf.Portnums.PortNum.TRACEROUTE_APP:
-        return Protobuf.Mesh.RouteDiscovery.fromBinary(bytes).toJson() as Record<
-          string,
-          unknown
-        >;
+        return Protobuf.Mesh.RouteDiscovery.fromBinary(
+          bytes,
+        ).toJson() as Record<string, unknown>;
       case Protobuf.Portnums.PortNum.NEIGHBORINFO_APP:
         return Protobuf.Mesh.NeighborInfo.fromBinary(bytes).toJson() as Record<
           string,
@@ -266,7 +266,9 @@ function PacketEntry({
 
       {decodedPayload && (
         <div className="mt-3">
-          <div className="text-green-500 font-semibold mb-2">Decoded Payload:</div>
+          <div className="text-green-500 font-semibold mb-2">
+            Decoded Payload:
+          </div>
           <div className="text-base font-mono bg-muted/30 p-3 rounded space-y-1">
             {Object.entries(decodedPayload).map(([key, value]) => (
               <div key={key}>
@@ -287,7 +289,7 @@ function PacketEntry({
 
 function PacketLogContent() {
   const { t } = useTranslation("config");
-  const { current } = useLang();
+  const { current } = useLanguage();
   const device = useDevice();
   const { packets } = usePacketLogs(device.id, 200);
   const [searchQuery, setSearchQuery] = useState("");

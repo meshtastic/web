@@ -1,15 +1,18 @@
-import { LocationResponseDialog } from "@components/Dialog/LocationResponseDialog.tsx";
-import { TracerouteResponseDialog } from "@components/Dialog/TracerouteResponseDialog.tsx";
-import { NodeAvatar } from "@components/NodeAvatar";
+import { useLanguage } from "@app/shared/hooks/useLanguage.ts";
 import { create } from "@bufbuild/protobuf";
-import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
+import { useNodes } from "@data/hooks";
+import { Protobuf, type Types } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { LocationResponseDialog } from "@shared/components/Dialog/LocationResponseDialog.tsx";
+import { TracerouteResponseDialog } from "@shared/components/Dialog/TracerouteResponseDialog.tsx";
+import { FilterControl } from "@shared/components/Filter/FilterControl.tsx";
 import {
   type FilterState,
   useFilterNode,
-} from "@components/generic/Filter/useFilterNode.ts";
-import { Mono } from "@shared/components/generic/Mono";
-import { SignalIndicator } from "@shared/components/generic/SignalIndicator";
-import { TimeAgo } from "@shared/components/generic/TimeAgo";
+} from "@shared/components/Filter/useFilterNode.ts";
+import { Mono } from "@shared/components/Mono.tsx";
+import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
+import { TimeAgo } from "@shared/components/TimeAgo.tsx";
 import { Badge } from "@shared/components/ui/badge";
 import { Button } from "@shared/components/ui/button";
 import {
@@ -36,18 +39,13 @@ import {
   TableHeader,
   TableRow,
 } from "@shared/components/ui/table";
-import useLang from "@core/hooks/useLang.ts";
+import { cn } from "@shared/utils/cn";
 import {
   type NodeColumnKey,
   useDevice,
   useDeviceContext,
   useUIStore,
-} from "@core/stores";
-import { cn } from "@shared/utils/cn";
-import { sortNodes } from "../utils/nodeSort";
-import { useNodes } from "@data/hooks";
-import { Protobuf, type Types } from "@meshtastic/core";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+} from "@state/index.ts";
 import { toByteArray } from "base64-js";
 import {
   ArrowDownIcon,
@@ -67,6 +65,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { base16 } from "rfc4648";
+import { sortNodes } from "../utils/nodeSort.ts";
 
 type SortColumn =
   | "longName"
@@ -112,7 +111,7 @@ function hexToUint8Array(hex: string): Uint8Array {
 
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
-  const { current } = useLang();
+  const { current } = useLanguage();
   const { hardware, connection, setDialogOpen } = useDevice();
   const { deviceId } = useDeviceContext();
   const { nodes: allNodes } = useNodes(deviceId);

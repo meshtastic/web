@@ -1,8 +1,7 @@
-import { Mono } from "@shared/components/generic/Mono";
-import { cn } from "@shared/utils/cn";
+import { Mono } from "@app/components/Mono";
 import { getSignalColor } from "@features/nodes/utils/signalColor";
-import type { VisibilityState } from "../Tools/MapLayerTool";
-import { useDevice } from "@core/stores";
+import type { Protobuf } from "@meshtastic/core";
+import { cn } from "@shared/utils/cn";
 import {
   distanceMeters,
   hasPos,
@@ -10,11 +9,12 @@ import {
   lngLatToMercator,
   mercatorToLngLat,
   toLngLat,
-} from "@core/utils/geo";
-import type { Protobuf } from "@meshtastic/core";
+} from "@shared/utils/geo";
+import { useDevice } from "@state/index.ts";
 import type { Feature, FeatureCollection } from "geojson";
 import { useTranslation } from "react-i18next";
 import { Layer, Source } from "react-map-gl/maplibre";
+import type { VisibilityState } from "../Tools/MapLayerTool.tsx";
 
 const ARC_SEGMENTS = 32;
 const ARC_OFFSET = 0.01; // 1% of distance

@@ -83,12 +83,12 @@ vi.mock("@shared/components/generic/OnlineIndicator", () => ({
   OnlineIndicator: () => null,
 }));
 
-vi.mock("@components/NodeAvatar", () => ({
+vi.mock("@shared/components/NodeAvatar", () => ({
   NodeAvatar: () => null,
 }));
 
 // Import after mocks
-import { ChatPanel } from "./ChatPanel";
+import { ChatPanel } from "./ChatPanel.tsx";
 
 describe("ChatPanel", () => {
   const mockDevice = {
@@ -152,7 +152,9 @@ describe("ChatPanel", () => {
     });
 
     // Get only message bubble elements (not input or other elements)
-    const messageElements = container.querySelectorAll('[data-testid^="message-"]:not([data-testid="message-input"])');
+    const messageElements = container.querySelectorAll(
+      '[data-testid^="message-"]:not([data-testid="message-input"])',
+    );
     const messageIds = Array.from(messageElements).map((el) =>
       el.getAttribute("data-testid")?.replace("message-", ""),
     );

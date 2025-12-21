@@ -1,8 +1,8 @@
+import { Connections } from "@features/connections";
 import { MessagesPage } from "@features/messages";
 import { ErrorPage } from "@shared/components/ui/error-page";
 import { Spinner } from "@shared/components/ui/spinner";
-import { useDeviceStore } from "@core/stores";
-import { Connections } from "@features/connections";
+import { useDeviceStore } from "@state/index.ts";
 import {
   createRootRoute,
   createRoute,
@@ -11,17 +11,17 @@ import {
 } from "@tanstack/react-router";
 import { Activity, lazy, Suspense } from "react";
 import { z } from "zod/v4";
-import { App } from "./App";
+import { App } from "./App.tsx";
 
 // Lazy loaded routes
 const MapPage = lazy(() =>
   import("@features/map/pages/MapPage").then((m) => ({
-    default: m.MapPage,
+    default: m.default,
   })),
 );
 const NodesPage = lazy(() =>
   import("@features/nodes/pages/NodesPage").then((m) => ({
-    default: m.NodesPage,
+    default: m.default,
   })),
 );
 const SettingsPage = lazy(() =>
@@ -29,7 +29,7 @@ const SettingsPage = lazy(() =>
     default: m.default,
   })),
 );
-const StatisticsPage = lazy(() => import("@pages/Statistics/index.tsx"));
+
 const RadioConfig = lazy(() =>
   import("@features/settings/pages/RadioConfig").then((m) => ({
     default: m.RadioConfig,
@@ -102,8 +102,8 @@ const messagesRoute = createRoute({
     // For direct messages: ?node=123456789 (node number)
     node: z.coerce.number().int().min(0).max(4294967294).optional(), // max is 0xffffffff - 1
   }),
-  beforeLoad: ({ context }) => {
-    requireActiveConnection(context);
+  beforeLoad: () => {
+    requireActiveConnection();
   },
 });
 
@@ -112,7 +112,7 @@ const mapRoute = createRoute({
   path: "/map",
   errorComponent: ErrorPage,
   beforeLoad: ({ context }) => {
-    requireActiveConnection(context);
+    requireActiveConnection();
   },
   component: () => (
     <Activity>
@@ -234,22 +234,6 @@ const connectionsRoute = createRoute({
   errorComponent: ErrorPage,
 });
 
-const statisticsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/statistics",
-  errorComponent: ErrorPage,
-  beforeLoad: ({ context }) => {
-    requireActiveConnection(context);
-  },
-  component: () => (
-    <Activity>
-      <Suspense fallback={<RouteLoader />}>
-        <StatisticsPage />
-      </Suspense>
-    </Activity>
-  ),
-});
-
 const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
@@ -258,7 +242,6 @@ const routeTree = rootRoute.addChildren([
   settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
   nodesRoute,
   connectionsRoute,
-  statisticsRoute,
 ]);
 
 const router = createRouter({

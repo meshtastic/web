@@ -1,3 +1,9 @@
+import type { Protobuf } from "@meshtastic/core";
+import { useMapFitting } from "@shared/hooks/useMapFitting.ts";
+import { hasPos, toLngLat } from "@shared/utils/geo.ts";
+import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import type { MapRef } from "react-map-gl/maplibre";
 import {
   fanOutOffsetsPx,
   groupNodesByIdenticalCoords,
@@ -11,12 +17,6 @@ import { NodeMarker } from "../Markers/NodeMarker.tsx";
 import { StackBadge } from "../Markers/StackBadge.tsx";
 import type { PopupState } from "../Popups/PopupWrapper.tsx";
 import { PopupWrapper } from "../Popups/PopupWrapper.tsx";
-import { useMapFitting } from "@core/hooks/useMapFitting";
-import { hasPos, toLngLat } from "@core/utils/geo.ts";
-import type { Protobuf } from "@meshtastic/core";
-import { useCallback, useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import type { MapRef } from "react-map-gl/maplibre";
 
 export interface NodeMarkerProps {
   mapRef: MapRef | undefined;

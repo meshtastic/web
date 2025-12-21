@@ -1,5 +1,6 @@
-import { NodeAvatar } from "@components/NodeAvatar";
 import logger from "@core/services/logger";
+import type { Message } from "@data/schema";
+import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
 import {
   Tooltip,
   TooltipArrow,
@@ -8,7 +9,6 @@ import {
 } from "@shared/components/ui/tooltip";
 import { cn } from "@shared/utils/cn";
 import { getAvatarColors } from "@shared/utils/color";
-import type { Message } from "@data/schema";
 import { Reply } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";

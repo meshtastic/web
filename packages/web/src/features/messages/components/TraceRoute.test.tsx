@@ -1,12 +1,12 @@
-import { TraceRoute } from "./TraceRoute";
-import { useDeviceContext } from "@core/stores";
 import { useNodes } from "@data/hooks";
 import type { Node } from "@data/schema";
+import { useDeviceContext } from "@state/index.ts";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { TraceRoute } from "./TraceRoute.tsx";
 
 vi.mock("@core/hooks/useDBNodes");
-vi.mock("@core/stores");
+vi.mock("@state/index.ts");
 
 describe("TraceRoute", () => {
   const fromUser = {

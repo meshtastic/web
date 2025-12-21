@@ -1,15 +1,15 @@
-import { TimeAgo } from "@shared/components/generic/TimeAgo";
+import { TimeAgo } from "@app/components/TimeAgo";
+import { useNodes } from "@data/hooks";
+import type { Protobuf } from "@meshtastic/core";
 import { Separator } from "@shared/components/ui/separator";
-import type { WaypointWithMetadata } from "@core/stores";
-import { useDeviceContext } from "@core/stores";
 import {
   bearingDegrees,
   distanceMeters,
   hasPos,
   toLngLat,
-} from "@core/utils/geo";
-import { useNodes } from "@data/hooks";
-import type { Protobuf } from "@meshtastic/core";
+} from "@shared/utils/geo";
+import type { WaypointWithMetadata } from "@state/index.ts";
+import { useDeviceContext } from "@state/index.ts";
 import {
   ClockFadingIcon,
   ClockPlusIcon,

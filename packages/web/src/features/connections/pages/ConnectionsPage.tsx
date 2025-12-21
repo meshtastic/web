@@ -1,12 +1,7 @@
-import AddConnectionDialog from "../components/AddConnectionDialog/AddConnectionDialog";
-import { TimeAgo } from "@shared/components/generic/TimeAgo";
-import LanguageSwitcher from "@components/LanguageSwitcher";
-import { ConfigProgressIndicator } from "../components/ConfigProgressIndicator";
-import { ConnectionStatusBadge } from "../components/ConnectionStatusBadge";
-import {
-  connectionTypeIcon,
-  formatConnectionSubtext,
-} from "../utils";
+import { useConnections } from "@data/hooks";
+import type { Connection } from "@data/index";
+import LanguageSwitcher from "@shared/components/LanguageSwitcher.tsx";
+import { TimeAgo } from "@shared/components/TimeAgo.tsx";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,9 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@shared/components/ui/dropdown-menu";
 import { Separator } from "@shared/components/ui/separator";
-import { useToast } from "@core/hooks/useToast.ts";
-import { useConnections } from "@data/hooks";
-import type { Connection } from "@data/index";
+import { useToast } from "@shared/hooks/useToast.ts";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -50,6 +43,10 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AddConnectionDialog } from "../components/AddConnectionDialog/AddConnectionDialog.tsx";
+import { ConfigProgressIndicator } from "../components/ConfigProgressIndicator.tsx";
+import { ConnectionStatusBadge } from "../components/ConnectionStatusBadge.tsx";
+import { connectionTypeIcon, formatConnectionSubtext } from "../utils.ts";
 
 export const Connections = () => {
   const {
@@ -396,7 +393,12 @@ function ConnectionCard({
             onClick={() => (isError ? onRetry() : onConnect())}
             disabled={isBusy}
           >
-            {isError ? (
+            {isBusy ? (
+              <>
+                <RotateCw className="size-4 animate-spin" />
+                {t("button.connecting")}
+              </>
+            ) : isError ? (
               <>
                 <RotateCw className="size-4" />
                 {t("button.retry")}

@@ -1,6 +1,6 @@
 import { Button } from "@shared/components/ui/button";
 import { Label } from "@shared/components/ui/label";
-import { useDevice } from "@core/stores";
+import { useDevice } from "@state/index.ts";
 import { AlertTriangle, Database, Power, RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 

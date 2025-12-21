@@ -1,4 +1,4 @@
-import type { ValidConfigType } from "@core/stores";
+import type { ValidConfigType } from "@state/index.ts";
 import type { ActivityItem, GroupedActivities } from "./types.ts";
 
 export function formatRelativeTime(timestamp: number): string {

@@ -1,10 +1,3 @@
-import { Bluetooth } from "../components/panels/Bluetooth.tsx";
-import { Device } from "../components/panels/Device/index.tsx";
-import { Display } from "../components/panels/Display.tsx";
-import { Network } from "../components/panels/Network/index.tsx";
-import { Position } from "../components/panels/Position.tsx";
-import { Power } from "../components/panels/Power.tsx";
-import { User } from "../components/panels/User.tsx";
 import {
   Card,
   CardContent,
@@ -12,10 +5,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@shared/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs";
-import { useDevice, type ValidConfigType } from "@core/stores";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@shared/components/ui/tabs";
+import { useDevice, type ValidConfigType } from "@state/index.ts";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { Bluetooth } from "../components/panels/Bluetooth.tsx";
+import { Device } from "../components/panels/Device/index.tsx";
+import { Display } from "../components/panels/Display.tsx";
+import { Network } from "../components/panels/Network/index.tsx";
+import { Position } from "../components/panels/Position.tsx";
+import { Power } from "../components/panels/Power.tsx";
+import { User } from "../components/panels/User.tsx";
 
 interface ConfigPageProps {
   searchQuery?: string;

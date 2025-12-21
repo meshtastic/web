@@ -1,2 +1,2 @@
-export { AppLayout } from "./AppLayout";
-export { AppSidebar } from "./AppSidebar";
+export { AppLayout } from "./AppLayout.tsx";
+export { AppSidebar } from "./AppSidebar.tsx";

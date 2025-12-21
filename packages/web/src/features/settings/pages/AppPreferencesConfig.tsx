@@ -1,4 +1,4 @@
-import { useTheme } from "@components/theme-provider";
+import { useTheme } from "@app/shared/components/ui/theme-provider";
 import { Button } from "@shared/components/ui/button";
 import {
   Card,
@@ -19,7 +19,7 @@ import {
 import { Separator } from "@shared/components/ui/separator";
 import { Slider } from "@shared/components/ui/slider";
 import { Switch } from "@shared/components/ui/switch";
-import { useUIStore } from "@core/stores";
+import { useUIStore } from "@state/index.ts";
 import {
   Database,
   Globe,
@@ -483,7 +483,9 @@ export const AppPreferencesConfig = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("preferences.performance.packetBatchSize.label")}</Label>
+                  <Label>
+                    {t("preferences.performance.packetBatchSize.label")}
+                  </Label>
                   <p className="text-xs md:text-sm text-muted-foreground">
                     {t("preferences.performance.packetBatchSize.description")}
                   </p>

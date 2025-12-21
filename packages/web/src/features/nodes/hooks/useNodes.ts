@@ -1,37 +1,100 @@
-import type { Result } from "neverthrow";
-import { ResultAsync } from "neverthrow";
-import { useCallback, useEffect, useMemo, useState } from "react";
+/**
+ * Node hooks using useSyncExternalStore for React 19 best practices
+ *
+ * These hooks subscribe to database events and provide reactive node data
+ * without the tearing issues that can occur with useState + useEffect patterns.
+ */
+
 import { NodeError } from "@data/errors";
 import { DB_EVENTS, dbEvents } from "@data/events";
 import { nodeRepo } from "@data/repositories";
 import type { Node, PositionLog, TelemetryLog } from "@data/schema";
+import type { Result } from "neverthrow";
+import { ResultAsync } from "neverthrow";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
+
+// ==================== Node Cache ====================
 
 /**
- * Hook to fetch all nodes for a device
+ * Cache for node data keyed by deviceId
+ * Supports useSyncExternalStore's synchronous getSnapshot requirement
  */
-export function useNodes(deviceId: number) {
-  const [nodes, setNodes] = useState<Node[]>([]);
+class NodeCache {
+  private nodes = new Map<number, Node[]>();
+  private listeners = new Set<() => void>();
+  private static readonly EMPTY_NODES: Node[] = [];
 
-  const refresh = useCallback(async (): Promise<Result<Node[], NodeError>> => {
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private notify(): void {
+    for (const listener of this.listeners) {
+      listener();
+    }
+  }
+
+  get(deviceId: number): Node[] {
+    return this.nodes.get(deviceId) ?? NodeCache.EMPTY_NODES;
+  }
+
+  set(deviceId: number, nodes: Node[]): void {
+    this.nodes.set(deviceId, nodes);
+    this.notify();
+  }
+
+  async refresh(deviceId: number): Promise<Result<Node[], NodeError>> {
     const result = await ResultAsync.fromPromise(
       nodeRepo.getNodes(deviceId),
       (cause) => NodeError.getNodes(deviceId, cause),
     );
     if (result.isOk()) {
-      setNodes(result.value);
+      this.set(deviceId, result.value);
     }
     return result;
-  }, [deviceId]);
+  }
+}
 
+const nodeCache = new NodeCache();
+
+// ==================== Main Hook ====================
+
+/**
+ * Hook to fetch all nodes for a device
+ * Uses useSyncExternalStore for tear-free concurrent rendering
+ */
+export function useNodes(deviceId: number) {
+  // Subscribe to both cache changes and database events
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const unsubCache = nodeCache.subscribe(onStoreChange);
+      const unsubDb = dbEvents.subscribe(DB_EVENTS.NODE_UPDATED, () => {
+        nodeCache.refresh(deviceId);
+      });
+
+      return () => {
+        unsubCache();
+        unsubDb();
+      };
+    },
+    [deviceId],
+  );
+
+  const getSnapshot = useCallback(() => nodeCache.get(deviceId), [deviceId]);
+
+  const nodes = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  // Initial load
   useEffect(() => {
-    refresh();
-
-    const unsubscribe = dbEvents.subscribe(DB_EVENTS.NODE_UPDATED, () => {
-      refresh();
-    });
-
-    return unsubscribe;
-  }, [refresh]);
+    nodeCache.refresh(deviceId);
+  }, [deviceId]);
 
   // Map nodeNum -> Node
   const nodeMap = useMemo(
@@ -39,82 +102,77 @@ export function useNodes(deviceId: number) {
     [nodes],
   );
 
+  const refresh = useCallback(
+    () => nodeCache.refresh(deviceId),
+    [deviceId],
+  );
+
   return { nodes, nodeMap, refresh };
 }
 
+// ==================== Single Node Hook ====================
+
 /**
  * Hook to fetch a specific node
+ * Derives from useNodes for consistency
  */
 export function useNode(deviceId: number, nodeNum: number) {
-  const [node, setNode] = useState<Node | undefined>(undefined);
+  const { nodes, refresh: refreshAll } = useNodes(deviceId);
+  const node = useMemo(
+    () => nodes.find((n) => n.nodeNum === nodeNum),
+    [nodes, nodeNum],
+  );
 
   const refresh = useCallback(async (): Promise<
     Result<Node | undefined, NodeError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      nodeRepo.getNode(deviceId, nodeNum),
-      (cause) => NodeError.getNode(deviceId, nodeNum, cause),
-    );
+    const result = await refreshAll();
     if (result.isOk()) {
-      setNode(result.value);
+      const found = result.value.find((n) => n.nodeNum === nodeNum);
+      return ResultAsync.ok(found);
     }
-    return result;
-  }, [deviceId, nodeNum]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+    return result.map(() => undefined);
+  }, [refreshAll, nodeNum]);
 
   return { node, refresh };
 }
 
+// ==================== Favorite Nodes Hook ====================
+
 /**
  * Hook to fetch favorite nodes
+ * Derives from useNodes for consistency
  */
 export function useFavoriteNodes(deviceId: number) {
-  const [nodes, setNodes] = useState<Node[]>([]);
-
-  const refresh = useCallback(async (): Promise<Result<Node[], NodeError>> => {
-    const result = await ResultAsync.fromPromise(
-      nodeRepo.getFavorites(deviceId),
-      (cause) => NodeError.getFavorites(deviceId, cause),
-    );
-    if (result.isOk()) {
-      setNodes(result.value);
-    }
-    return result;
-  }, [deviceId]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const { nodes: allNodes, refresh } = useNodes(deviceId);
+  const nodes = useMemo(
+    () => allNodes.filter((n) => n.isFavorite),
+    [allNodes],
+  );
 
   return { nodes, refresh };
 }
+
+// ==================== Recent Nodes Hook ====================
 
 /**
  * Hook to fetch recently heard nodes
+ * Derives from useNodes for consistency
  */
 export function useRecentNodes(deviceId: number, sinceTimestamp: number) {
-  const [nodes, setNodes] = useState<Node[]>([]);
-
-  const refresh = useCallback(async (): Promise<Result<Node[], NodeError>> => {
-    const result = await ResultAsync.fromPromise(
-      nodeRepo.getRecentNodes(deviceId, sinceTimestamp),
-      (cause) => NodeError.getRecentNodes(deviceId, cause),
-    );
-    if (result.isOk()) {
-      setNodes(result.value);
-    }
-    return result;
-  }, [deviceId, sinceTimestamp]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const { nodes: allNodes, refresh } = useNodes(deviceId);
+  const nodes = useMemo(
+    () =>
+      allNodes.filter(
+        (n) => n.lastHeard && n.lastHeard.getTime() > sinceTimestamp,
+      ),
+    [allNodes, sinceTimestamp],
+  );
 
   return { nodes, refresh };
 }
+
+// ==================== Position History Hook ====================
 
 /**
  * Hook to fetch position history for a node
@@ -147,6 +205,8 @@ export function usePositionHistory(
   return { positions, refresh };
 }
 
+// ==================== Telemetry History Hook ====================
+
 /**
  * Hook to fetch telemetry history for a node
  */
@@ -178,6 +238,8 @@ export function useTelemetryHistory(
   return { telemetry, refresh };
 }
 
+// ==================== Position Trails Hook ====================
+
 /**
  * Hook to fetch position history for multiple nodes at once
  */
@@ -189,10 +251,8 @@ export function usePositionTrails(
 ) {
   const [trails, setTrails] = useState<Map<number, PositionLog[]>>(new Map());
 
-  // Stabilize the nodeNums array reference to prevent infinite loops
-  // when passing inline arrays (e.g. usePositionTrails(id, [123]))
-  const _nodeNumsKey = JSON.stringify(nodeNums);
-  const stableNodeNums = useMemo(() => nodeNums, [nodeNums]);
+  // Stabilize the nodeNums array reference
+  const stableNodeNums = useMemo(() => nodeNums, [JSON.stringify(nodeNums)]);
 
   const refresh = useCallback(async (): Promise<
     Result<Map<number, PositionLog[]>, NodeError>

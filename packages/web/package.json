@@ -77,7 +77,6 @@
     "i18next-browser-languagedetector": "^8.2.0",
     "i18next-http-backend": "^3.0.2",
     "immer": "^11.0.1",
-    "js-cookie": "^3.0.5",
     "js-yaml": "^4.1.1",
     "lucide-react": "^0.556.0",
     "maplibre-gl": "5.14.0",

@@ -104,8 +104,8 @@ export class ConnectionRepository {
       updatedAt: new Date(),
     };
 
-    // Update lastConnectedAt when disconnecting
-    if (status === "disconnected") {
+    // Update lastConnectedAt when successfully connecting
+    if (status === "connected" || status === "configured") {
       updates.lastConnectedAt = new Date();
     }
 

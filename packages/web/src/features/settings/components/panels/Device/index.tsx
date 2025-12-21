@@ -1,13 +1,13 @@
-import type { DeviceValidation } from "../../../validation/config/device";
+import { Protobuf } from "@meshtastic/core";
+import { useDevice } from "@state/index.ts";
+import { useTranslation } from "react-i18next";
+import { useDeviceForm } from "../../../hooks/index.ts";
+import { ConfigFormSkeleton } from "../../../pages/SettingsLoading.tsx";
+import type { DeviceValidation } from "../../../validation/config/device.ts";
 import {
   ConfigFormFields,
   type FieldGroup,
-} from "../../form/ConfigFormFields";
-import { useDevice } from "@core/stores";
-import { Protobuf } from "@meshtastic/core";
-import { useDeviceForm } from "../../../hooks";
-import { ConfigFormSkeleton } from "../../../pages/SettingsLoading";
-import { useTranslation } from "react-i18next";
+} from "../../form/ConfigFormFields.tsx";
 
 export const Device = () => {
   const { t } = useTranslation("config");

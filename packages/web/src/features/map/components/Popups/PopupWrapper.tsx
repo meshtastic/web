@@ -1,7 +1,7 @@
-import type { PxOffset } from "../cluster.ts";
-import type { WaypointWithMetadata } from "@core/stores";
+import type { WaypointWithMetadata } from "@state/index.ts";
 import { memo } from "react";
 import { Popup } from "react-map-gl/maplibre";
+import type { PxOffset } from "../cluster.ts";
 
 export type PopupState =
   | { type: "node"; num: number; offset: PxOffset }

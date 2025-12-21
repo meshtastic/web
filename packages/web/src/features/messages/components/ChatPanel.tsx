@@ -1,20 +1,20 @@
-import { OnlineIndicator } from "@shared/components/generic/OnlineIndicator";
-import { NodeAvatar } from "@components/NodeAvatar";
-import { MessageBubble } from "./MessageBubble";
-import { MessageInput } from "./MessageInput";
-import { TooltipProvider } from "@shared/components/ui/tooltip";
-import type { Device } from "@core/stores";
 import {
   markConversationAsRead,
   useChannelMessages,
   useDirectMessages,
   useNodes,
 } from "@data/hooks";
-import type { Contact } from "@pages/Messages/index";
-import { groupMessagesByDay, toTimestamp } from "./MessageUtils";
+import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
+import { OnlineIndicator } from "@shared/components/OnlineIndicator.tsx";
+import { TooltipProvider } from "@shared/components/ui/tooltip";
+import type { Device } from "@state/index.ts";
 import { Hash } from "lucide-react";
 import { Fragment, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import type { Contact } from "../pages/MessagesPage.tsx";
+import { MessageBubble } from "./MessageBubble.tsx";
+import { MessageInput } from "./MessageInput.tsx";
+import { groupMessagesByDay, toTimestamp } from "./MessageUtils.tsx";
 
 interface ChatPanelProps {
   contact: Contact | null | undefined;
@@ -165,33 +165,33 @@ export function ChatPanel({
 
         {/* Messages Area - flex-col-reverse makes scroll start at bottom showing newest messages */}
         <div className="flex-1 min-h-0 overflow-y-auto flex flex-col-reverse px-3 xl:px-6 xl:pb-14 lg:pb-10 styled-scrollbar">
-            {messageGroups.map((group) => (
-              <Fragment key={group.dayKey}>
-                <div className="sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-2">
-                  <div className="text-center">
-                    <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                      {group.label}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col-reverse gap-3">
-                  {group.items.map((message) => {
-                    const senderNode = nodeMap.get(message.fromNode);
-                    const senderName = senderNode?.longName ?? undefined;
+          {messageGroups.map((group) => (
+            <Fragment key={group.dayKey}>
+              <div className="flex flex-col-reverse gap-3">
+                {group.items.map((message) => {
+                  const senderNode = nodeMap.get(message.fromNode);
+                  const senderName = senderNode?.longName ?? undefined;
 
-                    return (
-                      <MessageBubble
-                        key={message.id}
-                        message={message}
-                        myNodeNum={myNodeNum}
-                        senderName={senderName}
-                        isMine={message.fromNode === myNodeNum}
-                      />
-                    );
-                  })}
+                  return (
+                    <MessageBubble
+                      key={message.id}
+                      message={message}
+                      myNodeNum={myNodeNum}
+                      senderName={senderName}
+                      isMine={message.fromNode === myNodeNum}
+                    />
+                  );
+                })}
+              </div>
+              <div className="sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-2">
+                <div className="text-center">
+                  <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                    {group.label}
+                  </span>
                 </div>
-              </Fragment>
-            ))}
+              </div>
+            </Fragment>
+          ))}
         </div>
 
         {/* Message Input */}

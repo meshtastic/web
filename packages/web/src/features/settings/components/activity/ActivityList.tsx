@@ -1,4 +1,4 @@
-import type { ConfigChangeKey } from "@components/Settings/types.ts";
+import type { ConfigChangeKey } from "@shared/components/Settings/types.ts";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { CheckCircle2 } from "lucide-react";
 import { useTranslation } from "react-i18next";

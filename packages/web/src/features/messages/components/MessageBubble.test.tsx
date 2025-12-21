@@ -40,7 +40,7 @@ vi.mock("./RetryButton", () => ({
 }));
 
 // Mock NodeAvatar
-vi.mock("@components/NodeAvatar", () => ({
+vi.mock("@shared/components/NodeAvatar", () => ({
   NodeAvatar: ({ longName, size }: { longName?: string; size?: string }) => (
     <div data-testid="node-avatar" data-size={size}>
       {longName}

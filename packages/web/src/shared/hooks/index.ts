@@ -1,7 +1,5 @@
-// Re-export shared hooks
-export { useCookie, type CookieOptions } from "./useCookie";
-export { useCopyToClipboard } from "./useCopyToClipboard";
-export { useDebounce } from "./useDebounce";
-export { useIsMobile } from "./useIsMobile";
-export { useLocalStorage } from "./useLocalStorage";
-export { useWindowFocus } from "./useWindowFocus";
+export { useCopyToClipboard } from "./useCopyToClipboard.ts";
+export { useDebounce } from "./useDebounce.ts";
+export { useIsMobile } from "./useIsMobile.ts";
+export { useLocalStorage } from "./useLocalStorage.ts";
+export { useWindowFocus } from "./useWindowFocus.ts";

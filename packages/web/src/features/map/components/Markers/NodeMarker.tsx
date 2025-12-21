@@ -1,6 +1,4 @@
-import { cn } from "@shared/utils/cn";
-import { NodeAvatar } from "@components/NodeAvatar";
-import type { PxOffset } from "../cluster.ts";
+import { NodeAvatar } from "@shared/components/NodeAvatar";
 import {
   Tooltip,
   TooltipArrow,
@@ -9,8 +7,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
+import { cn } from "@shared/utils/cn";
 import { memo } from "react";
 import { Marker } from "react-map-gl/maplibre";
+import type { PxOffset } from "../cluster.ts";
 
 export const NodeMarker = memo(function NodeMarker({
   id,

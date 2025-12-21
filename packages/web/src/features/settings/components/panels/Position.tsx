@@ -1,14 +1,14 @@
-import type { PositionValidation } from "../../validation/config/position";
+import { Protobuf } from "@meshtastic/core";
+import type { FlagName } from "@shared/hooks/usePositionFlags";
+import { useDevice } from "@state/index.ts";
+import { useTranslation } from "react-i18next";
+import { usePositionForm } from "../../hooks/index.ts";
+import { ConfigFormSkeleton } from "../../pages/SettingsLoading.tsx";
+import type { PositionValidation } from "../../validation/config/position.ts";
 import {
   ConfigFormFields,
   type FieldGroup,
-} from "../form/ConfigFormFields";
-import type { FlagName } from "@core/hooks/usePositionFlags";
-import { useDevice } from "@core/stores";
-import { Protobuf } from "@meshtastic/core";
-import { usePositionForm } from "../../hooks";
-import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
-import { useTranslation } from "react-i18next";
+} from "../form/ConfigFormFields.tsx";
 
 export const Position = () => {
   const { t } = useTranslation("config");

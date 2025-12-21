@@ -1,20 +1,24 @@
 // State layer barrel export
-import { useDeviceContext } from "@core/hooks/useDeviceContext";
-import { useDeviceStore, type Device } from "@state/device";
+import { useDeviceContext } from "@shared/hooks/useDeviceContext";
+import { type Device, useDeviceStore } from "@state/device";
 
+// Re-export device context (for backwards compatibility)
+export {
+  CurrentDeviceContext,
+  type DeviceContext,
+  useDeviceContext,
+} from "@shared/hooks/useDeviceContext";
 // Re-export device store
 export {
-  useDeviceStore,
   type Device,
   type Page,
+  useDeviceStore,
   type ValidConfigType,
   type ValidModuleConfigType,
   type WaypointWithMetadata,
 } from "@state/device";
-
 // Re-export UI store
 export {
-  useUIStore,
   type CoordinateFormat,
   type DistanceUnits,
   type Language,
@@ -26,14 +30,8 @@ export {
   type Theme,
   type TimeFormat,
   type UIState,
+  useUIStore,
 } from "@state/ui";
-
-// Re-export device context (for backwards compatibility)
-export {
-  CurrentDeviceContext,
-  type DeviceContext,
-  useDeviceContext,
-} from "@core/hooks/useDeviceContext";
 
 // Helper hook to access current device
 export const useDevice = (): Device => {

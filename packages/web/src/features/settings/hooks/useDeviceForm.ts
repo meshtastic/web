@@ -1,13 +1,13 @@
+import { useUnsafeRolesDialog } from "@shared/components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
+import { useDevice } from "@state/index.ts";
+import { useCallback, useEffect, useRef } from "react";
+import { type Path, useForm } from "react-hook-form";
+import { createZodResolver } from "../components/form/createZodResolver.ts";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type DeviceValidation,
   DeviceValidationSchema,
-} from "../validation/config/device";
-import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
-import { createZodResolver } from "../components/form/createZodResolver";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice } from "@core/stores";
-import { useCallback, useEffect, useRef } from "react";
-import { type Path, useForm } from "react-hook-form";
+} from "../validation/config/device.ts";
 
 const SECTION = { type: "config", variant: "device" } as const;
 

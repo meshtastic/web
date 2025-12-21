@@ -1,7 +1,10 @@
-import { Link } from "@shared/components/ui/link";
-import { ONLINE_THRESHOLD_SECONDS } from "@shared/components/generic/OnlineIndicator";
-import { NodeAvatar } from "@components/NodeAvatar";
+import { isDefined } from "@app/shared";
+import { useGetMyNode } from "@app/shared/hooks/useGetMyNode";
+import { useConversations, useNodes } from "@data/hooks";
+import { NodeAvatar } from "@shared/components/NodeAvatar";
+import { ONLINE_THRESHOLD_SECONDS } from "@shared/components/OnlineIndicator";
 import { Badge } from "@shared/components/ui/badge";
+import { Link } from "@shared/components/ui/link";
 import {
   Sidebar,
   SidebarContent,
@@ -14,8 +17,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@shared/components/ui/sidebar";
-import { useDevice, useDeviceContext } from "@core/stores";
-import { useConversations, useNodes } from "@data/hooks";
+import { useDevice, useDeviceContext } from "@state/index.ts";
 import { useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -63,19 +65,11 @@ export function AppSidebar() {
   const pathname = useLocation().pathname;
 
   const { deviceId } = useDeviceContext();
-  const device = useDevice();
   const { t } = useTranslation();
   const { nodes: allNodes } = useNodes(deviceId);
+  const myNode = useGetMyNode();
 
-  const myNode = useMemo(() => {
-    const myNodeNum = device.hardware?.myNodeNum;
-    if (!myNodeNum) {
-      return undefined;
-    }
-    return allNodes.find((n) => n.nodeNum === myNodeNum);
-  }, [allNodes, device.hardware?.myNodeNum]);
-
-  const { conversations } = useConversations(deviceId);
+  const { conversations } = useConversations(deviceId, myNode.myNodeNum ?? 0);
 
   // Calculate total unread messages
   const totalUnread = useMemo(() => {
@@ -114,7 +108,9 @@ export function AppSidebar() {
             <span className="text-lg font-semibold text-sidebar-foreground">
               {t("app.title")}
             </span>
-            <span className="text-sm text-muted-foreground">Web Client</span>
+            <span className="text-sm text-muted-foreground">
+              {t("app.subtitle")}
+            </span>
           </div>
         </Link>
       </SidebarHeader>
@@ -171,7 +167,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Network Status</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("navigation.networkStatus")}</SidebarGroupLabel>
           <SidebarGroupContent className="px-2">
             <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-3 space-y-3">
               {/* TODO: Re-add signal strength when we have a way to get it */}
@@ -182,40 +178,39 @@ export function AppSidebar() {
                 </div>
                 <span className="text-sm font-medium text-chart-2">Strong</span>
               </div> */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-primary" />
-                  <span className="text-sm">Nodes</span>
+              <div className="flex items-center gap-3">
+                <Users className="h-4 w-4 text-primary" />
+                <div className="text-sm">
+                  <div>
+                    {nodeStats.online} of {nodeStats.total}
+                  </div>
+                  <div className="text-muted-foreground">nodes online</div>
                 </div>
-                <span className="text-sm font-medium">
-                  {nodeStats.online} of {nodeStats.total}
-                </span>
               </div>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border p-4">
-        <div className="flex items-center gap-3">
-          {myNode && (
-            <>
-              <NodeAvatar
-                nodeNum={myNode.nodeNum}
-                longName={myNode.longName ?? undefined}
-                size="sm"
-              />
-              <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-sm font-medium truncate">
-                  {myNode.longName || myNode.shortName || "My Node"}
-                </span>
-                <span className="text-xs text-muted-foreground font-mono">
-                  !{myNode.nodeNum.toString(16)}
-                </span>
-              </div>
-              <div className="ml-auto h-2 w-2 rounded-full bg-chart-2" />
-            </>
-          )}
-        </div>
+        {myNode?.myNode && (
+          <div className="flex items-center gap-3">
+            <NodeAvatar
+              nodeNum={myNode.myNodeNum ?? 0}
+              longName={myNode.myNode.longName ?? undefined}
+              clickable={true}
+              size="sm"
+            />
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-sm font-medium truncate">
+                {myNode.myNode.longName || myNode.myNode.shortName}
+              </span>
+              <span className="text-xs text-muted-foreground font-mono">
+                !{myNode.myNodeNum?.toString(16)}
+              </span>
+            </div>
+            <div className="ml-auto h-2 w-2 rounded-full bg-chart-2" />
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

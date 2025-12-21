@@ -1,15 +1,15 @@
+import { getX25519PrivateKey, getX25519PublicKey } from "@shared/utils/x25519";
+import { useDevice } from "@state/index.ts";
+import { fromByteArray, toByteArray } from "base64-js";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { type DefaultValues, type Path, useForm } from "react-hook-form";
+import { createZodResolver } from "../components/form/createZodResolver.ts";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type ParsedSecurity,
   type RawSecurity,
   RawSecuritySchema,
-} from "../validation/config/security";
-import { createZodResolver } from "../components/form/createZodResolver";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice } from "@core/stores";
-import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519";
-import { fromByteArray, toByteArray } from "base64-js";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { type DefaultValues, type Path, useForm } from "react-hook-form";
+} from "../validation/config/security.ts";
 
 const SECTION = { type: "config", variant: "security" } as const;
 

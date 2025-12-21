@@ -1,12 +1,12 @@
-import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice } from "@core/stores";
+import { useUnsafeRolesDialog } from "@shared/components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
+import { useDevice } from "@state/index.ts";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import { useDeviceForm } from "./useDeviceForm.ts";
 
 // Mocks
-vi.mock("@core/stores", () => ({
+vi.mock("@state/index.ts", () => ({
   useDevice: vi.fn(),
 }));
 
@@ -14,9 +14,12 @@ vi.mock("../services/fieldRegistry", () => ({
   useFieldRegistry: vi.fn(),
 }));
 
-vi.mock("@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog", () => ({
-  useUnsafeRolesDialog: vi.fn(),
-}));
+vi.mock(
+  "@shared/components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog",
+  () => ({
+    useUnsafeRolesDialog: vi.fn(),
+  }),
+);
 
 // Mock validation schema since it might have external deps
 vi.mock("../validation/config/device", () => ({

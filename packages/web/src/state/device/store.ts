@@ -1,12 +1,12 @@
-import logger from "@core/services/logger";
 import { create, toBinary } from "@bufbuild/protobuf";
+import logger from "@core/services/logger";
+import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
 import type {
   ChangeEntry,
   ConfigChangeKey,
   ValidConfigType,
   ValidModuleConfigType,
-} from "@components/Settings/types.ts";
-import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
+} from "@shared/components/Settings/types.ts";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
@@ -234,7 +234,10 @@ function deviceFactory(
     status: Types.DeviceStatusEnum.DeviceDisconnected,
     connectionPhase: "disconnected",
     connectionId: null,
-    configProgress: { receivedConfigs: new Set<string>(), total: TOTAL_CONFIG_COUNT },
+    configProgress: {
+      receivedConfigs: new Set<string>(),
+      total: TOTAL_CONFIG_COUNT,
+    },
     config: data?.config ?? create(Protobuf.LocalOnly.LocalConfigSchema),
     moduleConfig:
       data?.moduleConfig ?? create(Protobuf.LocalOnly.LocalModuleConfigSchema),
@@ -433,7 +436,8 @@ function deviceFactory(
                 break;
               }
               case "remoteHardware": {
-                device.moduleConfig.remoteHardware = config.payloadVariant.value;
+                device.moduleConfig.remoteHardware =
+                  config.payloadVariant.value;
                 break;
               }
               case "neighborInfo": {

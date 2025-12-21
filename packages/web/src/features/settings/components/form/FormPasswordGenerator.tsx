@@ -1,11 +1,11 @@
+import type { ButtonVariant } from "@shared/components/ui/button";
+import { Generator } from "@shared/components/ui/generator";
+import { usePasswordVisibilityToggle } from "@shared/hooks/usePasswordVisibilityToggle";
+import { Controller, type FieldValues } from "react-hook-form";
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "./FormTypes";
-import type { ButtonVariant } from "@shared/components/ui/button";
-import { Generator } from "@shared/components/ui/generator";
-import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
-import { Controller, type FieldValues } from "react-hook-form";
+} from "./FormTypes.ts";
 
 export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   type: "passwordGenerator";

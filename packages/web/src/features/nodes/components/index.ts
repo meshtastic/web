@@ -1,7 +1,2 @@
-export type { NodeDetailsDrawerProps } from "./NodeDetailsDrawer";
-export { NodeDetailsDrawer } from "./NodeDetailsDrawer";
-export { MetricCard } from "./MetricCard";
-export { MiniMap } from "./MiniMap";
-export { SectionHeader } from "./SectionHeader";
-export { SignalMetricsLog } from "./SignalMetricsLog";
-export { TelemetryChart } from "./TelemetryChart";
+// Node-specific components that are only used within the nodes feature
+// Note: NodeDetailsDrawer moved to components/Dialog/NodeDetailsDrawer/

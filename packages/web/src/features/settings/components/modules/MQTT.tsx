@@ -1,15 +1,15 @@
-import { useModuleConfigForm } from "../../hooks/useModuleConfigForm";
+import { useDevice } from "@state/index.ts";
+import { useTranslation } from "react-i18next";
+import { useModuleConfigForm } from "../../hooks/useModuleConfigForm.ts";
+import { ConfigFormSkeleton } from "../../pages/SettingsLoading.tsx";
 import {
   type MqttValidation,
   MqttValidationSchema,
-} from "../../validation/moduleConfig/mqtt";
+} from "../../validation/moduleConfig/mqtt.ts";
 import {
   ConfigFormFields,
   type FieldGroup,
-} from "../form/ConfigFormFields";
-import { useDevice } from "@core/stores";
-import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
-import { useTranslation } from "react-i18next";
+} from "../form/ConfigFormFields.tsx";
 
 export const MQTT = () => {
   const { t } = useTranslation("moduleConfig");

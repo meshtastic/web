@@ -1,4 +1,4 @@
-import { CurrentDeviceContext } from "@core/stores";
+import { CurrentDeviceContext } from "@state/index.ts";
 import type { ReactNode } from "react";
 
 export interface DeviceWrapperProps {

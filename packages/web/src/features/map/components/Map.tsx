@@ -1,4 +1,4 @@
-import { useTheme } from "@core/hooks/useTheme.ts";
+import { useTheme } from "@shared/hooks/useTheme";
 import { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import MapGl, {

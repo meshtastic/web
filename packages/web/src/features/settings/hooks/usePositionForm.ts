@@ -1,15 +1,15 @@
+import { AdminMessageService } from "@core/services/adminMessageService";
+import { useNodes } from "@data/hooks";
+import { usePositionFlags } from "@shared/hooks/usePositionFlags";
+import { useDevice, useDeviceContext } from "@state/index.ts";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { type Path, useForm } from "react-hook-form";
+import { createZodResolver } from "../components/form/createZodResolver.ts";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type PositionValidation,
   PositionValidationSchema,
-} from "../validation/config/position";
-import { createZodResolver } from "../components/form/createZodResolver";
-import { usePositionFlags } from "@core/hooks/usePositionFlags";
-import { AdminMessageService } from "@core/services/adminMessageService";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@data/hooks";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { type Path, useForm } from "react-hook-form";
+} from "../validation/config/position.ts";
 
 const SECTION = { type: "config", variant: "position" } as const;
 

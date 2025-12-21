@@ -1,4 +1,3 @@
-// Connections feature components
-export { ConfigProgressIndicator } from "./ConfigProgressIndicator";
-export { ConnectionStatusBadge } from "./ConnectionStatusBadge";
-export { AddConnectionDialog } from "./AddConnectionDialog/AddConnectionDialog";
+export { AddConnectionDialog } from "./AddConnectionDialog/AddConnectionDialog.tsx";
+export { ConfigProgressIndicator } from "./ConfigProgressIndicator.tsx";
+export { ConnectionStatusBadge } from "./ConnectionStatusBadge.tsx";

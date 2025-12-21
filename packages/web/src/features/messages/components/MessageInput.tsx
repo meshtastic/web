@@ -1,3 +1,10 @@
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { useMessageDraft } from "@data/hooks";
+import { messageRepo } from "@data/index";
+import type { NewMessage } from "@data/schema";
+import type { Types } from "@meshtastic/core";
+import type { Contact } from "@pages/Messages";
+import { Label } from "@radix-ui/react-label";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import {
@@ -6,19 +13,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
-import type { Device } from "@state/device";
 import type {
   OutgoingMessage,
   PipelineContext,
-} from "@core/utils/messagePipelineHandlers";
-import { autoFavoriteDMHandler } from "@core/utils/messagePipelineHandlers";
-import { DB_EVENTS, dbEvents } from "@data/events";
-import { useMessageDraft } from "@data/hooks";
-import { messageRepo } from "@data/index";
-import type { NewMessage } from "@data/schema";
-import type { Types } from "@meshtastic/core";
-import type { Contact } from "@pages/Messages";
-import { Label } from "@radix-ui/react-label";
+} from "@shared/utils/messagePipelineHandlers";
+import { autoFavoriteDMHandler } from "@shared/utils/messagePipelineHandlers";
+import type { Device } from "@state/device";
 import { ArrowUp } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";

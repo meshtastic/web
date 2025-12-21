@@ -1,6 +1,5 @@
 import type { Types } from "@meshtastic/core";
 
-// Config type discriminators
 export type ValidConfigType =
   | "device"
   | "position"
@@ -36,10 +35,8 @@ export type ConfigChangeKey =
   | { type: "user" }
   | { type: "adminMessage"; variant: ValidAdminMessageType; id: string };
 
-// Serialized key for Map storage
 export type ConfigChangeKeyString = string;
 
-// Registry entry
 export interface ChangeEntry {
   key: ConfigChangeKey;
   value: unknown;

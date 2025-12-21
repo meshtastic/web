@@ -1,12 +1,15 @@
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice } from "@core/stores";
-import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519";
+import {
+  getX25519PrivateKey,
+  getX25519PublicKey,
+} from "@shared/utils/x25519.ts";
+import { useDevice } from "@state/index.ts";
 import { act, renderHook } from "@testing-library/react";
 import { fromByteArray } from "base64-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import { useSecurityForm } from "./useSecurityForm.ts";
 
-vi.mock("@core/stores", () => ({
+vi.mock("@state/index.ts", () => ({
   useDevice: vi.fn(),
 }));
 
@@ -49,13 +52,11 @@ describe("useSecurityForm", () => {
       config: {
         security: { privateKey: mockKeys, publicKey: mockKeys, adminKey: [] },
       },
-      getEffectiveConfig: vi
-        .fn()
-        .mockReturnValue({
-          privateKey: mockKeys,
-          publicKey: mockKeys,
-          adminKey: [],
-        }),
+      getEffectiveConfig: vi.fn().mockReturnValue({
+        privateKey: mockKeys,
+        publicKey: mockKeys,
+        adminKey: [],
+      }),
       setChange: mockSetChange,
     });
 

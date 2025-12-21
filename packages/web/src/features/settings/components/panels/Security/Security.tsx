@@ -1,15 +1,15 @@
-import type { RawSecurity } from "../../../validation/config/security";
-import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog";
-import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog";
+import { ManagedModeDialog } from "@shared/components/Dialog/ManagedModeDialog";
+import { PkiRegenerateDialog } from "@shared/components/Dialog/PkiRegenerateDialog";
+import { useDevice } from "@state/index.ts";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useSecurityForm } from "../../../hooks/index.ts";
+import { ConfigFormSkeleton } from "../../../pages/SettingsLoading.tsx";
+import type { RawSecurity } from "../../../validation/config/security.ts";
 import {
   ConfigFormFields,
   type FieldGroup,
-} from "../../form/ConfigFormFields";
-import { useDevice } from "@core/stores";
-import { useSecurityForm } from "../../../hooks";
-import { ConfigFormSkeleton } from "../../../pages/SettingsLoading";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+} from "../../form/ConfigFormFields.tsx";
 
 export const Security = () => {
   const { t } = useTranslation("config");

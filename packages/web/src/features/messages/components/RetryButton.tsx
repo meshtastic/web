@@ -1,10 +1,10 @@
 import logger from "@core/services/logger";
-import { Button } from "@shared/components/ui/button";
-import { useDevice } from "@core/stores";
-import { cn } from "@shared/utils/cn";
 import { DB_EVENTS, dbEvents } from "@data/events";
 import { messageRepo } from "@data/index";
 import type { Message } from "@data/schema";
+import { Button } from "@shared/components/ui/button";
+import { cn } from "@shared/utils/cn";
+import { useDevice } from "@state/index.ts";
 import { RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 

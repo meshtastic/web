@@ -1,16 +1,16 @@
 import logger from "@core/services/logger";
-import { Button } from "@shared/components/ui/button";
-import { Label } from "@shared/components/ui/label";
-import { Slider } from "@shared/components/ui/slider";
-import { Switch } from "@shared/components/ui/switch";
 import {
   getNodeCleanupSettings,
   type NodeCleanupSettings,
   runNodeCleanup,
   updateNodeCleanupSettings,
 } from "@core/services/maintenanceService";
-import { useDeviceContext } from "@core/stores";
 import { nodeRepo } from "@data/index";
+import { Button } from "@shared/components/ui/button";
+import { Label } from "@shared/components/ui/label";
+import { Slider } from "@shared/components/ui/slider";
+import { Switch } from "@shared/components/ui/switch";
+import { useDeviceContext } from "@state/index.ts";
 import { Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

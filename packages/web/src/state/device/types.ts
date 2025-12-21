@@ -1,8 +1,8 @@
+import type { Protobuf } from "@meshtastic/core";
 import type {
   ValidConfigType,
   ValidModuleConfigType,
-} from "@components/Settings/types.ts";
-import type { Protobuf } from "@meshtastic/core";
+} from "@shared/components/Settings/types.ts";
 
 interface Dialogs {
   import: boolean;

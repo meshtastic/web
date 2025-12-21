@@ -1,15 +1,15 @@
+import { create } from "@bufbuild/protobuf";
+import { useNodes } from "@data/hooks";
+import { Protobuf } from "@meshtastic/core";
+import { useDevice, useDeviceContext } from "@state/index.ts";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { type Path, useForm } from "react-hook-form";
+import { createZodResolver } from "../components/form/createZodResolver.ts";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type UserValidation,
   UserValidationSchema,
-} from "../validation/config/user";
-import { create } from "@bufbuild/protobuf";
-import { createZodResolver } from "../components/form/createZodResolver";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice, useDeviceContext } from "@core/stores";
-import { useNodes } from "@data/hooks";
-import { Protobuf } from "@meshtastic/core";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { type Path, useForm } from "react-hook-form";
+} from "../validation/config/user.ts";
 
 const SECTION = { type: "config", variant: "user" } as const;
 

@@ -13,18 +13,14 @@
   },
   "app": {
     "title": "Meshtastic",
+    "subtitle": "Web Client",
     "logo": "Meshtastic Logo"
   },
   "sidebar": {
     "collapse": "Collapse"
   },
-  "deviceInfo": {
-    "volts": "{{voltage}} volts",
-    "firmware": {
-      "title": "Firmware",
-      "version": "v{{version}}",
-      "buildDate": "Build date: {{date}}"
-    }
+  "nodes": {
+    "online": "{{ online }} of {{ total }}"
   },
   "activityList": {
     "noPendingChanges": "No pending changes",

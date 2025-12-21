@@ -1,12 +1,12 @@
+import type { Protobuf } from "@meshtastic/core";
+import { useMapFitting } from "@shared/hooks/useMapFitting.ts";
+import { useDevice, type WaypointWithMetadata } from "@state/index.ts";
+import { useCallback } from "react";
+import type { MapRef } from "react-map-gl/maplibre";
 import { NodeMarker } from "../Markers/NodeMarker.tsx";
 import type { PopupState } from "../Popups/PopupWrapper.tsx";
 import { PopupWrapper } from "../Popups/PopupWrapper.tsx";
 import { WaypointDetail } from "../Popups/WaypointDetail.tsx";
-import { useMapFitting } from "@core/hooks/useMapFitting";
-import { useDevice, type WaypointWithMetadata } from "@core/stores";
-import type { Protobuf } from "@meshtastic/core";
-import { useCallback } from "react";
-import type { MapRef } from "react-map-gl/maplibre";
 
 export interface WaypointLayerProps {
   mapRef: MapRef | undefined;
@@ -16,7 +16,7 @@ export interface WaypointLayerProps {
   setPopupState: (state: PopupState | undefined) => void;
 }
 
-import { toLngLat } from "@core/utils/geo.ts";
+import { toLngLat } from "@shared/utils/geo.ts";
 
 export const WaypointLayer = ({
   mapRef,

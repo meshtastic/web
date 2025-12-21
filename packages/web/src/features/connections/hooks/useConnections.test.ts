@@ -1,7 +1,7 @@
-import { useDeviceStore } from "@core/stores";
+import { connectionRepo } from "@data/repositories";
+import { useDeviceStore } from "@state/index.ts";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { connectionRepo } from "@data/repositories";
 import {
   useConnection,
   useConnections,
@@ -28,7 +28,7 @@ const mockSetActiveConnectionId = vi.fn();
 const mockSetActiveDeviceId = vi.fn();
 const mockAddDevice = vi.fn();
 
-vi.mock("@core/stores", () => ({
+vi.mock("@state/index.ts", () => ({
   useDeviceStore: Object.assign(
     vi.fn((selector) => {
       if (selector) {

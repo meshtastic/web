@@ -1,21 +1,35 @@
-import * as React from "react";
+/**
+ * useIsMobile - React 19 hook using useSyncExternalStore
+ *
+ * Subscribes to viewport width changes via matchMedia without tearing issues.
+ * Returns a boolean indicating if the viewport is below the mobile breakpoint.
+ */
+
+import { useSyncExternalStore } from "react";
 
 const MOBILE_BREAKPOINT = 768;
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(
-    undefined,
-  );
+// ==================== Mobile Store ====================
 
-  React.useEffect(() => {
+const mobileStore = {
+  getSnapshot(): boolean {
+    return window.innerWidth < MOBILE_BREAKPOINT;
+  },
+
+  subscribe(onStoreChange: () => void): () => void {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    };
-    mql.addEventListener("change", onChange);
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
+    const handler = () => onStoreChange();
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  },
+};
 
-  return !!isMobile;
+// ==================== Hook ====================
+
+export function useIsMobile(): boolean {
+  return useSyncExternalStore(
+    mobileStore.subscribe,
+    mobileStore.getSnapshot,
+    mobileStore.getSnapshot,
+  );
 }

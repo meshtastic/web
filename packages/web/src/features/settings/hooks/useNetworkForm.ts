@@ -1,15 +1,15 @@
+import { create } from "@bufbuild/protobuf";
+import { Protobuf } from "@meshtastic/core";
+import { convertIntToIpAddress, convertIpAddressToInt } from "@shared/utils/ip";
+import { useDevice } from "@state/index.ts";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { type Path, useForm } from "react-hook-form";
+import { createZodResolver } from "../components/form/createZodResolver.ts";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type NetworkValidation,
   NetworkValidationSchema,
-} from "../validation/config/network";
-import { create } from "@bufbuild/protobuf";
-import { createZodResolver } from "../components/form/createZodResolver";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice } from "@core/stores";
-import { convertIntToIpAddress, convertIpAddressToInt } from "@core/utils/ip";
-import { Protobuf } from "@meshtastic/core";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { type Path, useForm } from "react-hook-form";
+} from "../validation/config/network.ts";
 
 const SECTION = { type: "config", variant: "network" } as const;
 

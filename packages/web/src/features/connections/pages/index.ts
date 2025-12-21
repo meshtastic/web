@@ -1,2 +1,1 @@
-// Connections feature pages
-export { Connections } from "./ConnectionsPage";
+export { Connections } from "./ConnectionsPage.tsx";

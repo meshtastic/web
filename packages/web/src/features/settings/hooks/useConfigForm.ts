@@ -1,6 +1,4 @@
-import { createZodResolver } from "../components/form/createZodResolver";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice, type ValidConfigType } from "@core/stores";
+import { useDevice, type ValidConfigType } from "@state/index.ts";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   type DefaultValues,
@@ -10,6 +8,8 @@ import {
   useForm,
 } from "react-hook-form";
 import type { ZodType } from "zod/v4";
+import { createZodResolver } from "../components/form/createZodResolver.ts";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 
 interface UseConfigFormOptions<T extends FieldValues> {
   configType: ValidConfigType;

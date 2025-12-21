@@ -1,4 +1,4 @@
-import type { ConfigChangeKey } from "@components/Settings/types.ts";
+import type { ConfigChangeKey } from "@shared/components/Settings/types.ts";
 import { Badge } from "@shared/components/ui/badge";
 import { Hash, Layers, RadioTower } from "lucide-react";
 import type { ActivityItem as ActivityItemType } from "./types.ts";

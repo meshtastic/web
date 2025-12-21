@@ -1,32 +1,16 @@
-import {
-  defaultVisibilityState,
-  MapLayerTool,
-  type VisibilityState,
-} from "../components/Tools/MapLayerTool";
 import { create } from "@bufbuild/protobuf";
-import { FilterControl } from "@components/generic/Filter/FilterControl";
-import {
-  type FilterState,
-  useFilterNode,
-} from "@components/generic/Filter/useFilterNode";
-import { BaseMap } from "../components/Map";
-import { NodesLayer } from "../components/Layers/NodesLayer";
-import { PositionTrailsLayer } from "../components/Layers/PositionTrailsLayer";
-import { PrecisionLayer } from "../components/Layers/PrecisionLayer";
-import {
-  SNRLayer,
-  SNRTooltip,
-  type SNRTooltipProps,
-} from "../components/Layers/SNRLayer";
-import { WaypointLayer } from "../components/Layers/WaypointLayer";
-import type { PopupState } from "../components/Popups/PopupWrapper";
-import { useMapFitting } from "@core/hooks/useMapFitting.ts";
-import { useDevice, useDeviceContext } from "@core/stores";
-import { cn } from "@shared/utils/cn";
-import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import { useNodes } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { FilterControl } from "@shared/components/generic/Filter/FilterControl";
+import {
+  type FilterState,
+  useFilterNode,
+} from "@shared/components/generic/Filter/useFilterNode";
+import { useMapFitting } from "@shared/hooks/useMapFitting";
+import { cn } from "@shared/utils/cn";
+import { hasPos, toLngLat } from "@shared/utils/geo.ts";
+import { useDevice, useDeviceContext } from "@state/index.ts";
 import { toByteArray } from "base64-js";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
@@ -39,6 +23,22 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import type { MapLayerMouseEvent, MapRef } from "react-map-gl/maplibre";
+import { NodesLayer } from "../components/Layers/NodesLayer.tsx";
+import { PositionTrailsLayer } from "../components/Layers/PositionTrailsLayer.tsx";
+import { PrecisionLayer } from "../components/Layers/PrecisionLayer.tsx";
+import {
+  SNRLayer,
+  SNRTooltip,
+  type SNRTooltipProps,
+} from "../components/Layers/SNRLayer.tsx";
+import { WaypointLayer } from "../components/Layers/WaypointLayer.tsx";
+import { BaseMap } from "../components/Map.tsx";
+import type { PopupState } from "../components/Popups/PopupWrapper.tsx";
+import {
+  defaultVisibilityState,
+  MapLayerTool,
+  type VisibilityState,
+} from "../components/Tools/MapLayerTool.tsx";
 
 // Helper to convert hex string to Uint8Array
 function hexToUint8Array(hex: string): Uint8Array {

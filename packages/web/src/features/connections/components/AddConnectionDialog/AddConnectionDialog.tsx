@@ -1,9 +1,10 @@
-import { SupportBadge } from "@components/Badge/SupportedBadge.tsx";
-import { Link } from "@shared/components/ui/link";
-import { testHttpReachable } from "../../utils";
+import type { ConnectionType } from "@data/repositories/ConnectionRepository";
+import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
+import { DialogWrapper } from "@shared/components/Dialog/DialogWrapper.tsx";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import { Label } from "@shared/components/ui/label";
+import { Link } from "@shared/components/ui/link";
 import { Switch } from "@shared/components/ui/switch";
 import {
   Tabs,
@@ -14,10 +15,8 @@ import {
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,
-} from "@core/hooks/useBrowserFeatureDetection.ts";
-import { useToast } from "@core/hooks/useToast.ts";
-import type { ConnectionType } from "@data/repositories/ConnectionRepository";
-import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
+} from "@shared/hooks/useBrowserFeatureDetection.ts";
+import { useToast } from "@shared/hooks/useToast.ts";
 import {
   AlertCircle,
   Bluetooth,
@@ -31,7 +30,8 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { DialogWrapper } from "@components/Dialog/DialogWrapper";
+import { testHttpReachable } from "../../utils.ts";
+import { SupportBadge } from "../SupportedBadge.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
 
 export type NewConnectionInput =
@@ -72,7 +72,10 @@ type DialogAction =
   | { type: "SET_PROTOCOL"; payload: "http" | "https" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
-  | { type: "SET_TEST_ATTEMPT"; payload: { current: number; total: number } | null }
+  | {
+      type: "SET_TEST_ATTEMPT";
+      payload: { current: number; total: number } | null;
+    }
   | {
       type: "SET_BT_SELECTED";
       payload:
@@ -223,7 +226,12 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
     case "SET_SERIAL_SELECTED":
       return { ...state, serialSelected: action.payload };
     case "SET_URL_AND_RESET_TEST":
-      return { ...state, url: action.payload, testStatus: "idle", testAttempt: null };
+      return {
+        ...state,
+        url: action.payload,
+        testStatus: "idle",
+        testAttempt: null,
+      };
     default:
       return state;
   }
@@ -272,7 +280,7 @@ const TAB_META: Array<{ key: TabKey; label: string; Icon: LucideIcon }> = [
   { key: "serial", label: "Serial", Icon: Cable },
 ];
 
-export default function AddConnectionDialog({
+export function AddConnectionDialog({
   open = false,
   onOpenChange = () => {},
   onSave = async () => {},

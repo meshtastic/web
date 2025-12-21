@@ -1,9 +1,15 @@
 import { fromByteArray, toByteArray } from "base64-js";
 import yaml from "js-yaml";
 import { describe, expect, it, vi } from "vitest";
-import { ConfigBackupValidationService, ConfigBackupExportSchema } from "../../validation/configBackup.ts";
-import { type ConfigBackupData, ConfigBackupService } from "./configBackupService.ts";
 import { z } from "zod/v4";
+import {
+  ConfigBackupExportSchema,
+  ConfigBackupValidationService,
+} from "../../features/settings/components/panels/configBackup.ts";
+import {
+  type ConfigBackupData,
+  ConfigBackupService,
+} from "./configBackupService.ts";
 
 const mockGetChannels = vi.fn();
 const mockGetNode = vi.fn();
@@ -55,7 +61,9 @@ describe("ConfigBackupService", () => {
         getEffectiveModuleConfig: vi.fn().mockReturnValue(undefined),
       };
 
-      const yamlContent = await ConfigBackupService.createBackup(mockDevice as any);
+      const yamlContent = await ConfigBackupService.createBackup(
+        mockDevice as any,
+      );
       const parsed = yaml.load(yamlContent) as ConfigBackupData;
 
       // Security config should have Base64 encoded keys
@@ -96,7 +104,9 @@ describe("ConfigBackupService", () => {
         getEffectiveModuleConfig: vi.fn().mockReturnValue(undefined),
       };
 
-      const yamlContent = await ConfigBackupService.createBackup(mockDevice as any);
+      const yamlContent = await ConfigBackupService.createBackup(
+        mockDevice as any,
+      );
       const parsed = yaml.load(yamlContent) as ConfigBackupData;
 
       // BigInt values should be converted to numbers
@@ -127,7 +137,9 @@ describe("ConfigBackupService", () => {
         getEffectiveModuleConfig: vi.fn().mockReturnValue(undefined),
       };
 
-      const yamlContent = await ConfigBackupService.createBackup(mockDevice as any);
+      const yamlContent = await ConfigBackupService.createBackup(
+        mockDevice as any,
+      );
       const parsed = yaml.load(yamlContent) as ConfigBackupData;
 
       // Verify node was fetched for correct device and node
@@ -179,7 +191,9 @@ describe("ConfigBackupService", () => {
         getEffectiveModuleConfig: vi.fn().mockReturnValue(undefined),
       };
 
-      const yamlContent = await ConfigBackupService.createBackup(mockDevice as any);
+      const yamlContent = await ConfigBackupService.createBackup(
+        mockDevice as any,
+      );
       const parsed = yaml.load(yamlContent) as ConfigBackupData;
 
       // Verify channels were fetched for correct device
@@ -190,14 +204,18 @@ describe("ConfigBackupService", () => {
       expect(parsed.channels[0].index).toBe(0);
       expect(parsed.channels[0].settings.name).toBe("Primary");
       expect(parsed.channels[0].settings.psk).toBe(mockPsk);
-      expect(parsed.channels[0].settings.moduleSettings.positionPrecision).toBe(12);
+      expect(parsed.channels[0].settings.moduleSettings.positionPrecision).toBe(
+        12,
+      );
       expect(parsed.channels[0].role).toBe(1);
 
       expect(parsed.channels[1].index).toBe(1);
       expect(parsed.channels[1].settings.name).toBe("Secondary");
       expect(parsed.channels[1].settings.psk).toBe("c2Vjb25kcHNr");
       expect(parsed.channels[1].settings.uplinkEnabled).toBe(true);
-      expect(parsed.channels[1].settings.moduleSettings.positionPrecision).toBe(0);
+      expect(parsed.channels[1].settings.moduleSettings.positionPrecision).toBe(
+        0,
+      );
     });
   });
 
@@ -321,7 +339,9 @@ channels: []
         ConfigBackupService.parseBackup(invalidYAML);
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toContain("config.device.tzdef: Required"); // This might fail if the error message format is different, but let's try.
+        expect((error as Error).message).toContain(
+          "config.device.tzdef: Required",
+        ); // This might fail if the error message format is different, but let's try.
         // Actually the error message includes "Invalid ConfigBackup structure:\n...".
         // It should contain the specific error line.
       }
@@ -375,7 +395,7 @@ channels: []
       // Optional fields should be undefined or default based on schema
       expect(parsedData.user?.shortName).toBeUndefined();
       // Relaxed expectation for boolean flags
-      expect(!!parsedData.user?.isLicensed).toBe(false); 
+      expect(!!parsedData.user?.isLicensed).toBe(false);
       expect(!!parsedData.user?.isUnmessageable).toBe(false);
     });
 
@@ -418,7 +438,7 @@ channels: []
             isManaged: false,
           },
         },
-        moduleConfig: {}, 
+        moduleConfig: {},
         channels: [],
       };
 
@@ -444,8 +464,8 @@ channels: []
       const data: ConfigBackupData = {
         version: "1.0",
         metadata: { exportedAt: "2024-01-01T00:00:00.000Z" },
-        config: {}, 
-        moduleConfig: {}, 
+        config: {},
+        moduleConfig: {},
         channels: [
           {
             index: 0,
@@ -495,8 +515,8 @@ channels: []
       const data: ConfigBackupData = {
         version: "1.0",
         metadata: { exportedAt: "2024-01-01T00:00:00.000Z" },
-        config: {}, 
-        moduleConfig: {}, 
+        config: {},
+        moduleConfig: {},
         channels: [],
         user: {
           longName: "My Node",
@@ -556,7 +576,7 @@ channels: []
             privateKey: base64Key,
           },
         },
-        moduleConfig: {}, 
+        moduleConfig: {},
         channels: [],
       };
 
@@ -584,8 +604,8 @@ channels: []
       const parsedYAML: ConfigBackupData = {
         version: "1.0",
         metadata: { exportedAt: "2024-01-01T00:00:00.000Z" },
-        config: {}, 
-        moduleConfig: {}, 
+        config: {},
+        moduleConfig: {},
         channels: [
           {
             index: 0,

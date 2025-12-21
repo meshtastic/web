@@ -24,7 +24,7 @@ __mocks__/
 
 Vitest will automatically use the mock files in this directory when the
 corresponding module is imported in tests. For example, when a test imports
-`@components/UI/Dialog.tsx`, Vitest will use
+`@shared/components/UI/Dialog.tsx`, Vitest will use
 `__mocks__/components/UI/Dialog.tsx` instead.
 
 ## Creating New Mocks

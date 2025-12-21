@@ -1,11 +1,11 @@
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice } from "@core/stores";
+import { useDevice } from "@state/index.ts";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod/v4";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import { useModuleConfigForm } from "./useModuleConfigForm.ts";
 
-vi.mock("@core/stores", () => ({
+vi.mock("@state/index.ts", () => ({
   useDevice: vi.fn(),
 }));
 

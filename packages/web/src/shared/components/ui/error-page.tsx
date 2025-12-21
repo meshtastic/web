@@ -1,7 +1,7 @@
 import { Link } from "@shared/components/ui/link";
 import { Heading } from "@shared/components/ui/typography/heading";
 import { P } from "@shared/components/ui/typography/p";
-import newGithubIssueUrl from "@core/utils/github.ts";
+import newGithubIssueUrl from "@shared/utils/github";
 import { ExternalLink } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
 

@@ -1,6 +1,6 @@
-import { useDeviceContext } from "@core/stores";
 import { useNodes } from "@data/hooks";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useDeviceContext } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
 
 interface NodeInfo {

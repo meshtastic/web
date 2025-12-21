@@ -1,12 +1,12 @@
-import { ImportConfigDialog } from "@components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
+import {
+  ConfigBackupService,
+  type ParsedConfigBackupField,
+} from "@core/services/configBackupService.ts";
+import { ImportConfigDialog } from "@shared/components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
 import { Button } from "@shared/components/ui/button";
 import { Label } from "@shared/components/ui/label";
-import { useToast } from "@core/hooks/useToast.ts";
-import {
-  type ParsedConfigBackupField,
-  ConfigBackupService,
-} from "@core/services/configBackupService.ts";
-import { useDevice } from "@core/stores";
+import { useToast } from "@shared/hooks/useToast";
+import { useDevice } from "@state/index.ts";
 import { Download, Key, Upload } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -51,7 +51,12 @@ export function BackupRestore() {
     onProgress: (percent: number, status: string) => void,
   ) => {
     try {
-      await ConfigBackupService.applyToDevice({} as never, fields, device, onProgress);
+      await ConfigBackupService.applyToDevice(
+        {} as never,
+        fields,
+        device,
+        onProgress,
+      );
 
       toast({
         title: t(

@@ -1,11 +1,11 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
-import AppLayout from "./layouts/AppLayout";
-import { DialogManager } from "@components/Dialog/DialogManager.tsx";
-import { Toaster } from "@components/Toaster.tsx";
-import { ThemeProvider } from "@components/theme-provider";
-import { useDeviceStore } from "@core/stores";
-import { Outlet } from "@tanstack/react-router";
+import { ThemeProvider } from "@app/shared/components/ui/theme-provider.tsx";
+import { DialogManager } from "@shared/components/Dialog/DialogManager";
+import { Toaster } from "@shared/components/Toaster";
 import { SidebarProvider } from "@shared/components/ui/sidebar";
+import { useDeviceStore } from "@state/index.ts";
+import { Outlet } from "@tanstack/react-router";
+import { AppLayout } from "./layouts/index.ts";
 
 export function App() {
   const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
@@ -18,8 +18,6 @@ export function App() {
         <DeviceWrapper deviceId={activeDeviceId}>
           <AppLayout>
             <DialogManager />
-            {/* <KeyBackupReminder /> */}
-            {/* <CommandPalette /> */}
             <Outlet />
           </AppLayout>
         </DeviceWrapper>

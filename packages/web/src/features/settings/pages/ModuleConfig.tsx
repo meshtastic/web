@@ -1,15 +1,3 @@
-import { AmbientLighting } from "../components/modules/AmbientLighting.tsx";
-import { Audio } from "../components/modules/Audio.tsx";
-import { CannedMessage } from "../components/modules/CannedMessage.tsx";
-import { DetectionSensor } from "../components/modules/DetectionSensor.tsx";
-import { ExternalNotification } from "../components/modules/ExternalNotification.tsx";
-import { MQTT } from "../components/modules/MQTT.tsx";
-import { NeighborInfo } from "../components/modules/NeighborInfo.tsx";
-import { Paxcounter } from "../components/modules/Paxcounter.tsx";
-import { RangeTest } from "../components/modules/RangeTest.tsx";
-import { Serial } from "../components/modules/Serial.tsx";
-import { StoreForward } from "../components/modules/StoreForward.tsx";
-import { Telemetry } from "../components/modules/Telemetry.tsx";
 import {
   Card,
   CardContent,
@@ -23,9 +11,21 @@ import {
   TabsList,
   TabsTrigger,
 } from "@shared/components/ui/tabs";
-import { useDevice, type ValidModuleConfigType } from "@core/stores";
+import { useDevice, type ValidModuleConfigType } from "@state/index.ts";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { AmbientLighting } from "../components/modules/AmbientLighting.tsx";
+import { Audio } from "../components/modules/Audio.tsx";
+import { CannedMessage } from "../components/modules/CannedMessage.tsx";
+import { DetectionSensor } from "../components/modules/DetectionSensor.tsx";
+import { ExternalNotification } from "../components/modules/ExternalNotification.tsx";
+import { MQTT } from "../components/modules/MQTT.tsx";
+import { NeighborInfo } from "../components/modules/NeighborInfo.tsx";
+import { Paxcounter } from "../components/modules/Paxcounter.tsx";
+import { RangeTest } from "../components/modules/RangeTest.tsx";
+import { Serial } from "../components/modules/Serial.tsx";
+import { StoreForward } from "../components/modules/StoreForward.tsx";
+import { Telemetry } from "../components/modules/Telemetry.tsx";
 
 interface ConfigPageProps {
   searchQuery?: string;

@@ -1,13 +1,13 @@
-import type { Channel as DbChannel } from "@data/index";
 import {
   type ChannelValidation,
   makeChannelSchema,
-} from "@app/validation/channel";
-import { createZodResolver } from "../components/form/createZodResolver";
-import { useFieldRegistry } from "../services/fieldRegistry";
+} from "../components/panels/Channels/validation";
+import type { Channel as DbChannel } from "@data/index";
 import cryptoRandomString from "crypto-random-string";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type DefaultValues, type Path, useForm } from "react-hook-form";
+import { createZodResolver } from "../components/form/createZodResolver";
+import { useFieldRegistry } from "../services/fieldRegistry";
 
 export interface UseChannelFormOptions {
   channel: DbChannel;

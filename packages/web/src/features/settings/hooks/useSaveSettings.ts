@@ -1,8 +1,8 @@
-import { useToast } from "@core/hooks/useToast";
 import { AdminMessageService } from "@core/services/adminMessageService";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice } from "@core/stores";
+import { useToast } from "@shared/hooks/useToast";
+import { useDevice } from "@state/index.ts";
 import { useCallback, useState } from "react";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 
 export function useSettingsSave() {
   const {

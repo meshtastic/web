@@ -27,6 +27,9 @@
     "includes": ["**", "!test/**", "!**/dist/**"],
     "rules": {
       "recommended": true,
+      "complexity": {
+        "noStaticOnlyClass": "off"
+      },
       "suspicious": {
         "noExplicitAny": "error",
         "noDebugger": "error"

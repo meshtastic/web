@@ -1,12 +1,15 @@
-import type {
-  BaseFormBuilderProps,
-  GenericFormElementProps,
-} from "./FormTypes";
-import { MultiSelect, MultiSelectItem } from "@shared/components/ui/multi-select";
-import type { FLAGS_CONFIG } from "@core/hooks/usePositionFlags.ts";
+import {
+  MultiSelect,
+  MultiSelectItem,
+} from "@shared/components/ui/multi-select";
+import type { FLAGS_CONFIG } from "@shared/hooks/usePositionFlags";
 import { cn } from "@shared/utils/cn";
 import type { FieldValues } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import type {
+  BaseFormBuilderProps,
+  GenericFormElementProps,
+} from "./FormTypes.ts";
 
 export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "multiSelect";

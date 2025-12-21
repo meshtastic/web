@@ -1,8 +1,11 @@
+import { useChannels, useConversations, useNodes } from "@data/hooks";
+import type { ConversationType } from "@data/types";
+import { sortNodes } from "@features/nodes/utils/nodeSort";
+import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
 import {
   ONLINE_THRESHOLD_SECONDS,
   OnlineIndicator,
-} from "@shared/components/generic/OnlineIndicator";
-import { NodeAvatar } from "@components/NodeAvatar";
+} from "@shared/components/OnlineIndicator";
 import { Badge } from "@shared/components/ui/badge";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
@@ -17,22 +20,19 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
+import { cn } from "@shared/utils/cn";
 import {
   type SplitMode,
   useDevice,
   useDeviceContext,
   useUIStore,
-} from "@core/stores";
-import { cn } from "@shared/utils/cn";
-import { sortNodes } from "@features/nodes/utils/nodeSort";
-import { useChannels, useConversations, useNodes } from "@data/hooks";
-import type { ConversationType } from "@data/types";
-import { ChatPanel } from "../components/ChatPanel";
+} from "@state/index.ts";
 import { useSearch } from "@tanstack/react-router";
 import { Columns, Hash, Plus, Rows, Search, Users, X } from "lucide-react";
 import type React from "react";
 import { Activity, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ChatPanel } from "../components/index.ts";
 
 export type Contact = {
   id: number;
@@ -489,6 +489,7 @@ export default function MessagesPage() {
                       longName={contact.name}
                       size="sm"
                       showFavorite={contact.isFavorite}
+                      clickable={true}
                     />
                   )}
                   {contact.online && contact.type === "direct" && (

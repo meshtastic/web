@@ -1,6 +1,6 @@
-import { useDevice } from "@core/stores";
 import { usePositionTrails } from "@data/hooks";
 import type { Protobuf } from "@meshtastic/core";
+import { useDevice } from "@state/index.ts";
 import type { Feature, FeatureCollection } from "geojson";
 import { useMemo } from "react";
 import { Layer, Source } from "react-map-gl/maplibre";

@@ -49,6 +49,39 @@ globalThis.ResizeObserver = class {
   disconnect() {}
 };
 
+// Mock localStorage for happy-dom
+const localStorageStore: { [key: string]: string } = {};
+globalThis.localStorage = {
+  getItem: (key: string) => localStorageStore[key] ?? null,
+  setItem: (key: string, value: string) => {
+    localStorageStore[key] = value;
+  },
+  removeItem: (key: string) => {
+    delete localStorageStore[key];
+  },
+  clear: () => {
+    for (const key of Object.keys(localStorageStore)) {
+      delete localStorageStore[key];
+    }
+  },
+  key: (index: number) => Object.keys(localStorageStore)[index] ?? null,
+  get length() {
+    return Object.keys(localStorageStore).length;
+  },
+} as Storage;
+
+// Mock matchMedia for happy-dom
+globalThis.matchMedia = vi.fn().mockImplementation((query: string) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
+}));
+
 const appNamespaces = [
   "channels",
   "commandPalette",

@@ -1,5 +1,5 @@
+import { makePskHelpers } from "@shared/utils/pskSchema";
 import { type ZodType, z } from "zod/v4";
-import { makePskHelpers } from "@app/validation/pskSchema";
 
 const { stringSchema, bytesSchema, isValidKey } = makePskHelpers([32]); // 256-bit
 

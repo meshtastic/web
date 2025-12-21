@@ -1,12 +1,12 @@
-import { ImportConfigDialog } from "@components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
-import { Button } from "@shared/components/ui/button";
-import { useToast } from "@core/hooks/useToast.ts";
 import {
-  type ParsedConfigBackupField,
   ConfigBackupService,
+  type ParsedConfigBackupField,
 } from "@core/services/configBackupService.ts";
-import { useDevice } from "@core/stores";
+import { ImportConfigDialog } from "@shared/components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
+import { Button } from "@shared/components/ui/button";
+import { useToast } from "@shared/hooks/useToast";
 import { cn } from "@shared/utils/cn";
+import { useDevice } from "@state/index.ts";
 import { Download, Upload } from "lucide-react";
 import { useState } from "react";
 
@@ -44,7 +44,12 @@ export const ImportExport = ({ variant = "default" }: ImportExportProps) => {
   ) => {
     try {
       // The first argument _parsedData is unused in applyToDevice
-      await ConfigBackupService.applyToDevice({} as any, fields, device, onProgress);
+      await ConfigBackupService.applyToDevice(
+        {} as any,
+        fields,
+        device,
+        onProgress,
+      );
 
       toast({
         title: "Import Successful",

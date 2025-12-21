@@ -1,4 +1,3 @@
-import { formatQuantity } from "@app/core/utils/string.ts";
 import { Button } from "@shared/components/ui/button";
 import {
   Sheet,
@@ -7,6 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@shared/components/ui/sheet";
+import { formatQuantity } from "@shared/utils/string.ts";
 import { FileEdit, RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ActivityList } from "./ActivityList.tsx";

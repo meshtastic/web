@@ -1,6 +1,4 @@
-import { Channels } from "@components/PageComponents/Channels/Channels.tsx";
-import { Lora } from "../components/panels/Lora.tsx";
-import { Security } from "../components/panels/Security/Security.tsx";
+import { Channels } from "../components/panels/Channels";
 import {
   Card,
   CardContent,
@@ -8,10 +6,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@shared/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs";
-import { useDevice, type ValidConfigType } from "@core/stores";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@shared/components/ui/tabs";
+import { useDevice, type ValidConfigType } from "@state/index.ts";
 import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
+import { Lora } from "../components/panels/Lora.tsx";
+import { Security } from "../components/panels/Security/Security.tsx";
 
 interface ConfigPageProps {
   searchQuery?: string;

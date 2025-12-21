@@ -1,12 +1,12 @@
-import { useToast } from "@core/hooks/useToast";
-import { useFieldRegistry } from "../services/fieldRegistry";
-import { useDevice } from "@core/stores";
+import { useToast } from "@shared/hooks/useToast.ts";
+import { useDevice } from "@state/index.ts";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import { useSettingsSave } from "./hooks/useSaveSettings.ts";
 
 // Mock dependencies
-vi.mock("@core/stores", () => ({
+vi.mock("@state/index.ts", () => ({
   useDevice: vi.fn(),
 }));
 

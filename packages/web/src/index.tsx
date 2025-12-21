@@ -1,16 +1,19 @@
 import React, { Suspense, use, useState } from "react";
 import "@app/index.css";
 
-// feature flags and dev overrides
 import "@core/services/dev-overrides.ts";
 import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
-import { router } from "./app/routes";
-import { WelcomeSplash } from "@components/WelcomeSplash.tsx";
-import { initDatabase, packetBatcher, resetConnectionStatuses } from "@data/index";
+import {
+  initDatabase,
+  packetBatcher,
+  resetConnectionStatuses,
+} from "@data/index";
 import { RouterProvider } from "@tanstack/react-router";
+import { router } from "./app/routes.tsx";
+import { WelcomeSplash } from "./shared/components/WelcomeSplash.tsx";
 
 declare module "@tanstack/react-router" {
   interface Register {}
@@ -18,7 +21,7 @@ declare module "@tanstack/react-router" {
 
 enableMapSet();
 
-// Check if database already exists (returning user)
+// if database already exists they are returning
 async function checkDatabaseExists(): Promise<boolean> {
   try {
     const root = await navigator.storage.getDirectory();
@@ -40,15 +43,14 @@ const dbPromise = initDatabase()
     throw error;
   });
 
-// This Promise will be resolved when the WelcomeSplash is "done"
+// This will be resolved when the WelcomeSplash is "done"
 let resolveWelcomeSplashPromise: () => void;
 const welcomeSplashCompletionPromise = new Promise<void>((resolve) => {
   resolveWelcomeSplashPromise = resolve;
 });
 
-// A component that waits for both the DB and WelcomeSplash
 function AppContent() {
-  use(dbPromise); // Wait for DB to init
+  use(dbPromise);
   use(welcomeSplashCompletionPromise); // Wait for WelcomeSplash to finish
 
   return (

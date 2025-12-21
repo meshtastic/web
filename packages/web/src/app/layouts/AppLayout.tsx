@@ -1,4 +1,3 @@
-import { AppSidebar } from "./AppSidebar";
 import { Separator } from "@shared/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@shared/components/ui/sidebar";
 import {
@@ -9,8 +8,9 @@ import {
 } from "@shared/components/ui/tooltip";
 import type React from "react";
 import { useTranslation } from "react-i18next";
+import { AppSidebar } from "./AppSidebar.tsx";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export function AppLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation("ui");
 
   return (
