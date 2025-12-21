@@ -13,51 +13,51 @@
     "tabSecurity": "Безопасность"
   },
   "sidebar": {
-    "label": "Configuration"
+    "label": "Настройки"
   },
   "device": {
-    "title": "Device Settings",
-    "description": "Settings for the device",
+    "title": "Настройки устройства",
+    "description": "Настройки этого устройства",
     "buttonPin": {
-      "description": "Button pin override",
-      "label": "Button Pin"
+      "description": "Переназначить pin кнопки",
+      "label": "Pin кнопки"
     },
     "buzzerPin": {
-      "description": "Buzzer pin override",
-      "label": "Buzzer Pin"
+      "description": "Переназначить pin динамика",
+      "label": "Pin динамика"
     },
     "disableTripleClick": {
-      "description": "Disable triple click",
-      "label": "Disable Triple Click"
+      "description": "Отключение тройного нажатия",
+      "label": "Отключить тройное нажатие"
     },
     "doubleTapAsButtonPress": {
-      "description": "Treat double tap as button press",
-      "label": "Double Tap as Button Press"
+      "description": "Двойное нажатие как одинарное",
+      "label": "Двойное нажатие как зажатие"
     },
     "ledHeartbeatDisabled": {
-      "description": "Disable default blinking LED",
-      "label": "LED Heartbeat Disabled"
+      "description": "Отключить мигание LED по умолчанию",
+      "label": "Отключить сердцебиение LED"
     },
     "nodeInfoBroadcastInterval": {
-      "description": "How often to broadcast node info",
+      "description": "Как часто транслировать информацию об узле",
       "label": "Интервал вещания передачи информации об узле"
     },
     "posixTimezone": {
-      "description": "The POSIX timezone string for the device",
+      "description": "Часовой пояс POSIX для устройства",
       "label": "Часовой пояс POSIX"
     },
     "rebroadcastMode": {
-      "description": "How to handle rebroadcasting",
+      "description": "Как обрабатывать ретрансляцию",
       "label": "Режим ретрансляции"
     },
     "role": {
-      "description": "What role the device performs on the mesh",
+      "description": "Какую роль выполняет устройство в сетке",
       "label": "Роль"
     }
   },
   "bluetooth": {
-    "title": "Bluetooth Settings",
-    "description": "Settings for the Bluetooth module",
+    "title": "Настройки Bluetooth",
+    "description": "Настройки Bluetooth модуля",
     "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
     "enabled": {
       "description": "Enable or disable Bluetooth",
@@ -124,7 +124,7 @@
     "title": "Mesh Settings",
     "description": "Settings for the LoRa mesh",
     "bandwidth": {
-      "description": "Channel bandwidth in kHz",
+      "description": "Channel bandwidth in MHz",
       "label": "Ширина канала"
     },
     "boostedRxGain": {
