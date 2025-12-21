@@ -98,6 +98,9 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
               name: "airQualityInterval",
               label: t("telemetry.airQualityInterval.label"),
               description: t("telemetry.airQualityInterval.description"),
+              properties: {
+                suffix: t("unit.second.plural"),
+              },
             },
             {
               type: "toggle",
@@ -110,6 +113,9 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
               name: "powerUpdateInterval",
               label: t("telemetry.powerUpdateInterval.label"),
               description: t("telemetry.powerUpdateInterval.description"),
+              properties: {
+                suffix: t("unit.second.plural"),
+              },
             },
             {
               type: "toggle",

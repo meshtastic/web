@@ -278,6 +278,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "broadcastSmartMinimumDistance",
               label: t("position.smartPositionMinDistance.label"),
               description: t("position.smartPositionMinDistance.description"),
+              properties: {
+                suffix: t("unit.meter.plural"),
+              },
               disabledBy: [
                 {
                   fieldName: "positionBroadcastSmartEnabled",
@@ -289,6 +292,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "broadcastSmartMinimumIntervalSecs",
               label: t("position.smartPositionMinInterval.label"),
               description: t("position.smartPositionMinInterval.description"),
+              properties: {
+                suffix: t("unit.second.plural"),
+              },
               disabledBy: [
                 {
                   fieldName: "positionBroadcastSmartEnabled",

@@ -77,6 +77,9 @@ export const DetectionSensor = ({
               name: "stateBroadcastSecs",
               label: t("detectionSensor.stateBroadcastSecs.label"),
               description: t("detectionSensor.stateBroadcastSecs.description"),
+              properties: {
+                suffix: t("unit.second.plural"),
+              },
               disabledBy: [
                 {
                   fieldName: "enabled",

@@ -88,6 +88,9 @@ export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
                   fieldName: "enabled",
                 },
               ],
+              properties: {
+                suffix: t("unit.record.plural"),
+              },
             },
             {
               type: "number",
@@ -99,6 +102,9 @@ export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
                   fieldName: "enabled",
                 },
               ],
+              properties: {
+                suffix: t("unit.record.plural"),
+              },
             },
           ],
         },

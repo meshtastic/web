@@ -202,6 +202,9 @@ export const ExternalNotification = ({
               name: "nagTimeout",
               label: t("externalNotification.nagTimeout.label"),
               description: t("externalNotification.nagTimeout.description"),
+              properties: {
+                suffix: t("unit.second.plural"),
+              },
               disabledBy: [
                 {
                   fieldName: "enabled",
