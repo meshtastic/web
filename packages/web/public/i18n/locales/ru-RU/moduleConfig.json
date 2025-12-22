@@ -1,448 +1,448 @@
 {
   "page": {
-    "tabAmbientLighting": "Световое освещение",
-    "tabAudio": "Звук",
-    "tabCannedMessage": "Canned",
+    "tabAmbientLighting": "Окружающее освещение",
+    "tabAudio": "Аудио",
+    "tabCannedMessage": "Готовые сообщения",
     "tabDetectionSensor": "Датчик обнаружения",
-    "tabExternalNotification": "Ext Notif",
+    "tabExternalNotification": "Внешние уведомления",
     "tabMqtt": "MQTT",
-    "tabNeighborInfo": "Информация об окружности",
-    "tabPaxcounter": "Счётчик прохожих",
-    "tabRangeTest": "Проверка дальности",
-    "tabSerial": "COM-порт",
-    "tabStoreAndForward": "S&F",
+    "tabNeighborInfo": "Информация о соседях",
+    "tabPaxcounter": "Счетчик людей",
+    "tabRangeTest": "Тест дальности",
+    "tabSerial": "Последовательный порт",
+    "tabStoreAndForward": "Хранение и пересылка",
     "tabTelemetry": "Телеметрия"
   },
   "ambientLighting": {
-    "title": "Ambient Lighting Settings",
-    "description": "Settings for the Ambient Lighting module",
+    "title": "Настройки окружающего освещения",
+    "description": "Настройки для модуля окружающего освещения",
     "ledState": {
-      "label": "LED State",
-      "description": "Sets LED to on or off"
+      "label": "Состояние светодиода",
+      "description": "Установить светодиод включенным или выключенным"
     },
     "current": {
       "label": "Ток",
-      "description": "Sets the current for the LED output. Default is 10"
+      "description": "Устанавливает ток для выхода светодиода. По умолчанию 10"
     },
     "red": {
       "label": "Красный",
-      "description": "Sets the red LED level. Values are 0-255"
+      "description": "Устанавливает уровень красного светодиода. Значения от 0 до 255"
     },
     "green": {
       "label": "Зеленый",
-      "description": "Sets the green LED level. Values are 0-255"
+      "description": "Устанавливает уровень зеленого светодиода. Значения от 0 до 255"
     },
     "blue": {
       "label": "Синий",
-      "description": "Sets the blue LED level. Values are 0-255"
+      "description": "Устанавливает уровень синего светодиода. Значения от 0 до 255"
     }
   },
   "audio": {
-    "title": "Audio Settings",
-    "description": "Settings for the Audio module",
+    "title": "Настройки аудио",
+    "description": "Настройки для модуля аудио",
     "codec2Enabled": {
-      "label": "Codec 2 Enabled",
-      "description": "Enable Codec 2 audio encoding"
+      "label": "Codec 2 включен",
+      "description": "Включить кодирование аудио Codec 2"
     },
     "pttPin": {
-      "label": "PTT Pin",
-      "description": "GPIO pin to use for PTT"
+      "label": "Пин PTT",
+      "description": "GPIO пин для использования для PTT"
     },
     "bitrate": {
-      "label": "Bitrate",
-      "description": "Bitrate to use for audio encoding"
+      "label": "Битрейт",
+      "description": "Битрейт для использования при кодировании аудио"
     },
     "i2sWs": {
       "label": "i2S WS",
-      "description": "GPIO pin to use for i2S WS"
+      "description": "GPIO пин для использования для i2S WS"
     },
     "i2sSd": {
       "label": "i2S SD",
-      "description": "GPIO pin to use for i2S SD"
+      "description": "GPIO пин для использования для i2S SD"
     },
     "i2sDin": {
       "label": "i2S DIN",
-      "description": "GPIO pin to use for i2S DIN"
+      "description": "GPIO пин для использования для i2S DIN"
     },
     "i2sSck": {
       "label": "i2S SCK",
-      "description": "GPIO pin to use for i2S SCK"
+      "description": "GPIO пин для использования для i2S SCK"
     }
   },
   "cannedMessage": {
-    "title": "Canned Message Settings",
-    "description": "Settings for the Canned Message module",
+    "title": "Настройки готовых сообщений",
+    "description": "Настройки для модуля готовых сообщений",
     "moduleEnabled": {
-      "label": "Module Enabled",
-      "description": "Enable Canned Message"
+      "label": "Модуль включен",
+      "description": "Включить готовые сообщения"
     },
     "rotary1Enabled": {
-      "label": "Rotary Encoder #1 Enabled",
-      "description": "Enable the rotary encoder"
+      "label": "Энкодер #1 включен",
+      "description": "Включить поворотный энкодер"
     },
     "inputbrokerPinA": {
-      "label": "Encoder Pin A",
-      "description": "GPIO Pin Value (1-39) For encoder port A"
+      "label": "Пин энкодера A",
+      "description": "Значение GPIO пина (1-39) для порта A энкодера"
     },
     "inputbrokerPinB": {
-      "label": "Encoder Pin B",
-      "description": "GPIO Pin Value (1-39) For encoder port B"
+      "label": "Пин энкодера B",
+      "description": "Значение GPIO пина (1-39) для порта B энкодера"
     },
     "inputbrokerPinPress": {
-      "label": "Encoder Pin Press",
-      "description": "GPIO Pin Value (1-39) For encoder Press"
+      "label": "Пин нажатия энкодера",
+      "description": "Значение GPIO пина (1-39) для нажатия энкодера"
     },
     "inputbrokerEventCw": {
-      "label": "Clockwise event",
-      "description": "Select input event."
+      "label": "Событие по часовой стрелке",
+      "description": "Выберите событие ввода."
     },
     "inputbrokerEventCcw": {
-      "label": "Counter Clockwise event",
-      "description": "Select input event."
+      "label": "Событие против часовой стрелки",
+      "description": "Выберите событие ввода."
     },
     "inputbrokerEventPress": {
-      "label": "Press event",
-      "description": "Select input event"
+      "label": "Событие нажатия",
+      "description": "Выберите событие ввода"
     },
     "updown1Enabled": {
-      "label": "Up Down enabled",
-      "description": "Enable the up / down encoder"
+      "label": "Вверх/вниз включен",
+      "description": "Включить энкодер вверх/вниз"
     },
     "allowInputSource": {
-      "label": "Allow Input Source",
-      "description": "Select from: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
+      "label": "Разрешить источник ввода",
+      "description": "Выберите из: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
     },
     "sendBell": {
-      "label": "Send Bell",
-      "description": "Sends a bell character with each message"
+      "label": "Отправить звонок",
+      "description": "Отправляет символ звонка с каждым сообщением"
     }
   },
   "detectionSensor": {
-    "title": "Detection Sensor Settings",
-    "description": "Settings for the Detection Sensor module",
+    "title": "Настройки датчика обнаружения",
+    "description": "Настройки для модуля датчика обнаружения",
     "enabled": {
       "label": "Включено",
-      "description": "Enable or disable Detection Sensor Module"
+      "description": "Включить или отключить модуль датчика обнаружения"
     },
     "minimumBroadcastSecs": {
-      "label": "Minimum Broadcast Seconds",
-      "description": "The interval in seconds of how often we can send a message to the mesh when a state change is detected"
+      "label": "Минимальные секунды вещания",
+      "description": "Интервал в секундах, как часто мы можем отправлять сообщение в сеть при обнаружении изменения состояния"
     },
     "stateBroadcastSecs": {
-      "label": "State Broadcast Seconds",
-      "description": "The interval in seconds of how often we should send a message to the mesh with the current state regardless of changes"
+      "label": "Секунды вещания состояния",
+      "description": "Интервал в секундах, как часто мы должны отправлять сообщение в сеть с текущим состоянием независимо от изменений"
     },
     "sendBell": {
-      "label": "Send Bell",
-      "description": "Send ASCII bell with alert message"
+      "label": "Отправить звонок",
+      "description": "Отправить ASCII звонок с сообщением предупреждения"
     },
     "name": {
-      "label": "Friendly Name",
-      "description": "Used to format the message sent to mesh, max 20 Characters"
+      "label": "Понятное имя",
+      "description": "Используется для форматирования сообщения, отправляемого в сеть, максимум 20 символов"
     },
     "monitorPin": {
-      "label": "Monitor Pin",
-      "description": "The GPIO pin to monitor for state changes"
+      "label": "Пин мониторинга",
+      "description": "GPIO пин для мониторинга изменений состояния"
     },
     "detectionTriggerType": {
-      "label": "Detection Triggered Type",
-      "description": "The type of trigger event to be used"
+      "label": "Тип триггера обнаружения",
+      "description": "Тип события триггера для использования"
     },
     "usePullup": {
-      "label": "Use Pullup",
-      "description": "Whether or not use INPUT_PULLUP mode for GPIO pin"
+      "label": "Использовать подтяжку",
+      "description": "Использовать ли режим INPUT_PULLUP для GPIO пина"
     }
   },
   "externalNotification": {
-    "title": "External Notification Settings",
-    "description": "Configure the external notification module",
+    "title": "Настройки внешних уведомлений",
+    "description": "Настроить модуль внешних уведомлений",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable External Notification"
+      "label": "Модуль включен",
+      "description": "Включить внешние уведомления"
     },
     "outputMs": {
-      "label": "Output MS",
-      "description": "Output MS"
+      "label": "Выход МС",
+      "description": "Выход МС"
     },
     "output": {
-      "label": "Output",
-      "description": "Output"
+      "label": "Выход",
+      "description": "Выход"
     },
     "outputVibra": {
-      "label": "Output Vibrate",
-      "description": "Output Vibrate"
+      "label": "Выход вибрации",
+      "description": "Выход вибрации"
     },
     "outputBuzzer": {
-      "label": "Output Buzzer",
-      "description": "Output Buzzer"
+      "label": "Выход зуммера",
+      "description": "Выход зуммера"
     },
     "active": {
-      "label": "Active",
-      "description": "Active"
+      "label": "Активный",
+      "description": "Активный"
     },
     "alertMessage": {
-      "label": "Alert Message",
-      "description": "Alert Message"
+      "label": "Сообщение предупреждения",
+      "description": "Сообщение предупреждения"
     },
     "alertMessageVibra": {
-      "label": "Alert Message Vibrate",
-      "description": "Alert Message Vibrate"
+      "label": "Вибрация сообщения предупреждения",
+      "description": "Вибрация сообщения предупреждения"
     },
     "alertMessageBuzzer": {
-      "label": "Alert Message Buzzer",
-      "description": "Alert Message Buzzer"
+      "label": "Зуммер сообщения предупреждения",
+      "description": "Зуммер сообщения предупреждения"
     },
     "alertBell": {
-      "label": "Alert Bell",
-      "description": "Should an alert be triggered when receiving an incoming bell?"
+      "label": "Звонок предупреждения",
+      "description": "Должно ли срабатывать предупреждение при получении входящего звонка?"
     },
     "alertBellVibra": {
-      "label": "Alert Bell Vibrate",
-      "description": "Alert Bell Vibrate"
+      "label": "Вибрация звонка предупреждения",
+      "description": "Вибрация звонка предупреждения"
     },
     "alertBellBuzzer": {
-      "label": "Alert Bell Buzzer",
-      "description": "Alert Bell Buzzer"
+      "label": "Зуммер звонка предупреждения",
+      "description": "Зуммер звонка предупреждения"
     },
     "usePwm": {
-      "label": "Use PWM",
-      "description": "Use PWM"
+      "label": "Использовать PWM",
+      "description": "Использовать PWM"
     },
     "nagTimeout": {
-      "label": "Nag Timeout",
-      "description": "Nag Timeout"
+      "label": "Таймаут напоминания",
+      "description": "Таймаут напоминания"
     },
     "useI2sAsBuzzer": {
-      "label": "Use I²S Pin as Buzzer",
-      "description": "Designate I²S Pin as Buzzer Output"
+      "label": "Использовать пин I²S как зуммер",
+      "description": "Назначить пин I²S как выход зуммера"
     }
   },
   "mqtt": {
-    "title": "MQTT Settings",
-    "description": "Settings for the MQTT module",
+    "title": "Настройки MQTT",
+    "description": "Настройки для модуля MQTT",
     "enabled": {
       "label": "Включено",
-      "description": "Enable or disable MQTT"
+      "description": "Включить или отключить MQTT"
     },
     "address": {
-      "label": "MQTT Server Address",
-      "description": "MQTT server address to use for default/custom servers"
+      "label": "Адрес MQTT сервера",
+      "description": "Адрес MQTT сервера для использования для серверов по умолчанию/пользовательских"
     },
     "username": {
-      "label": "MQTT Username",
-      "description": "MQTT username to use for default/custom servers"
+      "label": "Имя пользователя MQTT",
+      "description": "Имя пользователя MQTT для использования для серверов по умолчанию/пользовательских"
     },
     "password": {
-      "label": "MQTT Password",
-      "description": "MQTT password to use for default/custom servers"
+      "label": "Пароль MQTT",
+      "description": "Пароль MQTT для использования для серверов по умолчанию/пользовательских"
     },
     "encryptionEnabled": {
-      "label": "Encryption Enabled",
-      "description": "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data."
+      "label": "Шифрование включено",
+      "description": "Включить или отключить шифрование MQTT. Примечание: Все сообщения отправляются на MQTT брокер без шифрования, если эта опция не включена, даже когда ваши каналы восходящей связи имеют установленные ключи шифрования. Это включает данные о позиции."
     },
     "jsonEnabled": {
-      "label": "JSON Enabled",
-      "description": "Whether to send/consume JSON packets on MQTT"
+      "label": "JSON включен",
+      "description": "Отправлять/получать ли JSON пакеты через MQTT"
     },
     "tlsEnabled": {
-      "label": "TLS Enabled",
-      "description": "Enable or disable TLS"
+      "label": "TLS включен",
+      "description": "Включить или отключить TLS"
     },
     "root": {
       "label": "Корневая тема",
-      "description": "MQTT root topic to use for default/custom servers"
+      "description": "Корневая тема MQTT для использования для серверов по умолчанию/пользовательских"
     },
     "proxyToClientEnabled": {
-      "label": "MQTT Client Proxy Enabled",
-      "description": "Utilizes the network connection to proxy MQTT messages to the client."
+      "label": "Прокси MQTT клиента включен",
+      "description": "Использует сетевое подключение для проксирования MQTT сообщений клиенту."
     },
     "mapReportingEnabled": {
-      "label": "Map Reporting Enabled",
-      "description": "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
+      "label": "Отчеты карты включены",
+      "description": "Ваш узел будет периодически отправлять незашифрованный пакет отчета карты на настроенный MQTT сервер, это включает id, короткое и полное имя, приблизительное местоположение, модель оборудования, роль, версию прошивки, регион LoRa, предустановку модема и имя основного канала."
     },
     "mapReportSettings": {
       "publishIntervalSecs": {
-        "label": "Map Report Publish Interval (s)",
-        "description": "Interval in seconds to publish map reports"
+        "label": "Интервал публикации отчета карты (с)",
+        "description": "Интервал в секундах для публикации отчетов карты"
       },
       "positionPrecision": {
-        "label": "Approximate Location",
-        "description": "Position shared will be accurate within this distance",
+        "label": "Приблизительное местоположение",
+        "description": "Позиция будет точной в пределах этого расстояния",
         "options": {
-          "metric_km23": "Within 23 km",
-          "metric_km12": "Within 12 km",
-          "metric_km5_8": "Within 5.8 km",
-          "metric_km2_9": "Within 2.9 km",
-          "metric_km1_5": "Within 1.5 km",
-          "metric_m700": "Within 700 m",
-          "metric_m350": "Within 350 m",
-          "metric_m200": "Within 200 m",
-          "metric_m90": "Within 90 m",
-          "metric_m50": "Within 50 m",
-          "imperial_mi15": "Within 15 miles",
-          "imperial_mi7_3": "Within 7.3 miles",
-          "imperial_mi3_6": "Within 3.6 miles",
-          "imperial_mi1_8": "Within 1.8 miles",
-          "imperial_mi0_9": "Within 0.9 miles",
-          "imperial_mi0_5": "Within 0.5 miles",
-          "imperial_mi0_2": "Within 0.2 miles",
-          "imperial_ft600": "Within 600 feet",
-          "imperial_ft300": "Within 300 feet",
-          "imperial_ft150": "Within 150 feet"
+          "metric_km23": "В пределах 23 км",
+          "metric_km12": "В пределах 12 км",
+          "metric_km5_8": "В пределах 5.8 км",
+          "metric_km2_9": "В пределах 2.9 км",
+          "metric_km1_5": "В пределах 1.5 км",
+          "metric_m700": "В пределах 700 м",
+          "metric_m350": "В пределах 350 м",
+          "metric_m200": "В пределах 200 м",
+          "metric_m90": "В пределах 90 м",
+          "metric_m50": "В пределах 50 м",
+          "imperial_mi15": "В пределах 15 миль",
+          "imperial_mi7_3": "В пределах 7.3 миль",
+          "imperial_mi3_6": "В пределах 3.6 миль",
+          "imperial_mi1_8": "В пределах 1.8 миль",
+          "imperial_mi0_9": "В пределах 0.9 миль",
+          "imperial_mi0_5": "В пределах 0.5 миль",
+          "imperial_mi0_2": "В пределах 0.2 миль",
+          "imperial_ft600": "В пределах 600 футов",
+          "imperial_ft300": "В пределах 300 футов",
+          "imperial_ft150": "В пределах 150 футов"
         }
       }
     }
   },
   "neighborInfo": {
-    "title": "Neighbor Info Settings",
-    "description": "Settings for the Neighbor Info module",
+    "title": "Настройки информации о соседях",
+    "description": "Настройки для модуля информации о соседях",
     "enabled": {
       "label": "Включено",
-      "description": "Enable or disable Neighbor Info Module"
+      "description": "Включить или отключить модуль информации о соседях"
     },
     "updateInterval": {
       "label": "Интервал обновления",
-      "description": "Interval in seconds of how often we should try to send our Neighbor Info to the mesh"
+      "description": "Интервал в секундах, как часто мы должны пытаться отправлять нашу информацию о соседях в сеть"
     }
   },
   "paxcounter": {
-    "title": "Paxcounter Settings",
-    "description": "Settings for the Paxcounter module",
+    "title": "Настройки счетчика людей",
+    "description": "Настройки для модуля счетчика людей",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable Paxcounter"
+      "label": "Модуль включен",
+      "description": "Включить счетчик людей"
     },
     "paxcounterUpdateInterval": {
-      "label": "Update Interval (seconds)",
-      "description": "How long to wait between sending paxcounter packets"
+      "label": "Интервал обновления (секунды)",
+      "description": "Как долго ждать между отправкой пакетов счетчика людей"
     },
     "wifiThreshold": {
-      "label": "WiFi RSSI Threshold",
-      "description": "At what WiFi RSSI level should the counter increase. Defaults to -80."
+      "label": "Порог WiFi RSSI",
+      "description": "При каком уровне WiFi RSSI должен увеличиваться счетчик. По умолчанию -80."
     },
     "bleThreshold": {
-      "label": "BLE RSSI Threshold",
-      "description": "At what BLE RSSI level should the counter increase. Defaults to -80."
+      "label": "Порог BLE RSSI",
+      "description": "При каком уровне BLE RSSI должен увеличиваться счетчик. По умолчанию -80."
     }
   },
   "rangeTest": {
-    "title": "Range Test Settings",
-    "description": "Settings for the Range Test module",
+    "title": "Настройки теста дальности",
+    "description": "Настройки для модуля теста дальности",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable Range Test"
+      "label": "Модуль включен",
+      "description": "Включить тест дальности"
     },
     "sender": {
-      "label": "Message Interval",
-      "description": "How long to wait between sending test packets"
+      "label": "Интервал сообщений",
+      "description": "Как долго ждать между отправкой тестовых пакетов"
     },
     "save": {
-      "label": "Save CSV to storage",
-      "description": "ESP32 Only"
+      "label": "Сохранить CSV в хранилище",
+      "description": "Только ESP32"
     }
   },
   "serial": {
-    "title": "Serial Settings",
-    "description": "Settings for the Serial module",
+    "title": "Настройки последовательного порта",
+    "description": "Настройки для модуля последовательного порта",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable Serial output"
+      "label": "Модуль включен",
+      "description": "Включить вывод последовательного порта"
     },
     "echo": {
-      "label": "Echo",
-      "description": "Any packets you send will be echoed back to your device"
+      "label": "Эхо",
+      "description": "Любые пакеты, которые вы отправляете, будут возвращены обратно на ваше устройство"
     },
     "rxd": {
-      "label": "Receive Pin",
-      "description": "Set the GPIO pin to the RXD pin you have set up."
+      "label": "Пин приема",
+      "description": "Установить GPIO пин на пин RXD, который вы настроили."
     },
     "txd": {
-      "label": "Transmit Pin",
-      "description": "Set the GPIO pin to the TXD pin you have set up."
+      "label": "Пин передачи",
+      "description": "Установить GPIO пин на пин TXD, который вы настроили."
     },
     "baud": {
-      "label": "Baud Rate",
-      "description": "The serial baud rate"
+      "label": "Скорость передачи",
+      "description": "Скорость передачи последовательного порта"
     },
     "timeout": {
-      "label": "Время ожидания истекло",
-      "description": "Seconds to wait before we consider your packet as 'done'"
+      "label": "Таймаут",
+      "description": "Секунды ожидания, прежде чем мы считаем ваш пакет 'готовым'"
     },
     "mode": {
-      "label": "Mode",
-      "description": "Select Mode"
+      "label": "Режим",
+      "description": "Выбрать режим"
     },
     "overrideConsoleSerialPort": {
-      "label": "Override Console Serial Port",
-      "description": "If you have a serial port connected to the console, this will override it."
+      "label": "Переопределить последовательный порт консоли",
+      "description": "Если у вас есть последовательный порт, подключенный к консоли, это переопределит его."
     }
   },
   "storeForward": {
-    "title": "Store & Forward Settings",
-    "description": "Settings for the Store & Forward module",
+    "title": "Настройки хранения и пересылки",
+    "description": "Настройки для модуля хранения и пересылки",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable Store & Forward"
+      "label": "Модуль включен",
+      "description": "Включить хранение и пересылку"
     },
     "heartbeat": {
-      "label": "Heartbeat Enabled",
-      "description": "Enable Store & Forward heartbeat"
+      "label": "Пульс включен",
+      "description": "Включить пульс хранения и пересылки"
     },
     "records": {
       "label": "Количество записей",
-      "description": "Number of records to store"
+      "description": "Количество записей для хранения"
     },
     "historyReturnMax": {
-      "label": "Макс возврат истории",
-      "description": "Max number of records to return"
+      "label": "Максимум возврата истории",
+      "description": "Максимальное количество записей для возврата"
     },
     "historyReturnWindow": {
       "label": "Окно возврата истории",
-      "description": "Return records from this time window (minutes)"
+      "description": "Возвращать записи из этого временного окна (минуты)"
     }
   },
   "telemetry": {
-    "title": "Telemetry Settings",
-    "description": "Settings for the Telemetry module",
+    "title": "Настройки телеметрии",
+    "description": "Настройки для модуля телеметрии",
     "deviceUpdateInterval": {
-      "label": "Device Metrics",
-      "description": "Интервал обновления метрик устройства (в секундах)"
+      "label": "Метрики устройства",
+      "description": "Интервал обновления метрик устройства (секунды)"
     },
     "environmentUpdateInterval": {
-      "label": "Интервал обновления метрик окружения (в секундах)",
+      "label": "Интервал обновления метрик окружения (секунды)",
       "description": ""
     },
     "environmentMeasurementEnabled": {
-      "label": "Module Enabled",
-      "description": "Enable the Environment Telemetry"
+      "label": "Модуль включен",
+      "description": "Включить телеметрию окружения"
     },
     "environmentScreenEnabled": {
-      "label": "Displayed on Screen",
-      "description": "Show the Telemetry Module on the OLED"
+      "label": "Отображается на экране",
+      "description": "Показать модуль телеметрии на OLED"
     },
     "environmentDisplayFahrenheit": {
-      "label": "Display Fahrenheit",
-      "description": "Display temp in Fahrenheit"
+      "label": "Отображать по Фаренгейту",
+      "description": "Отображать температуру по Фаренгейту"
     },
     "airQualityEnabled": {
-      "label": "Air Quality Enabled",
-      "description": "Enable the Air Quality Telemetry"
+      "label": "Качество воздуха включено",
+      "description": "Включить телеметрию качества воздуха"
     },
     "airQualityInterval": {
-      "label": "Air Quality Update Interval",
-      "description": "How often to send Air Quality data over the mesh"
+      "label": "Интервал обновления качества воздуха",
+      "description": "Как часто отправлять данные о качестве воздуха по сети"
     },
     "powerMeasurementEnabled": {
-      "label": "Power Measurement Enabled",
-      "description": "Enable the Power Measurement Telemetry"
+      "label": "Измерение мощности включено",
+      "description": "Включить телеметрию измерения мощности"
     },
     "powerUpdateInterval": {
-      "label": "Power Update Interval",
-      "description": "How often to send Power data over the mesh"
+      "label": "Интервал обновления мощности",
+      "description": "Как часто отправлять данные о мощности по сети"
     },
     "powerScreenEnabled": {
-      "label": "Power Screen Enabled",
-      "description": "Enable the Power Telemetry Screen"
+      "label": "Экран мощности включен",
+      "description": "Включить экран телеметрии мощности"
     }
   }
 }
