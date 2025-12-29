@@ -26,11 +26,6 @@ export class TransportWebSerial implements Types.Transport {
   public static async create(baudRate?: number): Promise<TransportWebSerial> {
     const port = await navigator.serial.requestPort();
     await port.open({ baudRate: baudRate || 115200 });
-    try {
-      await port.setSignals({ dataTerminalReady: false, requestToSend: false });
-    } catch (e) {
-      console.warn("setSignals not supported:", e);
-    }
     return new TransportWebSerial(port);
   }
 
@@ -44,11 +39,6 @@ export class TransportWebSerial implements Types.Transport {
   ): Promise<TransportWebSerial> {
     if (!port.readable || !port.writable) {
       await port.open({ baudRate: baudRate || 115200 });
-      try {
-        await port.setSignals({ dataTerminalReady: false, requestToSend: false });
-      } catch (e) {
-        console.warn("setSignals not supported:", e);
-      }
     }
     return new TransportWebSerial(port);
   }

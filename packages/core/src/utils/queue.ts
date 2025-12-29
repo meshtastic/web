@@ -42,6 +42,7 @@ export class Queue {
         });
         // Check if this is a fire-and-forget packet type
         const decoded = fromBinary(Protobuf.Mesh.ToRadioSchema, item.data);
+        console.debug(`[Queue] Queued packet id=${item.id} type=${decoded.payloadVariant.case}`);
         if (
           decoded.payloadVariant.case === "heartbeat" ||
           decoded.payloadVariant.case === "wantConfigId"
@@ -118,8 +119,10 @@ export class Queue {
         if (item) {
           await new Promise((resolve) => setTimeout(resolve, 200));
           try {
+            console.debug(`[Queue] Writing packet id=${item.id} size=${item.data.length} bytes`);
             await writer.write(item.data);
             item.sent = true;
+            console.debug(`[Queue] Packet id=${item.id} sent successfully`);
           } catch (error) {
             if (
               error?.code === "ECONNRESET" ||

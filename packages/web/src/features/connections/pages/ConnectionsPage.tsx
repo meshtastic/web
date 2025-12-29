@@ -146,7 +146,10 @@ export const Connections = () => {
               key={c.id}
               connection={c}
               onConnect={async () => {
-                const ok = await connect(c.id, { allowPrompt: true });
+                const ok = await connect(c.id, {
+                  allowPrompt: true,
+                  skipConfig: false, // Debug: set to true to skip config sync
+                });
                 toast({
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
@@ -192,7 +195,10 @@ export const Connections = () => {
                 });
               }}
               onRetry={async () => {
-                const ok = await connect(c.id, { allowPrompt: true });
+                const ok = await connect(c.id, {
+                  allowPrompt: true,
+                  skipConfig: false, // Debug: set to true to skip config sync
+                });
                 toast({
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok

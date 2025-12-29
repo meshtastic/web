@@ -318,6 +318,46 @@ Data access is abstracted through repositories in `src/data/repositories/`:
 - Connection status tracking
 - Saved connections persistence
 
+#### Connection Flow
+
+The connections feature demonstrates the **Service + Hook** pattern used throughout the app for managing imperative, stateful operations.
+
+**ConnectionService** (`services/ConnectionService.ts`) - A singleton class handling all **imperative work**:
+- **Transport lifecycle** - Creating/destroying serial, bluetooth, and HTTP transports
+- **MeshDevice management** - Creating MeshDevice instances, subscribing to device events
+- **Connection state machine** - Managing status transitions (connecting → configuring → connected)
+- **Event subscriptions** - Subscribing to `onMyNodeInfo`, `onConfigPacket`, `onConfigComplete`, etc.
+- **Heartbeat management** - Starting/stopping heartbeat intervals
+- **Cache logic** - Checking for cached config/nodes for fast reconnection
+- **Database updates** - Updating connection status via repositories
+
+**useConnections** (`hooks/useConnections.ts`) - A React hook providing a **reactive interface**:
+- **React state synchronization** - Using `useSyncExternalStore` to subscribe to changes
+- **Exposing actions** - Wrapping ConnectionService methods in React-friendly callbacks
+- **Data fetching** - Refreshing connection list from the database
+- **Cache management** - Maintaining a local cache for synchronous React rendering
+
+```
+┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────┐
+│   React Component   │────▶│    useConnections    │────▶│ ConnectionService│
+│  (ConnectionsPage)  │     │       (hook)         │     │   (singleton)    │
+└─────────────────────┘     └──────────────────────┘     └─────────────────┘
+         ▲                           │                           │
+         │                           │                           ▼
+         │                           │                   ┌─────────────────┐
+         │                           │                   │   MeshDevice    │
+         │                           │                   │   Transport     │
+         └───────────────────────────┘                   │   Database      │
+              (state updates via                         └─────────────────┘
+               useSyncExternalStore)
+```
+
+**Why this split:**
+- **Testability** - ConnectionService can be tested without React
+- **Separation of concerns** - Imperative I/O vs reactive UI
+- **Lifecycle management** - Service persists across component mounts/unmounts
+- **Singleton pattern** - One connection manager, many observing components
+
 ### Messages (`src/features/messages/`)
 - Chat interface for channel and direct messages
 - Message drafts and delivery status

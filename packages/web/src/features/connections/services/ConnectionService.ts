@@ -7,25 +7,30 @@
 
 import { router } from "@app/app/routes";
 import logger from "@core/services/logger";
-import { configCacheRepo, connectionRepo } from "@data/repositories";
+import {
+  configCacheRepo,
+  connectionRepo,
+  nodeRepo,
+} from "@data/repositories";
 import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
 import type { Connection } from "@data/schema";
 import { SubscriptionService } from "@data/subscriptionService";
 import { MeshDevice, type Protobuf, Types } from "@meshtastic/core";
-import { TransportHTTP } from "@meshtastic/transport-http";
-import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
-import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { randId } from "@shared/utils/randId";
-import { type ConfigConflict, useDeviceStore } from "@state/index.ts";
+import { useDeviceStore } from "@state/index.ts";
 import { testHttpReachable } from "../utils.ts";
 import { BrowserHardware } from "./BrowserHardware.ts";
+import { BluetoothStrategy } from "./strategies/BluetoothStrategy";
+import { HttpStrategy } from "./strategies/HttpStrategy";
+import { SerialStrategy } from "./strategies/SerialStrategy";
+import type { ConnectionStrategy, PacketTransport } from "./strategies/types";
 
 const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
 
-type Transport = BluetoothDevice | SerialPort;
-
 interface ConnectionState {
-  transport?: Transport;
+  strategy?: ConnectionStrategy;
+  nativeHandle?: any;
+  cleanup?: () => void;
   heartbeat?: ReturnType<typeof setInterval>;
   dbSubscription?: () => void;
   statusSubscription?: () => void;
@@ -69,15 +74,20 @@ class ConnectionServiceClass {
 
   /**
    * Set up a MeshDevice with the given transport
+   *
+   * Connection flow:
+   * 1. Create MeshDevice and subscribe to events
+   * 2. Wait for myNodeInfo to get nodeNum
+   * 3. Check for cached config/nodes
+   * 4. If cache exists: use cache, mark connected, sync in background
+   * 5. If no cache: run full configureTwoStage in foreground
+   *
+   * @param opts.skipConfig - Debug flag to skip config sync entirely
    */
   private async setupMeshDevice(
     id: number,
-    transport:
-      | Awaited<ReturnType<typeof TransportHTTP.create>>
-      | Awaited<ReturnType<typeof TransportWebBluetooth.createFromDevice>>
-      | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>,
-    btDevice?: BluetoothDevice,
-    serialPort?: SerialPort,
+    transport: PacketTransport,
+    opts?: { skipConfig?: boolean },
   ): Promise<number> {
     const conn = await connectionRepo.getConnection(id);
     const deviceId = conn?.meshDeviceId ?? randId();
@@ -96,19 +106,48 @@ class ConnectionServiceClass {
     device.addConnection(meshDevice);
 
     const state = this.getState(id);
-    if (btDevice) {
-      state.transport = btDevice;
-    }
-    if (serialPort) {
-      state.transport = serialPort;
-    }
 
-    state.dbSubscription = SubscriptionService.subscribeToDevice(
-      deviceId,
-      0,
-      meshDevice,
-    );
-    logger.debug(`[DB] Subscribed to device ${deviceId} events`);
+    // Track whether we used cache for fast reconnection
+    let usedCache = false;
+
+    // Helper to start heartbeat
+    const startHeartbeat = () => {
+      meshDevice
+        .heartbeat()
+        .then(() => {
+          const heartbeat = setInterval(() => {
+            meshDevice.heartbeat().catch(console.warn);
+          }, HEARTBEAT_INTERVAL_MS);
+          state.heartbeat = heartbeat;
+        })
+        .catch(console.warn);
+    };
+
+    // Helper to run config sync
+    const runConfigSync = () => {
+      logger.debug(`[ConnectionService] Starting configureTwoStage`);
+      const syncPromise = meshDevice.configureTwoStage();
+
+      syncPromise
+        .then(() => {
+          logger.debug(`[ConnectionService] configureTwoStage completed`);
+          if (!usedCache) {
+            startHeartbeat();
+          }
+        })
+        .catch(async (err) => {
+          if (usedCache) {
+            logger.warn(
+              `[ConnectionService] Config sync failed but using cache: ${err.message}`,
+            );
+          } else {
+            logger.error(
+              `[ConnectionService] configureTwoStage failed: ${err.message}`,
+            );
+            await this.updateStatus(id, "error", err.message);
+          }
+        });
+    };
 
     meshDevice.events.onMyNodeInfo.subscribe(async (nodeInfo) => {
       device.setHardware(nodeInfo);
@@ -116,118 +155,66 @@ class ConnectionServiceClass {
         `[ConnectionService] Received myNodeInfo, myNodeNum: ${nodeInfo.myNodeNum}`,
       );
 
+      // Subscribe to device events now that we have the real myNodeNum
+      // This must happen after we know myNodeNum to properly filter own messages
+      if (!state.dbSubscription) {
+        state.dbSubscription = SubscriptionService.subscribeToDevice(
+          deviceId,
+          nodeInfo.myNodeNum,
+          meshDevice,
+        );
+        logger.debug(`[DB] Subscribed to device ${deviceId} events`);
+      }
+
       try {
-        const cached = await configCacheRepo.getCachedConfig(
+        // Check for cached config
+        const cachedConfig = await configCacheRepo.getCachedConfig(
           nodeInfo.myNodeNum,
         );
-        if (cached) {
-          logger.debug(
-            `[ConnectionService] Loading cached config for device ${deviceId}`,
+
+        // Check if we have cached nodes
+        const cachedNodes = await nodeRepo.getNodes(nodeInfo.myNodeNum);
+        const hasCache = cachedConfig && cachedNodes.length > 0;
+
+        if (hasCache) {
+          logger.info(
+            `[ConnectionService] Fast reconnection: using cached config + ${cachedNodes.length} nodes`,
           );
+          usedCache = true;
+
+          // Load cached config into device store
           device.setCachedConfig(
-            cached.config as Protobuf.LocalOnly.LocalConfig,
-            cached.moduleConfig as Protobuf.LocalOnly.LocalModuleConfig,
+            cachedConfig.config as Protobuf.LocalOnly.LocalConfig,
+            cachedConfig.moduleConfig as Protobuf.LocalOnly.LocalModuleConfig,
           );
           device.setConnectionPhase("cached");
 
+          // Mark as connected immediately
           await this.updateStatus(id, "connected");
           router.navigate({ to: "/messages", search: { channel: 0 } });
+
+          // Start heartbeat immediately for cached connection
+          startHeartbeat();
+
+          // Config sync continues in background to update cache
           logger.debug(
-            `[ConnectionService] Fast reconnection: navigated with cached config`,
+            `[ConnectionService] Config sync continuing in background`,
           );
         }
       } catch (err) {
-        logger.warn("[ConnectionService] Failed to load cached config:", err);
+        logger.warn("[ConnectionService] Error checking cache:", err);
       }
     });
 
-    meshDevice.events.onConfigPacket.subscribe(async (config) => {
+    meshDevice.events.onConfigPacket.subscribe((config) => {
       const variant = config.payloadVariant.case;
-      logger.info(`[ConnectionService] 📦 Config packet received: ${variant}`);
-
-      const myNodeNum = device.hardware.myNodeNum;
-      if (variant && myNodeNum && device.hasConfigChange(variant)) {
-        try {
-          const localChanges = await configCacheRepo.getLocalChangesForVariant(
-            myNodeNum,
-            "config",
-            variant,
-          );
-
-          for (const change of localChanges) {
-            const remoteValue = config.payloadVariant.value;
-            if (
-              change.originalValue !== undefined &&
-              JSON.stringify(remoteValue) !==
-                JSON.stringify(change.originalValue)
-            ) {
-              const conflict: ConfigConflict = {
-                variant,
-                localValue: change.value,
-                remoteValue,
-                originalValue: change.originalValue,
-              };
-              device.setConfigConflict("config", variant, conflict);
-              logger.warn(
-                `[ConnectionService] Config conflict detected for ${variant}`,
-              );
-              return;
-            }
-          }
-        } catch (err) {
-          logger.warn(
-            "[ConnectionService] Error checking config conflicts:",
-            err,
-          );
-        }
-      }
-
+      logger.debug(`[ConnectionService] Config packet: ${variant}`);
       device.setConfig(config);
     });
 
-    meshDevice.events.onModuleConfigPacket.subscribe(async (config) => {
+    meshDevice.events.onModuleConfigPacket.subscribe((config) => {
       const variant = config.payloadVariant.case;
-      logger.info(
-        `[ConnectionService] 📦 Module config packet received: ${variant}`,
-      );
-
-      const myNodeNum = device.hardware.myNodeNum;
-      if (variant && myNodeNum && device.hasModuleConfigChange(variant)) {
-        try {
-          const localChanges = await configCacheRepo.getLocalChangesForVariant(
-            myNodeNum,
-            "moduleConfig",
-            variant,
-          );
-
-          for (const change of localChanges) {
-            const remoteValue = config.payloadVariant.value;
-            if (
-              change.originalValue !== undefined &&
-              JSON.stringify(remoteValue) !==
-                JSON.stringify(change.originalValue)
-            ) {
-              const conflict: ConfigConflict = {
-                variant,
-                localValue: change.value,
-                remoteValue,
-                originalValue: change.originalValue,
-              };
-              device.setConfigConflict("moduleConfig", variant, conflict);
-              logger.warn(
-                `[ConnectionService] Module config conflict detected for ${variant}`,
-              );
-              return;
-            }
-          }
-        } catch (err) {
-          logger.warn(
-            "[ConnectionService] Error checking module config conflicts:",
-            err,
-          );
-        }
-      }
-
+      logger.debug(`[ConnectionService] Module config packet: ${variant}`);
       device.setModuleConfig(config);
     });
 
@@ -240,8 +227,12 @@ class ConnectionServiceClass {
           const wasCached = device.isCachedConfig;
           device.setIsCachedConfig(false);
           device.setConnectionPhase("connected");
-          await this.updateStatus(id, "connected");
 
+          if (!wasCached) {
+            await this.updateStatus(id, "connected");
+          }
+
+          // Save fresh config to cache
           try {
             const myNodeNum = device.hardware.myNodeNum;
             if (myNodeNum) {
@@ -254,9 +245,7 @@ class ConnectionServiceClass {
                     device.metadata.get(myNodeNum)?.firmwareVersion,
                 },
               );
-              logger.debug(
-                `[ConnectionService] Saved config to cache for device ${deviceId}`,
-              );
+              logger.debug(`[ConnectionService] Saved config to cache`);
             }
           } catch (err) {
             logger.warn("[ConnectionService] Failed to cache config:", err);
@@ -289,32 +278,24 @@ class ConnectionServiceClass {
 
     setActiveConnectionId(id);
     device.setConnectionId(id);
-    device.setConnectionPhase("configuring");
     device.resetConfigProgress();
+
+    // Set initial phase to configuring - will be updated by myNodeInfo handler
+    device.setConnectionPhase("configuring");
     await this.updateStatus(id, "configuring");
 
-    logger.info(`[ConnectionService] Starting configureTwoStage`);
-    meshDevice
-      .configureTwoStage()
-      .then(() => {
-        logger.info(`[ConnectionService] configureTwoStage completed`);
-        meshDevice
-          .heartbeat()
-          .then(() => {
-            const heartbeat = setInterval(() => {
-              meshDevice.heartbeat().catch(console.warn);
-            }, HEARTBEAT_INTERVAL_MS);
-            state.heartbeat = heartbeat;
-          })
-          .catch(console.warn);
-      })
-      .catch(async (err) => {
-        logger.error(
-          `[ConnectionService] configureTwoStage failed:`,
-          err.message,
-        );
-        await this.updateStatus(id, "error", err.message);
-      });
+    if (opts?.skipConfig) {
+      // Debug mode: skip config sync entirely
+      logger.info(`[ConnectionService] Skipping config sync (debug mode)`);
+      device.setConnectionPhase("connected");
+      await this.updateStatus(id, "connected");
+      startHeartbeat();
+    } else {
+      // Start config sync
+      // If cache is found in onMyNodeInfo handler, we'll use cached data immediately
+      // and let this sync complete in background to update the cache
+      runConfigSync();
+    }
 
     await connectionRepo.linkMeshDevice(id, deviceId);
     this.notify();
@@ -326,7 +307,7 @@ class ConnectionServiceClass {
    */
   async connect(
     conn: Connection,
-    opts?: { allowPrompt?: boolean },
+    opts?: { allowPrompt?: boolean; skipConfig?: boolean },
   ): Promise<boolean> {
     logger.info(
       `[ConnectionService] Starting connection id=${conn.id} type=${conn.type}`,
@@ -342,15 +323,43 @@ class ConnectionServiceClass {
     await this.updateStatus(conn.id, "connecting");
 
     try {
-      if (conn.type === "http") {
-        return await this.connectHttp(conn);
+      let strategy: ConnectionStrategy;
+
+      switch (conn.type) {
+        case "http":
+          strategy = new HttpStrategy();
+          break;
+        case "bluetooth":
+          strategy = new BluetoothStrategy();
+          break;
+        case "serial":
+          strategy = new SerialStrategy();
+          break;
+        default:
+          throw new Error(`Unknown connection type: ${conn.type}`);
       }
-      if (conn.type === "bluetooth") {
-        return await this.connectBluetooth(conn, opts);
+
+      const result = await strategy.connect(conn, opts);
+
+      // Store strategy and handle for cleanup
+      const state = this.getState(conn.id);
+      state.strategy = strategy;
+      state.nativeHandle = result.nativeHandle;
+      state.cleanup = result.onDisconnect;
+
+      // Handle bluetooth disconnect specifically if handle is provided
+      if (conn.type === "bluetooth" && result.nativeHandle) {
+         state.disconnectSubscription = BrowserHardware.onBluetoothDisconnect(
+            result.nativeHandle,
+            () => this.updateStatus(conn.id, "disconnected"),
+          );
       }
-      if (conn.type === "serial") {
-        return await this.connectSerial(conn, opts);
-      }
+
+      await this.setupMeshDevice(conn.id, result.transport, {
+        skipConfig: opts?.skipConfig,
+      });
+      return true;
+
     } catch (err: unknown) {
       logger.error(
         `[ConnectionService] Connection failed:`,
@@ -363,140 +372,6 @@ class ConnectionServiceClass {
       );
       return false;
     }
-
-    return false;
-  }
-
-  private async connectHttp(conn: Connection): Promise<boolean> {
-    if (!conn.url) {
-      throw new Error("HTTP connection missing URL");
-    }
-
-    logger.debug(`[ConnectionService] Testing HTTP reachability: ${conn.url}`);
-    const ok = await testHttpReachable(conn.url);
-    if (!ok) {
-      const url = new URL(conn.url);
-      throw new Error(
-        url.protocol === "https:"
-          ? `Cannot reach HTTPS endpoint. Open ${conn.url} in a new tab to accept the certificate.`
-          : "HTTP endpoint not reachable",
-      );
-    }
-
-    const url = new URL(conn.url);
-    logger.debug(`[ConnectionService] Creating HTTP transport for ${url.host}`);
-    const transport = await TransportHTTP.create(
-      url.host,
-      url.protocol === "https:",
-    );
-    logger.info(`[ConnectionService] HTTP transport created successfully`);
-    await this.setupMeshDevice(conn.id, transport);
-    return true;
-  }
-
-  private async connectBluetooth(
-    conn: Connection,
-    opts?: { allowPrompt?: boolean },
-  ): Promise<boolean> {
-    if (!BrowserHardware.hasBluetooth()) {
-      throw new Error("Web Bluetooth not supported");
-    }
-
-    logger.debug(`[ConnectionService] Looking for Bluetooth device`);
-    const state = this.getState(conn.id);
-    let bleDevice = state.transport as BluetoothDevice | undefined;
-
-    if (!bleDevice && conn.deviceId) {
-      bleDevice =
-        (await BrowserHardware.findBluetoothDevice(conn.deviceId)) ?? undefined;
-      if (bleDevice) {
-        logger.debug(`[ConnectionService] Found existing BT device`);
-      }
-    }
-
-    if (!bleDevice && opts?.allowPrompt) {
-      logger.debug(`[ConnectionService] Requesting new BT device from user`);
-      bleDevice =
-        (await BrowserHardware.requestBluetoothDevice(conn.gattServiceUUID)) ??
-        undefined;
-    }
-
-    if (!bleDevice) {
-      throw new Error("Bluetooth device not available. Re-select the device.");
-    }
-
-    logger.debug(`[ConnectionService] Creating Bluetooth transport`);
-    const transport = await TransportWebBluetooth.createFromDevice(bleDevice);
-    logger.info(`[ConnectionService] Bluetooth transport created successfully`);
-    await this.setupMeshDevice(conn.id, transport, bleDevice);
-
-    state.disconnectSubscription = BrowserHardware.onBluetoothDisconnect(
-      bleDevice,
-      () => this.updateStatus(conn.id, "disconnected"),
-    );
-
-    return true;
-  }
-
-  private async connectSerial(
-    conn: Connection,
-    opts?: { allowPrompt?: boolean },
-  ): Promise<boolean> {
-    if (!BrowserHardware.hasSerial()) {
-      throw new Error("Web Serial not supported");
-    }
-
-    logger.debug(`[ConnectionService] Looking for Serial port`);
-    const state = this.getState(conn.id);
-    let port = state.transport as SerialPort | undefined;
-
-    if (!port) {
-      port =
-        (await BrowserHardware.findSerialPort(
-          conn.usbVendorId,
-          conn.usbProductId,
-        )) ?? undefined;
-      if (port) {
-        logger.debug(`[ConnectionService] Found existing serial port`);
-      }
-    }
-
-    if (!port && opts?.allowPrompt) {
-      logger.debug(`[ConnectionService] Requesting serial port from user`);
-      const result = await BrowserHardware.requestSerialPort();
-      port = result?.port;
-    }
-
-    if (!port) {
-      throw new Error("Serial port not available. Re-select the port.");
-    }
-
-    if (BrowserHardware.isSerialPortOpen(port)) {
-      logger.debug(`[ConnectionService] Closing already-open serial port`);
-      await BrowserHardware.closeSerialPort(port);
-    }
-
-    try {
-      logger.debug(`[ConnectionService] Creating Serial transport`);
-      const transport = await TransportWebSerial.createFromPort(port);
-      logger.info(`[ConnectionService] Serial transport created successfully`);
-      await this.setupMeshDevice(conn.id, transport, undefined, port);
-      return true;
-    } catch (serialErr: unknown) {
-      const msg =
-        serialErr instanceof Error ? serialErr.message : String(serialErr);
-
-      if (
-        msg.includes("Failed to open") ||
-        msg.includes("already open") ||
-        msg.includes("NetworkError")
-      ) {
-        throw new Error(
-          "Port is locked or in use by another application. Close other apps using this device and try again.",
-        );
-      }
-      throw serialErr;
-    }
   }
 
   /**
@@ -504,46 +379,50 @@ class ConnectionServiceClass {
    */
   async disconnect(conn: Connection): Promise<void> {
     const state = this.state.get(conn.id);
-    if (!state) return;
+    if (!state) {
+      return;
+    }
 
     this.cleanupHeartbeat(conn.id);
 
-    state.dbSubscription?.();
-    state.statusSubscription?.();
-    state.disconnectSubscription?.();
+    try {
+      state.dbSubscription?.();
+      state.statusSubscription?.();
+      state.disconnectSubscription?.();
+      state.cleanup?.();
 
-    if (conn.meshDeviceId) {
-      const { getDevice } = useDeviceStore.getState();
-      const device = getDevice(conn.meshDeviceId);
+      if (conn.meshDeviceId) {
+        const { getDevice } = useDeviceStore.getState();
+        const device = getDevice(conn.meshDeviceId);
 
-      try {
-        device?.connection?.disconnect();
-      } catch {}
-
-      if (state.transport) {
-        if (conn.type === "bluetooth") {
-          BrowserHardware.disconnectBluetoothDevice(
-            state.transport as BluetoothDevice,
-          );
+        try {
+          device?.connection?.disconnect();
+        } catch (err) {
+          logger.warn("[ConnectionService] Error during disconnect:", err);
         }
-        if (conn.type === "serial") {
-          await BrowserHardware.closeSerialPort(state.transport as SerialPort);
+
+        if (device) {
+          device.setConnectionId(null);
+          device.setConnectionPhase("disconnected");
         }
       }
 
-      if (device) {
-        device.setConnectionId(null);
-        device.setConnectionPhase("disconnected");
+      if (state.strategy) {
+        await state.strategy.disconnect(state.nativeHandle);
       }
+
+    } catch (err) {
+      logger.error(`[ConnectionService] Error during clean disconnect for ${conn.id}:`, err);
+    } finally {
+      // Always ensure status is updated and state is cleared
+      await connectionRepo.updateConnection(conn.id, {
+        status: "disconnected",
+        error: null,
+      });
+
+      this.state.delete(conn.id);
+      this.notify();
     }
-
-    await connectionRepo.updateConnection(conn.id, {
-      status: "disconnected",
-      error: null,
-    });
-
-    this.state.delete(conn.id);
-    this.notify();
   }
 
   /**
@@ -580,7 +459,9 @@ class ConnectionServiceClass {
     const btChecks = connections
       .filter((c) => c.type === "bluetooth" && !this.isActiveStatus(c.status))
       .map(async (c) => {
-        if (!BrowserHardware.hasBluetooth()) return;
+        if (!BrowserHardware.hasBluetooth()) {
+          return;
+        }
         const devices = await BrowserHardware.getBluetoothDevices();
         const hasPermission = devices.some((d) => d.id === c.deviceId);
         await connectionRepo.updateStatus(
@@ -592,7 +473,9 @@ class ConnectionServiceClass {
     const serialChecks = connections
       .filter((c) => c.type === "serial" && !this.isActiveStatus(c.status))
       .map(async (c) => {
-        if (!BrowserHardware.hasSerial()) return;
+        if (!BrowserHardware.hasSerial()) {
+          return;
+        }
         const ports = await BrowserHardware.getSerialPorts();
         const hasPermission = ports.some(
           (p) =>
@@ -653,3 +536,4 @@ class ConnectionServiceClass {
 }
 
 export const ConnectionService = new ConnectionServiceClass();
+

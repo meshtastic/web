@@ -1,9 +1,16 @@
 import { usePacketLogs } from "@data/hooks/usePacketLogs";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf, Utils } from "@meshtastic/core";
 import { Mono } from "@shared/components/Mono";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@shared/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -22,12 +29,14 @@ import {
   ClipboardCopyIcon,
   DownloadIcon,
   FileText,
-  FilterIcon,
   RefreshCwIcon,
   Trash2Icon,
 } from "lucide-react";
 import { Suspense, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+
+// Derive packet type filter options from portNumMap
+const PACKET_TYPE_OPTIONS = Object.keys(Utils.portNumMap).sort();
 
 interface DebugLogDrawerProps {
   open: boolean;
@@ -46,24 +55,30 @@ function formatTimestamp(date: Date, locale: string | undefined): string {
   });
 }
 
-function getPortName(portnum: number): string {
+function getPortName(portnum: number | string): string {
+  if (typeof portnum === "string") {
+    return portnum;
+  }
   return Protobuf.Portnums.PortNum[portnum] ?? `PORT_${portnum}`;
 }
 
-function getPriorityName(priority: number): string {
-  const priorities: Record<number, string> = {
-    1: "MIN",
-    10: "BACKGROUND",
-    64: "DEFAULT",
-    70: "RELIABLE",
-    120: "ACK",
-    127: "MAX",
-  };
-  return priorities[priority] ?? `Priority ${priority}`;
+function isPortNumName(value: string): value is Utils.PortNumName {
+  return value in Utils.portNumMap;
 }
 
-function decodePayload(
-  portnum: number,
+function getPortNumber(portnum: number | string): number | undefined {
+  if (typeof portnum === "number") {
+    return portnum;
+  }
+  // Use pre-built lookup map for O(1) string-to-number conversion
+  if (isPortNumName(portnum)) {
+    return Utils.portNumMap[portnum];
+  }
+  return undefined;
+}
+
+function decodePayloadForDisplay(
+  portnum: number | string,
   payload: Uint8Array | string | undefined,
 ): Record<string, unknown> | null {
   if (!payload) {
@@ -71,69 +86,18 @@ function decodePayload(
   }
 
   try {
+    // toJson() encodes bytes fields as base64 strings
     const bytes =
       typeof payload === "string"
-        ? Uint8Array.from(payload, (c) => c.charCodeAt(0))
+        ? Uint8Array.from(atob(payload), (c) => c.charCodeAt(0))
         : payload;
 
-    switch (portnum) {
-      case Protobuf.Portnums.PortNum.TEXT_MESSAGE_APP:
-      case Protobuf.Portnums.PortNum.TEXT_MESSAGE_COMPRESSED_APP:
-        return { message: new TextDecoder().decode(bytes) };
-      case Protobuf.Portnums.PortNum.ROUTING_APP:
-        return Protobuf.Mesh.Routing.fromBinary(bytes).toJson() as Record<
-          string,
-          unknown
-        >;
-      case Protobuf.Portnums.PortNum.ADMIN_APP:
-        return Protobuf.Admin.AdminMessage.fromBinary(bytes).toJson() as Record<
-          string,
-          unknown
-        >;
-      case Protobuf.Portnums.PortNum.POSITION_APP:
-        return Protobuf.Mesh.Position.fromBinary(bytes).toJson() as Record<
-          string,
-          unknown
-        >;
-      case Protobuf.Portnums.PortNum.NODEINFO_APP:
-        return Protobuf.Mesh.User.fromBinary(bytes).toJson() as Record<
-          string,
-          unknown
-        >;
-      case Protobuf.Portnums.PortNum.TELEMETRY_APP:
-        return Protobuf.Telemetry.Telemetry.fromBinary(
-          bytes,
-        ).toJson() as Record<string, unknown>;
-      case Protobuf.Portnums.PortNum.WAYPOINT_APP:
-        return Protobuf.Mesh.Waypoint.fromBinary(bytes).toJson() as Record<
-          string,
-          unknown
-        >;
-      case Protobuf.Portnums.PortNum.TRACEROUTE_APP:
-        return Protobuf.Mesh.RouteDiscovery.fromBinary(
-          bytes,
-        ).toJson() as Record<string, unknown>;
-      case Protobuf.Portnums.PortNum.NEIGHBORINFO_APP:
-        return Protobuf.Mesh.NeighborInfo.fromBinary(bytes).toJson() as Record<
-          string,
-          unknown
-        >;
-      case Protobuf.Portnums.PortNum.STORE_FORWARD_APP:
-        return Protobuf.StoreAndForward.StoreAndForward.fromBinary(
-          bytes,
-        ).toJson() as Record<string, unknown>;
-      case Protobuf.Portnums.PortNum.PAXCOUNTER_APP:
-        return Protobuf.Paxcount.Paxcount.fromBinary(bytes).toJson() as Record<
-          string,
-          unknown
-        >;
-      case Protobuf.Portnums.PortNum.REMOTE_HARDWARE_APP:
-        return Protobuf.RemoteHardware.HardwareMessage.fromBinary(
-          bytes,
-        ).toJson() as Record<string, unknown>;
-      default:
-        return null;
+    const port = getPortNumber(portnum);
+    if (port === undefined) {
+      return null;
     }
+
+    return Utils.decodePayloadToJson(port, bytes);
   } catch {
     return null;
   }
@@ -150,14 +114,13 @@ function PacketEntry({
 }) {
   const rawPacket = packet.rawPacket as Record<string, unknown> | null;
   const decoded = rawPacket?.decoded as Record<string, unknown> | undefined;
-  const portnum = decoded?.portnum as number | undefined;
+  const portnum = decoded?.portnum as number | string | undefined;
   const payload = decoded?.payload as string | Uint8Array | undefined;
-  const priority = rawPacket?.priority as number | undefined;
   const wantAck = rawPacket?.wantAck as boolean | undefined;
   const requestId = decoded?.requestId as number | undefined;
 
   const decodedPayload =
-    portnum !== undefined ? decodePayload(portnum, payload) : null;
+    portnum !== undefined ? decodePayloadForDisplay(portnum, payload) : null;
 
   const copyPacketData = () => {
     const data = JSON.stringify(rawPacket, null, 2);
@@ -227,16 +190,10 @@ function PacketEntry({
             <span>{wantAck ? "true" : "false"}</span>
           </div>
         )}
-        {priority !== undefined && (
-          <div>
-            <span className="text-muted-foreground">priority: </span>
-            <span>{getPriorityName(priority)}</span>
-          </div>
-        )}
 
         {decoded && (
           <div className="mt-1">
-            <span className="text-muted-foreground">decoded {"{"}</span>
+            <span className="text-muted-foreground">payload {"{"}</span>
             <div className="ml-4">
               {portnum !== undefined && (
                 <div>
@@ -293,25 +250,35 @@ function PacketLogContent() {
   const device = useDevice();
   const { packets } = usePacketLogs(device.id, 200);
   const [searchQuery, setSearchQuery] = useState("");
+  const [packetTypeFilter, setPacketTypeFilter] = useState<string>("all");
 
   const filteredPackets = useMemo(() => {
-    if (!searchQuery.trim()) return packets;
-    const query = searchQuery.toLowerCase();
     return packets.filter((packet) => {
       const rawPacket = packet.rawPacket as Record<string, unknown> | null;
       const decoded = rawPacket?.decoded as Record<string, unknown> | undefined;
-      const portnum = decoded?.portnum as number | undefined;
+      const portnum = decoded?.portnum as number | string | undefined;
       const portName =
-        portnum !== undefined ? getPortName(portnum).toLowerCase() : "";
+        portnum !== undefined ? getPortName(portnum) : "";
 
-      return (
-        packet.fromNode.toString(16).includes(query) ||
-        packet.toNode?.toString(16).includes(query) ||
-        portName.includes(query) ||
-        JSON.stringify(rawPacket).toLowerCase().includes(query)
-      );
+      // Apply packet type filter
+      if (packetTypeFilter !== "all" && portName !== packetTypeFilter) {
+        return false;
+      }
+
+      // Apply search query filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        return (
+          packet.fromNode.toString(16).includes(query) ||
+          packet.toNode?.toString(16).includes(query) ||
+          portName.toLowerCase().includes(query) ||
+          JSON.stringify(rawPacket).toLowerCase().includes(query)
+        );
+      }
+
+      return true;
     });
-  }, [packets, searchQuery]);
+  }, [packets, searchQuery, packetTypeFilter]);
 
   const handleCopy = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -337,15 +304,19 @@ function PacketLogContent() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1"
         />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="sm">
-              Filters
-              <FilterIcon className="size-5 ml-1" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Filter packets by type</TooltipContent>
-        </Tooltip>
+        <Select value={packetTypeFilter} onValueChange={setPacketTypeFilter}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Filter by type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Packets</SelectItem>
+            {PACKET_TYPE_OPTIONS.map((portName) => (
+              <SelectItem key={portName} value={portName}>
+                {portName}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" onClick={handleExport}>

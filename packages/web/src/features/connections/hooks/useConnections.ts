@@ -77,7 +77,10 @@ export function useConnections() {
   }, [refresh]);
 
   const connect = useCallback(
-    async (id: number, opts?: { allowPrompt?: boolean }) => {
+    async (
+      id: number,
+      opts?: { allowPrompt?: boolean; skipConfig?: boolean },
+    ) => {
       const conn = connections.find((c) => c.id === id);
       if (!conn) {
         return false;

@@ -799,12 +799,108 @@ export class MeshDevice {
   }
 
   /**
-   * Triggers the device configure process with a specific nonce
+   * Two-stage config flow
+   * Stage 1: Config-only (device config, module config, channels)
+   * Stage 2: Node-info only (node database)
    */
-  private configureWithNonce(nonce: number): Promise<number> {
+  public async configureTwoStage(): Promise<void> {
+    // Nonces from Android implementation
+    const CONFIG_ONLY_NONCE = 69420;
+    const NODE_INFO_NONCE = 69421;
+    const WANT_CONFIG_DELAY = 100; // ms
+    const STAGE_TIMEOUT = 30000; // 30 second timeout
+
     this.log.debug(
       Emitter[Emitter.Configure],
-      `⚙️ Requesting device configuration with nonce: ${nonce}`,
+      "⚙️ Starting two-stage configuration flow",
+    );
+    this.updateDeviceStatus(DeviceStatusEnum.DeviceConfiguring);
+
+    // Helper to wait for a specific config complete nonce
+    const waitForConfigComplete = (
+      nonce: number,
+      stageName: string,
+    ): Promise<number> => {
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          unsubscribe();
+          reject(new Error(`${stageName} timeout`));
+        }, STAGE_TIMEOUT);
+
+        const unsubscribe = this.events.onConfigComplete.subscribe(
+          (configCompleteId) => {
+            if (configCompleteId === nonce) {
+              clearTimeout(timeout);
+              unsubscribe();
+              this.log.debug(
+                Emitter[Emitter.Configure],
+                `✅ ${stageName} complete (nonce: ${configCompleteId})`,
+              );
+              resolve(configCompleteId);
+            }
+          },
+        );
+      });
+    };
+
+    // Stage 1: Config-only
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      `⚙️ Stage 1: Requesting config-only (nonce: ${CONFIG_ONLY_NONCE})`,
+    );
+
+    // Set up listener FIRST, then send request
+    const stage1Promise = waitForConfigComplete(
+      CONFIG_ONLY_NONCE,
+      "Config-only stage",
+    );
+
+    // Send request and wait for it to be transmitted
+    await this.sendConfigRequest(CONFIG_ONLY_NONCE);
+
+    // Now wait for the config complete response
+    await stage1Promise;
+
+    // Send heartbeat between stages
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      "❤️ Sending heartbeat between config stages",
+    );
+    await new Promise((resolve) => setTimeout(resolve, WANT_CONFIG_DELAY));
+    await this.heartbeat();
+    await new Promise((resolve) => setTimeout(resolve, WANT_CONFIG_DELAY));
+
+    // Stage 2: Node-info only
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      `⚙️ Stage 2: Requesting node-info (nonce: ${NODE_INFO_NONCE})`,
+    );
+
+    const stage2Promise = waitForConfigComplete(
+      NODE_INFO_NONCE,
+      "Node-info stage",
+    );
+
+    // Send request and wait for it to be transmitted
+    await this.sendConfigRequest(NODE_INFO_NONCE);
+
+    // Now wait for the node info complete response
+    await stage2Promise;
+
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      "✅ Two-stage configuration complete",
+    );
+    this.updateDeviceStatus(DeviceStatusEnum.DeviceConfigured);
+  }
+
+  /**
+   * Sends a config request and waits for it to be sent
+   */
+  private async sendConfigRequest(nonce: number): Promise<number> {
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      `⚙️ Sending config request with nonce: ${nonce}`,
     );
 
     const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
@@ -822,101 +918,6 @@ export class MeshDevice {
         throw e;
       },
     );
-  }
-
-  /**
-   * Two-stage config flow
-   * Stage 1: Config-only (device config, module config, channels)
-   * Stage 2: Node-info only (node database)
-   */
-  public async configureTwoStage(): Promise<void> {
-    // Nonces from Android implementation
-    const CONFIG_ONLY_NONCE = 69420;
-    const NODE_INFO_NONCE = 69421;
-    const WANT_CONFIG_DELAY = 100; // ms
-
-    this.log.debug(
-      Emitter[Emitter.Configure],
-      "⚙️ Starting two-stage configuration flow",
-    );
-    this.updateDeviceStatus(DeviceStatusEnum.DeviceConfiguring);
-
-    // Stage 1: Config-only
-    this.log.debug(
-      Emitter[Emitter.Configure],
-      `⚙️ Stage 1: Requesting config-only (nonce: ${CONFIG_ONLY_NONCE})`,
-    );
-
-    // Wait for config-only complete
-    const configOnlyComplete = new Promise<number>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        unsubscribe();
-        reject(new Error("Config-only stage timeout"));
-      }, 30000); // 30 second timeout
-
-      const unsubscribe = this.events.onConfigComplete.subscribe(
-        (configCompleteId) => {
-          if (configCompleteId === CONFIG_ONLY_NONCE) {
-            clearTimeout(timeout);
-            unsubscribe();
-            this.log.debug(
-              Emitter[Emitter.Configure],
-              `✅ Config-only complete (nonce: ${configCompleteId})`,
-            );
-            resolve(configCompleteId);
-          }
-        },
-      );
-    });
-
-    await this.configureWithNonce(CONFIG_ONLY_NONCE);
-    await configOnlyComplete;
-
-    // Send heartbeat between stages
-    this.log.debug(
-      Emitter[Emitter.Configure],
-      "❤️ Sending heartbeat between config stages",
-    );
-    await new Promise((resolve) => setTimeout(resolve, WANT_CONFIG_DELAY));
-    await this.heartbeat();
-    await new Promise((resolve) => setTimeout(resolve, WANT_CONFIG_DELAY));
-
-    // Stage 2: Node-info only
-    this.log.debug(
-      Emitter[Emitter.Configure],
-      `⚙️ Stage 2: Requesting node-info (nonce: ${NODE_INFO_NONCE})`,
-    );
-
-    // Wait for node-info complete
-    const nodeInfoComplete = new Promise<number>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        unsubscribe();
-        reject(new Error("Node-info stage timeout"));
-      }, 30000); // 30 second timeout
-
-      const unsubscribe = this.events.onConfigComplete.subscribe(
-        (configCompleteId) => {
-          if (configCompleteId === NODE_INFO_NONCE) {
-            clearTimeout(timeout);
-            unsubscribe();
-            this.log.debug(
-              Emitter[Emitter.Configure],
-              `✅ Node-info complete (nonce: ${configCompleteId})`,
-            );
-            resolve(configCompleteId);
-          }
-        },
-      );
-    });
-
-    await this.configureWithNonce(NODE_INFO_NONCE);
-    await nodeInfoComplete;
-
-    this.log.debug(
-      Emitter[Emitter.Configure],
-      "✅ Two-stage configuration complete",
-    );
-    this.updateDeviceStatus(DeviceStatusEnum.DeviceConfigured);
   }
 
   /**

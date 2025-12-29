@@ -1,3 +1,9 @@
+export {
+  decodePayload,
+  decodePayloadToJson,
+  portNumMap,
+  type PortNumName,
+} from "./decodePayload.ts";
 export { EventSystem } from "./eventSystem.ts";
 export { Queue } from "./queue.ts";
 export { fromDeviceStream } from "./transform/fromDevice.ts";

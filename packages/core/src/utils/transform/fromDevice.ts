@@ -10,9 +10,7 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
     return new TransformStream<Uint8Array, DeviceOutput>({
       transform(chunk: Uint8Array, controller): void {
         chunkCount++;
-        if (chunkCount <= 5 || chunkCount % 20 === 0) {
-          console.debug(`[fromDevice] Chunk #${chunkCount}, size: ${chunk.length} bytes`);
-        }
+        console.debug(`[fromDevice] Chunk #${chunkCount}, size: ${chunk.length} bytes`);
         // onReleaseEvent.subscribe(() => {
         //   controller.terminate();
         // });
@@ -20,9 +18,36 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
         let processingExhausted = false;
         while (byteBuffer.length !== 0 && !processingExhausted) {
           const framingIndex = byteBuffer.indexOf(0x94);
+
+          // Case 1: No 0x94 found
+          if (framingIndex === -1) {
+            controller.enqueue({
+              type: "debug",
+              data: textDecoder.decode(byteBuffer),
+            });
+            byteBuffer = new Uint8Array([]);
+            processingExhausted = true;
+            continue;
+          }
+
+          // Case 2: 0x94 found. Check if we have enough data for framingByte2
+          if (framingIndex + 1 >= byteBuffer.length) {
+            // Dump preceeding as debug if any
+            if (framingIndex > 0) {
+              controller.enqueue({
+                type: "debug",
+                data: textDecoder.decode(byteBuffer.subarray(0, framingIndex)),
+              });
+              byteBuffer = byteBuffer.subarray(framingIndex);
+            }
+            // Buffer is just [0x94]
+            processingExhausted = true;
+            continue;
+          }
+
           const framingByte2 = byteBuffer[framingIndex + 1];
           if (framingByte2 === 0xc3) {
-            if (byteBuffer.subarray(0, framingIndex).length) {
+            if (framingIndex > 0) {
               controller.enqueue({
                 type: "debug",
                 data: textDecoder.decode(byteBuffer.subarray(0, framingIndex)),
@@ -30,32 +55,39 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
               byteBuffer = byteBuffer.subarray(framingIndex);
             }
 
+            // 2. Check length bytes
+            if (byteBuffer.length < 4) {
+              processingExhausted = true;
+              continue;
+            }
+
             const msb = byteBuffer[2];
             const lsb = byteBuffer[3];
+            const packetLen = (msb << 8) + lsb;
 
-            if (
-              msb !== undefined &&
-              lsb !== undefined &&
-              byteBuffer.length >= 4 + (msb << 8) + lsb
-            ) {
-              const packet = byteBuffer.subarray(4, 4 + (msb << 8) + lsb);
+            if (byteBuffer.length >= 4 + packetLen) {
+              const packet = byteBuffer.subarray(4, 4 + packetLen);
 
               const malformedDetectorIndex = packet.indexOf(0x94);
               if (
                 malformedDetectorIndex !== -1 &&
+                malformedDetectorIndex + 1 < packet.length &&
                 packet[malformedDetectorIndex + 1] === 0xc3
               ) {
                 console.warn(
                   `⚠️ Malformed packet found, discarding: ${byteBuffer
-                    .subarray(0, malformedDetectorIndex - 1)
+                    .subarray(0, 4 + malformedDetectorIndex - 1)
                     .toString()}`,
                 );
 
-                byteBuffer = byteBuffer.subarray(malformedDetectorIndex);
+                byteBuffer = byteBuffer.subarray(4 + malformedDetectorIndex);
+                continue; // Loop again to process this new header
               } else {
-                byteBuffer = byteBuffer.subarray(3 + (msb << 8) + lsb + 1);
+                byteBuffer = byteBuffer.subarray(4 + packetLen);
 
-                console.debug(`[fromDevice] Parsed packet, size: ${packet.length} bytes`);
+                console.debug(
+                  `[fromDevice] Parsed packet, size: ${packet.length} bytes`,
+                );
                 controller.enqueue({
                   type: "packet",
                   data: packet,
@@ -65,7 +97,13 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
               processingExhausted = true;
             }
           } else {
-            processingExhausted = true;
+            // 0x94 found but followed by !0xc3.
+            const discardLen = framingIndex + 1;
+            controller.enqueue({
+              type: "debug",
+              data: textDecoder.decode(byteBuffer.subarray(0, discardLen)),
+            });
+            byteBuffer = byteBuffer.subarray(discardLen);
           }
         }
       },

@@ -115,6 +115,8 @@ class FakeSerialPort {
   readable: ReadableStream<Uint8Array>;
   writable: WritableStream<Uint8Array>;
   lastWritten?: Uint8Array;
+  setSignalsCalled = false;
+  setSignalsArgs?: { dataTerminalReady?: boolean; requestToSend?: boolean };
 
   private _readController!: ReadableStreamDefaultController<Uint8Array>;
 
@@ -140,6 +142,15 @@ class FakeSerialPort {
     try {
       this._readController.close();
     } catch {}
+    return Promise.resolve();
+  }
+
+  setSignals(signals: {
+    dataTerminalReady?: boolean;
+    requestToSend?: boolean;
+  }): Promise<void> {
+    this.setSignalsCalled = true;
+    this.setSignalsArgs = signals;
     return Promise.resolve();
   }
 
@@ -239,6 +250,35 @@ describe("TransportWebSerial (extras)", () => {
       }
     }
     expect(saw).toBe(true);
+
+    reader.releaseLock();
+    await transport.disconnect();
+  });
+
+  /**
+   * REGRESSION TEST: setSignals() must NOT be called during connection.
+   *
+   * Calling setSignals({ dataTerminalReady: false, requestToSend: false })
+   * prevents the device from responding to config requests. This was
+   * discovered when the connection would hang during configureTwoStage().
+   *
+   * See: https://github.com/meshtastic/meshtastic-web/issues/XXX
+   */
+  it("does NOT call setSignals during connection (regression)", async () => {
+    const fake = new FakeSerialPort();
+    const transport = await TransportWebSerial.createFromPort(fake as any);
+
+    // Wait for connection to be established
+    const reader = transport.fromDevice.getReader();
+    for (let i = 0; i < 3; i++) {
+      const { value } = await reader.read();
+      if (value?.type === "status" && value.data.status === Types.DeviceStatusEnum.DeviceConnected) {
+        break;
+      }
+    }
+
+    // Verify setSignals was never called
+    expect(fake.setSignalsCalled).toBe(false);
 
     reader.releaseLock();
     await transport.disconnect();

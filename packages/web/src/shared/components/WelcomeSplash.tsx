@@ -45,11 +45,7 @@ export function WelcomeSplash({ onComplete }: WelcomeSplashProps) {
       </div>
 
       <div className="relative z-10 flex flex-col items-center gap-8 px-4 text-center">
-        <div className="relative">
-          <span className="animate-pulse [animation-duration:2s] z-0">
-            <img src="/logo.svg" alt="App Logo" className="h-24 w-24 z-10" />
-          </span>
-        </div>
+        <img src="/logo.svg" alt="App Logo" className="h-24 w-24 z-10" />
 
         <div className="space-y-2">
           <h1 className="text-5xl font-bold tracking-tight text-white md:text-6xl text-balance">

@@ -40,7 +40,7 @@ export const decodePacket = (device: MeshDevice) =>
           }
           device.events.onFromRadio.dispatch(decodedMessage);
 
-          device.log.debug(
+          device.log.info(
             Types.Emitter[Types.Emitter.HandleFromRadio],
             `📨 FromRadio: ${decodedMessage.payloadVariant.case}`,
           );
@@ -72,9 +72,9 @@ export const decodePacket = (device: MeshDevice) =>
             }
 
             case "nodeInfo": {
-              device.log.info(
+              device.log.debug(
                 Types.Emitter[Types.Emitter.HandleFromRadio],
-                `📱 Received Node Info packet for node: ${decodedMessage.payloadVariant.value.num}`,
+                `Received Node Info packet for node: ${decodedMessage.payloadVariant.value.num}`,
               );
 
               device.events.onNodeInfoPacket.dispatch(
@@ -119,7 +119,7 @@ export const decodePacket = (device: MeshDevice) =>
 
             case "config": {
               if (decodedMessage.payloadVariant.value.payloadVariant.case) {
-                device.log.trace(
+                device.log.info(
                   Types.Emitter[Types.Emitter.HandleFromRadio],
                   `💾 Received Config packet of variant: ${decodedMessage.payloadVariant.value.payloadVariant.case}`,
                 );
@@ -178,7 +178,7 @@ export const decodePacket = (device: MeshDevice) =>
 
             case "moduleConfig": {
               if (decodedMessage.payloadVariant.value.payloadVariant.case) {
-                device.log.trace(
+                device.log.info(
                   Types.Emitter[Types.Emitter.HandleFromRadio],
                   `💾 Received Module Config packet of variant: ${decodedMessage.payloadVariant.value.payloadVariant.case}`,
                 );
@@ -196,7 +196,7 @@ export const decodePacket = (device: MeshDevice) =>
             }
 
             case "channel": {
-              device.log.trace(
+              device.log.info(
                 Types.Emitter[Types.Emitter.HandleFromRadio],
                 `🔐 Received Channel: ${decodedMessage.payloadVariant.value.index}`,
               );
