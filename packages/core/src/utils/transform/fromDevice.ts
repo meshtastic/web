@@ -6,8 +6,13 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
   ) => {
     let byteBuffer = new Uint8Array([]);
     const textDecoder = new TextDecoder();
+    let chunkCount = 0;
     return new TransformStream<Uint8Array, DeviceOutput>({
       transform(chunk: Uint8Array, controller): void {
+        chunkCount++;
+        if (chunkCount <= 5 || chunkCount % 20 === 0) {
+          console.debug(`[fromDevice] Chunk #${chunkCount}, size: ${chunk.length} bytes`);
+        }
         // onReleaseEvent.subscribe(() => {
         //   controller.terminate();
         // });
@@ -50,17 +55,16 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
               } else {
                 byteBuffer = byteBuffer.subarray(3 + (msb << 8) + lsb + 1);
 
+                console.debug(`[fromDevice] Parsed packet, size: ${packet.length} bytes`);
                 controller.enqueue({
                   type: "packet",
                   data: packet,
                 });
               }
             } else {
-              /** Only partioal message in buffer, wait for the rest */
               processingExhausted = true;
             }
           } else {
-            /** Message not complete, only 1 byte in buffer */
             processingExhausted = true;
           }
         }

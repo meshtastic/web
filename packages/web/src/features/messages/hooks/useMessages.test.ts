@@ -121,17 +121,18 @@ describe("useMessages hooks", () => {
   describe("useConversations", () => {
     it("should fetch conversations", async () => {
       const mockConversations = [{ id: 1, type: "direct", unreadCount: 0 }];
+      const myNodeNum = 456;
       (messageRepo.getConversations as vi.Mock).mockResolvedValue(
         mockConversations,
       );
 
-      const { result } = renderHook(() => useConversations(deviceId));
+      const { result } = renderHook(() => useConversations(deviceId, myNodeNum));
 
       await waitFor(() => {
         expect(result.current.conversations).toEqual(mockConversations);
       });
 
-      expect(messageRepo.getConversations).toHaveBeenCalledWith(deviceId);
+      expect(messageRepo.getConversations).toHaveBeenCalledWith(deviceId, myNodeNum);
     });
   });
 });

@@ -38,7 +38,6 @@ function SignalBars({
       aria-label={`Signal strength: ${bars} bars`}
     >
       <title className="sr-only">Signal Indicator</title>
-      {/* Bar 1 - always visible, shortest */}
       <rect
         x="0"
         y="12"
@@ -48,7 +47,6 @@ function SignalBars({
         fill={bars >= 1 ? color : "currentColor"}
         opacity={bars >= 1 ? 1 : 0.2}
       />
-      {/* Bar 2 */}
       <rect
         x="4.25"
         y="9"
@@ -58,7 +56,6 @@ function SignalBars({
         fill={bars >= 2 ? color : "currentColor"}
         opacity={bars >= 2 ? 1 : 0.2}
       />
-      {/* Bar 3 */}
       <rect
         x="8.5"
         y="6"
@@ -68,7 +65,6 @@ function SignalBars({
         fill={bars >= 3 ? color : "currentColor"}
         opacity={bars >= 3 ? 1 : 0.2}
       />
-      {/* Bar 4 */}
       <rect
         x="12.75"
         y="3"
@@ -78,7 +74,6 @@ function SignalBars({
         fill={bars >= 4 ? color : "currentColor"}
         opacity={bars >= 4 ? 1 : 0.2}
       />
-      {/* Bar 5 - tallest */}
       <rect
         x="17"
         y="0"

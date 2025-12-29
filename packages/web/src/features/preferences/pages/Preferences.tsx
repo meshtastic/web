@@ -110,7 +110,6 @@ export function PreferencesPage() {
         </p>
       </div>
 
-      {/* Appearance */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -159,7 +158,6 @@ export function PreferencesPage() {
         </CardContent>
       </Card>
 
-      {/* Localization */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -257,7 +255,6 @@ export function PreferencesPage() {
         </CardContent>
       </Card>
 
-      {/* Map Preferences */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -334,7 +331,6 @@ export function PreferencesPage() {
         </CardContent>
       </Card>
 
-      {/* Audio */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -388,7 +384,6 @@ export function PreferencesPage() {
         </CardContent>
       </Card>
 
-      {/* Actions */}
       <div className="flex justify-end gap-4">
         <Button variant="outline" onClick={resetToDefaults}>
           {t("preferences.resetToDefaults")}

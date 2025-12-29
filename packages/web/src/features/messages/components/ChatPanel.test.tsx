@@ -9,7 +9,7 @@ const createMockMessage = (
   overrides: Partial<Message> = {},
 ): Message => ({
   id,
-  deviceId: 1,
+  ownerNodeNum: 1,
   messageId: id * 100,
   channelId: 0,
   toNode: 123456,

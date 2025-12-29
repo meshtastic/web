@@ -32,7 +32,6 @@ export function ActivityPanel({ open, onOpenChange }: ActivityPanelProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:w-96 flex flex-col p-0">
-        {/* Header */}
         <SheetHeader className="p-6 pb-4 border-b">
           <SheetTitle className="flex items-center gap-2">
             <FileEdit className="h-5 w-5" />
@@ -48,10 +47,8 @@ export function ActivityPanel({ open, onOpenChange }: ActivityPanelProps) {
           </SheetDescription>
         </SheetHeader>
 
-        {/* Activity List */}
         <ActivityList items={activityItems} onRemove={removeChange} />
 
-        {/* Footer Actions */}
         {totalCount > 0 && (
           <div className="p-4 border-t bg-muted/50 space-y-2">
             <Button

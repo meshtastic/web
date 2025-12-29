@@ -23,8 +23,8 @@ interface UseTracerouteReturn {
 export function useTraceroute({
   nodeNum,
 }: UseTracerouteOptions): UseTracerouteReturn {
-  const { deviceId } = useDeviceContext();
-  const { connection, traceroutes } = useDevice();
+  useDeviceContext(); // Ensure we're in a device context
+  const { connection, traceroutes, hardware } = useDevice();
   const navigate = useNavigate();
 
   const [isRunning, setIsRunning] = useState(false);
@@ -72,7 +72,7 @@ export function useTraceroute({
 
         tracerouteRepo
           .logTraceroute({
-            deviceId,
+            ownerNodeNum: hardware.myNodeNum,
             targetNodeNum: nodeNum,
             route: latestTraceroute.data.route,
             routeBack: latestTraceroute.data.routeBack,
@@ -95,7 +95,7 @@ export function useTraceroute({
           });
       }
     }
-  }, [currentTraceroutes, isRunning, deviceId, nodeNum, navigate]);
+  }, [currentTraceroutes, isRunning, hardware.myNodeNum, nodeNum, navigate]);
 
   // Progress animation
   useEffect(() => {

@@ -9,7 +9,6 @@ import { useSyncExternalStore } from "react";
 
 const MOBILE_BREAKPOINT = 768;
 
-// ==================== Mobile Store ====================
 
 const mobileStore = {
   getSnapshot(): boolean {
@@ -24,7 +23,6 @@ const mobileStore = {
   },
 };
 
-// ==================== Hook ====================
 
 export function useIsMobile(): boolean {
   return useSyncExternalStore(

@@ -10,6 +10,7 @@ interface Dialogs {
   shutdown: boolean;
   reboot: boolean;
   deviceName: boolean;
+  deviceShare: boolean;
   nodeRemoval: boolean;
   pkiBackup: boolean;
   nodeDetails: boolean;

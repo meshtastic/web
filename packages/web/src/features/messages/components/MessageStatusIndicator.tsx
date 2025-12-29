@@ -92,7 +92,6 @@ export const MessageStatusIndicator = ({
           <div className={cn("flex items-center gap-1 text-xs", className)}>
             {getStatusIcon()}
 
-            {/* Show retry count for failed messages ONLY */}
             {message.state === "failed" &&
               message.retryCount !== undefined &&
               message.retryCount > 0 &&
@@ -102,7 +101,6 @@ export const MessageStatusIndicator = ({
                 </span>
               )}
 
-            {/* Show SNR for acknowledged messages - only if SNR is meaningful */}
             {message.state === "ack" &&
               message.ackSNR &&
               message.ackSNR > 0 && (

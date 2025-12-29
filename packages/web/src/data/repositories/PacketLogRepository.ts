@@ -38,14 +38,14 @@ export class PacketLogRepository {
    * Get recent packets for a device
    */
   async getPackets(
-    deviceId: number,
+    ownerNodeNum: number,
     limit = 100,
     offset = 0,
   ): Promise<PacketLog[]> {
     return this.db
       .select()
       .from(packetLogs)
-      .where(eq(packetLogs.deviceId, deviceId))
+      .where(eq(packetLogs.ownerNodeNum, ownerNodeNum))
       .orderBy(desc(packetLogs.rxTime))
       .limit(limit)
       .offset(offset);
@@ -55,7 +55,7 @@ export class PacketLogRepository {
    * Get packets from a specific node
    */
   async getPacketsFromNode(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     limit = 100,
   ): Promise<PacketLog[]> {
@@ -64,7 +64,7 @@ export class PacketLogRepository {
       .from(packetLogs)
       .where(
         and(
-          eq(packetLogs.deviceId, deviceId),
+          eq(packetLogs.ownerNodeNum, ownerNodeNum),
           eq(packetLogs.fromNode, nodeNum),
         ),
       )
@@ -75,11 +75,11 @@ export class PacketLogRepository {
   /**
    * Get packet count for a device
    */
-  async getPacketCount(deviceId: number): Promise<number> {
+  async getPacketCount(ownerNodeNum: number): Promise<number> {
     const result = await this.db
       .select({ count: count() })
       .from(packetLogs)
-      .where(eq(packetLogs.deviceId, deviceId));
+      .where(eq(packetLogs.ownerNodeNum, ownerNodeNum));
     return result[0]?.count ?? 0;
   }
 
@@ -108,14 +108,14 @@ export class PacketLogRepository {
    * Trim packets to keep only the most recent N packets per device
    */
   async trimPackets(
-    deviceId: number,
+    ownerNodeNum: number,
     maxPackets = DEFAULT_MAX_PACKETS,
   ): Promise<number> {
     // Get the ID of the Nth most recent packet
     const cutoffPacket = await this.db
       .select({ id: packetLogs.id })
       .from(packetLogs)
-      .where(eq(packetLogs.deviceId, deviceId))
+      .where(eq(packetLogs.ownerNodeNum, ownerNodeNum))
       .orderBy(desc(packetLogs.rxTime))
       .limit(1)
       .offset(maxPackets - 1);
@@ -132,7 +132,7 @@ export class PacketLogRepository {
     const result = await this.db
       .delete(packetLogs)
       .where(
-        and(eq(packetLogs.deviceId, deviceId), lt(packetLogs.id, cutoffId)),
+        and(eq(packetLogs.ownerNodeNum, ownerNodeNum), lt(packetLogs.id, cutoffId)),
       );
 
     return result.rowsAffected ?? 0;
@@ -141,8 +141,8 @@ export class PacketLogRepository {
   /**
    * Delete all packets for a device
    */
-  async deleteAllPackets(deviceId: number): Promise<void> {
-    await this.db.delete(packetLogs).where(eq(packetLogs.deviceId, deviceId));
+  async deleteAllPackets(ownerNodeNum: number): Promise<void> {
+    await this.db.delete(packetLogs).where(eq(packetLogs.ownerNodeNum, ownerNodeNum));
   }
 
   /**
@@ -168,12 +168,12 @@ export class PacketLogRepository {
 
     // Then, trim each device to max packets
     const devices = await this.db
-      .selectDistinct({ deviceId: packetLogs.deviceId })
+      .selectDistinct({ ownerNodeNum: packetLogs.ownerNodeNum })
       .from(packetLogs);
 
     let deletedByCount = 0;
-    for (const { deviceId } of devices) {
-      deletedByCount += await this.trimPackets(deviceId, maxPackets);
+    for (const { ownerNodeNum } of devices) {
+      deletedByCount += await this.trimPackets(ownerNodeNum, maxPackets);
     }
 
     return { deletedByAge, deletedByCount };
@@ -186,7 +186,7 @@ export class PacketLogRepository {
     totalPackets: number;
     oldestPacket: Date | null;
     newestPacket: Date | null;
-    packetsPerDevice: Array<{ deviceId: number; count: number }>;
+    packetsPerDevice: Array<{ ownerNodeNum: number; count: number }>;
   }> {
     const totalPackets = await this.getTotalPacketCount();
 
@@ -204,11 +204,11 @@ export class PacketLogRepository {
 
     const perDevice = await this.db
       .select({
-        deviceId: packetLogs.deviceId,
+        ownerNodeNum: packetLogs.ownerNodeNum,
         count: count(),
       })
       .from(packetLogs)
-      .groupBy(packetLogs.deviceId);
+      .groupBy(packetLogs.ownerNodeNum);
 
     return {
       totalPackets,

@@ -7,6 +7,7 @@ import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ActionItem } from "@shared/components/Dialog/NodeDetailsDrawer/ActionItem.tsx";
 import { ActionToggle } from "@shared/components/Dialog/NodeDetailsDrawer/ActionToggle.tsx";
+import { DeviceShareDialog } from "@shared/components/Dialog/DeviceShareDialog.tsx";
 import { Mono } from "@shared/components/Mono.tsx";
 import { TimeAgo } from "@shared/components/TimeAgo.tsx";
 import { Badge } from "@shared/components/ui/badge";
@@ -169,6 +170,7 @@ export const NodeDetailsDrawer = ({
 
   const [noteText, setNoteText] = React.useState(node?.privateNote ?? "");
   const [isSavingNote, setIsSavingNote] = React.useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
 
   // Drawer navigation state machine
   type DrawerState = { page: "main" } | { page: "signal-log"; from: "main" };
@@ -288,7 +290,8 @@ export const NodeDetailsDrawer = ({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <>
+      <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-xl p-0">
         {drawerState.page === "signal-log" && (
           <Suspense fallback={<Skeleton className="h-full w-full" />}>
@@ -303,12 +306,10 @@ export const NodeDetailsDrawer = ({
         {drawerState.page === "main" && (
           <ScrollArea className="h-full">
             <div className="p-6 space-y-6">
-              {/* Header */}
               <SheetHeader>
                 <SheetTitle>{longName}</SheetTitle>
               </SheetHeader>
 
-              {/* Device Section */}
               {node.hwModel && (
                 <div className="space-y-3">
                   <Card className="bg-muted/20">
@@ -347,7 +348,6 @@ export const NodeDetailsDrawer = ({
                 </div>
               )}
 
-              {/* Details Section */}
               <div className="space-y-3">
                 <SectionHeader>Details</SectionHeader>
                 <Card className="bg-muted/20">
@@ -429,7 +429,6 @@ export const NodeDetailsDrawer = ({
                 </Card>
               </div>
 
-              {/* Notes Section */}
               <div className="space-y-3">
                 <SectionHeader>Notes</SectionHeader>
                 <Card className="bg-muted/20">
@@ -454,7 +453,6 @@ export const NodeDetailsDrawer = ({
                 </Card>
               </div>
 
-              {/* Actions Section */}
               <div className="space-y-3">
                 <SectionHeader>Actions</SectionHeader>
                 <Card className="bg-muted/20">
@@ -462,6 +460,7 @@ export const NodeDetailsDrawer = ({
                     <ActionItem
                       icon={QrCodeIcon}
                       label="Share Contact"
+                      onClick={() => setShareDialogOpen(true)}
                       showChevron
                     />
                     <ActionItem
@@ -514,7 +513,6 @@ export const NodeDetailsDrawer = ({
                 </Card>
               </div>
 
-              {/* Traceroute Result Section */}
               {tracerouteResult && (
                 <div className="space-y-3">
                   <SectionHeader>Traceroute Result</SectionHeader>
@@ -545,7 +543,6 @@ export const NodeDetailsDrawer = ({
                 </div>
               )}
 
-              {/* Position Section */}
               <Activity
                 mode={
                   isDefined(node.latitudeI) && isDefined(node.longitudeI)
@@ -568,7 +565,6 @@ export const NodeDetailsDrawer = ({
                 />
               </Activity>
 
-              {/* Telemetry Charts Section */}
               <div className="space-y-3">
                 <SectionHeader>Telemetry History</SectionHeader>
                 <Suspense fallback={<Skeleton className="h-40 w-full" />}>
@@ -576,7 +572,6 @@ export const NodeDetailsDrawer = ({
                 </Suspense>
               </div>
 
-              {/* Logs Section */}
               <div className="space-y-3">
                 <SectionHeader>Logs</SectionHeader>
                 <Card className="bg-muted/20">
@@ -613,7 +608,6 @@ export const NodeDetailsDrawer = ({
                 </Card>
               </div>
 
-              {/* Administration Section */}
               <Activity
                 mode={
                   node.nodeNum !== hardware.myNodeNum ? "visible" : "hidden"
@@ -640,6 +634,12 @@ export const NodeDetailsDrawer = ({
           </ScrollArea>
         )}
       </SheetContent>
-    </Sheet>
+      </Sheet>
+      <DeviceShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        nodeNum={node.nodeNum}
+      />
+    </>
   );
 };

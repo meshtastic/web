@@ -42,7 +42,14 @@ export {
 // Packet log hooks
 export { invalidatePacketLogsCache, usePacketLogs } from "./usePacketLogs.ts";
 // Preferences hooks
-export { usePanelSizes, usePreference } from "./usePreferences.ts";
+export {
+  invalidatePreferenceCache,
+  PREFERENCE_KEYS,
+  useAllPreferences,
+  usePanelSizes,
+  usePreference,
+} from "./usePreferences.ts";
+export type { PreferenceKey } from "./usePreferences.ts";
 // Unread count hooks - re-exported from features/messages for backwards compatibility
 export {
   markConversationAsRead,

@@ -44,9 +44,9 @@ class PacketToMessageDTO {
     this.viaMqtt = data.viaMqtt;
   }
 
-  toNewMessage(deviceId: number): NewMessage {
+  toNewMessage(ownerNodeNum: number): NewMessage {
     return {
-      deviceId,
+      ownerNodeNum,
       channelId: this.channelId,
       toNode: this.toNode,
       fromNode: this.fromNode,

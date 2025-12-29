@@ -22,7 +22,7 @@ export class MessageRepository {
    * Get direct messages between two nodes
    */
   async getDirectMessages(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeA: number,
     nodeB: number,
     limit = 50,
@@ -32,7 +32,7 @@ export class MessageRepository {
       .from(messages)
       .where(
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "direct"),
           or(
             and(eq(messages.fromNode, nodeA), eq(messages.toNode, nodeB)),
@@ -48,7 +48,7 @@ export class MessageRepository {
    * Get channel messages for a channel
    */
   async getBroadcastMessages(
-    deviceId: number,
+    ownerNodeNum: number,
     channelId: number,
     limit = 50,
   ): Promise<Message[]> {
@@ -57,7 +57,7 @@ export class MessageRepository {
       .from(messages)
       .where(
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "channel"),
           eq(messages.channelId, channelId),
         ),
@@ -70,14 +70,14 @@ export class MessageRepository {
    * Get all messages for a device (paginated)
    */
   async getAllMessages(
-    deviceId: number,
+    ownerNodeNum: number,
     limit = 100,
     offset = 0,
   ): Promise<Message[]> {
     return this.db
       .select()
       .from(messages)
-      .where(eq(messages.deviceId, deviceId))
+      .where(eq(messages.ownerNodeNum, ownerNodeNum))
       .orderBy(desc(messages.date))
       .limit(limit)
       .offset(offset);
@@ -95,13 +95,13 @@ export class MessageRepository {
    */
   async updateMessageState(
     id: number,
-    deviceId: number,
+    ownerNodeNum: number,
     newState: Message["state"],
   ): Promise<void> {
     await this.db
       .update(messages)
       .set({ state: newState })
-      .where(and(eq(messages.id, id), eq(messages.deviceId, deviceId)));
+      .where(and(eq(messages.id, id), eq(messages.ownerNodeNum, ownerNodeNum)));
   }
 
   /**
@@ -109,14 +109,14 @@ export class MessageRepository {
    */
   async updateMessageStateByMessageId(
     messageId: number,
-    deviceId: number,
+    ownerNodeNum: number,
     newState: Message["state"],
   ): Promise<void> {
     await this.db
       .update(messages)
       .set({ state: newState })
       .where(
-        and(eq(messages.messageId, messageId), eq(messages.deviceId, deviceId)),
+        and(eq(messages.messageId, messageId), eq(messages.ownerNodeNum, ownerNodeNum)),
       );
   }
 
@@ -125,12 +125,12 @@ export class MessageRepository {
    */
   async incrementRetryCount(
     messageId: number,
-    deviceId: number,
+    ownerNodeNum: number,
   ): Promise<void> {
     await this.db
       .update(messages)
       .set({ retryCount: sql`${messages.retryCount} + 1` })
-      .where(and(eq(messages.id, messageId), eq(messages.deviceId, deviceId)));
+      .where(and(eq(messages.id, messageId), eq(messages.ownerNodeNum, ownerNodeNum)));
   }
 
   /**
@@ -138,7 +138,7 @@ export class MessageRepository {
    */
   async updateMessageAck(
     messageId: number,
-    deviceId: number,
+    ownerNodeNum: number,
     ackData: {
       receivedACK: boolean;
       ackTimestamp: Date;
@@ -149,23 +149,23 @@ export class MessageRepository {
     await this.db
       .update(messages)
       .set(ackData)
-      .where(and(eq(messages.id, messageId), eq(messages.deviceId, deviceId)));
+      .where(and(eq(messages.id, messageId), eq(messages.ownerNodeNum, ownerNodeNum)));
   }
 
   /**
    * Delete a message
    */
-  async deleteMessage(messageId: number, deviceId: number): Promise<void> {
+  async deleteMessage(messageId: number, ownerNodeNum: number): Promise<void> {
     await this.db
       .delete(messages)
-      .where(and(eq(messages.id, messageId), eq(messages.deviceId, deviceId)));
+      .where(and(eq(messages.id, messageId), eq(messages.ownerNodeNum, ownerNodeNum)));
   }
 
   /**
    * Delete all messages for a conversation
    */
   async deleteConversation(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeA: number,
     nodeB: number,
   ): Promise<void> {
@@ -173,7 +173,7 @@ export class MessageRepository {
       .delete(messages)
       .where(
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "direct"),
           or(
             and(eq(messages.fromNode, nodeA), eq(messages.toNode, nodeB)),
@@ -187,14 +187,14 @@ export class MessageRepository {
    * Delete all messages for a channel
    */
   async deleteChannelMessages(
-    deviceId: number,
+    ownerNodeNum: number,
     channelId: number,
   ): Promise<void> {
     await this.db
       .delete(messages)
       .where(
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "channel"),
           eq(messages.channelId, channelId),
         ),
@@ -204,20 +204,20 @@ export class MessageRepository {
   /**
    * Delete all messages for a device
    */
-  async deleteAllMessages(deviceId: number): Promise<void> {
-    await this.db.delete(messages).where(eq(messages.deviceId, deviceId));
+  async deleteAllMessages(ownerNodeNum: number): Promise<void> {
+    await this.db.delete(messages).where(eq(messages.ownerNodeNum, ownerNodeNum));
   }
 
   /**
    * Get unacked/failed messages for retry
    */
-  async getPendingMessages(deviceId: number): Promise<Message[]> {
+  async getPendingMessages(ownerNodeNum: number): Promise<Message[]> {
     return this.db
       .select()
       .from(messages)
       .where(
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           or(
             eq(messages.state, "waiting"),
             eq(messages.state, "sending"),
@@ -231,11 +231,11 @@ export class MessageRepository {
   /**
    * Get message count for a device
    */
-  async getMessageCount(deviceId: number): Promise<number> {
+  async getMessageCount(ownerNodeNum: number): Promise<number> {
     const result = await this.db
       .select()
       .from(messages)
-      .where(eq(messages.deviceId, deviceId));
+      .where(eq(messages.ownerNodeNum, ownerNodeNum));
     return result.length;
   }
 
@@ -245,7 +245,7 @@ export class MessageRepository {
    * @param myNodeNum - The current user's node number (needed for unread count calculations)
    */
   async getConversations(
-    deviceId: number,
+    ownerNodeNum: number,
     myNodeNum: number,
   ): Promise<
     Array<{
@@ -269,7 +269,7 @@ export class MessageRepository {
         lastDate: sql<Date>`MAX(${messages.date})`.as("last_date"),
       })
       .from(messages)
-      .where(and(eq(messages.deviceId, deviceId), eq(messages.type, "direct")))
+      .where(and(eq(messages.ownerNodeNum, ownerNodeNum), eq(messages.type, "direct")))
       .groupBy(sql`node_a`, sql`node_b`)
       .as("direct_convos");
 
@@ -286,7 +286,7 @@ export class MessageRepository {
       .innerJoin(
         messages,
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "direct"),
           eq(messages.date, directConvosSubquery.lastDate),
           or(
@@ -310,7 +310,7 @@ export class MessageRepository {
         maxDate: sql<Date>`MAX(${messages.date})`.as("max_date"),
       })
       .from(messages)
-      .where(and(eq(messages.deviceId, deviceId), eq(messages.type, "channel")))
+      .where(and(eq(messages.ownerNodeNum, ownerNodeNum), eq(messages.type, "channel")))
       .groupBy(messages.channelId)
       .as("broadcast_max");
 
@@ -323,7 +323,7 @@ export class MessageRepository {
       .innerJoin(
         messages,
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "channel"),
           eq(messages.channelId, broadcastSubquery.channelId),
           eq(messages.date, broadcastSubquery.maxDate),
@@ -346,7 +346,7 @@ export class MessageRepository {
           ? row.message.toNode
           : row.message.fromNode;
       const unreadCount = await this.getUnreadCountDirect(
-        deviceId,
+        ownerNodeNum,
         myNodeNum,
         otherNode,
       );
@@ -361,7 +361,7 @@ export class MessageRepository {
     // Process channel conversations
     for (const row of broadcastMessages) {
       const unreadCount = await this.getUnreadCountBroadcast(
-        deviceId,
+        ownerNodeNum,
         row.message.channelId,
       );
       conversations.push({
@@ -386,7 +386,7 @@ export class MessageRepository {
    * Mark conversation as read up to a specific message
    */
   async markAsRead(
-    deviceId: number,
+    ownerNodeNum: number,
     type: ConversationType,
     conversationId: string,
     messageId: number,
@@ -394,14 +394,14 @@ export class MessageRepository {
     await this.db
       .insert(lastRead)
       .values({
-        deviceId,
+        ownerNodeNum,
         type,
         conversationId,
         messageId,
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
-        target: [lastRead.deviceId, lastRead.type, lastRead.conversationId],
+        target: [lastRead.ownerNodeNum, lastRead.type, lastRead.conversationId],
         set: {
           messageId,
           updatedAt: new Date(),
@@ -413,7 +413,7 @@ export class MessageRepository {
    * Get last read message ID for a conversation
    */
   async getLastRead(
-    deviceId: number,
+    ownerNodeNum: number,
     type: ConversationType,
     conversationId: string,
   ): Promise<number | null> {
@@ -422,7 +422,7 @@ export class MessageRepository {
       .from(lastRead)
       .where(
         and(
-          eq(lastRead.deviceId, deviceId),
+          eq(lastRead.ownerNodeNum, ownerNodeNum),
           eq(lastRead.type, type),
           eq(lastRead.conversationId, conversationId),
         ),
@@ -438,7 +438,7 @@ export class MessageRepository {
    * @param otherNodeNum - The other party's node number
    */
   async getUnreadCountDirect(
-    deviceId: number,
+    ownerNodeNum: number,
     myNodeNum: number,
     otherNodeNum: number,
   ): Promise<number> {
@@ -446,7 +446,7 @@ export class MessageRepository {
     const conversationId = `${myNodeNum}:${otherNodeNum}`;
 
     const lastReadId = await this.getLastRead(
-      deviceId,
+      ownerNodeNum,
       "direct",
       conversationId,
     );
@@ -458,7 +458,7 @@ export class MessageRepository {
         .from(messages)
         .where(
           and(
-            eq(messages.deviceId, deviceId),
+            eq(messages.ownerNodeNum, ownerNodeNum),
             eq(messages.type, "direct"),
             or(
               and(
@@ -481,7 +481,7 @@ export class MessageRepository {
       .from(messages)
       .where(
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "direct"),
           or(
             and(
@@ -503,12 +503,12 @@ export class MessageRepository {
    * Get unread count for a channel channel
    */
   async getUnreadCountBroadcast(
-    deviceId: number,
+    ownerNodeNum: number,
     channelId: number,
   ): Promise<number> {
     const conversationId = channelId.toString();
     const lastReadId = await this.getLastRead(
-      deviceId,
+      ownerNodeNum,
       "channel",
       conversationId,
     );
@@ -520,7 +520,7 @@ export class MessageRepository {
         .from(messages)
         .where(
           and(
-            eq(messages.deviceId, deviceId),
+            eq(messages.ownerNodeNum, ownerNodeNum),
             eq(messages.type, "channel"),
             eq(messages.channelId, channelId),
           ),
@@ -534,7 +534,7 @@ export class MessageRepository {
       .from(messages)
       .where(
         and(
-          eq(messages.deviceId, deviceId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "channel"),
           eq(messages.channelId, channelId),
           gt(messages.id, lastReadId),
@@ -547,7 +547,7 @@ export class MessageRepository {
    * Save or update a message draft
    */
   async saveDraft(
-    deviceId: number,
+    ownerNodeNum: number,
     type: ConversationType,
     targetId: number,
     content: string,
@@ -555,7 +555,7 @@ export class MessageRepository {
     await this.db
       .insert(messageDrafts)
       .values({
-        deviceId,
+        ownerNodeNum,
         type,
         targetId,
         content,
@@ -563,7 +563,7 @@ export class MessageRepository {
       })
       .onConflictDoUpdate({
         target: [
-          messageDrafts.deviceId,
+          messageDrafts.ownerNodeNum,
           messageDrafts.type,
           messageDrafts.targetId,
         ],
@@ -578,7 +578,7 @@ export class MessageRepository {
    * Get draft for a conversation
    */
   async getDraft(
-    deviceId: number,
+    ownerNodeNum: number,
     type: ConversationType,
     targetId: number,
   ): Promise<MessageDraft | null> {
@@ -587,7 +587,7 @@ export class MessageRepository {
       .from(messageDrafts)
       .where(
         and(
-          eq(messageDrafts.deviceId, deviceId),
+          eq(messageDrafts.ownerNodeNum, ownerNodeNum),
           eq(messageDrafts.type, type),
           eq(messageDrafts.targetId, targetId),
         ),
@@ -601,7 +601,7 @@ export class MessageRepository {
    * Delete a draft
    */
   async deleteDraft(
-    deviceId: number,
+    ownerNodeNum: number,
     type: ConversationType,
     targetId: number,
   ): Promise<void> {
@@ -609,7 +609,7 @@ export class MessageRepository {
       .delete(messageDrafts)
       .where(
         and(
-          eq(messageDrafts.deviceId, deviceId),
+          eq(messageDrafts.ownerNodeNum, ownerNodeNum),
           eq(messageDrafts.type, type),
           eq(messageDrafts.targetId, targetId),
         ),

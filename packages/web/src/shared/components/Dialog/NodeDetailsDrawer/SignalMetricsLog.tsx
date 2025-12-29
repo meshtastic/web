@@ -1,4 +1,4 @@
-import { SignalBars } from "@app/components/SignalIndicator";
+import { SignalBars } from "@shared/components/SignalIndicator";
 import { type SignalLog, useSignalLogs } from "@data/hooks/useSignalLogs";
 import {
   getSignalColorForGrade,
@@ -172,29 +172,24 @@ function DualAxisChart({
 
   return (
     <div className="space-y-2">
-      {/* Date range header */}
       <div className="flex justify-between text-xs text-muted-foreground px-1">
         <span>{formatDate(startDate)}</span>
         <span>{formatDate(endDate)}</span>
       </div>
 
-      {/* Chart */}
       <div className="relative">
-        {/* RSSI Y-axis labels (left) */}
         <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-xs text-blue-400 w-8">
           {rssiLabels.map((val) => (
             <span key={val}>{val}</span>
           ))}
         </div>
 
-        {/* SNR Y-axis labels (right) */}
         <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-xs text-yellow-400 w-8 text-right">
           {snrLabels.map((val) => (
             <span key={val}>{val}</span>
           ))}
         </div>
 
-        {/* SVG Chart */}
         <svg
           width={width}
           height={height}
@@ -216,7 +211,6 @@ function DualAxisChart({
               />
             ))}
 
-            {/* RSSI line (blue) */}
             {rssiPath && (
               <path
                 d={rssiPath}
@@ -228,7 +222,6 @@ function DualAxisChart({
               />
             )}
 
-            {/* SNR line (yellow) */}
             {snrPath && (
               <path
                 d={snrPath}
@@ -240,7 +233,6 @@ function DualAxisChart({
               />
             )}
 
-            {/* RSSI points */}
             {chartData.normalizedRssi.map((point) => {
               const x =
                 ((point.time - chartData.minTime) /
@@ -257,7 +249,6 @@ function DualAxisChart({
               );
             })}
 
-            {/* SNR points */}
             {chartData.normalizedSnr.map((point) => {
               const x =
                 ((point.time - chartData.minTime) /
@@ -277,7 +268,6 @@ function DualAxisChart({
         </svg>
       </div>
 
-      {/* Legend */}
       <div className="flex justify-center gap-6 text-sm">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-blue-500" />
@@ -377,7 +367,6 @@ function SignalMetricsLogContent({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ChevronLeftIcon className="h-5 w-5" />
@@ -387,18 +376,15 @@ function SignalMetricsLogContent({
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-6">
-          {/* Log count */}
           <div className="text-center text-muted-foreground">
             {filteredLogs.length} Logs
           </div>
 
-          {/* Chart */}
           <DualAxisChart
             rssiData={chartData.rssiData}
             snrData={chartData.snrData}
           />
 
-          {/* Time range selector */}
           <div className="flex rounded-lg overflow-hidden border">
             {TIME_RANGES.map((range) => (
               <button
@@ -416,7 +402,6 @@ function SignalMetricsLogContent({
             ))}
           </div>
 
-          {/* Log entries */}
           <div>
             {filteredLogs.length === 0 ? (
               <div className="text-center text-muted-foreground py-8">

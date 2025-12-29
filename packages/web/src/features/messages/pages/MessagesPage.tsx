@@ -130,12 +130,15 @@ export default function MessagesPage() {
     });
 
     // Add channels from database (at the top of the list)
+    // Only show PRIMARY (1) or SECONDARY (2) channels, not DISABLED (0)
     if (dbChannels) {
-      dbChannels.forEach((channel) => {
-        if (channel.role > 0) {
+      dbChannels
+        .filter((channel) => channel.role === 1 || channel.role === 2)
+        .forEach((channel) => {
+          // Use custom name only if non-empty, otherwise use role-based naming
           const name =
-            channel.name ||
-            (channel.channelIndex === 0
+            channel.name?.trim() ||
+            (channel.role === 1
               ? "Primary"
               : `Channel ${channel.channelIndex}`);
           contactsList.unshift({
@@ -150,8 +153,7 @@ export default function MessagesPage() {
             type: "channel",
             lastHeard: 0,
           });
-        }
-      });
+        });
     }
 
     return contactsList;
@@ -422,7 +424,6 @@ export default function MessagesPage() {
 
   return (
     <div className="flex h-full">
-      {/* Contacts Sidebar */}
       <div className="w-80 border-r flex flex-col min-h-0">
         <div className="p-4 border-b space-y-3 shrink-0">
           <div className="relative">
@@ -466,24 +467,32 @@ export default function MessagesPage() {
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2">
-            {filteredContacts.map((contact) => (
-              <button
-                type="button"
-                key={contact.id}
-                onClick={() => openChat(contact)}
-                className={cn(
-                  "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
-                  selectedContact?.id === contact.id
-                    ? "bg-sidebar-accent"
-                    : "hover:bg-sidebar-accent/50",
-                )}
-              >
-                <div className="relative">
-                  {contact.type === "channel" ? (
-                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Hash className="h-5 w-5 text-primary" />
-                    </div>
-                  ) : (
+            {filteredContacts.map((contact) =>
+              contact.type === "channel" ? (
+                <div
+                  key={`${contact.type}-${contact.id}`}
+                  className="w-full flex items-center gap-3 rounded-lg p-3 text-left"
+                >
+                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Hash className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="font-medium truncate">{contact.name}</span>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  key={`${contact.type}-${contact.id}`}
+                  onClick={() => openChat(contact)}
+                  className={cn(
+                    "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
+                    selectedContact?.id === contact.id
+                      ? "bg-sidebar-accent"
+                      : "hover:bg-sidebar-accent/50",
+                  )}
+                >
+                  <div className="relative">
                     <NodeAvatar
                       nodeNum={contact.nodeNum || contact.id}
                       longName={contact.name}
@@ -491,36 +500,37 @@ export default function MessagesPage() {
                       showFavorite={contact.isFavorite}
                       clickable={true}
                     />
-                  )}
-                  {contact.online && contact.type === "direct" && (
-                    <OnlineIndicator className="absolute bottom-0 right-0 h-3 w-3" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium truncate">{contact.name}</span>
-                    <span className="text-xs md:text-sm text-muted-foreground">
-                      {contact.time}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm md:text-base text-muted-foreground truncate">
-                      {contact.lastMessage}
-                    </span>
-                    {contact.unread > 0 && (
-                      <Badge className="h-5 min-w-5 justify-center bg-primary text-primary-foreground">
-                        {contact.unread}
-                      </Badge>
+                    {contact.online && (
+                      <OnlineIndicator className="absolute bottom-0 right-0 h-3 w-3" />
                     )}
                   </div>
-                </div>
-              </button>
-            ))}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium truncate">
+                        {contact.name}
+                      </span>
+                      <span className="text-xs md:text-sm text-muted-foreground">
+                        {contact.time}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm md:text-base text-muted-foreground truncate">
+                        {contact.lastMessage}
+                      </span>
+                      {contact.unread > 0 && (
+                        <Badge className="h-5 min-w-5 justify-center bg-primary text-primary-foreground">
+                          {contact.unread}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ),
+            )}
           </div>
         </ScrollArea>
       </div>
 
-      {/* Chat Area */}
       {renderChatArea()}
     </div>
   );

@@ -23,7 +23,6 @@ interface MessageBubbleProps {
   isMine: boolean;
   showAvatar?: boolean;
   showTimestamp?: boolean;
-  deviceId?: number;
 }
 
 export const MessageBubble = memo(function MessageBubble({
@@ -32,7 +31,6 @@ export const MessageBubble = memo(function MessageBubble({
   isMine,
   showAvatar = true,
   showTimestamp = true,
-  deviceId,
 }: MessageBubbleProps) {
   const { t } = useTranslation("messages");
   const avatarColors = getAvatarColors(message.fromNode);
@@ -76,7 +74,6 @@ export const MessageBubble = memo(function MessageBubble({
         isMine ? "flex-row-reverse" : "flex-row",
       )}
     >
-      {/* Avatar */}
       {showAvatar && (
         <NodeAvatar
           nodeNum={message.fromNode}
@@ -85,12 +82,10 @@ export const MessageBubble = memo(function MessageBubble({
         />
       )}
 
-      {/* Message Bubble */}
       <div
         className="max-w-[70%] rounded-2xl px-3 py-2 relative group shrink-0 text-white"
         style={bubbleStyle}
       >
-        {/* Top Row: Sender Name (longName + nodeNum) and Action Buttons */}
         <div className="flex items-center justify-between gap-2 mb-0.5">
           <div className="flex items-center gap-1.5">
             <p className="text-xs md:text-sm font-medium opacity-80">
@@ -108,7 +103,6 @@ export const MessageBubble = memo(function MessageBubble({
               </Tooltip>
             )}
           </div>
-          {/* Action Buttons - Emoji and Reply */}
           <div className="flex items-center">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -151,12 +145,10 @@ export const MessageBubble = memo(function MessageBubble({
           </div>
         </div>
 
-        {/* Middle Row: Message Content */}
         <p className="text-sm md:text-base leading-relaxed wrap-break-word">
           {message.message}
         </p>
 
-        {/* Bottom Row: Timestamp (am/pm), Hops, SNR, RSSI */}
         <div
           className={cn(
             "flex items-center flex-wrap mt-1 gap-x-2 gap-y-0.5 text-xs md:text-sm",
@@ -184,12 +176,10 @@ export const MessageBubble = memo(function MessageBubble({
           )}
         </div>
 
-        {/* Retry Button for Failed Messages */}
-        {isMine && deviceId && (
+        {isMine && (
           <div className="absolute -bottom-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <RetryButton
-              messageId={message.id}
-              deviceId={deviceId}
+              message={message}
               className="bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
             />
           </div>

@@ -4,10 +4,12 @@ import { toByteArray } from "base64-js";
 import { Activity, useMemo } from "react";
 import { ClientNotificationDialog } from "./ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "./DeleteMessagesDialog/DeleteMessagesDialog.tsx";
+import { DeviceShareDialog } from "./DeviceShareDialog.tsx";
 import { FactoryResetConfigDialog } from "./FactoryResetConfigDialog/FactoryResetConfigDialog.tsx";
 import { FactoryResetDeviceDialog } from "./FactoryResetDeviceDialog/FactoryResetDeviceDialog.tsx";
 import { NodeDetailsDrawer } from "./NodeDetailsDrawer/index.ts";
 import { PkiBackupDialog } from "./PKIBackupDialog.tsx";
+import { QRDialog } from "./QRDialog.tsx";
 import { RebootDialog } from "./RebootDialog.tsx";
 import { RefreshKeysDialog } from "./RefreshKeysDialog/RefreshKeysDialog.tsx";
 import { RemoveNodeDialog } from "./RemoveNodeDialog.tsx";
@@ -17,11 +19,11 @@ import { TracerouteResponseDialog } from "./TracerouteResponseDialog.tsx";
 import { UnsafeRolesDialog } from "./UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 
 export const DialogManager = () => {
-  const { dialog, setDialogOpen, id: deviceId } = useDevice();
+  const { dialog, setDialogOpen, id: deviceId, config } = useDevice();
   const { channels: dbChannels } = useChannels(deviceId);
 
   // Convert DB channels to Map format for QRDialog
-  const _channelsMap = useMemo(() => {
+  const channelsMap = useMemo(() => {
     const map = new Map();
     for (const ch of dbChannels) {
       map.set(ch.channelIndex, {
@@ -40,21 +42,14 @@ export const DialogManager = () => {
 
   return (
     <>
-      {/* <QRDialog
+      <QRDialog
         open={dialog.QR}
         onOpenChange={(open) => {
           setDialogOpen("QR", open);
         }}
         channels={channelsMap}
         loraConfig={config.lora}
-      /> */}
-      {/* <ImportDialog
-        open={dialog.import}
-        onOpenChange={(open) => {
-          setDialogOpen("import", open);
-        }}
-        loraConfig={config.lora}
-      /> */}
+      />
       <ShutdownDialog
         open={dialog.shutdown}
         onOpenChange={() => {
@@ -130,6 +125,12 @@ export const DialogManager = () => {
         />
       </Activity>
       <TracerouteResponseDialog />
+      <DeviceShareDialog
+        open={dialog.deviceShare}
+        onOpenChange={(open) => {
+          setDialogOpen("deviceShare", open);
+        }}
+      />
     </>
   );
 };

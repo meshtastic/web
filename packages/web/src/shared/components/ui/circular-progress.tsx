@@ -25,7 +25,6 @@ export function CircularProgress({
       className={cn("transform -rotate-90", className)}
     >
       <title className="sr-only">Loading progress: {progress}%</title>
-      {/* Background circle */}
       <circle
         cx={size / 2}
         cy={size / 2}
@@ -35,7 +34,6 @@ export function CircularProgress({
         strokeWidth={strokeWidth}
         className="opacity-20"
       />
-      {/* Progress circle */}
       <circle
         cx={size / 2}
         cy={size / 2}

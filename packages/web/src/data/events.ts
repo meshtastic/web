@@ -50,4 +50,5 @@ export const DB_EVENTS = {
   TELEMETRY_UPDATED: "telemetry:updated",
   CHANNEL_UPDATED: "channel:updated",
   TRACEROUTE_COMPLETED: "traceroute:completed",
+  PREFERENCE_UPDATED: "preference:updated",
 } as const;

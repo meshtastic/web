@@ -1,4 +1,3 @@
-import { BackupRestore } from "../components/panels/BackupRestore";
 import {
   Card,
   CardContent,
@@ -7,6 +6,7 @@ import {
   CardTitle,
 } from "@shared/components/ui/card";
 import { useTranslation } from "react-i18next";
+import { BackupRestore } from "../components/panels/BackupRestore.tsx";
 
 interface BackupRestoreConfigProps {
   searchQuery?: string;

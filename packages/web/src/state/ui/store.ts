@@ -2,15 +2,18 @@ import type { ConversationType } from "@data/types";
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 
-// Types
-export type Theme = "light" | "dark" | "system";
-export type SplitMode = "none" | "vertical" | "horizontal";
 
 export interface MessageTab {
   id: number;
   contactId: number;
   type: ConversationType;
 }
+
+export type SplitMode = "none" | "vertical" | "horizontal";
+
+// These are exported for type-safety when using the usePreference hook
+
+export type Theme = "light" | "dark" | "system";
 export type Language =
   | "en"
   | "es"
@@ -59,82 +62,8 @@ export type NodeColumnKey =
   | "role"
   | "nodeId";
 
-export interface UIState {
-  // Preferences (persisted)
-  theme: Theme;
-  compactMode: boolean;
-  showNodeAvatars: boolean;
-  language: Language;
-  timeFormat: TimeFormat;
-  distanceUnits: DistanceUnits;
-  coordinateFormat: CoordinateFormat;
-  mapStyle: MapStyle;
-  showNodeLabels: boolean;
-  showConnectionLines: boolean;
-  autoCenterOnPosition: boolean;
-  masterVolume: number;
-  messageSoundEnabled: boolean;
-  alertSoundEnabled: boolean;
-  packetBatchSize: number;
-  nodesTableColumnVisibility: Record<NodeColumnKey, boolean>;
-  nodesTableColumnOrder: NodeColumnKey[];
-
-  // App state (some persisted, some ephemeral)
-  rasterSources: RasterSource[]; // persisted
-  nodeNumToBeRemoved: number; // ephemeral
-  connectDialogOpen: boolean; // ephemeral
-  nodeNumDetails: number; // ephemeral
-  tracerouteNodeNum: number; // ephemeral - node num for traceroute dialog
-  commandPaletteOpen: boolean; // ephemeral
-
-  // Messages page state (ephemeral)
-  messageTabs: MessageTab[];
-  activeMessageTabId: number | null;
-  secondaryMessageTabId: number | null;
-  messageSplitMode: SplitMode;
-
-  // Preference actions
-  setTheme: (theme: Theme) => void;
-  setCompactMode: (enabled: boolean) => void;
-  setShowNodeAvatars: (enabled: boolean) => void;
-  setLanguage: (language: Language) => void;
-  setTimeFormat: (format: TimeFormat) => void;
-  setDistanceUnits: (units: DistanceUnits) => void;
-  setCoordinateFormat: (format: CoordinateFormat) => void;
-  setMapStyle: (style: MapStyle) => void;
-  setShowNodeLabels: (enabled: boolean) => void;
-  setShowConnectionLines: (enabled: boolean) => void;
-  setAutoCenterOnPosition: (enabled: boolean) => void;
-  setMasterVolume: (volume: number) => void;
-  setMessageSoundEnabled: (enabled: boolean) => void;
-  setAlertSoundEnabled: (enabled: boolean) => void;
-  setPacketBatchSize: (size: number) => void;
-  setNodesTableColumnVisibility: (
-    visibility: Record<NodeColumnKey, boolean>,
-  ) => void;
-  setNodesTableColumnOrder: (order: NodeColumnKey[]) => void;
-  resetToDefaults: () => void;
-
-  // App state actions
-  setRasterSources: (sources: RasterSource[]) => void;
-  addRasterSource: (source: RasterSource) => void;
-  removeRasterSource: (index: number) => void;
-  setCommandPaletteOpen: (open: boolean) => void;
-  setNodeNumToBeRemoved: (nodeNum: number) => void;
-  setConnectDialogOpen: (open: boolean) => void;
-  setNodeNumDetails: (nodeNum: number) => void;
-  setTracerouteNodeNum: (nodeNum: number) => void;
-
-  // Messages page actions
-  openMessageTab: (contactId: number, type: ConversationType) => void;
-  closeMessageTab: (tabId: number) => void;
-  setActiveMessageTab: (tabId: number) => void;
-  setSecondaryMessageTab: (tabId: number | null) => void;
-  setMessageSplitMode: (mode: SplitMode) => void;
-}
-
-const defaultState = {
-  // Preferences defaults
+// Default values for preferences (used by components with usePreference)
+export const DEFAULT_PREFERENCES = {
   theme: "system" as Theme,
   compactMode: false,
   showNodeAvatars: true,
@@ -176,9 +105,41 @@ const defaultState = {
     "role",
     "nodeId",
   ] as NodeColumnKey[],
+  rasterSources: [] as RasterSource[],
+};
 
-  // App state defaults
-  rasterSources: [],
+
+export interface UIState {
+  // Ephemeral app state (not persisted)
+  nodeNumToBeRemoved: number;
+  connectDialogOpen: boolean;
+  nodeNumDetails: number;
+  tracerouteNodeNum: number;
+  commandPaletteOpen: boolean;
+
+  // Messages page state (ephemeral)
+  messageTabs: MessageTab[];
+  activeMessageTabId: number | null;
+  secondaryMessageTabId: number | null;
+  messageSplitMode: SplitMode;
+
+  // Actions
+  setCommandPaletteOpen: (open: boolean) => void;
+  setNodeNumToBeRemoved: (nodeNum: number) => void;
+  setConnectDialogOpen: (open: boolean) => void;
+  setNodeNumDetails: (nodeNum: number) => void;
+  setTracerouteNodeNum: (nodeNum: number) => void;
+
+  // Messages page actions
+  openMessageTab: (contactId: number, type: ConversationType) => void;
+  closeMessageTab: (tabId: number) => void;
+  setActiveMessageTab: (tabId: number) => void;
+  setSecondaryMessageTab: (tabId: number | null) => void;
+  setMessageSplitMode: (mode: SplitMode) => void;
+}
+
+const defaultState = {
+  // Ephemeral state defaults
   commandPaletteOpen: false,
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
@@ -196,57 +157,7 @@ export const useUIStore = create<UIState>()(
   subscribeWithSelector((set) => ({
     ...defaultState,
 
-    // Preference actions
-    setTheme: (theme) => set({ theme }),
-    setCompactMode: (enabled) => set({ compactMode: enabled }),
-    setShowNodeAvatars: (enabled) => set({ showNodeAvatars: enabled }),
-    setLanguage: (language) => set({ language }),
-    setTimeFormat: (format) => set({ timeFormat: format }),
-    setDistanceUnits: (units) => set({ distanceUnits: units }),
-    setCoordinateFormat: (format) => set({ coordinateFormat: format }),
-    setMapStyle: (style) => set({ mapStyle: style }),
-    setShowNodeLabels: (enabled) => set({ showNodeLabels: enabled }),
-    setShowConnectionLines: (enabled) => set({ showConnectionLines: enabled }),
-    setAutoCenterOnPosition: (enabled) =>
-      set({ autoCenterOnPosition: enabled }),
-    setMasterVolume: (volume) => set({ masterVolume: volume }),
-    setMessageSoundEnabled: (enabled) => set({ messageSoundEnabled: enabled }),
-    setAlertSoundEnabled: (enabled) => set({ alertSoundEnabled: enabled }),
-    setPacketBatchSize: (size) => set({ packetBatchSize: size }),
-    setNodesTableColumnVisibility: (visibility) =>
-      set({ nodesTableColumnVisibility: visibility }),
-    setNodesTableColumnOrder: (order) => set({ nodesTableColumnOrder: order }),
-    resetToDefaults: () =>
-      set({
-        theme: defaultState.theme,
-        compactMode: defaultState.compactMode,
-        showNodeAvatars: defaultState.showNodeAvatars,
-        language: defaultState.language,
-        timeFormat: defaultState.timeFormat,
-        distanceUnits: defaultState.distanceUnits,
-        coordinateFormat: defaultState.coordinateFormat,
-        mapStyle: defaultState.mapStyle,
-        showNodeLabels: defaultState.showNodeLabels,
-        showConnectionLines: defaultState.showConnectionLines,
-        autoCenterOnPosition: defaultState.autoCenterOnPosition,
-        masterVolume: defaultState.masterVolume,
-        messageSoundEnabled: defaultState.messageSoundEnabled,
-        alertSoundEnabled: defaultState.alertSoundEnabled,
-        packetBatchSize: defaultState.packetBatchSize,
-        nodesTableColumnVisibility: defaultState.nodesTableColumnVisibility,
-        nodesTableColumnOrder: defaultState.nodesTableColumnOrder,
-      }),
-
-    // App state actions
-    setRasterSources: (sources) => set({ rasterSources: sources }),
-    addRasterSource: (source) =>
-      set((state) => ({
-        rasterSources: [...state.rasterSources, source],
-      })),
-    removeRasterSource: (index) =>
-      set((state) => ({
-        rasterSources: state.rasterSources.filter((_, i) => i !== index),
-      })),
+    // Ephemeral state actions
     setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
     setNodeNumToBeRemoved: (nodeNum) => set({ nodeNumToBeRemoved: nodeNum }),
     setConnectDialogOpen: (open) => set({ connectDialogOpen: open }),
@@ -315,4 +226,3 @@ export const useUIStore = create<UIState>()(
       }),
   })),
 );
-

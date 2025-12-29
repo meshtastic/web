@@ -13,11 +13,11 @@ export class ChannelRepository {
   /**
    * Get all channels for a device
    */
-  async getChannels(deviceId: number): Promise<Channel[]> {
+  async getChannels(ownerNodeNum: number): Promise<Channel[]> {
     return this.db
       .select()
       .from(channels)
-      .where(eq(channels.deviceId, deviceId))
+      .where(eq(channels.ownerNodeNum, ownerNodeNum))
       .orderBy(asc(channels.channelIndex));
   }
 
@@ -25,7 +25,7 @@ export class ChannelRepository {
    * Get a specific channel
    */
   async getChannel(
-    deviceId: number,
+    ownerNodeNum: number,
     channelIndex: number,
   ): Promise<Channel | undefined> {
     const result = await this.db
@@ -33,7 +33,7 @@ export class ChannelRepository {
       .from(channels)
       .where(
         and(
-          eq(channels.deviceId, deviceId),
+          eq(channels.ownerNodeNum, ownerNodeNum),
           eq(channels.channelIndex, channelIndex),
         ),
       )
@@ -47,7 +47,7 @@ export class ChannelRepository {
    */
   async upsertChannel(channel: NewChannel): Promise<void> {
     const existing = await this.getChannel(
-      channel.deviceId,
+      channel.ownerNodeNum,
       channel.channelIndex,
     );
 
@@ -61,7 +61,7 @@ export class ChannelRepository {
         })
         .where(
           and(
-            eq(channels.deviceId, channel.deviceId),
+            eq(channels.ownerNodeNum, channel.ownerNodeNum),
             eq(channels.channelIndex, channel.channelIndex),
           ),
         );
@@ -74,12 +74,12 @@ export class ChannelRepository {
   /**
    * Delete a channel
    */
-  async deleteChannel(deviceId: number, channelIndex: number): Promise<void> {
+  async deleteChannel(ownerNodeNum: number, channelIndex: number): Promise<void> {
     await this.db
       .delete(channels)
       .where(
         and(
-          eq(channels.deviceId, deviceId),
+          eq(channels.ownerNodeNum, ownerNodeNum),
           eq(channels.channelIndex, channelIndex),
         ),
       );
@@ -88,11 +88,11 @@ export class ChannelRepository {
   /**
    * Get primary channel
    */
-  async getPrimaryChannel(deviceId: number): Promise<Channel | undefined> {
+  async getPrimaryChannel(ownerNodeNum: number): Promise<Channel | undefined> {
     const result = await this.db
       .select()
       .from(channels)
-      .where(and(eq(channels.deviceId, deviceId), eq(channels.role, 1))) // PRIMARY = 1
+      .where(and(eq(channels.ownerNodeNum, ownerNodeNum), eq(channels.role, 1))) // PRIMARY = 1
       .limit(1);
 
     return result[0];
@@ -101,11 +101,11 @@ export class ChannelRepository {
   /**
    * Get enabled channels (non-disabled)
    */
-  async getEnabledChannels(deviceId: number): Promise<Channel[]> {
+  async getEnabledChannels(ownerNodeNum: number): Promise<Channel[]> {
     return this.db
       .select()
       .from(channels)
-      .where(eq(channels.deviceId, deviceId))
+      .where(eq(channels.ownerNodeNum, ownerNodeNum))
       .orderBy(asc(channels.channelIndex));
     // Note: Filter out role = 0 (DISABLED) in application code if needed
   }

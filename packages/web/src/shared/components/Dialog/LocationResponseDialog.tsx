@@ -1,21 +1,14 @@
 import { useNodes } from "@data/hooks";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@shared/components/ui/dialog";
 import { useDeviceContext } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
+import { DialogWrapper } from "./DialogWrapper";
 
 export interface LocationResponseDialogProps {
   location: Types.PacketMetadata<Protobuf.Mesh.Position> | undefined;
   open: boolean;
-  onOpenChange: () => void;
+  onOpenChange: (open: boolean) => void;
 }
 
 export const LocationResponseDialog = ({
@@ -46,52 +39,46 @@ export const LocationResponseDialog = ({
     typeof position.altitude === "number";
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogClose />
-        <DialogHeader>
-          <DialogTitle>
-            {t("locationResponse.title", {
-              interpolation: { escapeValue: false },
-              identifier: `${longName} (${shortName})`,
-            })}
-          </DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          {hasCoordinates ? (
-            <div className="ml-5 flex">
-              <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
-                <p>
-                  {t("locationResponse.coordinates")}
-                  <a
-                    className="text-blue-500 dark:text-blue-400"
-                    href={`https://www.openstreetmap.org/?mlat=${
-                      position.latitudeI ?? 0 / 1e7
-                    }&mlon=${position.longitudeI ?? 0 / 1e7}&layers=N`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {" "}
-                    {position.latitudeI ?? 0 / 1e7},{" "}
-                    {position.longitudeI ?? 0 / 1e7}
-                  </a>
-                </p>
-                <p>
-                  {t("locationResponse.altitude")} {position.altitude}
-                  {(position.altitude ?? 0) < 1
-                    ? t("unit.meter.one")
-                    : t("unit.meter.plural")}
-                </p>
-              </span>
-            </div>
-          ) : (
-            // Optional: Show a message if coordinates are not available
-            <p className="text-textPrimary">
-              {t("locationResponse.noCoordinates")}
+    <DialogWrapper
+      open={open}
+      onOpenChange={onOpenChange}
+      type="info"
+      title={t("locationResponse.title", {
+        interpolation: { escapeValue: false },
+        identifier: `${longName} (${shortName})`,
+      })}
+    >
+      {hasCoordinates ? (
+        <div className="ml-5 flex">
+          <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
+            <p>
+              {t("locationResponse.coordinates")}
+              <a
+                className="text-blue-500 dark:text-blue-400"
+                href={`https://www.openstreetmap.org/?mlat=${
+                  position.latitudeI ?? 0 / 1e7
+                }&mlon=${position.longitudeI ?? 0 / 1e7}&layers=N`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {" "}
+                {position.latitudeI ?? 0 / 1e7},{" "}
+                {position.longitudeI ?? 0 / 1e7}
+              </a>
             </p>
-          )}
-        </DialogDescription>
-      </DialogContent>
-    </Dialog>
+            <p>
+              {t("locationResponse.altitude")} {position.altitude}
+              {(position.altitude ?? 0) < 1
+                ? t("unit.meter.one")
+                : t("unit.meter.plural")}
+            </p>
+          </span>
+        </div>
+      ) : (
+        <p className="text-textPrimary">
+          {t("locationResponse.noCoordinates")}
+        </p>
+      )}
+    </DialogWrapper>
   );
 };

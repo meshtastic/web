@@ -1,7 +1,7 @@
 import { create } from "@bufbuild/protobuf";
-import type { Device } from "@state/device";
 import { nodeRepo } from "@data/index";
 import { Protobuf } from "@meshtastic/core";
+import type { Device } from "@state/device";
 
 /**
  * AdminMessageService - Centralized service for sending admin messages to devices
@@ -14,7 +14,6 @@ import { Protobuf } from "@meshtastic/core";
  * 2. Message creators (create*Message) - Create admin message for queueing
  */
 export class AdminMessageService {
-  // ==================== Message Creators (for queueing) ====================
 
   /**
    * Create a fixed position admin message for queueing
@@ -71,7 +70,6 @@ export class AdminMessageService {
     );
   }
 
-  // ==================== Immediate Operations ====================
 
   /**
    * Set or remove a node as favorite

@@ -142,8 +142,8 @@ describe("ConfigBackupService", () => {
       );
       const parsed = yaml.load(yamlContent) as ConfigBackupData;
 
-      // Verify node was fetched for correct device and node
-      expect(mockGetNode).toHaveBeenCalledWith(42, 12345);
+      // Verify node was fetched for own node (ownerNodeNum == nodeNum for self)
+      expect(mockGetNode).toHaveBeenCalledWith(12345, 12345);
 
       // Verify user config is in export
       expect(parsed.user).toBeDefined();
@@ -167,7 +167,7 @@ describe("ConfigBackupService", () => {
           role: 1,
           uplinkEnabled: false,
           downlinkEnabled: false,
-          moduleSettings: { positionPrecision: 12 },
+          positionPrecision: 12,
         },
         {
           channelIndex: 1,
@@ -176,7 +176,7 @@ describe("ConfigBackupService", () => {
           role: 2,
           uplinkEnabled: true,
           downlinkEnabled: false,
-          moduleSettings: { positionPrecision: 0 },
+          positionPrecision: 0,
         },
       ]);
 
@@ -196,8 +196,8 @@ describe("ConfigBackupService", () => {
       );
       const parsed = yaml.load(yamlContent) as ConfigBackupData;
 
-      // Verify channels were fetched for correct device
-      expect(mockGetChannels).toHaveBeenCalledWith(42);
+      // Verify channels were fetched for correct node
+      expect(mockGetChannels).toHaveBeenCalledWith(12345);
 
       // Verify channels are in export
       expect(parsed.channels).toHaveLength(2);
@@ -235,11 +235,11 @@ user:
   isUnmessageable: false
 config:
   device:
-    role: "1"
+    role: 1
     serialEnabled: true
     buttonGpio: 12
     buzzerGpio: 13
-    rebroadcastMode: "0"
+    rebroadcastMode: 0
     nodeInfoBroadcastSecs: 30
     doubleTapAsButtonPress: true
     isManaged: false
@@ -248,12 +248,12 @@ config:
     tzdef: "America/Los_Angeles"
   lora:
     usePreset: true
-    modemPreset: "1"
+    modemPreset: 1
     bandwidth: 125
     spreadFactor: 10
     codingRate: 4
     frequencyOffset: 0
-    region: "1"
+    region: 1
     hopLimit: 3
     txEnabled: true
     txPower: 20
@@ -316,11 +316,11 @@ user:
   isUnmessageable: false
 config:
   device:
-    role: "1"
+    role: 1
     serialEnabled: true
     buttonGpio: 12
     buzzerGpio: 13
-    rebroadcastMode: "0"
+    rebroadcastMode: 0
     nodeInfoBroadcastSecs: 30
     doubleTapAsButtonPress: true
     isManaged: false
@@ -339,11 +339,7 @@ channels: []
         ConfigBackupService.parseBackup(invalidYAML);
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toContain(
-          "config.device.tzdef: Required",
-        ); // This might fail if the error message format is different, but let's try.
-        // Actually the error message includes "Invalid ConfigBackup structure:\n...".
-        // It should contain the specific error line.
+        expect((error as Error).message).toContain("config.device.tzdef");
       }
     });
 

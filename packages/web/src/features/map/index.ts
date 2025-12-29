@@ -1,2 +1,2 @@
-export * from "./components";
-export * from "./pages";
+export * from "./components/index.ts";
+export * from "./pages/index.ts";

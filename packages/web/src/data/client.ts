@@ -1,14 +1,10 @@
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import { SQLocalDrizzle } from "sqlocal/drizzle";
 import logger from "../core/services/logger.ts";
-import migration0000 from "./migrations/0000_same_peter_quill.sql?raw";
-import migration0001 from "./migrations/0001_strange_scream.sql?raw";
+import initialSchema from "./migrations/0000_initial_schema.sql?raw";
 import * as schema from "./schema.ts";
 
-const migrations = [
-  { id: "0000_same_peter_quill", sql: migration0000 },
-  { id: "0001_strange_scream", sql: migration0001 },
-];
+const migrations = [{ id: "0000_initial_schema", sql: initialSchema }];
 
 class DatabaseClient {
   private static instance: DatabaseClient;
@@ -184,6 +180,9 @@ class DatabaseClient {
       "telemetry_logs",
       "message_drafts",
       "last_read",
+      "traceroute_logs",
+      "device_configs",
+      "config_changes",
     ];
 
     for (const table of tables) {

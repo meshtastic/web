@@ -19,6 +19,7 @@ export interface ConfigBackupUserConfig {
 
 export interface ConfigBackupData {
   version: string;
+  backupType?: "full" | "channels-only";
   metadata: {
     exportedAt: string;
     deviceName?: string;
@@ -30,6 +31,10 @@ export interface ConfigBackupData {
   config: Record<string, unknown>;
   moduleConfig: Record<string, unknown>;
   channels: unknown[];
+}
+
+export interface ChannelImportOptions {
+  mode: "merge" | "replace";
 }
 
 export interface ParsedConfigBackupField {
@@ -132,10 +137,22 @@ function buildConfigMap<T extends string>(
 
 export class ConfigBackupService {
   static async createBackup(device: Device): Promise<string> {
-    const myNodeNum = device.getMyNodeNum();
-    const dbChannels = await channelRepo.getChannels(device.id);
+    return this.createBackupInternal(device, "full");
+  }
 
-    const userConfig = await this.fetchUserConfig(device.id, myNodeNum);
+  static async createChannelOnlyBackup(device: Device): Promise<string> {
+    return this.createBackupInternal(device, "channels-only");
+  }
+
+  private static async createBackupInternal(
+    device: Device,
+    backupType: "full" | "channels-only",
+  ): Promise<string> {
+    const myNodeNum = device.getMyNodeNum();
+    const dbChannels = await channelRepo.getChannels(myNodeNum);
+
+    const userConfig =
+      backupType === "full" ? await this.fetchUserConfig(myNodeNum) : undefined;
 
     const protoChannels = dbChannels.map((ch) => ({
       index: ch.channelIndex as Types.ChannelNumber,
@@ -144,13 +161,16 @@ export class ConfigBackupService {
         psk: ch.psk || undefined,
         uplinkEnabled: ch.uplinkEnabled,
         downlinkEnabled: ch.downlinkEnabled,
-        moduleSettings: ch.moduleSettings,
+        moduleSettings: {
+          positionPrecision: ch.positionPrecision,
+        },
       },
       role: ch.role,
     }));
 
     const exportData: ConfigBackupData = {
       version: "1.0",
+      backupType,
       metadata: {
         exportedAt: new Date().toISOString(),
         deviceName:
@@ -162,12 +182,18 @@ export class ConfigBackupService {
         nodeId: myNodeNum,
       },
       user: userConfig,
-      config: buildConfigMap(CONFIG_TYPES, (type) =>
-        device.getEffectiveConfig(type),
-      ),
-      moduleConfig: buildConfigMap(MODULE_CONFIG_TYPES, (type) =>
-        device.getEffectiveModuleConfig(type),
-      ),
+      config:
+        backupType === "full"
+          ? buildConfigMap(CONFIG_TYPES, (type) =>
+              device.getEffectiveConfig(type),
+            )
+          : {},
+      moduleConfig:
+        backupType === "full"
+          ? buildConfigMap(MODULE_CONFIG_TYPES, (type) =>
+              device.getEffectiveModuleConfig(type),
+            )
+          : {},
       channels: protoChannels,
     };
 
@@ -180,12 +206,12 @@ export class ConfigBackupService {
   }
 
   private static async fetchUserConfig(
-    deviceId: string,
     myNodeNum: number | undefined,
   ): Promise<ConfigBackupUserConfig | undefined> {
     if (!myNodeNum) return undefined;
 
-    const myNode = await nodeRepo.getNode(deviceId, myNodeNum);
+    // Get the device's own node entry (ownerNodeNum == nodeNum for self)
+    const myNode = await nodeRepo.getNode(myNodeNum, myNodeNum);
     if (!myNode) return undefined;
 
     return {
@@ -259,8 +285,10 @@ export class ConfigBackupService {
     selectedFields: ParsedConfigBackupField[],
     device: Device,
     onProgress?: (percent: number, status: string) => void,
+    options?: { channelImportMode?: "merge" | "replace" },
   ): Promise<void> {
     const grouped = this.groupFieldsByType(selectedFields);
+    const channelImportMode = options?.channelImportMode ?? "merge";
 
     const totalSteps =
       grouped.config.size +
@@ -279,7 +307,12 @@ export class ConfigBackupService {
 
     this.applyConfigUpdates(grouped.config, device, updateProgress);
     this.applyModuleConfigUpdates(grouped.moduleConfig, device, updateProgress);
-    await this.applyChannelUpdates(grouped.channels, device, updateProgress);
+    await this.applyChannelUpdates(
+      grouped.channels,
+      device,
+      updateProgress,
+      channelImportMode,
+    );
     await this.applyUserUpdates(grouped.user, device, updateProgress);
   }
 
@@ -370,11 +403,32 @@ export class ConfigBackupService {
     updates: Map<number, Record<string, unknown>>,
     device: Device,
     updateProgress: (status: string) => void,
+    mode: "merge" | "replace" = "merge",
   ): Promise<void> {
     if (updates.size === 0) return;
 
     const dbChannels = await channelRepo.getChannels(device.id);
     const channelsMap = new Map(dbChannels.map((ch) => [ch.channelIndex, ch]));
+
+    // In replace mode, disable channels not in the import (except primary channel 0)
+    if (mode === "replace") {
+      for (const [channelIndex, existingChannel] of channelsMap) {
+        // Skip primary channel (index 0) - it can never be disabled
+        if (channelIndex === 0) continue;
+        // Skip channels that are being updated
+        if (updates.has(channelIndex)) continue;
+        // Skip channels that are already disabled
+        if (existingChannel.role === 0) continue;
+
+        updateProgress(`Disabling Channel ${channelIndex}...`);
+        const disabledChannel = create(Protobuf.Channel.ChannelSchema, {
+          index: channelIndex as Types.ChannelNumber,
+          role: Protobuf.Channel.Channel_Role.DISABLED,
+          settings: {},
+        });
+        await device.addChannel(disabledChannel);
+      }
+    }
 
     for (const [channelIndex, fieldUpdates] of updates) {
       updateProgress(`Applying Channel ${channelIndex}...`);
@@ -416,10 +470,7 @@ export class ConfigBackupService {
     if (Object.keys(updates).length === 0) return;
 
     updateProgress("Applying user config...");
-    const currentUser = await this.fetchUserConfig(
-      device.id,
-      device.getMyNodeNum(),
-    );
+    const currentUser = await this.fetchUserConfig(device.getMyNodeNum());
 
     const mergedUser = { ...currentUser, ...updates };
     const userData = create(Protobuf.Mesh.UserSchema, {

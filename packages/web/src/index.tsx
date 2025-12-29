@@ -2,22 +2,32 @@ import React, { Suspense, use, useState } from "react";
 import "@app/index.css";
 
 import "@core/services/dev-overrides.ts";
+import logger from "@core/services/logger";
 import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
+import { dbClient } from "@data/client";
 import {
   initDatabase,
   packetBatcher,
   resetConnectionStatuses,
 } from "@data/index";
+import {
+  channelRepo,
+  configCacheRepo,
+  connectionRepo,
+  messageRepo,
+  nodeRepo,
+  packetLogRepo,
+  preferencesRepo,
+  tracerouteRepo,
+} from "@data/repositories";
+import { useDeviceStore } from "@state/device";
+import { useUIStore } from "@state/ui";
 import { RouterProvider } from "@tanstack/react-router";
-import { router } from "./app/routes.tsx";
+import { router, type RouterContext } from "./app/routes.tsx";
 import { WelcomeSplash } from "./shared/components/WelcomeSplash.tsx";
-
-declare module "@tanstack/react-router" {
-  interface Register {}
-}
 
 enableMapSet();
 
@@ -31,6 +41,28 @@ async function checkDatabaseExists(): Promise<boolean> {
     return false;
   }
 }
+
+// Build router context with all services, repositories, and stores
+const routerContext: RouterContext = {
+  services: {
+    db: dbClient,
+    logger,
+  },
+  repositories: {
+    channel: channelRepo,
+    configCache: configCacheRepo,
+    connection: connectionRepo,
+    message: messageRepo,
+    node: nodeRepo,
+    packetLog: packetLogRepo,
+    preferences: preferencesRepo,
+    traceroute: tracerouteRepo,
+  },
+  stores: {
+    device: useDeviceStore,
+    ui: useUIStore,
+  },
+};
 
 // Initialize database before React mounts
 const dbPromise = initDatabase()
@@ -55,7 +87,7 @@ function AppContent() {
 
   return (
     <React.StrictMode>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} context={routerContext} />
     </React.StrictMode>
   );
 }

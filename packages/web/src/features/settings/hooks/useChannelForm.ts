@@ -50,7 +50,7 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
   // Convert form data back to flat DB structure
   const formToDbChannel = useCallback(
     (data: ChannelValidation): DbChannel => ({
-      deviceId: channel.deviceId,
+      ownerNodeNum: channel.ownerNodeNum,
       channelIndex: data.index,
       role: data.role,
       name: data.settings.name,
@@ -60,7 +60,7 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
       positionPrecision: data.settings.moduleSettings.positionPrecision,
       updatedAt: new Date(),
     }),
-    [channel.deviceId],
+    [channel.ownerNodeNum],
   );
 
   const defaultValues = useMemo(

@@ -1,10 +1,3 @@
-/**
- * Node hooks using useSyncExternalStore for React 19 best practices
- *
- * These hooks subscribe to database events and provide reactive node data
- * without the tearing issues that can occur with useState + useEffect patterns.
- */
-
 import { NodeError } from "@data/errors";
 import { DB_EVENTS, dbEvents } from "@data/events";
 import { nodeRepo } from "@data/repositories";
@@ -18,8 +11,6 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-
-// ==================== Node Cache ====================
 
 /**
  * Cache for node data keyed by deviceId
@@ -64,8 +55,6 @@ class NodeCache {
 
 const nodeCache = new NodeCache();
 
-// ==================== Main Hook ====================
-
 /**
  * Hook to fetch all nodes for a device
  * Uses useSyncExternalStore for tear-free concurrent rendering
@@ -91,7 +80,6 @@ export function useNodes(deviceId: number) {
 
   const nodes = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
-  // Initial load
   useEffect(() => {
     nodeCache.refresh(deviceId);
   }, [deviceId]);
@@ -102,15 +90,10 @@ export function useNodes(deviceId: number) {
     [nodes],
   );
 
-  const refresh = useCallback(
-    () => nodeCache.refresh(deviceId),
-    [deviceId],
-  );
+  const refresh = useCallback(() => nodeCache.refresh(deviceId), [deviceId]);
 
   return { nodes, nodeMap, refresh };
 }
-
-// ==================== Single Node Hook ====================
 
 /**
  * Hook to fetch a specific node
@@ -137,23 +120,16 @@ export function useNode(deviceId: number, nodeNum: number) {
   return { node, refresh };
 }
 
-// ==================== Favorite Nodes Hook ====================
-
 /**
  * Hook to fetch favorite nodes
  * Derives from useNodes for consistency
  */
 export function useFavoriteNodes(deviceId: number) {
   const { nodes: allNodes, refresh } = useNodes(deviceId);
-  const nodes = useMemo(
-    () => allNodes.filter((n) => n.isFavorite),
-    [allNodes],
-  );
+  const nodes = useMemo(() => allNodes.filter((n) => n.isFavorite), [allNodes]);
 
   return { nodes, refresh };
 }
-
-// ==================== Recent Nodes Hook ====================
 
 /**
  * Hook to fetch recently heard nodes
@@ -171,8 +147,6 @@ export function useRecentNodes(deviceId: number, sinceTimestamp: number) {
 
   return { nodes, refresh };
 }
-
-// ==================== Position History Hook ====================
 
 /**
  * Hook to fetch position history for a node
@@ -205,8 +179,6 @@ export function usePositionHistory(
   return { positions, refresh };
 }
 
-// ==================== Telemetry History Hook ====================
-
 /**
  * Hook to fetch telemetry history for a node
  */
@@ -238,8 +210,6 @@ export function useTelemetryHistory(
   return { telemetry, refresh };
 }
 
-// ==================== Position Trails Hook ====================
-
 /**
  * Hook to fetch position history for multiple nodes at once
  */
@@ -251,8 +221,7 @@ export function usePositionTrails(
 ) {
   const [trails, setTrails] = useState<Map<number, PositionLog[]>>(new Map());
 
-  // Stabilize the nodeNums array reference
-  const stableNodeNums = useMemo(() => nodeNums, [JSON.stringify(nodeNums)]);
+  const stableNodeNums = useMemo(() => nodeNums, [nodeNums]);
 
   const refresh = useCallback(async (): Promise<
     Result<Map<number, PositionLog[]>, NodeError>

@@ -27,7 +27,7 @@ try {
 }
 
 const CONTENT_SECURITY_POLICY =
-  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' data:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' http: https:; object-src 'none'; base-uri 'self';";
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: https://*.tile.openstreetmap.org https://tile.openstreetmap.org; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' http: https:; object-src 'none'; base-uri 'self';";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
@@ -91,9 +91,9 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       headers: {
-        "Content-Security-Policy": CONTENT_SECURITY_POLICY,
+        // "Content-Security-Policy": CONTENT_SECURITY_POLICY,
         "Cross-Origin-Opener-Policy": "same-origin",
-        "Cross-Origin-Embedder-Policy": "credentialless",
+        "Cross-Origin-Embedder-Policy": "require-corp",
         "X-Content-Type-Options": "nosniff",
         "Strict-Transport-Security":
           "max-age=63072000; includeSubDomains; preload",

@@ -22,11 +22,11 @@ export class MigrationService {
     await dbClient.init();
     const db = dbClient.db;
 
-    await db.delete(messages).where(eq(messages.deviceId, deviceId));
-    await db.delete(nodes).where(eq(nodes.deviceId, deviceId));
-    await db.delete(channels).where(eq(channels.deviceId, deviceId));
-    await db.delete(messageDrafts).where(eq(messageDrafts.deviceId, deviceId));
-    await db.delete(lastRead).where(eq(lastRead.deviceId, deviceId));
+    await db.delete(messages).where(eq(messages.ownerNodeNum, deviceId));
+    await db.delete(nodes).where(eq(nodes.ownerNodeNum, deviceId));
+    await db.delete(channels).where(eq(channels.ownerNodeNum, deviceId));
+    await db.delete(messageDrafts).where(eq(messageDrafts.ownerNodeNum, deviceId));
+    await db.delete(lastRead).where(eq(lastRead.ownerNodeNum, deviceId));
 
     logger.debug(`[MigrationService] Deleted all data for device ${deviceId}`);
   }
@@ -41,7 +41,7 @@ export class MigrationService {
     const result = await db
       .select()
       .from(messages)
-      .where(eq(messages.deviceId, deviceId))
+      .where(eq(messages.ownerNodeNum, deviceId))
       .limit(1);
 
     return result.length > 0;

@@ -4,7 +4,7 @@ export * from "./LanguageSwitcher";
 export * from "./MeshNetwork";
 export * from "./Mono";
 export * from "./NodeAvatar";
-export * from "./NodeAvatar";
+export * from "./QRCode";
 export * from "./SignalIndicator";
 export * from "./TimeAgo";
 export * from "./WelcomeSplash";

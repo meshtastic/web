@@ -1,6 +1,7 @@
 import logger from "../core/services/logger.ts";
-import { useUIStore } from "@state/ui";
-import { packetLogRepo } from "./repositories/index.ts";
+import { DEFAULT_PREFERENCES } from "@state/ui";
+import { DB_EVENTS, dbEvents } from "./events.ts";
+import { packetLogRepo, preferencesRepo } from "./repositories/index.ts";
 import type { NewPacketLog } from "./schema.ts";
 
 /**
@@ -17,20 +18,31 @@ class PacketBatcher {
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
   private isProcessing = false;
   private unsubscribe: (() => void) | null = null;
+  private cachedBatchSize = DEFAULT_PREFERENCES.packetBatchSize;
 
   private get batchSize(): number {
-    return useUIStore.getState().packetBatchSize;
+    return this.cachedBatchSize;
   }
 
   /**
    * Initialize the batcher and subscribe to preference changes
    */
-  init(): void {
-    // Subscribe to batch size changes (for logging purposes)
-    this.unsubscribe = useUIStore.subscribe(
-      (state) => state.packetBatchSize,
-      (newSize) => {
-        logger.debug(`[PacketBatcher] Batch size changed to ${newSize}`);
+  async init(): Promise<void> {
+    // Load initial batch size
+    const savedSize = await preferencesRepo.get<number>("packetBatchSize");
+    if (savedSize !== undefined) {
+      this.cachedBatchSize = savedSize;
+    }
+
+    // Subscribe to batch size changes
+    this.unsubscribe = dbEvents.subscribe(
+      DB_EVENTS.PREFERENCE_UPDATED,
+      async () => {
+        const newSize = await preferencesRepo.get<number>("packetBatchSize");
+        if (newSize !== undefined && newSize !== this.cachedBatchSize) {
+          this.cachedBatchSize = newSize;
+          logger.debug(`[PacketBatcher] Batch size changed to ${newSize}`);
+        }
       },
     );
   }

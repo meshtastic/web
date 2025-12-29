@@ -132,7 +132,6 @@ export function ChatPanel({
   return (
     <TooltipProvider delayDuration={300}>
       <div className="flex flex-col h-full min-h-0">
-        {/* Chat Header */}
         {showHeader && (
           <div className="h-14 border-b flex items-center px-4 shrink-0">
             <div className="flex items-center gap-3">
@@ -163,7 +162,6 @@ export function ChatPanel({
           </div>
         )}
 
-        {/* Messages Area - flex-col-reverse makes scroll start at bottom showing newest messages */}
         <div className="flex-1 min-h-0 overflow-y-auto flex flex-col-reverse px-3 xl:px-6 xl:pb-14 lg:pb-10 styled-scrollbar">
           {messageGroups.map((group) => (
             <Fragment key={group.dayKey}>
@@ -194,7 +192,6 @@ export function ChatPanel({
           ))}
         </div>
 
-        {/* Message Input */}
         <MessageInput selectedContact={contact} device={device} />
       </div>
     </TooltipProvider>

@@ -1,6 +1,7 @@
 import type { Result } from "neverthrow";
 import { ResultAsync } from "neverthrow";
 import { useCallback, useEffect, useState } from "react";
+import logger from "../../core/services/logger.ts";
 import { ChannelError } from "../errors.ts";
 import { DB_EVENTS, dbEvents } from "../events.ts";
 import { channelRepo } from "../repositories/index.ts";
@@ -21,6 +22,8 @@ export function useChannels(deviceId: number) {
     );
     if (result.isOk()) {
       setChannels(result.value);
+    } else {
+      logger.error("[useChannels] Failed to fetch channels:", result.error);
     }
     return result;
   }, [deviceId]);
@@ -50,6 +53,8 @@ export function useChannel(deviceId: number, channelIndex: number) {
     );
     if (result.isOk()) {
       setChannel(result.value);
+    } else {
+      logger.error("[useChannel] Failed to fetch channel:", result.error);
     }
     return result;
   }, [deviceId, channelIndex]);
@@ -79,6 +84,8 @@ export function usePrimaryChannel(deviceId: number) {
     );
     if (result.isOk()) {
       setChannel(result.value);
+    } else {
+      logger.error("[usePrimaryChannel] Failed to fetch primary channel:", result.error);
     }
     return result;
   }, [deviceId]);

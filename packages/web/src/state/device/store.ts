@@ -95,9 +95,17 @@ type DeviceData = {
 export type ConnectionPhase =
   | "disconnected"
   | "connecting"
+  | "cached" // Using cached config, fresh config still loading
   | "configuring"
   | "connected" // Config-only stage complete, node-info still loading
   | "configured"; // Full two-stage configuration complete
+
+export interface ConfigConflict {
+  variant: string;
+  localValue: unknown;
+  remoteValue: unknown;
+  originalValue?: unknown;
+}
 
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
@@ -116,6 +124,10 @@ export interface Device extends DeviceData {
   unreadCounts: Map<number, number>;
   dialog: Dialogs;
   clientNotifications: Protobuf.Mesh.ClientNotification[];
+
+  // Config caching state
+  isCachedConfig: boolean; // True when using cached config, false after fresh config received
+  configConflicts: Map<string, ConfigConflict>; // Tracks config conflicts by "config:variant" or "moduleConfig:variant"
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
   setConnectionPhase: (phase: ConnectionPhase) => void;
@@ -186,6 +198,24 @@ export interface Device extends DeviceData {
   queueAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
   getAllQueuedAdminMessages: () => Protobuf.Admin.AdminMessage[];
   getAdminMessageChangeCount: () => number;
+
+  // Config caching methods
+  setCachedConfig: (
+    config: Protobuf.LocalOnly.LocalConfig,
+    moduleConfig: Protobuf.LocalOnly.LocalModuleConfig,
+  ) => void;
+  setIsCachedConfig: (isCached: boolean) => void;
+  setConfigConflict: (
+    type: "config" | "moduleConfig",
+    variant: string,
+    conflict: ConfigConflict,
+  ) => void;
+  hasAnyConflicts: () => boolean;
+  getConfigConflict: (
+    type: "config" | "moduleConfig",
+    variant: string,
+  ) => ConfigConflict | undefined;
+  clearConfigConflicts: () => void;
 }
 
 export interface deviceState {
@@ -253,6 +283,7 @@ function deviceFactory(
       shutdown: false,
       reboot: false,
       deviceName: false,
+      deviceShare: false,
       nodeRemoval: false,
       pkiBackup: false,
       nodeDetails: false,
@@ -270,6 +301,10 @@ function deviceFactory(
     messageDraft: "",
     unreadCounts: new Map(),
     clientNotifications: [],
+
+    // Config caching state
+    isCachedConfig: false,
+    configConflicts: new Map<string, ConfigConflict>(),
 
     setStatus: (status: Types.DeviceStatusEnum) => {
       set(
@@ -549,9 +584,11 @@ function deviceFactory(
       // Channels are now stored in the database
       const { channelRepo } = await import("@data/index");
       const { fromByteArray } = await import("base64-js");
+      const device = get().devices.get(id);
+      if (!device?.hardware.myNodeNum) return;
 
       await channelRepo.upsertChannel({
-        deviceId: id,
+        ownerNodeNum: device.hardware.myNodeNum,
         channelIndex: channel.index,
         role: channel.role,
         name: channel.settings?.name,
@@ -1057,6 +1094,78 @@ function deviceFactory(
         return 0;
       }
       return device.queuedAdminMessages.length;
+    },
+
+    // Config caching methods
+    setCachedConfig: (
+      config: Protobuf.LocalOnly.LocalConfig,
+      moduleConfig: Protobuf.LocalOnly.LocalModuleConfig,
+    ) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (device) {
+            device.config = config;
+            device.moduleConfig = moduleConfig;
+            device.isCachedConfig = true;
+          }
+        }),
+      );
+    },
+
+    setIsCachedConfig: (isCached: boolean) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (device) {
+            device.isCachedConfig = isCached;
+          }
+        }),
+      );
+    },
+
+    setConfigConflict: (
+      type: "config" | "moduleConfig",
+      variant: string,
+      conflict: ConfigConflict,
+    ) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (device) {
+            const key = `${type}:${variant}`;
+            device.configConflicts.set(key, conflict);
+          }
+        }),
+      );
+    },
+
+    hasAnyConflicts: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return false;
+      }
+      return device.configConflicts.size > 0;
+    },
+
+    getConfigConflict: (type: "config" | "moduleConfig", variant: string) => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return undefined;
+      }
+      const key = `${type}:${variant}`;
+      return device.configConflicts.get(key);
+    },
+
+    clearConfigConflicts: () => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (device) {
+            device.configConflicts.clear();
+          }
+        }),
+      );
     },
   };
 }

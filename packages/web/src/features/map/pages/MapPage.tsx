@@ -1,15 +1,15 @@
+import { FilterControl } from "@app/shared/components/Filter/FilterControl.tsx";
+import {
+  type FilterState,
+  useFilterNode,
+} from "@app/shared/components/Filter/useFilterNode.ts";
 import { create } from "@bufbuild/protobuf";
 import { useNodes } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { FilterControl } from "@shared/components/generic/Filter/FilterControl";
-import {
-  type FilterState,
-  useFilterNode,
-} from "@shared/components/generic/Filter/useFilterNode";
 import { useMapFitting } from "@shared/hooks/useMapFitting";
 import { cn } from "@shared/utils/cn";
-import { hasPos, toLngLat } from "@shared/utils/geo.ts";
+import { boundsFromLngLat, hasPos, toLngLat } from "@shared/utils/geo.ts";
 import { useDevice, useDeviceContext } from "@state/index.ts";
 import { toByteArray } from "base64-js";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
@@ -48,7 +48,7 @@ function hexToUint8Array(hex: string): Uint8Array {
     : new Uint8Array();
 }
 
-const MapPage = () => {
+export const MapPage = () => {
   const { t } = useTranslation("map");
   const { deviceId } = useDeviceContext();
   const device = useDevice();
@@ -127,7 +127,7 @@ const MapPage = () => {
   );
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const [mapRef, setMapRef] = useState<MapRef | undefined>(undefined);
-  const { focusLngLat, fitToNodes } = useMapFitting(mapRef);
+  const { focusLngLat } = useMapFitting(mapRef);
 
   const hasFitBoundsOnce = useRef(false);
   const [snrHover, setSnrHover] = useState<SNRTooltipProps>();
@@ -138,7 +138,6 @@ const MapPage = () => {
     () => defaultVisibilityState,
   );
 
-  // Filters
   const [filterState, setFilterState] = useState<FilterState>(
     () => defaultFilterValues,
   );
@@ -153,12 +152,19 @@ const MapPage = () => {
   const handleMapLoad = useCallback(
     (map: MapRef) => {
       setMapRef(map);
-      if (!hasFitBoundsOnce.current) {
-        fitToNodes(validNodes);
+      if (!hasFitBoundsOnce.current && validNodes.length > 0) {
+        const coords = validNodes.map((n) => toLngLat(n.position));
+        const bounds = boundsFromLngLat(coords);
+        if (bounds) {
+          map.fitBounds(bounds, {
+            padding: { top: 50, bottom: 50, left: 50, right: 50 },
+            maxZoom: 15,
+          });
+        }
         hasFitBoundsOnce.current = true;
       }
     },
-    [fitToNodes, validNodes],
+    [validNodes],
   );
 
   // SNR lines
@@ -284,7 +290,7 @@ const MapPage = () => {
   );
 
   return (
-    <div>
+    <div className="h-full">
       <BaseMap
         onLoad={handleMapLoad}
         onMouseMove={onMouseMove}
@@ -356,5 +362,3 @@ const MapPage = () => {
     </div>
   );
 };
-
-export default MapPage;

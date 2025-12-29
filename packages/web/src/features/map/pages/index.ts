@@ -1,1 +1,1 @@
-export { MapPage } from "./MapPage";
+export { MapPage } from "./MapPage.tsx";

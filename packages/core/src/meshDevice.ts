@@ -80,7 +80,20 @@ export class MeshDevice {
       this.pendingSettingsChanges = state;
     });
 
-    this.transport.fromDevice.pipeTo(decodePacket(this));
+    this.transport.fromDevice
+      .pipeTo(decodePacket(this))
+      .then(() => {
+        this.log.info(
+          Emitter[Emitter.HandleFromRadio],
+          "📡 Packet pipeline completed",
+        );
+      })
+      .catch((err) => {
+        this.log.error(
+          Emitter[Emitter.HandleFromRadio],
+          `⚠️ Packet pipeline error: ${err?.message ?? err}`,
+        );
+      });
   }
 
   /** Abstract method that connects to the radio */
@@ -812,7 +825,7 @@ export class MeshDevice {
   }
 
   /**
-   * Two-stage config flow mirroring Android implementation
+   * Two-stage config flow
    * Stage 1: Config-only (device config, module config, channels)
    * Stage 2: Node-info only (node database)
    */
@@ -1387,14 +1400,14 @@ export class MeshDevice {
       ackTimestamp: number;
       ackSNR: number;
       realACK: boolean;
-    }
+    },
   ): void {
     // This will be handled by the web layer through event system
     // For now, just log the ACK information
     this.log.debug(
       Emitter[Emitter.HandleMeshPacket],
       `📨 ACK received for message ${messageId}:`,
-      ackInfo
+      ackInfo,
     );
 
     // Dispatch event for web layer to handle

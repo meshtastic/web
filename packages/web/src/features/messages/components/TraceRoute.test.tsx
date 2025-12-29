@@ -42,12 +42,11 @@ describe("TraceRoute", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.mocked(useDeviceContext).mockReturnValue({
-      deviceId: "test-device",
-    } as ReturnType<typeof useDeviceContext>);
+      deviceId: 123,
+    });
     vi.mocked(useNodes).mockReturnValue({
       nodes: mockNodes as Node[],
-      isLoading: false,
-      error: null,
+      nodeMap: new Map(),
       refresh: vi.fn(),
     });
   });

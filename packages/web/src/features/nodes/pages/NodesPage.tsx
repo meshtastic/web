@@ -1,4 +1,5 @@
 import { useLanguage } from "@app/shared/hooks/useLanguage.ts";
+import { SignalIndicator } from "@app/shared/index.ts";
 import { create } from "@bufbuild/protobuf";
 import { useNodes } from "@data/hooks";
 import { Protobuf, type Types } from "@meshtastic/core";
@@ -40,7 +41,9 @@ import {
   TableRow,
 } from "@shared/components/ui/table";
 import { cn } from "@shared/utils/cn";
+import { usePreference } from "@data/hooks";
 import {
+  DEFAULT_PREFERENCES,
   type NodeColumnKey,
   useDevice,
   useDeviceContext,
@@ -116,13 +119,16 @@ const NodesPage = (): JSX.Element => {
   const { deviceId } = useDeviceContext();
   const { nodes: allNodes } = useNodes(deviceId);
 
-  const {
-    setNodeNumDetails,
-    nodesTableColumnVisibility: columnVisibility,
-    nodesTableColumnOrder: columnOrder,
-    setNodesTableColumnVisibility: setColumnVisibility,
-    setNodesTableColumnOrder: setColumnOrder,
-  } = useUIStore();
+  const { setNodeNumDetails } = useUIStore();
+
+  const [columnVisibility, setColumnVisibility] = usePreference<
+    Record<NodeColumnKey, boolean>
+  >("nodesTableColumnVisibility", DEFAULT_PREFERENCES.nodesTableColumnVisibility);
+
+  const [columnOrder, setColumnOrder] = usePreference<NodeColumnKey[]>(
+    "nodesTableColumnOrder",
+    DEFAULT_PREFERENCES.nodesTableColumnOrder,
+  );
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
   const [selectedTraceroute, setSelectedTraceroute] = useState<
@@ -167,7 +173,7 @@ const NodesPage = (): JSX.Element => {
       newOrder.splice(draggedIndex, 1);
       newOrder.splice(targetIndex, 0, draggedColumn);
 
-      setColumnOrder(newOrder);
+      void setColumnOrder(newOrder);
       setDraggedColumn(null);
     },
     [draggedColumn, columnOrder, setColumnOrder],
@@ -577,10 +583,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.encryption}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         encryption: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.encryption")}
@@ -588,10 +594,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.lastHeard}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         lastHeard: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.lastHeard")}
@@ -599,10 +605,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.signal}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         signal: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.signal")}
@@ -610,10 +616,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.battery}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         battery: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.battery")}
@@ -621,10 +627,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.altitude}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         altitude: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.altitude")}
@@ -632,10 +638,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.hops}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         hops: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.hopsAway")}
@@ -643,10 +649,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.temp}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         temp: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.temp")}
@@ -654,10 +660,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.chUtil}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         chUtil: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.chUtil")}
@@ -665,10 +671,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.model}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         model: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.model")}
@@ -676,10 +682,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.role}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         role: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.role")}
@@ -687,10 +693,10 @@ const NodesPage = (): JSX.Element => {
                   <DropdownMenuCheckboxItem
                     checked={columnVisibility.nodeId}
                     onCheckedChange={(checked) =>
-                      setColumnVisibility((prev) => ({
-                        ...prev,
+                      void setColumnVisibility({
+                        ...columnVisibility,
                         nodeId: checked,
-                      }))
+                      })
                     }
                   >
                     {t("nodesTable.headings.nodeId")}
@@ -849,15 +855,11 @@ const NodesPage = (): JSX.Element => {
         </CardContent>
       </Card>
 
-      <TracerouteResponseDialog
-        traceroute={selectedTraceroute}
-        open={!!selectedTraceroute}
-        onOpenChange={() => setSelectedTraceroute(undefined)}
-      />
+      <TracerouteResponseDialog />
       <LocationResponseDialog
         location={selectedLocation}
         open={!!selectedLocation}
-        onOpenChange={() => setSelectedLocation(undefined)}
+        onOpenChange={(open) => !open && setSelectedLocation(undefined)}
       />
     </div>
   );

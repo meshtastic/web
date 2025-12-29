@@ -18,10 +18,14 @@ export function BackupRestore() {
   const { setDialogOpen } = device;
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
-  const exportConfig = async () => {
+  const exportConfig = async (type: "full" | "channels-only" = "full") => {
     try {
-      const yamlContent = await ConfigBackupService.createBackup(device);
-      const filename = `meshtastic_${device.hardware?.myNodeNum || "config"}.yaml`;
+      const yamlContent =
+        type === "full"
+          ? await ConfigBackupService.createBackup(device)
+          : await ConfigBackupService.createChannelOnlyBackup(device);
+      const suffix = type === "channels-only" ? "_channels" : "";
+      const filename = `meshtastic_${device.hardware?.myNodeNum || "config"}${suffix}.yaml`;
       ConfigBackupService.downloadBackup(yamlContent, filename);
 
       toast({
@@ -49,6 +53,7 @@ export function BackupRestore() {
   const handleImport = async (
     fields: ParsedConfigBackupField[],
     onProgress: (percent: number, status: string) => void,
+    options?: { channelImportMode?: "merge" | "replace" },
   ) => {
     try {
       await ConfigBackupService.applyToDevice(
@@ -56,6 +61,7 @@ export function BackupRestore() {
         fields,
         device,
         onProgress,
+        options,
       );
 
       toast({
@@ -99,10 +105,15 @@ export function BackupRestore() {
               )}
             </p>
           </div>
-          <Button variant="outline" onClick={exportConfig}>
-            <Download className="h-4 w-4 mr-2" />
-            {t("settings.advanced.backupRestore.export.button", "Export")}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => exportConfig("full")}>
+              <Download className="h-4 w-4 mr-2" />
+              {t("settings.advanced.backupRestore.export.button", "Export")}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => exportConfig("channels-only")}>
+              {t("settings.advanced.backupRestore.export.channelsOnly", "Channels Only")}
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center justify-between gap-4">

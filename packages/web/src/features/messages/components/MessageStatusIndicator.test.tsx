@@ -29,7 +29,7 @@ const createMockMessage = (
   ackTimestamp: null,
   ackSNR: 0,
   realACK: false,
-  deviceId: 1,
+  ownerNodeNum: 1,
   ...overrides,
 });
 

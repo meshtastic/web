@@ -7,20 +7,20 @@
 
 import { router } from "@app/app/routes";
 import logger from "@core/services/logger";
-import { connectionRepo } from "@data/repositories";
+import { configCacheRepo, connectionRepo } from "@data/repositories";
 import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
 import type { Connection } from "@data/schema";
 import { SubscriptionService } from "@data/subscriptionService";
-import { MeshDevice, Types } from "@meshtastic/core";
+import { MeshDevice, type Protobuf, Types } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { randId } from "@shared/utils/randId";
-import { useDeviceStore } from "@state/index.ts";
-import { BrowserHardware } from "./BrowserHardware";
-import { testHttpReachable } from "../utils";
+import { type ConfigConflict, useDeviceStore } from "@state/index.ts";
+import { testHttpReachable } from "../utils.ts";
+import { BrowserHardware } from "./BrowserHardware.ts";
 
-const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000; // 3 minutes
+const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
 
 type Transport = BluetoothDevice | SerialPort;
 
@@ -39,8 +39,6 @@ class ConnectionServiceClass {
   private state = new Map<number, ConnectionState>();
   private listeners = new Set<() => void>();
 
-  // ==================== Event System ====================
-
   /**
    * Subscribe to connection state changes
    */
@@ -57,8 +55,6 @@ class ConnectionServiceClass {
     }
   }
 
-  // ==================== Status Updates ====================
-
   /**
    * Update connection status in database and notify listeners
    */
@@ -70,8 +66,6 @@ class ConnectionServiceClass {
     await connectionRepo.updateStatus(id, status, errorMsg);
     this.notify();
   }
-
-  // ==================== MeshDevice Setup ====================
 
   /**
    * Set up a MeshDevice with the given transport
@@ -88,6 +82,10 @@ class ConnectionServiceClass {
     const conn = await connectionRepo.getConnection(id);
     const deviceId = conn?.meshDeviceId ?? randId();
 
+    logger.info(
+      `[ConnectionService] Setting up MeshDevice deviceId=${deviceId}`,
+    );
+
     const { addDevice, setActiveDeviceId, setActiveConnectionId } =
       useDeviceStore.getState();
 
@@ -97,56 +95,177 @@ class ConnectionServiceClass {
     setActiveDeviceId(deviceId);
     device.addConnection(meshDevice);
 
-    // Store transport for cleanup
     const state = this.getState(id);
-    if (btDevice) state.transport = btDevice;
-    if (serialPort) state.transport = serialPort;
+    if (btDevice) {
+      state.transport = btDevice;
+    }
+    if (serialPort) {
+      state.transport = serialPort;
+    }
 
-    // Subscribe to node info events
-    meshDevice.events.onMyNodeInfo.subscribe((nodeInfo) => {
+    state.dbSubscription = SubscriptionService.subscribeToDevice(
+      deviceId,
+      0,
+      meshDevice,
+    );
+    logger.debug(`[DB] Subscribed to device ${deviceId} events`);
+
+    meshDevice.events.onMyNodeInfo.subscribe(async (nodeInfo) => {
       device.setHardware(nodeInfo);
       logger.debug(
         `[ConnectionService] Received myNodeInfo, myNodeNum: ${nodeInfo.myNodeNum}`,
       );
 
-      // Set up database subscriptions
-      const unsubscribe = SubscriptionService.subscribeToDevice(
-        deviceId,
-        nodeInfo.myNodeNum,
-        meshDevice,
-      );
-      state.dbSubscription = unsubscribe;
-      logger.debug(`[DB] Subscribed to device ${deviceId} events`);
+      try {
+        const cached = await configCacheRepo.getCachedConfig(
+          nodeInfo.myNodeNum,
+        );
+        if (cached) {
+          logger.debug(
+            `[ConnectionService] Loading cached config for device ${deviceId}`,
+          );
+          device.setCachedConfig(
+            cached.config as Protobuf.LocalOnly.LocalConfig,
+            cached.moduleConfig as Protobuf.LocalOnly.LocalModuleConfig,
+          );
+          device.setConnectionPhase("cached");
+
+          await this.updateStatus(id, "connected");
+          router.navigate({ to: "/messages", search: { channel: 0 } });
+          logger.debug(
+            `[ConnectionService] Fast reconnection: navigated with cached config`,
+          );
+        }
+      } catch (err) {
+        logger.warn("[ConnectionService] Failed to load cached config:", err);
+      }
     });
 
-    // Subscribe to config events
-    meshDevice.events.onConfigPacket.subscribe((config) => {
-      logger.debug(
-        `[ConnectionService] Config packet: ${config.payloadVariant.case}`,
-      );
+    meshDevice.events.onConfigPacket.subscribe(async (config) => {
+      const variant = config.payloadVariant.case;
+      logger.info(`[ConnectionService] 📦 Config packet received: ${variant}`);
+
+      const myNodeNum = device.hardware.myNodeNum;
+      if (variant && myNodeNum && device.hasConfigChange(variant)) {
+        try {
+          const localChanges = await configCacheRepo.getLocalChangesForVariant(
+            myNodeNum,
+            "config",
+            variant,
+          );
+
+          for (const change of localChanges) {
+            const remoteValue = config.payloadVariant.value;
+            if (
+              change.originalValue !== undefined &&
+              JSON.stringify(remoteValue) !==
+                JSON.stringify(change.originalValue)
+            ) {
+              const conflict: ConfigConflict = {
+                variant,
+                localValue: change.value,
+                remoteValue,
+                originalValue: change.originalValue,
+              };
+              device.setConfigConflict("config", variant, conflict);
+              logger.warn(
+                `[ConnectionService] Config conflict detected for ${variant}`,
+              );
+              return;
+            }
+          }
+        } catch (err) {
+          logger.warn(
+            "[ConnectionService] Error checking config conflicts:",
+            err,
+          );
+        }
+      }
+
       device.setConfig(config);
     });
 
-    meshDevice.events.onModuleConfigPacket.subscribe((config) => {
-      logger.debug(
-        `[ConnectionService] Module config packet: ${config.payloadVariant.case}`,
+    meshDevice.events.onModuleConfigPacket.subscribe(async (config) => {
+      const variant = config.payloadVariant.case;
+      logger.info(
+        `[ConnectionService] 📦 Module config packet received: ${variant}`,
       );
+
+      const myNodeNum = device.hardware.myNodeNum;
+      if (variant && myNodeNum && device.hasModuleConfigChange(variant)) {
+        try {
+          const localChanges = await configCacheRepo.getLocalChangesForVariant(
+            myNodeNum,
+            "moduleConfig",
+            variant,
+          );
+
+          for (const change of localChanges) {
+            const remoteValue = config.payloadVariant.value;
+            if (
+              change.originalValue !== undefined &&
+              JSON.stringify(remoteValue) !==
+                JSON.stringify(change.originalValue)
+            ) {
+              const conflict: ConfigConflict = {
+                variant,
+                localValue: change.value,
+                remoteValue,
+                originalValue: change.originalValue,
+              };
+              device.setConfigConflict("moduleConfig", variant, conflict);
+              logger.warn(
+                `[ConnectionService] Module config conflict detected for ${variant}`,
+              );
+              return;
+            }
+          }
+        } catch (err) {
+          logger.warn(
+            "[ConnectionService] Error checking module config conflicts:",
+            err,
+          );
+        }
+      }
+
       device.setModuleConfig(config);
     });
 
-    // Navigate when config stage completes
     const configCompleteUnsub = meshDevice.events.onConfigComplete.subscribe(
       async (configCompleteId) => {
         logger.debug(
           `[ConnectionService] Config complete (nonce: ${configCompleteId})`,
         );
         if (configCompleteId === 69420) {
-          // Stage 1: device config loaded
+          const wasCached = device.isCachedConfig;
+          device.setIsCachedConfig(false);
           device.setConnectionPhase("connected");
           await this.updateStatus(id, "connected");
-          router.navigate({ to: "/messages", search: { channel: 0 } });
+
+          try {
+            const myNodeNum = device.hardware.myNodeNum;
+            if (myNodeNum) {
+              await configCacheRepo.saveCachedConfig(
+                myNodeNum,
+                device.config as unknown as Record<string, unknown>,
+                device.moduleConfig as unknown as Record<string, unknown>,
+                {
+                  firmwareVersion:
+                    device.metadata.get(myNodeNum)?.firmwareVersion,
+                },
+              );
+              logger.debug(
+                `[ConnectionService] Saved config to cache for device ${deviceId}`,
+              );
+            }
+          } catch (err) {
+            logger.warn("[ConnectionService] Failed to cache config:", err);
+          }
+
+          if (!wasCached) {
+            router.navigate({ to: "/messages", search: { channel: 0 } });
+          }
         } else if (configCompleteId === 69421) {
-          // Stage 2: nodeDB synced
           configCompleteUnsub();
           device.setConnectionPhase("configured");
           await this.updateStatus(id, "configured");
@@ -155,7 +274,6 @@ class ConnectionServiceClass {
       },
     );
 
-    // Monitor device status for disconnections
     const statusUnsub = meshDevice.events.onDeviceStatus.subscribe(
       async (status) => {
         if (status === Types.DeviceStatusEnum.DeviceDisconnected) {
@@ -175,11 +293,11 @@ class ConnectionServiceClass {
     device.resetConfigProgress();
     await this.updateStatus(id, "configuring");
 
-    // Start two-stage configuration
+    logger.info(`[ConnectionService] Starting configureTwoStage`);
     meshDevice
       .configureTwoStage()
       .then(() => {
-        // Start heartbeat after full configuration
+        logger.info(`[ConnectionService] configureTwoStage completed`);
         meshDevice
           .heartbeat()
           .then(() => {
@@ -191,6 +309,10 @@ class ConnectionServiceClass {
           .catch(console.warn);
       })
       .catch(async (err) => {
+        logger.error(
+          `[ConnectionService] configureTwoStage failed:`,
+          err.message,
+        );
         await this.updateStatus(id, "error", err.message);
       });
 
@@ -199,8 +321,6 @@ class ConnectionServiceClass {
     return deviceId;
   }
 
-  // ==================== Connection Methods ====================
-
   /**
    * Connect to a device
    */
@@ -208,7 +328,14 @@ class ConnectionServiceClass {
     conn: Connection,
     opts?: { allowPrompt?: boolean },
   ): Promise<boolean> {
+    logger.info(
+      `[ConnectionService] Starting connection id=${conn.id} type=${conn.type}`,
+    );
+
     if (conn.status === "configured" || conn.status === "connected") {
+      logger.debug(
+        `[ConnectionService] Already connected, status=${conn.status}`,
+      );
       return true;
     }
 
@@ -225,6 +352,10 @@ class ConnectionServiceClass {
         return await this.connectSerial(conn, opts);
       }
     } catch (err: unknown) {
+      logger.error(
+        `[ConnectionService] Connection failed:`,
+        err instanceof Error ? err.message : String(err),
+      );
       await this.updateStatus(
         conn.id,
         "error",
@@ -241,6 +372,7 @@ class ConnectionServiceClass {
       throw new Error("HTTP connection missing URL");
     }
 
+    logger.debug(`[ConnectionService] Testing HTTP reachability: ${conn.url}`);
     const ok = await testHttpReachable(conn.url);
     if (!ok) {
       const url = new URL(conn.url);
@@ -252,10 +384,12 @@ class ConnectionServiceClass {
     }
 
     const url = new URL(conn.url);
+    logger.debug(`[ConnectionService] Creating HTTP transport for ${url.host}`);
     const transport = await TransportHTTP.create(
       url.host,
       url.protocol === "https:",
     );
+    logger.info(`[ConnectionService] HTTP transport created successfully`);
     await this.setupMeshDevice(conn.id, transport);
     return true;
   }
@@ -268,17 +402,20 @@ class ConnectionServiceClass {
       throw new Error("Web Bluetooth not supported");
     }
 
+    logger.debug(`[ConnectionService] Looking for Bluetooth device`);
     const state = this.getState(conn.id);
     let bleDevice = state.transport as BluetoothDevice | undefined;
 
-    // Try to find existing device
     if (!bleDevice && conn.deviceId) {
       bleDevice =
         (await BrowserHardware.findBluetoothDevice(conn.deviceId)) ?? undefined;
+      if (bleDevice) {
+        logger.debug(`[ConnectionService] Found existing BT device`);
+      }
     }
 
-    // Request new device if allowed
     if (!bleDevice && opts?.allowPrompt) {
+      logger.debug(`[ConnectionService] Requesting new BT device from user`);
       bleDevice =
         (await BrowserHardware.requestBluetoothDevice(conn.gattServiceUUID)) ??
         undefined;
@@ -288,10 +425,11 @@ class ConnectionServiceClass {
       throw new Error("Bluetooth device not available. Re-select the device.");
     }
 
+    logger.debug(`[ConnectionService] Creating Bluetooth transport`);
     const transport = await TransportWebBluetooth.createFromDevice(bleDevice);
+    logger.info(`[ConnectionService] Bluetooth transport created successfully`);
     await this.setupMeshDevice(conn.id, transport, bleDevice);
 
-    // Listen for disconnection
     state.disconnectSubscription = BrowserHardware.onBluetoothDisconnect(
       bleDevice,
       () => this.updateStatus(conn.id, "disconnected"),
@@ -308,20 +446,23 @@ class ConnectionServiceClass {
       throw new Error("Web Serial not supported");
     }
 
+    logger.debug(`[ConnectionService] Looking for Serial port`);
     const state = this.getState(conn.id);
     let port = state.transport as SerialPort | undefined;
 
-    // Try to find existing port
     if (!port) {
       port =
         (await BrowserHardware.findSerialPort(
           conn.usbVendorId,
           conn.usbProductId,
         )) ?? undefined;
+      if (port) {
+        logger.debug(`[ConnectionService] Found existing serial port`);
+      }
     }
 
-    // Request new port if allowed
     if (!port && opts?.allowPrompt) {
+      logger.debug(`[ConnectionService] Requesting serial port from user`);
       const result = await BrowserHardware.requestSerialPort();
       port = result?.port;
     }
@@ -330,13 +471,15 @@ class ConnectionServiceClass {
       throw new Error("Serial port not available. Re-select the port.");
     }
 
-    // Close if already open
     if (BrowserHardware.isSerialPortOpen(port)) {
+      logger.debug(`[ConnectionService] Closing already-open serial port`);
       await BrowserHardware.closeSerialPort(port);
     }
 
     try {
+      logger.debug(`[ConnectionService] Creating Serial transport`);
       const transport = await TransportWebSerial.createFromPort(port);
+      logger.info(`[ConnectionService] Serial transport created successfully`);
       await this.setupMeshDevice(conn.id, transport, undefined, port);
       return true;
     } catch (serialErr: unknown) {
@@ -363,26 +506,20 @@ class ConnectionServiceClass {
     const state = this.state.get(conn.id);
     if (!state) return;
 
-    // Cleanup heartbeat
     this.cleanupHeartbeat(conn.id);
 
-    // Cleanup subscriptions
     state.dbSubscription?.();
     state.statusSubscription?.();
     state.disconnectSubscription?.();
 
-    // Disconnect MeshDevice
     if (conn.meshDeviceId) {
       const { getDevice } = useDeviceStore.getState();
       const device = getDevice(conn.meshDeviceId);
 
       try {
         device?.connection?.disconnect();
-      } catch {
-        // Ignore
-      }
+      } catch {}
 
-      // Cleanup transport
       if (state.transport) {
         if (conn.type === "bluetooth") {
           BrowserHardware.disconnectBluetoothDevice(
@@ -405,7 +542,6 @@ class ConnectionServiceClass {
       error: null,
     });
 
-    // Clear state
     this.state.delete(conn.id);
     this.notify();
   }
@@ -414,25 +550,18 @@ class ConnectionServiceClass {
    * Remove a connection entirely
    */
   async remove(conn: Connection): Promise<void> {
-    // Disconnect first
     await this.disconnect(conn);
 
-    // Remove device from store
     if (conn.meshDeviceId) {
       const { removeDevice } = useDeviceStore.getState();
       try {
         removeDevice(conn.meshDeviceId);
-      } catch {
-        // Ignore
-      }
+      } catch {}
     }
 
-    // Delete from database
     await connectionRepo.deleteConnection(conn.id);
     this.notify();
   }
-
-  // ==================== Status Refresh ====================
 
   /**
    * Refresh status of all connections based on hardware availability
@@ -441,9 +570,7 @@ class ConnectionServiceClass {
     const httpChecks = connections
       .filter(
         (c): c is Connection & { type: "http"; url: string } =>
-          c.type === "http" &&
-          c.url !== null &&
-          !this.isActiveStatus(c.status),
+          c.type === "http" && c.url !== null && !this.isActiveStatus(c.status),
       )
       .map(async (c) => {
         const ok = await testHttpReachable(c.url);
@@ -485,7 +612,10 @@ class ConnectionServiceClass {
   /**
    * Sync connection statuses with active device
    */
-  async syncStatuses(connections: Connection[], activeDeviceId: number | null): Promise<void> {
+  async syncStatuses(
+    connections: Connection[],
+    activeDeviceId: number | null,
+  ): Promise<void> {
     const activeConnection = connections.find(
       (c) => c.meshDeviceId === activeDeviceId,
     );
@@ -499,8 +629,6 @@ class ConnectionServiceClass {
 
     this.notify();
   }
-
-  // ==================== Helpers ====================
 
   private getState(id: number): ConnectionState {
     let state = this.state.get(id);
@@ -524,5 +652,4 @@ class ConnectionServiceClass {
   }
 }
 
-// Export singleton instance
 export const ConnectionService = new ConnectionServiceClass();

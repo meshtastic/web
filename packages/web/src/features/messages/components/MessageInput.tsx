@@ -88,8 +88,9 @@ export const MessageInput = ({
     const tempMessageId = Math.floor(Date.now() / 1000); // Use seconds like Meshtastic does
 
     // Save message immediately for instant UI feedback
+    // Use device.id (meshDeviceId) for ownerNodeNum to match query patterns
     const newMessage: NewMessage = {
-      deviceId: device.id,
+      ownerNodeNum: device.id,
       messageId: tempMessageId,
       type: isDirect ? "direct" : "channel",
       channelId: channelValue,

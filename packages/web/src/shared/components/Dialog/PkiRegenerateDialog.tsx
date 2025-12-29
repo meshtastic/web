@@ -1,14 +1,5 @@
-import { Button } from "@shared/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@shared/components/ui/dialog";
 import { useTranslation } from "react-i18next";
+import { DialogWrapper } from "./DialogWrapper";
 
 export interface PkiRegenerateDialogProps {
   text: {
@@ -17,7 +8,7 @@ export interface PkiRegenerateDialogProps {
     button: string;
   };
   open: boolean;
-  onOpenChange: () => void;
+  onOpenChange: (open: boolean) => void;
   onSubmit: () => void;
 }
 
@@ -32,29 +23,17 @@ export const PkiRegenerateDialog = ({
   onSubmit,
 }: PkiRegenerateDialogProps) => {
   const { t } = useTranslation("dialog");
-  const dialogText = {
-    title: text.title || t("pkiRegenerate.title"),
-    description: text.description || t("pkiRegenerate.description"),
-    button: text.button || t("button.regenerate"),
-  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogClose />
-        <DialogHeader>
-          <DialogTitle>{dialogText.title}</DialogTitle>
-          <DialogDescription>{dialogText.description}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button
-            variant="destructive"
-            name="regenerate"
-            onClick={() => onSubmit()}
-          >
-            {dialogText.button}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <DialogWrapper
+      open={open}
+      onOpenChange={onOpenChange}
+      type="confirm"
+      variant="destructive"
+      title={text.title || t("pkiRegenerate.title")}
+      description={text.description || t("pkiRegenerate.description")}
+      confirmText={text.button || t("button.regenerate")}
+      onConfirm={onSubmit}
+    />
   );
 };

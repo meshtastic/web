@@ -40,6 +40,11 @@ export const decodePacket = (device: MeshDevice) =>
           }
           device.events.onFromRadio.dispatch(decodedMessage);
 
+          device.log.debug(
+            Types.Emitter[Types.Emitter.HandleFromRadio],
+            `📨 FromRadio: ${decodedMessage.payloadVariant.case}`,
+          );
+
           /** @todo Add map here when `all=true` gets fixed. */
           switch (decodedMessage.payloadVariant.case) {
             case "packet": {
@@ -148,13 +153,10 @@ export const decodePacket = (device: MeshDevice) =>
                 `⚙️ Received config complete id: ${decodedMessage.payloadVariant.value}`,
               );
 
-              // Emit the configCompleteId event for MeshService to handle two-stage flow
               device.events.onConfigComplete.dispatch(
                 decodedMessage.payloadVariant.value,
               );
 
-              // For backward compatibility: if configId matches, update device status
-              // MeshService will override this behavior for two-stage flow
               if (decodedMessage.payloadVariant.value === device.configId) {
                 device.log.info(
                   Types.Emitter[Types.Emitter.HandleFromRadio],

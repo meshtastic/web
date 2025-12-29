@@ -118,14 +118,11 @@ export default function SettingsPage() {
 
   return (
     <div className="flex h-full">
-      {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-56 md:border-r md:flex-col">
         {sidebarContent}
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Config Header */}
         <div className="h-14 border-b flex items-center justify-between px-4 gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -189,9 +186,8 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Config Content */}
-        <div className="flex-1 flex flex-col overflow-y-auto [scrollbar-gutter:stable]">
-          <div className="p-4 sm:p-6 flex-1 flex flex-col">
+        <div className="flex-1 min-h-0 overflow-y-auto [scrollbar-gutter:stable]">
+          <div className="p-4 sm:p-6">
             <Suspense fallback={<SettingsLoadingSkeleton />}>
               {activeSection === "radio" && (
                 <RadioConfig searchQuery={searchQuery} />
@@ -216,7 +212,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Activity Panel */}
       <ActivityPanel open={activityOpen} onOpenChange={setActivityOpen} />
     </div>
   );

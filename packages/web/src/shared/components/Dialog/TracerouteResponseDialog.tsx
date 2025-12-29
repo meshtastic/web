@@ -3,19 +3,12 @@ import { tracerouteRepo } from "@data/repositories";
 import type { TracerouteLog } from "@data/schema";
 import { TraceRoute } from "@features/messages/components/TraceRoute";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@shared/components/ui/dialog";
 import { useGetMyNode } from "@shared/hooks/useGetMyNode";
 import { useDeviceContext } from "@state/index.ts";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DialogWrapper } from "./DialogWrapper";
 
 export const TracerouteResponseDialog = () => {
   const { t } = useTranslation("dialog");
@@ -48,15 +41,20 @@ export const TracerouteResponseDialog = () => {
       });
   }, [deviceId, tracerouteNodeNum]);
 
-  const handleClose = useCallback(() => {
-    // Remove traceroute param from URL
-    const currentSearch = new URLSearchParams(window.location.search);
-    currentSearch.delete("traceroute");
-    navigate({
-      to: ".",
-      search: Object.fromEntries(currentSearch),
-    });
-  }, [navigate]);
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        // Remove traceroute param from URL
+        const currentSearch = new URLSearchParams(window.location.search);
+        currentSearch.delete("traceroute");
+        navigate({
+          to: ".",
+          search: Object.fromEntries(currentSearch),
+        });
+      }
+    },
+    [navigate],
+  );
 
   const isOpen = tracerouteNodeNum !== undefined && tracerouteLog !== undefined;
 
@@ -77,35 +75,30 @@ export const TracerouteResponseDialog = () => {
     `${numberToHexUnpadded(tracerouteNodeNum).slice(-4).toUpperCase()}`;
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent>
-        <DialogClose />
-        <DialogHeader>
-          <DialogTitle>
-            {t("tracerouteResponse.title", {
-              identifier: `${targetLongName} (${targetShortName})`,
-            })}
-          </DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          <TraceRoute
-            route={route}
-            routeBack={routeBack}
-            from={{
-              longName: myNode?.longName ?? null,
-              shortName: myNode?.shortName ?? null,
-              nodeNum: myNodeNum ?? 0,
-            }}
-            to={{
-              longName: targetNode?.longName ?? null,
-              shortName: targetNode?.shortName ?? null,
-              nodeNum: tracerouteNodeNum,
-            }}
-            snrTowards={snrTowards}
-            snrBack={snrBack}
-          />
-        </DialogDescription>
-      </DialogContent>
-    </Dialog>
+    <DialogWrapper
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      type="info"
+      title={t("tracerouteResponse.title", {
+        identifier: `${targetLongName} (${targetShortName})`,
+      })}
+    >
+      <TraceRoute
+        route={route}
+        routeBack={routeBack}
+        from={{
+          longName: myNode?.longName ?? null,
+          shortName: myNode?.shortName ?? null,
+          nodeNum: myNodeNum ?? 0,
+        }}
+        to={{
+          longName: targetNode?.longName ?? null,
+          shortName: targetNode?.shortName ?? null,
+          nodeNum: tracerouteNodeNum,
+        }}
+        snrTowards={snrTowards}
+        snrBack={snrBack}
+      />
+    </DialogWrapper>
   );
 };

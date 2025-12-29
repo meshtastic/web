@@ -25,7 +25,7 @@ export class TracerouteRepository {
    * Get traceroute history for a specific target node
    */
   async getTraceroutesForNode(
-    deviceId: number,
+    ownerNodeNum: number,
     targetNodeNum: number,
     limit = 10,
   ): Promise<TracerouteLog[]> {
@@ -34,7 +34,7 @@ export class TracerouteRepository {
       .from(tracerouteLogs)
       .where(
         and(
-          eq(tracerouteLogs.deviceId, deviceId),
+          eq(tracerouteLogs.ownerNodeNum, ownerNodeNum),
           eq(tracerouteLogs.targetNodeNum, targetNodeNum),
         ),
       )
@@ -46,7 +46,7 @@ export class TracerouteRepository {
    * Get the most recent traceroute for a target node
    */
   async getLatestTraceroute(
-    deviceId: number,
+    ownerNodeNum: number,
     targetNodeNum: number,
   ): Promise<TracerouteLog | undefined> {
     const results = await this.db
@@ -54,7 +54,7 @@ export class TracerouteRepository {
       .from(tracerouteLogs)
       .where(
         and(
-          eq(tracerouteLogs.deviceId, deviceId),
+          eq(tracerouteLogs.ownerNodeNum, ownerNodeNum),
           eq(tracerouteLogs.targetNodeNum, targetNodeNum),
         ),
       )
@@ -68,13 +68,13 @@ export class TracerouteRepository {
    * Get all traceroutes for a device
    */
   async getAllTraceroutes(
-    deviceId: number,
+    ownerNodeNum: number,
     limit = 100,
   ): Promise<TracerouteLog[]> {
     return this.db
       .select()
       .from(tracerouteLogs)
-      .where(eq(tracerouteLogs.deviceId, deviceId))
+      .where(eq(tracerouteLogs.ownerNodeNum, ownerNodeNum))
       .orderBy(desc(tracerouteLogs.createdAt))
       .limit(limit);
   }
@@ -83,14 +83,14 @@ export class TracerouteRepository {
    * Delete traceroute logs for a specific target
    */
   async deleteTraceroutesForNode(
-    deviceId: number,
+    ownerNodeNum: number,
     targetNodeNum: number,
   ): Promise<void> {
     await this.db
       .delete(tracerouteLogs)
       .where(
         and(
-          eq(tracerouteLogs.deviceId, deviceId),
+          eq(tracerouteLogs.ownerNodeNum, ownerNodeNum),
           eq(tracerouteLogs.targetNodeNum, targetNodeNum),
         ),
       );
@@ -99,10 +99,10 @@ export class TracerouteRepository {
   /**
    * Delete all traceroute logs for a device
    */
-  async deleteAllTraceroutes(deviceId: number): Promise<void> {
+  async deleteAllTraceroutes(ownerNodeNum: number): Promise<void> {
     await this.db
       .delete(tracerouteLogs)
-      .where(eq(tracerouteLogs.deviceId, deviceId));
+      .where(eq(tracerouteLogs.ownerNodeNum, ownerNodeNum));
   }
 }
 

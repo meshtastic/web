@@ -52,11 +52,11 @@ export const RetryButton = ({ message, className }: RetryButtonProps) => {
         // Increment retry count and update state in database
         await messageRepo.incrementRetryCount(
           currentMessage.id,
-          currentMessage.deviceId,
+          currentMessage.ownerNodeNum,
         );
         await messageRepo.updateMessageState(
           currentMessage.id,
-          currentMessage.deviceId,
+          currentMessage.ownerNodeNum,
           "sent",
         );
 
@@ -76,11 +76,11 @@ export const RetryButton = ({ message, className }: RetryButtonProps) => {
       // Increment retry count and mark as failed again
       await messageRepo.incrementRetryCount(
         currentMessage.id,
-        currentMessage.deviceId,
+        currentMessage.ownerNodeNum,
       );
       await messageRepo.updateMessageState(
         currentMessage.id,
-        currentMessage.deviceId,
+        currentMessage.ownerNodeNum,
         "failed",
       );
       dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);

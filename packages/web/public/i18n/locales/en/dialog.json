@@ -3,6 +3,12 @@
     "description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
     "title": "Clear All Messages"
   },
+  "deviceShare": {
+    "title": "Share {{name}}",
+    "description": "Scan this QR code to add this device as a contact.",
+    "shareableUrl": "Shareable URL",
+    "copyUrl": "Copy URL"
+  },
   "import": {
     "description": "Import a Channel Set from a Meshtastic URL. Valid Meshtasic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
     "error": {

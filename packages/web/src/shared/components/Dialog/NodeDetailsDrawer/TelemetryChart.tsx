@@ -145,7 +145,6 @@ function SimpleLineChart({
           strokeLinejoin="round"
         />
 
-        {/* Data points */}
         {normalizedData.map((point) => {
           const x = ((point.time - minTime) / (maxTime - minTime || 1)) * width;
           return (

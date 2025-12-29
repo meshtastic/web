@@ -146,11 +146,8 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
           description: t("pkiRegenerateDialog.description", { ns: "dialog" }),
         }}
         open={preSharedDialogOpen}
-        onOpenChange={() => setPreSharedDialogOpen(false)}
-        onSubmit={async () => {
-          await regeneratePsk();
-          setPreSharedDialogOpen(false);
-        }}
+        onOpenChange={setPreSharedDialogOpen}
+        onSubmit={regeneratePsk}
       />
     </>
   );

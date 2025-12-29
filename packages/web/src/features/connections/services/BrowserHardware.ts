@@ -39,7 +39,6 @@ export interface BluetoothDeviceInfo {
  * Browser hardware capability detection and access
  */
 export const BrowserHardware = {
-  // ==================== Capability Detection ====================
 
   /**
    * Check if Web Serial API is available
@@ -64,7 +63,6 @@ export const BrowserHardware = {
     return typeof bt?.getDevices === "function";
   },
 
-  // ==================== Serial API ====================
 
   /**
    * Get the Serial API interface
@@ -185,7 +183,6 @@ export const BrowserHardware = {
     };
   },
 
-  // ==================== Bluetooth API ====================
 
   /**
    * Get the Bluetooth API interface

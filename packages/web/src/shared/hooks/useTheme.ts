@@ -12,7 +12,6 @@ type ActualTheme = "light" | "dark";
 
 const STORAGE_KEY = "theme";
 
-// ==================== System Theme Store ====================
 
 const systemThemeStore = {
   getSnapshot(): ActualTheme {
@@ -29,7 +28,6 @@ const systemThemeStore = {
   },
 };
 
-// ==================== Theme Preference Store ====================
 
 const themePreferenceStore = {
   getSnapshot(): Theme {
@@ -72,7 +70,6 @@ const themePreferenceStore = {
   },
 };
 
-// ==================== Hook ====================
 
 export function useTheme() {
   // Subscribe to system theme changes

@@ -14,7 +14,6 @@ import type { Result } from "neverthrow";
 import { ResultAsync } from "neverthrow";
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 
-// ==================== Message Cache ====================
 
 type CacheKey = string;
 
@@ -60,7 +59,6 @@ const keys = {
   pending: (deviceId: number) => `pending:${deviceId}`,
 };
 
-// ==================== Direct Messages Hook ====================
 
 /**
  * Hook to fetch direct messages between two nodes
@@ -122,7 +120,6 @@ export function useDirectMessages(
   return { messages, refresh };
 }
 
-// ==================== Channel Messages Hook ====================
 
 /**
  * Hook to fetch broadcast messages for a channel
@@ -182,7 +179,6 @@ export function useChannelMessages(
   return { messages, refresh };
 }
 
-// ==================== All Messages Hook ====================
 
 /**
  * Hook to fetch all messages for a device (paginated)
@@ -233,7 +229,6 @@ export function useAllMessages(deviceId: number, limit = 100, offset = 0) {
   return { messages, refresh };
 }
 
-// ==================== Pending Messages Hook ====================
 
 /**
  * Hook to fetch pending messages (for retry logic)
@@ -284,7 +279,6 @@ export function usePendingMessages(deviceId: number) {
   return { messages, refresh };
 }
 
-// ==================== Conversations Hook ====================
 
 type Conversation = {
   type: ConversationType;

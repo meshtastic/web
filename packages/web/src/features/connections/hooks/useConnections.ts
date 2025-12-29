@@ -1,9 +1,6 @@
 /**
- * useConnections - React hook for connection state synchronization
+ * useConnections - Connection state synchronization
  *
- * A clean React 19 hook focused solely on synchronizing connection state to the UI.
- * All imperative work (connecting, disconnecting, hardware access) is delegated
- * to the ConnectionService singleton.
  */
 
 import { ConnectionError } from "@data/errors";
@@ -16,33 +13,26 @@ import type { Connection } from "@data/schema";
 import { useDeviceStore } from "@state/index.ts";
 import { type Result, ResultAsync } from "neverthrow";
 import { useCallback, useEffect, useSyncExternalStore } from "react";
-import type { NewConnectionInput } from "../components/AddConnectionDialog/AddConnectionDialog";
-import { BrowserHardware } from "../services/BrowserHardware";
-import { ConnectionService } from "../services/ConnectionService";
+import type { NewConnectionInput } from "../components/AddConnectionDialog/AddConnectionDialog.tsx";
+import { BrowserHardware } from "../services/BrowserHardware.ts";
+import { ConnectionService } from "../services/ConnectionService.ts";
 
 export type { ConnectionStatus, ConnectionType };
 
-// ==================== Main Hook ====================
-
 /**
- * Hook to manage connections (CRUD + connect/disconnect)
+ * Hook to manage connections
  */
 export function useConnections() {
   const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
 
-  // getSnapshot: fetch connections synchronously (cached)
   const getSnapshot = useCallback(() => connectionCache.get(), []);
 
-  // Subscribe to ConnectionService changes using useSyncExternalStore (React 19)
   const connections = useSyncExternalStore(
     useCallback((onStoreChange) => {
-      // Subscribe to cache changes (triggered by refresh)
       const unsubCache = connectionCache.subscribe(onStoreChange);
 
-      // Subscribe to service changes
       const unsubService = ConnectionService.subscribe(onStoreChange);
 
-      // Also trigger refresh on hardware changes
       const unsubSerial = BrowserHardware.onSerialDeviceChange(onStoreChange);
 
       return () => {
@@ -55,7 +45,6 @@ export function useConnections() {
     getSnapshot,
   );
 
-  // Initial load and refresh function
   const refresh = useCallback(async (): Promise<
     Result<Connection[], ConnectionError>
   > => {
@@ -69,12 +58,10 @@ export function useConnections() {
     return result;
   }, []);
 
-  // Load connections on mount
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  // Subscribe to Bluetooth disconnections
   useEffect(() => {
     let cleanup: (() => void) | undefined;
 
@@ -89,12 +76,12 @@ export function useConnections() {
     };
   }, [refresh]);
 
-  // ==================== Actions ====================
-
   const connect = useCallback(
     async (id: number, opts?: { allowPrompt?: boolean }) => {
       const conn = connections.find((c) => c.id === id);
-      if (!conn) return false;
+      if (!conn) {
+        return false;
+      }
 
       const result = await ConnectionService.connect(conn, opts);
       await refresh();
@@ -106,7 +93,9 @@ export function useConnections() {
   const disconnect = useCallback(
     async (id: number) => {
       const conn = connections.find((c) => c.id === id);
-      if (!conn) return;
+      if (!conn) {
+        return;
+      }
 
       await ConnectionService.disconnect(conn);
       await refresh();
@@ -117,7 +106,9 @@ export function useConnections() {
   const removeConnection = useCallback(
     async (id: number) => {
       const conn = connections.find((c) => c.id === id);
-      if (!conn) return;
+      if (!conn) {
+        return;
+      }
 
       await ConnectionService.remove(conn);
       await refresh();
@@ -182,8 +173,6 @@ export function useConnections() {
   };
 }
 
-// ==================== Connection Cache ====================
-
 /**
  * Cache for connection data to support useSyncExternalStore
  */
@@ -214,8 +203,6 @@ class ConnectionCache {
 
 const connectionCache = new ConnectionCache();
 
-// ==================== Single Connection Hook ====================
-
 /**
  * Hook to fetch a single connection
  */
@@ -236,8 +223,6 @@ export function useConnection(id: number) {
   return { connection, refresh };
 }
 
-// ==================== Default Connection Hook ====================
-
 /**
  * Hook to fetch the default connection
  */
@@ -257,8 +242,6 @@ export function useDefaultConnection() {
 
   return { connection, refresh };
 }
-
-// ==================== Utility Functions ====================
 
 /**
  * Reset all connection statuses on app startup

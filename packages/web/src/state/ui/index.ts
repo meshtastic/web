@@ -1,5 +1,6 @@
 // UI store barrel export
 export {
+  DEFAULT_PREFERENCES,
   useUIStore,
   type CoordinateFormat,
   type DistanceUnits,

@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX `messages_device_message_id_unique` ON `messages` (`device_id`,`message_id`);

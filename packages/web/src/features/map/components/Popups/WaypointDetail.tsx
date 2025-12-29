@@ -1,4 +1,4 @@
-import { TimeAgo } from "@app/components/TimeAgo";
+import { TimeAgo } from "@app/shared";
 import { useNodes } from "@data/hooks";
 import type { Protobuf } from "@meshtastic/core";
 import { Separator } from "@shared/components/ui/separator";
@@ -74,7 +74,6 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
 
       <section aria-label={t("waypointDetail.details")}>
         <dl className="space-y-1.5">
-          {/* Coordinates */}
           <div className="flex flex-wrap items-start gap-x-3">
             <dt className="inline-flex items-top gap-2 text-slate-500 min-w-0">
               <MapPinnedIcon size={14} aria-hidden className="mt-1" />
@@ -91,7 +90,6 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
             </dd>
           </div>
 
-          {/* Created */}
           <div className="flex flex-wrap items-start gap-x-3">
             <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
               <ClockPlusIcon size={14} aria-hidden />
@@ -108,7 +106,6 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
             </dd>
           </div>
 
-          {/* Updated */}
           {waypoint.metadata.updated && (
             <div className="flex flex-wrap items-start gap-x-3">
               <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
@@ -125,7 +122,6 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
             </div>
           )}
 
-          {/* Expires */}
           {waypoint.expire !== 0 && (
             <div className="flex flex-wrap items-start gap-x-3">
               <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
@@ -140,7 +136,6 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
             </div>
           )}
 
-          {/* Distance */}
           {distance != null && (
             <div className="flex flex-wrap items-start gap-x-3">
               <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
@@ -158,7 +153,6 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
             </div>
           )}
 
-          {/* Bearing */}
           {bearing != null && (
             <div className="flex flex-wrap items-start gap-x-3">
               <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
@@ -178,7 +172,6 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
             </div>
           )}
 
-          {/* Locked To */}
           {waypoint.lockedTo != null && waypoint.lockedTo !== 0 && (
             <div className="flex flex-wrap items-start gap-x-3">
               <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">

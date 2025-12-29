@@ -21,18 +21,16 @@ vi.mock("./MessageStatusIndicator", () => ({
 // Mock RetryButton
 vi.mock("./RetryButton", () => ({
   RetryButton: ({
-    messageId,
-    deviceId,
+    message,
     className,
   }: {
-    messageId: number;
-    deviceId: number;
+    message: Message;
     className?: string;
   }) => (
     <button
       data-testid="retry-button"
       className={className}
-      onClick={() => console.log(`Retry ${messageId} on device ${deviceId}`)}
+      onClick={() => console.log(`Retry ${message.id}`)}
     >
       Retry
     </button>
@@ -53,7 +51,7 @@ const createMockMessage = (
   overrides: Partial<Message> = {},
 ): Message => ({
   id: 1,
-  deviceId: 1,
+  ownerNodeNum: 1,
   messageId: 123,
   channelId: 0,
   toNode: 123456,
@@ -89,7 +87,6 @@ describe("MessageBubble", () => {
         myNodeNum={789012}
         senderName={mockSenderName}
         isMine={true}
-        deviceId={1}
       />,
     );
 
@@ -107,7 +104,6 @@ describe("MessageBubble", () => {
         myNodeNum={789012}
         senderName={mockSenderName}
         isMine={false}
-        deviceId={1}
       />,
     );
 
@@ -130,7 +126,6 @@ describe("MessageBubble", () => {
         myNodeNum={789012}
         senderName={mockSenderName}
         isMine={true}
-        deviceId={1}
       />,
     );
 
@@ -146,7 +141,6 @@ describe("MessageBubble", () => {
         myNodeNum={789012}
         senderName={mockSenderName}
         isMine={true}
-        deviceId={1}
       />,
     );
 
@@ -167,7 +161,6 @@ describe("MessageBubble", () => {
         myNodeNum={789012}
         senderName={mockSenderName}
         isMine={false}
-        deviceId={1}
       />,
     );
 
@@ -184,7 +177,6 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={false}
         showAvatar={false}
-        deviceId={1}
       />,
     );
 
@@ -201,7 +193,6 @@ describe("MessageBubble", () => {
         senderName={mockSenderName}
         isMine={true}
         showTimestamp={false}
-        deviceId={1}
       />,
     );
 
@@ -218,7 +209,6 @@ describe("MessageBubble", () => {
         myNodeNum={789012}
         senderName={mockSenderName}
         isMine={true}
-        deviceId={1}
       />,
     );
 
@@ -235,7 +225,6 @@ describe("MessageBubble", () => {
         myNodeNum={789012}
         senderName={mockSenderName}
         isMine={false}
-        deviceId={1}
       />,
     );
 
@@ -256,7 +245,6 @@ describe("MessageBubble", () => {
         myNodeNum={789012}
         senderName={mockSenderName}
         isMine={true}
-        deviceId={1}
       />,
     );
 

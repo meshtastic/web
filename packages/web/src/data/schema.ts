@@ -15,11 +15,10 @@ import {
 export const messages = sqliteTable(
   "messages",
   {
-    // Primary key
     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    // Foreign keys
-    deviceId: integer("device_id").notNull(),
+    // Device identity - the node number of the device that owns this data
+    ownerNodeNum: integer("owner_node_num").notNull(),
 
     // Message metadata
     messageId: integer("message_id").notNull(), // Original packet message ID
@@ -63,17 +62,17 @@ export const messages = sqliteTable(
   },
   (table) => [
     // Unique constraint for deduplication (same message ID per device)
-    unique("messages_device_message_id_unique").on(
-      table.deviceId,
+    unique("messages_owner_message_id_unique").on(
+      table.ownerNodeNum,
       table.messageId,
     ),
     // Indexes for common query patterns
-    index("messages_device_idx").on(table.deviceId),
-    index("messages_device_date_idx").on(table.deviceId, table.date),
-    index("messages_device_type_idx").on(table.deviceId, table.type),
+    index("messages_owner_idx").on(table.ownerNodeNum),
+    index("messages_owner_date_idx").on(table.ownerNodeNum, table.date),
+    index("messages_owner_type_idx").on(table.ownerNodeNum, table.type),
     // Direct message queries: device + participants + date
     index("messages_direct_convo_idx").on(
-      table.deviceId,
+      table.ownerNodeNum,
       table.type,
       table.fromNode,
       table.toNode,
@@ -81,13 +80,13 @@ export const messages = sqliteTable(
     ),
     // Channel queries: device + channel + date
     index("messages_channel_idx").on(
-      table.deviceId,
+      table.ownerNodeNum,
       table.type,
       table.channelId,
       table.date,
     ),
     // For finding unacked messages
-    index("messages_state_idx").on(table.deviceId, table.state),
+    index("messages_state_idx").on(table.ownerNodeNum, table.state),
   ],
 );
 
@@ -98,8 +97,10 @@ export const messages = sqliteTable(
 export const nodes = sqliteTable(
   "nodes",
   {
-    // Composite primary key (deviceId + nodeNum)
-    deviceId: integer("device_id").notNull(),
+    // Composite primary key (ownerNodeNum + nodeNum)
+    // ownerNodeNum = the device's own node number that reported this data
+    // nodeNum = the remote node this record is about
+    ownerNodeNum: integer("owner_node_num").notNull(),
     nodeNum: integer("node_num").notNull(),
 
     // Node metadata
@@ -149,15 +150,15 @@ export const nodes = sqliteTable(
   },
   (table) => [
     // Composite primary key - ensures deduplication
-    primaryKey({ columns: [table.deviceId, table.nodeNum] }),
-    // Query by device
-    index("nodes_device_idx").on(table.deviceId),
+    primaryKey({ columns: [table.ownerNodeNum, table.nodeNum] }),
+    // Query by owner device
+    index("nodes_owner_idx").on(table.ownerNodeNum),
     // Query recently heard nodes
-    index("nodes_last_heard_idx").on(table.deviceId, table.lastHeard),
+    index("nodes_last_heard_idx").on(table.ownerNodeNum, table.lastHeard),
     // Spatial queries (nodes in area)
     index("nodes_spatial_idx").on(table.latitudeI, table.longitudeI),
     // Favorites
-    index("nodes_favorite_idx").on(table.deviceId, table.isFavorite),
+    index("nodes_favorite_idx").on(table.ownerNodeNum, table.isFavorite),
   ],
 );
 
@@ -167,8 +168,9 @@ export const nodes = sqliteTable(
 export const channels = sqliteTable(
   "channels",
   {
-    // Composite primary key (deviceId + channelIndex)
-    deviceId: integer("device_id").notNull(),
+    // Composite primary key (ownerNodeNum + channelIndex)
+    // ownerNodeNum = the device's own node number that owns these channels
+    ownerNodeNum: integer("owner_node_num").notNull(),
     channelIndex: integer("channel_index").notNull(), // 0-7
 
     // Channel metadata
@@ -194,9 +196,9 @@ export const channels = sqliteTable(
   },
   (table) => [
     // Composite primary key
-    primaryKey({ columns: [table.deviceId, table.channelIndex] }),
+    primaryKey({ columns: [table.ownerNodeNum, table.channelIndex] }),
     // Query by device
-    index("channels_device_idx").on(table.deviceId),
+    index("channels_owner_idx").on(table.ownerNodeNum),
   ],
 );
 
@@ -209,8 +211,9 @@ export const positionLogs = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    // Foreign keys
-    deviceId: integer("device_id").notNull(),
+    // ownerNodeNum = the device's own node number that reported this data
+    // nodeNum = the remote node whose position this is
+    ownerNodeNum: integer("owner_node_num").notNull(),
     nodeNum: integer("node_num").notNull(),
 
     // Position data (same format as nodes table)
@@ -231,12 +234,12 @@ export const positionLogs = sqliteTable(
   (table) => [
     // Query position history for a node
     index("position_logs_node_time_idx").on(
-      table.deviceId,
+      table.ownerNodeNum,
       table.nodeNum,
       table.time,
     ),
     // Query all positions in time range
-    index("position_logs_device_time_idx").on(table.deviceId, table.time),
+    index("position_logs_owner_time_idx").on(table.ownerNodeNum, table.time),
     // Spatial queries
     index("position_logs_spatial_idx").on(table.latitudeI, table.longitudeI),
   ],
@@ -251,8 +254,8 @@ export const packetLogs = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    // Foreign keys
-    deviceId: integer("device_id").notNull(),
+    // Device identity - the node number of the device that received this packet
+    ownerNodeNum: integer("owner_node_num").notNull(),
 
     // Packet metadata
     fromNode: integer("from_node").notNull(),
@@ -280,12 +283,12 @@ export const packetLogs = sqliteTable(
   (table) => [
     // Query packets from a node
     index("packet_logs_from_node_idx").on(
-      table.deviceId,
+      table.ownerNodeNum,
       table.fromNode,
       table.rxTime,
     ),
     // Query packets by time
-    index("packet_logs_device_time_idx").on(table.deviceId, table.rxTime),
+    index("packet_logs_owner_time_idx").on(table.ownerNodeNum, table.rxTime),
   ],
 );
 
@@ -298,8 +301,9 @@ export const telemetryLogs = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    // Foreign keys
-    deviceId: integer("device_id").notNull(),
+    // ownerNodeNum = the device's own node number that reported this data
+    // nodeNum = the remote node whose telemetry this is
+    ownerNodeNum: integer("owner_node_num").notNull(),
     nodeNum: integer("node_num").notNull(),
 
     // Device metrics
@@ -326,12 +330,12 @@ export const telemetryLogs = sqliteTable(
   (table) => [
     // Query telemetry history for a node
     index("telemetry_logs_node_time_idx").on(
-      table.deviceId,
+      table.ownerNodeNum,
       table.nodeNum,
       table.time,
     ),
     // Query all telemetry in time range
-    index("telemetry_logs_device_time_idx").on(table.deviceId, table.time),
+    index("telemetry_logs_owner_time_idx").on(table.ownerNodeNum, table.time),
   ],
 );
 
@@ -343,7 +347,8 @@ export const messageDrafts = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    deviceId: integer("device_id").notNull(),
+    // Device identity - the node number of the device that owns this draft
+    ownerNodeNum: integer("owner_node_num").notNull(),
     type: text("type", { enum: ["direct", "channel"] }).notNull(),
 
     // For direct: nodeNum of recipient
@@ -360,8 +365,8 @@ export const messageDrafts = sqliteTable(
   },
   (table) => [
     // One draft per conversation
-    unique("message_drafts_unique_idx").on(
-      table.deviceId,
+    unique("message_drafts_owner_unique_idx").on(
+      table.ownerNodeNum,
       table.type,
       table.targetId,
     ),
@@ -460,7 +465,8 @@ export const lastRead = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    deviceId: integer("device_id").notNull(),
+    // Device identity - the node number of the device that owns this data
+    ownerNodeNum: integer("owner_node_num").notNull(),
     type: text("type", { enum: ["direct", "channel"] }).notNull(),
 
     // For direct: conversation ID (formatted as "nodeA:nodeB")
@@ -477,8 +483,8 @@ export const lastRead = sqliteTable(
   },
   (table) => [
     // One last-read marker per conversation
-    unique("last_read_unique_idx").on(
-      table.deviceId,
+    unique("last_read_owner_unique_idx").on(
+      table.ownerNodeNum,
       table.type,
       table.conversationId,
     ),
@@ -494,8 +500,8 @@ export const tracerouteLogs = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
 
-    // Foreign keys
-    deviceId: integer("device_id").notNull(),
+    // Device identity - the node number of the device that owns this data
+    ownerNodeNum: integer("owner_node_num").notNull(),
 
     // Target node
     targetNodeNum: integer("target_node_num").notNull(),
@@ -514,13 +520,13 @@ export const tracerouteLogs = sqliteTable(
   (table) => [
     // Query traceroutes for a specific target
     index("traceroute_logs_target_idx").on(
-      table.deviceId,
+      table.ownerNodeNum,
       table.targetNodeNum,
       table.createdAt,
     ),
     // Query all traceroutes by time
-    index("traceroute_logs_device_time_idx").on(
-      table.deviceId,
+    index("traceroute_logs_owner_time_idx").on(
+      table.ownerNodeNum,
       table.createdAt,
     ),
   ],
@@ -561,3 +567,103 @@ export type NewPreference = typeof preferences.$inferInsert;
 
 export type TracerouteLog = typeof tracerouteLogs.$inferSelect;
 export type NewTracerouteLog = typeof tracerouteLogs.$inferInsert;
+
+/**
+ * Device configs - cached device and module configuration
+ * Enables instant UI on reconnect and change detection
+ */
+export const deviceConfigs = sqliteTable(
+  "device_configs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    // Device identity - the node number of the device that owns this config
+    ownerNodeNum: integer("owner_node_num").notNull(),
+
+    // Config data (stored as JSON)
+    config: text("config", { mode: "json" }).notNull(), // LocalConfig
+    moduleConfig: text("module_config", { mode: "json" }).notNull(), // LocalModuleConfig
+
+    // Sync metadata
+    configHash: text("config_hash"), // SHA-256 for quick comparison
+    configVersion: integer("config_version"), // From firmware (when available)
+
+    // Firmware info
+    firmwareVersion: text("firmware_version"),
+
+    // Timestamps
+    lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (table) => [
+    // One config cache per device
+    unique("device_configs_owner_unique").on(table.ownerNodeNum),
+    index("device_configs_owner_idx").on(table.ownerNodeNum),
+  ],
+);
+
+/**
+ * Config changes - track pending local changes separately from synced config
+ * Enables preserving unsaved edits across reconnects and detecting conflicts
+ */
+export const configChanges = sqliteTable(
+  "config_changes",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    // Device identity - the node number of the device that owns this data
+    ownerNodeNum: integer("owner_node_num").notNull(),
+
+    // Change identification
+    changeType: text("change_type", {
+      enum: ["config", "moduleConfig", "channel", "user"],
+    }).notNull(),
+    variant: text("variant"), // e.g., "device", "lora", "mqtt"
+    channelIndex: integer("channel_index"), // For channel changes
+
+    // Change data
+    fieldPath: text("field_path"), // Dot-separated path within the config (e.g., "region", "txPower")
+    value: text("value", { mode: "json" }).notNull(),
+    originalValue: text("original_value", { mode: "json" }),
+
+    // Conflict tracking
+    hasConflict: integer("has_conflict", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    remoteValue: text("remote_value", { mode: "json" }), // Value from device when conflict detected
+
+    // Timestamps
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (table) => [
+    // Unique per change type/variant/channel/field
+    unique("config_changes_owner_unique").on(
+      table.ownerNodeNum,
+      table.changeType,
+      table.variant,
+      table.channelIndex,
+      table.fieldPath,
+    ),
+    index("config_changes_owner_idx").on(table.ownerNodeNum),
+    index("config_changes_conflict_idx").on(
+      table.ownerNodeNum,
+      table.hasConflict,
+    ),
+  ],
+);
+
+export type DeviceConfig = typeof deviceConfigs.$inferSelect;
+export type NewDeviceConfig = typeof deviceConfigs.$inferInsert;
+
+export type ConfigChange = typeof configChanges.$inferSelect;
+export type NewConfigChange = typeof configChanges.$inferInsert;

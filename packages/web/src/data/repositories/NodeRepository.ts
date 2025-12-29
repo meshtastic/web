@@ -23,22 +23,22 @@ export class NodeRepository {
   /**
    * Get all nodes for a device
    */
-  async getNodes(deviceId: number): Promise<Node[]> {
+  async getNodes(ownerNodeNum: number): Promise<Node[]> {
     return this.db
       .select()
       .from(nodes)
-      .where(eq(nodes.deviceId, deviceId))
+      .where(eq(nodes.ownerNodeNum, ownerNodeNum))
       .orderBy(desc(nodes.lastHeard));
   }
 
   /**
    * Get a specific node
    */
-  async getNode(deviceId: number, nodeNum: number): Promise<Node | undefined> {
+  async getNode(ownerNodeNum: number, nodeNum: number): Promise<Node | undefined> {
     const result = await this.db
       .select()
       .from(nodes)
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)))
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)))
       .limit(1);
 
     return result[0];
@@ -46,14 +46,14 @@ export class NodeRepository {
 
   /**
    * Upsert a node (insert or update)
-   * Uses the composite PRIMARY KEY (deviceId, nodeNum) for automatic deduplication
+   * Uses the composite PRIMARY KEY (ownerNodeNum, nodeNum) for automatic deduplication
    */
   async upsertNode(node: NewNode): Promise<void> {
     await this.db
       .insert(nodes)
       .values(node)
       .onConflictDoUpdate({
-        target: [nodes.deviceId, nodes.nodeNum],
+        target: [nodes.ownerNodeNum, nodes.nodeNum],
         set: {
           // Update all fields except the primary key
           lastHeard: node.lastHeard,
@@ -90,7 +90,7 @@ export class NodeRepository {
    * Update node position
    */
   async updatePosition(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     position: {
       latitudeI?: number;
@@ -109,14 +109,14 @@ export class NodeRepository {
         ...position,
         updatedAt: new Date(),
       })
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
   }
 
   /**
    * Update node user info
    */
   async updateUser(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     user: {
       userId?: string;
@@ -135,14 +135,14 @@ export class NodeRepository {
         ...user,
         updatedAt: new Date(),
       })
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
   }
 
   /**
    * Update node metrics
    */
   async updateMetrics(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     metrics: {
       batteryLevel?: number;
@@ -158,7 +158,7 @@ export class NodeRepository {
         ...metrics,
         updatedAt: new Date(),
       })
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
   }
 
   /**
@@ -166,7 +166,7 @@ export class NodeRepository {
    * @param lastHeard - Unix timestamp in seconds
    */
   async updateLastHeard(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     lastHeard: number,
     snr?: number,
@@ -183,21 +183,21 @@ export class NodeRepository {
     await this.db
       .update(nodes)
       .set(updates)
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
   }
 
   /**
    * Update favorite status
    */
   async updateFavorite(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     isFavorite: boolean,
   ): Promise<void> {
     await this.db
       .update(nodes)
       .set({ isFavorite, updatedAt: new Date() })
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
   }
 
   /**
@@ -205,38 +205,38 @@ export class NodeRepository {
    */
 
   async updatePrivateNote(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     privateNote: string | null,
   ): Promise<void> {
     await this.db
       .update(nodes)
       .set({ privateNote, updatedAt: new Date() })
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
   }
 
   /**
    * Update ignored status
    */
   async updateIgnored(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     isIgnored: boolean,
   ): Promise<void> {
     await this.db
       .update(nodes)
       .set({ isIgnored, updatedAt: new Date() })
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
   }
 
   /**
    * Get favorite nodes
    */
-  async getFavorites(deviceId: number): Promise<Node[]> {
+  async getFavorites(ownerNodeNum: number): Promise<Node[]> {
     return this.db
       .select()
       .from(nodes)
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.isFavorite, true)))
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.isFavorite, true)))
       .orderBy(desc(nodes.lastHeard));
   }
 
@@ -244,7 +244,7 @@ export class NodeRepository {
    * Get recently heard nodes
    */
   async getRecentNodes(
-    deviceId: number,
+    ownerNodeNum: number,
     sinceTimestamp: number,
   ): Promise<Node[]> {
     return this.db
@@ -252,7 +252,7 @@ export class NodeRepository {
       .from(nodes)
       .where(
         and(
-          eq(nodes.deviceId, deviceId),
+          eq(nodes.ownerNodeNum, ownerNodeNum),
           gt(nodes.lastHeard, new Date(sinceTimestamp)),
         ),
       )
@@ -262,10 +262,10 @@ export class NodeRepository {
   /**
    * Delete a node
    */
-  async deleteNode(deviceId: number, nodeNum: number): Promise<void> {
+  async deleteNode(ownerNodeNum: number, nodeNum: number): Promise<void> {
     await this.db
       .delete(nodes)
-      .where(and(eq(nodes.deviceId, deviceId), eq(nodes.nodeNum, nodeNum)));
+      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
   }
 
   /**
@@ -273,14 +273,14 @@ export class NodeRepository {
    * @param unknownOnly - If true, only count nodes without a longName
    */
   async countStaleNodes(
-    deviceId: number,
+    ownerNodeNum: number,
     daysOld: number,
     unknownOnly = false,
   ): Promise<number> {
     const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
     let baseCondition = and(
-      eq(nodes.deviceId, deviceId),
+      eq(nodes.ownerNodeNum, ownerNodeNum),
       lt(nodes.lastHeard, cutoffDate),
     );
 
@@ -304,14 +304,14 @@ export class NodeRepository {
    * @param unknownOnly - If true, only return nodes without a longName
    */
   async getStaleNodes(
-    deviceId: number,
+    ownerNodeNum: number,
     daysOld: number,
     unknownOnly = false,
   ): Promise<Node[]> {
     const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
     let baseCondition = and(
-      eq(nodes.deviceId, deviceId),
+      eq(nodes.ownerNodeNum, ownerNodeNum),
       lt(nodes.lastHeard, cutoffDate),
     );
 
@@ -334,12 +334,12 @@ export class NodeRepository {
    * @param unknownOnly - If true, only delete nodes without a longName
    */
   async deleteStaleNodes(
-    deviceId: number,
+    ownerNodeNum: number,
     daysOld: number,
     unknownOnly = false,
   ): Promise<number> {
     // First count the nodes to be deleted (since sqlocal doesn't return changes count)
-    const count = await this.countStaleNodes(deviceId, daysOld, unknownOnly);
+    const count = await this.countStaleNodes(ownerNodeNum, daysOld, unknownOnly);
 
     if (count === 0) {
       return 0;
@@ -348,7 +348,7 @@ export class NodeRepository {
     const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
     let baseCondition = and(
-      eq(nodes.deviceId, deviceId),
+      eq(nodes.ownerNodeNum, ownerNodeNum),
       lt(nodes.lastHeard, cutoffDate),
     );
 
@@ -364,7 +364,6 @@ export class NodeRepository {
     return count;
   }
 
-  // ==================== Position History ====================
 
   /**
    * Log a position update
@@ -377,13 +376,13 @@ export class NodeRepository {
    * Get position history for a node
    */
   async getPositionHistory(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     since?: number,
     limit = 100,
   ): Promise<PositionLog[]> {
     const conditions = [
-      eq(positionLogs.deviceId, deviceId),
+      eq(positionLogs.ownerNodeNum, ownerNodeNum),
       eq(positionLogs.nodeNum, nodeNum),
     ];
 
@@ -404,7 +403,7 @@ export class NodeRepository {
    * Returns a map of nodeNum -> position history
    */
   async getPositionHistoryForNodes(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNums: number[],
     since?: number,
     limitPerNode = 100,
@@ -413,7 +412,7 @@ export class NodeRepository {
       return new Map();
     }
 
-    const conditions = [eq(positionLogs.deviceId, deviceId)];
+    const conditions = [eq(positionLogs.ownerNodeNum, ownerNodeNum)];
 
     if (since !== undefined) {
       conditions.push(gt(positionLogs.time, new Date(since)));
@@ -448,7 +447,7 @@ export class NodeRepository {
    * Delete old position logs
    */
   async deleteOldPositions(
-    deviceId: number,
+    ownerNodeNum: number,
     olderThan: number,
   ): Promise<number> {
     // Count first since sqlocal doesn't return changes count
@@ -457,7 +456,7 @@ export class NodeRepository {
       .from(positionLogs)
       .where(
         and(
-          eq(positionLogs.deviceId, deviceId),
+          eq(positionLogs.ownerNodeNum, ownerNodeNum),
           lt(positionLogs.time, new Date(olderThan)),
         ),
       );
@@ -471,7 +470,7 @@ export class NodeRepository {
       .delete(positionLogs)
       .where(
         and(
-          eq(positionLogs.deviceId, deviceId),
+          eq(positionLogs.ownerNodeNum, ownerNodeNum),
           lt(positionLogs.time, new Date(olderThan)),
         ),
       );
@@ -479,7 +478,6 @@ export class NodeRepository {
     return count;
   }
 
-  // ==================== Telemetry History ====================
 
   /**
    * Log telemetry data
@@ -492,13 +490,13 @@ export class NodeRepository {
    * Get telemetry history for a node
    */
   async getTelemetryHistory(
-    deviceId: number,
+    ownerNodeNum: number,
     nodeNum: number,
     since?: number,
     limit = 100,
   ): Promise<TelemetryLog[]> {
     const conditions = [
-      eq(telemetryLogs.deviceId, deviceId),
+      eq(telemetryLogs.ownerNodeNum, ownerNodeNum),
       eq(telemetryLogs.nodeNum, nodeNum),
     ];
 
@@ -518,7 +516,7 @@ export class NodeRepository {
    * Delete old telemetry logs
    */
   async deleteOldTelemetry(
-    deviceId: number,
+    ownerNodeNum: number,
     olderThan: number,
   ): Promise<number> {
     // Count first since sqlocal doesn't return changes count
@@ -527,7 +525,7 @@ export class NodeRepository {
       .from(telemetryLogs)
       .where(
         and(
-          eq(telemetryLogs.deviceId, deviceId),
+          eq(telemetryLogs.ownerNodeNum, ownerNodeNum),
           lt(telemetryLogs.time, new Date(olderThan)),
         ),
       );
@@ -541,7 +539,7 @@ export class NodeRepository {
       .delete(telemetryLogs)
       .where(
         and(
-          eq(telemetryLogs.deviceId, deviceId),
+          eq(telemetryLogs.ownerNodeNum, ownerNodeNum),
           lt(telemetryLogs.time, new Date(olderThan)),
         ),
       );

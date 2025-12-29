@@ -28,7 +28,7 @@
     "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ .",
     "db:generate": "drizzle-kit generate",
     "db:check": "drizzle-kit check",
-    "db:squash": "rm -rf ./src/db/migrations/* && pnpm db:generate"
+    "db:squash": "rm -rf ./isrc/data/migrations/* && pnpm db:generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

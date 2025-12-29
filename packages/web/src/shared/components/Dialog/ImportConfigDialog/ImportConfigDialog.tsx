@@ -28,6 +28,7 @@ interface ImportConfigDialogProps {
   onImport: (
     fields: ParsedConfigBackupField[],
     onProgress: (percent: number, status: string) => void,
+    options?: { channelImportMode?: "merge" | "replace" },
   ) => Promise<void>;
 }
 
@@ -36,7 +37,7 @@ export function ImportConfigDialog({
   onOpenChange,
   onImport,
 }: ImportConfigDialogProps) {
-  const { t } = useTranslation("settings");
+  const { t } = useTranslation("config");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [yamlContent, setYamlContent] = useState("");
@@ -48,6 +49,7 @@ export function ImportConfigDialog({
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
   const [importStatus, setImportStatus] = useState("");
+  const [channelImportMode, setChannelImportMode] = useState<"merge" | "replace">("merge");
 
   // Parse YAML content and extract fields
   useEffect(() => {
@@ -136,6 +138,13 @@ export function ImportConfigDialog({
     return groups;
   }, [filteredFields]);
 
+  // Check if there are channel fields selected
+  const hasChannelFieldsSelected = useMemo(() => {
+    return allFields.some(
+      (field) => field.type === "channel" && selectedFields.has(field.originalPath),
+    );
+  }, [allFields, selectedFields]);
+
   // Debounced search
   const debouncedSearch = useCallback(
     debounce((query: string) => {
@@ -208,10 +217,14 @@ export function ImportConfigDialog({
         return;
       }
 
-      await onImport(fieldsToImport, (percent, status) => {
-        setImportProgress(percent);
-        setImportStatus(status);
-      });
+      await onImport(
+        fieldsToImport,
+        (percent, status) => {
+          setImportProgress(percent);
+          setImportStatus(status);
+        },
+        hasChannelFieldsSelected ? { channelImportMode } : undefined,
+      );
 
       onOpenChange(false);
       setYamlContent("");
@@ -224,7 +237,7 @@ export function ImportConfigDialog({
     } finally {
       setIsImporting(false);
     }
-  }, [selectedFields, allFields, onImport, onOpenChange]);
+  }, [selectedFields, allFields, onImport, onOpenChange, channelImportMode, hasChannelFieldsSelected]);
 
   const isGroupSelected = useCallback(
     (groupFields: ParsedConfigBackupField[]) => {
@@ -268,7 +281,6 @@ export function ImportConfigDialog({
               </div>
             ) : (
               <>
-                {/* File Upload Section */}
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Button
@@ -290,7 +302,6 @@ export function ImportConfigDialog({
                     />
                   </div>
 
-                  {/* YAML Content Editor */}
                   <div className="space-y-2">
                     <Label htmlFor="yaml-content">
                       {t("importConfig.yamlContent", "YAML Content")}
@@ -308,7 +319,6 @@ export function ImportConfigDialog({
                     />
                   </div>
 
-                  {/* Validation Error */}
                   {validationError && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-800 text-sm">
                       <div className="flex items-start gap-2">
@@ -321,7 +331,6 @@ export function ImportConfigDialog({
                   )}
                 </div>
 
-                {/* Search and Filter */}
                 {allFields.length > 0 && (
                   <div className="space-y-4">
                     <div className="relative">
@@ -383,7 +392,45 @@ export function ImportConfigDialog({
                   </div>
                 )}
 
-                {/* Fields Selection - Group level only */}
+                {allFields.some((f) => f.type === "channel") && (
+                  <div className="p-4 rounded-lg border bg-muted/20">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium">
+                          {t("importConfig.channelImportMode", "Channel Import Mode")}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {channelImportMode === "merge"
+                            ? t(
+                                "importConfig.mergeDescription",
+                                "Merge with existing channels (keep unimported channels)",
+                              )
+                            : t(
+                                "importConfig.replaceDescription",
+                                "Replace channels (disable channels not in backup)",
+                              )}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={channelImportMode === "merge" ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setChannelImportMode("merge")}
+                        >
+                          {t("importConfig.merge", "Merge")}
+                        </Button>
+                        <Button
+                          variant={channelImportMode === "replace" ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setChannelImportMode("replace")}
+                        >
+                          {t("importConfig.replace", "Replace")}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {Object.entries(groupedFields).map(
                   ([groupKey, groupFields]) => {
                     const [type, section] = groupKey.split(".");
@@ -441,7 +488,6 @@ export function ImportConfigDialog({
                   },
                 )}
 
-                {/* Action Buttons */}
                 <div className="flex justify-end gap-3 pt-4 border-t">
                   <Button variant="outline" onClick={() => onOpenChange(false)}>
                     {t("button.cancel", "Cancel")}

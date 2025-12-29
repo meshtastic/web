@@ -26,11 +26,11 @@ export class SubscriptionService {
    * Subscribe to all relevant events for a device
    */
   static subscribeToDevice(
-    deviceId: number,
+    ownerNodeNum: number,
     myNodeNum: number,
     connection: MeshDevice,
   ): () => void {
-    logger.debug(`[DB Subscriptions] Subscribing to device ${deviceId}...`);
+    logger.debug(`[DB Subscriptions] Subscribing to device ${ownerNodeNum}...`);
 
     // Store unsubscribe functions
     const unsubscribers: Array<() => void> = [];
@@ -40,7 +40,7 @@ export class SubscriptionService {
       connection.events.onPositionPacket.subscribe(async (position) => {
         try {
           // Update current position in nodes table
-          await nodeRepo.updatePosition(deviceId, position.from, {
+          await nodeRepo.updatePosition(ownerNodeNum, position.from, {
             latitudeI: position.data.latitudeI,
             longitudeI: position.data.longitudeI,
             altitude: position.data.altitude,
@@ -56,7 +56,7 @@ export class SubscriptionService {
 
           // Log position history
           const positionLog: NewPositionLog = {
-            deviceId,
+            ownerNodeNum: ownerNodeNum,
             nodeNum: position.from,
             latitudeI: position.data.latitudeI,
             longitudeI: position.data.longitudeI,
@@ -84,7 +84,7 @@ export class SubscriptionService {
     unsubscribers.push(
       connection.events.onUserPacket.subscribe(async (user) => {
         try {
-          await nodeRepo.updateUser(deviceId, user.from, {
+          await nodeRepo.updateUser(ownerNodeNum, user.from, {
             userId: user.data.id,
             longName: user.data.longName,
             shortName: user.data.shortName,
@@ -111,7 +111,7 @@ export class SubscriptionService {
       connection.events.onNodeInfoPacket.subscribe(async (nodeInfo) => {
         try {
           const newNode: NewNode = {
-            deviceId,
+            ownerNodeNum: ownerNodeNum,
             nodeNum: nodeInfo.num,
             // Convert Unix timestamp (seconds) to Date if present
             lastHeard: nodeInfo.lastHeard
@@ -171,7 +171,7 @@ export class SubscriptionService {
       connection.events.onTelemetryPacket.subscribe(async (telemetry) => {
         try {
           // Update current metrics in nodes table
-          await nodeRepo.updateMetrics(deviceId, telemetry.from, {
+          await nodeRepo.updateMetrics(ownerNodeNum, telemetry.from, {
             batteryLevel: telemetry.data.deviceMetrics?.batteryLevel,
             voltage: telemetry.data.deviceMetrics?.voltage,
             channelUtilization:
@@ -182,7 +182,7 @@ export class SubscriptionService {
 
           // Log telemetry history
           const telemetryLog: NewTelemetryLog = {
-            deviceId,
+            ownerNodeNum: ownerNodeNum,
             nodeNum: telemetry.from,
             // Convert Unix timestamp (seconds) to Date if present
             time: telemetry.data.time
@@ -223,7 +223,7 @@ export class SubscriptionService {
         // Update last heard for the node (higher priority, don't queue)
         nodeRepo
           .updateLastHeard(
-            deviceId,
+            ownerNodeNum,
             meshPacket.from,
             meshPacket.rxTime,
             meshPacket.rxSnr,
@@ -240,7 +240,7 @@ export class SubscriptionService {
 
         // Log the packet to packet_logs table via queue (batched for performance)
         const packetLog: NewPacketLog = {
-          deviceId,
+          ownerNodeNum: ownerNodeNum,
           fromNode: meshPacket.from,
           toNode: meshPacket.to,
           channel: meshPacket.channel,
@@ -307,7 +307,7 @@ export class SubscriptionService {
           }
 
           const newMessage: NewMessage = {
-            deviceId,
+            ownerNodeNum: ownerNodeNum,
             messageId: messagePacket.id,
             type,
             channelId: messagePacket.channel ?? 0,
@@ -342,7 +342,7 @@ export class SubscriptionService {
       connection.events.onChannelPacket.subscribe(async (channel) => {
         try {
           await channelRepo.upsertChannel({
-            deviceId,
+            ownerNodeNum: ownerNodeNum,
             channelIndex: channel.index,
             role: channel.role,
             name: channel.settings?.name,
@@ -365,7 +365,7 @@ export class SubscriptionService {
     // Return unsubscribe function
     return () => {
       logger.debug(
-        `[DB Subscriptions] Unsubscribing from device ${deviceId}...`,
+        `[DB Subscriptions] Unsubscribing from device ${ownerNodeNum}...`,
       );
       for (const unsubscribe of unsubscribers) {
         unsubscribe();

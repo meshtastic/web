@@ -191,11 +191,8 @@ export const Security = () => {
           description: t("pkiRegenerate.description"),
         }}
         open={privateKeyDialogOpen}
-        onOpenChange={() => setPrivateKeyDialogOpen((prev) => !prev)}
-        onSubmit={() => {
-          regenerateKeys();
-          setPrivateKeyDialogOpen(false);
-        }}
+        onOpenChange={setPrivateKeyDialogOpen}
+        onSubmit={regenerateKeys}
       />
       <ManagedModeDialog
         open={managedModeDialogOpen}

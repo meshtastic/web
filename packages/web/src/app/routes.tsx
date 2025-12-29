@@ -4,7 +4,7 @@ import { ErrorPage } from "@shared/components/ui/error-page";
 import { Spinner } from "@shared/components/ui/spinner";
 import { useDeviceStore } from "@state/index.ts";
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   createRoute,
   createRouter,
   redirect,
@@ -12,11 +12,12 @@ import {
 import { Activity, lazy, Suspense } from "react";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
+import type { RouterContext } from "./routerContext.ts";
 
 // Lazy loaded routes
 const MapPage = lazy(() =>
   import("@features/map/pages/MapPage").then((m) => ({
-    default: m.default,
+    default: m.MapPage,
   })),
 );
 const NodesPage = lazy(() =>
@@ -54,8 +55,6 @@ function RouteLoader() {
   );
 }
 
-type DeviceStore = ReturnType<typeof useDeviceStore>;
-
 // Helper function to check if there's an active connection
 function requireActiveConnection() {
   const devices = useDeviceStore.getState().getDevices();
@@ -72,7 +71,7 @@ function requireActiveConnection() {
   }
 }
 
-export const rootRoute = createRootRoute({
+export const rootRoute = createRootRouteWithContext<RouterContext>()({
   component: () => <App />,
   errorComponent: ErrorPage,
   validateSearch: z.object({
@@ -86,7 +85,7 @@ const indexRoute = createRoute({
   path: "/",
   component: Connections,
   loader: () => {
-    // Redirect to longfast channel on first load
+    // Redirect to primary channel on first load
     return redirect({ to: "/messages", search: { channel: 0 }, replace: true });
   },
 });
@@ -111,7 +110,7 @@ const mapRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map",
   errorComponent: ErrorPage,
-  beforeLoad: ({ context }) => {
+  beforeLoad: () => {
     requireActiveConnection();
   },
   component: () => (
@@ -135,7 +134,7 @@ const coordParamsSchema = z.object({
       (n) => Number.isFinite(n) && n >= -90 && n <= 90,
       "Invalid latitude (-90..90).",
     ),
-  // Typical web map zoom levels ~0..22 (adjust if your map lib differs)
+  // map zoom levels ~0..22
   zoom: z.coerce
     .number()
     .int()
@@ -147,8 +146,8 @@ export const mapWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map/$long/$lat/$zoom",
   errorComponent: ErrorPage,
-  beforeLoad: ({ context }) => {
-    requireActiveConnection(context);
+  beforeLoad: () => {
+    requireActiveConnection();
   },
   component: () => (
     <Activity>
@@ -156,12 +155,11 @@ export const mapWithParamsRoute = createRoute({
     </Activity>
   ),
   parseParams: (raw) => coordParamsSchema.parse(raw),
-  // // This controls how params are serialized when you navigate/link
-  // stringifyParams: (p) => ({
-  //   long: String(p.long),
-  //   lat: String(p.lat),
-  //   zoom: String(p.zoom),
-  // }),
+  stringifyParams: (p) => ({
+    long: String(p.long),
+    lat: String(p.lat),
+    zoom: String(p.zoom),
+  }),
 });
 
 export const settingsRoute = createRoute({
@@ -173,8 +171,8 @@ export const settingsRoute = createRoute({
     </Suspense>
   ),
   errorComponent: ErrorPage,
-  beforeLoad: ({ context }) => {
-    requireActiveConnection(context);
+  beforeLoad: () => {
+    requireActiveConnection();
   },
 });
 
@@ -215,8 +213,8 @@ const nodesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/nodes",
   errorComponent: ErrorPage,
-  beforeLoad: ({ context }) => {
-    requireActiveConnection(context);
+  beforeLoad: () => {
+    requireActiveConnection();
   },
   component: () => (
     <Activity>
@@ -246,10 +244,15 @@ const routeTree = rootRoute.addChildren([
 
 const router = createRouter({
   routeTree,
-  context: {
-    stores: {
-      device: {} as DeviceStore,
-    },
-  },
+  context: undefined!, // Provided at runtime via RouterProvider
 });
+
+// Register router types for type-safe navigation
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
+}
+
 export { router };
+export type { RouterContext };

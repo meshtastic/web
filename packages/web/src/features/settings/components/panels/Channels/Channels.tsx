@@ -1,18 +1,13 @@
 import { Channel } from "./Channel";
 import { type Channel as DbChannel, useChannels } from "@data/index";
 import { Button } from "@shared/components/ui/button";
-import { Spinner } from "@shared/components/ui/spinner";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@shared/components/ui/tabs";
 import { useDevice, useDeviceContext } from "@state/index.ts";
 import i18next from "i18next";
-import { QrCodeIcon, UploadIcon } from "lucide-react";
-import { Suspense, useMemo } from "react";
+import { ChevronRight, Plus, Radio } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+
+const MAX_SECONDARY_CHANNELS = 7; // Channels 1-7 (channel 0 is always primary)
 
 export const getChannelName = (channel: DbChannel) => {
   return channel.name?.length
@@ -25,13 +20,30 @@ export const getChannelName = (channel: DbChannel) => {
         });
 };
 
+const getRoleLabel = (role: number, channelIndex: number, t: (key: string) => string) => {
+  if (channelIndex === 0) return t("role.options.primary");
+  switch (role) {
+    case 0:
+      return t("role.options.disabled");
+    case 1:
+      return t("role.options.primary");
+    case 2:
+      return t("role.options.secondary");
+    default:
+      return t("role.options.disabled");
+  }
+};
+
 export const Channels = () => {
-  const { hasChannelChange, setDialogOpen } = useDevice();
+  const device = useDevice();
+  const { hasChannelChange } = device;
   const { deviceId } = useDeviceContext();
   const { channels } = useChannels(deviceId);
   const { t } = useTranslation("channels");
+  const [openChannels, setOpenChannels] = useState<Set<number>>(new Set([0]));
 
   const allChannels = channels;
+
   const flags = useMemo(
     () =>
       new Map(
@@ -43,51 +55,124 @@ export const Channels = () => {
     [allChannels, hasChannelChange],
   );
 
+  // Enabled channels (role > 0) - these are shown in the list
+  const enabledChannels = useMemo(
+    () => allChannels.filter((ch) => ch.role > 0),
+    [allChannels],
+  );
+
+  // Disabled channels that can be added
+  const disabledChannels = useMemo(
+    () => allChannels.filter((ch) => ch.role === 0 && ch.channelIndex > 0),
+    [allChannels],
+  );
+
+  // Check if we can add more secondary channels
+  const canAddChannel = disabledChannels.length > 0 &&
+    enabledChannels.filter(ch => ch.channelIndex > 0).length < MAX_SECONDARY_CHANNELS;
+
+  // Get the next disabled channel to show when "Add" is clicked
+  const nextDisabledChannel = disabledChannels[0];
+
+  const handleToggle = (channelIndex: number, isOpen: boolean) => {
+    setOpenChannels(prev => {
+      const next = new Set(prev);
+      if (isOpen) {
+        next.add(channelIndex);
+      } else {
+        next.delete(channelIndex);
+      }
+      return next;
+    });
+  };
+
+  const handleAddChannel = () => {
+    if (nextDisabledChannel) {
+      setOpenChannels(prev => new Set(prev).add(nextDisabledChannel.channelIndex));
+    }
+  };
+
+  // Channels to display: enabled ones + one disabled one if user clicked "Add"
+  const displayChannels = useMemo(() => {
+    const result = [...enabledChannels];
+
+    // If a disabled channel is open, include it in the list
+    for (const ch of disabledChannels) {
+      if (openChannels.has(ch.channelIndex)) {
+        result.push(ch);
+      }
+    }
+
+    // Sort by channel index
+    return result.sort((a, b) => a.channelIndex - b.channelIndex);
+  }, [enabledChannels, disabledChannels, openChannels]);
+
   return (
-    <Tabs defaultValue="channel_0">
-      <TabsList className="w-full">
-        {allChannels.map((channel) => (
-          <TabsTrigger
-            key={`channel_${channel.channelIndex}`}
-            value={`channel_${channel.channelIndex}`}
-            className="relative text-white"
+    <div className="space-y-2">
+      {displayChannels.map((channel) => {
+        const hasChanges = flags.get(channel.channelIndex);
+        const isEnabled = channel.role > 0;
+        const roleLabel = getRoleLabel(channel.role, channel.channelIndex, t);
+        const isOpen = openChannels.has(channel.channelIndex);
+
+        return (
+          <details
+            key={channel.channelIndex}
+            id={`channel-details-${channel.channelIndex}`}
+            className="group rounded-lg border bg-card"
+            open={isOpen}
+            onToggle={(e) => handleToggle(channel.channelIndex, e.currentTarget.open)}
           >
-            {getChannelName(channel)}
-            {flags.get(channel.channelIndex) && (
-              <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
-                <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
-              </span>
-            )}
-          </TabsTrigger>
-        ))}
+            <summary className="flex cursor-pointer items-center gap-3 p-4 [&::-webkit-details-marker]:hidden">
+              <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-90" />
+
+              <Radio
+                className={`size-4 shrink-0 ${
+                  isEnabled
+                    ? "text-green-500"
+                    : "text-muted-foreground"
+                }`}
+              />
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium truncate">
+                    {getChannelName(channel)}
+                  </span>
+                  {hasChanges && (
+                    <span className="relative flex size-2">
+                      <span className="absolute inline-flex size-2 animate-ping rounded-full bg-sky-500 opacity-75" />
+                      <span className="relative inline-flex size-2 rounded-full bg-sky-500" />
+                    </span>
+                  )}
+                </div>
+                <span className={`text-sm ${
+                  isEnabled
+                    ? "text-muted-foreground"
+                    : "text-muted-foreground/50 italic"
+                }`}>
+                  {roleLabel}
+                </span>
+              </div>
+            </summary>
+
+            <div className="border-t px-4 py-4">
+              <Channel channel={channel} />
+            </div>
+          </details>
+        );
+      })}
+
+      {canAddChannel && (
         <Button
-          variant={"outline"}
-          className="ml-auto mr-1 h-8"
-          onClick={() => setDialogOpen("import", true)}
+          variant="outline"
+          className="w-full border-dashed"
+          onClick={handleAddChannel}
         >
-          <UploadIcon className="mr-2" size={14} />
-          {t("page.import")}
+          <Plus className="mr-2 size-4" />
+          {t("page.addChannel", "Add Channel")}
         </Button>
-        <Button
-          variant={"outline"}
-          className=" h-8"
-          onClick={() => setDialogOpen("QR", true)}
-        >
-          <QrCodeIcon className="mr-2" size={14} />
-          {t("page.export")}
-        </Button>
-      </TabsList>
-      {allChannels.map((channel) => (
-        <TabsContent
-          key={`channel_${channel.channelIndex}`}
-          value={`channel_${channel.channelIndex}`}
-        >
-          <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <Channel key={channel.channelIndex} channel={channel} />
-          </Suspense>
-        </TabsContent>
-      ))}
-    </Tabs>
+      )}
+    </div>
   );
 };

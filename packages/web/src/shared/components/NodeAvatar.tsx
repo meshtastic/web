@@ -18,7 +18,7 @@ interface NodeAvatarProps {
   showError?: boolean;
   showFavorite?: boolean;
   clickable?: boolean; // If false, disables click behavior
-  onClick?: () => void; // Custom click handler (overrides default)
+  onClick?: () => void;
 }
 
 export const NodeAvatar = ({
@@ -51,13 +51,11 @@ export const NodeAvatar = ({
       return;
     }
 
-    // Stop propagation to prevent parent click handlers from firing
     e.stopPropagation();
 
     if (onClick) {
       onClick();
     } else {
-      // Default behavior: open node details drawer
       const nodeNumber =
         typeof nodeNum === "string" ? parseInt(nodeNum, 10) : nodeNum;
       setNodeNumDetails(nodeNumber);

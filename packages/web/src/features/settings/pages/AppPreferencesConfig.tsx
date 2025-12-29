@@ -1,4 +1,5 @@
 import { useTheme } from "@app/shared/components/ui/theme-provider";
+import { usePreference } from "@data/hooks";
 import { Button } from "@shared/components/ui/button";
 import {
   Card,
@@ -19,7 +20,13 @@ import {
 import { Separator } from "@shared/components/ui/separator";
 import { Slider } from "@shared/components/ui/slider";
 import { Switch } from "@shared/components/ui/switch";
-import { useUIStore } from "@state/index.ts";
+import {
+  type CoordinateFormat,
+  DEFAULT_PREFERENCES,
+  type DistanceUnits,
+  type MapStyle,
+  type TimeFormat,
+} from "@state/ui";
 import {
   Database,
   Globe,
@@ -30,7 +37,7 @@ import {
   Sun,
   Volume2,
 } from "lucide-react";
-import { Activity } from "react";
+import { Activity, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 const PACKET_BATCH_SIZE_MIN = 10;
@@ -47,21 +54,83 @@ export const AppPreferencesConfig = ({
   const { t } = useTranslation("ui");
   const { theme: themeFromProvider, setTheme: setThemeInProvider } = useTheme();
 
-  const {
-    compactMode,
-    showNodeAvatars,
-    language,
-    timeFormat,
-    distanceUnits,
-    coordinateFormat,
-    mapStyle,
-    showNodeLabels,
-    showConnectionLines,
-    autoCenterOnPosition,
-    masterVolume,
-    messageSoundEnabled,
-    alertSoundEnabled,
-    packetBatchSize,
+  // Preferences with persistence
+  const [compactMode, setCompactMode] = usePreference(
+    "compactMode",
+    DEFAULT_PREFERENCES.compactMode,
+  );
+  const [showNodeAvatars, setShowNodeAvatars] = usePreference(
+    "showNodeAvatars",
+    DEFAULT_PREFERENCES.showNodeAvatars,
+  );
+  const [language, setLanguage] = usePreference(
+    "language",
+    DEFAULT_PREFERENCES.language,
+  );
+  const [timeFormat, setTimeFormat] = usePreference<TimeFormat>(
+    "timeFormat",
+    DEFAULT_PREFERENCES.timeFormat,
+  );
+  const [distanceUnits, setDistanceUnits] = usePreference<DistanceUnits>(
+    "distanceUnits",
+    DEFAULT_PREFERENCES.distanceUnits,
+  );
+  const [coordinateFormat, setCoordinateFormat] =
+    usePreference<CoordinateFormat>(
+      "coordinateFormat",
+      DEFAULT_PREFERENCES.coordinateFormat,
+    );
+  const [mapStyle, setMapStyle] = usePreference<MapStyle>(
+    "mapStyle",
+    DEFAULT_PREFERENCES.mapStyle,
+  );
+  const [showNodeLabels, setShowNodeLabels] = usePreference(
+    "showNodeLabels",
+    DEFAULT_PREFERENCES.showNodeLabels,
+  );
+  const [showConnectionLines, setShowConnectionLines] = usePreference(
+    "showConnectionLines",
+    DEFAULT_PREFERENCES.showConnectionLines,
+  );
+  const [autoCenterOnPosition, setAutoCenterOnPosition] = usePreference(
+    "autoCenterOnPosition",
+    DEFAULT_PREFERENCES.autoCenterOnPosition,
+  );
+  const [masterVolume, setMasterVolume] = usePreference(
+    "masterVolume",
+    DEFAULT_PREFERENCES.masterVolume,
+  );
+  const [messageSoundEnabled, setMessageSoundEnabled] = usePreference(
+    "messageSoundEnabled",
+    DEFAULT_PREFERENCES.messageSoundEnabled,
+  );
+  const [alertSoundEnabled, setAlertSoundEnabled] = usePreference(
+    "alertSoundEnabled",
+    DEFAULT_PREFERENCES.alertSoundEnabled,
+  );
+  const [packetBatchSize, setPacketBatchSize] = usePreference(
+    "packetBatchSize",
+    DEFAULT_PREFERENCES.packetBatchSize,
+  );
+
+  const resetToDefaults = useCallback(async () => {
+    await Promise.all([
+      setCompactMode(DEFAULT_PREFERENCES.compactMode),
+      setShowNodeAvatars(DEFAULT_PREFERENCES.showNodeAvatars),
+      setLanguage(DEFAULT_PREFERENCES.language),
+      setTimeFormat(DEFAULT_PREFERENCES.timeFormat),
+      setDistanceUnits(DEFAULT_PREFERENCES.distanceUnits),
+      setCoordinateFormat(DEFAULT_PREFERENCES.coordinateFormat),
+      setMapStyle(DEFAULT_PREFERENCES.mapStyle),
+      setShowNodeLabels(DEFAULT_PREFERENCES.showNodeLabels),
+      setShowConnectionLines(DEFAULT_PREFERENCES.showConnectionLines),
+      setAutoCenterOnPosition(DEFAULT_PREFERENCES.autoCenterOnPosition),
+      setMasterVolume(DEFAULT_PREFERENCES.masterVolume),
+      setMessageSoundEnabled(DEFAULT_PREFERENCES.messageSoundEnabled),
+      setAlertSoundEnabled(DEFAULT_PREFERENCES.alertSoundEnabled),
+      setPacketBatchSize(DEFAULT_PREFERENCES.packetBatchSize),
+    ]);
+  }, [
     setCompactMode,
     setShowNodeAvatars,
     setLanguage,
@@ -76,8 +145,7 @@ export const AppPreferencesConfig = ({
     setMessageSoundEnabled,
     setAlertSoundEnabled,
     setPacketBatchSize,
-    resetToDefaults,
-  } = useUIStore();
+  ]);
 
   const query = searchQuery.toLowerCase().trim();
 
@@ -134,7 +202,6 @@ export const AppPreferencesConfig = ({
 
   return (
     <div className="space-y-6">
-      {/* Appearance */}
       <Activity mode={appearanceVisible ? "visible" : "hidden"}>
         <Card className="max-w-7xl">
           <CardHeader>
@@ -190,7 +257,10 @@ export const AppPreferencesConfig = ({
                   {t("preferences.appearance.compactMode.description")}
                 </p>
               </div>
-              <Switch checked={compactMode} onCheckedChange={setCompactMode} />
+              <Switch
+                checked={compactMode}
+                onCheckedChange={(checked) => void setCompactMode(checked)}
+              />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
@@ -203,14 +273,13 @@ export const AppPreferencesConfig = ({
               </div>
               <Switch
                 checked={showNodeAvatars}
-                onCheckedChange={setShowNodeAvatars}
+                onCheckedChange={(checked) => void setShowNodeAvatars(checked)}
               />
             </div>
           </CardContent>
         </Card>
       </Activity>
 
-      {/* Localization */}
       <Activity mode={localizationVisible ? "visible" : "hidden"}>
         <Card className="max-w-7xl">
           <CardHeader>
@@ -228,7 +297,7 @@ export const AppPreferencesConfig = ({
                 <Label>{t("preferences.localization.language")}</Label>
                 <Select
                   value={language}
-                  onValueChange={(value) => setLanguage(value)}
+                  onValueChange={(value) => void setLanguage(value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -248,7 +317,7 @@ export const AppPreferencesConfig = ({
                 <Select
                   value={timeFormat}
                   onValueChange={(value) =>
-                    setTimeFormat(value as "12h" | "24h")
+                    void setTimeFormat(value as "12h" | "24h")
                   }
                 >
                   <SelectTrigger>
@@ -271,7 +340,7 @@ export const AppPreferencesConfig = ({
                 <Select
                   value={distanceUnits}
                   onValueChange={(value) =>
-                    setDistanceUnits(value as "imperial" | "metric")
+                    void setDistanceUnits(value as "imperial" | "metric")
                   }
                 >
                   <SelectTrigger>
@@ -292,7 +361,7 @@ export const AppPreferencesConfig = ({
                 <Select
                   value={coordinateFormat}
                   onValueChange={(value) =>
-                    setCoordinateFormat(value as "dd" | "dms" | "utm")
+                    void setCoordinateFormat(value as "dd" | "dms" | "utm")
                   }
                 >
                   <SelectTrigger>
@@ -316,7 +385,6 @@ export const AppPreferencesConfig = ({
         </Card>
       </Activity>
 
-      {/* Map Preferences */}
       <Activity mode={mapVisible ? "visible" : "hidden"}>
         <Card className="max-w-7xl">
           <CardHeader>
@@ -334,7 +402,7 @@ export const AppPreferencesConfig = ({
               <Select
                 value={mapStyle}
                 onValueChange={(value) =>
-                  setMapStyle(
+                  void setMapStyle(
                     value as
                       | "dark"
                       | "light"
@@ -375,7 +443,7 @@ export const AppPreferencesConfig = ({
               </div>
               <Switch
                 checked={showNodeLabels}
-                onCheckedChange={setShowNodeLabels}
+                onCheckedChange={(checked) => void setShowNodeLabels(checked)}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -387,7 +455,9 @@ export const AppPreferencesConfig = ({
               </div>
               <Switch
                 checked={showConnectionLines}
-                onCheckedChange={setShowConnectionLines}
+                onCheckedChange={(checked) =>
+                  void setShowConnectionLines(checked)
+                }
               />
             </div>
             <div className="flex items-center justify-between">
@@ -399,14 +469,15 @@ export const AppPreferencesConfig = ({
               </div>
               <Switch
                 checked={autoCenterOnPosition}
-                onCheckedChange={setAutoCenterOnPosition}
+                onCheckedChange={(checked) =>
+                  void setAutoCenterOnPosition(checked)
+                }
               />
             </div>
           </CardContent>
         </Card>
       </Activity>
 
-      {/* Audio */}
       <Activity mode={audioVisible ? "visible" : "hidden"}>
         <Card className="max-w-7xl">
           <CardHeader>
@@ -431,7 +502,7 @@ export const AppPreferencesConfig = ({
                 onValueChange={(value) => {
                   const vol = value[0];
                   if (vol !== undefined) {
-                    setMasterVolume(vol);
+                    void setMasterVolume(vol);
                   }
                 }}
                 max={100}
@@ -448,7 +519,9 @@ export const AppPreferencesConfig = ({
               </div>
               <Switch
                 checked={messageSoundEnabled}
-                onCheckedChange={setMessageSoundEnabled}
+                onCheckedChange={(checked) =>
+                  void setMessageSoundEnabled(checked)
+                }
               />
             </div>
             <div className="flex items-center justify-between">
@@ -460,14 +533,13 @@ export const AppPreferencesConfig = ({
               </div>
               <Switch
                 checked={alertSoundEnabled}
-                onCheckedChange={setAlertSoundEnabled}
+                onCheckedChange={(checked) => void setAlertSoundEnabled(checked)}
               />
             </div>
           </CardContent>
         </Card>
       </Activity>
 
-      {/* Performance */}
       <Activity mode={performanceVisible ? "visible" : "hidden"}>
         <Card className="max-w-7xl">
           <CardHeader>
@@ -499,7 +571,7 @@ export const AppPreferencesConfig = ({
                 onValueChange={(value) => {
                   const size = value[0];
                   if (size !== undefined) {
-                    setPacketBatchSize(size);
+                    void setPacketBatchSize(size);
                   }
                 }}
                 min={PACKET_BATCH_SIZE_MIN}
@@ -511,7 +583,6 @@ export const AppPreferencesConfig = ({
         </Card>
       </Activity>
 
-      {/* Reset Button */}
       <div className="flex justify-end">
         <Button variant="outline" onClick={resetToDefaults}>
           {t("preferences.resetToDefaults")}

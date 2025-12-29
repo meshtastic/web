@@ -89,7 +89,6 @@ function createLocalStorageStore<T>(
   return { getSnapshot, subscribe, setValue, removeValue };
 }
 
-// ==================== Hook ====================
 
 export function useLocalStorage<T>(
   key: string,

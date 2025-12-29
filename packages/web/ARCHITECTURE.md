@@ -234,10 +234,55 @@ The project uses TypeScript path aliases for clean imports:
 - Stores device config, module config, and ephemeral state
 - Handles change tracking for settings forms
 
-### UI Store (`src/state/ui/index.ts`)
-- User preferences (theme, language, units)
-- UI state (dialog visibility, selected nodes)
-- Node table column visibility and ordering
+### UI Store (`src/state/ui/store.ts`)
+- **Ephemeral state only** (not persisted):
+  - Modal/dialog visibility (`connectDialogOpen`, `nodeNumDetails`, `tracerouteNodeNum`)
+  - Command palette state
+  - Message tab state (`messageTabs`, `activeMessageTabId`, `secondaryMessageTabId`, `messageSplitMode`)
+- Exports `DEFAULT_PREFERENCES` for use with the preferences hook
+
+### Preferences System
+
+User preferences are persisted to IndexedDB using a database-driven architecture:
+
+```
+Component ──> usePreference(key, default) ──> PreferenceCache (memory)
+                     ↑                              ↓
+              DB_EVENTS listener          PreferencesRepository (IndexedDB)
+```
+
+**Key files:**
+- `src/data/hooks/usePreferences.ts` - Preferences hook
+- `src/data/repositories/PreferencesRepository.ts` - Database access
+- `src/state/ui/store.ts` - `DEFAULT_PREFERENCES` constants
+
+**Usage:**
+```typescript
+import { usePreference } from "@data/hooks";
+import { DEFAULT_PREFERENCES } from "@state/ui";
+
+const [theme, setTheme] = usePreference("theme", DEFAULT_PREFERENCES.theme);
+```
+
+**Available preferences:**
+- `theme` - Light/dark/system theme
+- `compactMode` - Compact UI mode
+- `showNodeAvatars` - Show node avatars
+- `language` - UI language
+- `timeFormat` - 12h/24h time format
+- `distanceUnits` - Imperial/metric
+- `coordinateFormat` - DD/DMS/UTM
+- `mapStyle` - Map tile style
+- `showNodeLabels` - Show labels on map
+- `showConnectionLines` - Show connection lines on map
+- `autoCenterOnPosition` - Auto-center map on position updates
+- `masterVolume` - Audio volume (0-100)
+- `messageSoundEnabled` - Message notification sounds
+- `alertSoundEnabled` - Alert sounds
+- `packetBatchSize` - Packet batching size
+- `nodesTableColumnVisibility` - Visible columns in nodes table
+- `nodesTableColumnOrder` - Column ordering in nodes table
+- `rasterSources` - Custom map raster sources
 
 ## Database Layer
 
@@ -369,6 +414,7 @@ pnpm db:check     # Validate migrations
 | **State Machine** | Drawer navigation, connection phases |
 | **Observer** | Zustand subscriptions, event bus |
 | **Lazy Loading** | Route-based code splitting with Suspense |
+| **useSyncExternalStore** | Preferences hook with external cache |
 
 ## Code Standards
 
@@ -386,7 +432,9 @@ pnpm db:check     # Validate migrations
 | `src/app/routes.tsx` | Route definitions with guards |
 | `src/data/schema.ts` | Database schema definitions |
 | `src/state/device/store.ts` | Device state management |
-| `src/state/ui/store.ts` | UI preferences and state |
+| `src/state/ui/store.ts` | Ephemeral UI state and DEFAULT_PREFERENCES |
+| `src/data/hooks/usePreferences.ts` | Preferences hook |
+| `src/data/repositories/PreferencesRepository.ts` | Preferences persistence |
 | `src/features/nodes/utils/signalColor.ts` | Signal grading algorithm |
 | `src/shared/utils/typeGuards.ts` | Type guard utilities |
 | `src/DeviceWrapper.tsx` | Device context provider |

@@ -10,6 +10,8 @@ export {
 } from "@shared/hooks/useDeviceContext";
 // Re-export device store
 export {
+  type ConfigConflict,
+  type ConnectionPhase,
   type Device,
   type Page,
   useDeviceStore,
@@ -20,6 +22,7 @@ export {
 // Re-export UI store
 export {
   type CoordinateFormat,
+  DEFAULT_PREFERENCES,
   type DistanceUnits,
   type Language,
   type MapStyle,

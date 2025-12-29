@@ -1,4 +1,4 @@
-import { Mono } from "@app/components/Mono";
+import { Mono } from "@app/shared/index.ts";
 import { getSignalColor } from "@features/nodes/utils/signalColor";
 import type { Protobuf } from "@meshtastic/core";
 import { cn } from "@shared/utils/cn";
