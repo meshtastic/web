@@ -8,10 +8,12 @@ import {
   type FieldGroup,
 } from "../form/ConfigFormFields";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 export const RangeTest = () => {
   const { t } = useTranslation("moduleConfig");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { form, isReady, isDisabledByField } =
     useModuleConfigForm<RangeTestValidation>({
       moduleConfigType: "rangeTest",
@@ -59,6 +61,7 @@ export const RangeTest = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

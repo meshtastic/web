@@ -8,10 +8,12 @@ import {
   type FieldGroup,
 } from "../form/ConfigFormFields";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 export const StoreForward = () => {
   const { t } = useTranslation("moduleConfig");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { form, isReady, isDisabledByField } =
     useModuleConfigForm<StoreForwardValidation>({
       moduleConfigType: "storeForward",
@@ -73,6 +75,7 @@ export const StoreForward = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

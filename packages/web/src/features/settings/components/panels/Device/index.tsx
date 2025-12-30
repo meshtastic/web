@@ -1,4 +1,5 @@
 import { Protobuf } from "@meshtastic/core";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
 import { useDeviceForm } from "../../../hooks/index.ts";
@@ -11,6 +12,7 @@ import {
 
 export const Device = () => {
   const { t } = useTranslation("config");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { getEffectiveConfig } = useDevice();
   const { form, isReady, isDisabledByField } = useDeviceForm();
 
@@ -104,6 +106,7 @@ export const Device = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

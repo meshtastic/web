@@ -1,11 +1,3 @@
-/**
- * TanStack Router Context Types
- *
- * Defines the context type passed to all routes via RouterProvider.
- * Enables dependency injection for easier testing and mocking.
- */
-
-import type { Logger } from "tslog";
 import type { dbClient } from "@data/client";
 import type {
   ChannelRepository,
@@ -19,6 +11,7 @@ import type {
 } from "@data/repositories";
 import type { useDeviceStore } from "@state/device";
 import type { useUIStore } from "@state/ui";
+import type { Logger } from "tslog";
 
 export interface RouterContext {
   services: {

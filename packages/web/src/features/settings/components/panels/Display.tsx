@@ -9,10 +9,12 @@ import {
 } from "../form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 export const Display = () => {
   const { t } = useTranslation("config");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { form, isReady, isDisabledByField } = useConfigForm<DisplayValidation>(
     {
       configType: "display",
@@ -126,6 +128,7 @@ export const Display = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

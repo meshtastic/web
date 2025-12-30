@@ -1,6 +1,7 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import logger from "@core/services/logger";
 import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
+import { toByteArray } from "base64-js";
 import type {
   ChangeEntry,
   ConfigChangeKey,
@@ -129,6 +130,11 @@ export interface Device extends DeviceData {
   isCachedConfig: boolean; // True when using cached config, false after fresh config received
   configConflicts: Map<string, ConfigConflict>; // Tracks config conflicts by "config:variant" or "moduleConfig:variant"
 
+  // Remote administration state
+  remoteAdminTargetNode: number | null; // Node being remotely administered, null = local
+  remoteAdminAuthorized: boolean; // Whether authorized to admin the target node
+  recentlyConnectedNodes: number[]; // History of nodes (local + remote admin targets)
+
   setStatus: (status: Types.DeviceStatusEnum) => void;
   setConnectionPhase: (phase: ConnectionPhase) => void;
   setConnectionId: (id: ConnectionId | null) => void;
@@ -216,6 +222,10 @@ export interface Device extends DeviceData {
     variant: string,
   ) => ConfigConflict | undefined;
   clearConfigConflicts: () => void;
+
+  // Remote administration methods
+  setRemoteAdminTarget: (nodeNum: number | null, targetPublicKey?: string) => void;
+  getAdminDestination: () => number | "self";
 }
 
 export interface deviceState {
@@ -305,6 +315,11 @@ function deviceFactory(
     // Config caching state
     isCachedConfig: false,
     configConflicts: new Map<string, ConfigConflict>(),
+
+    // Remote administration state
+    remoteAdminTargetNode: null,
+    remoteAdminAuthorized: true, // Local is always authorized
+    recentlyConnectedNodes: [],
 
     setStatus: (status: Types.DeviceStatusEnum) => {
       set(
@@ -830,10 +845,11 @@ function deviceFactory(
         return;
       }
 
+      const destination = device.remoteAdminTargetNode ?? "self";
       device.connection?.sendPacket(
         toBinary(Protobuf.Admin.AdminMessageSchema, message),
         Protobuf.Portnums.PortNum.ADMIN_APP,
-        "self",
+        destination,
       );
     },
 
@@ -1166,6 +1182,58 @@ function deviceFactory(
           }
         }),
       );
+    },
+
+    // Remote administration methods
+    setRemoteAdminTarget: (nodeNum: number | null, targetPublicKey?: string) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (device) {
+            device.remoteAdminTargetNode = nodeNum;
+
+            // Check authorization only when entering remote admin
+            if (nodeNum !== null && targetPublicKey) {
+              const adminKeys = device.config.security?.adminKey ?? [];
+              const isAuthorized = adminKeys.some((adminKey) => {
+                if (!adminKey || adminKey.length === 0) return false;
+                try {
+                  const targetBytes = toByteArray(targetPublicKey);
+                  return (
+                    adminKey.length === targetBytes.length &&
+                    adminKey.every((b, i) => b === targetBytes[i])
+                  );
+                } catch {
+                  return false;
+                }
+              });
+              device.remoteAdminAuthorized = isAuthorized;
+            } else if (nodeNum === null) {
+              // Exiting remote admin - reset to authorized (local)
+              device.remoteAdminAuthorized = true;
+            } else {
+              // No public key provided - assume not authorized
+              device.remoteAdminAuthorized = false;
+            }
+
+            // Add to recently connected if not null and not already in list
+            if (
+              nodeNum !== null &&
+              !device.recentlyConnectedNodes.includes(nodeNum)
+            ) {
+              device.recentlyConnectedNodes = [
+                nodeNum,
+                ...device.recentlyConnectedNodes,
+              ].slice(0, 10);
+            }
+          }
+        }),
+      );
+    },
+
+    getAdminDestination: () => {
+      const device = get().devices.get(id);
+      return device?.remoteAdminTargetNode ?? "self";
     },
   };
 }

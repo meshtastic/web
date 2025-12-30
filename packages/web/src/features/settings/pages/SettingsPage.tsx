@@ -7,6 +7,7 @@ import { Button } from "@shared/components/ui/button";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@shared/components/ui/sheet";
 import { useFieldRegistry } from "../services/fieldRegistry";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { cn } from "@shared/utils/cn";
 import { AppPreferencesConfig } from "./AppPreferencesConfig";
 import { BackupRestoreConfig } from "./BackupRestoreConfig";
@@ -15,6 +16,7 @@ import { ModuleConfig } from "./ModuleConfig";
 import { RadioConfig } from "./RadioConfig";
 import { t } from "i18next";
 import {
+  AlertCircleIcon,
   Archive,
   Database,
   FileEdit,
@@ -75,6 +77,7 @@ export default function SettingsPage() {
     useSettingsSave();
 
   const { getChangeCount } = useFieldRegistry();
+  const { isRemoteAdmin, isAuthorized } = useRemoteAdminAuth();
 
   const [activeSection, setActiveSection] = useState<SettingsSection>("radio");
   const [searchQuery, setSearchQuery] = useState("");
@@ -188,6 +191,17 @@ export default function SettingsPage() {
 
         <div className="flex-1 min-h-0 overflow-y-auto [scrollbar-gutter:stable]">
           <div className="p-4 sm:p-6">
+            {isRemoteAdmin && !isAuthorized && (
+              <div className="mb-6 flex items-start gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+                <AlertCircleIcon className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-destructive">Not Authorized</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Add this node's public key to your admin keys in Security settings to enable remote configuration.
+                  </p>
+                </div>
+              </div>
+            )}
             <Suspense fallback={<SettingsLoadingSkeleton />}>
               {activeSection === "radio" && (
                 <RadioConfig searchQuery={searchQuery} />

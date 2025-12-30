@@ -3,7 +3,7 @@ import { useDevice } from "@state/index.ts";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
-import { useSettingsSave } from "./hooks/useSaveSettings.ts";
+import { useSettingsSave } from "../hooks/useSaveSettings.ts";
 
 // Mock dependencies
 vi.mock("@state/index.ts", () => ({

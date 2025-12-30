@@ -8,10 +8,12 @@ import {
   type FieldGroup,
 } from "../form/ConfigFormFields";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 export const NeighborInfo = () => {
   const { t } = useTranslation("moduleConfig");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { form, isReady, isDisabledByField } =
     useModuleConfigForm<NeighborInfoValidation>({
       moduleConfigType: "neighborInfo",
@@ -52,6 +54,7 @@ export const NeighborInfo = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

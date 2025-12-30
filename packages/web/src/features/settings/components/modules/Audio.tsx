@@ -9,10 +9,12 @@ import {
 } from "../form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 export const Audio = () => {
   const { t } = useTranslation("moduleConfig");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { form, isReady, isDisabledByField } =
     useModuleConfigForm<AudioValidation>({
       moduleConfigType: "audio",
@@ -83,6 +85,7 @@ export const Audio = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

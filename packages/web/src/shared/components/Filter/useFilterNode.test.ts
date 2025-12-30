@@ -1,5 +1,5 @@
 import { Protobuf } from "@meshtastic/core";
-import { useFilterNode } from "@shared/components/generic/Filter/useFilterNode.ts";
+import { useFilterNode } from "./useFilterNode.ts";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 

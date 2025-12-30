@@ -1,7 +1,11 @@
 import { DB_EVENTS, dbEvents } from "@data/events";
 import { messageRepo } from "@data/index";
-import type { ConversationType } from "@data/types";
-import { useCallback, useEffect, useState } from "react";
+import { type ConversationType } from "@data/types";
+import { useCallback, useMemo } from "react";
+import { getClient, getDb } from "../../../data/client.ts";
+import { lastRead, messages } from "../../../data/schema.ts";
+import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
+import { useReactiveQuery } from "sqlocal/react";
 
 /**
  * Hook to get unread count for a direct conversation
@@ -13,67 +17,95 @@ export function useUnreadCountDirect(
   myNodeNum: number,
   otherNodeNum: number,
 ) {
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const conversationId = `${myNodeNum}:${otherNodeNum}`;
 
-  const refresh = useCallback(async () => {
-    try {
-      setLoading(true);
-      const count = await messageRepo.getUnreadCountDirect(
-        deviceId,
-        myNodeNum,
-        otherNodeNum,
-      );
-      setUnreadCount(count);
-    } catch (error) {
-      console.error("[useUnreadCountDirect] Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [deviceId, myNodeNum, otherNodeNum]);
+  const query = useMemo(
+    () =>
+      getDb()
+        .select({ count: sql<number>`count(*)` })
+        .from(messages)
+        .leftJoin(
+          lastRead,
+          and(
+            eq(lastRead.ownerNodeNum, messages.ownerNodeNum),
+            eq(lastRead.type, "direct"),
+            eq(lastRead.conversationId, conversationId),
+          ),
+        )
+        .where(
+          and(
+            eq(messages.ownerNodeNum, deviceId),
+            eq(messages.type, "direct"),
+            or(
+              and(
+                eq(messages.fromNode, myNodeNum),
+                eq(messages.toNode, otherNodeNum),
+              ),
+              and(
+                eq(messages.fromNode, otherNodeNum),
+                eq(messages.toNode, myNodeNum),
+              ),
+            ),
+            or(isNull(lastRead.messageId), gt(messages.id, lastRead.messageId)),
+          ),
+        ),
+    [deviceId, myNodeNum, otherNodeNum, conversationId],
+  );
 
-  useEffect(() => {
-    refresh();
+  const { data, status } = useReactiveQuery(getClient(), query);
 
-    // Subscribe to message events for auto-refresh
-    const unsubscribe = dbEvents.subscribe(DB_EVENTS.MESSAGE_SAVED, refresh);
-    return unsubscribe;
-  }, [refresh]);
+  const refresh = useCallback(() => {
+    // No-op for reactive query
+  }, []);
 
-  return { unreadCount, loading, refresh };
+  return {
+    unreadCount: data?.[0]?.count ?? 0,
+    loading: status === "pending" && !data,
+    refresh,
+  };
 }
 
 /**
  * Hook to get unread count for a channel
  */
 export function useUnreadCountBroadcast(deviceId: number, channelId: number) {
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const conversationId = channelId.toString();
 
-  const refresh = useCallback(async () => {
-    try {
-      setLoading(true);
-      const count = await messageRepo.getUnreadCountBroadcast(
-        deviceId,
-        channelId,
-      );
-      setUnreadCount(count);
-    } catch (error) {
-      console.error("[useUnreadCountBroadcast] Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [deviceId, channelId]);
+  const query = useMemo(
+    () =>
+      getDb()
+        .select({ count: sql<number>`count(*)` })
+        .from(messages)
+        .leftJoin(
+          lastRead,
+          and(
+            eq(lastRead.ownerNodeNum, messages.ownerNodeNum),
+            eq(lastRead.type, "channel"),
+            eq(lastRead.conversationId, conversationId),
+          ),
+        )
+        .where(
+          and(
+            eq(messages.ownerNodeNum, deviceId),
+            eq(messages.type, "channel"),
+            eq(messages.channelId, channelId),
+            or(isNull(lastRead.messageId), gt(messages.id, lastRead.messageId)),
+          ),
+        ),
+    [deviceId, channelId, conversationId],
+  );
 
-  useEffect(() => {
-    refresh();
+  const { data, status } = useReactiveQuery(getClient(), query);
 
-    // Subscribe to message events for auto-refresh
-    const unsubscribe = dbEvents.subscribe(DB_EVENTS.MESSAGE_SAVED, refresh);
-    return unsubscribe;
-  }, [refresh]);
+  const refresh = useCallback(() => {
+    // No-op for reactive query
+  }, []);
 
-  return { unreadCount, loading, refresh };
+  return {
+    unreadCount: data?.[0]?.count ?? 0,
+    loading: status === "pending" && !data,
+    refresh,
+  };
 }
 
 /**

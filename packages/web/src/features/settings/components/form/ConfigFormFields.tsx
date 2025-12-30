@@ -115,6 +115,7 @@ interface ConfigFormFieldsProps<T extends FieldValues> {
     disabledBy?: DisabledByConfig<T>[],
     disabled?: boolean,
   ) => boolean;
+  disabled?: boolean; // Globally disable all fields (e.g., unauthorized remote admin)
 }
 
 interface SingleFieldProps<T extends FieldValues> {
@@ -292,6 +293,7 @@ export function ConfigFormFields<T extends FieldValues>({
   form,
   fieldGroups,
   isDisabledByField,
+  disabled = false,
 }: ConfigFormFieldsProps<T>) {
   return (
     <Form {...form}>
@@ -312,7 +314,9 @@ export function ConfigFormFields<T extends FieldValues>({
                 key={field.name}
                 field={field}
                 control={form.control}
-                disabled={isDisabledByField(field.disabledBy, field.disabled)}
+                disabled={
+                  disabled || isDisabledByField(field.disabledBy, field.disabled)
+                }
               />
             ))}
           </div>

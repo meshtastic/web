@@ -1,98 +1,41 @@
 import { NodeError } from "@data/errors";
-import { DB_EVENTS, dbEvents } from "@data/events";
-import { nodeRepo } from "@data/repositories";
+import { nodes, positionLogs, telemetryLogs } from "@data/schema";
 import type { Node, PositionLog, TelemetryLog } from "@data/schema";
+import { and, desc, eq, gt } from "drizzle-orm";
 import type { Result } from "neverthrow";
-import { ResultAsync } from "neverthrow";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
-
-/**
- * Cache for node data keyed by deviceId
- * Supports useSyncExternalStore's synchronous getSnapshot requirement
- */
-class NodeCache {
-  private nodes = new Map<number, Node[]>();
-  private listeners = new Set<() => void>();
-  private static readonly EMPTY_NODES: Node[] = [];
-
-  subscribe(listener: () => void): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
-  }
-
-  private notify(): void {
-    for (const listener of this.listeners) {
-      listener();
-    }
-  }
-
-  get(deviceId: number): Node[] {
-    return this.nodes.get(deviceId) ?? NodeCache.EMPTY_NODES;
-  }
-
-  set(deviceId: number, nodes: Node[]): void {
-    this.nodes.set(deviceId, nodes);
-    this.notify();
-  }
-
-  async refresh(deviceId: number): Promise<Result<Node[], NodeError>> {
-    const result = await ResultAsync.fromPromise(
-      nodeRepo.getNodes(deviceId),
-      (cause) => NodeError.getNodes(deviceId, cause),
-    );
-    if (result.isOk()) {
-      this.set(deviceId, result.value);
-    }
-    return result;
-  }
-}
-
-const nodeCache = new NodeCache();
+import { okAsync, ResultAsync } from "neverthrow";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useReactiveQuery } from "sqlocal/react";
+import { getClient, getDb } from "../../../data/client.ts";
+import { nodeRepo } from "@data/repositories";
 
 /**
  * Hook to fetch all nodes for a device
- * Uses useSyncExternalStore for tear-free concurrent rendering
+ * Now reactive using sqlocal
  */
 export function useNodes(deviceId: number) {
-  // Subscribe to both cache changes and database events
-  const subscribe = useCallback(
-    (onStoreChange: () => void) => {
-      const unsubCache = nodeCache.subscribe(onStoreChange);
-      const unsubDb = dbEvents.subscribe(DB_EVENTS.NODE_UPDATED, () => {
-        nodeCache.refresh(deviceId);
-      });
-
-      return () => {
-        unsubCache();
-        unsubDb();
-      };
-    },
+  const query = useMemo(
+    () => getDb().select().from(nodes).where(eq(nodes.ownerNodeNum, deviceId)),
     [deviceId],
   );
 
-  const getSnapshot = useCallback(() => nodeCache.get(deviceId), [deviceId]);
+  const { data } = useReactiveQuery(getClient(), query);
 
-  const nodes = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-  useEffect(() => {
-    nodeCache.refresh(deviceId);
-  }, [deviceId]);
-
-  // Map nodeNum -> Node
   const nodeMap = useMemo(
-    () => new Map(nodes.map((node) => [node.nodeNum, node])),
-    [nodes],
+    () => new Map((data ?? []).map((node) => [node.nodeNum, node])),
+    [data],
   );
 
-  const refresh = useCallback(() => nodeCache.refresh(deviceId), [deviceId]);
+  const refresh = useCallback(async (): Promise<Result<Node[], NodeError>> => {
+    // No-op, just return current data
+    return okAsync(data ?? []);
+  }, [data]);
 
-  return { nodes, nodeMap, refresh };
+  return {
+    nodes: data ?? [],
+    nodeMap,
+    refresh,
+  };
 }
 
 /**
@@ -112,7 +55,7 @@ export function useNode(deviceId: number, nodeNum: number) {
     const result = await refreshAll();
     if (result.isOk()) {
       const found = result.value.find((n) => n.nodeNum === nodeNum);
-      return ResultAsync.ok(found);
+      return okAsync(found);
     }
     return result.map(() => undefined);
   }, [refreshAll, nodeNum]);
@@ -157,26 +100,37 @@ export function usePositionHistory(
   since?: number,
   limit = 100,
 ) {
-  const [positions, setPositions] = useState<PositionLog[]>([]);
+  const query = useMemo(() => {
+    const conditions = [
+      eq(positionLogs.ownerNodeNum, deviceId),
+      eq(positionLogs.nodeNum, nodeNum),
+    ];
+
+    if (since) {
+      conditions.push(gt(positionLogs.time, new Date(since)));
+    }
+
+    return getDb()
+      .select()
+      .from(positionLogs)
+      .where(and(...conditions))
+      .orderBy(desc(positionLogs.time))
+      .limit(limit);
+  }, [deviceId, nodeNum, since, limit]);
+
+  const { data, status } = useReactiveQuery(getClient(), query);
 
   const refresh = useCallback(async (): Promise<
     Result<PositionLog[], NodeError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      nodeRepo.getPositionHistory(deviceId, nodeNum, since, limit),
-      (cause) => NodeError.getPositionHistory(deviceId, nodeNum, cause),
-    );
-    if (result.isOk()) {
-      setPositions(result.value);
-    }
-    return result;
-  }, [deviceId, nodeNum, since, limit]);
+    return okAsync(data ?? []);
+  }, [data]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return { positions, refresh };
+  return {
+    positions: data ?? [],
+    refresh,
+    isLoading: status === "pending" && !data,
+  };
 }
 
 /**
@@ -188,26 +142,37 @@ export function useTelemetryHistory(
   since?: number,
   limit = 100,
 ) {
-  const [telemetry, setTelemetry] = useState<TelemetryLog[]>([]);
+  const query = useMemo(() => {
+    const conditions = [
+      eq(telemetryLogs.ownerNodeNum, deviceId),
+      eq(telemetryLogs.nodeNum, nodeNum),
+    ];
+
+    if (since) {
+      conditions.push(gt(telemetryLogs.time, new Date(since)));
+    }
+
+    return getDb()
+      .select()
+      .from(telemetryLogs)
+      .where(and(...conditions))
+      .orderBy(desc(telemetryLogs.time))
+      .limit(limit);
+  }, [deviceId, nodeNum, since, limit]);
+
+  const { data, status } = useReactiveQuery(getClient(), query);
 
   const refresh = useCallback(async (): Promise<
     Result<TelemetryLog[], NodeError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      nodeRepo.getTelemetryHistory(deviceId, nodeNum, since, limit),
-      (cause) => NodeError.getTelemetryHistory(deviceId, nodeNum, cause),
-    );
-    if (result.isOk()) {
-      setTelemetry(result.value);
-    }
-    return result;
-  }, [deviceId, nodeNum, since, limit]);
+    return okAsync(data ?? []);
+  }, [data]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return { telemetry, refresh };
+  return {
+    telemetry: data ?? [],
+    refresh,
+    isLoading: status === "pending" && !data,
+  };
 }
 
 /**
@@ -219,6 +184,9 @@ export function usePositionTrails(
   since?: number,
   limitPerNode = 100,
 ) {
+  // Keeping this as non-reactive for now as it involves complex logic
+  // that is not easily mapable to a single reactive query without window functions
+  // or multiple hooks.
   const [trails, setTrails] = useState<Map<number, PositionLog[]>>(new Map());
 
   const stableNodeNums = useMemo(() => nodeNums, [nodeNums]);

@@ -1,9 +1,21 @@
 import { isDefined } from "@app/shared";
 import { useGetMyNode } from "@app/shared/hooks/useGetMyNode";
-import { useConversations, useNodes } from "@data/hooks";
+import { ConnectionService } from "@features/connections/services/ConnectionService";
+import { useConnections, useConversations, useNodes } from "@data/hooks";
 import { NodeAvatar } from "@shared/components/NodeAvatar";
 import { ONLINE_THRESHOLD_SECONDS } from "@shared/components/OnlineIndicator";
 import { Badge } from "@shared/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@shared/components/ui/dropdown-menu";
 import { Link } from "@shared/components/ui/link";
 import {
   Sidebar,
@@ -18,9 +30,12 @@ import {
   SidebarMenuItem,
 } from "@shared/components/ui/sidebar";
 import { useDevice, useDeviceContext } from "@state/index.ts";
-import { useLocation } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
+  CheckIcon,
+  CableIcon,
   LayoutDashboard,
+  LogOutIcon,
   MapIcon,
   MessageSquare,
   Settings,
@@ -63,13 +78,36 @@ const configNavItems = [
 
 export function AppSidebar() {
   const pathname = useLocation().pathname;
+  const navigate = useNavigate();
 
   const { deviceId } = useDeviceContext();
+  const device = useDevice();
   const { t } = useTranslation();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { nodes: allNodes, nodeMap } = useNodes(deviceId);
   const myNode = useGetMyNode();
+  const { connections } = useConnections();
+
+  // Get active connection for disconnect functionality
+  const activeConnection = connections.find(
+    (c) => c.meshDeviceId === deviceId,
+  );
 
   const { conversations } = useConversations(deviceId, myNode.myNodeNum ?? 0);
+
+  // Remote admin state
+  const remoteAdminTarget = device.remoteAdminTargetNode;
+  const isRemoteAdmin = remoteAdminTarget !== null;
+  const isAuthorized = device.remoteAdminAuthorized;
+  const remoteNode = remoteAdminTarget ? nodeMap.get(remoteAdminTarget) : null;
+
+  // Determine what node to display in footer
+  const displayNode = isRemoteAdmin ? remoteNode : myNode?.myNode;
+  const displayNodeNum = isRemoteAdmin
+    ? remoteAdminTarget
+    : myNode?.myNodeNum ?? 0;
+  const displayName = isRemoteAdmin
+    ? `[Remote] ${remoteNode?.longName ?? remoteNode?.shortName ?? "Unknown"}`
+    : displayNode?.longName ?? displayNode?.shortName ?? "Unknown";
 
   // Calculate total unread messages
   const totalUnread = useMemo(() => {
@@ -192,24 +230,114 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border p-4">
-        {myNode?.myNode && (
-          <div className="flex items-center gap-3">
-            <NodeAvatar
-              nodeNum={myNode.myNodeNum ?? 0}
-              longName={myNode.myNode.longName ?? undefined}
-              clickable={true}
-              size="sm"
-            />
-            <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-sm font-medium truncate">
-                {myNode.myNode.longName || myNode.myNode.shortName}
-              </span>
-              <span className="text-xs text-muted-foreground font-mono">
-                !{myNode.myNodeNum?.toString(16)}
-              </span>
+        {displayNode && (
+          <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center gap-3 w-full text-left hover:bg-sidebar-accent/50 rounded-md p-1 -m-1 transition-colors"
+              >
+                <NodeAvatar
+                  nodeNum={displayNodeNum}
+                  longName={displayNode.longName ?? undefined}
+                  size="sm"
+                />
+                <div className="flex flex-col flex-1 min-w-0">
+                  <span className="text-sm font-medium truncate">
+                    {displayName}
+                  </span>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    !{displayNodeNum.toString(16)}
+                  </span>
+                </div>
+                <div
+                  className={`ml-auto h-2 w-2 rounded-full ${isRemoteAdmin && !isAuthorized ? "bg-red-500" : "bg-chart-2"}`}
+                />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="w-56">
+              <DropdownMenuLabel>
+                {isRemoteAdmin ? "Remote Administration" : "My Node"}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Users className="mr-2 h-4 w-4" />
+                  Recently Connected Nodes
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  {/* Local node - always first */}
+                  {myNode?.myNode && (
+                    <DropdownMenuItem
+                      onClick={() => device.setRemoteAdminTarget(null)}
+                    >
+                      {!isRemoteAdmin && (
+                        <CheckIcon className="mr-2 h-4 w-4" />
+                      )}
+                      <span className={!isRemoteAdmin ? "" : "ml-6"}>
+                        {myNode.myNode.longName ?? myNode.myNode.shortName}
+                      </span>
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        Local
+                      </span>
+                    </DropdownMenuItem>
+                  )}
+                  {/* Remote nodes from history */}
+                  {device.recentlyConnectedNodes
+                    .filter((nodeNum) => nodeNum !== myNode?.myNodeNum)
+                    .map((nodeNum) => {
+                      const node = nodeMap.get(nodeNum);
+                      const isSelected = remoteAdminTarget === nodeNum;
+                      return (
+                        <DropdownMenuItem
+                          key={nodeNum}
+                          onClick={() =>
+                            device.setRemoteAdminTarget(nodeNum, node?.publicKey)
+                          }
+                        >
+                          {isSelected && (
+                            <CheckIcon className="mr-2 h-4 w-4" />
+                          )}
+                          <span className={isSelected ? "" : "ml-6"}>
+                            {node?.longName ?? node?.shortName ?? `!${nodeNum.toString(16)}`}
+                          </span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem onClick={() => navigate({ to: "/connections" })}>
+                <CableIcon className="mr-2 h-4 w-4" />
+                Connections
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  if (activeConnection) {
+                    ConnectionService.disconnect(activeConnection);
+                  }
+                }}
+                className="text-destructive focus:text-destructive"
+              >
+                <LogOutIcon className="mr-2 h-4 w-4" />
+                Disconnect
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {isRemoteAdmin && (
+            <div className="text-xs text-muted-foreground mt-3 space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-chart-2" />
+                <span>Authorized - can configure</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-red-500" />
+                <span>Not authorized - read only</span>
+              </div>
             </div>
-            <div className="ml-auto h-2 w-2 rounded-full bg-chart-2" />
-          </div>
+          )}
+          </>
         )}
       </SidebarFooter>
     </Sidebar>

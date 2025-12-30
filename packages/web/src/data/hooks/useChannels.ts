@@ -1,101 +1,109 @@
-import type { Result } from "neverthrow";
-import { ResultAsync } from "neverthrow";
-import { useCallback, useEffect, useState } from "react";
-import logger from "../../core/services/logger.ts";
+import { and, eq } from "drizzle-orm";
+import { type Result, okAsync } from "neverthrow";
+import { useCallback, useMemo } from "react";
+import { useReactiveQuery } from "sqlocal/react";
+import { getClient, getDb } from "../client.ts";
 import { ChannelError } from "../errors.ts";
-import { DB_EVENTS, dbEvents } from "../events.ts";
-import { channelRepo } from "../repositories/index.ts";
+import { channels as channelsTable } from "../schema.ts";
 import type { Channel } from "../schema.ts";
 
 /**
  * Hook to fetch all channels for a device
+ * Now reactive using sqlocal
  */
 export function useChannels(deviceId: number) {
-  const [channels, setChannels] = useState<Channel[]>([]);
+  const query = useMemo(
+    () =>
+      getDb()
+        .select()
+        .from(channelsTable)
+        .where(eq(channelsTable.ownerNodeNum, deviceId)),
+    [deviceId],
+  );
+
+  const { data, status } = useReactiveQuery(getClient(), query);
 
   const refresh = useCallback(async (): Promise<
     Result<Channel[], ChannelError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      channelRepo.getChannels(deviceId),
-      (cause) => ChannelError.getChannels(deviceId, cause),
-    );
-    if (result.isOk()) {
-      setChannels(result.value);
-    } else {
-      logger.error("[useChannels] Failed to fetch channels:", result.error);
-    }
-    return result;
-  }, [deviceId]);
+    return okAsync(data ?? []);
+  }, [data]);
 
-  useEffect(() => {
-    refresh();
-
-    const unsubscribe = dbEvents.subscribe(DB_EVENTS.CHANNEL_UPDATED, refresh);
-    return unsubscribe;
-  }, [refresh]);
-
-  return { channels, refresh };
+  return {
+    channels: data ?? [],
+    refresh,
+    isLoading: status === "pending" && !data,
+  };
 }
 
 /**
  * Hook to fetch a specific channel
+ * Now reactive using sqlocal
  */
 export function useChannel(deviceId: number, channelIndex: number) {
-  const [channel, setChannel] = useState<Channel | undefined>(undefined);
+  const query = useMemo(
+    () =>
+      getDb()
+        .select()
+        .from(channelsTable)
+        .where(
+          and(
+            eq(channelsTable.ownerNodeNum, deviceId),
+            eq(channelsTable.channelIndex, channelIndex),
+          ),
+        )
+        .limit(1),
+    [deviceId, channelIndex],
+  );
+
+  const { data, status } = useReactiveQuery(getClient(), query);
+  const channel = data?.[0];
 
   const refresh = useCallback(async (): Promise<
     Result<Channel | undefined, ChannelError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      channelRepo.getChannel(deviceId, channelIndex),
-      (cause) => ChannelError.getChannel(deviceId, channelIndex, cause),
-    );
-    if (result.isOk()) {
-      setChannel(result.value);
-    } else {
-      logger.error("[useChannel] Failed to fetch channel:", result.error);
-    }
-    return result;
-  }, [deviceId, channelIndex]);
+    return okAsync(channel);
+  }, [channel]);
 
-  useEffect(() => {
-    refresh();
-
-    const unsubscribe = dbEvents.subscribe(DB_EVENTS.CHANNEL_UPDATED, refresh);
-    return unsubscribe;
-  }, [refresh]);
-
-  return { channel, refresh };
+  return {
+    channel,
+    refresh,
+    isLoading: status === "pending" && !data,
+  };
 }
 
 /**
  * Hook to fetch the primary channel
+ * Now reactive using sqlocal
  */
 export function usePrimaryChannel(deviceId: number) {
-  const [channel, setChannel] = useState<Channel | undefined>(undefined);
+  const query = useMemo(
+    () =>
+      getDb()
+        .select()
+        .from(channelsTable)
+        .where(
+          and(
+            eq(channelsTable.ownerNodeNum, deviceId),
+            eq(channelsTable.role, 1), // PRIMARY = 1
+          ),
+        )
+        .limit(1),
+    [deviceId],
+  );
+
+  const { data, status } = useReactiveQuery(getClient(), query);
+  const channel = data?.[0];
 
   const refresh = useCallback(async (): Promise<
     Result<Channel | undefined, ChannelError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      channelRepo.getPrimaryChannel(deviceId),
-      (cause) => ChannelError.getPrimaryChannel(deviceId, cause),
-    );
-    if (result.isOk()) {
-      setChannel(result.value);
-    } else {
-      logger.error("[usePrimaryChannel] Failed to fetch primary channel:", result.error);
-    }
-    return result;
-  }, [deviceId]);
+    return okAsync(channel);
+  }, [channel]);
 
-  useEffect(() => {
-    refresh();
-
-    const unsubscribe = dbEvents.subscribe(DB_EVENTS.CHANNEL_UPDATED, refresh);
-    return unsubscribe;
-  }, [refresh]);
-
-  return { channel, refresh };
+  return {
+    channel,
+    refresh,
+    isLoading: status === "pending" && !data,
+  };
 }

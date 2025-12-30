@@ -10,9 +10,13 @@ import type {
   ConnectionType,
 } from "@data/repositories/ConnectionRepository";
 import type { Connection } from "@data/schema";
+import { connections } from "@data/schema";
 import { useDeviceStore } from "@state/index.ts";
-import { type Result, ResultAsync } from "neverthrow";
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { eq } from "drizzle-orm";
+import { type Result, okAsync } from "neverthrow";
+import { useCallback, useEffect, useMemo } from "react";
+import { useReactiveQuery } from "sqlocal/react";
+import { getClient, getDb } from "../../../data/client.ts";
 import type { NewConnectionInput } from "../components/AddConnectionDialog/AddConnectionDialog.tsx";
 import { BrowserHardware } from "../services/BrowserHardware.ts";
 import { ConnectionService } from "../services/ConnectionService.ts";
@@ -25,146 +29,124 @@ export type { ConnectionStatus, ConnectionType };
 export function useConnections() {
   const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
 
-  const getSnapshot = useCallback(() => connectionCache.get(), []);
+  const query = useMemo(() => getDb().select().from(connections), []);
+  const { data } = useReactiveQuery(getClient(), query);
 
-  const connections = useSyncExternalStore(
-    useCallback((onStoreChange) => {
-      const unsubCache = connectionCache.subscribe(onStoreChange);
+  const connList = data ?? [];
 
-      const unsubService = ConnectionService.subscribe(onStoreChange);
+  const refreshStatuses = useCallback(async () => {
+    if (connList.length > 0) {
+      await ConnectionService.refreshStatuses(connList);
+    }
+  }, [connList]);
 
-      const unsubSerial = BrowserHardware.onSerialDeviceChange(onStoreChange);
+  // Sync statuses on mount and when connection list changes
+  useEffect(() => {
+    refreshStatuses();
+  }, [refreshStatuses]);
 
-      return () => {
-        unsubCache();
-        unsubService();
-        unsubSerial();
-      };
-    }, []),
-    getSnapshot,
-    getSnapshot,
-  );
+  // Listen for hardware changes to re-check statuses
+  useEffect(() => {
+    const unsubSerial = BrowserHardware.onSerialDeviceChange(() => {
+      refreshStatuses();
+    });
+
+    let unsubBt: (() => void) | undefined;
+    BrowserHardware.onAnyBluetoothDisconnect(() => {
+      refreshStatuses();
+    }).then((unsub) => {
+      unsubBt = unsub;
+    });
+
+    return () => {
+      unsubSerial();
+      unsubBt?.();
+    };
+  }, [refreshStatuses]);
 
   const refresh = useCallback(async (): Promise<
     Result<Connection[], ConnectionError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      connectionRepo.getConnections(),
-      (cause: unknown) => ConnectionError.getConnections(cause),
-    );
-    if (result.isOk()) {
-      connectionCache.set(result.value);
-    }
-    return result;
-  }, []);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  useEffect(() => {
-    let cleanup: (() => void) | undefined;
-
-    BrowserHardware.onAnyBluetoothDisconnect(() => {
-      refresh();
-    }).then((unsub) => {
-      cleanup = unsub;
-    });
-
-    return () => {
-      cleanup?.();
-    };
-  }, [refresh]);
+    // No-op for reactive query, but we can trigger status check
+    await refreshStatuses();
+    return okAsync(connList);
+  }, [connList, refreshStatuses]);
 
   const connect = useCallback(
     async (
       id: number,
       opts?: { allowPrompt?: boolean; skipConfig?: boolean },
     ) => {
-      const conn = connections.find((c) => c.id === id);
+      const conn = connList.find((c) => c.id === id);
       if (!conn) {
         return false;
       }
 
       const result = await ConnectionService.connect(conn, opts);
-      await refresh();
       return result;
     },
-    [connections, refresh],
+    [connList],
   );
 
   const disconnect = useCallback(
     async (id: number) => {
-      const conn = connections.find((c) => c.id === id);
+      const conn = connList.find((c) => c.id === id);
       if (!conn) {
         return;
       }
 
       await ConnectionService.disconnect(conn);
-      await refresh();
     },
-    [connections, refresh],
+    [connList],
   );
 
   const removeConnection = useCallback(
     async (id: number) => {
-      const conn = connections.find((c) => c.id === id);
+      const conn = connList.find((c) => c.id === id);
       if (!conn) {
         return;
       }
 
       await ConnectionService.remove(conn);
-      await refresh();
     },
-    [connections, refresh],
+    [connList],
   );
 
-  const addConnection = useCallback(
-    async (input: NewConnectionInput) => {
-      const conn = await connectionRepo.createConnection({
-        type: input.type,
-        name:
-          input.name.length === 0 && input.type === "http"
-            ? input.url
-            : input.name,
-        status: "disconnected",
-        url: input.type === "http" ? input.url : null,
-        deviceId: input.type === "bluetooth" ? input.deviceId : null,
-        deviceName: input.type === "bluetooth" ? input.deviceName : null,
-        gattServiceUUID:
-          input.type === "bluetooth" ? input.gattServiceUUID : null,
-        usbVendorId: input.type === "serial" ? input.usbVendorId : null,
-        usbProductId: input.type === "serial" ? input.usbProductId : null,
-      });
-      await refresh();
-      return conn;
-    },
-    [refresh],
-  );
+  const addConnection = useCallback(async (input: NewConnectionInput) => {
+    const conn = await connectionRepo.createConnection({
+      type: input.type,
+      name:
+        input.name.length === 0 && input.type === "http"
+          ? input.url
+          : input.name,
+      status: "disconnected",
+      url: input.type === "http" ? input.url : null,
+      deviceId: input.type === "bluetooth" ? input.deviceId : null,
+      deviceName: input.type === "bluetooth" ? input.deviceName : null,
+      gattServiceUUID:
+        input.type === "bluetooth" ? input.gattServiceUUID : null,
+      usbVendorId: input.type === "serial" ? input.usbVendorId : null,
+      usbProductId: input.type === "serial" ? input.usbProductId : null,
+    });
+    return conn;
+  }, []);
 
   const setDefaultConnection = useCallback(
     async (id: number) => {
-      const conn = connections.find((c) => c.id === id);
+      const conn = connList.find((c) => c.id === id);
       if (conn) {
         await connectionRepo.setDefault(id, !conn.isDefault);
-        await refresh();
       }
     },
-    [connections, refresh],
+    [connList],
   );
 
-  const refreshStatuses = useCallback(async () => {
-    await ConnectionService.refreshStatuses(connections);
-    await refresh();
-  }, [connections, refresh]);
-
   const syncConnectionStatuses = useCallback(async () => {
-    await ConnectionService.syncStatuses(connections, activeDeviceId);
-    await refresh();
-  }, [connections, activeDeviceId, refresh]);
+    await ConnectionService.syncStatuses(connList, activeDeviceId);
+  }, [connList, activeDeviceId]);
 
   return {
-    connections,
+    connections: connList,
     refresh,
     addConnection,
     connect,
@@ -177,51 +159,21 @@ export function useConnections() {
 }
 
 /**
- * Cache for connection data to support useSyncExternalStore
- */
-class ConnectionCache {
-  private data: Connection[] = [];
-  private listeners = new Set<() => void>();
-
-  subscribe(listener: () => void): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
-  }
-
-  private notify(): void {
-    for (const listener of this.listeners) {
-      listener();
-    }
-  }
-
-  get(): Connection[] {
-    return this.data;
-  }
-
-  set(connections: Connection[]): void {
-    this.data = connections;
-    this.notify();
-  }
-}
-
-const connectionCache = new ConnectionCache();
-
-/**
  * Hook to fetch a single connection
  */
 export function useConnection(id: number) {
-  const { connections } = useConnections();
-  const connection = connections.find((c) => c.id === id);
+  const query = useMemo(
+    () => getDb().select().from(connections).where(eq(connections.id, id)),
+    [id],
+  );
+  const { data } = useReactiveQuery(getClient(), query);
+  const connection = data?.[0];
 
   const refresh = useCallback(async (): Promise<
     Result<Connection | undefined, ConnectionError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      connectionRepo.getConnection(id),
-      (cause: unknown) => ConnectionError.getConnection(id, cause),
-    );
-    return result;
-  }, [id]);
+    return okAsync(connection);
+  }, [connection]);
 
   return { connection, refresh };
 }
@@ -230,18 +182,18 @@ export function useConnection(id: number) {
  * Hook to fetch the default connection
  */
 export function useDefaultConnection() {
-  const { connections } = useConnections();
-  const connection = connections.find((c) => c.isDefault);
+  const query = useMemo(
+    () => getDb().select().from(connections).where(eq(connections.isDefault, true)),
+    [],
+  );
+  const { data } = useReactiveQuery(getClient(), query);
+  const connection = data?.[0];
 
   const refresh = useCallback(async (): Promise<
     Result<Connection | undefined, ConnectionError>
   > => {
-    const result = await ResultAsync.fromPromise(
-      connectionRepo.getDefaultConnection(),
-      (cause: unknown) => ConnectionError.getDefaultConnection(cause),
-    );
-    return result;
-  }, []);
+    return okAsync(connection);
+  }, [connection]);
 
   return { connection, refresh };
 }

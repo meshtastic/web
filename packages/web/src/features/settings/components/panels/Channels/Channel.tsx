@@ -6,6 +6,7 @@ import {
 } from "@features/settings/components/form/ConfigFormFields";
 import { useChannelForm } from "@features/settings/hooks";
 import { PkiRegenerateDialog } from "@shared/components/Dialog/PkiRegenerateDialog";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,6 +18,7 @@ export interface SettingsPanelProps {
 export const Channel = ({ channel }: SettingsPanelProps) => {
   const { config } = useDevice();
   const { t } = useTranslation(["channels", "ui", "dialog"]);
+  const { isAuthorized } = useRemoteAdminAuth();
   const [preSharedDialogOpen, setPreSharedDialogOpen] = useState(false);
 
   const {
@@ -138,6 +140,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
         form={form}
         fieldGroups={fieldGroups}
         isDisabledByField={isDisabledByField}
+        disabled={!isAuthorized}
       />
       <PkiRegenerateDialog
         text={{

@@ -1,6 +1,8 @@
-import { use, useCallback, useMemo, useState } from "react";
-import { packetLogRepo } from "../repositories/index.ts";
-import type { PacketLog } from "../schema.ts";
+import { and, desc, eq, isNotNull } from "drizzle-orm";
+import { useCallback, useMemo } from "react";
+import { useReactiveQuery } from "sqlocal/react";
+import { getClient, getDb } from "../client.ts";
+import { packetLogs } from "../schema.ts";
 
 export interface SignalLog {
   id: number;
@@ -9,71 +11,9 @@ export interface SignalLog {
   rxRssi: number;
 }
 
-// Cache for signal log promises
-const signalLogPromiseCache = new Map<string, Promise<SignalLog[]>>();
-
-async function fetchSignalLogs(
-  deviceId: number,
-  nodeNum: number,
-  limit: number,
-): Promise<SignalLog[]> {
-  const packets = await packetLogRepo.getPacketsFromNode(
-    deviceId,
-    nodeNum,
-    limit * 2, // Fetch more since we filter
-  );
-
-  // Filter packets that have signal data and map to SignalLog
-  return packets
-    .filter(
-      (p): p is PacketLog & { rxSnr: number; rxRssi: number; rxTime: Date } =>
-        p.rxSnr !== null && p.rxRssi !== null && p.rxTime !== null,
-    )
-    .slice(0, limit)
-    .map((p) => ({
-      id: p.id,
-      rxTime: p.rxTime,
-      rxSnr: p.rxSnr,
-      rxRssi: p.rxRssi,
-    }));
-}
-
-function getSignalLogsPromise(
-  deviceId: number,
-  nodeNum: number,
-  limit: number,
-): Promise<SignalLog[]> {
-  const key = `${deviceId}:${nodeNum}:${limit}`;
-  if (!signalLogPromiseCache.has(key)) {
-    signalLogPromiseCache.set(key, fetchSignalLogs(deviceId, nodeNum, limit));
-  }
-  return signalLogPromiseCache.get(key) as Promise<SignalLog[]>;
-}
-
-export function invalidateSignalLogsCache(
-  deviceId?: number,
-  nodeNum?: number,
-): void {
-  if (deviceId !== undefined && nodeNum !== undefined) {
-    for (const key of signalLogPromiseCache.keys()) {
-      if (key.startsWith(`${deviceId}:${nodeNum}:`)) {
-        signalLogPromiseCache.delete(key);
-      }
-    }
-  } else if (deviceId !== undefined) {
-    for (const key of signalLogPromiseCache.keys()) {
-      if (key.startsWith(`${deviceId}:`)) {
-        signalLogPromiseCache.delete(key);
-      }
-    }
-  } else {
-    signalLogPromiseCache.clear();
-  }
-}
-
 /**
  * Hook to get signal logs (SNR/RSSI) for a specific node
- * Uses React's `use()` API for Suspense integration
+ * Now reactive! Automatically updates when new packets are logged.
  */
 export function useSignalLogs(
   deviceId: number,
@@ -84,24 +24,58 @@ export function useSignalLogs(
   refresh: () => void;
   isRefreshing: boolean;
 } {
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const query = useMemo(
+    () =>
+      getDb()
+        .select({
+          id: packetLogs.id,
+          rxTime: packetLogs.rxTime,
+          rxSnr: packetLogs.rxSnr,
+          rxRssi: packetLogs.rxRssi,
+        })
+        .from(packetLogs)
+        .where(
+          and(
+            eq(packetLogs.ownerNodeNum, deviceId),
+            eq(packetLogs.fromNode, nodeNum),
+            isNotNull(packetLogs.rxSnr),
+            isNotNull(packetLogs.rxRssi),
+          ),
+        )
+        .orderBy(desc(packetLogs.rxTime))
+        .limit(limit),
+    [deviceId, nodeNum, limit],
+  );
 
-  // Invalidate cache when refreshKey changes
-  useMemo(() => {
-    if (refreshKey > 0) {
-      invalidateSignalLogsCache(deviceId, nodeNum);
-    }
-  }, [refreshKey, deviceId, nodeNum]);
+  const { data, status } = useReactiveQuery(getClient(), query);
 
-  const logs = use(getSignalLogsPromise(deviceId, nodeNum, limit));
+  const logs: SignalLog[] = useMemo(() => {
+    return (data ?? []).reduce<SignalLog[]>((acc, p) => {
+      if (p.rxSnr !== null && p.rxRssi !== null) {
+        acc.push({
+          id: p.id,
+          rxTime: p.rxTime,
+          rxSnr: p.rxSnr,
+          rxRssi: p.rxRssi,
+        });
+      }
+      return acc;
+    }, []);
+  }, [data]);
 
   const refresh = useCallback(() => {
-    setIsRefreshing(true);
-    invalidateSignalLogsCache(deviceId, nodeNum);
-    setRefreshKey((k) => k + 1);
-    setTimeout(() => setIsRefreshing(false), 100);
-  }, [deviceId, nodeNum]);
+    // No-op for reactive query
+  }, []);
 
-  return { logs, refresh, isRefreshing };
+  // To maintain Suspense compatibility, we throw the query (which is thenable)
+  // when the status is pending and we don't have data yet.
+  if (status === "pending" && !data) {
+    throw query;
+  }
+
+  return {
+    logs,
+    refresh,
+    isRefreshing: status === "pending",
+  };
 }

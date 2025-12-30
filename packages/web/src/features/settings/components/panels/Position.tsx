@@ -1,5 +1,6 @@
 import { Protobuf } from "@meshtastic/core";
 import type { FlagName } from "@shared/hooks/usePositionFlags";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
 import { usePositionForm } from "../../hooks/index.ts";
@@ -12,6 +13,7 @@ import {
 
 export const Position = () => {
   const { t } = useTranslation("config");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { getEffectiveConfig } = useDevice();
   const {
     form,
@@ -182,6 +184,7 @@ export const Position = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

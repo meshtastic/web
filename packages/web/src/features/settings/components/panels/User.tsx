@@ -5,10 +5,12 @@ import {
 } from "../form/ConfigFormFields";
 import { useUserForm } from "../../hooks";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 export const User = () => {
   const { t } = useTranslation("config");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { form, isReady, isDisabledByField } = useUserForm();
 
   if (!isReady) {
@@ -67,6 +69,7 @@ export const User = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

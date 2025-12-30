@@ -1,3 +1,4 @@
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
 import { useModuleConfigForm } from "../../hooks/useModuleConfigForm.ts";
@@ -13,6 +14,7 @@ import {
 
 export const MQTT = () => {
   const { t } = useTranslation("moduleConfig");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { config } = useDevice();
 
   const { form, isReady, isDisabledByField } =
@@ -204,6 +206,7 @@ export const MQTT = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

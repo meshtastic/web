@@ -1,10 +1,10 @@
-import { Mono } from "@app/components/Mono";
-import { TimeAgo } from "@app/components/TimeAgo";
+import { Mono } from "@shared/components/Mono";
+import { TimeAgo } from "@shared/components/TimeAgo";
 import {
   type DataRow,
   type Heading,
   Table,
-} from "@shared/components/generic/Table/index.tsx";
+} from "./index.tsx";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 

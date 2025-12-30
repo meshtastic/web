@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DB_EVENTS, dbEvents } from "../events.ts";
-import { nodeRepo } from "../repositories/index.ts";
+import { DB_EVENTS, dbEvents } from "@data/events";
+import { nodeRepo } from "@data/repositories";
 import {
   useFavoriteNodes,
   useNode,
@@ -13,7 +13,7 @@ import {
 } from "./useNodes.ts";
 
 // Mock dependencies
-vi.mock("../repositories", () => ({
+vi.mock("@data/repositories", () => ({
   nodeRepo: {
     getNodes: vi.fn(),
     getNode: vi.fn(),
@@ -25,7 +25,7 @@ vi.mock("../repositories", () => ({
   },
 }));
 
-vi.mock("../events", () => ({
+vi.mock("@data/events", () => ({
   dbEvents: {
     subscribe: vi.fn(),
   },

@@ -144,7 +144,7 @@ export const NodeDetailsDrawer = ({
   open,
   onOpenChange,
 }: NodeDetailsDrawerProps) => {
-  const { hardware, setDialogOpen } = useDevice();
+  const { hardware, setDialogOpen, setRemoteAdminTarget } = useDevice();
   const { current } = useLanguage();
   const { deviceId } = useDeviceContext();
   const { nodeNumDetails } = useUIStore();
@@ -624,6 +624,10 @@ export const NodeDetailsDrawer = ({
                       <ActionItem
                         icon={SettingsIcon}
                         label="Remote Administration"
+                        onClick={() => {
+                          setRemoteAdminTarget(node.nodeNum, node.publicKey);
+                          onOpenChange(false);
+                        }}
                         showChevron
                       />
                     </CardContent>

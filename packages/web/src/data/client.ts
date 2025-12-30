@@ -80,10 +80,10 @@ class DatabaseClient {
 
     // Check if we have an existing database without migration tracking
     // (database was created before we added migration tracking)
-    const existingTables = await sql<{ name: string }[]>(
+    const existingTables = await sql<{ name: string }>(
       `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != '__drizzle_migrations'`,
     );
-    const appliedMigrations = await sql<{ migration_id: string }[]>(
+    const appliedMigrations = await sql<{ migration_id: string }>(
       `SELECT migration_id FROM __drizzle_migrations`,
     );
 

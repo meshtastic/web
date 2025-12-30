@@ -6,10 +6,12 @@ import {
 import { Protobuf } from "@meshtastic/core";
 import { useNetworkForm } from "../../../hooks";
 import { ConfigFormSkeleton } from "../../../pages/SettingsLoading";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 export const Network = () => {
   const { t } = useTranslation("config");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { form, isReady, isDisabledByField } = useNetworkForm();
 
   if (!isReady) {
@@ -162,6 +164,7 @@ export const Network = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };

@@ -8,10 +8,12 @@ import {
   type FieldGroup,
 } from "../form/ConfigFormFields";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 export const Power = () => {
   const { t } = useTranslation("config");
+  const { isAuthorized } = useRemoteAdminAuth();
   const { form, isReady, isDisabledByField } = useConfigForm<PowerValidation>({
     configType: "power",
     schema: PowerValidationSchema,
@@ -107,6 +109,7 @@ export const Power = () => {
       form={form}
       fieldGroups={fieldGroups}
       isDisabledByField={isDisabledByField}
+      disabled={!isAuthorized}
     />
   );
 };
