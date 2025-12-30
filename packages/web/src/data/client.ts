@@ -41,7 +41,10 @@ class DatabaseClient {
     logger.debug("[DB] Initializing database...");
 
     // Create SQLocalDrizzle instance and get the driver
-    this.sqlocalDrizzle = new SQLocalDrizzle("meshtastic.db");
+    this.sqlocalDrizzle = new SQLocalDrizzle({
+      databasePath: "meshtastic.db",
+      reactive: true,
+    });
     const { driver } = this.sqlocalDrizzle;
 
     // Create Drizzle instance with the SQLocalDrizzle driver
@@ -107,7 +110,9 @@ class DatabaseClient {
     // Run each migration that hasn't been applied yet
     for (const migration of migrations) {
       if (appliedSet.has(migration.id)) {
-        logger.debug(`[DB] Migration ${migration.id} already applied, skipping`);
+        logger.debug(
+          `[DB] Migration ${migration.id} already applied, skipping`,
+        );
         continue;
       }
 
@@ -135,6 +140,16 @@ class DatabaseClient {
   }
 
   /**
+   * Get the SQLocalDrizzle instance
+   */
+  get client() {
+    if (!this.sqlocalDrizzle) {
+      throw new Error("Database not initialized. Call init() first.");
+    }
+    return this.sqlocalDrizzle;
+  }
+
+  /**
    * Get the Drizzle database instance
    */
   get db() {
@@ -148,7 +163,7 @@ class DatabaseClient {
    * Get raw SQL access for direct queries
    */
   get sql() {
-    return this.sqlocalDrizzle.sql;
+    return this.client.sql;
   }
 
   /**
@@ -198,6 +213,9 @@ export const dbClient = DatabaseClient.getInstance();
 
 // Export the db getter for convenience
 export const getDb = () => dbClient.db;
+
+// Export the client getter for convenience
+export const getClient = () => dbClient.client;
 
 // Export for direct SQL access
 export const getSql = () => dbClient.sql;

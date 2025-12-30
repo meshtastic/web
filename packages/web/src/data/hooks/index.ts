@@ -40,7 +40,7 @@ export {
   useTelemetryHistory,
 } from "@features/nodes/hooks/useNodes";
 // Packet log hooks
-export { invalidatePacketLogsCache, usePacketLogs } from "./usePacketLogs.ts";
+export { usePacketLogs } from "./usePacketLogs.ts";
 // Preferences hooks
 export {
   invalidatePreferenceCache,

@@ -1,71 +1,45 @@
-import { use, useCallback, useMemo, useState } from "react";
+import { desc, eq } from "drizzle-orm";
+import { useCallback, useMemo } from "react";
+import { useReactiveQuery } from "sqlocal/react";
+import { getClient, getDb } from "../client.ts";
 import { packetLogRepo } from "../repositories/index.ts";
-import type { PacketLog } from "../schema.ts";
-
-// Cache for packet log promises
-const packetLogPromiseCache = new Map<string, Promise<PacketLog[]>>();
-
-function getPacketLogsPromise(
-  deviceId: number,
-  limit: number,
-): Promise<PacketLog[]> {
-  const key = `${deviceId}:${limit}`;
-  if (!packetLogPromiseCache.has(key)) {
-    packetLogPromiseCache.set(key, packetLogRepo.getPackets(deviceId, limit));
-  }
-  return packetLogPromiseCache.get(key) as Promise<PacketLog[]>;
-}
-
-export function invalidatePacketLogsCache(deviceId?: number): void {
-  if (deviceId !== undefined) {
-    // Invalidate all cache entries for this device
-    for (const key of packetLogPromiseCache.keys()) {
-      if (key.startsWith(`${deviceId}:`)) {
-        packetLogPromiseCache.delete(key);
-      }
-    }
-  } else {
-    packetLogPromiseCache.clear();
-  }
-}
+import { type PacketLog, packetLogs } from "../schema.ts";
 
 /**
- * Hook to get packet logs for a device
- * Uses React's `use()` API for Suspense integration
+ * Reactive hook to get packet logs for a device
  */
 export function usePacketLogs(
   deviceId: number,
   limit = 100,
 ): {
   packets: PacketLog[];
-  refresh: () => void;
-  isRefreshing: boolean;
   clearLogs: () => Promise<void>;
 } {
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const query = useMemo(
+    () =>
+      getDb()
+        .select()
+        .from(packetLogs)
+        .where(eq(packetLogs.ownerNodeNum, deviceId))
+        .orderBy(desc(packetLogs.rxTime))
+        .limit(limit),
+    [deviceId, limit],
+  );
 
-  // Invalidate cache when refreshKey changes
-  useMemo(() => {
-    if (refreshKey > 0) {
-      invalidatePacketLogsCache(deviceId);
-    }
-  }, [refreshKey, deviceId]);
-
-  const packets = use(getPacketLogsPromise(deviceId, limit));
-
-  const refresh = useCallback(() => {
-    setIsRefreshing(true);
-    invalidatePacketLogsCache(deviceId);
-    setRefreshKey((k) => k + 1);
-    setTimeout(() => setIsRefreshing(false), 100);
-  }, [deviceId]);
+  const { data: packets, status } = useReactiveQuery(getClient(), query);
 
   const clearLogs = useCallback(async () => {
     await packetLogRepo.deleteAllPackets(deviceId);
-    invalidatePacketLogsCache(deviceId);
-    setRefreshKey((k) => k + 1);
   }, [deviceId]);
 
-  return { packets, refresh, isRefreshing, clearLogs };
+  // To maintain Suspense compatibility, we throw the query (which is thenable)
+  // when the status is pending and we don't have data yet.
+  if (status === "pending" && !packets) {
+    throw query;
+  }
+
+  return {
+    packets: packets ?? [],
+    clearLogs,
+  };
 }
