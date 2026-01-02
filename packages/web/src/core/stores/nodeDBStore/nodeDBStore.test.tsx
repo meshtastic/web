@@ -95,18 +95,43 @@ describe("NodeDB store", () => {
     const { useNodeDBStore } = await freshStore();
     const db = useNodeDBStore.getState().addNodeDB(1);
 
-    db.processPacket({ from: 50, time: 1111, snr: 7 } as any);
+    db.processPacket({
+      from: 50,
+      time: 1111,
+      snr: 7,
+      hopStart: 5,
+      hopLimit: 2,
+      hasBitfield: true,
+    } as any);
     expect(db.getNode(50)).toBeTruthy();
     expect(db.getNode(50)?.lastHeard).toBe(1111);
     expect(db.getNode(50)?.snr).toBe(7);
+    expect(db.getNode(50)?.hopsAway).toBe(3);
 
-    db.processPacket({ from: 50, time: 2222, snr: 9 } as any);
+    db.processPacket({
+      from: 50,
+      time: 2222,
+      snr: 9,
+      hopStart: 6,
+      hopLimit: 3,
+      hasBitfield: true,
+    } as any);
     expect(db.getNode(50)?.lastHeard).toBe(2222);
     expect(db.getNode(50)?.snr).toBe(9);
+    expect(db.getNode(50)?.hopsAway).toBe(3);
 
-    db.processPacket({ from: 50, time: 0, snr: 9 } as any);
+    // when hopStart===0 and hasBitfield is false, hopsAway should be undefined
+    db.processPacket({
+      from: 50,
+      time: 0,
+      snr: 9,
+      hopStart: 0,
+      hopLimit: 0,
+      hasBitfield: false,
+    } as any);
     expect(db.getNode(50)?.lastHeard).toBeCloseTo(Date.now() / 1000, -1); // within 1s, note lastHeard is in seconds
     expect(db.getNode(50)?.snr).toBe(9);
+    expect(db.getNode(50)?.hopsAway).toBeUndefined();
   });
 
   it("addUser and addPosition updates existing or creates new nodes", async () => {

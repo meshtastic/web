@@ -14,6 +14,9 @@ type ProcessPacketParams = {
   from: number;
   snr: number;
   time: number;
+  hopStart: number;
+  hopLimit: number;
+  hasBitfield: boolean;
 };
 
 export type { NodeError, ProcessPacketParams, NodeErrorType };

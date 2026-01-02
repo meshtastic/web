@@ -270,12 +270,18 @@ function nodeDBFactory(
           }
           const node = nodeDB.nodeMap.get(data.from);
           const nowSec = Math.floor(Date.now() / 1000); // lastHeard is in seconds(!)
+          const hopsAway =
+            data.hopLimit > data.hopStart ||
+            (data.hopStart === 0 && !data.hasBitfield)
+              ? undefined
+              : data.hopStart - data.hopLimit;
 
           if (node) {
             const updated = {
               ...node,
               lastHeard: data.time > 0 ? data.time : nowSec,
               snr: data.snr,
+              hopsAway,
             };
             nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(data.from, updated);
           } else {
@@ -285,6 +291,7 @@ function nodeDBFactory(
                 num: data.from,
                 lastHeard: data.time > 0 ? data.time : nowSec, // fallback to now if time is 0 or negative,
                 snr: data.snr,
+                hopsAway,
               }),
             );
           }
