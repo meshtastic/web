@@ -306,7 +306,7 @@
     }
   },
   "paxcounter": {
-    "title": "Paxcounter Settings",
+    "title": "Настройки на Paxcounter",
     "description": "Настройки за модула Paxcounter",
     "enabled": {
       "label": "Модулът е активиран",
@@ -330,7 +330,7 @@
     "description": "Настройки на модула за тестване на обхвата",
     "enabled": {
       "label": "Модулът е активиран",
-      "description": "Enable Range Test"
+      "description": "Активиране на теста на обхвата"
     },
     "sender": {
       "label": "Интервал на съобщенията",

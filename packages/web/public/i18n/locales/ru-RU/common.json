@@ -3,7 +3,7 @@
     "apply": "Применить",
     "addConnection": "Добавить подключение",
     "saveConnection": "Сохранить подключение",
-    "backupKey": "Бэкап ключа",
+    "backupKey": "Резервное копирование",
     "cancel": "Отмена",
     "connect": "Подключиться",
     "clearMessages": "Очистить сообщения",
@@ -15,45 +15,44 @@
     "disconnect": "Отключиться",
     "export": "Экспорт",
     "generate": "Создать",
-    "regenerate": "Создать снова",
+    "regenerate": "Сгенерировать новый",
     "import": "Импортировать",
     "message": "Сообщение",
     "now": "Сейчас",
     "ok": "Лады",
     "print": "Печать",
     "remove": "Удалить",
-    "requestNewKeys": "Запрос нового ключа",
+    "requestNewKeys": "Запросить новые ключи",
     "requestPosition": "Запрос позиции",
     "reset": "Сброс",
     "retry": "Повторить",
     "save": "Сохранить",
     "setDefault": "Установить по умолчанию",
-    "unsetDefault": "Убрать умолчание",
+    "unsetDefault": "Снять по умолчанию",
     "scanQr": "Сканировать QR код",
-    "traceRoute": "Отследить маршрут",
-    "submit": "Отправить"
+    "traceRoute": "Трассировка маршрута",
+    "submit": "Продолжить"
   },
   "app": {
     "title": "Meshtastic",
-    "fullTitle": "Веб клиент Meshtastic"
+    "fullTitle": "Веб-клиент Meshtastic"
   },
   "loading": "Загрузка...",
   "unit": {
-    "cps": "CPS",
-    "dbm": "dBm",
+    "cps": "Чирпов",
+    "dbm": "дБм",
     "hertz": "Гц",
     "hop": {
-      "one": "Прыжок",
-      "plural": "Прыжков"
+      "one": "Хоп",
+      "plural": "Хопов"
     },
     "hopsAway": {
-      "one": "{{count}} прыжок до",
-      "plural": "{{count}} прыжков",
-      "unknown": "? прыжков"
+      "one": "{{count}} хопов до",
+      "plural": "{{count}} хопов",
+      "unknown": "Неизвестное кол-во хопов"
     },
     "megahertz": "МГц",
-    "kilohertz": "кГц",
-    "raw": "raw",
+    "raw": "исх.",
     "meter": {
       "one": "Метр",
       "plural": "Метров",
@@ -92,74 +91,74 @@
       "plural": "Месяцев"
     },
     "year": {
-      "one": "Year",
-      "plural": "Years"
+      "one": "Год",
+      "plural": "Лет"
     },
     "snr": "Сигнал/шум",
     "volt": {
-      "one": "Volt",
-      "plural": "Volts",
+      "one": "Вольт",
+      "plural": "Вольт",
       "suffix": "V"
     },
     "record": {
-      "one": "Records",
-      "plural": "Records"
+      "one": "Записи",
+      "plural": "Записи"
     },
     "degree": {
-      "one": "Degree",
-      "plural": "Degrees",
+      "one": "Градус",
+      "plural": "Градусы",
       "suffix": "°"
     }
   },
   "security": {
-    "0bit": "Empty",
-    "8bit": "8 bit",
-    "128bit": "128 bit",
-    "256bit": "256 bit"
+    "0bit": "Пусто",
+    "8bit": "8 бит",
+    "128bit": "128 бит",
+    "256bit": "256 бит"
   },
   "unknown": {
     "longName": "Неизвестно",
-    "shortName": "UNK",
-    "notAvailable": "N/A",
+    "shortName": "Н/И",
+    "notAvailable": "Н/Д",
     "num": "??"
   },
   "nodeUnknownPrefix": "!",
-  "unset": "UNSET",
+  "unset": "Не установлено",
   "fallbackName": "Meshtastic {{last4}}",
-  "node": "Node",
+  "node": "Узел",
   "formValidation": {
-    "unsavedChanges": "Unsaved changes",
+    "unsavedChanges": "Несохраненные изменения",
     "tooBig": {
-      "string": "Too long, expected less than or equal to {{maximum}} characters.",
-      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+      "string": "Слишком большое, должно быть меньше или равно {{maximum}} символов",
+      "number": "Слишком большое, число должно быть меньше или равно {{maximum}}",
+      "bytes": "Слишком большое, должно быть меньше или равно {{params.maximum}} байтов"
     },
     "tooSmall": {
-      "string": "Too short, expected more than or equal to {{minimum}} characters.",
-      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+      "string": "Слишком короткий, должно быть больше или равно {{minimum}} символов",
+      "number": "Слишком маленькое число, должно быть больше или равно {{minimum}}"
     },
     "invalidFormat": {
-      "ipv4": "Invalid format, expected an IPv4 address.",
-      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+      "ipv4": "Неверный формат, должен быть IPv4 адрес",
+      "key": "Неверный формат, должен быть Base64-кодированный общий ключ (PSK)"
     },
     "invalidType": {
-      "number": "Invalid type, expected a number."
+      "number": "Недопустимый тип, должно быть число"
     },
     "pskLength": {
-      "0bit": "Key is required to be empty.",
-      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+      "0bit": "Ключ должен быть пустым",
+      "8bit": "Общий ключ должен быть 8-битным (PSK)",
+      "128bit": "Общий ключ должен быть 128-битным (PSK)",
+      "256bit": "Общий ключ должен быть 256-битным (PSK)"
     },
     "required": {
-      "generic": "This field is required.",
-      "managed": "At least one admin key is requred if the node is managed.",
-      "key": "Key is required."
+      "generic": "Это поле обязательное",
+      "managed": "Для управления узлом требуется по крайней мере один ключ администратора",
+      "key": "Требуется ключ"
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+      "number": "Недопустимый формат, должно быть значение в диапазоне 410-930 МГц (0 по умолчанию)"
     }
   },
-  "yes": "Yes",
-  "no": "No"
+  "yes": "Да",
+  "no": "Нет"
 }
