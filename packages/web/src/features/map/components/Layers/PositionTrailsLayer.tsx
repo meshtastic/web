@@ -1,13 +1,15 @@
 import { usePositionTrails } from "@data/hooks";
-import type { Protobuf } from "@meshtastic/core";
+import type { Node, PositionLog } from "@data/schema";
 import { useDevice } from "@state/index.ts";
 import type { Feature, FeatureCollection } from "geojson";
 import { useMemo } from "react";
 import { Layer, Source } from "react-map-gl/maplibre";
 
+const INT_DEG = 1e7;
+
 export interface PositionTrailsLayerProps {
   id: string;
-  filteredNodes: Protobuf.Mesh.NodeInfo[];
+  filteredNodes: Node[];
   isVisible: boolean;
   trailDurationHours?: number;
 }
@@ -16,10 +18,7 @@ export interface PositionTrailsLayerProps {
  * Convert position trails to GeoJSON LineStrings
  */
 function generateTrailLines(
-  trails: Map<
-    number,
-    Array<{ latitudeI: number; longitudeI: number; time: number }>
-  >,
+  trails: Map<number, PositionLog[]>,
 ): FeatureCollection {
   const features: Feature[] = [];
 
@@ -29,11 +28,17 @@ function generateTrailLines(
       continue;
     }
 
-    // Convert to GeoJSON coordinates [lng, lat]
-    const coordinates = positions.map((pos) => [
-      pos.longitudeI / 1e7,
-      pos.latitudeI / 1e7,
-    ]);
+    // Convert to GeoJSON coordinates [lng, lat] - PositionLog has latitudeI/longitudeI
+    const coordinates = positions
+      .filter(
+        (pos): pos is PositionLog & { latitudeI: number; longitudeI: number } =>
+          pos.latitudeI !== null && pos.longitudeI !== null,
+      )
+      .map((pos) => [pos.longitudeI / INT_DEG, pos.latitudeI / INT_DEG]);
+
+    if (coordinates.length < 2) {
+      continue;
+    }
 
     features.push({
       type: "Feature",
@@ -70,12 +75,12 @@ export const PositionTrailsLayer = ({
 
   // Get node numbers for filtered nodes
   const nodeNums = useMemo(
-    () => filteredNodes.map((node) => node.num),
+    () => filteredNodes.map((node) => node.nodeNum),
     [filteredNodes],
   );
 
   // Fetch position trails from database
-  const { trails, loading } = usePositionTrails(
+  const { trails } = usePositionTrails(
     deviceId,
     isVisible ? nodeNums : [],
     sinceTimestamp,
@@ -84,11 +89,11 @@ export const PositionTrailsLayer = ({
 
   // Generate GeoJSON features
   const featureCollection = useMemo(() => {
-    if (!isVisible || loading) {
+    if (!isVisible) {
       return { type: "FeatureCollection" as const, features: [] };
     }
     return generateTrailLines(trails);
-  }, [trails, loading, isVisible]);
+  }, [trails, isVisible]);
 
   if (!isVisible) {
     return null;

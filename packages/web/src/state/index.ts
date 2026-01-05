@@ -39,8 +39,13 @@ export {
 // Helper hook to access current device
 export const useDevice = (): Device => {
   const { deviceId } = useDeviceContext();
-  const device = useDeviceStore(
-    (s) => s.getDevice(deviceId) ?? s.addDevice(deviceId),
-  );
+  // Get device from store - do NOT call addDevice in selector as it modifies state
+  let device = useDeviceStore((s) => s.getDevice(deviceId));
+
+  // If device doesn't exist, add it outside the selector
+  if (!device) {
+    device = useDeviceStore.getState().addDevice(deviceId);
+  }
+
   return device;
 };

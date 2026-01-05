@@ -1,15 +1,16 @@
 import { TimeAgo } from "@app/shared";
 import { useNodes } from "@data/hooks";
-import type { Protobuf } from "@meshtastic/core";
+import { useMyNode } from "@shared/hooks";
+import type { Node } from "@data/schema";
 import { Separator } from "@shared/components/ui/separator";
 import {
   bearingDegrees,
   distanceMeters,
-  hasPos,
+  hasNodePosition,
   toLngLat,
+  toLngLatFromNode,
 } from "@shared/utils/geo";
 import type { WaypointWithMetadata } from "@state/index.ts";
-import { useDeviceContext } from "@state/index.ts";
 import {
   ClockFadingIcon,
   ClockPlusIcon,
@@ -24,14 +25,14 @@ import { useTranslation } from "react-i18next";
 
 interface WaypointDetailProps {
   waypoint: WaypointWithMetadata;
-  myNode?: Protobuf.Mesh.NodeInfo;
+  myNode?: Node;
   onEdit: () => void;
 }
 
 export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
   const { t } = useTranslation("map");
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
 
   // Create getNode function from database nodes
   const getNode = (nodeNum: number) => {
@@ -43,12 +44,12 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
     longitudeI: waypoint.longitudeI,
   });
 
-  const distance = hasPos(myNode?.position)
-    ? distanceMeters(toLngLat(myNode?.position), waypointLngLat)
+  const distance = myNode && hasNodePosition(myNode)
+    ? distanceMeters(toLngLatFromNode(myNode), waypointLngLat)
     : undefined;
 
-  const bearing = hasPos(myNode?.position)
-    ? bearingDegrees(toLngLat(myNode?.position), waypointLngLat)
+  const bearing = myNode && hasNodePosition(myNode)
+    ? bearingDegrees(toLngLatFromNode(myNode), waypointLngLat)
     : undefined;
 
   return (

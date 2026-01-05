@@ -1,5 +1,5 @@
 import { useDevice, type ValidModuleConfigType } from "@state/index.ts";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import {
   type DefaultValues,
   type FieldValues,
@@ -78,60 +78,61 @@ export function useModuleConfigForm<T extends FieldValues>({
   const hasInitialSyncRef = useRef(false);
 
   // Sync form changes to store and field registry
+  const onFormChange = useEffectEvent((formValues: Partial<T>) => {
+    if (!baseConfig || !formValues) {
+      return;
+    }
+
+    const currentValues = formValues as T;
+
+    // Skip the first watch fire - just capture initial values without tracking
+    // This prevents spurious change detection during form initialization
+    if (!hasInitialSyncRef.current) {
+      prevValuesRef.current = currentValues;
+      hasInitialSyncRef.current = true;
+      return;
+    }
+
+    const prevValues = prevValuesRef.current;
+
+    // Only process if values actually changed
+    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+      return;
+    }
+
+    prevValuesRef.current = currentValues;
+
+    // Build the change object with only modified fields
+    const changes: Partial<T> = {};
+    let hasChanges = false;
+
+    for (const key of Object.keys(currentValues) as Array<keyof T>) {
+      const newValue = currentValues[key];
+      const originalValue = (baseConfig as T)[key];
+
+      if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
+        changes[key] = newValue;
+        hasChanges = true;
+        // Track per-field change for Activity panel
+        trackChange(section, key as string, newValue, originalValue);
+      } else {
+        // Remove from Activity if reverted to original
+        removeChange(section, key as string);
+      }
+    }
+
+    if (hasChanges) {
+      setChange(section, { ...baseConfig, ...changes }, baseConfig);
+    }
+  });
+
   useEffect(() => {
     // Reset initial sync flag when effect re-runs
     hasInitialSyncRef.current = false;
 
-    const subscription = watch((formValues) => {
-      if (!baseConfig || !formValues) {
-        return;
-      }
-
-      const currentValues = formValues as T;
-
-      // Skip the first watch fire - just capture initial values without tracking
-      // This prevents spurious change detection during form initialization
-      if (!hasInitialSyncRef.current) {
-        prevValuesRef.current = currentValues;
-        hasInitialSyncRef.current = true;
-        return;
-      }
-
-      const prevValues = prevValuesRef.current;
-
-      // Only process if values actually changed
-      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-        return;
-      }
-
-      prevValuesRef.current = currentValues;
-
-      // Build the change object with only modified fields
-      const changes: Partial<T> = {};
-      let hasChanges = false;
-
-      for (const key of Object.keys(currentValues) as Array<keyof T>) {
-        const newValue = currentValues[key];
-        const originalValue = (baseConfig as T)[key];
-
-        if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-          changes[key] = newValue;
-          hasChanges = true;
-          // Track per-field change for Activity panel
-          trackChange(section, key as string, newValue, originalValue);
-        } else {
-          // Remove from Activity if reverted to original
-          removeChange(section, key as string);
-        }
-      }
-
-      if (hasChanges) {
-        setChange(section, { ...baseConfig, ...changes }, baseConfig);
-      }
-    });
-
+    const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch, baseConfig, section, setChange, trackChange, removeChange]);
+  }, [watch]);
 
   const isDisabledByField = useCallback(
     (

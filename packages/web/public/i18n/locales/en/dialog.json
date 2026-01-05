@@ -159,6 +159,18 @@
     "description": "Are you sure you want to remove this Node?",
     "title": "Remove Node?"
   },
+  "removeDevice": {
+    "title": "Remove Device?",
+    "description": "This will permanently remove all data associated with this device.",
+    "confirm": "Remove Device",
+    "nodeNum": "Node #{{nodeNum}}",
+    "warningTitle": "This action will permanently delete:",
+    "warningMessages": "All messages",
+    "warningNodes": "Node database",
+    "warningChannels": "Channel settings",
+    "warningPositions": "Position history",
+    "warningSettings": "All device settings and configuration"
+  },
   "shutdown": {
     "title": "Schedule Shutdown",
     "description": "Turn off the connected node after x minutes."

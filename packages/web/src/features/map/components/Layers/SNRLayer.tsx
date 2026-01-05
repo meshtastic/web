@@ -1,14 +1,15 @@
 import { Mono } from "@app/shared/index.ts";
 import { getSignalColor } from "@features/nodes/utils/signalColor";
+import type { Node } from "@data/schema";
 import type { Protobuf } from "@meshtastic/core";
 import { cn } from "@shared/utils/cn";
 import {
   distanceMeters,
-  hasPos,
+  hasNodePosition,
   type LngLat,
   lngLatToMercator,
   mercatorToLngLat,
-  toLngLat,
+  toLngLatFromNode,
 } from "@shared/utils/geo";
 import { useDevice } from "@state/index.ts";
 import type { Feature, FeatureCollection } from "geojson";
@@ -22,8 +23,8 @@ const MIN_LEN = 1e-3; // meters
 
 export interface SNRLayerProps {
   id: string;
-  filteredNodes: Protobuf.Mesh.NodeInfo[];
-  myNode: Protobuf.Mesh.NodeInfo | undefined;
+  filteredNodes: Node[];
+  myNode: Node | undefined;
   visibilityState: VisibilityState;
 }
 
@@ -36,7 +37,7 @@ export interface SNRTooltipProps {
 
 type NeighborPlus = Protobuf.Mesh.Neighbor & {
   num: number | undefined;
-  position: Protobuf.Mesh.Position | undefined;
+  lngLat: LngLat | undefined;
 };
 type NeighborInfoPlus = Omit<Protobuf.Mesh.NeighborInfo, "neighbors"> & {
   neighbors: NeighborPlus[];
@@ -44,14 +45,14 @@ type NeighborInfoPlus = Omit<Protobuf.Mesh.NeighborInfo, "neighbors"> & {
 
 type RemoteInfo = {
   type: "remote";
-  node: Protobuf.Mesh.NodeInfo;
+  node: Node;
   neighborInfo: NeighborInfoPlus;
 };
 
 type DirectInfo = {
   type: "direct";
-  from: Protobuf.Mesh.NodeInfo;
-  to: Protobuf.Mesh.NodeInfo;
+  from: Node;
+  to: Node;
   snr: number;
 };
 
@@ -185,21 +186,26 @@ function generateNeighborLines(
 ): FeatureCollection {
   // Collect positions for all referenced nodes, discard pairs with missing positions
   const idToLngLat = new Map<number, LngLat>();
-  const ensure = (node?: Protobuf.Mesh.NodeInfo | NeighborPlus) => {
-    if (node?.num && hasPos(node.position) && !idToLngLat.has(node.num)) {
-      idToLngLat.set(node.num, toLngLat(node.position));
+  const ensureNode = (node: Node) => {
+    if (hasNodePosition(node) && !idToLngLat.has(node.nodeNum)) {
+      idToLngLat.set(node.nodeNum, toLngLatFromNode(node));
+    }
+  };
+  const ensureNeighbor = (neighbor: NeighborPlus) => {
+    if (neighbor.num && neighbor.lngLat && !idToLngLat.has(neighbor.num)) {
+      idToLngLat.set(neighbor.num, neighbor.lngLat);
     }
   };
 
   for (const info of neighborInfos) {
     if (info.type === "remote") {
-      ensure(info.node);
+      ensureNode(info.node);
       for (const neighbor of info.neighborInfo.neighbors) {
-        ensure(neighbor);
+        ensureNeighbor(neighbor);
       }
     } else {
-      ensure(info.from);
-      ensure(info.to);
+      ensureNode(info.from);
+      ensureNode(info.to);
     }
   }
 
@@ -208,13 +214,13 @@ function generateNeighborLines(
   for (const info of neighborInfos) {
     if (info.type === "remote") {
       // RemoteInfo object
-      const fromId = info.node.num;
+      const fromId = info.node.nodeNum;
       for (const neighbor of info.neighborInfo.neighbors) {
         upsertPair(fromId, neighbor.nodeId, neighbor.snr, pairs, idToLngLat);
       }
     } else {
       // DirectInfo object
-      upsertPair(info.from.num, info.to.num, info.snr, pairs, idToLngLat);
+      upsertPair(info.from.nodeNum, info.to.nodeNum, info.snr, pairs, idToLngLat);
     }
   }
 
@@ -288,7 +294,7 @@ export const SNRLayer = ({
 
   const remotePairs = visibilityState.remoteNeighbors
     ? filteredNodes.flatMap((node) => {
-        const neighborInfo = getNeighborInfo(node.num);
+        const neighborInfo = getNeighborInfo(node.nodeNum);
         return neighborInfo
           ? [
               {
@@ -297,10 +303,16 @@ export const SNRLayer = ({
                 neighborInfo: {
                   ...neighborInfo,
                   neighbors: neighborInfo.neighbors.map((n) => {
-                    const node = filteredNodes.find(
-                      (node) => node.num === n.nodeId,
+                    const foundNode = filteredNodes.find(
+                      (node) => node.nodeNum === n.nodeId,
                     );
-                    return { ...n, num: node?.num, position: node?.position };
+                    return {
+                      ...n,
+                      num: foundNode?.nodeNum,
+                      lngLat: foundNode && hasNodePosition(foundNode)
+                        ? toLngLatFromNode(foundNode)
+                        : undefined,
+                    };
                   }),
                 },
               } as const,
@@ -309,10 +321,16 @@ export const SNRLayer = ({
       })
     : [];
 
+  // Note: hopsAway is not available in Node schema, filter based on snr > 0 as a heuristic for direct nodes
   const directPairs =
     visibilityState.directNeighbors && myNode
       ? filteredNodes
-          .filter((node) => node.hopsAway === 0 && node.num !== myNode.num)
+          .filter(
+            (node) =>
+              node.snr !== null &&
+              node.snr !== 0 &&
+              node.nodeNum !== myNode.nodeNum,
+          )
           .map((to) => ({
             type: "direct" as const,
             from: myNode,

@@ -4,7 +4,7 @@ import {
 } from "../components/panels/Channels/validation";
 import type { Channel as DbChannel } from "@data/index";
 import cryptoRandomString from "crypto-random-string";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { type DefaultValues, type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver";
 import { useFieldRegistry } from "../services/fieldRegistry";
@@ -143,37 +143,38 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
   // Track whether we've completed initial sync (skip first watch fire)
   const hasInitialSyncRef = useRef(false);
 
+  const onFormChange = useEffectEvent((formData: Partial<ChannelValidation>) => {
+    if (!formData) {
+      return;
+    }
+
+    const currentValues = formData as ChannelValidation;
+
+    // Skip the first watch fire - just capture initial values without tracking
+    // This prevents spurious change detection during form initialization
+    if (!hasInitialSyncRef.current) {
+      prevValuesRef.current = currentValues;
+      hasInitialSyncRef.current = true;
+      return;
+    }
+
+    const prevValues = prevValuesRef.current;
+
+    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+      return;
+    }
+
+    prevValuesRef.current = currentValues;
+    submitChanges(currentValues);
+  });
+
   useEffect(() => {
     // Reset initial sync flag when effect re-runs
     hasInitialSyncRef.current = false;
 
-    const subscription = watch((formData) => {
-      if (!formData) {
-        return;
-      }
-
-      const currentValues = formData as ChannelValidation;
-
-      // Skip the first watch fire - just capture initial values without tracking
-      // This prevents spurious change detection during form initialization
-      if (!hasInitialSyncRef.current) {
-        prevValuesRef.current = currentValues;
-        hasInitialSyncRef.current = true;
-        return;
-      }
-
-      const prevValues = prevValuesRef.current;
-
-      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-        return;
-      }
-
-      prevValuesRef.current = currentValues;
-      submitChanges(currentValues);
-    });
-
+    const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch, submitChanges]);
+  }, [watch]);
 
   // Regenerate PSK
   const regeneratePsk = useCallback(async () => {

@@ -1,4 +1,3 @@
-import { DB_EVENTS, dbEvents } from "@data/events";
 import { tracerouteRepo } from "@data/index";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { useDevice, useDeviceContext } from "@state/index.ts";
@@ -80,8 +79,6 @@ export function useTraceroute({
             snrBack: latestTraceroute.data.snrBack,
           })
           .then(() => {
-            // Emit event after saving to database
-            dbEvents.emit(DB_EVENTS.TRACEROUTE_COMPLETED);
             // Navigate with traceroute param to show dialog
             const currentSearch = new URLSearchParams(window.location.search);
             currentSearch.set("traceroute", String(nodeNum));

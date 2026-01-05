@@ -12,7 +12,7 @@ interface ActivityListProps {
 }
 
 export function ActivityList({ items, onRemove }: ActivityListProps) {
-  const { t } = useTranslation("ui");
+  const { t } = useTranslation("config");
 
   if (items.length === 0) {
     return (

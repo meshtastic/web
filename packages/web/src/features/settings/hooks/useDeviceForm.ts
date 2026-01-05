@@ -1,6 +1,6 @@
 import { useUnsafeRolesDialog } from "@shared/components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
 import { useDevice } from "@state/index.ts";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
 import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
@@ -34,47 +34,48 @@ export function useDeviceForm() {
   const prevValuesRef = useRef<DeviceValidation | undefined>(undefined);
 
   // Sync form changes to store and field registry
+  const onFormChange = useEffectEvent((formData: Partial<DeviceValidation>) => {
+    if (!baseConfig || !formData) {
+      return;
+    }
+
+    const currentValues = formData as DeviceValidation;
+    const prevValues = prevValuesRef.current;
+
+    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+      return;
+    }
+
+    prevValuesRef.current = currentValues;
+
+    // Track per-field changes for Activity panel and build changes object
+    const changes: Partial<DeviceValidation> = {};
+    let hasChanges = false;
+
+    for (const key of Object.keys(currentValues) as Array<
+      keyof DeviceValidation
+    >) {
+      const newValue = currentValues[key];
+      const originalValue = baseConfig[key];
+
+      if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
+        (changes as Record<string, unknown>)[key] = newValue;
+        hasChanges = true;
+        trackChange(SECTION, key, newValue, originalValue);
+      } else {
+        removeChange(SECTION, key);
+      }
+    }
+
+    if (hasChanges) {
+      setChange(SECTION, { ...baseConfig, ...changes }, baseConfig);
+    }
+  });
+
   useEffect(() => {
-    const subscription = watch((formData) => {
-      if (!baseConfig || !formData) {
-        return;
-      }
-
-      const currentValues = formData as DeviceValidation;
-      const prevValues = prevValuesRef.current;
-
-      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-        return;
-      }
-
-      prevValuesRef.current = currentValues;
-
-      // Track per-field changes for Activity panel and build changes object
-      const changes: Partial<DeviceValidation> = {};
-      let hasChanges = false;
-
-      for (const key of Object.keys(currentValues) as Array<
-        keyof DeviceValidation
-      >) {
-        const newValue = currentValues[key];
-        const originalValue = baseConfig[key];
-
-        if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-          (changes as Record<string, unknown>)[key] = newValue;
-          hasChanges = true;
-          trackChange(SECTION, key, newValue, originalValue);
-        } else {
-          removeChange(SECTION, key);
-        }
-      }
-
-      if (hasChanges) {
-        setChange(SECTION, { ...baseConfig, ...changes }, baseConfig);
-      }
-    });
-
+    const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch, baseConfig, setChange, trackChange, removeChange]);
+  }, [watch]);
 
   // Handle role change with validation dialog
   const handleRoleChange = useCallback(

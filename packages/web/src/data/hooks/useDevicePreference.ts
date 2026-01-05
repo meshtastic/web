@@ -1,12 +1,9 @@
-import { eq } from "drizzle-orm";
 import { useMemo } from "react";
 import { useReactiveQuery } from "sqlocal/react";
-import { getClient, getDb } from "../client.ts";
-import { preferences } from "../schema.ts";
+import { preferencesRepo } from "../repositories/index.ts";
 
 /**
  * Hook to get a device-specific preference value
- * Now reactive using sqlocal
  */
 export function useDevicePreference<T>(
   deviceId: number,
@@ -16,16 +13,11 @@ export function useDevicePreference<T>(
   const cacheKey = `device:${deviceId}:${key}`;
 
   const query = useMemo(
-    () =>
-      getDb()
-        .select()
-        .from(preferences)
-        .where(eq(preferences.key, cacheKey))
-        .limit(1),
+    () => preferencesRepo.buildPreferenceQuery(cacheKey),
     [cacheKey],
   );
 
-  const { data, status } = useReactiveQuery(getClient(), query);
+  const { data, status } = useReactiveQuery(preferencesRepo.getClient(), query);
 
   const value = useMemo((): T => {
     const row = data?.[0];

@@ -40,10 +40,10 @@ export const decodePacket = (device: MeshDevice) =>
           }
           device.events.onFromRadio.dispatch(decodedMessage);
 
-          device.log.info(
-            Types.Emitter[Types.Emitter.HandleFromRadio],
-            `📨 FromRadio: ${decodedMessage.payloadVariant.case}`,
-          );
+          // device.log.info(
+          //   Types.Emitter[Types.Emitter.HandleFromRadio],
+          //   `📨 FromRadio: ${decodedMessage.payloadVariant.case}`,
+          // );
 
           /** @todo Add map here when `all=true` gets fixed. */
           switch (decodedMessage.payloadVariant.case) {

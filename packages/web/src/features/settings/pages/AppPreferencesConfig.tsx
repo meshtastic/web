@@ -1,5 +1,6 @@
 import { useTheme } from "@app/shared/components/ui/theme-provider";
 import { usePreference } from "@data/hooks";
+import { DevicesPanel } from "../components/panels/DevicesPanel";
 import { Button } from "@shared/components/ui/button";
 import {
   Card,
@@ -582,6 +583,8 @@ export const AppPreferencesConfig = ({
           </CardContent>
         </Card>
       </Activity>
+
+      <DevicesPanel searchQuery={searchQuery} />
 
       <div className="flex justify-end">
         <Button variant="outline" onClick={resetToDefaults}>

@@ -1,7 +1,6 @@
 import { useLanguage } from "@app/shared/hooks/useLanguage.ts";
 import { SignalIndicator } from "@app/shared/index.ts";
-import { create } from "@bufbuild/protobuf";
-import { useNodes } from "@data/hooks";
+import { useNodes, useOnlineNodes, usePreference } from "@data/hooks";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LocationResponseDialog } from "@shared/components/Dialog/LocationResponseDialog.tsx";
@@ -41,7 +40,6 @@ import {
   TableRow,
 } from "@shared/components/ui/table";
 import { cn } from "@shared/utils/cn";
-import { usePreference } from "@data/hooks";
 import {
   DEFAULT_PREFERENCES,
   type NodeColumnKey,
@@ -49,7 +47,7 @@ import {
   useDeviceContext,
   useUIStore,
 } from "@state/index.ts";
-import { toByteArray } from "base64-js";
+import type { Node } from "@data/schema";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -67,7 +65,6 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { base16 } from "rfc4648";
 import { sortNodes } from "../utils/nodeSort.ts";
 
 type SortColumn =
@@ -104,26 +101,28 @@ const SortIcon = ({
   );
 };
 
-// Helper to convert hex string to Uint8Array
-function hexToUint8Array(hex: string): Uint8Array {
-  const matches = hex.match(/.{1,2}/g);
-  return matches
-    ? new Uint8Array(matches.map((byte) => parseInt(byte, 16)))
-    : new Uint8Array();
-}
-
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { current } = useLanguage();
   const { hardware, connection, setDialogOpen } = useDevice();
   const { deviceId } = useDeviceContext();
   const { nodes: allNodes } = useNodes(deviceId);
+  const { nodes: onlineNodes } = useOnlineNodes(deviceId);
+
+  // Create a Set of online node numbers for O(1) lookup
+  const onlineNodeNums = useMemo(
+    () => new Set(onlineNodes.map((n) => n.nodeNum)),
+    [onlineNodes],
+  );
 
   const { setNodeNumDetails } = useUIStore();
 
   const [columnVisibility, setColumnVisibility] = usePreference<
     Record<NodeColumnKey, boolean>
-  >("nodesTableColumnVisibility", DEFAULT_PREFERENCES.nodesTableColumnVisibility);
+  >(
+    "nodesTableColumnVisibility",
+    DEFAULT_PREFERENCES.nodesTableColumnVisibility,
+  );
 
   const [columnOrder, setColumnOrder] = usePreference<NodeColumnKey[]>(
     "nodesTableColumnOrder",
@@ -150,7 +149,6 @@ const NodesPage = (): JSX.Element => {
     null,
   );
 
-  // Drag and drop handlers
   const handleDragStart = useCallback((column: NodeColumnKey) => {
     setDraggedColumn(column);
   }, []);
@@ -179,14 +177,14 @@ const NodesPage = (): JSX.Element => {
     [draggedColumn, columnOrder, setColumnOrder],
   );
 
-  // Column configuration
+  // Column for sorting
   const columnConfig: Record<
     NodeColumnKey,
     {
       label: string;
       sortable: boolean;
       sortKey?: SortColumn;
-      render: (node: Protobuf.Mesh.NodeInfo) => React.ReactNode;
+      render: (node: Node) => React.ReactNode;
     }
   > = useMemo(
     () => ({
@@ -195,7 +193,7 @@ const NodesPage = (): JSX.Element => {
         sortable: false,
         render: (node) => (
           <div className="text-center">
-            {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
+            {node.publicKey && node.publicKey.length > 0 ? (
               <LockIcon className="h-4 w-4 text-green-600 dark:text-green-500 mx-auto" />
             ) : (
               <LockOpenIcon className="h-4 w-4 text-yellow-600 dark:text-yellow-500 mx-auto" />
@@ -209,11 +207,11 @@ const NodesPage = (): JSX.Element => {
         sortKey: "lastHeard",
         render: (node) => (
           <Mono className="text-xs md:text-sm">
-            {node.lastHeard === 0 ? (
+            {node.lastHeard === null ? (
               t("unknown.longName")
             ) : (
               <TimeAgo
-                timestamp={node.lastHeard * 1000}
+                timestamp={node.lastHeard.getTime()}
                 locale={current?.code}
               />
             )}
@@ -225,22 +223,21 @@ const NodesPage = (): JSX.Element => {
         sortable: true,
         sortKey: "snr",
         render: (node) => {
-          if (node.snr === 0 && node.lastHeard === 0) {
+          const snr = node.snr ?? 0;
+          if (snr === 0 && node.lastHeard === null) {
             return <Mono className="text-xs md:text-sm">—</Mono>;
           }
           // Use a default RSSI estimate based on SNR for grading
-          // In practice, RSSI would be stored separately
-          const estimatedRssi =
-            node.snr > 0 ? -60 : node.snr > -10 ? -90 : -120;
+          const estimatedRssi = snr > 0 ? -60 : snr > -10 ? -90 : -120;
           return (
             <div className="flex flex-col gap-0.5">
               <SignalIndicator
-                snr={node.snr}
+                snr={snr}
                 rssi={estimatedRssi}
                 showLabel={true}
               />
               <Mono className="text-xs text-muted-foreground">
-                {node.snr.toFixed(1)} dB
+                {snr.toFixed(1)} dB
               </Mono>
             </div>
           );
@@ -250,14 +247,14 @@ const NodesPage = (): JSX.Element => {
         label: t("nodesTable.headings.battery"),
         sortable: false,
         render: (node) => {
-          const batteryLevel = node.deviceMetrics?.batteryLevel;
-          const voltage = node.deviceMetrics?.voltage;
+          const batteryLevel = node.batteryLevel;
+          const voltage = node.voltage;
           const text =
-            batteryLevel !== undefined && batteryLevel > 0
-              ? `${batteryLevel}% ${voltage ? `${voltage.toFixed(2)}V` : ""}`
-              : voltage
+            batteryLevel !== null && batteryLevel > 0
+              ? `${batteryLevel}% ${voltage !== null ? `${voltage.toFixed(2)}V` : ""}`
+              : voltage !== null
                 ? `${voltage.toFixed(2)}V`
-                : node.deviceMetrics?.voltage === 0
+                : node.voltage === 0
                   ? "PWD"
                   : "—";
           return <Mono className="text-xs md:text-sm">{text}</Mono>;
@@ -267,8 +264,8 @@ const NodesPage = (): JSX.Element => {
         label: t("nodesTable.headings.altitude"),
         sortable: false,
         render: (node) => {
-          const altitude = node.position?.altitude;
-          const text = altitude ? `${altitude} m MSL` : "—";
+          const altitude = node.altitude;
+          const text = altitude !== null ? `${altitude} m MSL` : "—";
           return <Mono className="text-xs md:text-sm">{text}</Mono>;
         },
       },
@@ -276,19 +273,9 @@ const NodesPage = (): JSX.Element => {
         label: t("nodesTable.headings.hopsAway"),
         sortable: true,
         sortKey: "connection",
-        render: (node) => (
-          <Mono className="text-xs md:text-sm">
-            {node.hopsAway !== undefined
-              ? node?.viaMqtt === false && node.hopsAway === 0
-                ? t("nodesTable.connectionStatus.direct")
-                : `${node.hopsAway}`
-              : "—"}
-            {node?.viaMqtt === true && (
-              <Badge variant="secondary" className="ml-2">
-                MQTT
-              </Badge>
-            )}
-          </Mono>
+        render: (_node) => (
+          // hopsAway and viaMqtt not available in Node schema - would need to add if needed
+          <Mono className="text-xs md:text-sm">—</Mono>
         ),
       },
       temp: {
@@ -304,11 +291,11 @@ const NodesPage = (): JSX.Element => {
         label: t("nodesTable.headings.chUtil"),
         sortable: false,
         render: (node) => {
-          const chUtil = node.deviceMetrics?.channelUtilization;
-          const airUtil = node.deviceMetrics?.airUtilTx;
+          const chUtil = node.channelUtilization;
+          const airUtil = node.airUtilTx;
           const text =
-            chUtil !== undefined || airUtil !== undefined
-              ? `Ch ${chUtil?.toFixed(1) ?? "—"}%${airUtil !== undefined ? ` / Air ${airUtil.toFixed(1)}%` : ""}`
+            chUtil !== null || airUtil !== null
+              ? `Ch ${chUtil?.toFixed(1) ?? "—"}%${airUtil !== null ? ` / Air ${airUtil.toFixed(1)}%` : ""}`
               : "—";
           return <Mono className="text-xs md:text-sm">{text}</Mono>;
         },
@@ -319,7 +306,9 @@ const NodesPage = (): JSX.Element => {
         sortKey: "model",
         render: (node) => (
           <Mono className="text-xs md:text-sm">
-            {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}
+            {node.hwModel !== null
+              ? Protobuf.Mesh.HardwareModel[node.hwModel]
+              : "—"}
           </Mono>
         ),
       },
@@ -327,8 +316,8 @@ const NodesPage = (): JSX.Element => {
         label: t("nodesTable.headings.role"),
         sortable: false,
         render: (node) => {
-          const role = node.user?.role
-            ? Protobuf.Config.Config_DeviceConfig_Role[node.user.role]
+          const role = node.role
+            ? Protobuf.Config.Config_DeviceConfig_Role[node.role]
             : "—";
           return <Mono className="text-xs md:text-sm">{role}</Mono>;
         },
@@ -337,7 +326,7 @@ const NodesPage = (): JSX.Element => {
         label: t("nodesTable.headings.nodeId"),
         sortable: false,
         render: (node) => {
-          const nodeId = `!${numberToHexUnpadded(node.num)}`;
+          const nodeId = `!${numberToHexUnpadded(node.nodeNum)}`;
           return <Mono className="text-xs md:text-sm">{nodeId}</Mono>;
         },
       },
@@ -345,69 +334,10 @@ const NodesPage = (): JSX.Element => {
     [t, current?.code],
   );
 
-  // Convert database nodes to protobuf format
-  const convertedNodes = useMemo(() => {
-    return allNodes.map((node): Protobuf.Mesh.NodeInfo => {
-      return {
-        $typeName: "meshtastic.NodeInfo",
-        num: node.nodeNum,
-        snr: node.snr ?? 0,
-        lastHeard: node.lastHeard
-          ? Math.floor(node.lastHeard.getTime() / 1000)
-          : 0,
-        channel: 0,
-        viaMqtt: false,
-        isFavorite: node.isFavorite ?? false,
-        isIgnored: node.isIgnored ?? false,
-        hopsAway: 0,
-        isKeyManuallyVerified: false,
-        user: {
-          $typeName: "meshtastic.User",
-          id: node.userId ?? "",
-          longName: node.longName ?? "",
-          shortName: node.shortName ?? "",
-          macaddr: node.macaddr
-            ? hexToUint8Array(node.macaddr)
-            : new Uint8Array(),
-          hwModel: node.hwModel ?? 0,
-          role: node.role ?? 0,
-          publicKey: node.publicKey
-            ? toByteArray(node.publicKey)
-            : new Uint8Array(),
-          isLicensed: node.isLicensed ?? false,
-        },
-        position: node.latitudeI
-          ? create(Protobuf.Mesh.PositionSchema, {
-              latitudeI: node.latitudeI,
-              longitudeI: node.longitudeI ?? 0,
-              altitude: node.altitude ?? 0,
-              time: node.positionTime
-                ? Math.floor(node.positionTime.getTime() / 1000)
-                : 0,
-              precisionBits: node.positionPrecisionBits ?? 32,
-              groundSpeed: node.groundSpeed ?? 0,
-              groundTrack: node.groundTrack ?? 0,
-              satsInView: node.satsInView ?? 0,
-            })
-          : undefined,
-        deviceMetrics: {
-          $typeName: "meshtastic.DeviceMetrics",
-          batteryLevel: node.batteryLevel ?? 0,
-          voltage: node.voltage ?? 0,
-          channelUtilization: node.channelUtilization ?? 0,
-          airUtilTx: node.airUtilTx ?? 0,
-          uptimeSeconds: node.uptimeSeconds ?? 0,
-        },
-      };
-    });
-  }, [allNodes]);
-
-  // Apply filter to converted nodes
+  // Apply filter to nodes (now using NodeDTO directly)
   const filteredNodes = useMemo(() => {
-    return convertedNodes.filter((node) =>
-      nodeFilter(node, deferredFilterState),
-    );
-  }, [convertedNodes, nodeFilter, deferredFilterState]);
+    return allNodes.filter((node) => nodeFilter(node, deferredFilterState));
+  }, [allNodes, nodeFilter, deferredFilterState]);
 
   // Stub for hasNodeError - no longer tracking node errors
   const hasNodeError = useCallback((_nodeNum: number) => false, []);
@@ -470,9 +400,8 @@ const NodesPage = (): JSX.Element => {
   );
 
   const getName = useCallback(
-    (node: Protobuf.Mesh.NodeInfo) =>
-      node.user?.longName ??
-      numberToHexUnpadded(node.num).slice(-4).toUpperCase(),
+    (node: Node) =>
+      node.longName || numberToHexUnpadded(node.nodeNum).slice(-4).toUpperCase(),
     [],
   );
 
@@ -481,7 +410,7 @@ const NodesPage = (): JSX.Element => {
     if (!sortColumn || sortColumn === "lastHeard") {
       return sortNodes(filteredNodes, {
         getName,
-        getLastHeard: (n) => n.lastHeard,
+        getLastHeard: (n) => n.lastHeard?.getTime() ?? 0,
         isFavorite: (n) => n.isFavorite,
       });
     }
@@ -501,28 +430,22 @@ const NodesPage = (): JSX.Element => {
           bValue = getName(b);
           break;
         case "connection":
-          aValue = a.hopsAway ?? Number.MAX_SAFE_INTEGER;
-          bValue = b.hopsAway ?? Number.MAX_SAFE_INTEGER;
+          // hopsAway not available in Node schema
+          aValue = Number.MAX_SAFE_INTEGER;
+          bValue = Number.MAX_SAFE_INTEGER;
           break;
         case "snr":
-          aValue = a.snr;
-          bValue = b.snr;
+          aValue = a.snr ?? 0;
+          bValue = b.snr ?? 0;
           break;
         case "model":
-          aValue = Protobuf.Mesh.HardwareModel[a.user?.hwModel ?? 0] ?? "UNSET";
-          bValue = Protobuf.Mesh.HardwareModel[b.user?.hwModel ?? 0] ?? "UNSET";
+          aValue = Protobuf.Mesh.HardwareModel[a.hwModel ?? 0] ?? "UNSET";
+          bValue = Protobuf.Mesh.HardwareModel[b.hwModel ?? 0] ?? "UNSET";
           break;
         case "macAddress":
-          aValue =
-            base16
-              .stringify(a.user?.macaddr ?? [])
-              .match(/.{1,2}/g)
-              ?.join(":") ?? "";
-          bValue =
-            base16
-              .stringify(b.user?.macaddr ?? [])
-              .match(/.{1,2}/g)
-              ?.join(":") ?? "";
+          // macaddr is stored as hex string in schema
+          aValue = a.macaddr?.match(/.{1,2}/g)?.join(":") ?? "";
+          bValue = b.macaddr?.match(/.{1,2}/g)?.join(":") ?? "";
           break;
         default:
           return 0;
@@ -803,17 +726,17 @@ const NodesPage = (): JSX.Element => {
               ) : (
                 sortedNodes.map((node) => {
                   const shortName =
-                    node.user?.shortName ??
-                    numberToHexUnpadded(node.num).slice(-4).toUpperCase();
+                    node.shortName ||
+                    numberToHexUnpadded(node.nodeNum).slice(-4).toUpperCase();
                   const longName =
-                    node.user?.longName ??
+                    node.longName ||
                     t("fallbackName", {
                       last4: shortName,
                     });
 
                   return (
                     <TableRow
-                      key={node.num}
+                      key={node.nodeNum}
                       className={cn(
                         node.isFavorite &&
                           "bg-yellow-50/50 dark:bg-yellow-900/10",
@@ -821,14 +744,15 @@ const NodesPage = (): JSX.Element => {
                     >
                       <TableCell>
                         <NodeAvatar
-                          nodeNum={node.num}
+                          nodeNum={node.nodeNum}
                           showFavorite={node.isFavorite}
-                          showError={hasNodeError(node.num)}
+                          showError={hasNodeError(node.nodeNum)}
+                          showOnline={onlineNodeNums.has(node.nodeNum)}
                         />
                       </TableCell>
                       <TableCell>
                         <button
-                          onClick={() => handleNodeInfoDialog(node.num)}
+                          onClick={() => handleNodeInfoDialog(node.nodeNum)}
                           className="hover:underline text-left font-medium"
                           type="button"
                         >

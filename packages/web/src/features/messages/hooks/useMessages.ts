@@ -1,172 +1,104 @@
 /**
- * Message hooks using useReactiveQuery for reactive updates
+ * Message hooks for fetching and managing messages
  */
 
-import { MessageError } from "@data/errors";
-import { DB_EVENTS, dbEvents } from "@data/events";
+import logger from "@core/services/logger";
 import { messageRepo } from "@data/repositories";
-import type { Message } from "@data/schema";
-import { messages } from "@data/schema";
+import type { LastRead, Message } from "@data/schema";
 import type { ConversationType } from "@data/types";
-import { and, desc, eq, or } from "drizzle-orm";
-import type { Result } from "neverthrow";
-import { ResultAsync } from "neverthrow";
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo } from "react";
 import { useReactiveQuery } from "sqlocal/react";
-import { getClient, getDb } from "../../../data/client.ts";
 
 /**
  * Hook to fetch direct messages between two nodes
- * Auto-refreshes when new messages are saved
  */
 export function useDirectMessages(
-  deviceId: number,
+  myNodeNum: number,
   nodeA: number,
   nodeB: number,
   limit = 50,
 ) {
   const query = useMemo(
-    () =>
-      getDb()
-        .select()
-        .from(messages)
-        .where(
-          and(
-            eq(messages.ownerNodeNum, deviceId),
-            eq(messages.type, "direct"),
-            or(
-              and(eq(messages.fromNode, nodeA), eq(messages.toNode, nodeB)),
-              and(eq(messages.fromNode, nodeB), eq(messages.toNode, nodeA)),
-            ),
-          ),
-        )
-        .orderBy(desc(messages.date))
-        .limit(limit),
-    [deviceId, nodeA, nodeB, limit],
+    () => messageRepo.buildDirectMessagesQuery(myNodeNum, nodeA, nodeB, limit),
+    [myNodeNum, nodeA, nodeB, limit],
   );
 
-  const { data, status } = useReactiveQuery(getClient(), query);
-
-  const refresh = useCallback(async () => {
-    // No-op for reactive query
-    return ResultAsync.fromSafePromise(Promise.resolve([] as Message[]));
-  }, []);
+  const { data, status } = useReactiveQuery<Message>(
+    messageRepo.getClient(),
+    query,
+  );
 
   return {
-    messages: data ?? [],
-    refresh,
-    isLoading: status === "pending" && !data,
+    messages: data,
+    isLoading: status === "pending" && data.length === 0,
   };
 }
 
 /**
  * Hook to fetch broadcast messages for a channel
- * Auto-refreshes when new messages are saved
  */
 export function useChannelMessages(
-  deviceId: number,
+  myNodeNum: number,
   channelId: number,
   limit = 50,
 ) {
   const query = useMemo(
-    () =>
-      getDb()
-        .select()
-        .from(messages)
-        .where(
-          and(
-            eq(messages.ownerNodeNum, deviceId),
-            eq(messages.type, "channel"),
-            eq(messages.channelId, channelId),
-          ),
-        )
-        .orderBy(desc(messages.date))
-        .limit(limit),
-    [deviceId, channelId, limit],
+    () => messageRepo.buildBroadcastMessagesQuery(myNodeNum, channelId, limit),
+    [myNodeNum, channelId, limit],
   );
 
-  const { data, status } = useReactiveQuery(getClient(), query);
-
-  const refresh = useCallback(async () => {
-    // No-op
-    return ResultAsync.fromSafePromise(Promise.resolve([] as Message[]));
-  }, []);
+  const { data, status } = useReactiveQuery<Message>(
+    messageRepo.getClient(),
+    query,
+  );
 
   return {
-    messages: data ?? [],
-    refresh,
-    isLoading: status === "pending" && !data,
+    messages: data,
+    isLoading: status === "pending" && data.length === 0,
   };
 }
 
 /**
  * Hook to fetch all messages for a device (paginated)
  */
-export function useAllMessages(deviceId: number, limit = 100, offset = 0) {
+export function useAllMessages(myNodeNum: number, limit = 100, offset = 0) {
   const query = useMemo(
-    () =>
-      getDb()
-        .select()
-        .from(messages)
-        .where(eq(messages.ownerNodeNum, deviceId))
-        .orderBy(desc(messages.date))
-        .limit(limit)
-        .offset(offset),
-    [deviceId, limit, offset],
+    () => messageRepo.buildAllMessagesQuery(myNodeNum, limit, offset),
+    [myNodeNum, limit, offset],
   );
 
-  const { data, status } = useReactiveQuery(getClient(), query);
-
-  const refresh = useCallback(async () => {
-    // No-op
-    return ResultAsync.fromSafePromise(Promise.resolve([] as Message[]));
-  }, []);
+  const { data, status } = useReactiveQuery<Message>(
+    messageRepo.getClient(),
+    query,
+  );
 
   return {
-    messages: data ?? [],
-    refresh,
-    isLoading: status === "pending" && !data,
+    messages: data,
+    isLoading: status === "pending" && data.length === 0,
   };
 }
 
 /**
  * Hook to fetch pending messages (for retry logic)
  */
-export function usePendingMessages(deviceId: number) {
+export function usePendingMessages(myNodeNum: number) {
   const query = useMemo(
-    () =>
-      getDb()
-        .select()
-        .from(messages)
-        .where(
-          and(
-            eq(messages.ownerNodeNum, deviceId),
-            or(
-              eq(messages.state, "waiting"),
-              eq(messages.state, "sending"),
-              eq(messages.state, "failed"),
-            ),
-          ),
-        )
-        .orderBy(desc(messages.date)),
-    [deviceId],
+    () => messageRepo.buildPendingMessagesQuery(myNodeNum),
+    [myNodeNum],
   );
 
-  const { data, status } = useReactiveQuery(getClient(), query);
-
-  const refresh = useCallback(async () => {
-    // No-op
-    return ResultAsync.fromSafePromise(Promise.resolve([] as Message[]));
-  }, []);
+  const { data, status } = useReactiveQuery<Message>(
+    messageRepo.getClient(),
+    query,
+  );
 
   return {
-    messages: data ?? [],
-    refresh,
-    isLoading: status === "pending" && !data,
+    messages: data,
+    isLoading: status === "pending" && data.length === 0,
   };
 }
 
-type Conversation = {
+export type Conversation = {
   type: ConversationType;
   id: number;
   lastMessage: Message | null;
@@ -174,90 +106,155 @@ type Conversation = {
 };
 
 /**
- * Cache for conversation data
+ * Compute unread count for a direct conversation
  */
-class ConversationCache {
-  private data = new Map<string, Conversation[]>();
-  private listeners = new Set<() => void>();
-  private static readonly EMPTY_CONVERSATIONS: Conversation[] = [];
+function computeDirectUnreadCount(
+  messages: Message[],
+  lastReadEntries: LastRead[],
+  myNodeNum: number,
+  otherNodeNum: number,
+): number {
+  const conversationId = `${myNodeNum}:${otherNodeNum}`;
+  const lastReadEntry = lastReadEntries.find(
+    (lr) => lr.type === "direct" && lr.conversationId === conversationId,
+  );
+  const lastReadId = lastReadEntry?.messageId ?? 0;
 
-  subscribe(listener: () => void): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
-  }
-
-  private notify(): void {
-    for (const listener of this.listeners) {
-      listener();
-    }
-  }
-
-  get(key: string): Conversation[] {
-    return this.data.get(key) ?? ConversationCache.EMPTY_CONVERSATIONS;
-  }
-
-  set(key: string, conversations: Conversation[]): void {
-    this.data.set(key, conversations);
-    this.notify();
-  }
+  return messages.filter(
+    (m) =>
+      m.type === "direct" &&
+      ((m.fromNode === myNodeNum && m.toNode === otherNodeNum) ||
+        (m.fromNode === otherNodeNum && m.toNode === myNodeNum)) &&
+      m.id > lastReadId,
+  ).length;
 }
 
-const conversationCache = new ConversationCache();
+/**
+ * Compute unread count for a channel conversation
+ */
+function computeChannelUnreadCount(
+  messages: Message[],
+  lastReadEntries: LastRead[],
+  channelId: number,
+): number {
+  const conversationId = channelId.toString();
+  const lastReadEntry = lastReadEntries.find(
+    (lr) => lr.type === "channel" && lr.conversationId === conversationId,
+  );
+  const lastReadId = lastReadEntry?.messageId ?? 0;
+
+  return messages.filter(
+    (m) =>
+      m.type === "channel" && m.channelId === channelId && m.id > lastReadId,
+  ).length;
+}
 
 /**
  * Hook to get conversations list (for contact sidebar)
  * Returns a list of unique conversations with their last message and unread counts
  * @param myNodeNum - The current user's node number (needed for unread count calculations)
  */
-export function useConversations(deviceId: number, myNodeNum: number) {
-  const cacheKey = `conversations:${deviceId}:${myNodeNum}`;
-
-  const subscribe = useCallback(
-    (onStoreChange: () => void) => {
-      const unsubCache = conversationCache.subscribe(onStoreChange);
-      const unsubDb = dbEvents.subscribe(DB_EVENTS.MESSAGE_SAVED, async () => {
-        const result = await messageRepo.getConversations(deviceId, myNodeNum);
-        conversationCache.set(cacheKey, result);
-      });
-
-      return () => {
-        unsubCache();
-        unsubDb();
-      };
-    },
-    [deviceId, myNodeNum, cacheKey],
+export function useConversations(myNodeNum: number) {
+  // Query all direct messages
+  const directQuery = useMemo(
+    () => messageRepo.buildAllDirectMessagesQuery(myNodeNum),
+    [myNodeNum],
+  );
+  const { data: directMessages } = useReactiveQuery<Message>(
+    messageRepo.getClient(),
+    directQuery,
   );
 
-  const getSnapshot = useCallback(
-    () => conversationCache.get(cacheKey),
-    [cacheKey],
+  // Query all channel messages
+  const channelQuery = useMemo(
+    () => messageRepo.buildAllChannelMessagesQuery(myNodeNum),
+    [myNodeNum],
+  );
+  const { data: channelMessages } = useReactiveQuery<Message>(
+    messageRepo.getClient(),
+    channelQuery,
   );
 
-  const conversations = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getSnapshot,
+  // Query all lastRead entries
+  const lastReadQuery = useMemo(
+    () => messageRepo.buildLastReadQuery(myNodeNum),
+    [myNodeNum],
+  );
+  const { data: lastReadEntries } = useReactiveQuery<LastRead>(
+    messageRepo.getClient(),
+    lastReadQuery,
   );
 
-  // Initial load
-  useEffect(() => {
-    messageRepo
-      .getConversations(deviceId, myNodeNum)
-      .then((result) => conversationCache.set(cacheKey, result));
-  }, [deviceId, myNodeNum, cacheKey]);
+  // Compute conversations from the reactive data
+  const conversations = useMemo(() => {
+    const result: Conversation[] = [];
 
-  const refresh = useCallback(async (): Promise<
-    Result<Conversation[], MessageError>
-  > => {
-    const result = await ResultAsync.fromPromise(
-      messageRepo.getConversations(deviceId, myNodeNum),
-      (cause) => MessageError.getConversations(deviceId, cause),
-    );
-    if (result.isOk()) {
-      conversationCache.set(cacheKey, result.value);
+    // Process direct conversations - find unique conversation partners
+    const directConvoMap = new Map<
+      number,
+      { lastMessage: Message; otherNode: number }
+    >();
+
+    for (const msg of directMessages) {
+      // Determine the other node from myNodeNum's perspective
+      const otherNode = msg.fromNode === myNodeNum ? msg.toNode : msg.fromNode;
+
+      // Only keep the first (latest) message for each conversation partner
+      if (!directConvoMap.has(otherNode)) {
+        directConvoMap.set(otherNode, { lastMessage: msg, otherNode });
+      }
     }
-    return result;
-  }, [deviceId, myNodeNum, cacheKey]);
 
-  return { conversations, refresh };
+    // Add direct conversations to result
+    for (const [otherNode, { lastMessage }] of directConvoMap) {
+      const unreadCount = computeDirectUnreadCount(
+        directMessages,
+        lastReadEntries,
+        myNodeNum,
+        otherNode,
+      );
+      result.push({
+        type: "direct",
+        id: otherNode,
+        lastMessage,
+        unreadCount,
+      });
+    }
+
+    // Process channel conversations - find unique channels
+    const channelConvoMap = new Map<number, Message>();
+
+    for (const msg of channelMessages) {
+      // Skip messages with no channelId, only keep the first (latest) message for each channel
+      if (msg.channelId != null && !channelConvoMap.has(msg.channelId)) {
+        channelConvoMap.set(msg.channelId, msg);
+      }
+    }
+
+    // Add channel conversations to result
+    for (const [channelId, lastMessage] of channelConvoMap) {
+      const unreadCount = computeChannelUnreadCount(
+        channelMessages,
+        lastReadEntries,
+        channelId,
+      );
+      result.push({
+        type: "channel",
+        id: channelId,
+        lastMessage,
+        unreadCount,
+      });
+    }
+
+    // Sort by last message date (most recent first)
+    result.sort((a, b) => {
+      const aDate = a.lastMessage?.date?.getTime() ?? 0;
+      const bDate = b.lastMessage?.date?.getTime() ?? 0;
+      return bDate - aDate;
+    });
+
+    return result;
+  }, [directMessages, channelMessages, lastReadEntries, myNodeNum]);
+
+  return { conversations };
 }

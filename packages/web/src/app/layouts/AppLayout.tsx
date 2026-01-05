@@ -11,6 +11,7 @@ import { useDevice } from "@state/index.ts";
 import type React from "react";
 import { useTranslation } from "react-i18next";
 import { AppSidebar } from "./AppSidebar.tsx";
+import { DialogManager } from "@app/shared/components/Dialog/DialogManager.tsx";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation("ui");
@@ -18,7 +19,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const isRemoteAdmin = device.remoteAdminTargetNode !== null;
 
   return (
-    <div className={cn("flex flex-1 min-h-0", isRemoteAdmin && "ring-2 ring-red-500 ring-inset")}>
+    <div
+      className={cn(
+        "flex flex-1 min-h-0",
+        isRemoteAdmin && "ring-2 ring-red-500 ring-inset",
+      )}
+    >
+      <DialogManager />
       <AppSidebar />
       <SidebarInset className="flex flex-col flex-1 min-h-0">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">

@@ -1,4 +1,4 @@
-import { useFieldRegistry } from "../../services/fieldRegistry";
+import { useFieldRegistry } from "../../services/fieldRegistry/index.ts";
 import type { ActivityItem } from "./types.ts";
 
 export function useActivityChanges() {

@@ -1,13 +1,13 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Node } from "@data/schema";
 import { getColorFromNodeNum, isLightColor } from "@shared/utils/color";
-import { precisionBitsToMeters, toLngLat } from "@shared/utils/geo";
+import { precisionBitsToMeters, toLngLatFromNode } from "@shared/utils/geo";
 import { circle } from "@turf/turf";
 import type { Feature, FeatureCollection, Polygon } from "geojson";
 import { Layer, Source } from "react-map-gl/maplibre";
 
 export interface PrecisionLayerProps {
   id: string;
-  filteredNodes: Protobuf.Mesh.NodeInfo[];
+  filteredNodes: Node[];
   isVisible: boolean;
 }
 
@@ -20,7 +20,7 @@ type CircleProps = {
 };
 
 export function generatePrecisionCircles(
-  filteredNodes: Protobuf.Mesh.NodeInfo[],
+  filteredNodes: Node[],
 ): FeatureCollection {
   const unique = new Map<
     string,
@@ -37,15 +37,15 @@ export function generatePrecisionCircles(
 
   for (const node of filteredNodes) {
     if (
-      node.position?.precisionBits === undefined ||
-      node.position.precisionBits === 0
+      node.positionPrecisionBits === null ||
+      node.positionPrecisionBits === 0
     ) {
       continue;
     }
-    const [lng, lat] = toLngLat(node.position);
-    const radiusM = precisionBitsToMeters(node.position?.precisionBits ?? 0);
+    const [lng, lat] = toLngLatFromNode(node);
+    const radiusM = precisionBitsToMeters(node.positionPrecisionBits);
 
-    const color = getColorFromNodeNum(node.num);
+    const color = getColorFromNodeNum(node.nodeNum);
     const isLight = isLightColor(color);
 
     const key = `${lat},${lng}:${radiusM}`;

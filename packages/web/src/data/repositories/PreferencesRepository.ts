@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
 import { preferences } from "../schema.ts";
 
@@ -9,6 +10,40 @@ export class PreferencesRepository {
   private get db() {
     return dbClient.db;
   }
+
+  /**
+   * Get the SQLocal client for reactive queries
+   * @param client - Optional client override for dependency injection
+   */
+  getClient(client?: SQLocalDrizzle) {
+    return client ?? dbClient.client;
+  }
+
+  // ===================
+  // Query Builders 
+  // ===================
+
+  /**
+   * Build a query to get a preference by key
+   */
+  buildPreferenceQuery(key: string) {
+    return this.db
+      .select()
+      .from(preferences)
+      .where(eq(preferences.key, key))
+      .limit(1);
+  }
+
+  /**
+   * Build a query to get all preferences
+   */
+  buildAllPreferencesQuery() {
+    return this.db.select().from(preferences);
+  }
+
+  // ===================
+  // Async Methods (execute queries)
+  // ===================
 
   /**
    * Get a preference value by key

@@ -1,8 +1,7 @@
-import { DB_EVENTS, dbEvents } from "@data/events";
 import { messageRepo } from "@data/index";
 import { type ConversationType } from "@data/types";
-import { useCallback, useMemo } from "react";
-import { getClient, getDb } from "../../../data/client.ts";
+import { useMemo } from "react";
+import { getDb } from "../../../data/client.ts";
 import { lastRead, messages } from "../../../data/schema.ts";
 import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
 import { useReactiveQuery } from "sqlocal/react";
@@ -52,16 +51,11 @@ export function useUnreadCountDirect(
     [deviceId, myNodeNum, otherNodeNum, conversationId],
   );
 
-  const { data, status } = useReactiveQuery(getClient(), query);
-
-  const refresh = useCallback(() => {
-    // No-op for reactive query
-  }, []);
+  const { data, status } = useReactiveQuery(messageRepo.getClient(), query);
 
   return {
     unreadCount: data?.[0]?.count ?? 0,
-    loading: status === "pending" && !data,
-    refresh,
+    isLoading: status === "pending" && !data,
   };
 }
 
@@ -95,16 +89,11 @@ export function useUnreadCountBroadcast(deviceId: number, channelId: number) {
     [deviceId, channelId, conversationId],
   );
 
-  const { data, status } = useReactiveQuery(getClient(), query);
-
-  const refresh = useCallback(() => {
-    // No-op for reactive query
-  }, []);
+  const { data, status } = useReactiveQuery(messageRepo.getClient(), query);
 
   return {
     unreadCount: data?.[0]?.count ?? 0,
-    loading: status === "pending" && !data,
-    refresh,
+    isLoading: status === "pending" && !data,
   };
 }
 
@@ -123,5 +112,4 @@ export async function markConversationAsRead(
       : conversationId;
 
   await messageRepo.markAsRead(deviceId, type, convId, lastMessageId);
-  dbEvents.emit(DB_EVENTS.MESSAGE_SAVED); // Trigger unread count refresh
 }

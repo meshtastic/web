@@ -1,5 +1,4 @@
 import logger from "@core/services/logger";
-import { DB_EVENTS, dbEvents } from "@data/events";
 import { messageRepo } from "@data/index";
 import type { Message } from "@data/schema";
 import { Button } from "@shared/components/ui/button";
@@ -60,9 +59,6 @@ export const RetryButton = ({ message, className }: RetryButtonProps) => {
           "sent",
         );
 
-        // Emit event to trigger UI refresh
-        dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
-
         logger.debug(
           `[RetryButton] Message ${currentMessage.id} retried successfully with new ID ${newMessageId}`,
         );
@@ -83,7 +79,6 @@ export const RetryButton = ({ message, className }: RetryButtonProps) => {
         currentMessage.ownerNodeNum,
         "failed",
       );
-      dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
     } finally {
       setIsRetrying(false);
     }

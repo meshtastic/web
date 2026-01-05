@@ -1,3 +1,3 @@
-export { App } from "./App";
-export { routes } from "./routes";
-export * from "./layouts";
+export { App } from "./App.tsx";
+export * from "./layouts/index.ts";
+export { router } from "./routes.tsx";

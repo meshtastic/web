@@ -1,19 +1,16 @@
-import { DB_EVENTS, dbEvents } from "@data/events";
+import { useMyNode } from "@shared/hooks";
 import { messageRepo } from "@data/index";
-import { useDeviceContext } from "@shared/hooks/useDeviceContext";
 import { useCallback } from "react";
 
 /**
  * Hook to delete all messages for the current device
  */
 export function useDeleteMessages() {
-  const { deviceId } = useDeviceContext();
+  const { myNodeNum } = useMyNode();
 
   const deleteAllMessages = useCallback(async () => {
-    await messageRepo.deleteAllMessages(deviceId);
-    // Emit event to trigger reactivity
-    dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
-  }, [deviceId]);
+    await messageRepo.deleteAllMessages(myNodeNum);
+  }, [myNodeNum]);
 
   return { deleteAllMessages };
 }

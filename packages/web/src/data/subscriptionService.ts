@@ -3,7 +3,6 @@ import { toJson } from "@bufbuild/protobuf";
 import { type MeshDevice, Protobuf } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import logger from "../core/services/logger.ts";
-import { DB_EVENTS, dbEvents } from "./events.ts";
 import { packetBatcher } from "./packetBatcher.ts";
 import {
   channelRepo,
@@ -72,8 +71,6 @@ export class SubscriptionService {
           };
 
           await nodeRepo.logPosition(positionLog);
-
-          dbEvents.emit(DB_EVENTS.POSITION_UPDATED);
         } catch (error) {
           logger.error("[DB Subscriptions] Error saving position:", error);
         }
@@ -98,8 +95,6 @@ export class SubscriptionService {
               : undefined,
             isLicensed: user.data.isLicensed,
           });
-
-          dbEvents.emit(DB_EVENTS.NODE_UPDATED);
         } catch (error) {
           logger.error("[DB Subscriptions] Error saving user:", error);
         }
@@ -157,9 +152,6 @@ export class SubscriptionService {
           };
 
           await nodeRepo.upsertNode(newNode);
-
-          // Emit event to notify listeners
-          dbEvents.emit(DB_EVENTS.NODE_UPDATED);
         } catch (error) {
           logger.error("[DB Subscriptions] Error saving node:", error);
         }
@@ -209,8 +201,6 @@ export class SubscriptionService {
           };
 
           await nodeRepo.logTelemetry(telemetryLog);
-
-          dbEvents.emit(DB_EVENTS.TELEMETRY_UPDATED);
         } catch (error) {
           logger.error("[DB Subscriptions] Error saving telemetry:", error);
         }
@@ -228,9 +218,6 @@ export class SubscriptionService {
             meshPacket.rxTime,
             meshPacket.rxSnr,
           )
-          .then(() => {
-            dbEvents.emit(DB_EVENTS.NODE_UPDATED);
-          })
           .catch((error) => {
             logger.error(
               "[DB Subscriptions] Error updating lastHeard:",
@@ -328,9 +315,6 @@ export class SubscriptionService {
           };
 
           await messageRepo.saveMessage(newMessage);
-
-          // Emit event to notify listeners
-          dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
         } catch (error) {
           logger.error("[DB Subscriptions] Error saving message:", error);
         }
@@ -354,8 +338,6 @@ export class SubscriptionService {
             positionPrecision:
               channel.settings?.moduleSettings?.positionPrecision,
           });
-
-          dbEvents.emit(DB_EVENTS.CHANNEL_UPDATED);
         } catch (error) {
           logger.error("[DB Subscriptions] Error saving channel:", error);
         }

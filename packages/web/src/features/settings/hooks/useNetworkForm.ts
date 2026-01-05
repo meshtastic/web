@@ -2,7 +2,7 @@ import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/core";
 import { convertIntToIpAddress, convertIpAddressToInt } from "@shared/utils/ip";
 import { useDevice } from "@state/index.ts";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
 import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
@@ -83,56 +83,49 @@ export function useNetworkForm() {
   const prevValuesRef = useRef<NetworkValidation | undefined>(undefined);
 
   // Sync form changes to store and field registry
+  const onFormChange = useEffectEvent((formData: Partial<NetworkValidation>) => {
+    if (!baseConfig || !formData || !defaultValues) {
+      return;
+    }
+
+    const currentValues = formData as NetworkValidation;
+    const prevValues = prevValuesRef.current;
+
+    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+      return;
+    }
+
+    prevValuesRef.current = currentValues;
+
+    // Convert for store
+    const parsed = fromFormValues(currentValues);
+
+    // Track per-field changes for Activity panel
+    for (const key of Object.keys(currentValues) as Array<
+      keyof NetworkValidation
+    >) {
+      const newValue = currentValues[key];
+      const originalValue = defaultValues[key];
+
+      if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
+        trackChange(SECTION, key, newValue, originalValue);
+      } else {
+        removeChange(SECTION, key);
+      }
+    }
+
+    // Send full config to device store
+    const hasChanges = JSON.stringify(parsed) !== JSON.stringify(baseConfig);
+
+    if (hasChanges) {
+      setChange(SECTION, parsed, baseConfig);
+    }
+  });
+
   useEffect(() => {
-    const subscription = watch((formData) => {
-      if (!baseConfig || !formData || !defaultValues) {
-        return;
-      }
-
-      const currentValues = formData as NetworkValidation;
-      const prevValues = prevValuesRef.current;
-
-      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-        return;
-      }
-
-      prevValuesRef.current = currentValues;
-
-      // Convert for store
-      const parsed = fromFormValues(currentValues);
-
-      // Track per-field changes for Activity panel
-      for (const key of Object.keys(currentValues) as Array<
-        keyof NetworkValidation
-      >) {
-        const newValue = currentValues[key];
-        const originalValue = defaultValues[key];
-
-        if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-          trackChange(SECTION, key, newValue, originalValue);
-        } else {
-          removeChange(SECTION, key);
-        }
-      }
-
-      // Send full config to device store
-      const hasChanges = JSON.stringify(parsed) !== JSON.stringify(baseConfig);
-
-      if (hasChanges) {
-        setChange(SECTION, parsed, baseConfig);
-      }
-    });
-
+    const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [
-    watch,
-    baseConfig,
-    defaultValues,
-    fromFormValues,
-    setChange,
-    trackChange,
-    removeChange,
-  ]);
+  }, [watch]);
 
   const isDisabledByField = useCallback(
     (

@@ -1,4 +1,5 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, isNotNull } from "drizzle-orm";
+import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
 import { type Connection, connections, type NewConnection } from "../schema.ts";
 
@@ -20,6 +21,49 @@ export class ConnectionRepository {
   private get db() {
     return dbClient.db;
   }
+
+  /**
+   * Get the SQLocal client for reactive queries
+   * @param client - Optional client override for dependency injection
+   */
+  getClient(client?: SQLocalDrizzle) {
+    return client ?? dbClient.client;
+  }
+
+  // ===================
+  // Query Builders 
+  // ===================
+
+  /**
+   * Build a query to get all connections
+   */
+  buildConnectionsQuery() {
+    return this.db.select().from(connections);
+  }
+
+  /**
+   * Build a query to get a connection by ID
+   */
+  buildConnectionQuery(id: number) {
+    return this.db
+      .select()
+      .from(connections)
+      .where(eq(connections.id, id));
+  }
+
+  /**
+   * Build a query to get the default connection
+   */
+  buildDefaultConnectionQuery() {
+    return this.db
+      .select()
+      .from(connections)
+      .where(eq(connections.isDefault, true));
+  }
+
+  // ===================
+  // Async Methods (execute queries)
+  // ===================
 
   /**
    * Get all connections
@@ -52,6 +96,36 @@ export class ConnectionRepository {
       .select()
       .from(connections)
       .where(eq(connections.isDefault, true))
+      .limit(1);
+
+    return result[0];
+  }
+
+  /**
+   * Get the last active device ID (most recently connected device with a meshDeviceId)
+   * Used to restore active device on app reload
+   */
+  async getLastActiveDeviceId(): Promise<number | null> {
+    const result = await this.db
+      .select({ meshDeviceId: connections.meshDeviceId })
+      .from(connections)
+      .where(isNotNull(connections.meshDeviceId))
+      .orderBy(desc(connections.lastConnectedAt))
+      .limit(1);
+
+    return result[0]?.meshDeviceId ?? null;
+  }
+
+  /**
+   * Get the last connected connection (most recently connected)
+   * Used for auto-reconnect on app startup
+   */
+  async getLastConnectedConnection(): Promise<Connection | undefined> {
+    const result = await this.db
+      .select()
+      .from(connections)
+      .where(isNotNull(connections.lastConnectedAt))
+      .orderBy(desc(connections.lastConnectedAt))
       .limit(1);
 
     return result[0];

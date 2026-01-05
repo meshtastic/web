@@ -1,9 +1,9 @@
-import { DB_EVENTS, dbEvents } from "@data/events";
+import logger from "@core/services/logger";
 import { useMessageDraft } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
 import { messageRepo } from "@data/index";
 import type { NewMessage } from "@data/schema";
 import type { Types } from "@meshtastic/core";
-import type { Contact } from "@pages/Messages";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
@@ -13,32 +13,27 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
-import type {
-  OutgoingMessage,
-  PipelineContext,
-} from "@shared/utils/messagePipelineHandlers";
+import { useDeviceCommands } from "@shared/hooks/useDeviceCommands";
+import type { OutgoingMessage } from "@shared/utils/messagePipelineHandlers";
 import { autoFavoriteDMHandler } from "@shared/utils/messagePipelineHandlers";
-import type { Device } from "@state/device";
 import { ArrowUp } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import type { Contact } from "../pages/MessagesPage.tsx";
 
 const MAX_MESSAGE_BYTES = 200;
 
 export interface MessageInputProps {
   selectedContact: Contact;
-  device: Device;
 }
 
-export const MessageInput = ({
-  selectedContact,
-  device,
-}: MessageInputProps) => {
+export const MessageInput = ({ selectedContact }: MessageInputProps) => {
   const { t } = useTranslation("messages");
-  const myNodeNum = device.getMyNodeNum();
+  const { myNodeNum } = useMyNode();
+  const commands = useDeviceCommands();
 
   const { draft, setDraft, clearDraft } = useMessageDraft(
-    device.id,
+    myNodeNum,
     selectedContact.type === "direct" ? "direct" : "channel",
     selectedContact.id,
   );
@@ -60,7 +55,7 @@ export const MessageInput = ({
   };
 
   const sendMessage = async () => {
-    if (!selectedContact || !device.connection || !myNodeNum) {
+    if (!selectedContact || !commands.isConnected() || !myNodeNum) {
       return;
     }
 
@@ -88,9 +83,11 @@ export const MessageInput = ({
     const tempMessageId = Math.floor(Date.now() / 1000); // Use seconds like Meshtastic does
 
     // Save message immediately for instant UI feedback
-    // Use device.id (meshDeviceId) for ownerNodeNum to match query patterns
+    logger.info(
+      `[MessageInput] Saving message with ownerNodeNum=${myNodeNum}, channelId=${channelValue}, type=${isDirect ? "direct" : "channel"}`,
+    );
     const newMessage: NewMessage = {
-      ownerNodeNum: device.id,
+      ownerNodeNum: myNodeNum,
       messageId: tempMessageId,
       type: isDirect ? "direct" : "channel",
       channelId: channelValue,
@@ -112,7 +109,6 @@ export const MessageInput = ({
 
     try {
       await messageRepo.saveMessage(newMessage);
-      dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
     } catch (error) {
       console.error("[sendMessage] Failed to save message:", error);
       return;
@@ -127,16 +123,10 @@ export const MessageInput = ({
         wantAck: true,
       };
 
-      const pipelineContext: PipelineContext = {
-        device,
-        deviceId: device.id,
-        myNodeNum,
-      };
-
-      await autoFavoriteDMHandler(outgoingMessage, pipelineContext);
+      await autoFavoriteDMHandler(outgoingMessage, myNodeNum);
 
       // Send message - don't await, handle result asynchronously
-      device.connection
+      commands
         .sendText(
           trimmedMessage,
           toValue,
@@ -148,29 +138,26 @@ export const MessageInput = ({
             // Update message state to sent
             await messageRepo.updateMessageStateByMessageId(
               tempMessageId,
-              device.id,
+              myNodeNum,
               "sent",
             );
-            dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
           }
         })
         .catch(async (error) => {
           console.error("[sendMessage] Failed to send:", error);
           await messageRepo.updateMessageStateByMessageId(
             tempMessageId,
-            device.id,
+            myNodeNum,
             "failed",
           );
-          dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
         });
     } catch (error) {
       console.error("[sendMessage] Failed to send message:", error);
       await messageRepo.updateMessageStateByMessageId(
         tempMessageId,
-        device.id,
+        myNodeNum,
         "failed",
       );
-      dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
     }
   };
 
@@ -190,7 +177,7 @@ export const MessageInput = ({
             onChange={(e) => handleMessageChange(e.target.value)}
             className="flex-1"
           />
-          <span className="flex items-center text-sm text-muted-foreground min-w-[60px] justify-end">
+          <span className="flex items-center text-sm text-muted-foreground min-w-15 justify-end">
             {messageBytes}/{MAX_MESSAGE_BYTES}
           </span>
         </div>

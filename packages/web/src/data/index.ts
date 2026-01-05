@@ -1,10 +1,3 @@
-/**
- * Database module exports
- *
- * This module provides a complete database layer using sqlocal + Drizzle ORM
- * for storing messages, nodes, channels, and packet logs.
- */
-
 export { dbClient, getDb, getSql } from "./client.ts";
 export { ChannelError, DBError, MessageError, NodeError } from "./errors.ts";
 export type { ConnectionStatus, ConnectionType } from "./hooks/index.ts";
@@ -14,10 +7,11 @@ export {
   useChannel,
   useChannelMessages,
   useChannels,
+  useConnect,
   useConnection,
-  useConnections,
   useConversations,
   useDefaultConnection,
+  useDevices,
   useDirectMessages,
   useFavoriteNodes,
   useMessageDraft,
@@ -26,34 +20,38 @@ export {
   usePendingMessages,
   usePositionHistory,
   usePositionTrails,
-  usePrimaryChannel,
-  useRecentNodes,
   useTelemetryHistory,
 } from "./hooks/index.ts";
 export { MigrationService } from "./migrationService.ts";
+// Export packet batcher
+export { PacketBatcher, packetBatcher } from "./packetBatcher.ts";
 export {
   ChannelRepository,
   ConnectionRepository,
+  DeviceRepository,
+  MessageRepository,
+  NodeRepository,
+  PreferencesRepository,
+  TracerouteRepository,
   channelRepo,
   connectionRepo,
-  MessageRepository,
+  deviceRepo,
   messageRepo,
-  NodeRepository,
   nodeRepo,
-  PreferencesRepository,
   preferencesRepo,
-  TracerouteRepository,
   tracerouteRepo,
 } from "./repositories/index.ts";
 // Export schema types
 export type {
   Channel,
   Connection,
+  Device,
   LastRead,
   Message,
   MessageDraft,
   NewChannel,
   NewConnection,
+  NewDevice,
   NewLastRead,
   NewMessage,
   NewMessageDraft,
@@ -72,6 +70,7 @@ export type {
 export {
   channels,
   connections,
+  devices,
   lastRead,
   messageDrafts,
   messages,
@@ -84,8 +83,6 @@ export {
 // Export subscription service
 export { SubscriptionService } from "./subscriptionService.ts";
 export type { ConversationType } from "./types.ts";
-// Export packet batcher
-export { packetBatcher, PacketBatcher } from "./packetBatcher.ts";
 
 /**
  * Initialize the database

@@ -1,7 +1,8 @@
 import { Channel } from "./Channel";
+import { useMyNode } from "@shared/hooks";
 import { type Channel as DbChannel, useChannels } from "@data/index";
 import { Button } from "@shared/components/ui/button";
-import { useDevice, useDeviceContext } from "@state/index.ts";
+import { useDevice } from "@state/index.ts";
 import i18next from "i18next";
 import { ChevronRight, Plus, Radio } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -37,8 +38,8 @@ const getRoleLabel = (role: number, channelIndex: number, t: (key: string) => st
 export const Channels = () => {
   const device = useDevice();
   const { hasChannelChange } = device;
-  const { deviceId } = useDeviceContext();
-  const { channels } = useChannels(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { channels } = useChannels(myNodeNum);
   const { t } = useTranslation("channels");
   const [openChannels, setOpenChannels] = useState<Set<number>>(new Set([0]));
 

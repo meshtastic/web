@@ -39,6 +39,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react({
+        reactRefreshHost: "http://localhost:3000",
         babel: {
           plugins: ["babel-plugin-react-compiler"],
         },
@@ -91,7 +92,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       headers: {
-        // "Content-Security-Policy": CONTENT_SECURITY_POLICY,
+        "Content-Security-Policy": CONTENT_SECURITY_POLICY,
         "Cross-Origin-Opener-Policy": "same-origin",
         "Cross-Origin-Embedder-Policy": "require-corp",
         "X-Content-Type-Options": "nosniff",

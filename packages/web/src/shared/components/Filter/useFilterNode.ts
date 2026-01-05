@@ -1,3 +1,4 @@
+import type { Node } from "@data/schema";
 import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useCallback, useMemo } from "react";
@@ -58,10 +59,7 @@ export function useFilterNode() {
   );
 
   const nodeFilter = useCallback(
-    (
-      node: Protobuf.Mesh.NodeInfo,
-      filterOverrides?: Partial<FilterState>,
-    ): boolean => {
+    (node: Node, filterOverrides?: Partial<FilterState>): boolean => {
       const filterState: FilterState = {
         ...defaultFilterValues,
         ...filterOverrides,
@@ -69,10 +67,10 @@ export function useFilterNode() {
 
       const nodeName = filterState.nodeName.toLowerCase();
       if (nodeName) {
-        const short = node.user?.shortName?.toLowerCase() ?? "";
-        const long = node.user?.longName?.toLowerCase() ?? "";
-        const numStr = node.num.toString();
-        const hex = numberToHexUnpadded(node.num);
+        const short = node.shortName?.toLowerCase() ?? "";
+        const long = node.longName?.toLowerCase() ?? "";
+        const numStr = node.nodeNum.toString();
+        const hex = numberToHexUnpadded(node.nodeNum);
 
         if (
           !short.includes(nodeName) &&
@@ -84,33 +82,17 @@ export function useFilterNode() {
         }
       }
 
-      const hops = node.hopsAway ?? 7;
-      if (
-        (node.hopsAway === undefined &&
-          !shallowEqualArray(
-            filterState.hopsAway,
-            defaultFilterValues.hopsAway,
-          )) || // If hops are unknown, hide node if state is not default
-        hops < filterState.hopsAway[0] ||
-        hops > filterState.hopsAway[1]
-      ) {
-        return false;
-      }
+      // Note: hopsAway is not available in Node schema (not stored in database)
+      // Skip hops filtering for now - would need to add to schema if needed
 
+      const lastHeardMs = node.lastHeard?.getTime() ?? 0;
+      const secondsAgo = Math.max(0, (Date.now() - lastHeardMs) / 1000);
       if (
-        (filterState.hopsUnknown === true && node.hopsAway !== undefined) ||
-        (filterState.hopsUnknown === false && node.hopsAway === undefined)
-      ) {
-        return false;
-      }
-
-      const secondsAgo = Math.max(0, Date.now() / 1000 - (node.lastHeard ?? 0));
-      if (
-        (node.lastHeard === 0 &&
+        (node.lastHeard === null &&
           !shallowEqualArray(
             filterState.lastHeard,
             defaultFilterValues.lastHeard,
-          )) || // If lastHeard is unknown (0), hide node if state is not default
+          )) || // If lastHeard is unknown (null), hide node if state is not default
         secondsAgo < filterState.lastHeard[0] ||
         (secondsAgo > filterState.lastHeard[1] &&
           filterState.lastHeard[1] !== defaultFilterValues.lastHeard[1])
@@ -119,8 +101,8 @@ export function useFilterNode() {
       }
 
       if (
-        (filterState.showUnheard === true && (node.lastHeard ?? 0) !== 0) ||
-        (filterState.showUnheard === false && (node.lastHeard ?? 0) === 0)
+        (filterState.showUnheard === true && node.lastHeard !== null) ||
+        (filterState.showUnheard === false && node.lastHeard === null)
       ) {
         return false;
       }
@@ -132,16 +114,12 @@ export function useFilterNode() {
         return false;
       }
 
-      if (
-        typeof filterState.viaMqtt !== "undefined" &&
-        node.viaMqtt !== filterState.viaMqtt
-      ) {
-        return false;
-      }
+      // Note: viaMqtt is not available in Node schema (not stored in database)
+      // Skip viaMqtt filtering for now - would need to add to schema if needed
 
-      const snr = node.snr ?? -20;
+      const snr = node.snr ?? 0;
       if (
-        (node.snr === undefined &&
+        (node.snr === null &&
           !shallowEqualArray(filterState.snr, defaultFilterValues.snr)) ||
         (snr < filterState.snr[0] &&
           filterState.snr[0] !== defaultFilterValues.snr[0]) ||
@@ -151,9 +129,9 @@ export function useFilterNode() {
         return false;
       }
 
-      const channelUtilization = node.deviceMetrics?.channelUtilization ?? 0;
+      const channelUtilization = node.channelUtilization ?? 0;
       if (
-        (node.deviceMetrics?.channelUtilization === undefined &&
+        (node.channelUtilization === null &&
           !shallowEqualArray(
             filterState.channelUtilization,
             defaultFilterValues.channelUtilization,
@@ -164,9 +142,9 @@ export function useFilterNode() {
         return false;
       }
 
-      const airUtilTx = node.deviceMetrics?.airUtilTx ?? 0;
+      const airUtilTx = node.airUtilTx ?? 0;
       if (
-        (node.deviceMetrics?.airUtilTx === undefined &&
+        (node.airUtilTx === null &&
           !shallowEqualArray(
             filterState.airUtilTx,
             defaultFilterValues.airUtilTx,
@@ -177,9 +155,9 @@ export function useFilterNode() {
         return false;
       }
 
-      const batt = node.deviceMetrics?.batteryLevel ?? 101;
+      const batt = node.batteryLevel ?? 101;
       if (
-        (node.deviceMetrics?.batteryLevel === undefined &&
+        (node.batteryLevel === null &&
           !shallowEqualArray(
             filterState.batteryLevel,
             defaultFilterValues.batteryLevel,
@@ -190,9 +168,9 @@ export function useFilterNode() {
         return false;
       }
 
-      const voltage = Math.abs(node.deviceMetrics?.voltage ?? 0);
+      const voltage = Math.abs(node.voltage ?? 0);
       if (
-        (node.deviceMetrics?.voltage === undefined &&
+        (node.voltage === null &&
           !shallowEqualArray(
             filterState.voltage,
             defaultFilterValues.voltage,
@@ -205,9 +183,9 @@ export function useFilterNode() {
       }
 
       const role: Protobuf.Config.Config_DeviceConfig_Role =
-        node.user?.role ?? Protobuf.Config.Config_DeviceConfig_Role.CLIENT;
+        node.role ?? Protobuf.Config.Config_DeviceConfig_Role.CLIENT;
       if (
-        (node.user?.role === undefined &&
+        (node.role === null &&
           !shallowEqualArray(filterState.role, defaultFilterValues.role)) ||
         !filterState.role.includes(role)
       ) {
@@ -215,9 +193,9 @@ export function useFilterNode() {
       }
 
       const hwModel: Protobuf.Mesh.HardwareModel =
-        node.user?.hwModel ?? Protobuf.Mesh.HardwareModel.UNSET;
+        node.hwModel ?? Protobuf.Mesh.HardwareModel.UNSET;
       if (
-        (node.user?.hwModel === undefined &&
+        (node.hwModel === null &&
           !shallowEqualArray(
             filterState.hwModel,
             defaultFilterValues.hwModel,

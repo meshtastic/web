@@ -2,9 +2,15 @@ import { drizzle } from "drizzle-orm/sqlite-proxy";
 import { SQLocalDrizzle } from "sqlocal/drizzle";
 import logger from "../core/services/logger.ts";
 import initialSchema from "./migrations/0000_initial_schema.sql?raw";
+import migration0002 from "./migrations/0002_empty_paper_doll.sql?raw";
+import migration0003 from "./migrations/0003_devices_table.sql?raw";
 import * as schema from "./schema.ts";
 
-const migrations = [{ id: "0000_initial_schema", sql: initialSchema }];
+const migrations = [
+  { id: "0000_initial_schema", sql: initialSchema },
+  { id: "0002_empty_paper_doll", sql: migration0002 },
+  { id: "0003_devices_table", sql: migration0003 },
+];
 
 class DatabaseClient {
   private static instance: DatabaseClient;
@@ -94,13 +100,11 @@ class DatabaseClient {
         "[DB] Detected existing database without migration tracking, seeding migration history...",
       );
 
-      // Mark all migrations as applied since the schema already exists
-      for (const migration of migrations) {
-        await sql(
-          `INSERT INTO __drizzle_migrations (migration_id) VALUES ('${migration.id}')`,
-        );
-      }
-      logger.debug("[DB] Migration history seeded");
+      // Only mark the initial schema as applied - new migrations should still run
+      await sql(
+        `INSERT INTO __drizzle_migrations (migration_id) VALUES ('0000_initial_schema')`,
+      );
+      logger.debug("[DB] Migration history seeded with initial schema");
     }
 
     const appliedSet = new Set(
@@ -186,6 +190,8 @@ class DatabaseClient {
 
     logger.debug("[DB] Deleting all data...");
 
+    // Delete in order that respects foreign key constraints
+    // Child tables first, then devices (parent)
     const tables = [
       "messages",
       "nodes",
@@ -198,6 +204,7 @@ class DatabaseClient {
       "traceroute_logs",
       "device_configs",
       "config_changes",
+      "devices",
     ];
 
     for (const table of tables) {

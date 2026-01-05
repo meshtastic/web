@@ -1,20 +1,18 @@
+import { useMyNode } from "@app/shared/hooks/useMyNode";
 import { useNodes } from "@data/hooks";
 import { tracerouteRepo } from "@data/repositories";
 import type { TracerouteLog } from "@data/schema";
 import { TraceRoute } from "@features/messages/components/TraceRoute";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { useGetMyNode } from "@shared/hooks/useGetMyNode";
-import { useDeviceContext } from "@state/index.ts";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DialogWrapper } from "./DialogWrapper";
+import { DialogWrapper } from "./DialogWrapper.tsx";
 
 export const TracerouteResponseDialog = () => {
   const { t } = useTranslation("dialog");
-  const { deviceId } = useDeviceContext();
-  const { nodeMap } = useNodes(deviceId);
-  const { myNodeNum, myNode } = useGetMyNode();
+  const { myNodeNum, myNode } = useMyNode();
+  const { nodeMap } = useNodes(myNodeNum);
   const navigate = useNavigate();
 
   // Read traceroute param from URL
@@ -33,13 +31,13 @@ export const TracerouteResponseDialog = () => {
     }
 
     tracerouteRepo
-      .getLatestTraceroute(deviceId, tracerouteNodeNum)
+      .getLatestTraceroute(myNodeNum, tracerouteNodeNum)
       .then(setTracerouteLog)
       .catch((error) => {
         console.error("Failed to load traceroute:", error);
         setTracerouteLog(undefined);
       });
-  }, [deviceId, tracerouteNodeNum]);
+  }, [myNodeNum, tracerouteNodeNum]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -89,7 +87,7 @@ export const TracerouteResponseDialog = () => {
         from={{
           longName: myNode?.longName ?? null,
           shortName: myNode?.shortName ?? null,
-          nodeNum: myNodeNum ?? 0,
+          nodeNum: myNodeNum,
         }}
         to={{
           longName: targetNode?.longName ?? null,

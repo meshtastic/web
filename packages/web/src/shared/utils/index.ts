@@ -1,4 +1,5 @@
 // Re-export shared utilities
+export { hexToUint8Array, uint8ArrayToHex } from "./bytes";
 export { cn } from "./cn";
 export * from "./color";
 export { debounce } from "./debounce";

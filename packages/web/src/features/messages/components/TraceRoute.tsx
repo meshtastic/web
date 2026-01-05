@@ -1,6 +1,6 @@
 import { useNodes } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { useDeviceContext } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
 
 interface NodeInfo {
@@ -27,8 +27,8 @@ interface RoutePathProps {
 }
 
 const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
   const { t } = useTranslation();
 
   // Create getNode function from database nodes

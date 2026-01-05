@@ -1,38 +1,75 @@
 /**
- * useConnections - Connection state synchronization
- *
+ * useConnect - Connection state synchronization
  */
 
-import { ConnectionError } from "@data/errors";
 import { connectionRepo } from "@data/repositories";
 import type {
   ConnectionStatus,
   ConnectionType,
 } from "@data/repositories/ConnectionRepository";
-import type { Connection } from "@data/schema";
-import { connections } from "@data/schema";
 import { useDeviceStore } from "@state/index.ts";
-import { eq } from "drizzle-orm";
-import { type Result, okAsync } from "neverthrow";
-import { useCallback, useEffect, useMemo } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+} from "react";
 import { useReactiveQuery } from "sqlocal/react";
-import { getClient, getDb } from "../../../data/client.ts";
 import type { NewConnectionInput } from "../components/AddConnectionDialog/AddConnectionDialog.tsx";
 import { BrowserHardware } from "../services/BrowserHardware.ts";
-import { ConnectionService } from "../services/ConnectionService.ts";
+import {
+  ConnectionService,
+  type NavigationIntent,
+} from "../services/ConnectionService.ts";
 
 export type { ConnectionStatus, ConnectionType };
+export type { NavigationIntent };
+
+export type AutoReconnectStatus = "idle" | "connecting" | "connected" | "failed";
+
+export interface UseConnectOptions {
+  /** Attempt auto-reconnect to last connection on mount */
+  autoReconnect?: boolean;
+  /** Callback for navigation intents after successful connection */
+  onNavigationIntent?: (intent: NavigationIntent) => void;
+}
 
 /**
  * Hook to manage connections
+ *
+ * @param options.autoReconnect - Attempt auto-reconnect to last connection on mount
+ * @param options.onNavigationIntent - Callback for navigation intents after successful connection
  */
-export function useConnections() {
+export function useConnect(options?: UseConnectOptions) {
   const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
 
-  const query = useMemo(() => getDb().select().from(connections), []);
-  const { data } = useReactiveQuery(getClient(), query);
+  const query = useMemo(() => connectionRepo.buildConnectionsQuery(), []);
+  const { data } = useReactiveQuery(connectionRepo.getClient(), query);
 
   const connList = data ?? [];
+
+  // Auto-reconnect state
+  const [autoReconnectStatus, setAutoReconnectStatus] =
+    useState<AutoReconnectStatus>("idle");
+
+  // Handle auto-reconnect on mount
+  useEffect(() => {
+    if (!options?.autoReconnect) return;
+
+    setAutoReconnectStatus("connecting");
+    ConnectionService.tryAutoReconnect()
+      .then((success) =>
+        setAutoReconnectStatus(success ? "connected" : "failed"),
+      )
+      .catch(() => setAutoReconnectStatus("failed"));
+  }, [options?.autoReconnect]);
+
+  // Subscribe to navigation intents
+  useEffect(() => {
+    if (!options?.onNavigationIntent) return;
+    return ConnectionService.onNavigationIntent(options.onNavigationIntent);
+  }, [options?.onNavigationIntent]);
 
   const refreshStatuses = useCallback(async () => {
     if (connList.length > 0) {
@@ -46,15 +83,15 @@ export function useConnections() {
   }, [refreshStatuses]);
 
   // Listen for hardware changes to re-check statuses
+  const onHardwareChange = useEffectEvent(() => {
+    refreshStatuses();
+  });
+
   useEffect(() => {
-    const unsubSerial = BrowserHardware.onSerialDeviceChange(() => {
-      refreshStatuses();
-    });
+    const unsubSerial = BrowserHardware.onSerialDeviceChange(onHardwareChange);
 
     let unsubBt: (() => void) | undefined;
-    BrowserHardware.onAnyBluetoothDisconnect(() => {
-      refreshStatuses();
-    }).then((unsub) => {
+    BrowserHardware.onAnyBluetoothDisconnect(onHardwareChange).then((unsub) => {
       unsubBt = unsub;
     });
 
@@ -62,15 +99,7 @@ export function useConnections() {
       unsubSerial();
       unsubBt?.();
     };
-  }, [refreshStatuses]);
-
-  const refresh = useCallback(async (): Promise<
-    Result<Connection[], ConnectionError>
-  > => {
-    // No-op for reactive query, but we can trigger status check
-    await refreshStatuses();
-    return okAsync(connList);
-  }, [connList, refreshStatuses]);
+  }, []);
 
   const connect = useCallback(
     async (
@@ -147,7 +176,6 @@ export function useConnections() {
 
   return {
     connections: connList,
-    refresh,
     addConnection,
     connect,
     disconnect,
@@ -155,6 +183,7 @@ export function useConnections() {
     setDefaultConnection,
     refreshStatuses,
     syncConnectionStatuses,
+    autoReconnectStatus,
   };
 }
 
@@ -163,19 +192,12 @@ export function useConnections() {
  */
 export function useConnection(id: number) {
   const query = useMemo(
-    () => getDb().select().from(connections).where(eq(connections.id, id)),
+    () => connectionRepo.buildConnectionQuery(id),
     [id],
   );
-  const { data } = useReactiveQuery(getClient(), query);
-  const connection = data?.[0];
+  const { data } = useReactiveQuery(connectionRepo.getClient(), query);
 
-  const refresh = useCallback(async (): Promise<
-    Result<Connection | undefined, ConnectionError>
-  > => {
-    return okAsync(connection);
-  }, [connection]);
-
-  return { connection, refresh };
+  return { connection: data?.[0] };
 }
 
 /**
@@ -183,19 +205,12 @@ export function useConnection(id: number) {
  */
 export function useDefaultConnection() {
   const query = useMemo(
-    () => getDb().select().from(connections).where(eq(connections.isDefault, true)),
+    () => connectionRepo.buildDefaultConnectionQuery(),
     [],
   );
-  const { data } = useReactiveQuery(getClient(), query);
-  const connection = data?.[0];
+  const { data } = useReactiveQuery(connectionRepo.getClient(), query);
 
-  const refresh = useCallback(async (): Promise<
-    Result<Connection | undefined, ConnectionError>
-  > => {
-    return okAsync(connection);
-  }, [connection]);
-
-  return { connection, refresh };
+  return { connection: data?.[0] };
 }
 
 /**

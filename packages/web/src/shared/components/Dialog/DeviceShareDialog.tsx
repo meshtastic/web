@@ -1,14 +1,16 @@
+import { useMyNode } from "@app/shared/hooks/useMyNode";
 import { useNodes } from "@data/hooks";
-import { DeviceQRCode, generateDeviceShareUrl } from "@shared/components/QRCode";
+import {
+  DeviceQRCode,
+  generateDeviceShareUrl,
+} from "@shared/components/QRCode";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import { Label } from "@shared/components/ui/label";
-import { useGetMyNode } from "@shared/hooks/useGetMyNode";
-import { useDeviceContext } from "@state/index.ts";
-import { Copy, Check } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DialogWrapper } from "./DialogWrapper";
+import { DialogWrapper } from "./DialogWrapper.tsx";
 
 export interface DeviceShareDialogProps {
   open: boolean;
@@ -22,9 +24,8 @@ export const DeviceShareDialog = ({
   nodeNum,
 }: DeviceShareDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { deviceId } = useDeviceContext();
-  const { nodeMap } = useNodes(deviceId);
-  const { myNodeNum, myNode } = useGetMyNode();
+  const { myNodeNum, myNode } = useMyNode();
+  const { nodeMap } = useNodes(myNodeNum);
   const [copied, setCopied] = useState(false);
 
   const targetNodeNum = nodeNum ?? myNodeNum;
@@ -35,7 +36,9 @@ export const DeviceShareDialog = ({
     : null;
 
   const deviceInfo = useMemo(() => {
-    if (!targetNodeNum) return null;
+    if (!targetNodeNum) {
+      return null;
+    }
     return {
       nodeNum: targetNodeNum,
       longName: targetNode?.longName ?? null,
@@ -45,12 +48,16 @@ export const DeviceShareDialog = ({
   }, [targetNodeNum, targetNode]);
 
   const shareUrl = useMemo(() => {
-    if (!deviceInfo) return "";
+    if (!deviceInfo) {
+      return "";
+    }
     return generateDeviceShareUrl(deviceInfo);
   }, [deviceInfo]);
 
   const handleCopy = useCallback(async () => {
-    if (!shareUrl) return;
+    if (!shareUrl) {
+      return;
+    }
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);

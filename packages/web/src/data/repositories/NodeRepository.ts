@@ -1,4 +1,16 @@
-import { and, desc, eq, gt, isNull, lt, or, sql } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  gt,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  or,
+  sql,
+} from "drizzle-orm";
+import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
 import {
   type NewNode,
@@ -12,12 +24,196 @@ import {
   telemetryLogs,
 } from "../schema.ts";
 
+/** Nodes are considered "online" if heard within this many seconds */
+const ONLINE_THRESHOLD_SECONDS = 900; // 15 minutes
+
 /**
  * Repository for node operations
  */
 export class NodeRepository {
   private get db() {
     return dbClient.db;
+  }
+
+  /**
+   * Get the SQLocal client for reactive queries
+   * @param client - Optional client override for dependency injection
+   */
+  getClient(client?: SQLocalDrizzle) {
+    return client ?? dbClient.client;
+  }
+
+  // ===================
+  // Private Helpers
+  // ===================
+
+  /**
+   * Build the composite key condition for a specific node
+   */
+  private nodeCondition(ownerNodeNum: number, nodeNum: number) {
+    return and(
+      eq(nodes.ownerNodeNum, ownerNodeNum),
+      eq(nodes.nodeNum, nodeNum),
+    );
+  }
+
+  /**
+   * Build condition for stale nodes (not heard from in X days)
+   * @param unknownOnly - If true, only match nodes without a longName
+   */
+  private staleNodesCondition(
+    ownerNodeNum: number,
+    daysOld: number,
+    unknownOnly: boolean,
+  ) {
+    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
+
+    const conditions = [
+      eq(nodes.ownerNodeNum, ownerNodeNum),
+      lt(nodes.lastHeard, cutoffDate),
+    ];
+
+    if (unknownOnly) {
+      conditions.push(or(isNull(nodes.longName), eq(nodes.longName, "")));
+    }
+
+    return and(...conditions);
+  }
+
+  /**
+   * Build condition for position logs
+   * @param sinceMs - Optional Unix timestamp in milliseconds
+   */
+  private positionLogsCondition(
+    ownerNodeNum: number,
+    nodeNum: number,
+    sinceMs?: number,
+  ) {
+    const conditions = [
+      eq(positionLogs.ownerNodeNum, ownerNodeNum),
+      eq(positionLogs.nodeNum, nodeNum),
+    ];
+
+    if (sinceMs !== undefined) {
+      conditions.push(gt(positionLogs.time, new Date(sinceMs)));
+    }
+
+    return and(...conditions);
+  }
+
+  /**
+   * Build condition for telemetry logs
+   * @param sinceMs - Optional Unix timestamp in milliseconds
+   */
+  private telemetryLogsCondition(
+    ownerNodeNum: number,
+    nodeNum: number,
+    sinceMs?: number,
+  ) {
+    const conditions = [
+      eq(telemetryLogs.ownerNodeNum, ownerNodeNum),
+      eq(telemetryLogs.nodeNum, nodeNum),
+    ];
+
+    if (sinceMs !== undefined) {
+      conditions.push(gt(telemetryLogs.time, new Date(sinceMs)));
+    }
+
+    return and(...conditions);
+  }
+
+  /**
+   * Helper to count rows then delete them
+   * Used because sqlocal doesn't return changes count
+   */
+  private async countAndDelete(
+    countFn: () => Promise<number>,
+    deleteFn: () => Promise<void>,
+  ): Promise<number> {
+    const count = await countFn();
+    if (count > 0) {
+      await deleteFn();
+    }
+    return count;
+  }
+
+  // ===================
+  // Query Builders
+  // ===================
+
+  /**
+   * Build a query to get all nodes for a device
+   */
+  buildNodesQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(nodes)
+      .where(eq(nodes.ownerNodeNum, ownerNodeNum));
+  }
+
+  /**
+   * Build a query to get online nodes
+   * Online = heard within last 15 minutes
+   */
+  buildOnlineNodesQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(nodes)
+      .where(
+        and(
+          eq(nodes.ownerNodeNum, ownerNodeNum),
+          isNotNull(nodes.lastHeard),
+          gt(nodes.lastHeard, sql`unixepoch() - ${ONLINE_THRESHOLD_SECONDS}`),
+        ),
+      );
+  }
+
+  /**
+   * Build a query to get position history for a node
+   * @param sinceMs - Optional Unix timestamp in milliseconds
+   */
+  buildPositionHistoryQuery(
+    ownerNodeNum: number,
+    nodeNum: number,
+    sinceMs?: number,
+    limit = 100,
+  ) {
+    return this.db
+      .select()
+      .from(positionLogs)
+      .where(this.positionLogsCondition(ownerNodeNum, nodeNum, sinceMs))
+      .orderBy(desc(positionLogs.time))
+      .limit(limit);
+  }
+
+  /**
+   * Build a query to get telemetry history for a node
+   * @param sinceMs - Optional Unix timestamp in milliseconds
+   */
+  buildTelemetryHistoryQuery(
+    ownerNodeNum: number,
+    nodeNum: number,
+    sinceMs?: number,
+    limit = 100,
+  ) {
+    return this.db
+      .select()
+      .from(telemetryLogs)
+      .where(this.telemetryLogsCondition(ownerNodeNum, nodeNum, sinceMs))
+      .orderBy(desc(telemetryLogs.time))
+      .limit(limit);
+  }
+
+  // ===================
+  // execute queries
+  // ===================
+
+  /**
+   * Get the count of online nodes
+   */
+  async getOnlineNodeCount(deviceId: number): Promise<number> {
+    const result = await this.buildOnlineNodesQuery(deviceId);
+    return result.length;
   }
 
   /**
@@ -34,11 +230,14 @@ export class NodeRepository {
   /**
    * Get a specific node
    */
-  async getNode(ownerNodeNum: number, nodeNum: number): Promise<Node | undefined> {
+  async getNode(
+    ownerNodeNum: number,
+    nodeNum: number,
+  ): Promise<Node | undefined> {
     const result = await this.db
       .select()
       .from(nodes)
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)))
+      .where(this.nodeCondition(ownerNodeNum, nodeNum))
       .limit(1);
 
     return result[0];
@@ -81,7 +280,7 @@ export class NodeRepository {
           channelUtilization: node.channelUtilization,
           airUtilTx: node.airUtilTx,
           uptimeSeconds: node.uptimeSeconds,
-          updatedAt: sql`(unixepoch() * 1000)`, // Use SQL function for current timestamp
+          updatedAt: sql`(unixepoch() * 1000)`,
         },
       });
   }
@@ -109,7 +308,7 @@ export class NodeRepository {
         ...position,
         updatedAt: new Date(),
       })
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
+      .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
   /**
@@ -135,7 +334,7 @@ export class NodeRepository {
         ...user,
         updatedAt: new Date(),
       })
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
+      .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
   /**
@@ -158,21 +357,21 @@ export class NodeRepository {
         ...metrics,
         updatedAt: new Date(),
       })
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
+      .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
   /**
    * Update last heard
-   * @param lastHeard - Unix timestamp in seconds
+   * @param lastHeardSec - Unix timestamp in seconds
    */
   async updateLastHeard(
     ownerNodeNum: number,
     nodeNum: number,
-    lastHeard: number,
+    lastHeardSec: number,
     snr?: number,
   ): Promise<void> {
     const updates: Partial<Node> = {
-      lastHeard: new Date(lastHeard * 1000), // Convert seconds to Date
+      lastHeard: new Date(lastHeardSec * 1000),
       updatedAt: new Date(),
     };
 
@@ -183,7 +382,7 @@ export class NodeRepository {
     await this.db
       .update(nodes)
       .set(updates)
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
+      .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
   /**
@@ -197,13 +396,12 @@ export class NodeRepository {
     await this.db
       .update(nodes)
       .set({ isFavorite, updatedAt: new Date() })
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
+      .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
   /**
-   *  Add a private note about a node.
+   * Add a private note about a node.
    */
-
   async updatePrivateNote(
     ownerNodeNum: number,
     nodeNum: number,
@@ -212,7 +410,7 @@ export class NodeRepository {
     await this.db
       .update(nodes)
       .set({ privateNote, updatedAt: new Date() })
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
+      .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
   /**
@@ -226,7 +424,7 @@ export class NodeRepository {
     await this.db
       .update(nodes)
       .set({ isIgnored, updatedAt: new Date() })
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
+      .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
   /**
@@ -236,16 +434,19 @@ export class NodeRepository {
     return this.db
       .select()
       .from(nodes)
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.isFavorite, true)))
+      .where(
+        and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.isFavorite, true)),
+      )
       .orderBy(desc(nodes.lastHeard));
   }
 
   /**
    * Get recently heard nodes
+   * @param sinceTimestampMs - Unix timestamp in milliseconds
    */
   async getRecentNodes(
     ownerNodeNum: number,
-    sinceTimestamp: number,
+    sinceTimestampMs: number,
   ): Promise<Node[]> {
     return this.db
       .select()
@@ -253,7 +454,7 @@ export class NodeRepository {
       .where(
         and(
           eq(nodes.ownerNodeNum, ownerNodeNum),
-          gt(nodes.lastHeard, new Date(sinceTimestamp)),
+          gt(nodes.lastHeard, new Date(sinceTimestampMs)),
         ),
       )
       .orderBy(desc(nodes.lastHeard));
@@ -265,7 +466,7 @@ export class NodeRepository {
   async deleteNode(ownerNodeNum: number, nodeNum: number): Promise<void> {
     await this.db
       .delete(nodes)
-      .where(and(eq(nodes.ownerNodeNum, ownerNodeNum), eq(nodes.nodeNum, nodeNum)));
+      .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
   /**
@@ -277,24 +478,10 @@ export class NodeRepository {
     daysOld: number,
     unknownOnly = false,
   ): Promise<number> {
-    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
-
-    let baseCondition = and(
-      eq(nodes.ownerNodeNum, ownerNodeNum),
-      lt(nodes.lastHeard, cutoffDate),
-    );
-
-    if (unknownOnly) {
-      baseCondition = and(
-        baseCondition,
-        or(isNull(nodes.longName), eq(nodes.longName, "")),
-      );
-    }
-
     const result = await this.db
       .select({ count: sql<number>`count(*)` })
       .from(nodes)
-      .where(baseCondition);
+      .where(this.staleNodesCondition(ownerNodeNum, daysOld, unknownOnly));
 
     return result[0]?.count ?? 0;
   }
@@ -308,24 +495,10 @@ export class NodeRepository {
     daysOld: number,
     unknownOnly = false,
   ): Promise<Node[]> {
-    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
-
-    let baseCondition = and(
-      eq(nodes.ownerNodeNum, ownerNodeNum),
-      lt(nodes.lastHeard, cutoffDate),
-    );
-
-    if (unknownOnly) {
-      baseCondition = and(
-        baseCondition,
-        or(isNull(nodes.longName), eq(nodes.longName, "")),
-      );
-    }
-
     return this.db
       .select()
       .from(nodes)
-      .where(baseCondition)
+      .where(this.staleNodesCondition(ownerNodeNum, daysOld, unknownOnly))
       .orderBy(nodes.lastHeard);
   }
 
@@ -338,32 +511,15 @@ export class NodeRepository {
     daysOld: number,
     unknownOnly = false,
   ): Promise<number> {
-    // First count the nodes to be deleted (since sqlocal doesn't return changes count)
-    const count = await this.countStaleNodes(ownerNodeNum, daysOld, unknownOnly);
-
-    if (count === 0) {
-      return 0;
-    }
-
-    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
-
-    let baseCondition = and(
-      eq(nodes.ownerNodeNum, ownerNodeNum),
-      lt(nodes.lastHeard, cutoffDate),
+    return this.countAndDelete(
+      () => this.countStaleNodes(ownerNodeNum, daysOld, unknownOnly),
+      async () => {
+        await this.db
+          .delete(nodes)
+          .where(this.staleNodesCondition(ownerNodeNum, daysOld, unknownOnly));
+      },
     );
-
-    if (unknownOnly) {
-      baseCondition = and(
-        baseCondition,
-        or(isNull(nodes.longName), eq(nodes.longName, "")),
-      );
-    }
-
-    await this.db.delete(nodes).where(baseCondition);
-
-    return count;
   }
-
 
   /**
    * Log a position update
@@ -374,26 +530,18 @@ export class NodeRepository {
 
   /**
    * Get position history for a node
+   * @param sinceMs - Optional Unix timestamp in milliseconds
    */
   async getPositionHistory(
     ownerNodeNum: number,
     nodeNum: number,
-    since?: number,
+    sinceMs?: number,
     limit = 100,
   ): Promise<PositionLog[]> {
-    const conditions = [
-      eq(positionLogs.ownerNodeNum, ownerNodeNum),
-      eq(positionLogs.nodeNum, nodeNum),
-    ];
-
-    if (since !== undefined) {
-      conditions.push(gt(positionLogs.time, new Date(since)));
-    }
-
     return this.db
       .select()
       .from(positionLogs)
-      .where(and(...conditions))
+      .where(this.positionLogsCondition(ownerNodeNum, nodeNum, sinceMs))
       .orderBy(positionLogs.time)
       .limit(limit);
   }
@@ -401,39 +549,38 @@ export class NodeRepository {
   /**
    * Get position history for multiple nodes at once
    * Returns a map of nodeNum -> position history
+   * @param sinceMs - Optional Unix timestamp in milliseconds
    */
   async getPositionHistoryForNodes(
     ownerNodeNum: number,
     nodeNums: number[],
-    since?: number,
+    sinceMs?: number,
     limitPerNode = 100,
   ): Promise<Map<number, PositionLog[]>> {
     if (nodeNums.length === 0) {
       return new Map();
     }
 
-    const conditions = [eq(positionLogs.ownerNodeNum, ownerNodeNum)];
+    const conditions = [
+      eq(positionLogs.ownerNodeNum, ownerNodeNum),
+      inArray(positionLogs.nodeNum, nodeNums),
+    ];
 
-    if (since !== undefined) {
-      conditions.push(gt(positionLogs.time, new Date(since)));
+    if (sinceMs !== undefined) {
+      conditions.push(gt(positionLogs.time, new Date(sinceMs)));
     }
 
-    // Fetch all positions for all nodes
     const allPositions = await this.db
       .select()
       .from(positionLogs)
       .where(and(...conditions))
       .orderBy(positionLogs.nodeNum, positionLogs.time);
 
-    // Group by nodeNum and apply per-node limit
+    // Group by nodeNum with per-node limit
     const result = new Map<number, PositionLog[]>();
 
     for (const position of allPositions) {
-      if (!nodeNums.includes(position.nodeNum)) {
-        continue;
-      }
-
-      const existing = result.get(position.nodeNum) || [];
+      const existing = result.get(position.nodeNum) ?? [];
       if (existing.length < limitPerNode) {
         existing.push(position);
         result.set(position.nodeNum, existing);
@@ -445,39 +592,30 @@ export class NodeRepository {
 
   /**
    * Delete old position logs
+   * @param olderThanMs - Unix timestamp in milliseconds
    */
   async deleteOldPositions(
     ownerNodeNum: number,
-    olderThan: number,
+    olderThanMs: number,
   ): Promise<number> {
-    // Count first since sqlocal doesn't return changes count
-    const countResult = await this.db
-      .select({ count: sql<number>`count(*)` })
-      .from(positionLogs)
-      .where(
-        and(
-          eq(positionLogs.ownerNodeNum, ownerNodeNum),
-          lt(positionLogs.time, new Date(olderThan)),
-        ),
-      );
+    const condition = and(
+      eq(positionLogs.ownerNodeNum, ownerNodeNum),
+      lt(positionLogs.time, new Date(olderThanMs)),
+    );
 
-    const count = countResult[0]?.count ?? 0;
-    if (count === 0) {
-      return 0;
-    }
-
-    await this.db
-      .delete(positionLogs)
-      .where(
-        and(
-          eq(positionLogs.ownerNodeNum, ownerNodeNum),
-          lt(positionLogs.time, new Date(olderThan)),
-        ),
-      );
-
-    return count;
+    return this.countAndDelete(
+      async () => {
+        const result = await this.db
+          .select({ count: sql<number>`count(*)` })
+          .from(positionLogs)
+          .where(condition);
+        return result[0]?.count ?? 0;
+      },
+      async () => {
+        await this.db.delete(positionLogs).where(condition);
+      },
+    );
   }
-
 
   /**
    * Log telemetry data
@@ -488,62 +626,46 @@ export class NodeRepository {
 
   /**
    * Get telemetry history for a node
+   * @param sinceMs - Optional Unix timestamp in milliseconds
    */
   async getTelemetryHistory(
     ownerNodeNum: number,
     nodeNum: number,
-    since?: number,
+    sinceMs?: number,
     limit = 100,
   ): Promise<TelemetryLog[]> {
-    const conditions = [
-      eq(telemetryLogs.ownerNodeNum, ownerNodeNum),
-      eq(telemetryLogs.nodeNum, nodeNum),
-    ];
-
-    if (since !== undefined) {
-      conditions.push(gt(telemetryLogs.time, new Date(since)));
-    }
-
     return this.db
       .select()
       .from(telemetryLogs)
-      .where(and(...conditions))
+      .where(this.telemetryLogsCondition(ownerNodeNum, nodeNum, sinceMs))
       .orderBy(telemetryLogs.time)
       .limit(limit);
   }
 
   /**
    * Delete old telemetry logs
+   * @param olderThanMs - Unix timestamp in milliseconds
    */
   async deleteOldTelemetry(
     ownerNodeNum: number,
-    olderThan: number,
+    olderThanMs: number,
   ): Promise<number> {
-    // Count first since sqlocal doesn't return changes count
-    const countResult = await this.db
-      .select({ count: sql<number>`count(*)` })
-      .from(telemetryLogs)
-      .where(
-        and(
-          eq(telemetryLogs.ownerNodeNum, ownerNodeNum),
-          lt(telemetryLogs.time, new Date(olderThan)),
-        ),
-      );
+    const condition = and(
+      eq(telemetryLogs.ownerNodeNum, ownerNodeNum),
+      lt(telemetryLogs.time, new Date(olderThanMs)),
+    );
 
-    const count = countResult[0]?.count ?? 0;
-    if (count === 0) {
-      return 0;
-    }
-
-    await this.db
-      .delete(telemetryLogs)
-      .where(
-        and(
-          eq(telemetryLogs.ownerNodeNum, ownerNodeNum),
-          lt(telemetryLogs.time, new Date(olderThan)),
-        ),
-      );
-
-    return count;
+    return this.countAndDelete(
+      async () => {
+        const result = await this.db
+          .select({ count: sql<number>`count(*)` })
+          .from(telemetryLogs)
+          .where(condition);
+        return result[0]?.count ?? 0;
+      },
+      async () => {
+        await this.db.delete(telemetryLogs).where(condition);
+      },
+    );
   }
 }

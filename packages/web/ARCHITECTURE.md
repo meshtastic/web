@@ -121,16 +121,17 @@ src/
 │   │   ├── useCopyToClipboard.ts
 │   │   ├── useDebounce.ts
 │   │   ├── useDeleteMessages.ts
+│   │   ├── useDeviceCommands.ts  # Device command interface
 │   │   ├── useDeviceContext.ts
 │   │   ├── useFavoriteNode.ts
 │   │   ├── useFeatureFlags.ts
 │   │   ├── useFilter.ts
-│   │   ├── useGetMyNode.ts
 │   │   ├── useIgnoreNode.ts
 │   │   ├── useIsMobile.ts
-│   │   ├── useLang.ts
+│   │   ├── useLanguage.ts
 │   │   ├── useLocalStorage.ts
 │   │   ├── useMapFitting.ts
+│   │   ├── useMyNode.ts          # Device context hooks (useMyNode, useNodeNum, useNodeNumSafe)
 │   │   ├── usePasswordVisibilityToggle.ts
 │   │   ├── usePinnedItems.ts
 │   │   ├── usePositionFlags.ts
@@ -170,7 +171,6 @@ src/
 │   ├── schema.ts                # Drizzle ORM schema definitions
 │   ├── client.ts                # SQLite client initialization
 │   ├── types.ts                 # Data layer types
-│   ├── events.ts                # Data events
 │   ├── errors.ts                # Data error types
 │   ├── packetBatcher.ts         # Packet batching utility
 │   ├── subscriptionService.ts   # Data subscription service
@@ -243,17 +243,17 @@ The project uses TypeScript path aliases for clean imports:
 
 ### Preferences System
 
-User preferences are persisted to IndexedDB using a database-driven architecture:
+User preferences are persisted to SQLite using reactive queries:
 
 ```
-Component ──> usePreference(key, default) ──> PreferenceCache (memory)
-                     ↑                              ↓
-              DB_EVENTS listener          PreferencesRepository (IndexedDB)
+Component ──> usePreference(key, default) ──> useReactiveQuery ──> PreferencesRepository (SQLite)
+                                                     ↑
+                                          (auto-updates on DB changes)
 ```
 
 **Key files:**
-- `src/data/hooks/usePreferences.ts` - Preferences hook
-- `src/data/repositories/PreferencesRepository.ts` - Database access
+- `src/data/hooks/usePreferences.ts` - Preferences hook using `useReactiveQuery`
+- `src/data/repositories/PreferencesRepository.ts` - Database access with query builders
 - `src/state/ui/store.ts` - `DEFAULT_PREFERENCES` constants
 
 **Usage:**
@@ -263,6 +263,8 @@ import { DEFAULT_PREFERENCES } from "@state/ui";
 
 const [theme, setTheme] = usePreference("theme", DEFAULT_PREFERENCES.theme);
 ```
+
+The `usePreference` hook uses `preferencesRepo.buildPreferenceQuery(key)` with `useReactiveQuery` for automatic updates when preferences change.
 
 **Available preferences:**
 - `theme` - Light/dark/system theme
@@ -283,6 +285,78 @@ const [theme, setTheme] = usePreference("theme", DEFAULT_PREFERENCES.theme);
 - `nodesTableColumnVisibility` - Visible columns in nodes table
 - `nodesTableColumnOrder` - Column ordering in nodes table
 - `rasterSources` - Custom map raster sources
+
+## Device-Scoped Architecture
+
+The application supports multiple Meshtastic devices. All data is scoped to a specific device using `ownerNodeNum` (the device's node number) as a foreign key. The current device context is determined by the URL.
+
+### URL-Based Device Context
+
+After connecting to a device, the user is navigated to `/$nodeNum/messages?channel=0`. The `nodeNum` URL parameter identifies which device's data to display.
+
+```
+URL: /2662173639/messages?channel=0
+      ↑
+      └── nodeNum identifies the connected device
+```
+
+### Accessing the Current Device's nodeNum
+
+Use the `useMyNode` hook to get the current device context:
+
+```typescript
+import { useMyNode } from "@shared/hooks";
+
+function MyComponent() {
+  const { myNodeNum, myNode } = useMyNode();
+
+  // myNodeNum: number | undefined - extracted from URL params
+  // myNode: Node | undefined - the device's node data from database
+
+  if (!myNodeNum) {
+    return <div>Not connected</div>;
+  }
+
+  // Use myNodeNum for queries
+  const { messages } = useChannelMessages(myNodeNum, channelId, 100);
+}
+```
+
+**Implementation details:**
+- `useMyNode()` internally calls `useNodeNumSafe()` which extracts `nodeNum` from TanStack Router's `useParams()`
+- Returns `undefined` when not in a connected route (e.g., `/connect` page)
+- The `connectedLayoutRoute` validates the nodeNum and checks device existence before rendering
+
+### Database Scoping with ownerNodeNum
+
+All database tables use `ownerNodeNum` as a scoping key:
+
+```typescript
+// Saving a message - use myNodeNum as ownerNodeNum
+const newMessage: NewMessage = {
+  ownerNodeNum: myNodeNum,  // Critical: scope to current device
+  messageId: packetId,
+  type: "channel",
+  channelId: 0,
+  // ... other fields
+};
+await messageRepo.saveMessage(newMessage);
+
+// Querying messages - filter by ownerNodeNum
+const query = messageRepo.buildBroadcastMessagesQuery(myNodeNum, channelId, limit);
+// This generates: SELECT * FROM messages WHERE ownerNodeNum = ? AND ...
+```
+
+**Key tables with ownerNodeNum:**
+- `messages` - Scopes messages to the device that received/sent them
+- `nodes` - Scopes discovered nodes to the device that saw them
+- `channels` - Scopes channel configs to the device they belong to
+- `positionLogs`, `telemetryLogs`, `packetLogs` - Scopes logs to the receiving device
+
+This architecture enables:
+- Multiple devices to store data without conflicts
+- Switching between devices without data mixing
+- Per-device message history and node discovery
 
 ## Database Layer
 
@@ -310,6 +384,57 @@ Data access is abstracted through repositories in `src/data/repositories/`:
 - `PacketLogRepository` - Raw packet logging for debugging
 - `PreferencesRepository` - Key-value user preferences
 - `TracerouteRepository` - Route discovery results
+
+#### Query Builder Pattern with Reactive Updates
+
+Repositories expose two types of methods:
+
+1. **Mutation methods** - Execute database operations directly:
+   ```typescript
+   await nodeRepo.upsertNode(node);
+   await messageRepo.saveMessage(message);
+   ```
+
+2. **Query builder methods** - Return Drizzle query objects (not executed) for use with `useReactiveQuery`:
+   ```typescript
+   // Repository method returns query object
+   buildNodesQuery(ownerNodeNum: number) {
+     return this.db.select().from(nodes).where(eq(nodes.ownerNodeNum, ownerNodeNum));
+   }
+   ```
+
+This pattern enables automatic reactivity via sqlocal's `useReactiveQuery`, which subscribes to database changes and re-runs queries when relevant tables are modified:
+
+```typescript
+// Hook using repository query builder
+export function useNodes(deviceId: number) {
+  const query = useMemo(() => nodeRepo.buildNodesQuery(deviceId), [deviceId]);
+  const { data, status } = useReactiveQuery(nodeRepo.getClient(), query);
+
+  // data automatically updates when nodes table changes
+  return { nodes: data ?? [], isLoading: status === "pending" };
+}
+```
+
+**Repository methods:**
+
+| Repository | Query Builders |
+|------------|----------------|
+| `NodeRepository` | `buildNodesQuery()`, `buildOnlineNodesQuery()`, `buildPositionHistoryQuery()`, `buildTelemetryHistoryQuery()` |
+| `MessageRepository` | `buildDirectMessagesQuery()`, `buildBroadcastMessagesQuery()`, `buildAllMessagesQuery()`, `buildPendingMessagesQuery()`, `buildAllDirectMessagesQuery()`, `buildAllChannelMessagesQuery()`, `buildLastReadQuery()` |
+| `ConnectionRepository` | `buildConnectionsQuery()`, `buildConnectionQuery()`, `buildDefaultConnectionQuery()` |
+| `ChannelRepository` | `buildChannelsQuery()`, `buildChannelQuery()`, `buildPrimaryChannelQuery()` |
+| `PacketLogRepository` | `buildPacketLogsQuery()`, `buildSignalLogsQuery()` |
+| `PreferencesRepository` | `buildPreferenceQuery()`, `buildAllPreferencesQuery()` |
+
+**Dependency injection:** Each repository exposes `getClient(client?: SQLocalDrizzle)` for testing:
+```typescript
+// Production - uses default client
+const { data } = useReactiveQuery(nodeRepo.getClient(), query);
+
+// Testing - inject mock client
+const { data } = useReactiveQuery(nodeRepo.getClient(mockClient), query);
+```
 
 ## Feature Modules
 
@@ -406,20 +531,21 @@ SNR limits vary by modem preset:
 
 ## Routes
 
+Routes are organized around the connected device's `nodeNum`:
+
 | Path | Component | Description |
 |------|-----------|-------------|
-| `/connections` | `Connections` | Device connection management |
-| `/messages` | `MessagesPage` | Chat interface (channel/direct) |
-| `/map` | `MapPage` | Full map view with nodes |
-| `/map/$long/$lat/$zoom` | `MapPage` | Map with specific coordinates |
-| `/nodes` | `NodesPage` | Node list with signal/telemetry |
-| `/settings` | `SettingsPage` | Device configuration |
-| `/settings/radio` | `RadioConfig` | LoRa settings |
-| `/settings/device` | `DeviceConfig` | Device settings |
-| `/settings/module` | `ModuleConfig` | Module configuration |
-| `/statistics` | `StatisticsPage` | Network statistics |
+| `/connect` | `ConnectPage` | Device connection management |
+| `/$nodeNum/messages` | `MessagesPage` | Chat interface (channel/direct) |
+| `/$nodeNum/map` | `MapPage` | Full map view with nodes |
+| `/$nodeNum/map/$long/$lat/$zoom` | `MapPage` | Map with specific coordinates |
+| `/$nodeNum/nodes` | `NodesPage` | Node list with signal/telemetry |
+| `/$nodeNum/settings` | `SettingsPage` | Device configuration |
+| `/$nodeNum/settings/radio` | `RadioConfig` | LoRa settings |
+| `/$nodeNum/settings/device` | `DeviceConfig` | Device settings |
+| `/$nodeNum/settings/module` | `ModuleConfig` | Module configuration |
 
-Routes requiring an active connection redirect to `/connections` if disconnected.
+Routes under `/$nodeNum/*` require a valid device and redirect to `/connect` if the device doesn't exist.
 
 ## Development
 
@@ -449,12 +575,12 @@ pnpm db:check     # Validate migrations
 | Pattern | Usage |
 |---------|-------|
 | **Feature-based Organization** | Colocated code by feature domain |
-| **Repository** | Database access abstraction |
+| **Repository with Query Builders** | Database access abstraction with reactive query support |
 | **Factory** | Device store creation |
 | **State Machine** | Drawer navigation, connection phases |
 | **Observer** | Zustand subscriptions, event bus |
 | **Lazy Loading** | Route-based code splitting with Suspense |
-| **useSyncExternalStore** | Preferences hook with external cache |
+| **Reactive Queries** | `useReactiveQuery` for automatic UI updates on database changes |
 
 ## Code Standards
 
@@ -475,9 +601,9 @@ pnpm db:check     # Validate migrations
 | `src/state/ui/store.ts` | Ephemeral UI state and DEFAULT_PREFERENCES |
 | `src/data/hooks/usePreferences.ts` | Preferences hook |
 | `src/data/repositories/PreferencesRepository.ts` | Preferences persistence |
+| `src/shared/hooks/useMyNode.ts` | Device context hooks (useMyNode, useNodeNum, useNodeNumSafe) |
 | `src/features/nodes/utils/signalColor.ts` | Signal grading algorithm |
 | `src/shared/utils/typeGuards.ts` | Type guard utilities |
-| `src/DeviceWrapper.tsx` | Device context provider |
 | `src/core/services/adminMessageService.ts` | Admin message handling |
 | `src/data/repositories/NodeRepository.ts` | Node data access |
 | `src/shared/hooks/useFavoriteNode.ts` | Favorite node management |

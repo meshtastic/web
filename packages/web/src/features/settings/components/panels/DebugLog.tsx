@@ -128,7 +128,7 @@ function PacketEntry({
   };
 
   return (
-    <div className="p-4 border-b border-border">
+    <div className="p-4 border-b border-border [content-visibility:auto] [contain-intrinsic-size:16rem]">
       <div className="flex items-center justify-between mb-3">
         <span className="font-semibold text-lg">Packet</span>
         <div className="flex items-center gap-2">

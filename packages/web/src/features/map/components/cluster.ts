@@ -1,22 +1,22 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Node } from "@data/schema";
 
 export type ClusterKey = string;
 export type PxOffset = [number, number];
 
-export function makeClusterKey(pos: Protobuf.Mesh.Position): ClusterKey {
-  return `${pos.latitudeI},${pos.longitudeI}`;
+export function makeClusterKey(node: Node): ClusterKey {
+  return `${node.latitudeI},${node.longitudeI}`;
 }
 
 export function groupNodesByIdenticalCoords(
-  nodes: Protobuf.Mesh.NodeInfo[],
-): Map<ClusterKey, Protobuf.Mesh.NodeInfo[]> {
-  const map = new Map<ClusterKey, Protobuf.Mesh.NodeInfo[]>();
+  nodes: Node[],
+): Map<ClusterKey, Node[]> {
+  const map = new Map<ClusterKey, Node[]>();
   for (const node of nodes) {
-    if (!node.position) {
+    if (node.latitudeI === null || node.longitudeI === null) {
       continue;
     }
 
-    const key = makeClusterKey(node.position);
+    const key = makeClusterKey(node);
     const arr = map.get(key);
     if (arr) {
       arr.push(node);

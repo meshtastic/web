@@ -2,14 +2,14 @@
  * ConnectionService - Singleton service for managing device connections
  *
  * Handles the imperative work: connecting, disconnecting, managing MeshDevice
- * instances, heartbeats, and transport cleanup. Keeps mutable state out of React.
+ * instances, heartbeats, and transport cleanup.
  */
 
-import { router } from "@app/app/routes";
 import logger from "@core/services/logger";
 import {
   configCacheRepo,
   connectionRepo,
+  deviceRepo,
   nodeRepo,
 } from "@data/repositories";
 import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
@@ -29,12 +29,16 @@ const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
 
 interface ConnectionState {
   strategy?: ConnectionStrategy;
-  nativeHandle?: any;
+  nativeHandle?: unknown;
   cleanup?: () => void;
   heartbeat?: ReturnType<typeof setInterval>;
-  dbSubscription?: () => void;
-  statusSubscription?: () => void;
-  disconnectSubscription?: () => void;
+  subscriptions: Array<() => void>;
+}
+
+export interface NavigationIntent {
+  nodeNum: number;
+  cached: boolean;
+  timestamp: number;
 }
 
 /**
@@ -43,6 +47,31 @@ interface ConnectionState {
 class ConnectionServiceClass {
   private state = new Map<number, ConnectionState>();
   private listeners = new Set<() => void>();
+  private navigationCallbacks = new Set<(intent: NavigationIntent) => void>();
+
+  /**
+   * Subscribe to navigation intents (connection success events)
+   * Used by React components to handle navigation after connection
+   */
+  onNavigationIntent(
+    callback: (intent: NavigationIntent) => void,
+  ): () => void {
+    this.navigationCallbacks.add(callback);
+    return () => {
+      this.navigationCallbacks.delete(callback);
+    };
+  }
+
+  private emitNavigationIntent(nodeNum: number, cached: boolean): void {
+    const intent: NavigationIntent = {
+      nodeNum,
+      cached,
+      timestamp: Date.now(),
+    };
+    for (const cb of this.navigationCallbacks) {
+      cb(intent);
+    }
+  }
 
   /**
    * Subscribe to connection state changes
@@ -110,6 +139,15 @@ class ConnectionServiceClass {
     // Track whether we used cache for fast reconnection
     let usedCache = false;
 
+    // Store myNodeNum when received - device.hardware.myNodeNum is stale after setHardware
+    let receivedMyNodeNum: number | undefined;
+
+    // Promise to ensure device is upserted before navigation
+    let resolveDeviceUpserted: () => void;
+    const deviceUpsertedPromise = new Promise<void>((resolve) => {
+      resolveDeviceUpserted = resolve;
+    });
+
     // Helper to start heartbeat
     const startHeartbeat = () => {
       meshDevice
@@ -150,21 +188,47 @@ class ConnectionServiceClass {
     };
 
     meshDevice.events.onMyNodeInfo.subscribe(async (nodeInfo) => {
+      receivedMyNodeNum = nodeInfo.myNodeNum;
       device.setHardware(nodeInfo);
       logger.debug(
         `[ConnectionService] Received myNodeInfo, myNodeNum: ${nodeInfo.myNodeNum}`,
       );
 
+      // Upsert device in database so routes can validate
+      // Only nodeNum is available from myNodeInfo - other fields come from User packets
+      try {
+        await deviceRepo.upsertDevice({
+          nodeNum: nodeInfo.myNodeNum,
+        });
+        logger.debug(
+          `[ConnectionService] Upserted device ${nodeInfo.myNodeNum}`,
+        );
+
+        // Link connection to device
+        await connectionRepo.updateConnection(id, {
+          nodeNum: nodeInfo.myNodeNum,
+        });
+        logger.debug(
+          `[ConnectionService] Linked connection ${id} to device ${nodeInfo.myNodeNum}`,
+        );
+
+        // Signal that device is ready for navigation
+        resolveDeviceUpserted();
+      } catch (err) {
+        logger.warn("[ConnectionService] Failed to upsert device:", err);
+        // Still resolve so navigation can proceed (will fail at route guard)
+        resolveDeviceUpserted();
+      }
+
       // Subscribe to device events now that we have the real myNodeNum
       // This must happen after we know myNodeNum to properly filter own messages
-      if (!state.dbSubscription) {
-        state.dbSubscription = SubscriptionService.subscribeToDevice(
-          deviceId,
-          nodeInfo.myNodeNum,
-          meshDevice,
-        );
-        logger.debug(`[DB] Subscribed to device ${deviceId} events`);
-      }
+      const dbUnsub = SubscriptionService.subscribeToDevice(
+        nodeInfo.myNodeNum,
+        nodeInfo.myNodeNum,
+        meshDevice,
+      );
+      state.subscriptions.push(dbUnsub);
+      logger.debug(`[DB] Subscribed to device ${nodeInfo.myNodeNum} events`);
 
       try {
         // Check for cached config
@@ -191,7 +255,10 @@ class ConnectionServiceClass {
 
           // Mark as connected immediately
           await this.updateStatus(id, "connected");
-          router.navigate({ to: "/messages", search: { channel: 0 } });
+          logger.info(
+            `[ConnectionService] Emitting navigation intent (cached), myNodeNum=${nodeInfo.myNodeNum}`,
+          );
+          this.emitNavigationIntent(nodeInfo.myNodeNum, true);
 
           // Start heartbeat immediately for cached connection
           startHeartbeat();
@@ -203,6 +270,26 @@ class ConnectionServiceClass {
         }
       } catch (err) {
         logger.warn("[ConnectionService] Error checking cache:", err);
+      }
+    });
+
+    // Subscribe to user packets to sync device info (shortName, longName, hwModel)
+    meshDevice.events.onUserPacket.subscribe(async (packet) => {
+      // Only sync if this is our own node's user info
+      if (receivedMyNodeNum && packet.from === receivedMyNodeNum) {
+        try {
+          await deviceRepo.upsertDevice({
+            nodeNum: packet.from,
+            shortName: packet.data.shortName ?? undefined,
+            longName: packet.data.longName ?? undefined,
+            hwModel: packet.data.hwModel ?? undefined,
+          });
+          logger.debug(
+            `[ConnectionService] Synced device info: ${packet.data.longName ?? packet.data.shortName ?? packet.from}`,
+          );
+        } catch (err) {
+          logger.warn("[ConnectionService] Failed to sync device info:", err);
+        }
       }
     });
 
@@ -220,8 +307,8 @@ class ConnectionServiceClass {
 
     const configCompleteUnsub = meshDevice.events.onConfigComplete.subscribe(
       async (configCompleteId) => {
-        logger.debug(
-          `[ConnectionService] Config complete (nonce: ${configCompleteId})`,
+        logger.info(
+          `[ConnectionService] Config complete (nonce: ${configCompleteId}), isCachedConfig=${device.isCachedConfig}`,
         );
         if (configCompleteId === 69420) {
           const wasCached = device.isCachedConfig;
@@ -234,15 +321,14 @@ class ConnectionServiceClass {
 
           // Save fresh config to cache
           try {
-            const myNodeNum = device.hardware.myNodeNum;
-            if (myNodeNum) {
+            if (receivedMyNodeNum) {
               await configCacheRepo.saveCachedConfig(
-                myNodeNum,
+                receivedMyNodeNum,
                 device.config as unknown as Record<string, unknown>,
                 device.moduleConfig as unknown as Record<string, unknown>,
                 {
                   firmwareVersion:
-                    device.metadata.get(myNodeNum)?.firmwareVersion,
+                    device.metadata.get(receivedMyNodeNum)?.firmwareVersion,
                 },
               );
               logger.debug(`[ConnectionService] Saved config to cache`);
@@ -252,7 +338,24 @@ class ConnectionServiceClass {
           }
 
           if (!wasCached) {
-            router.navigate({ to: "/messages", search: { channel: 0 } });
+            // Wait for device to be upserted before navigating
+            // This prevents race condition where route guard runs before DB write completes
+            await deviceUpsertedPromise;
+
+            if (receivedMyNodeNum) {
+              logger.info(
+                `[ConnectionService] Emitting navigation intent, myNodeNum=${receivedMyNodeNum}`,
+              );
+              this.emitNavigationIntent(receivedMyNodeNum, false);
+            } else {
+              logger.warn(
+                `[ConnectionService] Cannot emit navigation intent: myNodeNum is undefined`,
+              );
+            }
+          } else {
+            logger.debug(
+              `[ConnectionService] Skipping navigation (wasCached=${wasCached})`,
+            );
           }
         } else if (configCompleteId === 69421) {
           configCompleteUnsub();
@@ -262,6 +365,7 @@ class ConnectionServiceClass {
         }
       },
     );
+    state.subscriptions.push(configCompleteUnsub);
 
     const statusUnsub = meshDevice.events.onDeviceStatus.subscribe(
       async (status) => {
@@ -274,7 +378,7 @@ class ConnectionServiceClass {
         }
       },
     );
-    state.statusSubscription = statusUnsub;
+    state.subscriptions.push(statusUnsub);
 
     setActiveConnectionId(id);
     device.setConnectionId(id);
@@ -349,17 +453,17 @@ class ConnectionServiceClass {
 
       // Handle bluetooth disconnect specifically if handle is provided
       if (conn.type === "bluetooth" && result.nativeHandle) {
-         state.disconnectSubscription = BrowserHardware.onBluetoothDisconnect(
-            result.nativeHandle,
-            () => this.updateStatus(conn.id, "disconnected"),
-          );
+        const btDisconnectUnsub = BrowserHardware.onBluetoothDisconnect(
+          result.nativeHandle,
+          () => this.updateStatus(conn.id, "disconnected"),
+        );
+        state.subscriptions.push(btDisconnectUnsub);
       }
 
       await this.setupMeshDevice(conn.id, result.transport, {
         skipConfig: opts?.skipConfig,
       });
       return true;
-
     } catch (err: unknown) {
       logger.error(
         `[ConnectionService] Connection failed:`,
@@ -386,9 +490,11 @@ class ConnectionServiceClass {
     this.cleanupHeartbeat(conn.id);
 
     try {
-      state.dbSubscription?.();
-      state.statusSubscription?.();
-      state.disconnectSubscription?.();
+      // Cleanup all subscriptions
+      for (const unsub of state.subscriptions) {
+        unsub();
+      }
+      state.subscriptions = [];
       state.cleanup?.();
 
       if (conn.meshDeviceId) {
@@ -410,9 +516,11 @@ class ConnectionServiceClass {
       if (state.strategy) {
         await state.strategy.disconnect(state.nativeHandle);
       }
-
     } catch (err) {
-      logger.error(`[ConnectionService] Error during clean disconnect for ${conn.id}:`, err);
+      logger.error(
+        `[ConnectionService] Error during clean disconnect for ${conn.id}:`,
+        err,
+      );
     } finally {
       // Always ensure status is updated and state is cleared
       await connectionRepo.updateConnection(conn.id, {
@@ -516,7 +624,7 @@ class ConnectionServiceClass {
   private getState(id: number): ConnectionState {
     let state = this.state.get(id);
     if (!state) {
-      state = {};
+      state = { subscriptions: [] };
       this.state.set(id, state);
     }
     return state;
@@ -533,7 +641,96 @@ class ConnectionServiceClass {
   private isActiveStatus(status: ConnectionStatus): boolean {
     return ["connected", "configured", "configuring"].includes(status);
   }
+
+  /**
+   * Attempt to auto-reconnect to the last connected device
+   * For serial connections, uses getPorts() to check if permission still exists
+   * Returns true if auto-reconnect was attempted, false if skipped
+   */
+  async tryAutoReconnect(): Promise<boolean> {
+    try {
+      const lastConnection = await connectionRepo.getLastConnectedConnection();
+
+      if (!lastConnection) {
+        logger.debug(
+          "[ConnectionService] No previous connection found for auto-reconnect",
+        );
+        return false;
+      }
+
+      logger.info(
+        `[ConnectionService] Attempting auto-reconnect to ${lastConnection.name} (${lastConnection.type})`,
+      );
+
+      // Check if hardware is available before attempting connection
+      let hardwareAvailable = false;
+
+      switch (lastConnection.type) {
+        case "serial":
+          if (BrowserHardware.hasSerial()) {
+            const port = await BrowserHardware.findSerialPort(
+              lastConnection.usbVendorId,
+              lastConnection.usbProductId,
+            );
+            hardwareAvailable = port !== null;
+            if (hardwareAvailable) {
+              logger.debug(
+                "[ConnectionService] Serial port found via getPorts()",
+              );
+            }
+          }
+          break;
+
+        case "bluetooth":
+          if (
+            BrowserHardware.hasBluetoothGetDevices() &&
+            lastConnection.deviceId
+          ) {
+            const device = await BrowserHardware.findBluetoothDevice(
+              lastConnection.deviceId,
+            );
+            hardwareAvailable = device !== null;
+            if (hardwareAvailable) {
+              logger.debug(
+                "[ConnectionService] Bluetooth device found via getDevices()",
+              );
+            }
+          }
+          break;
+
+        case "http":
+          // HTTP connections don't require hardware permission
+          hardwareAvailable = true;
+          break;
+      }
+
+      if (!hardwareAvailable) {
+        logger.debug(
+          `[ConnectionService] Hardware not available for auto-reconnect (${lastConnection.type})`,
+        );
+        return false;
+      }
+
+      // Attempt connection without prompting user
+      const success = await this.connect(lastConnection, {
+        allowPrompt: false,
+      });
+
+      if (success) {
+        logger.info("[ConnectionService] Auto-reconnect successful");
+      } else {
+        logger.warn("[ConnectionService] Auto-reconnect failed");
+      }
+
+      return success;
+    } catch (err) {
+      logger.error(
+        "[ConnectionService] Auto-reconnect error:",
+        err instanceof Error ? err.message : String(err),
+      );
+      return false;
+    }
+  }
 }
 
 export const ConnectionService = new ConnectionServiceClass();
-

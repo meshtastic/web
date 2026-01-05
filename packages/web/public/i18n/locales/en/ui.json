@@ -9,7 +9,7 @@
     "preferences": "Preferences",
     "configuration": "Configuration",
     "networkStatus": "Network Status",
-    "manageConnections": "Manage Connections"
+    "connections": "Connections"
   },
   "app": {
     "title": "Meshtastic",
@@ -20,41 +20,10 @@
     "collapse": "Collapse"
   },
   "nodes": {
-    "online": "{{ online }} of {{ total }}"
+    "onlineTotal": "{{ online }} of {{ total }}",
+    "text": "nodes online"
   },
-  "activityList": {
-    "noPendingChanges": "No pending changes",
-    "pendingChanges": "Pending Changes",
-    "emptyPage": "Changes will appear here as you modify settings",
-    "discardChanges": "Are you sure you want to discard all pending changes?",
-    "changesWaitingToSave": "{{num}} waiting to be saved",
-    "clearAllChanges": "Clear all changes",
-    "categories": {
-      "User": "User",
-      "Device": "Device",
-      "Lora": "LoRa",
-      "Security": "Security",
-      "Position": "Position",
-      "Power": "Power",
-      "Network": "Network",
-      "Display": "Display",
-      "Bluetooth": "Bluetooth",
-      "MQTT": "MQTT",
-      "Serial": "Serial",
-      "Telemetry": "Telemetry",
-      "Canned Message": "Canned Message",
-      "External Notification": "External Notification",
-      "Store Forward": "Store Forward",
-      "Range Test": "Range Test",
-      "Audio": "Audio",
-      "Neighbor Info": "Neighbor Info",
-      "Ambient Lighting": "Ambient Lighting",
-      "Detection Sensor": "Detection Sensor",
-      "Paxcounter": "Paxcounter",
-      "Channels": "Channels",
-      "Settings": "Settings"
-    }
-  },
+  "remoteAdmin": {},
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
@@ -309,6 +278,13 @@
         "label": "Packet Batch Size",
         "description": "Number of packets to batch before writing to database"
       }
+    },
+    "devices": {
+      "title": "Devices",
+      "description": "Manage saved devices and their data",
+      "noDevices": "No devices found",
+      "lastSeen": "Last seen",
+      "remove": "Remove device"
     }
   }
 }

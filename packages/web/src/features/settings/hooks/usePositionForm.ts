@@ -1,8 +1,9 @@
 import { AdminMessageService } from "@core/services/adminMessageService";
 import { useNodes } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
 import { usePositionFlags } from "@shared/hooks/usePositionFlags";
-import { useDevice, useDeviceContext } from "@state/index.ts";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useDevice } from "@state/index.ts";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
 import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
@@ -17,8 +18,8 @@ export function usePositionForm() {
   const { config, getEffectiveConfig, setChange, queueAdminMessage, hardware } =
     useDevice();
   const { trackChange, removeChange } = useFieldRegistry();
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
 
   const effectiveConfig = getEffectiveConfig("position");
   const baseConfig = config.position;
@@ -64,56 +65,57 @@ export function usePositionForm() {
   const prevValuesRef = useRef<PositionValidation | undefined>(undefined);
 
   // Sync form changes to store and field registry (excluding position coordinates)
+  const onFormChange = useEffectEvent((formData: Partial<PositionValidation>) => {
+    if (!baseConfig || !formData) {
+      return;
+    }
+
+    const currentValues = formData as PositionValidation;
+    const prevValues = prevValuesRef.current;
+
+    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+      return;
+    }
+
+    prevValuesRef.current = currentValues;
+
+    // Exclude position coordinates - they're handled via admin message
+    const {
+      latitude: _lat,
+      longitude: _lon,
+      altitude: _alt,
+      ...configData
+    } = currentValues;
+
+    // Include computed flags value
+    const payload = { ...configData, positionFlags: flagsValue };
+
+    // Track per-field changes for Activity panel and build changes object
+    const changes: Partial<typeof payload> = {};
+    let hasChanges = false;
+
+    for (const key of Object.keys(payload) as Array<keyof typeof payload>) {
+      const newValue = payload[key];
+      const originalValue = baseConfig[key as keyof typeof baseConfig];
+
+      if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
+        changes[key] = newValue;
+        hasChanges = true;
+        trackChange(SECTION, key as string, newValue, originalValue);
+      } else {
+        removeChange(SECTION, key as string);
+      }
+    }
+
+    if (hasChanges) {
+      setChange(SECTION, { ...baseConfig, ...changes }, baseConfig);
+    }
+  });
+
   useEffect(() => {
-    const subscription = watch((formData) => {
-      if (!baseConfig || !formData) {
-        return;
-      }
-
-      const currentValues = formData as PositionValidation;
-      const prevValues = prevValuesRef.current;
-
-      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-        return;
-      }
-
-      prevValuesRef.current = currentValues;
-
-      // Exclude position coordinates - they're handled via admin message
-      const {
-        latitude: _lat,
-        longitude: _lon,
-        altitude: _alt,
-        ...configData
-      } = currentValues;
-
-      // Include computed flags value
-      const payload = { ...configData, positionFlags: flagsValue };
-
-      // Track per-field changes for Activity panel and build changes object
-      const changes: Partial<typeof payload> = {};
-      let hasChanges = false;
-
-      for (const key of Object.keys(payload) as Array<keyof typeof payload>) {
-        const newValue = payload[key];
-        const originalValue = baseConfig[key as keyof typeof baseConfig];
-
-        if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-          changes[key] = newValue;
-          hasChanges = true;
-          trackChange(SECTION, key as string, newValue, originalValue);
-        } else {
-          removeChange(SECTION, key as string);
-        }
-      }
-
-      if (hasChanges) {
-        setChange(SECTION, { ...baseConfig, ...changes }, baseConfig);
-      }
-    });
-
+    const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch, baseConfig, flagsValue, setChange, trackChange, removeChange]);
+  }, [watch]);
 
   // Queue admin message for fixed position when saving
   const queueFixedPositionUpdate = useCallback(() => {

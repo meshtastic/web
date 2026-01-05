@@ -1,4 +1,5 @@
 import { useNodes } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
 import {
   CommandDialog,
   CommandEmpty,
@@ -9,13 +10,8 @@ import {
 } from "@shared/components/ui/command";
 import { usePinnedItems } from "@shared/hooks/usePinnedItems.ts";
 import { cn } from "@shared/utils/cn";
-import {
-  useDevice,
-  useDeviceContext,
-  useDeviceStore,
-  useUIStore,
-} from "@state/index.ts";
-import { useNavigate } from "@tanstack/react-router";
+import { useDevice, useDeviceStore, useUIStore } from "@state/index.ts";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useCommandState } from "cmdk";
 import {
   ArrowLeftRightIcon,
@@ -39,7 +35,7 @@ import {
   TrashIcon,
   UsersIcon,
 } from "lucide-react";
-import { useEffect } from "react";
+import { Suspense, useEffect, useEffectEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { NodeAvatar } from "../NodeAvatar.tsx";
 
@@ -62,11 +58,12 @@ export interface SubItem {
   action: () => void;
 }
 
-export const CommandPalette = () => {
+// Inner component that uses device-dependent hooks
+function CommandPaletteContent() {
   const { commandPaletteOpen, setCommandPaletteOpen, setConnectDialogOpen } =
     useUIStore();
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
   const { getDevices, setActiveDeviceId } = useDeviceStore();
   const { setDialogOpen, connection } = useDevice();
 
@@ -91,21 +88,27 @@ export const CommandPalette = () => {
           label: t("goto.command.messages"),
           icon: MessageSquareIcon,
           action() {
-            navigate({ to: "/messages" });
+            if (myNodeNum) {
+              navigate({ to: "/$nodeNum/messages", params: { nodeNum: String(myNodeNum) } });
+            }
           },
         },
         {
           label: t("goto.command.map"),
           icon: MapIcon,
           action() {
-            navigate({ to: "/map" });
+            if (myNodeNum) {
+              navigate({ to: "/$nodeNum/map", params: { nodeNum: String(myNodeNum) } });
+            }
           },
         },
         {
           label: t("goto.command.config"),
           icon: SettingsIcon,
           action() {
-            navigate({ to: "/config" });
+            if (myNodeNum) {
+              navigate({ to: "/$nodeNum/settings", params: { nodeNum: String(myNodeNum) } });
+            }
           },
           tags: ["settings"],
         },
@@ -113,7 +116,9 @@ export const CommandPalette = () => {
           label: t("goto.command.nodes"),
           icon: UsersIcon,
           action() {
-            navigate({ to: "/nodes" });
+            if (myNodeNum) {
+              navigate({ to: "/$nodeNum/nodes", params: { nodeNum: String(myNodeNum) } });
+            }
           },
         },
       ],
@@ -252,18 +257,6 @@ export const CommandPalette = () => {
     return bPinned - aPinned;
   });
 
-  useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setCommandPaletteOpen(true);
-      }
-    };
-
-    globalThis.addEventListener("keydown", handleKeydown);
-    return () => globalThis.removeEventListener("keydown", handleKeydown);
-  }, [setCommandPaletteOpen]);
-
   return (
     <CommandDialog
       open={commandPaletteOpen}
@@ -327,6 +320,39 @@ export const CommandPalette = () => {
         ))}
       </CommandList>
     </CommandDialog>
+  );
+}
+
+// Wrapper component that handles Suspense and connected route detection
+export const CommandPalette = () => {
+  const location = useLocation();
+  const { commandPaletteOpen, setCommandPaletteOpen } = useUIStore();
+
+  // Check if we're on a connected route (/:nodeNum/*)
+  const isConnectedRoute = /^\/\d+\//.test(location.pathname);
+
+  // Always register keyboard shortcut
+  const onKeydown = useEffectEvent((e: KeyboardEvent) => {
+    if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      setCommandPaletteOpen(true);
+    }
+  });
+
+  useEffect(() => {
+    globalThis.addEventListener("keydown", onKeydown);
+    return () => globalThis.removeEventListener("keydown", onKeydown);
+  }, []);
+
+  // Only render command palette content on connected routes
+  if (!isConnectedRoute) {
+    return null;
+  }
+
+  return (
+    <Suspense fallback={null}>
+      <CommandPaletteContent />
+    </Suspense>
   );
 };
 

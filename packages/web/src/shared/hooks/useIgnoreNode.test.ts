@@ -11,15 +11,17 @@ const mockNode = {
 const mockToast = vi.fn();
 const mockSetIgnoredNode = vi.fn();
 const mockGetNode = vi.fn();
-const mockEmit = vi.fn();
 const mockDevice = { id: 1 };
 
 vi.mock("@state/index.ts", () => ({
   useDevice: () => mockDevice,
-  useDeviceContext: () => ({ deviceId: 1234 }),
 }));
 
-vi.mock("@core/hooks/useToast.ts", () => ({
+vi.mock("@shared/hooks/useMyNode", () => ({
+  useMyNode: () => ({ myNodeNum: 1234, myNode: null }),
+}));
+
+vi.mock("@shared/hooks/useToast", () => ({
   useToast: () => ({
     toast: mockToast,
   }),
@@ -29,15 +31,6 @@ vi.mock("@data/index", () => ({
   nodeRepo: {
     getNode: (deviceId: number, nodeNum: number) =>
       mockGetNode(deviceId, nodeNum),
-  },
-}));
-
-vi.mock("@data/events", () => ({
-  dbEvents: {
-    emit: (event: string) => mockEmit(event),
-  },
-  DB_EVENTS: {
-    NODE_UPDATED: "node:updated",
   },
 }));
 
@@ -58,7 +51,7 @@ describe("useIgnoreNode hook", () => {
     mockGetNode.mockResolvedValue(mockNode);
   });
 
-  it("calls AdminMessageService.setIgnoredNode, shows toast, and emits event", async () => {
+  it("calls AdminMessageService.setIgnoredNode and shows toast", async () => {
     const { result } = renderHook(() => useIgnoreNode());
 
     await act(async () => {
@@ -73,7 +66,6 @@ describe("useIgnoreNode hook", () => {
     );
     expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
     expect(mockToast).toHaveBeenCalled();
-    expect(mockEmit).toHaveBeenCalledWith("node:updated");
   });
 
   it("handles removal case", async () => {

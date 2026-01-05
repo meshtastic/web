@@ -1,29 +1,21 @@
 /**
- * Preferences hooks using useReactiveQuery for reactive updates
+ * Preferences hooks for managing user preferences
  */
 
-import { eq } from "drizzle-orm";
 import { useCallback, useMemo } from "react";
 import { useReactiveQuery } from "sqlocal/react";
-import { getClient, getDb } from "../client.ts";
 import { preferencesRepo } from "../repositories/index.ts";
-import { preferences } from "../schema.ts";
 
 /**
  * Hook to get and set a single preference value
- * Now reactive using sqlocal
  */
 export function usePreference<T>(
   key: string,
   defaultValue: T,
 ): [T, (value: T) => Promise<void>] {
-  const query = useMemo(
-    () =>
-      getDb().select().from(preferences).where(eq(preferences.key, key)).limit(1),
-    [key],
-  );
+  const query = useMemo(() => preferencesRepo.buildPreferenceQuery(key), [key]);
 
-  const { data } = useReactiveQuery(getClient(), query);
+  const { data } = useReactiveQuery(preferencesRepo.getClient(), query);
 
   const value = useMemo((): T => {
     const row = data?.[0];
@@ -49,11 +41,10 @@ export function usePreference<T>(
 
 /**
  * Hook to get all preferences as a Map
- * Now reactive using sqlocal
  */
 export function useAllPreferences(): Map<string, unknown> {
-  const query = useMemo(() => getDb().select().from(preferences), []);
-  const { data } = useReactiveQuery(getClient(), query);
+  const query = useMemo(() => preferencesRepo.buildAllPreferencesQuery(), []);
+  const { data } = useReactiveQuery(preferencesRepo.getClient(), query);
 
   return useMemo(() => {
     const map = new Map<string, unknown>();
@@ -80,11 +71,6 @@ export function usePanelSizes(
   const key = `panel-sizes:${panelGroupId}`;
   return usePreference<number[]>(key, defaultSizes);
 }
-
-/**
- * Deprecated: No longer needed with reactive queries
- */
-export function invalidatePreferenceCache(_key: string): void {}
 
 /**
  * Preference keys and their types

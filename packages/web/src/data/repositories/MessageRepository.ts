@@ -1,4 +1,6 @@
 import { and, desc, eq, gt, or, sql } from "drizzle-orm";
+import type { SQLocalDrizzle } from "sqlocal/drizzle";
+import logger from "../../core/services/logger.ts";
 import { dbClient } from "../client.ts";
 import {
   lastRead,
@@ -17,6 +19,142 @@ export class MessageRepository {
   private get db() {
     return dbClient.db;
   }
+
+  getClient(client?: SQLocalDrizzle) {
+    return client ?? dbClient.client;
+  }
+
+  /**
+   * Build a query to get direct messages between two nodes
+   */
+  buildDirectMessagesQuery(
+    ownerNodeNum: number,
+    nodeA: number,
+    nodeB: number,
+    limit = 50,
+  ) {
+    return this.db
+      .select()
+      .from(messages)
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          eq(messages.type, "direct"),
+          or(
+            and(eq(messages.fromNode, nodeA), eq(messages.toNode, nodeB)),
+            and(eq(messages.fromNode, nodeB), eq(messages.toNode, nodeA)),
+          ),
+        ),
+      )
+      .orderBy(desc(messages.date))
+      .limit(limit);
+  }
+
+  /**
+   * Build a query to get broadcast messages for a channel
+   */
+  buildBroadcastMessagesQuery(
+    ownerNodeNum: number,
+    channelId: number,
+    limit = 50,
+  ) {
+    logger.debug(
+      `[MessageRepo] buildBroadcastMessagesQuery: ownerNodeNum=${ownerNodeNum}, channelId=${channelId}, limit=${limit}`,
+    );
+    return this.db
+      .select()
+      .from(messages)
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          eq(messages.type, "channel"),
+          eq(messages.channelId, channelId),
+        ),
+      )
+      .orderBy(desc(messages.date))
+      .limit(limit);
+  }
+
+  /**
+   * Build a query to get all messages for a device (paginated)
+   */
+  buildAllMessagesQuery(ownerNodeNum: number, limit = 100, offset = 0) {
+    return this.db
+      .select()
+      .from(messages)
+      .where(eq(messages.ownerNodeNum, ownerNodeNum))
+      .orderBy(desc(messages.date))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  /**
+   * Build a query to get pending messages (for retry logic)
+   */
+  buildPendingMessagesQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(messages)
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          or(
+            eq(messages.state, "waiting"),
+            eq(messages.state, "sending"),
+            eq(messages.state, "failed"),
+          ),
+        ),
+      )
+      .orderBy(desc(messages.date));
+  }
+
+  /**
+   * Build a query to get all direct messages (for conversation computation)
+   * Returns messages sorted by date descending
+   */
+  buildAllDirectMessagesQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(messages)
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          eq(messages.type, "direct"),
+        ),
+      )
+      .orderBy(desc(messages.date));
+  }
+
+  /**
+   * Build a query to get all channel messages (for conversation computation)
+   * Returns messages sorted by date descending
+   */
+  buildAllChannelMessagesQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(messages)
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          eq(messages.type, "channel"),
+        ),
+      )
+      .orderBy(desc(messages.date));
+  }
+
+  /**
+   * Build a query to get all lastRead entries (for unread count computation)
+   */
+  buildLastReadQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(lastRead)
+      .where(eq(lastRead.ownerNodeNum, ownerNodeNum));
+  }
+
+  // ===================
+  // Async Methods (execute queries)
+  // ===================
 
   /**
    * Get direct messages between two nodes
@@ -87,6 +225,9 @@ export class MessageRepository {
    * Save a new message
    */
   async saveMessage(message: NewMessage): Promise<void> {
+    logger.debug(
+      `[MessageRepo] saveMessage: ownerNodeNum=${message.ownerNodeNum}, type=${message.type}, channelId=${message.channelId}, from=${message.fromNode}`,
+    );
     await this.db.insert(messages).values(message);
   }
 
@@ -116,7 +257,10 @@ export class MessageRepository {
       .update(messages)
       .set({ state: newState })
       .where(
-        and(eq(messages.messageId, messageId), eq(messages.ownerNodeNum, ownerNodeNum)),
+        and(
+          eq(messages.messageId, messageId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
+        ),
       );
   }
 
@@ -130,7 +274,12 @@ export class MessageRepository {
     await this.db
       .update(messages)
       .set({ retryCount: sql`${messages.retryCount} + 1` })
-      .where(and(eq(messages.id, messageId), eq(messages.ownerNodeNum, ownerNodeNum)));
+      .where(
+        and(
+          eq(messages.id, messageId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
+        ),
+      );
   }
 
   /**
@@ -149,7 +298,12 @@ export class MessageRepository {
     await this.db
       .update(messages)
       .set(ackData)
-      .where(and(eq(messages.id, messageId), eq(messages.ownerNodeNum, ownerNodeNum)));
+      .where(
+        and(
+          eq(messages.id, messageId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
+        ),
+      );
   }
 
   /**
@@ -158,7 +312,12 @@ export class MessageRepository {
   async deleteMessage(messageId: number, ownerNodeNum: number): Promise<void> {
     await this.db
       .delete(messages)
-      .where(and(eq(messages.id, messageId), eq(messages.ownerNodeNum, ownerNodeNum)));
+      .where(
+        and(
+          eq(messages.id, messageId),
+          eq(messages.ownerNodeNum, ownerNodeNum),
+        ),
+      );
   }
 
   /**
@@ -205,7 +364,9 @@ export class MessageRepository {
    * Delete all messages for a device
    */
   async deleteAllMessages(ownerNodeNum: number): Promise<void> {
-    await this.db.delete(messages).where(eq(messages.ownerNodeNum, ownerNodeNum));
+    await this.db
+      .delete(messages)
+      .where(eq(messages.ownerNodeNum, ownerNodeNum));
   }
 
   /**
@@ -240,6 +401,23 @@ export class MessageRepository {
   }
 
   /**
+   * Debug: Get all messages without ownerNodeNum filter
+   * Used to diagnose issues with message storage
+   */
+  async debugGetAllMessages(): Promise<
+    Array<{ ownerNodeNum: number; count: number }>
+  > {
+    const result = await this.db
+      .select({
+        ownerNodeNum: messages.ownerNodeNum,
+        count: sql<number>`count(*)`,
+      })
+      .from(messages)
+      .groupBy(messages.ownerNodeNum);
+    return result;
+  }
+
+  /**
    * Get conversations list with last message and unread counts
    * Returns both direct conversations and channel conversations
    * @param myNodeNum - The current user's node number (needed for unread count calculations)
@@ -269,7 +447,12 @@ export class MessageRepository {
         lastDate: sql<Date>`MAX(${messages.date})`.as("last_date"),
       })
       .from(messages)
-      .where(and(eq(messages.ownerNodeNum, ownerNodeNum), eq(messages.type, "direct")))
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          eq(messages.type, "direct"),
+        ),
+      )
       .groupBy(sql`node_a`, sql`node_b`)
       .as("direct_convos");
 
@@ -310,7 +493,12 @@ export class MessageRepository {
         maxDate: sql<Date>`MAX(${messages.date})`.as("max_date"),
       })
       .from(messages)
-      .where(and(eq(messages.ownerNodeNum, ownerNodeNum), eq(messages.type, "channel")))
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          eq(messages.type, "channel"),
+        ),
+      )
       .groupBy(messages.channelId)
       .as("broadcast_max");
 

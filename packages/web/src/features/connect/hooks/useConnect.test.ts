@@ -3,10 +3,10 @@ import { useDeviceStore } from "@state/index.ts";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  useConnect,
   useConnection,
-  useConnections,
   useDefaultConnection,
-} from "./useConnections.ts";
+} from "./useConnect.ts";
 
 // Mock Repositories
 vi.mock("@data/repositories", () => ({
@@ -70,7 +70,7 @@ vi.mock("@data/subscriptionService", () => ({
   SubscriptionService: { subscribeToDevice: vi.fn() },
 }));
 
-describe("useConnections", () => {
+describe("useConnect", () => {
   const mockConnections = [
     {
       id: 1,
@@ -122,7 +122,7 @@ describe("useConnections", () => {
   });
 
   it("should initialize and fetch connections", async () => {
-    const { result } = renderHook(() => useConnections());
+    const { result } = renderHook(() => useConnect());
 
     await waitFor(() => {
       expect(result.current.connections).toEqual(mockConnections);
@@ -143,7 +143,7 @@ describe("useConnections", () => {
       .mockResolvedValueOnce(mockConnections) // Initial load
       .mockResolvedValueOnce([...mockConnections, createdConn]); // After add
 
-    const { result } = renderHook(() => useConnections());
+    const { result } = renderHook(() => useConnect());
     await waitFor(() => expect(result.current.connections).toHaveLength(2));
 
     await act(async () => {
@@ -169,7 +169,7 @@ describe("useConnections", () => {
       .mockResolvedValueOnce(mockConnections)
       .mockResolvedValueOnce([mockConnections[1]]); // After delete
 
-    const { result } = renderHook(() => useConnections());
+    const { result } = renderHook(() => useConnect());
     await waitFor(() => expect(result.current.connections).toHaveLength(2));
 
     await act(async () => {
@@ -185,7 +185,7 @@ describe("useConnections", () => {
   it("should set default connection", async () => {
     (connectionRepo.setDefault as vi.Mock).mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useConnections());
+    const { result } = renderHook(() => useConnect());
     await waitFor(() => expect(result.current.connections).toHaveLength(2));
 
     await act(async () => {

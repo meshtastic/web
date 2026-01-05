@@ -1,12 +1,10 @@
-import { desc, eq } from "drizzle-orm";
 import { useCallback, useMemo } from "react";
 import { useReactiveQuery } from "sqlocal/react";
-import { getClient, getDb } from "../client.ts";
 import { packetLogRepo } from "../repositories/index.ts";
-import { type PacketLog, packetLogs } from "../schema.ts";
+import type { PacketLog } from "../schema.ts";
 
 /**
- * Reactive hook to get packet logs for a device
+ * Hook to get packet logs for a device
  */
 export function usePacketLogs(
   deviceId: number,
@@ -16,17 +14,14 @@ export function usePacketLogs(
   clearLogs: () => Promise<void>;
 } {
   const query = useMemo(
-    () =>
-      getDb()
-        .select()
-        .from(packetLogs)
-        .where(eq(packetLogs.ownerNodeNum, deviceId))
-        .orderBy(desc(packetLogs.rxTime))
-        .limit(limit),
+    () => packetLogRepo.buildPacketLogsQuery(deviceId, limit),
     [deviceId, limit],
   );
 
-  const { data: packets, status } = useReactiveQuery(getClient(), query);
+  const { data: packets, status } = useReactiveQuery(
+    packetLogRepo.getClient(),
+    query,
+  );
 
   const clearLogs = useCallback(async () => {
     await packetLogRepo.deleteAllPackets(deviceId);

@@ -3,15 +3,12 @@ import {
   type FilterState,
   useFilterNode,
 } from "@app/shared/components/Filter/useFilterNode.ts";
-import { create } from "@bufbuild/protobuf";
 import { useNodes } from "@data/hooks";
-import { Protobuf } from "@meshtastic/core";
+import { useMyNode } from "@shared/hooks";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useMapFitting } from "@shared/hooks/useMapFitting";
 import { cn } from "@shared/utils/cn";
-import { boundsFromLngLat, hasPos, toLngLat } from "@shared/utils/geo.ts";
-import { useDevice, useDeviceContext } from "@state/index.ts";
-import { toByteArray } from "base64-js";
+import { boundsFromLngLat, hasNodePosition, toLngLatFromNode } from "@shared/utils/geo.ts";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
   useCallback,
@@ -40,88 +37,20 @@ import {
   type VisibilityState,
 } from "../components/Tools/MapLayerTool.tsx";
 
-// Helper to convert hex string to Uint8Array
-function hexToUint8Array(hex: string): Uint8Array {
-  const matches = hex.match(/.{1,2}/g);
-  return matches
-    ? new Uint8Array(matches.map((byte) => parseInt(byte, 16)))
-    : new Uint8Array();
-}
-
 export const MapPage = () => {
   const { t } = useTranslation("map");
-  const { deviceId } = useDeviceContext();
-  const device = useDevice();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { myNodeNum, myNode } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
 
-  // Filter to only nodes with positions and convert to protobuf format
+  // Filter to only nodes with positions (NodeDTO now has latitude/longitude directly)
   const validNodes = useMemo(() => {
-    return allNodes
-      .filter((node) => Boolean(node.latitudeI))
-      .map((node): Protobuf.Mesh.NodeInfo => {
-        return {
-          $typeName: "meshtastic.NodeInfo",
-          num: node.nodeNum,
-          snr: node.snr ?? 0,
-          lastHeard: node.lastHeard
-            ? Math.floor(node.lastHeard.getTime() / 1000)
-            : 0,
-          channel: 0,
-          viaMqtt: false,
-          isFavorite: node.isFavorite ?? false,
-          isIgnored: node.isIgnored ?? false,
-          hopsAway: 0,
-          isKeyManuallyVerified: false,
-          user: {
-            $typeName: "meshtastic.User",
-            id: node.userId ?? "",
-            longName: node.longName ?? "",
-            shortName: node.shortName ?? "",
-            macaddr: node.macaddr
-              ? hexToUint8Array(node.macaddr)
-              : new Uint8Array(),
-            hwModel: node.hwModel ?? 0,
-            role: node.role ?? 0,
-            publicKey: node.publicKey
-              ? toByteArray(node.publicKey)
-              : new Uint8Array(),
-            isLicensed: node.isLicensed ?? false,
-          },
-          position: create(Protobuf.Mesh.PositionSchema, {
-            latitudeI: node.latitudeI ?? 0,
-            longitudeI: node.longitudeI ?? 0,
-            altitude: node.altitude ?? 0,
-            time: node.positionTime
-              ? Math.floor(node.positionTime.getTime() / 1000)
-              : 0,
-            precisionBits: node.positionPrecisionBits ?? 32,
-            groundSpeed: node.groundSpeed ?? 0,
-            groundTrack: node.groundTrack ?? 0,
-            satsInView: node.satsInView ?? 0,
-          }),
-          deviceMetrics: {
-            $typeName: "meshtastic.DeviceMetrics",
-            batteryLevel: node.batteryLevel ?? 0,
-            voltage: node.voltage ?? 0,
-            channelUtilization: node.channelUtilization ?? 0,
-            airUtilTx: node.airUtilTx ?? 0,
-            uptimeSeconds: node.uptimeSeconds ?? 0,
-          },
-        };
-      });
+    return allNodes.filter((node) => hasNodePosition(node));
   }, [allNodes]);
-
-  const myNodeNum = device.hardware?.myNodeNum ?? 0;
-
-  // Get myNode
-  const myNode = useMemo(() => {
-    return validNodes.find((n) => n.num === myNodeNum);
-  }, [validNodes, myNodeNum]);
 
   // Create getNode helper
   const getNode = useCallback(
     (nodeNum: number) => {
-      return validNodes.find((n) => n.num === nodeNum);
+      return validNodes.find((n) => n.nodeNum === nodeNum);
     },
     [validNodes],
   );
@@ -153,7 +82,7 @@ export const MapPage = () => {
     (map: MapRef) => {
       setMapRef(map);
       if (!hasFitBoundsOnce.current && validNodes.length > 0) {
-        const coords = validNodes.map((n) => toLngLat(n.position));
+        const coords = validNodes.map((n) => toLngLatFromNode(n));
         const bounds = boundsFromLngLat(coords);
         if (bounds) {
           map.fitBounds(bounds, {
@@ -193,13 +122,13 @@ export const MapPage = () => {
         const { from, to, snr } = hoveredFeature.properties;
 
         const fromLong =
-          getNode(from)?.user?.longName ??
+          getNode(from)?.longName ||
           t("fallbackName", {
             last4: numberToHexUnpadded(from).slice(-4).toUpperCase(),
           });
 
         const toLong =
-          getNode(to)?.user?.longName ??
+          getNode(to)?.longName ||
           t("fallbackName", {
             last4: numberToHexUnpadded(to).slice(-4).toUpperCase(),
           });
@@ -313,7 +242,7 @@ export const MapPage = () => {
         )}
       </BaseMap>
       <div className="flex flex-col space-y-1 fixed top-35 right-2.5">
-        {myNode && hasPos(myNode?.position) && (
+        {myNode && hasNodePosition(myNode) && (
           <button
             type="button"
             className={cn(
@@ -324,7 +253,7 @@ export const MapPage = () => {
               "dark:text-slate-600 hover:dark:text-slate-700",
             )}
             aria-label={t("mapMenu.locateAria")}
-            onClick={() => focusLngLat(toLngLat(myNode.position))}
+            onClick={() => focusLngLat(toLngLatFromNode(myNode))}
           >
             {" "}
             <LocateFixedIcon className="w-[21px]" />

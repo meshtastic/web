@@ -1,6 +1,6 @@
 import type { Message } from "@data/schema";
 import { render, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Create mock messages with specific IDs and dates
 const createMockMessage = (
@@ -54,6 +54,11 @@ vi.mock("@data/hooks", () => ({
     mockMarkConversationAsRead(...args),
 }));
 
+// Mock useMyNode from shared hooks
+vi.mock("@shared/hooks/useMyNode", () => ({
+  useMyNode: () => ({ myNodeNum: 1 }),
+}));
+
 // Mock i18next
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -91,11 +96,6 @@ vi.mock("@shared/components/NodeAvatar", () => ({
 import { ChatPanel } from "./ChatPanel.tsx";
 
 describe("ChatPanel", () => {
-  const mockDevice = {
-    id: 1,
-    getMyNodeNum: () => 999,
-  };
-
   const mockChannelContact = {
     type: "channel" as const,
     id: 0,
@@ -103,6 +103,10 @@ describe("ChatPanel", () => {
     nodeId: "!test",
     nodeNum: 0,
     online: true,
+    lastMessage: "",
+    time: "",
+    unread: 0,
+    isFavorite: false,
   };
 
   beforeEach(() => {
@@ -110,14 +114,7 @@ describe("ChatPanel", () => {
   });
 
   it("should mark conversation as read with the NEWEST message ID, not oldest", async () => {
-    render(
-      <ChatPanel
-        contact={mockChannelContact}
-        // biome-ignore lint/suspicious/noExplicitAny: test mock
-        device={mockDevice as any}
-        showHeader={false}
-      />,
-    );
+    render(<ChatPanel contact={mockChannelContact} showHeader={false} />);
 
     await waitFor(() => {
       expect(mockMarkConversationAsRead).toHaveBeenCalled();
@@ -125,10 +122,15 @@ describe("ChatPanel", () => {
 
     // Verify markConversationAsRead was called with the newest message (id: 5)
     // NOT the oldest message (id: 1)
-    const [deviceId, type, conversationId, messageId] =
-      mockMarkConversationAsRead.mock.calls[0];
+    const callArgs = mockMarkConversationAsRead.mock.calls[0] as [
+      number,
+      string,
+      string,
+      number,
+    ];
+    const [myNodeNum, type, conversationId, messageId] = callArgs;
 
-    expect(deviceId).toBe(1);
+    expect(myNodeNum).toBe(1);
     expect(type).toBe("channel");
     expect(conversationId).toBe("0");
 
@@ -139,12 +141,7 @@ describe("ChatPanel", () => {
 
   it("should sort messages newest-first for display (flex-col-reverse shows oldest at top)", async () => {
     const { container } = render(
-      <ChatPanel
-        contact={mockChannelContact}
-        // biome-ignore lint/suspicious/noExplicitAny: test mock
-        device={mockDevice as any}
-        showHeader={false}
-      />,
+      <ChatPanel contact={mockChannelContact} showHeader={false} />,
     );
 
     await waitFor(() => {

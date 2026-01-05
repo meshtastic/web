@@ -18,7 +18,7 @@ interface ActivityPanelProps {
 }
 
 export function ActivityPanel({ open, onOpenChange }: ActivityPanelProps) {
-  const { t } = useTranslation("ui");
+  const { t } = useTranslation("config");
 
   const { activityItems, totalCount, removeChange, clearAllChanges } =
     useActivityChanges();

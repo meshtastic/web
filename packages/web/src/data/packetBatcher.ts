@@ -1,6 +1,5 @@
 import logger from "../core/services/logger.ts";
 import { DEFAULT_PREFERENCES } from "@state/ui";
-import { DB_EVENTS, dbEvents } from "./events.ts";
 import { packetLogRepo, preferencesRepo } from "./repositories/index.ts";
 import type { NewPacketLog } from "./schema.ts";
 
@@ -17,44 +16,23 @@ class PacketBatcher {
   private buffer: NewPacketLog[] = [];
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
   private isProcessing = false;
-  private unsubscribe: (() => void) | null = null;
   private cachedBatchSize = DEFAULT_PREFERENCES.packetBatchSize;
 
-  private get batchSize(): number {
-    return this.cachedBatchSize;
-  }
-
   /**
-   * Initialize the batcher and subscribe to preference changes
+   * Get the current batch size, reading from preferences on each flush
    */
-  async init(): Promise<void> {
-    // Load initial batch size
+  private async refreshBatchSize(): Promise<void> {
     const savedSize = await preferencesRepo.get<number>("packetBatchSize");
-    if (savedSize !== undefined) {
+    if (savedSize !== undefined && savedSize !== this.cachedBatchSize) {
       this.cachedBatchSize = savedSize;
+      logger.debug(`[PacketBatcher] Batch size updated to ${savedSize}`);
     }
-
-    // Subscribe to batch size changes
-    this.unsubscribe = dbEvents.subscribe(
-      DB_EVENTS.PREFERENCE_UPDATED,
-      async () => {
-        const newSize = await preferencesRepo.get<number>("packetBatchSize");
-        if (newSize !== undefined && newSize !== this.cachedBatchSize) {
-          this.cachedBatchSize = newSize;
-          logger.debug(`[PacketBatcher] Batch size changed to ${newSize}`);
-        }
-      },
-    );
   }
 
   /**
-   * Cleanup subscriptions
+   * Cleanup timers
    */
   destroy(): void {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-      this.unsubscribe = null;
-    }
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
       this.flushTimer = null;
@@ -68,7 +46,7 @@ class PacketBatcher {
     this.buffer.push(packet);
     this.scheduleFlush();
 
-    if (this.buffer.length >= this.batchSize) {
+    if (this.buffer.length >= this.cachedBatchSize) {
       void this.flush();
     }
   }
@@ -91,6 +69,9 @@ class PacketBatcher {
     }
 
     this.isProcessing = true;
+
+    // Refresh batch size from preferences (reads on each flush, not on each add)
+    await this.refreshBatchSize();
 
     // Take all current packets
     const packets = this.buffer.splice(0, this.buffer.length);

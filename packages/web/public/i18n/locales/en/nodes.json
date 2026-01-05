@@ -29,6 +29,9 @@
       "label": "Error",
       "text": "An error occurred while fetching node details. Please try again later."
     },
+    "online": {
+      "label": "Online"
+    },
     "status": {
       "heard": "Heard",
       "mqtt": "MQTT"

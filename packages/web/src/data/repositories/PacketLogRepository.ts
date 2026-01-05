@@ -1,4 +1,5 @@
-import { and, count, desc, eq, lt } from "drizzle-orm";
+import { and, count, desc, eq, isNotNull, lt } from "drizzle-orm";
+import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
 import { type NewPacketLog, type PacketLog, packetLogs } from "../schema.ts";
 
@@ -14,6 +15,58 @@ export class PacketLogRepository {
   private get db() {
     return dbClient.db;
   }
+
+  /**
+   * Get the SQLocal client for reactive queries
+   * @param client - Optional client override for dependency injection
+   */
+  getClient(client?: SQLocalDrizzle) {
+    return client ?? dbClient.client;
+  }
+
+  // ===================
+  // Query Builders 
+  // ===================
+
+  /**
+   * Build a query to get packet logs for a device
+   */
+  buildPacketLogsQuery(ownerNodeNum: number, limit = 100) {
+    return this.db
+      .select()
+      .from(packetLogs)
+      .where(eq(packetLogs.ownerNodeNum, ownerNodeNum))
+      .orderBy(desc(packetLogs.rxTime))
+      .limit(limit);
+  }
+
+  /**
+   * Build a query to get signal logs (SNR/RSSI) for a specific node
+   */
+  buildSignalLogsQuery(ownerNodeNum: number, nodeNum: number, limit = 100) {
+    return this.db
+      .select({
+        id: packetLogs.id,
+        rxTime: packetLogs.rxTime,
+        rxSnr: packetLogs.rxSnr,
+        rxRssi: packetLogs.rxRssi,
+      })
+      .from(packetLogs)
+      .where(
+        and(
+          eq(packetLogs.ownerNodeNum, ownerNodeNum),
+          eq(packetLogs.fromNode, nodeNum),
+          isNotNull(packetLogs.rxSnr),
+          isNotNull(packetLogs.rxRssi),
+        ),
+      )
+      .orderBy(desc(packetLogs.rxTime))
+      .limit(limit);
+  }
+
+  // ===================
+  // Async Methods (execute queries)
+  // ===================
 
   /**
    * Log a packet

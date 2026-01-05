@@ -1,7 +1,7 @@
 import { getX25519PrivateKey, getX25519PublicKey } from "@shared/utils/x25519";
 import { useDevice } from "@state/index.ts";
 import { fromByteArray, toByteArray } from "base64-js";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type DefaultValues, type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
 import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
@@ -81,56 +81,49 @@ export function useSecurityForm() {
   const prevValuesRef = useRef<RawSecurity | undefined>(undefined);
 
   // Sync form changes to store and field registry
+  const onFormChange = useEffectEvent((formData: Partial<RawSecurity>) => {
+    if (!baseConfig || !formData || !defaultValues) {
+      return;
+    }
+
+    const currentValues = formData as RawSecurity;
+    const prevValues = prevValuesRef.current;
+
+    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+      return;
+    }
+
+    prevValuesRef.current = currentValues;
+
+    // Convert for store
+    const parsed = fromFormValues(currentValues);
+
+    // Track per-field changes for Activity panel
+    for (const key of Object.keys(currentValues) as Array<
+      keyof RawSecurity
+    >) {
+      const newValue = currentValues[key];
+      const originalValue = defaultValues[key];
+
+      if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
+        trackChange(SECTION, key, newValue, originalValue);
+      } else {
+        removeChange(SECTION, key);
+      }
+    }
+
+    // Send full config to device store
+    const hasChanges = JSON.stringify(parsed) !== JSON.stringify(baseConfig);
+
+    if (hasChanges) {
+      setChange(SECTION, parsed, baseConfig);
+    }
+  });
+
   useEffect(() => {
-    const subscription = watch((formData) => {
-      if (!baseConfig || !formData || !defaultValues) {
-        return;
-      }
-
-      const currentValues = formData as RawSecurity;
-      const prevValues = prevValuesRef.current;
-
-      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-        return;
-      }
-
-      prevValuesRef.current = currentValues;
-
-      // Convert for store
-      const parsed = fromFormValues(currentValues);
-
-      // Track per-field changes for Activity panel
-      for (const key of Object.keys(currentValues) as Array<
-        keyof RawSecurity
-      >) {
-        const newValue = currentValues[key];
-        const originalValue = defaultValues[key];
-
-        if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-          trackChange(SECTION, key, newValue, originalValue);
-        } else {
-          removeChange(SECTION, key);
-        }
-      }
-
-      // Send full config to device store
-      const hasChanges = JSON.stringify(parsed) !== JSON.stringify(baseConfig);
-
-      if (hasChanges) {
-        setChange(SECTION, parsed, baseConfig);
-      }
-    });
-
+    const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [
-    watch,
-    baseConfig,
-    defaultValues,
-    fromFormValues,
-    setChange,
-    trackChange,
-    removeChange,
-  ]);
+  }, [watch]);
 
   // Generate new private/public key pair
   const regenerateKeys = useCallback(() => {

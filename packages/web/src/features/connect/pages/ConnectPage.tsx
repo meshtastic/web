@@ -1,4 +1,4 @@
-import { useConnections } from "@data/hooks";
+import { useConnect } from "@data/hooks";
 import type { Connection } from "@data/index";
 import LanguageSwitcher from "@shared/components/LanguageSwitcher.tsx";
 import { TimeAgo } from "@shared/components/TimeAgo.tsx";
@@ -30,7 +30,6 @@ import {
 } from "@shared/components/ui/dropdown-menu";
 import { Separator } from "@shared/components/ui/separator";
 import { useToast } from "@shared/hooks/useToast.ts";
-import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   LinkIcon,
@@ -48,7 +47,7 @@ import { ConfigProgressIndicator } from "../components/ConfigProgressIndicator.t
 import { ConnectionStatusBadge } from "../components/ConnectionStatusBadge.tsx";
 import { connectionTypeIcon, formatConnectionSubtext } from "../utils.ts";
 
-export const Connections = () => {
+export const ConnectPage = () => {
   const {
     connections,
     addConnection,
@@ -58,9 +57,8 @@ export const Connections = () => {
     setDefaultConnection,
     refreshStatuses,
     syncConnectionStatuses,
-  } = useConnections();
+  } = useConnect();
   const { toast } = useToast();
-  const navigate = useNavigate({ from: "/" });
   const [addOpen, setAddOpen] = useState(false);
   const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
   const { t } = useTranslation("connections");
@@ -75,18 +73,11 @@ export const Connections = () => {
   const sorted = useMemo(() => {
     const copy = [...connections];
     return copy.sort((a, b) => {
-      if (a.isDefault && !b.isDefault) {
-        return -1;
-      }
-      if (!a.isDefault && b.isDefault) {
-        return 1;
-      }
-      const aConnected = a.status === "connected" || a.status === "configured";
-      const bConnected = b.status === "connected" || b.status === "configured";
-      if (aConnected && !bConnected) {
-        return -1;
-      }
-      return a.name.localeCompare(b.name);
+      // Sort by lastConnectedAt descending (most recent first)
+      // Connections that have never been connected go to the end
+      const aTime = a.lastConnectedAt?.getTime() ?? 0;
+      const bTime = b.lastConnectedAt?.getTime() ?? 0;
+      return bTime - aTime;
     });
   }, [connections]);
 
@@ -94,14 +85,6 @@ export const Connections = () => {
     <div className="space-y-6 p-6">
       <header className="flex items-start justify-between">
         <div className="flex items-stretch gap-3">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/" })}
-            className="flex items-center justify-center w-9 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="size-5" />
-          </button>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
               {t("page.title")}
@@ -159,9 +142,7 @@ export const Connections = () => {
                       })
                     : t("toasts.checkConnection"),
                 });
-                if (ok) {
-                  navigate({ to: "/" });
-                }
+                // Navigation handled by ConnectionService after config complete
               }}
               onDisconnect={async () => {
                 await disconnect(c.id);
@@ -208,9 +189,7 @@ export const Connections = () => {
                       })
                     : t("toasts.pickConnectionAgain"),
                 });
-                if (ok) {
-                  navigate({ to: "/" });
-                }
+                // Navigation handled by ConnectionService after config complete
               }}
             />
           ))}

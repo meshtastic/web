@@ -33,10 +33,6 @@ function serializeKey(key: ConfigChangeKey): string {
   return "";
 }
 
-const _TRACEROUTE_TARGET_RETENTION_NUM = 100; // Number of traceroutes targets to keep
-const _TRACEROUTE_ROUTE_RETENTION_NUM = 100; // Number of traceroutes to keep per target
-const _WAYPOINT_RETENTION_NUM = 100;
-
 // Config types expected during Stage 1 configuration
 const DEVICE_CONFIG_TYPES = [
   "device",
@@ -224,7 +220,10 @@ export interface Device extends DeviceData {
   clearConfigConflicts: () => void;
 
   // Remote administration methods
-  setRemoteAdminTarget: (nodeNum: number | null, targetPublicKey?: string) => void;
+  setRemoteAdminTarget: (
+    nodeNum: number | null,
+    targetPublicKey?: string,
+  ) => void;
   getAdminDestination: () => number | "self";
 }
 
@@ -1185,7 +1184,10 @@ function deviceFactory(
     },
 
     // Remote administration methods
-    setRemoteAdminTarget: (nodeNum: number | null, targetPublicKey?: string) => {
+    setRemoteAdminTarget: (
+      nodeNum: number | null,
+      targetPublicKey?: string,
+    ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
           const device = draft.devices.get(id);

@@ -10,6 +10,26 @@ import {
 } from "drizzle-orm/sqlite-core";
 
 /**
+ * Devices table - anchor table for all device-scoped data
+ * All other tables reference this via ownerNodeNum with cascade delete
+ */
+export const devices = sqliteTable("devices", {
+  nodeNum: integer("node_num").primaryKey(),
+  shortName: text("short_name"),
+  longName: text("long_name"),
+  hwModel: integer("hw_model"),
+  firstSeen: integer("first_seen", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+  lastSeen: integer("last_seen", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+});
+
+export type Device = typeof devices.$inferSelect;
+export type NewDevice = typeof devices.$inferInsert;
+
+/**
  * Messages table - stores all direct and channel messages
  */
 export const messages = sqliteTable(
@@ -18,7 +38,9 @@ export const messages = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     // Device identity - the node number of the device that owns this data
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
 
     // Message metadata
     messageId: integer("message_id").notNull(), // Original packet message ID
@@ -100,7 +122,9 @@ export const nodes = sqliteTable(
     // Composite primary key (ownerNodeNum + nodeNum)
     // ownerNodeNum = the device's own node number that reported this data
     // nodeNum = the remote node this record is about
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
     nodeNum: integer("node_num").notNull(),
 
     // Node metadata
@@ -170,7 +194,9 @@ export const channels = sqliteTable(
   {
     // Composite primary key (ownerNodeNum + channelIndex)
     // ownerNodeNum = the device's own node number that owns these channels
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
     channelIndex: integer("channel_index").notNull(), // 0-7
 
     // Channel metadata
@@ -213,7 +239,9 @@ export const positionLogs = sqliteTable(
 
     // ownerNodeNum = the device's own node number that reported this data
     // nodeNum = the remote node whose position this is
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
     nodeNum: integer("node_num").notNull(),
 
     // Position data (same format as nodes table)
@@ -255,7 +283,9 @@ export const packetLogs = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     // Device identity - the node number of the device that received this packet
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
 
     // Packet metadata
     fromNode: integer("from_node").notNull(),
@@ -303,7 +333,9 @@ export const telemetryLogs = sqliteTable(
 
     // ownerNodeNum = the device's own node number that reported this data
     // nodeNum = the remote node whose telemetry this is
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
     nodeNum: integer("node_num").notNull(),
 
     // Device metrics
@@ -348,7 +380,9 @@ export const messageDrafts = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     // Device identity - the node number of the device that owns this draft
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
     type: text("type", { enum: ["direct", "channel"] }).notNull(),
 
     // For direct: nodeNum of recipient
@@ -375,11 +409,18 @@ export const messageDrafts = sqliteTable(
 
 /**
  * Connections table - stores saved connection configurations
+ * One device can have many saved connections (HTTP, Bluetooth, Serial)
  */
 export const connections = sqliteTable(
   "connections",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
+
+    // Device this connection belongs to (set after first successful connection)
+    // Nullable because nodeNum isn't known until first connection
+    nodeNum: integer("node_num").references(() => devices.nodeNum, {
+      onDelete: "cascade",
+    }),
 
     // Connection type
     type: text("type", { enum: ["http", "bluetooth", "serial"] }).notNull(),
@@ -466,7 +507,9 @@ export const lastRead = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     // Device identity - the node number of the device that owns this data
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
     type: text("type", { enum: ["direct", "channel"] }).notNull(),
 
     // For direct: conversation ID (formatted as "nodeA:nodeB")
@@ -501,7 +544,9 @@ export const tracerouteLogs = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     // Device identity - the node number of the device that owns this data
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
 
     // Target node
     targetNodeNum: integer("target_node_num").notNull(),
@@ -578,7 +623,9 @@ export const deviceConfigs = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     // Device identity - the node number of the device that owns this config
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
 
     // Config data (stored as JSON)
     config: text("config", { mode: "json" }).notNull(), // LocalConfig
@@ -617,7 +664,9 @@ export const configChanges = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
 
     // Device identity - the node number of the device that owns this data
-    ownerNodeNum: integer("owner_node_num").notNull(),
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
 
     // Change identification
     changeType: text("change_type", {

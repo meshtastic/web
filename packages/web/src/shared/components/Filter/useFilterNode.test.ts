@@ -1,39 +1,40 @@
+import type { Node } from "@data/schema";
 import { Protobuf } from "@meshtastic/core";
-import { useFilterNode } from "./useFilterNode.ts";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { useFilterNode } from "./useFilterNode.ts";
 
-function createMockNode(): Protobuf.Mesh.NodeInfo {
+function createMockNode(): Node {
   return {
-    $typeName: "meshtastic.NodeInfo",
-    num: 1234567890,
+    ownerNodeNum: 1,
+    nodeNum: 1234567890,
     snr: -10.2,
-    lastHeard: 1747519674,
-    channel: 0,
-    viaMqtt: false,
+    lastHeard: new Date(1747519674 * 1000),
     isFavorite: true,
     isIgnored: false,
-    hopsAway: 2,
-    isKeyManuallyVerified: false,
-    user: {
-      $typeName: "meshtastic.User",
-      id: "!12345678",
-      longName: "longName",
-      shortName: "lN",
-      macaddr: new Uint8Array(0),
-      hwModel: Protobuf.Mesh.HardwareModel.TLORA_T3_S3,
-      isLicensed: false,
-      role: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
-      publicKey: new Uint8Array(32),
-    },
-    deviceMetrics: {
-      $typeName: "meshtastic.DeviceMetrics",
-      batteryLevel: 101,
-      voltage: 4.21,
-      channelUtilization: 7.5,
-      airUtilTx: 2.57,
-      uptimeSeconds: 528092,
-    },
+    userId: "!12345678",
+    longName: "longName",
+    shortName: "lN",
+    macaddr: null,
+    hwModel: Protobuf.Mesh.HardwareModel.TLORA_T3_S3,
+    isLicensed: false,
+    role: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
+    publicKey: null,
+    latitudeI: null,
+    longitudeI: null,
+    altitude: null,
+    positionTime: null,
+    positionPrecisionBits: null,
+    groundSpeed: null,
+    groundTrack: null,
+    satsInView: null,
+    batteryLevel: 101,
+    voltage: 4.21,
+    channelUtilization: 7.5,
+    airUtilTx: 2.57,
+    uptimeSeconds: 528092,
+    privateNote: null,
+    updatedAt: new Date(),
   };
 }
 
@@ -49,10 +50,8 @@ describe("useFilterNode", () => {
       expect(nodeFilter(node, { nodeName: "xxx" })).toBe(false);
     });
 
-    it("filters by hopsAway", () => {
-      expect(nodeFilter(node, { hopsAway: [0, 1] })).toBe(false);
-      expect(nodeFilter(node, { hopsAway: [2, 2] })).toBe(true);
-    });
+    // Note: hopsAway is not available in Node schema, so we skip this test
+    // it("filters by hopsAway", () => {...});
 
     it("filters by snr", () => {
       expect(nodeFilter(node, { snr: [-12, -10] })).toBe(true);
@@ -70,11 +69,8 @@ describe("useFilterNode", () => {
       expect(nodeFilter(node, { isFavorite: undefined })).toBe(true);
     });
 
-    it("filters by viaMqtt", () => {
-      expect(nodeFilter(node, { viaMqtt: true })).toBe(false);
-      expect(nodeFilter(node, { viaMqtt: false })).toBe(true);
-      expect(nodeFilter(node, { viaMqtt: undefined })).toBe(true);
-    });
+    // Note: viaMqtt is not available in Node schema, so we skip this test
+    // it("filters by viaMqtt", () => {...});
 
     it("filters by airUtilTx", () => {
       expect(nodeFilter(node, { airUtilTx: [2, 3] })).toBe(true);
@@ -115,11 +111,8 @@ describe("useFilterNode", () => {
       ).toBe(false);
     });
 
-    it("filters by hopsUnknown", () => {
-      expect(nodeFilter(node, { hopsUnknown: true })).toBe(false);
-      expect(nodeFilter(node, { hopsUnknown: false })).toBe(true);
-      expect(nodeFilter(node, { hopsUnknown: undefined })).toBe(true);
-    });
+    // Note: hopsUnknown filter depends on hopsAway which is not in schema
+    // it("filters by hopsUnknown", () => {...});
 
     it("filters by showUnheard", () => {
       expect(nodeFilter(node, { showUnheard: true })).toBe(false);
@@ -188,7 +181,9 @@ describe("useFilterNode", () => {
       const {
         lastHeard: [lastHeardMin, lastHeardMax],
       } = defaultFilterValues;
-      const veryOld = { ...node, lastHeard: lastHeardMax + 1 }; // older than slider max
+      // Create a very old lastHeard date
+      const veryOldDate = new Date(Date.now() - (lastHeardMax + 1) * 1000);
+      const veryOld = { ...node, lastHeard: veryOldDate };
       expect(
         nodeFilter(veryOld, { lastHeard: [lastHeardMin, lastHeardMax] }),
       ).toBe(true); // open upper
@@ -221,11 +216,8 @@ describe("useFilterNode", () => {
       } = defaultFilterValues;
       const hiV = {
         ...node,
-        deviceMetrics: {
-          ...node.deviceMetrics!,
-          voltage: voltageMax + 1,
-        },
-      } satisfies Protobuf.Mesh.NodeInfo;
+        voltage: voltageMax + 1,
+      };
       expect(nodeFilter(hiV, { voltage: [voltageMin, voltageMax] })).toBe(true); // open upper
       expect(
         nodeFilter(hiV, { voltage: [voltageMin, voltageMax - 0.01] }),

@@ -38,6 +38,16 @@ vi.mock("@core/hooks/useToast.ts", () => ({
   toast: (...args: unknown[]) => mockToast(...args),
 }));
 
+vi.mock("@shared/hooks/useToast.ts", () => ({
+  toast: (...args: unknown[]) => mockToast(...args),
+}));
+
+vi.mock("@data/index", () => ({
+  MigrationService: {
+    deleteDeviceData: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 describe("FactoryResetDeviceDialog", () => {
   const mockOnOpenChange = vi.fn();
 

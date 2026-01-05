@@ -1,8 +1,6 @@
-import { and, desc, eq, isNotNull } from "drizzle-orm";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useReactiveQuery } from "sqlocal/react";
-import { getClient, getDb } from "../client.ts";
-import { packetLogs } from "../schema.ts";
+import { packetLogRepo } from "../repositories/index.ts";
 
 export interface SignalLog {
   id: number;
@@ -13,7 +11,6 @@ export interface SignalLog {
 
 /**
  * Hook to get signal logs (SNR/RSSI) for a specific node
- * Now reactive! Automatically updates when new packets are logged.
  */
 export function useSignalLogs(
   deviceId: number,
@@ -21,33 +18,14 @@ export function useSignalLogs(
   limit = 100,
 ): {
   logs: SignalLog[];
-  refresh: () => void;
-  isRefreshing: boolean;
+  isLoading: boolean;
 } {
   const query = useMemo(
-    () =>
-      getDb()
-        .select({
-          id: packetLogs.id,
-          rxTime: packetLogs.rxTime,
-          rxSnr: packetLogs.rxSnr,
-          rxRssi: packetLogs.rxRssi,
-        })
-        .from(packetLogs)
-        .where(
-          and(
-            eq(packetLogs.ownerNodeNum, deviceId),
-            eq(packetLogs.fromNode, nodeNum),
-            isNotNull(packetLogs.rxSnr),
-            isNotNull(packetLogs.rxRssi),
-          ),
-        )
-        .orderBy(desc(packetLogs.rxTime))
-        .limit(limit),
+    () => packetLogRepo.buildSignalLogsQuery(deviceId, nodeNum, limit),
     [deviceId, nodeNum, limit],
   );
 
-  const { data, status } = useReactiveQuery(getClient(), query);
+  const { data, status } = useReactiveQuery(packetLogRepo.getClient(), query);
 
   const logs: SignalLog[] = useMemo(() => {
     return (data ?? []).reduce<SignalLog[]>((acc, p) => {
@@ -63,19 +41,8 @@ export function useSignalLogs(
     }, []);
   }, [data]);
 
-  const refresh = useCallback(() => {
-    // No-op for reactive query
-  }, []);
-
-  // To maintain Suspense compatibility, we throw the query (which is thenable)
-  // when the status is pending and we don't have data yet.
-  if (status === "pending" && !data) {
-    throw query;
-  }
-
   return {
     logs,
-    refresh,
-    isRefreshing: status === "pending",
+    isLoading: status === "pending" && !data,
   };
 }

@@ -1,6 +1,6 @@
+import { useMyNode } from "@app/shared/hooks/useMyNode";
 import { useTelemetryHistory } from "@data/hooks";
 import { Card, CardContent } from "@shared/components/ui/card";
-import { useGetMyNode } from "@shared/hooks/useGetMyNode";
 import { isDefined } from "@shared/utils/typeGuards";
 import {
   BatteryIcon,
@@ -166,8 +166,7 @@ export function TelemetryChart({
   nodeNum,
   durationHours = 24,
 }: TelemetryChartProps) {
-  const { myNodeNum } = useGetMyNode();
-  const deviceId = myNodeNum ?? 0;
+  const { myNodeNum } = useMyNode();
 
   const sinceTimestamp = useMemo(() => {
     const now = Date.now();
@@ -176,7 +175,7 @@ export function TelemetryChart({
   }, [durationHours]);
 
   const { telemetry } = useTelemetryHistory(
-    deviceId,
+    myNodeNum,
     nodeNum,
     sinceTimestamp,
     200,
@@ -221,19 +220,6 @@ export function TelemetryChart({
     charts.voltage.length > 0 ||
     charts.temperature.length > 0 ||
     charts.humidity.length > 0;
-
-  // Early return if device not connected
-  if (!myNodeNum) {
-    return (
-      <Card className="bg-muted/20">
-        <CardContent className="p-4">
-          <div className="text-center text-sm text-muted-foreground">
-            Connect to a device to view telemetry
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   if (!hasData) {
     return (

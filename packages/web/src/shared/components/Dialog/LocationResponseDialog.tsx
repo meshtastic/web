@@ -1,7 +1,7 @@
 import { useNodes } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { useDeviceContext } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper";
 
@@ -17,8 +17,8 @@ export const LocationResponseDialog = ({
   onOpenChange,
 }: LocationResponseDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
 
   const from = allNodes.find((n) => n.nodeNum === (location?.from ?? 0));
   const longName =

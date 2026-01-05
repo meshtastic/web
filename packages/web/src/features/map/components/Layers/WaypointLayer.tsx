@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Node } from "@data/schema";
 import { useMapFitting } from "@shared/hooks/useMapFitting.ts";
 import { useDevice, type WaypointWithMetadata } from "@state/index.ts";
 import { useCallback } from "react";
@@ -10,7 +10,7 @@ import { WaypointDetail } from "../Popups/WaypointDetail.tsx";
 
 export interface WaypointLayerProps {
   mapRef: MapRef | undefined;
-  myNode: Protobuf.Mesh.NodeInfo | undefined;
+  myNode: Node | undefined;
   isVisible: boolean;
   popupState: PopupState | undefined;
   setPopupState: (state: PopupState | undefined) => void;

@@ -1,4 +1,5 @@
 import { and, asc, eq } from "drizzle-orm";
+import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
 import { type Channel, channels, type NewChannel } from "../schema.ts";
 
@@ -9,6 +10,59 @@ export class ChannelRepository {
   private get db() {
     return dbClient.db;
   }
+
+  /**
+   * @param client - Optional client override for dependency injection
+   */
+  getClient(client?: SQLocalDrizzle) {
+    return client ?? dbClient.client;
+  }
+
+  /**
+   * Build a query to get all channels for a device
+   */
+  buildChannelsQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(channels)
+      .where(eq(channels.ownerNodeNum, ownerNodeNum));
+  }
+
+  /**
+   * Build a query to get a specific channel
+   */
+  buildChannelQuery(ownerNodeNum: number, channelIndex: number) {
+    return this.db
+      .select()
+      .from(channels)
+      .where(
+        and(
+          eq(channels.ownerNodeNum, ownerNodeNum),
+          eq(channels.channelIndex, channelIndex),
+        ),
+      )
+      .limit(1);
+  }
+
+  /**
+   * Build a query to get the primary channel
+   */
+  buildPrimaryChannelQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(channels)
+      .where(
+        and(
+          eq(channels.ownerNodeNum, ownerNodeNum),
+          eq(channels.role, 1), // PRIMARY = 1
+        ),
+      )
+      .limit(1);
+  }
+
+  // ===================
+  // execute queries
+  // ===================
 
   /**
    * Get all channels for a device
@@ -74,7 +128,10 @@ export class ChannelRepository {
   /**
    * Delete a channel
    */
-  async deleteChannel(ownerNodeNum: number, channelIndex: number): Promise<void> {
+  async deleteChannel(
+    ownerNodeNum: number,
+    channelIndex: number,
+  ): Promise<void> {
     await this.db
       .delete(channels)
       .where(

@@ -3,6 +3,7 @@ import type {
   ChannelRepository,
   ConfigCacheRepository,
   ConnectionRepository,
+  DeviceRepository,
   MessageRepository,
   NodeRepository,
   PacketLogRepository,
@@ -22,6 +23,7 @@ export interface RouterContext {
     channel: ChannelRepository;
     configCache: ConfigCacheRepository;
     connection: ConnectionRepository;
+    device: DeviceRepository;
     message: MessageRepository;
     node: NodeRepository;
     packetLog: PacketLogRepository;

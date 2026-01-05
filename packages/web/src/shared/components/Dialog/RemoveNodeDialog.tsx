@@ -1,8 +1,8 @@
-import { DB_EVENTS, dbEvents } from "@data/events";
 import { useNodes } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
 import { nodeRepo } from "@data/index";
 import { Label } from "@shared/components/ui/label";
-import { useDevice, useDeviceContext, useUIStore } from "@state/index.ts";
+import { useDevice, useUIStore } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
 
@@ -17,8 +17,8 @@ export const RemoveNodeDialog = ({
 }: RemoveNodeDialogProps) => {
   const { t } = useTranslation("dialog");
   const { connection } = useDevice();
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
   const { nodeNumToBeRemoved } = useUIStore();
 
   // Create getNode function from database nodes
@@ -31,10 +31,7 @@ export const RemoveNodeDialog = ({
     connection?.removeNodeByNum(nodeNumToBeRemoved);
 
     // Remove from local database
-    await nodeRepo.deleteNode(deviceId, nodeNumToBeRemoved);
-
-    // Emit event to trigger UI refresh
-    dbEvents.emit(DB_EVENTS.NODE_UPDATED);
+    await nodeRepo.deleteNode(myNodeNum, nodeNumToBeRemoved);
   };
 
   return (

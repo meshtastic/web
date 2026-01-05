@@ -13,6 +13,7 @@ vi.mock("@state/index.ts", () => ({
     _currentValue: { deviceId: 1234 },
   },
   useDevice: () => ({
+    id: 1234,
     connection: {
       resetNodes: mockResetNodes,
     },
@@ -23,6 +24,22 @@ vi.mock("@state/index.ts", () => ({
   useNodeDB: () => ({
     removeAllNodeErrors: mockRemoveAllNodeErrors,
     removeAllNodes: mockRemoveAllNodes,
+  }),
+}));
+
+vi.mock("@shared/hooks/useMyNode", () => ({
+  useMyNode: () => ({ myNodeNum: 1234, myNode: null }),
+}));
+
+vi.mock("@data/index", () => ({
+  MigrationService: {
+    deleteDeviceData: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock("@shared/hooks/useDeleteMessages.ts", () => ({
+  useDeleteMessages: () => ({
+    deleteAllMessages: mockDeleteAllMessages,
   }),
 }));
 

@@ -1,8 +1,8 @@
 import { AdminMessageService } from "@core/services/adminMessageService";
-import { DB_EVENTS, dbEvents } from "@data/events";
+import { useMyNode } from "@shared/hooks";
 import { nodeRepo } from "@data/index";
 import { useToast } from "@shared/hooks/useToast";
-import { useDevice, useDeviceContext } from "@state/index.ts";
+import { useDevice } from "@state/index.ts";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,14 +13,14 @@ interface IgnoreNodeOptions {
 
 export function useIgnoreNode() {
   const device = useDevice();
-  const { deviceId } = useDeviceContext();
+  const { myNodeNum } = useMyNode();
   const { t } = useTranslation();
   const { toast } = useToast();
 
   const updateIgnoredCB = useCallback(
     async ({ nodeNum, isIgnored }: IgnoreNodeOptions) => {
       // Get node from database for toast message
-      const node = await nodeRepo.getNode(deviceId, nodeNum);
+      const node = await nodeRepo.getNode(myNodeNum, nodeNum);
       if (!node) {
         return;
       }
@@ -41,15 +41,12 @@ export function useIgnoreNode() {
       // Send admin message and update local database
       await AdminMessageService.setIgnoredNode(
         device,
-        deviceId,
+        myNodeNum,
         nodeNum,
         isIgnored,
       );
-
-      // Emit event to trigger UI refresh
-      dbEvents.emit(DB_EVENTS.NODE_UPDATED);
     },
-    [device, deviceId, t, toast],
+    [device, myNodeNum, t, toast],
   );
 
   return { updateIgnored: updateIgnoredCB };

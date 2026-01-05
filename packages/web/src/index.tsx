@@ -1,6 +1,5 @@
-import React, { Suspense, use, useState } from "react";
+import React, { useState } from "react";
 import "@app/index.css";
-
 import "@core/services/dev-overrides.ts";
 import logger from "@core/services/logger";
 import { enableMapSet } from "immer";
@@ -8,15 +7,12 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { dbClient } from "@data/client";
-import {
-  initDatabase,
-  packetBatcher,
-  resetConnectionStatuses,
-} from "@data/index";
+import { initDatabase, resetConnectionStatuses } from "@data/index";
 import {
   channelRepo,
   configCacheRepo,
   connectionRepo,
+  deviceRepo,
   messageRepo,
   nodeRepo,
   packetLogRepo,
@@ -26,14 +22,16 @@ import {
 import { useDeviceStore } from "@state/device";
 import { useUIStore } from "@state/ui";
 import { RouterProvider } from "@tanstack/react-router";
-import { router, type RouterContext } from "./app/routes.tsx";
+import { type RouterContext, router } from "./app/routes.tsx";
 import { WelcomeSplash } from "./shared/components/WelcomeSplash.tsx";
 
 enableMapSet();
 
-// if database already exists they are returning
 async function checkDatabaseExists(): Promise<boolean> {
   try {
+    if (!navigator.storage?.getDirectory) {
+      return false;
+    }
     const root = await navigator.storage.getDirectory();
     await root.getFileHandle("meshtastic.db");
     return true;
@@ -42,7 +40,13 @@ async function checkDatabaseExists(): Promise<boolean> {
   }
 }
 
-// Build router context with all services, repositories, and stores
+async function initializeApp(): Promise<{ isReturningUser: boolean }> {
+  const isReturningUser = await checkDatabaseExists();
+  await initDatabase();
+  await resetConnectionStatuses();
+  return { isReturningUser };
+}
+
 const routerContext: RouterContext = {
   services: {
     db: dbClient,
@@ -52,6 +56,7 @@ const routerContext: RouterContext = {
     channel: channelRepo,
     configCache: configCacheRepo,
     connection: connectionRepo,
+    device: deviceRepo,
     message: messageRepo,
     node: nodeRepo,
     packetLog: packetLogRepo,
@@ -64,27 +69,7 @@ const routerContext: RouterContext = {
   },
 };
 
-// Initialize database before React mounts
-const dbPromise = initDatabase()
-  .then(() => {
-    packetBatcher.init();
-    return resetConnectionStatuses();
-  })
-  .catch((error) => {
-    console.error("[App] Failed to initialize database:", error);
-    throw error;
-  });
-
-// This will be resolved when the WelcomeSplash is "done"
-let resolveWelcomeSplashPromise: () => void;
-const welcomeSplashCompletionPromise = new Promise<void>((resolve) => {
-  resolveWelcomeSplashPromise = resolve;
-});
-
-function AppContent() {
-  use(dbPromise);
-  use(welcomeSplashCompletionPromise); // Wait for WelcomeSplash to finish
-
+function App() {
   return (
     <React.StrictMode>
       <RouterProvider router={router} context={routerContext} />
@@ -92,49 +77,49 @@ function AppContent() {
   );
 }
 
-function MinimalLoader() {
+function AppWithSplash({ isReturningUser }: { isReturningUser: boolean }) {
+  const [splashComplete, setSplashComplete] = useState(isReturningUser);
+
+  if (!splashComplete) {
+    return <WelcomeSplash onComplete={() => setSplashComplete(true)} />;
+  }
+
+  return <App />;
+}
+
+function InitError({ error }: { error: Error }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-4 text-center">
+      <h1 className="text-xl font-semibold text-destructive">
+        Failed to initialize
+      </h1>
+      <p className="text-muted-foreground">{error.message}</p>
+      <button
+        type="button"
+        className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
+        onClick={() => window.location.reload()}
+      >
+        Retry
+      </button>
     </div>
   );
 }
 
-function RootApp({ initialReturningUser }: { initialReturningUser: boolean }) {
-  const [showSplash, setShowSplash] = useState(!initialReturningUser);
+const rootElement = document.getElementById("root")!;
+const root = createRoot(rootElement);
 
-  // If returning user, resolve promise immediately
-  if (initialReturningUser) {
-    resolveWelcomeSplashPromise();
-  }
+rootElement.innerHTML = `
+  <div style="display: flex; min-height: 100vh; align-items: center; justify-content: center;">
+    <div style="width: 2rem; height: 2rem; border: 4px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+  </div>
+  <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+`;
 
-  const handleSplashComplete = () => {
-    resolveWelcomeSplashPromise();
-    setShowSplash(false);
-  };
-
-  if (showSplash) {
-    return (
-      <Suspense fallback={<MinimalLoader />}>
-        <WelcomeSplash onComplete={handleSplashComplete} />
-      </Suspense>
-    );
-  }
-
-  return (
-    <Suspense fallback={<MinimalLoader />}>
-      <AppContent />
-    </Suspense>
-  );
-}
-
-const container = document.getElementById("root") as HTMLElement;
-const root = createRoot(container);
-
-// Show minimal loader immediately
-root.render(<MinimalLoader />);
-
-// After the database check, determine what to render
-checkDatabaseExists().then((exists) => {
-  root.render(<RootApp initialReturningUser={exists} />);
-});
+initializeApp()
+  .then(({ isReturningUser }) => {
+    root.render(<AppWithSplash isReturningUser={true} />);
+  })
+  .catch((error) => {
+    logger.error("[App] Failed to initialize:", error);
+    root.render(<InitError error={error} />);
+  });

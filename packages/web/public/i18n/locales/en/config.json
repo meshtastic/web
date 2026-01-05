@@ -1,5 +1,38 @@
 {
   "settings": {
+    "activityList": {
+      "noPendingChanges": "No pending changes",
+      "pendingChanges": "Pending Changes",
+      "emptyPage": "Changes will appear here as you modify settings",
+      "discardChanges": "Are you sure you want to discard all pending changes?",
+      "changesWaitingToSave": "{{num}} waiting to be saved",
+      "clearAllChanges": "Clear all changes",
+      "categories": {
+        "User": "User",
+        "Device": "Device",
+        "Lora": "LoRa",
+        "Security": "Security",
+        "Position": "Position",
+        "Power": "Power",
+        "Network": "Network",
+        "Display": "Display",
+        "Bluetooth": "Bluetooth",
+        "MQTT": "MQTT",
+        "Serial": "Serial",
+        "Telemetry": "Telemetry",
+        "Canned Message": "Canned Message",
+        "External Notification": "External Notification",
+        "Store Forward": "Store Forward",
+        "Range Test": "Range Test",
+        "Audio": "Audio",
+        "Neighbor Info": "Neighbor Info",
+        "Ambient Lighting": "Ambient Lighting",
+        "Detection Sensor": "Detection Sensor",
+        "Paxcounter": "Paxcounter",
+        "Channels": "Channels",
+        "Settings": "Settings"
+      }
+    },
     "advanced": {
       "administration": {
         "title": "Administration",

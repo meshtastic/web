@@ -1,5 +1,6 @@
 import { useNodes } from "@data/hooks";
-import { useDevice, useDeviceContext } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks";
+import { useDevice } from "@state/index.ts";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
@@ -7,11 +8,14 @@ import { useUserForm } from "./useUserForm.ts";
 
 vi.mock("@state/index.ts", () => ({
   useDevice: vi.fn(),
-  useDeviceContext: vi.fn(),
 }));
 
 vi.mock("@data/hooks", () => ({
   useNodes: vi.fn(),
+}));
+
+vi.mock("@shared/hooks/useMyNode", () => ({
+  useMyNode: vi.fn(),
 }));
 
 vi.mock("../services/fieldRegistry", () => ({
@@ -52,7 +56,7 @@ describe("useUserForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useDeviceContext as vi.Mock).mockReturnValue({ deviceId: 1 });
+    (useMyNode as vi.Mock).mockReturnValue({ myNodeNum, myNode: null });
     (useNodes as vi.Mock).mockReturnValue({ nodes: mockNodes });
     (useDevice as vi.Mock).mockReturnValue({
       hardware: { myNodeNum },

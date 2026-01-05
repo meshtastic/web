@@ -1,6 +1,6 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Node } from "@data/schema";
 import { useMapFitting } from "@shared/hooks/useMapFitting.ts";
-import { hasPos, toLngLat } from "@shared/utils/geo.ts";
+import { hasNodePosition, toLngLatFromNode } from "@shared/utils/geo.ts";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { MapRef } from "react-map-gl/maplibre";
@@ -20,8 +20,8 @@ import { PopupWrapper } from "../Popups/PopupWrapper.tsx";
 
 export interface NodeMarkerProps {
   mapRef: MapRef | undefined;
-  filteredNodes: Protobuf.Mesh.NodeInfo[];
-  myNode: Protobuf.Mesh.NodeInfo | undefined;
+  filteredNodes: Node[];
+  myNode: Node | undefined;
   expandedCluster: string | undefined;
   setExpandedCluster: (key: string | undefined) => void;
   popupState: PopupState | undefined;
@@ -42,14 +42,14 @@ export const NodesLayer = ({
   const { t } = useTranslation("map");
 
   // Node error tracking has been removed from the node database
-  const hasNodeError = () => false;
+  const hasNodeError = (_nodeNum: number) => false;
   const { focusLngLat } = useMapFitting(mapRef);
 
   const selectedNode = useMemo(
     () =>
       popupState?.type !== "node"
         ? undefined
-        : (filteredNodes.find((node) => node.num === popupState.num) ??
+        : (filteredNodes.find((node) => node.nodeNum === popupState.num) ??
           undefined),
     [popupState, filteredNodes],
   );
@@ -58,9 +58,9 @@ export const NodesLayer = ({
     (num: number, offset: PxOffset, e: { originalEvent: MouseEvent }) => {
       e.originalEvent?.stopPropagation();
       setPopupState({ type: "node", num, offset });
-      const node = filteredNodes.find((node) => node.num === num) ?? undefined;
-      if (node) {
-        focusLngLat(toLngLat(node.position));
+      const node = filteredNodes.find((node) => node.nodeNum === num) ?? undefined;
+      if (node && hasNodePosition(node)) {
+        focusLngLat(toLngLatFromNode(node));
       }
     },
     [filteredNodes, focusLngLat, setPopupState],
@@ -70,10 +70,11 @@ export const NodesLayer = ({
   const rendered: React.ReactNode[] = [];
 
   for (const [key, nodes] of clusters) {
-    if (!nodes.length || !nodes[0]?.position) {
+    const firstNode = nodes[0];
+    if (!firstNode || !hasNodePosition(firstNode)) {
       continue;
     }
-    const [lng, lat] = toLngLat(nodes[0].position);
+    const [lng, lat] = toLngLatFromNode(firstNode);
     const isExpanded = expandedCluster === key;
 
     // Precompute pixel offsets for expanded state
@@ -87,15 +88,15 @@ export const NodesLayer = ({
 
       rendered.push(
         <NodeMarker
-          key={`node-${key}-${node.num}`}
-          id={node.num}
+          key={`node-${key}-${node.nodeNum}`}
+          id={node.nodeNum}
           lng={lng}
           lat={lat}
           offset={expandedOffsets?.[i]}
-          label={node.user?.shortName ?? t("unknown.shortName")}
-          tooltipLabel={node.user?.longName ?? t("unknown.longName")}
-          hasError={hasNodeError(node.num)}
-          isFavorite={node.isFavorite ?? false}
+          label={node.shortName || t("unknown.shortName")}
+          tooltipLabel={node.longName || t("unknown.longName")}
+          hasError={hasNodeError(node.nodeNum)}
+          isFavorite={node.isFavorite}
           isVisible={isVisible}
           onClick={(num, e) => {
             e.originalEvent?.stopPropagation();
@@ -130,18 +131,18 @@ export const NodesLayer = ({
   if (selectedNode) {
     rendered.push(
       <SourcePrecisionCircles
-        key={`precision-circles-selected-${selectedNode.num}`}
+        key={`precision-circles-selected-${selectedNode.nodeNum}`}
         data={generatePrecisionCircles([selectedNode])}
-        id={`precisionCircles-selected-${selectedNode.num}`}
+        id={`precisionCircles-selected-${selectedNode.nodeNum}`}
         isVisible={true}
       />,
     );
 
-    const [lng, lat] = toLngLat(selectedNode.position);
+    const [lng, lat] = toLngLatFromNode(selectedNode);
 
     rendered.push(
       <PopupWrapper
-        key={`popup-nodeinfo-${selectedNode.num}`}
+        key={`popup-nodeinfo-${selectedNode.nodeNum}`}
         lng={lng}
         lat={lat}
         offset={popupState?.type === "node" ? popupState.offset : [0, 0]}
@@ -152,19 +153,19 @@ export const NodesLayer = ({
     );
   }
 
-  if (myNode && hasPos(myNode.position)) {
-    const [lng, lat] = toLngLat(myNode.position);
+  if (myNode && hasNodePosition(myNode)) {
+    const [lng, lat] = toLngLatFromNode(myNode);
     rendered.push(
       <NodeMarker
-        key={`node-${myNode.num}`}
-        id={myNode.num}
+        key={`node-${myNode.nodeNum}`}
+        id={myNode.nodeNum}
         lng={lng}
         lat={lat}
-        label={myNode.user?.shortName?.toString() ?? String(myNode.num)}
+        label={myNode.shortName || String(myNode.nodeNum)}
         tooltipLabel={t("myNode.tooltip")}
         hasError={false}
         isFavorite={true}
-        onClick={(_, e) => onMarkerClick(myNode.num, [0, 0], e)}
+        onClick={(_, e) => onMarkerClick(myNode.nodeNum, [0, 0], e)}
       />,
     );
   }

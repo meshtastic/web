@@ -17,6 +17,7 @@ interface NodeAvatarProps {
   className?: string;
   showError?: boolean;
   showFavorite?: boolean;
+  showOnline?: boolean; // Show online status indicator
   clickable?: boolean; // If false, disables click behavior
   onClick?: () => void;
 }
@@ -27,6 +28,7 @@ export const NodeAvatar = ({
   size = "sm",
   showError = false,
   showFavorite = false,
+  showOnline = false,
   clickable = true,
   onClick,
   className,
@@ -95,6 +97,20 @@ export const NodeAvatar = ({
           </TooltipTrigger>
           <TooltipContent className="bg-slate-800 dark:bg-slate-600 px-4 py-1 text-xs text-white rounded">
             {t("nodeDetail.error.label", { ns: "nodes" })}
+          </TooltipContent>
+        </Tooltip>
+      )}
+
+      {showOnline && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className="absolute -bottom-0.5 -left-0.5 z-10 h-3 w-3 rounded-full bg-green-500 border-2 border-background"
+              aria-hidden="true"
+            />
+          </TooltipTrigger>
+          <TooltipContent className="px-4 py-1">
+            {t("nodeDetail.online.label", { ns: "nodes" })}
           </TooltipContent>
         </Tooltip>
       )}

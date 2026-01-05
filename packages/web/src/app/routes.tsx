@@ -1,20 +1,23 @@
-import { Connections } from "@features/connections";
+import { SidebarProvider } from "@app/shared/components/ui/sidebar.tsx";
+import { CurrentDeviceContext, useDeviceStore } from "@app/state/index.ts";
+import { ConnectPage, useConnect } from "@features/connect";
 import { MessagesPage } from "@features/messages";
 import { ErrorPage } from "@shared/components/ui/error-page";
 import { Spinner } from "@shared/components/ui/spinner";
-import { useDeviceStore } from "@state/index.ts";
 import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
+  Outlet,
   redirect,
+  useNavigate,
 } from "@tanstack/react-router";
-import { Activity, lazy, Suspense } from "react";
+import { Activity, lazy, Suspense, useCallback } from "react";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
+import { AppLayout } from "./layouts/AppLayout.tsx";
 import type { RouterContext } from "./routerContext.ts";
 
-// Lazy loaded routes
 const MapPage = lazy(() =>
   import("@features/map/pages/MapPage").then((m) => ({
     default: m.MapPage,
@@ -55,20 +58,38 @@ function RouteLoader() {
   );
 }
 
-// Helper function to check if there's an active connection
-function requireActiveConnection() {
-  const devices = useDeviceStore.getState().getDevices();
+/**
+ * Handles auto-reconnect and navigation intent subscriptions
+ */
+function ConnectedLayout() {
+  const navigate = useNavigate();
+  const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
 
-  // Check if any device has an active connection
-  const hasActiveConnection = devices.some(
-    (device) =>
-      device.connectionPhase === "connected" ||
-      device.connectionPhase === "configured",
+  const handleNavigationIntent = useCallback(
+    (intent: { nodeNum: number }) => {
+      navigate({
+        to: "/$nodeNum/messages",
+        params: { nodeNum: String(intent.nodeNum) },
+        search: { channel: 0 },
+      });
+    },
+    [navigate],
   );
 
-  if (!hasActiveConnection) {
-    throw redirect({ to: "/connections", replace: true });
-  }
+  useConnect({
+    autoReconnect: true,
+    onNavigationIntent: handleNavigationIntent,
+  });
+
+  return (
+    <SidebarProvider className="flex h-screen">
+      <CurrentDeviceContext.Provider value={{ deviceId: activeDeviceId }}>
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
+      </CurrentDeviceContext.Provider>
+    </SidebarProvider>
+  );
 }
 
 export const rootRoute = createRootRouteWithContext<RouterContext>()({
@@ -83,17 +104,74 @@ export const rootRoute = createRootRouteWithContext<RouterContext>()({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: Connections,
-  loader: () => {
-    // Redirect to primary channel on first load
-    return redirect({ to: "/messages", search: { channel: 0 }, replace: true });
+  // component: ConnectPage,
+  beforeLoad: async ({ context }) => {
+    const lastConnection =
+      await context.repositories.connection.getLastConnectedConnection();
+
+    if (lastConnection?.nodeNum) {
+      // Verify the device still exists in the database
+      const deviceExists = await context.repositories.device.deviceExists(
+        lastConnection.nodeNum,
+      );
+
+      if (deviceExists) {
+        // Device exists - redirect to messages
+        throw redirect({
+          to: "/$nodeNum/messages",
+          params: { nodeNum: String(lastConnection.nodeNum) },
+          search: { channel: 0 },
+          replace: true,
+        });
+      }
+    }
+
+    // No valid previous connection - go to connect page
+    throw redirect({ to: "/connect", replace: true });
+  },
+});
+
+const connectRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/connect",
+  component: ConnectPage,
+  errorComponent: ErrorPage,
+});
+
+// Connected layout route - validates nodeNum and provides it to children
+const connectedLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/$nodeNum",
+  component: ConnectedLayout,
+  errorComponent: ErrorPage,
+  beforeLoad: async ({ params, context }) => {
+    const nodeNum = Number(params.nodeNum);
+
+    // Validate nodeNum is a valid number
+    if (Number.isNaN(nodeNum) || nodeNum <= 0) {
+      throw redirect({ to: "/connect", replace: true });
+    }
+
+    // Check if device exists in database
+    const deviceExists =
+      await context.repositories.device.deviceExists(nodeNum);
+
+    if (!deviceExists) {
+      throw redirect({ to: "/connect", replace: true });
+    }
+
+    return { nodeNum };
   },
 });
 
 const messagesRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => connectedLayoutRoute,
   path: "/messages",
-  component: MessagesPage,
+  component: () => (
+    <Suspense fallback={<RouteLoader />}>
+      <MessagesPage />
+    </Suspense>
+  ),
   errorComponent: ErrorPage,
   validateSearch: z.object({
     // For broadcast messages: ?channel=0 (channel index 0-7)
@@ -101,27 +179,22 @@ const messagesRoute = createRoute({
     // For direct messages: ?node=123456789 (node number)
     node: z.coerce.number().int().min(0).max(4294967294).optional(), // max is 0xffffffff - 1
   }),
-  beforeLoad: () => {
-    requireActiveConnection();
-  },
 });
 
 const mapRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => connectedLayoutRoute,
   path: "/map",
   errorComponent: ErrorPage,
-  beforeLoad: () => {
-    requireActiveConnection();
-  },
   component: () => (
-    <Activity>
-      <MapPage />
-    </Activity>
+    <Suspense fallback={<RouteLoader />}>
+      <Activity>
+        <MapPage />
+      </Activity>
+    </Suspense>
   ),
 });
 
 const coordParamsSchema = z.object({
-  // Accept "strings" from the URL, coerce to number, then validate
   long: z.coerce
     .number()
     .refine(
@@ -143,16 +216,15 @@ const coordParamsSchema = z.object({
 });
 
 export const mapWithParamsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => connectedLayoutRoute,
   path: "/map/$long/$lat/$zoom",
   errorComponent: ErrorPage,
-  beforeLoad: () => {
-    requireActiveConnection();
-  },
   component: () => (
-    <Activity>
-      <MapPage />
-    </Activity>
+    <Suspense fallback={<RouteLoader />}>
+      <Activity>
+        <MapPage />
+      </Activity>
+    </Suspense>
   ),
   parseParams: (raw) => coordParamsSchema.parse(raw),
   stringifyParams: (p) => ({
@@ -163,7 +235,7 @@ export const mapWithParamsRoute = createRoute({
 });
 
 export const settingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => connectedLayoutRoute,
   path: "/settings",
   component: () => (
     <Suspense fallback={<RouteLoader />}>
@@ -171,9 +243,6 @@ export const settingsRoute = createRoute({
     </Suspense>
   ),
   errorComponent: ErrorPage,
-  beforeLoad: () => {
-    requireActiveConnection();
-  },
 });
 
 export const radioRoute = createRoute({
@@ -210,12 +279,9 @@ export const moduleRoute = createRoute({
 });
 
 const nodesRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => connectedLayoutRoute,
   path: "/nodes",
   errorComponent: ErrorPage,
-  beforeLoad: () => {
-    requireActiveConnection();
-  },
   component: () => (
     <Activity>
       <Suspense fallback={<RouteLoader />}>
@@ -225,34 +291,22 @@ const nodesRoute = createRoute({
   ),
 });
 
-const connectionsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/connections",
-  component: Connections,
-  errorComponent: ErrorPage,
-});
-
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  messagesRoute,
-  mapRoute,
-  mapWithParamsRoute,
-  settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
-  nodesRoute,
-  connectionsRoute,
+  connectRoute,
+  connectedLayoutRoute.addChildren([
+    messagesRoute,
+    mapRoute,
+    mapWithParamsRoute,
+    settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
+    nodesRoute,
+  ]),
 ]);
 
 const router = createRouter({
   routeTree,
-  context: undefined!, // Provided at runtime via RouterProvider
+  context: undefined!,
 });
-
-// Register router types for type-safe navigation
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
 
 export { router };
 export type { RouterContext };

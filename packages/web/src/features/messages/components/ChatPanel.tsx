@@ -1,3 +1,4 @@
+import logger from "@core/services/logger";
 import {
   markConversationAsRead,
   useChannelMessages,
@@ -7,7 +8,7 @@ import {
 import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
 import { OnlineIndicator } from "@shared/components/OnlineIndicator.tsx";
 import { TooltipProvider } from "@shared/components/ui/tooltip";
-import type { Device } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks";
 import { Hash } from "lucide-react";
 import { Fragment, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,34 +19,28 @@ import { groupMessagesByDay, toTimestamp } from "./MessageUtils.tsx";
 
 interface ChatPanelProps {
   contact: Contact | null | undefined;
-  device: Device;
   showHeader?: boolean;
 }
 
-export function ChatPanel({
-  contact,
-  device,
-  showHeader = true,
-}: ChatPanelProps) {
+export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
   const { i18n, t } = useTranslation();
-  const myNodeNum = device.getMyNodeNum();
+  const { myNodeNum } = useMyNode();
 
-  const { nodeMap } = useNodes(device.id);
+  const { nodeMap } = useNodes(myNodeNum);
 
   const directMessages = useDirectMessages(
-    device.id,
-    myNodeNum ?? 0,
+    myNodeNum,
+    myNodeNum,
     contact?.type === "direct" ? contact.id : 0,
     100,
   );
 
   const channelMessages = useChannelMessages(
-    device.id,
+    myNodeNum,
     contact?.type === "channel" ? contact.id : -1,
     100,
   );
 
-  // Get messages for the selected contact from database
   const currentMessages = useMemo(() => {
     if (!contact || !myNodeNum) {
       return [];
@@ -58,7 +53,6 @@ export function ChatPanel({
     return directMessages.messages;
   }, [contact, directMessages.messages, channelMessages.messages, myNodeNum]);
 
-  // Locale and date formatting for message grouping
   const locale = useMemo(
     () =>
       i18n.language ||
@@ -104,7 +98,7 @@ export function ChatPanel({
 
     if (contact.type === "channel") {
       markConversationAsRead(
-        device.id,
+        myNodeNum,
         "channel",
         contact.id.toString(),
         newestMessage.id,
@@ -113,13 +107,13 @@ export function ChatPanel({
       // Conversation ID format: myNodeNum:otherNodeNum (from user's perspective)
       const otherNode = contact.nodeNum ?? contact.id;
       markConversationAsRead(
-        device.id,
+        myNodeNum,
         "direct",
         `${myNodeNum}:${otherNode}`,
         newestMessage.id,
       );
     }
-  }, [contact, sortedMessages, device.id, myNodeNum]);
+  }, [contact, sortedMessages, myNodeNum]);
 
   if (!contact) {
     return (
@@ -192,7 +186,7 @@ export function ChatPanel({
           ))}
         </div>
 
-        <MessageInput selectedContact={contact} device={device} />
+        <MessageInput selectedContact={contact} />
       </div>
     </TooltipProvider>
   );

@@ -85,3 +85,19 @@ export function bearingDegrees(from: LngLat, to: LngLat): number {
 
   return (rad2deg(Math.atan2(y, x)) + 360) % 360;
 }
+
+export const hasNodePosition = (node: {
+  latitudeI: number | null;
+  longitudeI: number | null;
+}): boolean =>
+  node.latitudeI !== null &&
+  node.longitudeI !== null &&
+  !(node.latitudeI === 0 && node.longitudeI === 0);
+
+export const toLngLatFromNode = (node: {
+  latitudeI: number | null;
+  longitudeI: number | null;
+}): LngLat => [
+  (node.longitudeI ?? 0) / INT_DEG,
+  (node.latitudeI ?? 0) / INT_DEG,
+];

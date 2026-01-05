@@ -1,8 +1,9 @@
 import { create } from "@bufbuild/protobuf";
 import { useNodes } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
 import { Protobuf } from "@meshtastic/core";
-import { useDevice, useDeviceContext } from "@state/index.ts";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useDevice } from "@state/index.ts";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
 import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
@@ -16,8 +17,8 @@ const SECTION = { type: "config", variant: "user" } as const;
 export function useUserForm() {
   const { hardware, connection, setChange } = useDevice();
   const { trackChange, removeChange } = useFieldRegistry();
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
 
   // Get user data from node, not config
   const myNode = useMemo(() => {
@@ -55,46 +56,47 @@ export function useUserForm() {
   }, [defaultValues]);
 
   // Sync form changes to store and field registry
+  const onFormChange = useEffectEvent((formData: Partial<UserValidation>) => {
+    if (!formData) {
+      return;
+    }
+
+    const currentValues = formData as UserValidation;
+    const prevValues = prevValuesRef.current;
+
+    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+      return;
+    }
+
+    prevValuesRef.current = currentValues;
+
+    const original = originalValuesRef.current;
+
+    // Track per-field changes for Activity panel
+    let hasChanges = false;
+    for (const key of Object.keys(currentValues) as Array<
+      keyof UserValidation
+    >) {
+      const newValue = currentValues[key];
+      const originalValue = original[key];
+
+      if (newValue !== originalValue) {
+        hasChanges = true;
+        trackChange(SECTION, key, newValue, originalValue);
+      } else {
+        removeChange(SECTION, key);
+      }
+    }
+
+    if (hasChanges) {
+      setChange(SECTION, currentValues, original);
+    }
+  });
+
   useEffect(() => {
-    const subscription = watch((formData) => {
-      if (!formData) {
-        return;
-      }
-
-      const currentValues = formData as UserValidation;
-      const prevValues = prevValuesRef.current;
-
-      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-        return;
-      }
-
-      prevValuesRef.current = currentValues;
-
-      const original = originalValuesRef.current;
-
-      // Track per-field changes for Activity panel
-      let hasChanges = false;
-      for (const key of Object.keys(currentValues) as Array<
-        keyof UserValidation
-      >) {
-        const newValue = currentValues[key];
-        const originalValue = original[key];
-
-        if (newValue !== originalValue) {
-          hasChanges = true;
-          trackChange(SECTION, key, newValue, originalValue);
-        } else {
-          removeChange(SECTION, key);
-        }
-      }
-
-      if (hasChanges) {
-        setChange(SECTION, currentValues, original);
-      }
-    });
-
+    const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch, setChange, trackChange, removeChange]);
+  }, [watch]);
 
   // Send user data directly to device (called on save)
   const sendToDevice = useCallback(() => {
