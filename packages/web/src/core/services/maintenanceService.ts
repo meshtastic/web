@@ -1,5 +1,5 @@
-import logger from "../services/logger.ts";
 import { nodeRepo, preferencesRepo } from "@data/index";
+import logger from "../services/logger.ts";
 
 const getSettingsKey = (deviceId: number) =>
   `device:${deviceId}:maintenance:nodeCleanup`;

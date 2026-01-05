@@ -4,12 +4,14 @@ import logger from "../core/services/logger.ts";
 import initialSchema from "./migrations/0000_initial_schema.sql?raw";
 import migration0002 from "./migrations/0002_empty_paper_doll.sql?raw";
 import migration0003 from "./migrations/0003_devices_table.sql?raw";
+import migration0004 from "./migrations/0004_add_reply_id.sql?raw";
 import * as schema from "./schema.ts";
 
 const migrations = [
   { id: "0000_initial_schema", sql: initialSchema },
   { id: "0002_empty_paper_doll", sql: migration0002 },
   { id: "0003_devices_table", sql: migration0003 },
+  { id: "0004_add_reply_id", sql: migration0004 },
 ];
 
 class DatabaseClient {

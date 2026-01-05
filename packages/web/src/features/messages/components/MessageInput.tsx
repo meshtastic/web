@@ -1,8 +1,7 @@
 import logger from "@core/services/logger";
 import { useMessageDraft } from "@data/hooks";
-import { useMyNode } from "@shared/hooks";
 import { messageRepo } from "@data/index";
-import type { NewMessage } from "@data/schema";
+import type { Message, NewMessage } from "@data/schema";
 import type { Types } from "@meshtastic/core";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@shared/components/ui/button";
@@ -13,10 +12,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
+import { useMyNode } from "@shared/hooks";
 import { useDeviceCommands } from "@shared/hooks/useDeviceCommands";
 import type { OutgoingMessage } from "@shared/utils/messagePipelineHandlers";
 import { autoFavoriteDMHandler } from "@shared/utils/messagePipelineHandlers";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, X } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { Contact } from "../pages/MessagesPage.tsx";
@@ -25,9 +25,15 @@ const MAX_MESSAGE_BYTES = 200;
 
 export interface MessageInputProps {
   selectedContact: Contact;
+  replyingTo?: Message | null;
+  onCancelReply?: () => void;
 }
 
-export const MessageInput = ({ selectedContact }: MessageInputProps) => {
+export const MessageInput = ({
+  selectedContact,
+  replyingTo,
+  onCancelReply,
+}: MessageInputProps) => {
   const { t } = useTranslation("messages");
   const { myNodeNum } = useMyNode();
   const commands = useDeviceCommands();
@@ -56,6 +62,9 @@ export const MessageInput = ({ selectedContact }: MessageInputProps) => {
 
   const sendMessage = async () => {
     if (!selectedContact || !commands.isConnected() || !myNodeNum) {
+      logger.warn(
+        `[MessageInput] Cannot send: selectedContact=${!!selectedContact}, isConnected=${commands.isConnected()}, myNodeNum=${myNodeNum}`,
+      );
       return;
     }
 
@@ -66,33 +75,31 @@ export const MessageInput = ({ selectedContact }: MessageInputProps) => {
     }
 
     const isDirect = selectedContact.type === "direct";
-
-    // Determine destination and channel based on contact type
-    const toValue = isDirect
-      ? (selectedContact.nodeNum as number)
-      : ("broadcast" as const);
+    const destinationNodeNum = selectedContact.nodeNum ?? selectedContact.id;
+    const toValue: number | "broadcast" = isDirect
+      ? destinationNodeNum
+      : "broadcast";
 
     const channelValue = isDirect
       ? 0
       : (selectedContact.id as Types.ChannelNumber);
 
-    // Clear draft immediately
     await clearDraft();
-
-    // Generate a temporary message ID for optimistic UI
-    const tempMessageId = Math.floor(Date.now() / 1000); // Use seconds like Meshtastic does
-
-    // Save message immediately for instant UI feedback
+    const tempMessageId = Math.floor(Date.now() / 1000); //
     logger.info(
       `[MessageInput] Saving message with ownerNodeNum=${myNodeNum}, channelId=${channelValue}, type=${isDirect ? "direct" : "channel"}`,
     );
+
+    // For direct messages, use the destination node; for channels, use broadcast address
+    const toNodeValue = isDirect ? destinationNodeNum : 0xffffffff;
+
     const newMessage: NewMessage = {
       ownerNodeNum: myNodeNum,
       messageId: tempMessageId,
       type: isDirect ? "direct" : "channel",
       channelId: channelValue,
       fromNode: myNodeNum,
-      toNode: isDirect ? (selectedContact.nodeNum as number) : 0xffffffff,
+      toNode: toNodeValue,
       message: trimmedMessage,
       date: new Date(),
       state: "sending",
@@ -105,6 +112,7 @@ export const MessageInput = ({ selectedContact }: MessageInputProps) => {
       receivedACK: false,
       ackError: 0,
       realACK: false,
+      replyId: replyingTo?.messageId ?? null,
     };
 
     try {
@@ -125,13 +133,18 @@ export const MessageInput = ({ selectedContact }: MessageInputProps) => {
 
       await autoFavoriteDMHandler(outgoingMessage, myNodeNum);
 
-      // Send message - don't await, handle result asynchronously
+      const replyMessageId = replyingTo?.messageId;
+
+      // Clear reply state after sending
+      onCancelReply?.();
+
       commands
         .sendText(
           trimmedMessage,
           toValue,
           true,
           isDirect ? undefined : channelValue,
+          replyMessageId,
         )
         .then(async (realMessageId) => {
           if (realMessageId !== undefined) {
@@ -162,9 +175,32 @@ export const MessageInput = ({ selectedContact }: MessageInputProps) => {
   };
 
   return (
-    <div className="border-t p-4 shrink-0">
+    <div className="border-t shrink-0">
+      {replyingTo ? (
+        <div className="px-4 pt-3 pb-1 flex items-center gap-2 bg-muted/50">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-muted-foreground">
+              {t("input.replyingTo", "Replying to")}
+            </p>
+            <p className="text-sm truncate">{replyingTo.message}</p>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="shrink-0 h-6 w-6"
+            onClick={onCancelReply}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">
+              {t("input.cancelReply", "Cancel reply")}
+            </span>
+          </Button>
+        </div>
+      ) : null}
+
       <form
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 p-4"
         onSubmit={(e) => {
           e.preventDefault();
           sendMessage();
@@ -190,20 +226,11 @@ export const MessageInput = ({ selectedContact }: MessageInputProps) => {
                 type="submit"
                 className="rounded-full"
                 id="send-message"
-                // disabled={!isConnected}
-                // variant={isConnected ? "default" : "secondary"}
               >
-                {/* {isConnected ? (
-                  <ArrowUp className="h-5 w-5" />
-                ) : (
-                  <WifiOff className="h-4 w-4" />
-                )} */}
                 <ArrowUp className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-2 py-1 rounded text-xs">
-              {/* {isConnected ? t("input.toolitp") : t("input.notConnected")} */}
-            </TooltipContent>
+            <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-2 py-1 rounded text-xs"></TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <Label htmlFor="send-message" className="sr-only">

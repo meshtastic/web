@@ -99,6 +99,10 @@
       "unknown": "Unknown"
     }
   },
+
+  "clearInput": {
+    "label": "Clear input"
+  },
   "general": {
     "label": "General"
   },
@@ -116,9 +120,6 @@
   },
   "advanced": {
     "label": "Advanced"
-  },
-  "clearInput": {
-    "label": "Clear input"
   },
   "resetFilters": {
     "label": "Reset Filters"

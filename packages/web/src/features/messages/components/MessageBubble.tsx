@@ -23,14 +23,21 @@ interface MessageBubbleProps {
   isMine: boolean;
   showAvatar?: boolean;
   showTimestamp?: boolean;
+  onReply?: (message: Message) => void;
+  replyToMessage?: Message;
+  replyToSenderName?: string;
 }
 
 export const MessageBubble = memo(function MessageBubble({
   message,
+  myNodeNum,
   senderName,
   isMine,
   showAvatar = true,
   showTimestamp = true,
+  onReply,
+  replyToMessage,
+  replyToSenderName,
 }: MessageBubbleProps) {
   const { t } = useTranslation("messages");
   const avatarColors = getAvatarColors(message.fromNode);
@@ -86,6 +93,29 @@ export const MessageBubble = memo(function MessageBubble({
         className="max-w-[70%] rounded-2xl px-3 py-2 relative group shrink-0 text-white"
         style={bubbleStyle}
       >
+        {/* Reply preview - shown when this message is a reply */}
+        {message.replyId && (
+          <div className="mb-2 text-xs opacity-70 border-l-2 border-white/40 pl-2">
+            {replyToMessage ? (
+              <>
+                <p className="font-medium">
+                  {replyToMessage.fromNode === myNodeNum
+                    ? t("reply.you", "You")
+                    : replyToSenderName ||
+                      `!${replyToMessage.fromNode.toString(16).toLowerCase()}`}
+                </p>
+                <p className="truncate max-w-[200px]">
+                  {replyToMessage.message}
+                </p>
+              </>
+            ) : (
+              <p className="italic">
+                {t("reply.unknownMessage", "Reply to unknown message")}
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center justify-between gap-2 mb-0.5">
           <div className="flex items-center gap-1.5">
             <p className="text-xs md:text-sm font-medium opacity-80">
@@ -124,9 +154,7 @@ export const MessageBubble = memo(function MessageBubble({
                   type="button"
                   className="p-2 rounded transition-colors hover:bg-white/20"
                   aria-label={t("actionsMenu.reply", "Reply")}
-                  onClick={() => {
-                    // TODO: Implement reply
-                  }}
+                  onClick={() => onReply?.(message)}
                 >
                   <Reply className="size-5 opacity-90" />
                 </button>

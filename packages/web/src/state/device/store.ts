@@ -1,13 +1,13 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import logger from "@core/services/logger";
 import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
-import { toByteArray } from "base64-js";
 import type {
   ChangeEntry,
   ConfigChangeKey,
   ValidConfigType,
   ValidModuleConfigType,
 } from "@shared/components/Settings/types.ts";
+import { toByteArray } from "base64-js";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
@@ -108,17 +108,13 @@ export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
   status: Types.DeviceStatusEnum;
   connectionPhase: ConnectionPhase;
-  connectionId: ConnectionId | null;
   configProgress: ConfigProgress; // Track config loading progress
   changes: Map<string, ChangeEntry>; // Unified change tracking
   queuedAdminMessages: Protobuf.Admin.AdminMessage[]; // Queued admin messages
   hardware: Protobuf.Mesh.MyNodeInfo;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
   connection?: MeshDevice;
-  activeNode: number;
   pendingSettingsChanges: boolean;
-  messageDraft: string;
-  unreadCounts: Map<number, number>;
   dialog: Dialogs;
   clientNotifications: Protobuf.Mesh.ClientNotification[];
 
@@ -144,7 +140,6 @@ export interface Device extends DeviceData {
     payloadVariant: K,
   ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
-  setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
   addChannel: (channel: Protobuf.Channel.Channel) => void;
   addWaypoint: (
@@ -227,25 +222,35 @@ export interface Device extends DeviceData {
   getAdminDestination: () => number | "self";
 }
 
-export interface deviceState {
-  addDevice: (id: number) => Device;
-  removeDevice: (id: number) => void;
-  getDevices: () => Device[];
-  getDevice: (id: number) => Device | undefined;
+// Public API for single-device store
+export interface DeviceState {
+  // Single device - null when not connected
+  device: Device | null;
 
-  // Active device tracking
-  activeDeviceId: number;
-  setActiveDeviceId: (id: number) => void;
-  getActiveDeviceId: () => number;
+  // Device lifecycle
+  initializeDevice: () => Device;
+  clearDevice: () => void;
+
+  // Connection management
+  setConnection: (connection: MeshDevice) => void;
 
   // Active connection tracking (connections now stored in SQLite)
   activeConnectionId: ConnectionId | null;
   setActiveConnectionId: (id: ConnectionId | null) => void;
-  getActiveConnectionId: () => ConnectionId | null;
 }
 
-interface PrivateDeviceState extends deviceState {
+// Internal state includes backward-compat fields during migration
+interface PrivateDeviceState extends DeviceState {
+  // Legacy fields - to be removed after migration
   devices: Map<number, Device>;
+  activeDeviceId: number;
+  addDevice: (id: number) => Device;
+  removeDevice: (id: number) => void;
+  getDevices: () => Device[];
+  getDevice: (id: number) => Device | undefined;
+  setActiveDeviceId: (id: number) => void;
+  getActiveDeviceId: () => number;
+  getActiveConnectionId: () => ConnectionId | null;
 }
 
 type DevicePersisted = {
@@ -271,8 +276,6 @@ function deviceFactory(
     neighborInfo,
 
     status: Types.DeviceStatusEnum.DeviceDisconnected,
-    connectionPhase: "disconnected",
-    connectionId: null,
     configProgress: {
       receivedConfigs: new Set<string>(),
       total: TOTAL_CONFIG_COUNT,
@@ -284,8 +287,6 @@ function deviceFactory(
     queuedAdminMessages: [],
     hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
     metadata: new Map(),
-    connection: undefined,
-    activeNode: 0,
     dialog: {
       import: false,
       QR: false,
@@ -713,27 +714,6 @@ function deviceFactory(
       }
 
       return device.waypoints.find((waypoint) => waypoint.id === waypointId);
-    },
-    setActiveNode: (node) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (device) {
-            device.activeNode = node;
-          }
-        }),
-      );
-    },
-    addConnection: (connection) => {
-      // Store in HMR-safe cache
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (device) {
-            device.connection = connection;
-          }
-        }),
-      );
     },
     addMetadata: (from, metadata) => {
       set(
@@ -1244,6 +1224,57 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   set,
   get,
 ) => ({
+  // New single-device API
+  device: null,
+
+  initializeDevice: () => {
+    const existing = get().device;
+    if (existing) {
+      return existing;
+    }
+
+    // Use a constant ID since we only have one device
+    const DEVICE_ID = 1;
+    const device = deviceFactory(DEVICE_ID, get, set);
+    set(
+      produce<PrivateDeviceState>((draft) => {
+        draft.device = device;
+        // Keep legacy fields in sync during migration
+        draft.devices = new Map([[DEVICE_ID, device]]);
+        draft.activeDeviceId = DEVICE_ID;
+      }),
+    );
+
+    return device;
+  },
+
+  clearDevice: () => {
+    set(
+      produce<PrivateDeviceState>((draft) => {
+        draft.device = null;
+        // Keep legacy fields in sync during migration
+        draft.devices = new Map();
+        draft.activeDeviceId = 0;
+      }),
+    );
+  },
+
+  setConnection: (connection: MeshDevice) => {
+    set(
+      produce<PrivateDeviceState>((draft) => {
+        if (draft.device) {
+          draft.device.connection = connection;
+        }
+        // Keep legacy fields in sync during migration
+        const legacyDevice = draft.devices.get(draft.activeDeviceId);
+        if (legacyDevice) {
+          legacyDevice.connection = connection;
+        }
+      }),
+    );
+  },
+
+  // Legacy fields - kept during migration
   devices: new Map(),
   activeDeviceId: 0,
   activeConnectionId: null,
@@ -1258,9 +1289,9 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
     set(
       produce<PrivateDeviceState>((draft) => {
         draft.devices = new Map(draft.devices).set(id, device);
-
-        // Enforce retention limit
-        // evictOldestEntries(draft.devices, DEVICESTORE_RETENTION_NUM);
+        // Keep new API in sync
+        draft.device = device;
+        draft.activeDeviceId = id;
       }),
     );
 
@@ -1272,6 +1303,11 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
         const updated = new Map(draft.devices);
         updated.delete(id);
         draft.devices = updated;
+        // Keep new API in sync
+        if (draft.activeDeviceId === id) {
+          draft.device = null;
+          draft.activeDeviceId = 0;
+        }
       }),
     );
   },
@@ -1282,6 +1318,8 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
     set(
       produce<PrivateDeviceState>((draft) => {
         draft.activeDeviceId = id;
+        // Keep new API in sync
+        draft.device = draft.devices.get(id) ?? null;
       }),
     );
   },
@@ -1341,3 +1379,29 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
 export const useDeviceStore = createStore(
   subscribeWithSelector(deviceStoreInitializer),
 );
+
+/**
+ * Device actions for use in services (outside React components).
+ * Provides imperative access to device state without using hooks.
+ */
+export const deviceActions = {
+  /** Initialize a new device. Returns the device instance. */
+  initializeDevice: () => useDeviceStore.getState().initializeDevice(),
+
+  /** Clear the current device (on disconnect). */
+  clearDevice: () => useDeviceStore.getState().clearDevice(),
+
+  /** Get the current device, or null if not connected. */
+  getDevice: () => useDeviceStore.getState().device,
+
+  /** Set the MeshDevice connection on the current device. */
+  setConnection: (connection: MeshDevice) =>
+    useDeviceStore.getState().setConnection(connection),
+
+  /** Set the active connection ID. */
+  setActiveConnectionId: (id: ConnectionId | null) =>
+    useDeviceStore.getState().setActiveConnectionId(id),
+
+  /** Get the active connection ID. */
+  getActiveConnectionId: () => useDeviceStore.getState().activeConnectionId,
+};

@@ -5,6 +5,11 @@ import {
   useOnlineCount,
 } from "@data/hooks";
 import { ConnectionService } from "@features/connect/services/ConnectionService";
+import {
+  getEffectiveStatus,
+  getStatusColor,
+  getStatusTranslationKey,
+} from "@features/connect/utils/connectionStatus";
 import { NodeAvatar } from "@shared/components/NodeAvatar";
 import { Badge } from "@shared/components/ui/badge";
 import {
@@ -32,6 +37,12 @@ import {
   SidebarMenuItem,
 } from "@shared/components/ui/sidebar";
 import { Skeleton } from "@shared/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@shared/components/ui/tooltip";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
 import { useLocation, useNavigate } from "@tanstack/react-router";
@@ -121,7 +132,7 @@ function ConnectedSidebarContent() {
 
   const { nodes: allNodes, nodeMap } = useNodes(myNodeNum);
   const { count: onlineCount } = useOnlineCount(myNodeNum);
-  const { connections } = useConnect();
+  const { connections, autoReconnectStatus } = useConnect();
 
   // Find connection for current device by nodeNum
   const activeConnection = connections.find((c) => c.nodeNum === myNodeNum);
@@ -131,26 +142,27 @@ function ConnectedSidebarContent() {
   const isAuthorized = device.remoteAdminAuthorized;
   const remoteNode = remoteAdminTarget ? nodeMap.get(remoteAdminTarget) : null;
 
-  const getStatusColor = () => {
-    if (!activeConnection) {
-      return "bg-gray-400";
-    }
+  // Get effective connection status using consolidated utilities
+  const effectiveStatus = getEffectiveStatus(
+    activeConnection?.status,
+    autoReconnectStatus,
+  );
+
+  // Handle special case for unauthorized remote admin
+  const statusColor =
+    isRemoteAdmin && !isAuthorized
+      ? "bg-red-500"
+      : getStatusColor(effectiveStatus);
+
+  const statusText = (() => {
     if (isRemoteAdmin && !isAuthorized) {
-      return "bg-red-500";
+      return t("status.notAuthorized", { ns: "connections" });
     }
-    switch (activeConnection.status) {
-      case "connected":
-      case "configured":
-        return "bg-chart-2";
-      case "connecting":
-      case "configuring":
-        return "bg-yellow-500";
-      case "error":
-        return "bg-red-500";
-      default:
-        return "bg-gray-400";
+    if (activeConnection?.error && effectiveStatus === "error") {
+      return activeConnection.error;
     }
-  };
+    return t(getStatusTranslationKey(effectiveStatus), { ns: "connections" });
+  })();
 
   const { conversations } = useConversations(myNodeNum);
 
@@ -268,120 +280,132 @@ function ConnectedSidebarContent() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
-        {displayNode && (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="flex items-center gap-3 w-full text-left hover:bg-sidebar-accent/50 rounded-md p-1 -m-1 transition-colors"
-                >
-                  <NodeAvatar
-                    nodeNum={displayNodeNum}
-                    longName={displayNode.longName ?? undefined}
-                    size="sm"
-                  />
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <span className="text-sm font-medium truncate">
-                      {displayName}
-                    </span>
-                    <span className="text-xs text-muted-foreground font-mono">
-                      !{displayNodeNum.toString(16)}
-                    </span>
+        <TooltipProvider>
+          {displayNode && (
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-3 w-full text-left hover:bg-sidebar-accent/50 rounded-md p-1 -m-1 transition-colors"
+                  >
+                    <NodeAvatar
+                      nodeNum={displayNodeNum}
+                      longName={displayNode.longName ?? undefined}
+                      size="sm"
+                      clickable={false}
+                    />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="text-sm font-medium truncate">
+                        {displayName}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-mono">
+                        !{displayNodeNum.toString(16)}
+                      </span>
+                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div
+                          className={`ml-auto h-2 w-2 rounded-full ${statusColor}`}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        <p>{statusText}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-56">
+                  <DropdownMenuLabel>
+                    {isRemoteAdmin ? "Remote Administration" : "My Node"}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <Users className="mr-2 h-4 w-4" />
+                      Recently Connected Nodes
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {/* Local node - always first */}
+                      {myNode && (
+                        <DropdownMenuItem
+                          onClick={() => device.setRemoteAdminTarget(null)}
+                        >
+                          {!isRemoteAdmin && (
+                            <CheckIcon className="mr-2 h-4 w-4" />
+                          )}
+                          <span className={!isRemoteAdmin ? "" : "ml-6"}>
+                            {myNode.longName ?? myNode.shortName}
+                          </span>
+                          <span className="ml-auto text-xs text-muted-foreground">
+                            Local
+                          </span>
+                        </DropdownMenuItem>
+                      )}
+                      {/* Remote nodes from history */}
+                      {device.recentlyConnectedNodes
+                        .filter((nodeNum) => nodeNum !== myNodeNum)
+                        .map((nodeNum) => {
+                          const node = nodeMap.get(nodeNum);
+                          const isSelected = remoteAdminTarget === nodeNum;
+                          return (
+                            <DropdownMenuItem
+                              key={nodeNum}
+                              onClick={() =>
+                                device.setRemoteAdminTarget(
+                                  nodeNum,
+                                  node?.publicKey ?? undefined,
+                                )
+                              }
+                            >
+                              {isSelected && (
+                                <CheckIcon className="mr-2 h-4 w-4" />
+                              )}
+                              <span className={isSelected ? "" : "ml-6"}>
+                                {node?.longName ??
+                                  node?.shortName ??
+                                  `!${nodeNum.toString(16)}`}
+                              </span>
+                            </DropdownMenuItem>
+                          );
+                        })}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                  <DropdownMenuItem
+                    onClick={() => navigate({ to: "/connect" })}
+                  >
+                    <CableIcon className="mr-2 h-4 w-4" />
+                    Connections
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (activeConnection) {
+                        ConnectionService.disconnect(activeConnection);
+                      }
+                    }}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <LogOutIcon className="mr-2 h-4 w-4" />
+                    Disconnect
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {isRemoteAdmin && (
+                <div className="text-xs text-muted-foreground mt-3 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-chart-2" />
+                    <span>Authorized - can configure</span>
                   </div>
-                  <div
-                    className={`ml-auto h-2 w-2 rounded-full ${getStatusColor()}`}
-                  />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start" className="w-56">
-                <DropdownMenuLabel>
-                  {isRemoteAdmin ? "Remote Administration" : "My Node"}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <Users className="mr-2 h-4 w-4" />
-                    Recently Connected Nodes
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {/* Local node - always first */}
-                    {myNode && (
-                      <DropdownMenuItem
-                        onClick={() => device.setRemoteAdminTarget(null)}
-                      >
-                        {!isRemoteAdmin && (
-                          <CheckIcon className="mr-2 h-4 w-4" />
-                        )}
-                        <span className={!isRemoteAdmin ? "" : "ml-6"}>
-                          {myNode.longName ?? myNode.shortName}
-                        </span>
-                        <span className="ml-auto text-xs text-muted-foreground">
-                          Local
-                        </span>
-                      </DropdownMenuItem>
-                    )}
-                    {/* Remote nodes from history */}
-                    {device.recentlyConnectedNodes
-                      .filter((nodeNum) => nodeNum !== myNodeNum)
-                      .map((nodeNum) => {
-                        const node = nodeMap.get(nodeNum);
-                        const isSelected = remoteAdminTarget === nodeNum;
-                        return (
-                          <DropdownMenuItem
-                            key={nodeNum}
-                            onClick={() =>
-                              device.setRemoteAdminTarget(
-                                nodeNum,
-                                node?.publicKey ?? undefined,
-                              )
-                            }
-                          >
-                            {isSelected && (
-                              <CheckIcon className="mr-2 h-4 w-4" />
-                            )}
-                            <span className={isSelected ? "" : "ml-6"}>
-                              {node?.longName ??
-                                node?.shortName ??
-                                `!${nodeNum.toString(16)}`}
-                            </span>
-                          </DropdownMenuItem>
-                        );
-                      })}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-                <DropdownMenuItem onClick={() => navigate({ to: "/connect" })}>
-                  <CableIcon className="mr-2 h-4 w-4" />
-                  Connections
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    if (activeConnection) {
-                      ConnectionService.disconnect(activeConnection);
-                    }
-                  }}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <LogOutIcon className="mr-2 h-4 w-4" />
-                  Disconnect
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {isRemoteAdmin && (
-              <div className="text-xs text-muted-foreground mt-3 space-y-1">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-chart-2" />
-                  <span>Authorized - can configure</span>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-red-500" />
+                    <span>Not authorized - read only</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-red-500" />
-                  <span>Not authorized - read only</span>
-                </div>
-              </div>
-            )}
-          </>
-        )}
+              )}
+            </>
+          )}
+        </TooltipProvider>
       </SidebarFooter>
     </>
   );

@@ -1,5 +1,4 @@
-import { SidebarProvider } from "@app/shared/components/ui/sidebar.tsx";
-import { CurrentDeviceContext, useDeviceStore } from "@app/state/index.ts";
+import { SidebarInset } from "@app/shared/components/ui/sidebar.tsx";
 import { ConnectPage, useConnect } from "@features/connect";
 import { MessagesPage } from "@features/messages";
 import { ErrorPage } from "@shared/components/ui/error-page";
@@ -12,10 +11,11 @@ import {
   redirect,
   useNavigate,
 } from "@tanstack/react-router";
-import { Activity, lazy, Suspense, useCallback } from "react";
+import { Activity, lazy, Suspense, useCallback, useEffect } from "react";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
 import { AppLayout } from "./layouts/AppLayout.tsx";
+import { AppSidebar } from "./layouts/AppSidebar.tsx";
 import type { RouterContext } from "./routerContext.ts";
 
 const MapPage = lazy(() =>
@@ -63,7 +63,6 @@ function RouteLoader() {
  */
 function ConnectedLayout() {
   const navigate = useNavigate();
-  const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
 
   const handleNavigationIntent = useCallback(
     (intent: { nodeNum: number }) => {
@@ -76,19 +75,23 @@ function ConnectedLayout() {
     [navigate],
   );
 
-  useConnect({
+  const { autoReconnectStatus } = useConnect({
     autoReconnect: true,
     onNavigationIntent: handleNavigationIntent,
   });
 
+  // Redirect to connect page if auto-reconnect fails
+  // (e.g., Web Serial permissions have timed out)
+  useEffect(() => {
+    if (autoReconnectStatus === "failed") {
+      navigate({ to: "/connect", replace: true });
+    }
+  }, [autoReconnectStatus, navigate]);
+
   return (
-    <SidebarProvider className="flex h-screen">
-      <CurrentDeviceContext.Provider value={{ deviceId: activeDeviceId }}>
-        <AppLayout>
-          <Outlet />
-        </AppLayout>
-      </CurrentDeviceContext.Provider>
-    </SidebarProvider>
+    <AppLayout>
+      <Outlet />
+    </AppLayout>
   );
 }
 
@@ -131,10 +134,24 @@ const indexRoute = createRoute({
   },
 });
 
+/**
+ * Layout for the connect page - shows sidebar in disconnected state
+ */
+function ConnectLayout() {
+  return (
+    <>
+      <AppSidebar />
+      <SidebarInset className="flex flex-col flex-1 min-h-0">
+        <ConnectPage />
+      </SidebarInset>
+    </>
+  );
+}
+
 const connectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/connect",
-  component: ConnectPage,
+  component: ConnectLayout,
   errorComponent: ErrorPage,
 });
 

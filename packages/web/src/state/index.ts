@@ -1,13 +1,6 @@
 // State layer barrel export
-import { useDeviceContext } from "@shared/hooks/useDeviceContext";
 import { type Device, useDeviceStore } from "@state/device";
 
-// Re-export device context (for backwards compatibility)
-export {
-  CurrentDeviceContext,
-  type DeviceContext,
-  useDeviceContext,
-} from "@shared/hooks/useDeviceContext";
 // Re-export device store
 export {
   type ConfigConflict,
@@ -36,16 +29,37 @@ export {
   useUIStore,
 } from "@state/ui";
 
-// Helper hook to access current device
+/**
+ * Hook to access current device from Zustand store.
+ *
+ * Most components inside connected routes (/$nodeNum/*) can safely use this hook
+ * as a device will be guaranteed to exist by the time they render.
+ *
+ * For components that may render before a device is connected (e.g., AppSidebar),
+ * use useDeviceStore directly to check activeDeviceId first.
+ */
 export const useDevice = (): Device => {
-  const { deviceId } = useDeviceContext();
-  // Get device from store - do NOT call addDevice in selector as it modifies state
-  let device = useDeviceStore((s) => s.getDevice(deviceId));
+  const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
 
-  // If device doesn't exist, add it outside the selector
+  // Get device from store, create if missing (maintains compatibility with previous behavior)
+  let device = useDeviceStore((s) => s.getDevice(activeDeviceId));
   if (!device) {
-    device = useDeviceStore.getState().addDevice(deviceId);
+    device = useDeviceStore.getState().addDevice(activeDeviceId);
   }
 
+  return device;
+};
+
+/**
+ * Hook to access current device, throwing if none exists.
+ * Use this in components that are guaranteed to render inside connected routes.
+ */
+export const useDeviceRequired = (): Device => {
+  const device = useDevice();
+  if (!device) {
+    throw new Error(
+      "useDeviceRequired must be used when a device is connected",
+    );
+  }
   return device;
 };

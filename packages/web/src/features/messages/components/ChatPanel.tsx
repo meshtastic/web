@@ -1,16 +1,17 @@
-import logger from "@core/services/logger";
 import {
   markConversationAsRead,
   useChannelMessages,
   useDirectMessages,
   useNodes,
 } from "@data/hooks";
+import { messageRepo } from "@data/repositories";
+import type { Message } from "@data/schema";
 import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
 import { OnlineIndicator } from "@shared/components/OnlineIndicator.tsx";
 import { TooltipProvider } from "@shared/components/ui/tooltip";
 import { useMyNode } from "@shared/hooks";
 import { Hash } from "lucide-react";
-import { Fragment, useEffect, useMemo } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Contact } from "../pages/MessagesPage.tsx";
 import { MessageBubble } from "./MessageBubble.tsx";
@@ -27,6 +28,22 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
   const { myNodeNum } = useMyNode();
 
   const { nodeMap } = useNodes(myNodeNum);
+
+  // Reply state - the message being replied to
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+
+  // Clear reply when contact changes
+  useEffect(() => {
+    setReplyingTo(null);
+  }, [contact?.id, contact?.type]);
+
+  const handleReply = useCallback((message: Message) => {
+    setReplyingTo(message);
+  }, []);
+
+  const handleCancelReply = useCallback(() => {
+    setReplyingTo(null);
+  }, []);
 
   const directMessages = useDirectMessages(
     myNodeNum,
@@ -52,6 +69,12 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
 
     return directMessages.messages;
   }, [contact, directMessages.messages, channelMessages.messages, myNodeNum]);
+
+  // Create a map of messageId -> Message for O(1) lookup of replied-to messages
+  const messageByMessageId = useMemo(
+    () => messageRepo.createMessageIdMap(currentMessages),
+    [currentMessages],
+  );
 
   const locale = useMemo(
     () =>
@@ -164,6 +187,18 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
                   const senderNode = nodeMap.get(message.fromNode);
                   const senderName = senderNode?.longName ?? undefined;
 
+                  // Look up the message being replied to (if any)
+                  const replyToMessage = message.replyId
+                    ? messageByMessageId.get(message.replyId)
+                    : undefined;
+
+                  // Get the sender name of the replied-to message
+                  const replyToSenderNode = replyToMessage
+                    ? nodeMap.get(replyToMessage.fromNode)
+                    : undefined;
+                  const replyToSenderName =
+                    replyToSenderNode?.longName ?? undefined;
+
                   return (
                     <MessageBubble
                       key={message.id}
@@ -171,6 +206,9 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
                       myNodeNum={myNodeNum}
                       senderName={senderName}
                       isMine={message.fromNode === myNodeNum}
+                      onReply={handleReply}
+                      replyToMessage={replyToMessage}
+                      replyToSenderName={replyToSenderName}
                     />
                   );
                 })}
@@ -186,7 +224,11 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
           ))}
         </div>
 
-        <MessageInput selectedContact={contact} />
+        <MessageInput
+          selectedContact={contact}
+          replyingTo={replyingTo}
+          onCancelReply={handleCancelReply}
+        />
       </div>
     </TooltipProvider>
   );

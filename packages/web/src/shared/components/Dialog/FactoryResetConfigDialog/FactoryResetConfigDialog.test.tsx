@@ -6,9 +6,6 @@ const mockFactoryReset = vi.fn();
 const mockToast = vi.fn();
 
 vi.mock("@state/index.ts", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
   useDevice: () => ({
     connection: {
       factoryResetConfig: mockFactoryReset,

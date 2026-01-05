@@ -9,9 +9,6 @@ const mockRemoveAllNodeErrors = vi.fn();
 const mockRemoveAllNodes = vi.fn();
 
 vi.mock("@state/index.ts", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
   useDevice: () => ({
     id: 1234,
     connection: {

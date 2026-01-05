@@ -30,8 +30,8 @@ import {
 } from "@shared/components/ui/dropdown-menu";
 import { Separator } from "@shared/components/ui/separator";
 import { useToast } from "@shared/hooks/useToast.ts";
+import { useNavigate } from "@tanstack/react-router";
 import {
-  ArrowLeft,
   LinkIcon,
   MoreHorizontal,
   RotateCw,
@@ -39,8 +39,9 @@ import {
   Star,
   StarOff,
   Trash2,
+  X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AddConnectionDialog } from "../components/AddConnectionDialog/AddConnectionDialog.tsx";
 import { ConfigProgressIndicator } from "../components/ConfigProgressIndicator.tsx";
@@ -48,6 +49,24 @@ import { ConnectionStatusBadge } from "../components/ConnectionStatusBadge.tsx";
 import { connectionTypeIcon, formatConnectionSubtext } from "../utils.ts";
 
 export const ConnectPage = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [addOpen, setAddOpen] = useState(false);
+  const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
+  const { t } = useTranslation("connections");
+
+  // Navigate to messages when connection succeeds
+  const handleNavigationIntent = useCallback(
+    (intent: { nodeNum: number }) => {
+      navigate({
+        to: "/$nodeNum/messages",
+        params: { nodeNum: String(intent.nodeNum) },
+        search: { channel: 0 },
+      });
+    },
+    [navigate],
+  );
+
   const {
     connections,
     addConnection,
@@ -57,11 +76,9 @@ export const ConnectPage = () => {
     setDefaultConnection,
     refreshStatuses,
     syncConnectionStatuses,
-  } = useConnect();
-  const { toast } = useToast();
-  const [addOpen, setAddOpen] = useState(false);
-  const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
-  const { t } = useTranslation("connections");
+  } = useConnect({
+    onNavigationIntent: handleNavigationIntent,
+  });
 
   // On first mount, sync statuses and refresh
   // biome-ignore lint/correctness/useExhaustiveDependencies: This can cause the icon to refresh too often
@@ -373,18 +390,27 @@ function ConnectionCard({
           >
             {t("button.disconnect")}
           </Button>
+        ) : isBusy ? (
+          <>
+            <Button className="gap-2" disabled>
+              <RotateCw className="size-4 animate-spin" />
+              {t("button.connecting")}
+            </Button>
+            <Button
+              variant="subtle"
+              className="gap-2"
+              onClick={() => onDisconnect()}
+            >
+              <X className="size-4" />
+              {t("button.cancel")}
+            </Button>
+          </>
         ) : (
           <Button
             className="gap-2"
             onClick={() => (isError ? onRetry() : onConnect())}
-            disabled={isBusy}
           >
-            {isBusy ? (
-              <>
-                <RotateCw className="size-4 animate-spin" />
-                {t("button.connecting")}
-              </>
-            ) : isError ? (
+            {isError ? (
               <>
                 <RotateCw className="size-4" />
                 {t("button.retry")}

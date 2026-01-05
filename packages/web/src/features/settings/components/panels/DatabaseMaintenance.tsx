@@ -10,14 +10,14 @@ import { Button } from "@shared/components/ui/button";
 import { Label } from "@shared/components/ui/label";
 import { Slider } from "@shared/components/ui/slider";
 import { Switch } from "@shared/components/ui/switch";
-import { useDeviceContext } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks/useMyNode";
 import { Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export function DatabaseMaintenance() {
   const { t } = useTranslation();
-  const { deviceId } = useDeviceContext();
+  const { myNodeNum } = useMyNode();
 
   const [settings, setSettings] = useState<NodeCleanupSettings>({
     enabled: true,
@@ -31,20 +31,20 @@ export function DatabaseMaintenance() {
 
   // Load settings from database
   useEffect(() => {
-    if (!deviceId) {
+    if (!myNodeNum) {
       return;
     }
-    getNodeCleanupSettings(deviceId).then(setSettings);
-  }, [deviceId]);
+    getNodeCleanupSettings(myNodeNum).then(setSettings);
+  }, [myNodeNum]);
 
   const refreshCount = useCallback(async () => {
-    if (!deviceId) {
+    if (!myNodeNum) {
       return;
     }
     setIsLoading(true);
     try {
       const count = await nodeRepo.countStaleNodes(
-        deviceId,
+        myNodeNum,
         settings.daysOld,
         settings.unknownOnly,
       );
@@ -54,35 +54,35 @@ export function DatabaseMaintenance() {
     } finally {
       setIsLoading(false);
     }
-  }, [deviceId, settings.daysOld, settings.unknownOnly]);
+  }, [myNodeNum, settings.daysOld, settings.unknownOnly]);
 
   useEffect(() => {
     refreshCount();
   }, [refreshCount]);
 
   const handleSettingChange = async (updates: Partial<NodeCleanupSettings>) => {
-    if (!deviceId) {
+    if (!myNodeNum) {
       return;
     }
-    const updated = await updateNodeCleanupSettings(deviceId, updates);
+    const updated = await updateNodeCleanupSettings(myNodeNum, updates);
     setSettings(updated);
   };
 
   const handleCleanup = async () => {
-    if (!deviceId || nodeCount === 0) {
+    if (!myNodeNum || nodeCount === 0) {
       return;
     }
 
     setIsDeleting(true);
     try {
       const deleted = await runNodeCleanup(
-        deviceId,
+        myNodeNum,
         settings.daysOld,
         settings.unknownOnly,
       );
       logger.debug(`Deleted ${deleted} stale nodes`);
       // Reload settings to get updated lastRun
-      const updated = await getNodeCleanupSettings(deviceId);
+      const updated = await getNodeCleanupSettings(myNodeNum);
       setSettings(updated);
       await refreshCount();
     } catch (error) {

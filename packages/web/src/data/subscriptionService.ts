@@ -4,11 +4,7 @@ import { type MeshDevice, Protobuf } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import logger from "../core/services/logger.ts";
 import { packetBatcher } from "./packetBatcher.ts";
-import {
-  channelRepo,
-  messageRepo,
-  nodeRepo,
-} from "./repositories/index.ts";
+import { channelRepo, messageRepo, nodeRepo } from "./repositories/index.ts";
 import type {
   NewMessage,
   NewNode,
@@ -219,10 +215,7 @@ export class SubscriptionService {
             meshPacket.rxSnr,
           )
           .catch((error) => {
-            logger.error(
-              "[DB Subscriptions] Error updating lastHeard:",
-              error,
-            );
+            logger.error("[DB Subscriptions] Error updating lastHeard:", error);
           });
 
         // Log the packet to packet_logs table via queue (batched for performance)
@@ -312,6 +305,7 @@ export class SubscriptionService {
             receivedACK: false,
             ackError: 0,
             realACK: false,
+            replyId: messagePacket.replyId ?? null,
           };
 
           await messageRepo.saveMessage(newMessage);

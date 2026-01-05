@@ -81,6 +81,9 @@ export const messages = sqliteTable(
     ackTimestamp: integer("ack_timestamp", { mode: "timestamp_ms" }),
     ackSNR: real("ack_snr").default(0),
     realACK: integer("real_ack", { mode: "boolean" }).notNull().default(false),
+
+    // Reply support - references the messageId of the message being replied to
+    replyId: integer("reply_id"),
   },
   (table) => [
     // Unique constraint for deduplication (same message ID per device)
@@ -131,7 +134,6 @@ export const nodes = sqliteTable(
     lastHeard: integer("last_heard", { mode: "timestamp" }), // Unix timestamp in seconds
     snr: real("snr").default(0),
 
-    // User preferences (not from radio)
     isFavorite: integer("is_favorite", { mode: "boolean" })
       .notNull()
       .default(false),
@@ -139,7 +141,7 @@ export const nodes = sqliteTable(
       .notNull()
       .default(false),
 
-    // User info (from radio)
+    // User info
     userId: text("user_id"),
     longName: text("long_name"),
     shortName: text("short_name"),

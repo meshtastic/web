@@ -22,6 +22,13 @@
       "when": 1735824000000,
       "tag": "0003_devices_table",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1767635911613,
+      "tag": "0003_mysterious_beast",
+      "breakpoints": true
     }
   ]
 }

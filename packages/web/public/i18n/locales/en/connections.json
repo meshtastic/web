@@ -3,6 +3,16 @@
     "title": "Connect to a Meshtastic device",
     "description": "Add a device connection via HTTP, Bluetooth, or Serial. Your saved connections will be saved in your browser."
   },
+  "status": {
+    "disconnected": "Disconnected",
+    "connecting": "Connecting...",
+    "configuring": "Configuring...",
+    "configured": "Connected",
+    "connected": "Connected",
+    "reconnecting": "Reconnecting...",
+    "error": "Connection error",
+    "notAuthorized": "Not authorized"
+  },
   "button": {
     "addConnection": "Add Connection",
     "connect": "Connect",

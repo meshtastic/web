@@ -13,6 +13,8 @@
   "input": {
     "placeholder": "Enter your message here...",
     "tooltip": "Send message",
+    "cancelReply": "Cancel reply",
+    "replyingTo": "Replying to",
     "notConnected": "Not connected - go to the Connections page to reconnect"
   },
   "emojiPicker": { "search": "Search emoji" },

@@ -2,11 +2,10 @@
  * Message hooks for fetching and managing messages
  */
 
-import logger from "@core/services/logger";
 import { messageRepo } from "@data/repositories";
 import type { LastRead, Message } from "@data/schema";
 import type { ConversationType } from "@data/types";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useReactiveQuery } from "sqlocal/react";
 
 /**
@@ -107,6 +106,7 @@ export type Conversation = {
 
 /**
  * Compute unread count for a direct conversation
+ * Only counts messages FROM the other party (not our own sent messages)
  */
 function computeDirectUnreadCount(
   messages: Message[],
@@ -123,19 +123,22 @@ function computeDirectUnreadCount(
   return messages.filter(
     (m) =>
       m.type === "direct" &&
-      ((m.fromNode === myNodeNum && m.toNode === otherNodeNum) ||
-        (m.fromNode === otherNodeNum && m.toNode === myNodeNum)) &&
+      // Only count messages FROM the other party
+      m.fromNode === otherNodeNum &&
+      m.toNode === myNodeNum &&
       m.id > lastReadId,
   ).length;
 }
 
 /**
  * Compute unread count for a channel conversation
+ * Only counts messages from other nodes (not our own sent messages)
  */
 function computeChannelUnreadCount(
   messages: Message[],
   lastReadEntries: LastRead[],
   channelId: number,
+  myNodeNum: number,
 ): number {
   const conversationId = channelId.toString();
   const lastReadEntry = lastReadEntries.find(
@@ -145,7 +148,11 @@ function computeChannelUnreadCount(
 
   return messages.filter(
     (m) =>
-      m.type === "channel" && m.channelId === channelId && m.id > lastReadId,
+      m.type === "channel" &&
+      m.channelId === channelId &&
+      // Only count messages from others
+      m.fromNode !== myNodeNum &&
+      m.id > lastReadId,
   ).length;
 }
 
@@ -237,6 +244,7 @@ export function useConversations(myNodeNum: number) {
         channelMessages,
         lastReadEntries,
         channelId,
+        myNodeNum,
       );
       result.push({
         type: "channel",

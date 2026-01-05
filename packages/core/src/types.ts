@@ -64,6 +64,7 @@ export interface PacketMetadata<T> {
   rxRssi: number;
   rxSnr: number;
   viaMqtt: boolean;
+  replyId?: number;
   data: T;
 }
 

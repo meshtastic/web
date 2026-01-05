@@ -89,7 +89,10 @@ function CommandPaletteContent() {
           icon: MessageSquareIcon,
           action() {
             if (myNodeNum) {
-              navigate({ to: "/$nodeNum/messages", params: { nodeNum: String(myNodeNum) } });
+              navigate({
+                to: "/$nodeNum/messages",
+                params: { nodeNum: String(myNodeNum) },
+              });
             }
           },
         },
@@ -98,7 +101,10 @@ function CommandPaletteContent() {
           icon: MapIcon,
           action() {
             if (myNodeNum) {
-              navigate({ to: "/$nodeNum/map", params: { nodeNum: String(myNodeNum) } });
+              navigate({
+                to: "/$nodeNum/map",
+                params: { nodeNum: String(myNodeNum) },
+              });
             }
           },
         },
@@ -107,7 +113,10 @@ function CommandPaletteContent() {
           icon: SettingsIcon,
           action() {
             if (myNodeNum) {
-              navigate({ to: "/$nodeNum/settings", params: { nodeNum: String(myNodeNum) } });
+              navigate({
+                to: "/$nodeNum/settings",
+                params: { nodeNum: String(myNodeNum) },
+              });
             }
           },
           tags: ["settings"],
@@ -117,7 +126,10 @@ function CommandPaletteContent() {
           icon: UsersIcon,
           action() {
             if (myNodeNum) {
-              navigate({ to: "/$nodeNum/nodes", params: { nodeNum: String(myNodeNum) } });
+              navigate({
+                to: "/$nodeNum/nodes",
+                params: { nodeNum: String(myNodeNum) },
+              });
             }
           },
         },

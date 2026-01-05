@@ -37,9 +37,6 @@ const mockDevice = {
 };
 
 vi.mock("@state/index.ts", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 123 },
-  },
   useDevice: () => ({
     setDialogOpen: mockDevice.setDialogOpen,
   }),

@@ -9,12 +9,6 @@ vi.mock("@core/hooks/useDeleteMessages", () => ({
   })),
 }));
 
-vi.mock("@core/hooks/useDeviceContext", () => ({
-  useDeviceContext: vi.fn(() => ({
-    deviceId: 1234,
-  })),
-}));
-
 describe("DeleteMessagesDialog", () => {
   const mockOnOpenChange = vi.fn();
   const mockClearAllMessages = vi.fn();

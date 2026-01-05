@@ -1,4 +1,3 @@
-import { useNodes } from "@data/hooks";
 import { Button } from "@shared/components/ui/button";
 import {
   Dialog,
@@ -9,7 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@shared/components/ui/dialog";
-import { useDevice, useDeviceContext } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks/useMyNode";
+import { useDevice } from "@state/index.ts";
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
@@ -25,19 +25,10 @@ export const PkiBackupDialog = ({
   onOpenChange,
 }: PkiBackupDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { config, setDialogOpen, hardware } = useDevice();
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
+  const { config, setDialogOpen } = useDevice();
+  const { myNode } = useMyNode();
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;
-
-  const myNode = React.useMemo(() => {
-    const myNodeNum = hardware.myNodeNum;
-    if (!myNodeNum) {
-      return undefined;
-    }
-    return allNodes.find((n) => n.nodeNum === myNodeNum);
-  }, [allNodes, hardware.myNodeNum]);
 
   const decodeKeyData = React.useCallback(
     (key: Uint8Array<ArrayBufferLike>) => {

@@ -72,6 +72,7 @@ const createMockMessage = (
   ackTimestamp: null,
   ackSNR: 0,
   realACK: false,
+  replyId: null,
   ...overrides,
 });
 

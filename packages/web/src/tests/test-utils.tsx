@@ -7,7 +7,6 @@ import { type RenderOptions, render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import "@app/i18n-config.ts";
 
-import { DeviceWrapper } from "../DeviceWrapper.tsx";
 import { routeTree } from "../routeTree.gen.ts";
 
 const Providers = () => {
@@ -20,11 +19,7 @@ const Providers = () => {
     history: memoryHistory,
   });
 
-  return (
-    <DeviceWrapper deviceId={1}>
-      <RouterProvider router={router} />
-    </DeviceWrapper>
-  );
+  return <RouterProvider router={router} />;
 };
 
 const renderWithProviders = (

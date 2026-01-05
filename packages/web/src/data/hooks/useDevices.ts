@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useReactiveQuery } from "sqlocal/react";
-import { deviceRepo } from "../repositories";
-import type { Device } from "../schema";
+import { deviceRepo } from "../repositories/index.ts";
+import type { Device } from "../schema.ts";
 
 /**
  * Hook to get all devices

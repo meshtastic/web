@@ -33,12 +33,6 @@ async function freshStore(persist = false) {
   vi.spyOn(console, "log").mockImplementation(() => {});
   vi.spyOn(console, "info").mockImplementation(() => {});
 
-  vi.doMock("@core/services/featureFlags", () => ({
-    featureFlags: {
-      get: vi.fn((key: string) => (key === "persistDevices" ? persist : false)),
-    },
-  }));
-
   const storeMod = await import("./index.ts");
   const { useNodeDB } = await import("../index.ts");
   return { ...storeMod, useNodeDB };
@@ -563,7 +557,9 @@ describe("DeviceStore – config progress tracking", () => {
     );
 
     const updatedDevice = state.getDevice(2)!;
-    expect(updatedDevice.configProgress.receivedConfigs.has("config:device")).toBe(true);
+    expect(
+      updatedDevice.configProgress.receivedConfigs.has("config:device"),
+    ).toBe(true);
     expect(updatedDevice.configProgress.receivedConfigs.size).toBe(1);
 
     // Set lora config
@@ -577,7 +573,9 @@ describe("DeviceStore – config progress tracking", () => {
     );
 
     const afterLora = state.getDevice(2)!;
-    expect(afterLora.configProgress.receivedConfigs.has("config:lora")).toBe(true);
+    expect(afterLora.configProgress.receivedConfigs.has("config:lora")).toBe(
+      true,
+    );
     expect(afterLora.configProgress.receivedConfigs.size).toBe(2);
   });
 
@@ -591,13 +589,18 @@ describe("DeviceStore – config progress tracking", () => {
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "mqtt",
-          value: create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, {}),
+          value: create(
+            Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema,
+            {},
+          ),
         },
       }),
     );
 
     const updatedDevice = state.getDevice(3)!;
-    expect(updatedDevice.configProgress.receivedConfigs.has("moduleConfig:mqtt")).toBe(true);
+    expect(
+      updatedDevice.configProgress.receivedConfigs.has("moduleConfig:mqtt"),
+    ).toBe(true);
     expect(updatedDevice.configProgress.receivedConfigs.size).toBe(1);
 
     // Set telemetry module config
@@ -605,13 +608,20 @@ describe("DeviceStore – config progress tracking", () => {
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "telemetry",
-          value: create(Protobuf.ModuleConfig.ModuleConfig_TelemetryConfigSchema, {}),
+          value: create(
+            Protobuf.ModuleConfig.ModuleConfig_TelemetryConfigSchema,
+            {},
+          ),
         },
       }),
     );
 
     const afterTelemetry = state.getDevice(3)!;
-    expect(afterTelemetry.configProgress.receivedConfigs.has("moduleConfig:telemetry")).toBe(true);
+    expect(
+      afterTelemetry.configProgress.receivedConfigs.has(
+        "moduleConfig:telemetry",
+      ),
+    ).toBe(true);
     expect(afterTelemetry.configProgress.receivedConfigs.size).toBe(2);
   });
 
@@ -633,7 +643,10 @@ describe("DeviceStore – config progress tracking", () => {
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "mqtt",
-          value: create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, {}),
+          value: create(
+            Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema,
+            {},
+          ),
         },
       }),
     );
@@ -649,7 +662,8 @@ describe("DeviceStore – config progress tracking", () => {
   });
 
   it("getConfigProgressPercent calculates correct percentage", async () => {
-    const { useDeviceStore, getConfigProgressPercent, TOTAL_CONFIG_COUNT } = await freshStore(false);
+    const { useDeviceStore, getConfigProgressPercent, TOTAL_CONFIG_COUNT } =
+      await freshStore(false);
     const state = useDeviceStore.getState();
     const device = state.addDevice(5);
 
@@ -657,7 +671,16 @@ describe("DeviceStore – config progress tracking", () => {
     expect(getConfigProgressPercent(device.configProgress)).toBe(0);
 
     // Add 10 configs (half of 20)
-    const deviceConfigs = ["device", "position", "power", "network", "display", "lora", "bluetooth", "security"] as const;
+    const deviceConfigs = [
+      "device",
+      "position",
+      "power",
+      "network",
+      "display",
+      "lora",
+      "bluetooth",
+      "security",
+    ] as const;
     for (const variant of deviceConfigs) {
       device.setConfig(
         create(Protobuf.Config.ConfigSchema, {
@@ -671,7 +694,9 @@ describe("DeviceStore – config progress tracking", () => {
 
     // 8 configs out of 20 = 40%
     const afterDeviceConfigs = state.getDevice(5)!;
-    expect(getConfigProgressPercent(afterDeviceConfigs.configProgress)).toBe(40);
+    expect(getConfigProgressPercent(afterDeviceConfigs.configProgress)).toBe(
+      40,
+    );
 
     // Add 2 module configs to get to 10/20 = 50%
     device.setModuleConfig(
@@ -686,7 +711,9 @@ describe("DeviceStore – config progress tracking", () => {
     );
 
     const afterModuleConfigs = state.getDevice(5)!;
-    expect(getConfigProgressPercent(afterModuleConfigs.configProgress)).toBe(50);
+    expect(getConfigProgressPercent(afterModuleConfigs.configProgress)).toBe(
+      50,
+    );
   });
 
   it("does not duplicate config entries on repeated setConfig calls", async () => {
@@ -708,6 +735,8 @@ describe("DeviceStore – config progress tracking", () => {
 
     const updatedDevice = state.getDevice(6)!;
     expect(updatedDevice.configProgress.receivedConfigs.size).toBe(1);
-    expect(updatedDevice.configProgress.receivedConfigs.has("config:device")).toBe(true);
+    expect(
+      updatedDevice.configProgress.receivedConfigs.has("config:device"),
+    ).toBe(true);
   });
 });

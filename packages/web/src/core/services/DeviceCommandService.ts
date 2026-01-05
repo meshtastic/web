@@ -17,9 +17,8 @@ class DeviceCommandService {
   /**
    * Get the active device from the store
    */
-  private getActiveDevice(): Device | undefined {
-    const store = useDeviceStore.getState();
-    return store.getDevice(store.activeDeviceId);
+  private getActiveDevice(): Device | null {
+    return useDeviceStore.getState().device;
   }
 
   /**
@@ -56,14 +55,22 @@ class DeviceCommandService {
    * @param to Destination node number or "broadcast"
    * @param wantAck Whether to request acknowledgement
    * @param channel Channel number (undefined for DMs)
+   * @param replyId Message ID being replied to (optional)
    */
   async sendText(
     message: string,
     to: number | "broadcast",
     wantAck = true,
     channel?: Types.ChannelNumber,
+    replyId?: number,
   ): Promise<number | undefined> {
-    return this.getConnection().sendText(message, to, wantAck, channel);
+    return this.getConnection().sendText(
+      message,
+      to,
+      wantAck,
+      channel,
+      replyId,
+    );
   }
 
   /**

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "@app/index.css";
-import "@core/services/dev-overrides.ts";
 import logger from "@core/services/logger";
 import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";

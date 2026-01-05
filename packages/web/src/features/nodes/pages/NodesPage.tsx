@@ -44,9 +44,9 @@ import {
   DEFAULT_PREFERENCES,
   type NodeColumnKey,
   useDevice,
-  useDeviceContext,
   useUIStore,
 } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks/useMyNode";
 import type { Node } from "@data/schema";
 import {
   ArrowDownIcon,
@@ -105,9 +105,9 @@ const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { current } = useLanguage();
   const { hardware, connection, setDialogOpen } = useDevice();
-  const { deviceId } = useDeviceContext();
-  const { nodes: allNodes } = useNodes(deviceId);
-  const { nodes: onlineNodes } = useOnlineNodes(deviceId);
+  const { myNodeNum } = useMyNode();
+  const { nodes: allNodes } = useNodes(myNodeNum);
+  const { nodes: onlineNodes } = useOnlineNodes(myNodeNum);
 
   // Create a Set of online node numbers for O(1) lookup
   const onlineNodeNums = useMemo(
@@ -401,7 +401,8 @@ const NodesPage = (): JSX.Element => {
 
   const getName = useCallback(
     (node: Node) =>
-      node.longName || numberToHexUnpadded(node.nodeNum).slice(-4).toUpperCase(),
+      node.longName ||
+      numberToHexUnpadded(node.nodeNum).slice(-4).toUpperCase(),
     [],
   );
 

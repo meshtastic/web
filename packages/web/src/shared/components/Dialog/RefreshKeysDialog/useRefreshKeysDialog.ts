@@ -1,9 +1,8 @@
-import { useDevice, useDeviceContext } from "@state/index.ts";
+import { useDevice } from "@state/index.ts";
 import { useCallback } from "react";
 
 export function useRefreshKeysDialog() {
   const { setDialogOpen } = useDevice();
-  const { deviceId } = useDeviceContext();
 
   // TODO: Implement activeChat state management
   // This was previously in the message store, needs to be moved to UI store or similar

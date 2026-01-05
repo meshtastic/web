@@ -122,9 +122,7 @@ src/
 │   │   ├── useDebounce.ts
 │   │   ├── useDeleteMessages.ts
 │   │   ├── useDeviceCommands.ts  # Device command interface
-│   │   ├── useDeviceContext.ts
 │   │   ├── useFavoriteNode.ts
-│   │   ├── useFeatureFlags.ts
 │   │   ├── useFilter.ts
 │   │   ├── useIgnoreNode.ts
 │   │   ├── useIsMobile.ts
@@ -199,14 +197,12 @@ src/
 │       ├── adminMessageService.ts
 │       ├── configBackupService.ts
 │       ├── maintenanceService.ts
-│       ├── featureFlags.ts
 │       └── logger.ts
 │
 ├── tests/                       # Test configuration
 │   ├── setup.ts
 │   └── test-utils.tsx
 │
-├── DeviceWrapper.tsx            # Device context provider
 ├── i18n-config.ts               # Internationalization config
 ├── index.tsx                    # Application entry point
 └── index.css                    # Global styles
@@ -233,6 +229,36 @@ The project uses TypeScript path aliases for clean imports:
 - Tracks connection phase: `disconnected → connecting → configuring → connected → configured`
 - Stores device config, module config, and ephemeral state
 - Handles change tracking for settings forms
+- `activeDeviceId` tracks which device is currently selected
+
+### Accessing the Current Device
+
+Use the `useDevice()` hook from `@state/index.ts` to access the current device:
+
+```typescript
+import { useDevice } from "@state/index.ts";
+
+function MyComponent() {
+  const { connection, config, setDialogOpen } = useDevice();
+  // Access device properties and methods
+}
+```
+
+**How it works:**
+- `useDevice()` reads `activeDeviceId` from the Zustand store
+- Returns the `Device` object for the active device
+- Auto-creates a device if one doesn't exist for the `activeDeviceId`
+
+**Note:** For database queries that need the device's node number (not the Zustand store ID), use `useMyNode()` instead:
+
+```typescript
+import { useMyNode } from "@shared/hooks";
+
+function MyComponent() {
+  const { myNodeNum } = useMyNode();
+  const { nodes } = useNodes(myNodeNum); // Query database by nodeNum
+}
+```
 
 ### UI Store (`src/state/ui/store.ts`)
 - **Ephemeral state only** (not persisted):

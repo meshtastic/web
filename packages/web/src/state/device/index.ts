@@ -1,12 +1,17 @@
 // Device store barrel export
 export {
-  useDeviceStore,
+  deviceActions,
   type ConfigConflict,
   type ConnectionPhase,
   type Device,
+  type DeviceState,
   TOTAL_CONFIG_COUNT,
   getConfigProgressPercent,
 } from "./store";
+
+// Internal export - only for use within state module
+export { useDeviceStore } from "./store";
+
 export type {
   Page,
   ValidConfigType,

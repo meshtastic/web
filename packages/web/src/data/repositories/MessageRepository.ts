@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, or, sql } from "drizzle-orm";
+import { and, desc, eq, gt, ne, or, sql } from "drizzle-orm";
 import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import logger from "../../core/services/logger.ts";
 import { dbClient } from "../client.ts";
@@ -219,6 +219,56 @@ export class MessageRepository {
       .orderBy(desc(messages.date))
       .limit(limit)
       .offset(offset);
+  }
+
+  /**
+   * Get a message by its packet messageId
+   * Used for looking up replied-to messages
+   */
+  async getMessageByMessageId(
+    ownerNodeNum: number,
+    messageId: number,
+  ): Promise<Message | undefined> {
+    const result = await this.db
+      .select()
+      .from(messages)
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          eq(messages.messageId, messageId),
+        ),
+      )
+      .limit(1);
+    return result[0];
+  }
+
+  /**
+   * Build a query to get a message by its packet messageId
+   * Used for reactive lookup of replied-to messages
+   */
+  buildMessageByMessageIdQuery(ownerNodeNum: number, messageId: number) {
+    return this.db
+      .select()
+      .from(messages)
+      .where(
+        and(
+          eq(messages.ownerNodeNum, ownerNodeNum),
+          eq(messages.messageId, messageId),
+        ),
+      )
+      .limit(1);
+  }
+
+  /**
+   * Create a map of messageId -> Message for fast lookup
+   * Useful for looking up replied-to messages
+   */
+  createMessageIdMap(messageList: Message[]): Map<number, Message> {
+    const map = new Map<number, Message>();
+    for (const msg of messageList) {
+      map.set(msg.messageId, msg);
+    }
+    return map;
   }
 
   /**
@@ -622,6 +672,8 @@ export class MessageRepository {
 
   /**
    * Get unread count for a direct conversation
+   * Only counts messages FROM the other party (not our own sent messages)
+   * @param ownerNodeNum - The device owner's node number
    * @param myNodeNum - The current user's node number (always first in conversationId)
    * @param otherNodeNum - The other party's node number
    */
@@ -640,7 +692,7 @@ export class MessageRepository {
     );
 
     if (!lastReadId) {
-      // No read marker, all messages are unread
+      // No read marker, count all messages FROM the other party
       const result = await this.db
         .select({ count: sql<number>`count(*)` })
         .from(messages)
@@ -648,22 +700,15 @@ export class MessageRepository {
           and(
             eq(messages.ownerNodeNum, ownerNodeNum),
             eq(messages.type, "direct"),
-            or(
-              and(
-                eq(messages.fromNode, myNodeNum),
-                eq(messages.toNode, otherNodeNum),
-              ),
-              and(
-                eq(messages.fromNode, otherNodeNum),
-                eq(messages.toNode, myNodeNum),
-              ),
-            ),
+            // Only count messages FROM the other party
+            eq(messages.fromNode, otherNodeNum),
+            eq(messages.toNode, myNodeNum),
           ),
         );
       return result[0]?.count ?? 0;
     }
 
-    // Count messages after last read
+    // Count messages after last read, only FROM the other party
     const result = await this.db
       .select({ count: sql<number>`count(*)` })
       .from(messages)
@@ -671,16 +716,9 @@ export class MessageRepository {
         and(
           eq(messages.ownerNodeNum, ownerNodeNum),
           eq(messages.type, "direct"),
-          or(
-            and(
-              eq(messages.fromNode, myNodeNum),
-              eq(messages.toNode, otherNodeNum),
-            ),
-            and(
-              eq(messages.fromNode, otherNodeNum),
-              eq(messages.toNode, myNodeNum),
-            ),
-          ),
+          // Only count messages FROM the other party
+          eq(messages.fromNode, otherNodeNum),
+          eq(messages.toNode, myNodeNum),
           gt(messages.id, lastReadId),
         ),
       );
@@ -688,11 +726,16 @@ export class MessageRepository {
   }
 
   /**
-   * Get unread count for a channel channel
+   * Get unread count for a channel
+   * Only counts messages from other nodes (not our own sent messages)
+   * @param ownerNodeNum - The device owner's node number
+   * @param channelId - The channel ID
+   * @param myNodeNum - Optional: if provided, excludes messages from this node
    */
   async getUnreadCountBroadcast(
     ownerNodeNum: number,
     channelId: number,
+    myNodeNum?: number,
   ): Promise<number> {
     const conversationId = channelId.toString();
     const lastReadId = await this.getLastRead(
@@ -701,33 +744,32 @@ export class MessageRepository {
       conversationId,
     );
 
+    // Build base conditions
+    const baseConditions = [
+      eq(messages.ownerNodeNum, ownerNodeNum),
+      eq(messages.type, "channel"),
+      eq(messages.channelId, channelId),
+    ];
+
+    // Exclude own messages if myNodeNum provided
+    if (myNodeNum !== undefined) {
+      baseConditions.push(ne(messages.fromNode, myNodeNum));
+    }
+
     if (!lastReadId) {
-      // No read marker, all messages are unread
+      // No read marker, count all messages (excluding own)
       const result = await this.db
         .select({ count: sql<number>`count(*)` })
         .from(messages)
-        .where(
-          and(
-            eq(messages.ownerNodeNum, ownerNodeNum),
-            eq(messages.type, "channel"),
-            eq(messages.channelId, channelId),
-          ),
-        );
+        .where(and(...baseConditions));
       return result[0]?.count ?? 0;
     }
 
-    // Count messages after last read
+    // Count messages after last read (excluding own)
     const result = await this.db
       .select({ count: sql<number>`count(*)` })
       .from(messages)
-      .where(
-        and(
-          eq(messages.ownerNodeNum, ownerNodeNum),
-          eq(messages.type, "channel"),
-          eq(messages.channelId, channelId),
-          gt(messages.id, lastReadId),
-        ),
-      );
+      .where(and(...baseConditions, gt(messages.id, lastReadId)));
     return result[0]?.count ?? 0;
   }
 

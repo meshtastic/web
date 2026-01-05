@@ -1,12 +1,12 @@
 import { useNodes } from "@data/hooks";
 import type { Node } from "@data/schema";
-import { useDeviceContext } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks/useMyNode";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TraceRoute } from "./TraceRoute.tsx";
 
-vi.mock("@core/hooks/useDBNodes");
-vi.mock("@state/index.ts");
+vi.mock("@shared/hooks/useMyNode");
+vi.mock("@data/hooks");
 
 describe("TraceRoute", () => {
   const fromUser = {
@@ -41,13 +41,13 @@ describe("TraceRoute", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(useDeviceContext).mockReturnValue({
-      deviceId: 123,
+    vi.mocked(useMyNode).mockReturnValue({
+      myNodeNum: 123456789,
+      myNode: undefined,
     });
     vi.mocked(useNodes).mockReturnValue({
       nodes: mockNodes as Node[],
       nodeMap: new Map(),
-      refresh: vi.fn(),
     });
   });
 

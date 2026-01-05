@@ -21,9 +21,6 @@ vi.mock("@state/index.ts", () => {
   });
 
   return {
-    CurrentDeviceContext: {
-      _currentValue: { deviceId: 1234 },
-    },
     useDevice: () => ({
       id: 42,
       connection: { factoryResetDevice: mockFactoryResetDevice },

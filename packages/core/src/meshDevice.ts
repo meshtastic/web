@@ -1070,6 +1070,7 @@ export class MeshDevice {
       rxRssi: meshPacket.rxRssi,
       rxSnr: meshPacket.rxSnr,
       viaMqtt: meshPacket.viaMqtt,
+      replyId: dataPacket.replyId,
     };
 
     this.log.trace(

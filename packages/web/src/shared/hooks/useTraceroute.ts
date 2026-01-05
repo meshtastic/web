@@ -1,6 +1,6 @@
 import { tracerouteRepo } from "@data/index";
 import type { Protobuf, Types } from "@meshtastic/core";
-import { useDevice, useDeviceContext } from "@state/index.ts";
+import { useDevice } from "@state/index.ts";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import logger from "../../core/services/logger.ts";
@@ -22,7 +22,6 @@ interface UseTracerouteReturn {
 export function useTraceroute({
   nodeNum,
 }: UseTracerouteOptions): UseTracerouteReturn {
-  useDeviceContext(); // Ensure we're in a device context
   const { connection, traceroutes, hardware } = useDevice();
   const navigate = useNavigate();
 

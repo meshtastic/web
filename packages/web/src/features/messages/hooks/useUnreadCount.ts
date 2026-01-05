@@ -3,7 +3,7 @@ import { type ConversationType } from "@data/types";
 import { useMemo } from "react";
 import { getDb } from "../../../data/client.ts";
 import { lastRead, messages } from "../../../data/schema.ts";
-import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
+import { and, eq, gt, isNull, ne, or, sql } from "drizzle-orm";
 import { useReactiveQuery } from "sqlocal/react";
 
 /**
@@ -35,16 +35,9 @@ export function useUnreadCountDirect(
           and(
             eq(messages.ownerNodeNum, deviceId),
             eq(messages.type, "direct"),
-            or(
-              and(
-                eq(messages.fromNode, myNodeNum),
-                eq(messages.toNode, otherNodeNum),
-              ),
-              and(
-                eq(messages.fromNode, otherNodeNum),
-                eq(messages.toNode, myNodeNum),
-              ),
-            ),
+            // Only count messages FROM the other party (not our own sent messages)
+            eq(messages.fromNode, otherNodeNum),
+            eq(messages.toNode, myNodeNum),
             or(isNull(lastRead.messageId), gt(messages.id, lastRead.messageId)),
           ),
         ),
@@ -61,6 +54,9 @@ export function useUnreadCountDirect(
 
 /**
  * Hook to get unread count for a channel
+ * Only counts messages from other nodes (not our own sent messages)
+ * @param deviceId - The current device's node number (also used as ownerNodeNum)
+ * @param channelId - The channel ID
  */
 export function useUnreadCountBroadcast(deviceId: number, channelId: number) {
   const conversationId = channelId.toString();
@@ -83,6 +79,8 @@ export function useUnreadCountBroadcast(deviceId: number, channelId: number) {
             eq(messages.ownerNodeNum, deviceId),
             eq(messages.type, "channel"),
             eq(messages.channelId, channelId),
+            // Only count messages from others (deviceId is also myNodeNum)
+            ne(messages.fromNode, deviceId),
             or(isNull(lastRead.messageId), gt(messages.id, lastRead.messageId)),
           ),
         ),

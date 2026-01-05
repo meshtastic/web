@@ -30,6 +30,7 @@ const createMockMessage = (
   ackSNR: 0,
   realACK: false,
   ownerNodeNum: 1,
+  replyId: null,
   ...overrides,
 });
 
