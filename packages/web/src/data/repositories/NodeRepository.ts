@@ -24,32 +24,17 @@ import {
   telemetryLogs,
 } from "../schema.ts";
 
-/** Nodes are considered "online" if heard within this many seconds */
-const ONLINE_THRESHOLD_SECONDS = 900; // 15 minutes
+const ONLINE_THRESHOLD_SECONDS = 900;
 
-/**
- * Repository for node operations
- */
 export class NodeRepository {
   private get db() {
     return dbClient.db;
   }
 
-  /**
-   * Get the SQLocal client for reactive queries
-   * @param client - Optional client override for dependency injection
-   */
   getClient(client?: SQLocalDrizzle) {
     return client ?? dbClient.client;
   }
 
-  // ===================
-  // Private Helpers
-  // ===================
-
-  /**
-   * Build the composite key condition for a specific node
-   */
   private nodeCondition(ownerNodeNum: number, nodeNum: number) {
     return and(
       eq(nodes.ownerNodeNum, ownerNodeNum),
@@ -57,10 +42,6 @@ export class NodeRepository {
     );
   }
 
-  /**
-   * Build condition for stale nodes (not heard from in X days)
-   * @param unknownOnly - If true, only match nodes without a longName
-   */
   private staleNodesCondition(
     ownerNodeNum: number,
     daysOld: number,
@@ -80,10 +61,6 @@ export class NodeRepository {
     return and(...conditions);
   }
 
-  /**
-   * Build condition for position logs
-   * @param sinceMs - Optional Unix timestamp in milliseconds
-   */
   private positionLogsCondition(
     ownerNodeNum: number,
     nodeNum: number,
@@ -101,10 +78,6 @@ export class NodeRepository {
     return and(...conditions);
   }
 
-  /**
-   * Build condition for telemetry logs
-   * @param sinceMs - Optional Unix timestamp in milliseconds
-   */
   private telemetryLogsCondition(
     ownerNodeNum: number,
     nodeNum: number,
@@ -122,10 +95,6 @@ export class NodeRepository {
     return and(...conditions);
   }
 
-  /**
-   * Helper to count rows then delete them
-   * Used because sqlocal doesn't return changes count
-   */
   private async countAndDelete(
     countFn: () => Promise<number>,
     deleteFn: () => Promise<void>,
@@ -137,13 +106,6 @@ export class NodeRepository {
     return count;
   }
 
-  // ===================
-  // Query Builders
-  // ===================
-
-  /**
-   * Build a query to get all nodes for a device
-   */
   buildNodesQuery(ownerNodeNum: number) {
     return this.db
       .select()
@@ -151,10 +113,6 @@ export class NodeRepository {
       .where(eq(nodes.ownerNodeNum, ownerNodeNum));
   }
 
-  /**
-   * Build a query to get online nodes
-   * Online = heard within last 15 minutes
-   */
   buildOnlineNodesQuery(ownerNodeNum: number) {
     return this.db
       .select()
@@ -168,10 +126,6 @@ export class NodeRepository {
       );
   }
 
-  /**
-   * Build a query to get position history for a node
-   * @param sinceMs - Optional Unix timestamp in milliseconds
-   */
   buildPositionHistoryQuery(
     ownerNodeNum: number,
     nodeNum: number,
@@ -186,10 +140,6 @@ export class NodeRepository {
       .limit(limit);
   }
 
-  /**
-   * Build a query to get telemetry history for a node
-   * @param sinceMs - Optional Unix timestamp in milliseconds
-   */
   buildTelemetryHistoryQuery(
     ownerNodeNum: number,
     nodeNum: number,
@@ -204,21 +154,11 @@ export class NodeRepository {
       .limit(limit);
   }
 
-  // ===================
-  // execute queries
-  // ===================
-
-  /**
-   * Get the count of online nodes
-   */
   async getOnlineNodeCount(deviceId: number): Promise<number> {
     const result = await this.buildOnlineNodesQuery(deviceId);
     return result.length;
   }
 
-  /**
-   * Get all nodes for a device
-   */
   async getNodes(ownerNodeNum: number): Promise<Node[]> {
     return this.db
       .select()
@@ -227,9 +167,6 @@ export class NodeRepository {
       .orderBy(desc(nodes.lastHeard));
   }
 
-  /**
-   * Get a specific node
-   */
   async getNode(
     ownerNodeNum: number,
     nodeNum: number,
@@ -243,10 +180,6 @@ export class NodeRepository {
     return result[0];
   }
 
-  /**
-   * Upsert a node (insert or update)
-   * Uses the composite PRIMARY KEY (ownerNodeNum, nodeNum) for automatic deduplication
-   */
   async upsertNode(node: NewNode): Promise<void> {
     await this.db
       .insert(nodes)
@@ -254,7 +187,6 @@ export class NodeRepository {
       .onConflictDoUpdate({
         target: [nodes.ownerNodeNum, nodes.nodeNum],
         set: {
-          // Update all fields except the primary key
           lastHeard: node.lastHeard,
           snr: node.snr,
           isFavorite: node.isFavorite ?? false,
@@ -285,9 +217,6 @@ export class NodeRepository {
       });
   }
 
-  /**
-   * Update node position
-   */
   async updatePosition(
     ownerNodeNum: number,
     nodeNum: number,
@@ -311,9 +240,6 @@ export class NodeRepository {
       .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
-  /**
-   * Update node user info
-   */
   async updateUser(
     ownerNodeNum: number,
     nodeNum: number,
@@ -337,9 +263,6 @@ export class NodeRepository {
       .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
-  /**
-   * Update node metrics
-   */
   async updateMetrics(
     ownerNodeNum: number,
     nodeNum: number,
@@ -360,10 +283,6 @@ export class NodeRepository {
       .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
-  /**
-   * Update last heard
-   * @param lastHeardSec - Unix timestamp in seconds
-   */
   async updateLastHeard(
     ownerNodeNum: number,
     nodeNum: number,
@@ -385,9 +304,6 @@ export class NodeRepository {
       .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
-  /**
-   * Update favorite status
-   */
   async updateFavorite(
     ownerNodeNum: number,
     nodeNum: number,
@@ -399,9 +315,6 @@ export class NodeRepository {
       .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
-  /**
-   * Add a private note about a node.
-   */
   async updatePrivateNote(
     ownerNodeNum: number,
     nodeNum: number,
@@ -413,9 +326,6 @@ export class NodeRepository {
       .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
-  /**
-   * Update ignored status
-   */
   async updateIgnored(
     ownerNodeNum: number,
     nodeNum: number,
@@ -427,9 +337,6 @@ export class NodeRepository {
       .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
-  /**
-   * Get favorite nodes
-   */
   async getFavorites(ownerNodeNum: number): Promise<Node[]> {
     return this.db
       .select()
@@ -440,10 +347,6 @@ export class NodeRepository {
       .orderBy(desc(nodes.lastHeard));
   }
 
-  /**
-   * Get recently heard nodes
-   * @param sinceTimestampMs - Unix timestamp in milliseconds
-   */
   async getRecentNodes(
     ownerNodeNum: number,
     sinceTimestampMs: number,
@@ -460,19 +363,12 @@ export class NodeRepository {
       .orderBy(desc(nodes.lastHeard));
   }
 
-  /**
-   * Delete a node
-   */
   async deleteNode(ownerNodeNum: number, nodeNum: number): Promise<void> {
     await this.db
       .delete(nodes)
       .where(this.nodeCondition(ownerNodeNum, nodeNum));
   }
 
-  /**
-   * Count stale nodes (not heard from in X days)
-   * @param unknownOnly - If true, only count nodes without a longName
-   */
   async countStaleNodes(
     ownerNodeNum: number,
     daysOld: number,
@@ -486,10 +382,6 @@ export class NodeRepository {
     return result[0]?.count ?? 0;
   }
 
-  /**
-   * Get stale nodes (not heard from in X days)
-   * @param unknownOnly - If true, only return nodes without a longName
-   */
   async getStaleNodes(
     ownerNodeNum: number,
     daysOld: number,
@@ -502,10 +394,6 @@ export class NodeRepository {
       .orderBy(nodes.lastHeard);
   }
 
-  /**
-   * Delete stale nodes (not heard from in X days)
-   * @param unknownOnly - If true, only delete nodes without a longName
-   */
   async deleteStaleNodes(
     ownerNodeNum: number,
     daysOld: number,
@@ -521,17 +409,10 @@ export class NodeRepository {
     );
   }
 
-  /**
-   * Log a position update
-   */
   async logPosition(position: NewPositionLog): Promise<void> {
     await this.db.insert(positionLogs).values(position);
   }
 
-  /**
-   * Get position history for a node
-   * @param sinceMs - Optional Unix timestamp in milliseconds
-   */
   async getPositionHistory(
     ownerNodeNum: number,
     nodeNum: number,
@@ -546,11 +427,6 @@ export class NodeRepository {
       .limit(limit);
   }
 
-  /**
-   * Get position history for multiple nodes at once
-   * Returns a map of nodeNum -> position history
-   * @param sinceMs - Optional Unix timestamp in milliseconds
-   */
   async getPositionHistoryForNodes(
     ownerNodeNum: number,
     nodeNums: number[],
@@ -576,7 +452,6 @@ export class NodeRepository {
       .where(and(...conditions))
       .orderBy(positionLogs.nodeNum, positionLogs.time);
 
-    // Group by nodeNum with per-node limit
     const result = new Map<number, PositionLog[]>();
 
     for (const position of allPositions) {
@@ -590,10 +465,6 @@ export class NodeRepository {
     return result;
   }
 
-  /**
-   * Delete old position logs
-   * @param olderThanMs - Unix timestamp in milliseconds
-   */
   async deleteOldPositions(
     ownerNodeNum: number,
     olderThanMs: number,
@@ -617,17 +488,10 @@ export class NodeRepository {
     );
   }
 
-  /**
-   * Log telemetry data
-   */
   async logTelemetry(telemetry: NewTelemetryLog): Promise<void> {
     await this.db.insert(telemetryLogs).values(telemetry);
   }
 
-  /**
-   * Get telemetry history for a node
-   * @param sinceMs - Optional Unix timestamp in milliseconds
-   */
   async getTelemetryHistory(
     ownerNodeNum: number,
     nodeNum: number,
@@ -642,10 +506,6 @@ export class NodeRepository {
       .limit(limit);
   }
 
-  /**
-   * Delete old telemetry logs
-   * @param olderThanMs - Unix timestamp in milliseconds
-   */
   async deleteOldTelemetry(
     ownerNodeNum: number,
     olderThanMs: number,

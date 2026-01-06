@@ -45,12 +45,12 @@ export default function LanguageSwitcher({
           <Languages
             size={16}
             className={cn(
-              "text-gray-500 dark:text-gray-400 w-4 flex-shrink-0 transition-colors duration-150",
+              "text-gray-500 dark:text-gray-400 w-4 shrink-0 transition-colors duration-150",
               !disableHover &&
                 "group-hover:text-gray-700 dark:group-hover:text-gray-200",
             )}
           />
-          <Subtle
+          {/* <Subtle
             className={cn(
               "text-sm text-gray-600 dark:text-gray-100 transition-colors duration-150",
               !disableHover &&
@@ -58,7 +58,7 @@ export default function LanguageSwitcher({
             )}
           >
             {`${t("languagePicker.label")}:`}
-          </Subtle>
+          </Subtle> */}
           <Subtle
             className={cn(
               "text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors duration-150",

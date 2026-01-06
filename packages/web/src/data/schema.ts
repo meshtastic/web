@@ -24,6 +24,12 @@ export const devices = sqliteTable("devices", {
   lastSeen: integer("last_seen", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
 });
 
 export type Device = typeof devices.$inferSelect;
@@ -57,6 +63,9 @@ export const messages = sqliteTable(
     // Timestamps
     date: integer("date", { mode: "timestamp_ms" }).notNull(), // When message was sent
     createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
 
@@ -168,8 +177,9 @@ export const nodes = sqliteTable(
     airUtilTx: real("air_util_tx"),
     uptimeSeconds: integer("uptime_seconds"),
     privateNote: text("private_note"),
-
-    // Timestamps
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -214,10 +224,11 @@ export const channels = sqliteTable(
       false,
     ),
 
-    // Module settings
     positionPrecision: integer("position_precision").default(32),
-
     // Timestamps
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -256,8 +267,10 @@ export const positionLogs = sqliteTable(
     groundTrack: integer("ground_track"),
     satsInView: integer("sats_in_view"),
 
-    // When we received this position
     rxTime: integer("rx_time", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
@@ -289,23 +302,22 @@ export const packetLogs = sqliteTable(
       .notNull()
       .references(() => devices.nodeNum, { onDelete: "cascade" }),
 
-    // Packet metadata
     fromNode: integer("from_node").notNull(),
     toNode: integer("to_node"),
     channel: integer("channel"),
     packetId: integer("packet_id"),
 
-    // Routing
     hopLimit: integer("hop_limit"),
     hopStart: integer("hop_start"),
     wantAck: integer("want_ack", { mode: "boolean" }),
 
-    // Radio metrics
     rxSnr: real("rx_snr"),
     rxRssi: real("rx_rssi"),
 
-    // Timing
     rxTime: integer("rx_time", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
 
@@ -360,6 +372,9 @@ export const telemetryLogs = sqliteTable(
     rxTime: integer("rx_time", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
   },
   (table) => [
     // Query telemetry history for a node
@@ -395,6 +410,9 @@ export const messageDrafts = sqliteTable(
     content: text("content").notNull(),
 
     // Timestamps
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -417,20 +435,11 @@ export const connections = sqliteTable(
   "connections",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-
-    // Device this connection belongs to (set after first successful connection)
-    // Nullable because nodeNum isn't known until first connection
     nodeNum: integer("node_num").references(() => devices.nodeNum, {
       onDelete: "cascade",
     }),
-
-    // Connection type
     type: text("type", { enum: ["http", "bluetooth", "serial"] }).notNull(),
-
-    // Display name
     name: text("name").notNull(),
-
-    // Connection status (ephemeral, but persisted for UI state)
     status: text("status", {
       enum: [
         "connected",
@@ -447,13 +456,8 @@ export const connections = sqliteTable(
       .default("disconnected"),
     error: text("error"),
 
-    // Link to mesh device (when connected)
-    meshDeviceId: integer("mesh_device_id"),
-
-    // HTTP-specific fields
     url: text("url"),
 
-    // Bluetooth-specific fields
     deviceId: text("device_id"), // BluetoothDevice.id
     deviceName: text("device_name"),
     gattServiceUUID: text("gatt_service_uuid"),
@@ -467,7 +471,6 @@ export const connections = sqliteTable(
       .notNull()
       .default(false),
 
-    // Timestamps
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -495,6 +498,9 @@ export const preferences = sqliteTable("preferences", {
   value: text("value").notNull(),
 
   // Timestamps
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
@@ -522,6 +528,9 @@ export const lastRead = sqliteTable(
     messageId: integer("message_id").notNull(),
 
     // Timestamp
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -558,8 +567,6 @@ export const tracerouteLogs = sqliteTable(
     routeBack: text("route_back", { mode: "json" }).$type<number[]>(),
     snrTowards: text("snr_towards", { mode: "json" }).$type<number[]>(),
     snrBack: text("snr_back", { mode: "json" }).$type<number[]>(),
-
-    // Timing
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -670,25 +677,21 @@ export const configChanges = sqliteTable(
       .notNull()
       .references(() => devices.nodeNum, { onDelete: "cascade" }),
 
-    // Change identification
     changeType: text("change_type", {
       enum: ["config", "moduleConfig", "channel", "user"],
     }).notNull(),
     variant: text("variant"), // e.g., "device", "lora", "mqtt"
     channelIndex: integer("channel_index"), // For channel changes
 
-    // Change data
     fieldPath: text("field_path"), // Dot-separated path within the config (e.g., "region", "txPower")
     value: text("value", { mode: "json" }).notNull(),
     originalValue: text("original_value", { mode: "json" }),
 
-    // Conflict tracking
     hasConflict: integer("has_conflict", { mode: "boolean" })
       .notNull()
       .default(false),
     remoteValue: text("remote_value", { mode: "json" }), // Value from device when conflict detected
 
-    // Timestamps
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -718,3 +721,53 @@ export type NewDeviceConfig = typeof deviceConfigs.$inferInsert;
 
 export type ConfigChange = typeof configChanges.$inferSelect;
 export type NewConfigChange = typeof configChanges.$inferInsert;
+
+/**
+ * Message reactions - stores emoji reactions to messages
+ * Multiple reactions per user per message are allowed (different emojis)
+ */
+export const messageReactions = sqliteTable(
+  "message_reactions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    // Device identity - the node number of the device that owns this data
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
+
+    // Target message - the messageId being reacted to
+    targetMessageId: integer("target_message_id").notNull(),
+
+    // Who sent the reaction
+    fromNode: integer("from_node").notNull(),
+
+    // The emoji character (e.g., "👍", "❤️")
+    emoji: text("emoji").notNull(),
+
+    // Timestamps
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (table) => [
+    // One specific emoji per user per message (can have multiple different emojis)
+    unique("message_reactions_unique").on(
+      table.ownerNodeNum,
+      table.targetMessageId,
+      table.fromNode,
+      table.emoji,
+    ),
+    // Efficient lookup of all reactions to a message
+    index("message_reactions_message_idx").on(
+      table.ownerNodeNum,
+      table.targetMessageId,
+    ),
+  ],
+);
+
+export type Reaction = typeof messageReactions.$inferSelect;
+export type NewReaction = typeof messageReactions.$inferInsert;

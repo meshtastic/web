@@ -1,5 +1,5 @@
 import { preferencesRepo } from "@data/repositories";
-import { createContext, use, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, use, useEffect, useMemo, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -20,7 +20,7 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 const THEME_PREFERENCE_KEY = "appearance:theme";
 
@@ -102,13 +102,3 @@ function ThemeProviderInner({
 export function ThemeProvider(props: ThemeProviderProps) {
   return <ThemeProviderInner {...props} />;
 }
-
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-
-  if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-
-  return context;
-};

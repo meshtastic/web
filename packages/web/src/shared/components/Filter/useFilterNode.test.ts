@@ -34,6 +34,7 @@ function createMockNode(): Node {
     airUtilTx: 2.57,
     uptimeSeconds: 528092,
     privateNote: null,
+    createdAt: new Date(),
     updatedAt: new Date(),
   };
 }

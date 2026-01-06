@@ -120,6 +120,31 @@ class DeviceCommandService {
   async requestPosition(nodeNum: number): Promise<number | undefined> {
     return this.getConnection().requestPosition(nodeNum);
   }
+
+  /**
+   * Send a reaction (emoji) to a message
+   * @param targetMessageId The messageId being reacted to
+   * @param emoji The emoji character (e.g., "👍")
+   * @param destination Node number or "broadcast"
+   * @param channel Channel number for channel messages
+   */
+  async sendReaction(
+    targetMessageId: number,
+    emoji: string,
+    destination: number | "broadcast",
+    channel?: Types.ChannelNumber,
+  ): Promise<number | undefined> {
+    const emojiCodepoint = emoji.codePointAt(0) ?? 0;
+    // Send with emoji field set - replyId points to target message
+    return this.getConnection().sendText(
+      emoji,
+      destination,
+      true,
+      channel,
+      targetMessageId, // replyId = target message
+      emojiCodepoint, // emoji field indicates this is a reaction
+    );
+  }
 }
 
 export const deviceCommands = new DeviceCommandService();

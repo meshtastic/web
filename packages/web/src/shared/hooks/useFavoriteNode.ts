@@ -1,8 +1,7 @@
-import { AdminMessageService } from "@core/services/adminMessageService";
-import { useMyNode } from "@shared/hooks";
+import { adminCommands } from "@core/services/adminCommands";
 import { nodeRepo } from "@data/index";
+import { useMyNode } from "@shared/hooks";
 import { useToast } from "@shared/hooks/useToast";
-import { useDevice } from "@state/index.ts";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -12,7 +11,6 @@ interface FavoriteNodeOptions {
 }
 
 export function useFavoriteNode() {
-  const device = useDevice();
   const { myNodeNum } = useMyNode();
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -39,14 +37,9 @@ export function useFavoriteNode() {
       });
 
       // Send admin message and update local database
-      await AdminMessageService.setFavoriteNode(
-        device,
-        myNodeNum,
-        nodeNum,
-        isFavorite,
-      );
+      await adminCommands.setFavoriteNode(nodeNum, isFavorite);
     },
-    [device, myNodeNum, t, toast],
+    [myNodeNum, t, toast],
   );
 
   return { updateFavorite: updateFavoriteCB };

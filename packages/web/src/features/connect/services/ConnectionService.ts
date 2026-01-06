@@ -1,8 +1,3 @@
-/**
- * ConnectionService - Singleton service for managing device connections
- *
- */
-
 import logger from "@core/services/logger";
 import {
   configCacheRepo,
@@ -12,16 +7,19 @@ import {
 } from "@data/repositories";
 import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
 import type { Connection } from "@data/schema";
-import { SubscriptionService } from "@data/subscriptionService";
+import { subscribeToDevice } from "@data/subscriptionService";
 import { MeshDevice, type Protobuf, Types } from "@meshtastic/core";
 import { randId } from "@shared/utils/randId";
 import { useDeviceStore } from "@state/index.ts";
 import { testHttpReachable } from "../utils.ts";
 import { BrowserHardware } from "./BrowserHardware.ts";
-import { BluetoothStrategy } from "./strategies/BluetoothStrategy";
-import { HttpStrategy } from "./strategies/HttpStrategy";
-import { SerialStrategy } from "./strategies/SerialStrategy";
-import type { ConnectionStrategy, PacketTransport } from "./strategies/types";
+import { BluetoothStrategy } from "./strategies/BluetoothStrategy.ts";
+import { HttpStrategy } from "./strategies/HttpStrategy.ts";
+import { SerialStrategy } from "./strategies/SerialStrategy.ts";
+import type {
+  ConnectionStrategy,
+  PacketTransport,
+} from "./strategies/types.ts";
 
 const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
 const CONFIG_COMPLETE_STAGE1 = 69420;
@@ -225,7 +223,6 @@ class ConnectionServiceClass {
       resolveDeviceUpserted: resolveDeviceUpserted!,
     };
 
-    // Subscribe to events
     this.subscribeToNodeInfo(ctx);
     this.subscribeToUserPackets(ctx);
     this.subscribeToConfig(ctx);
@@ -263,7 +260,7 @@ class ConnectionServiceClass {
       ctx.resolveDeviceUpserted();
 
       // Subscribe to DB events now that we have nodeNum
-      const dbUnsub = SubscriptionService.subscribeToDevice(
+      const dbUnsub = subscribeToDevice(
         nodeInfo.myNodeNum,
         nodeInfo.myNodeNum,
         meshDevice,

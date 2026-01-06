@@ -293,7 +293,7 @@ function ConnectedSidebarContent() {
                       nodeNum={displayNodeNum}
                       longName={displayNode.longName ?? undefined}
                       size="sm"
-                      clickable={false}
+                      clickable={true}
                     />
                     <div className="flex flex-col flex-1 min-w-0">
                       <span className="text-sm font-medium truncate">

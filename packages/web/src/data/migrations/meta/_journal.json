@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1734912000000,
-      "tag": "0000_initial_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1767192037169,
-      "tag": "0002_empty_paper_doll",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1735824000000,
-      "tag": "0003_devices_table",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1767635911613,
-      "tag": "0003_mysterious_beast",
+      "when": 1767665103209,
+      "tag": "0000_initial_migration",
       "breakpoints": true
     }
   ]

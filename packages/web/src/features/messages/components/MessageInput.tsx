@@ -1,3 +1,7 @@
+import {
+  type OutgoingMessage,
+  runSendHooks,
+} from "@app/core/services/messageHooks.ts";
 import logger from "@core/services/logger";
 import { useMessageDraft } from "@data/hooks";
 import { messageRepo } from "@data/index";
@@ -14,8 +18,6 @@ import {
 } from "@shared/components/ui/tooltip";
 import { useMyNode } from "@shared/hooks";
 import { useDeviceCommands } from "@shared/hooks/useDeviceCommands";
-import type { OutgoingMessage } from "@shared/utils/messagePipelineHandlers";
-import { autoFavoriteDMHandler } from "@shared/utils/messagePipelineHandlers";
 import { ArrowUp, X } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -128,10 +130,14 @@ export const MessageInput = ({
         text: trimmedMessage,
         to: toValue,
         channelId: channelValue,
+        replyId: replyingTo?.messageId,
         wantAck: true,
       };
 
-      await autoFavoriteDMHandler(outgoingMessage, myNodeNum);
+      // Fire send hooks (auto-favorite on DM, etc.) - don't await, let them run in background
+      runSendHooks(outgoingMessage, myNodeNum).catch((error) => {
+        logger.warn("[MessageInput] Send hooks failed:", error);
+      });
 
       const replyMessageId = replyingTo?.messageId;
 

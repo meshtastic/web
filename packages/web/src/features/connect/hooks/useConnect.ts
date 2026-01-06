@@ -7,7 +7,6 @@ import type {
   ConnectionStatus,
   ConnectionType,
 } from "@data/repositories/ConnectionRepository";
-import { useDeviceStore } from "@state/index.ts";
 import {
   useCallback,
   useEffect,
@@ -26,7 +25,11 @@ import {
 export type { ConnectionStatus, ConnectionType };
 export type { NavigationIntent };
 
-export type AutoReconnectStatus = "idle" | "connecting" | "connected" | "failed";
+export type AutoReconnectStatus =
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "failed";
 
 export interface UseConnectOptions {
   /** Attempt auto-reconnect to last connection on mount */
@@ -42,8 +45,6 @@ export interface UseConnectOptions {
  * @param options.onNavigationIntent - Callback for navigation intents after successful connection
  */
 export function useConnect(options?: UseConnectOptions) {
-  const activeDeviceId = useDeviceStore((s) => s.activeDeviceId);
-
   const query = useMemo(() => connectionRepo.buildConnectionsQuery(), []);
   const { data } = useReactiveQuery(connectionRepo.getClient(), query);
 
@@ -171,8 +172,8 @@ export function useConnect(options?: UseConnectOptions) {
   );
 
   const syncConnectionStatuses = useCallback(async () => {
-    await ConnectionService.syncStatuses(connList, activeDeviceId);
-  }, [connList, activeDeviceId]);
+    await ConnectionService.refreshStatuses(connList);
+  }, [connList]);
 
   return {
     connections: connList,
@@ -191,10 +192,7 @@ export function useConnect(options?: UseConnectOptions) {
  * Hook to fetch a single connection
  */
 export function useConnection(id: number) {
-  const query = useMemo(
-    () => connectionRepo.buildConnectionQuery(id),
-    [id],
-  );
+  const query = useMemo(() => connectionRepo.buildConnectionQuery(id), [id]);
   const { data } = useReactiveQuery(connectionRepo.getClient(), query);
 
   return { connection: data?.[0] };
@@ -204,10 +202,7 @@ export function useConnection(id: number) {
  * Hook to fetch the default connection
  */
 export function useDefaultConnection() {
-  const query = useMemo(
-    () => connectionRepo.buildDefaultConnectionQuery(),
-    [],
-  );
+  const query = useMemo(() => connectionRepo.buildDefaultConnectionQuery(), []);
   const { data } = useReactiveQuery(connectionRepo.getClient(), query);
 
   return { connection: data?.[0] };

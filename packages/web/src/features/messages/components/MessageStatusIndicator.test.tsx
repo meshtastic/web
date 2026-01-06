@@ -15,6 +15,7 @@ const createMockMessage = (
   fromNode: 789012,
   date: new Date(),
   createdAt: new Date(),
+  updatedAt: new Date(),
   state,
   message: "Test message",
   rxSnr: 0,

@@ -58,6 +58,7 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
       uplinkEnabled: data.settings.uplinkEnabled,
       downlinkEnabled: data.settings.downlinkEnabled,
       positionPrecision: data.settings.moduleSettings.positionPrecision,
+      createdAt: channel.createdAt,
       updatedAt: new Date(),
     }),
     [channel.ownerNodeNum],

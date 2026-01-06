@@ -6,7 +6,6 @@ import { Spinner } from "@shared/components/ui/spinner";
 import {
   createRootRouteWithContext,
   createRoute,
-  createRouter,
   Outlet,
   redirect,
   useNavigate,
@@ -308,7 +307,7 @@ const nodesRoute = createRoute({
   ),
 });
 
-const routeTree = rootRoute.addChildren([
+export const routeTree = rootRoute.addChildren([
   indexRoute,
   connectRoute,
   connectedLayoutRoute.addChildren([
@@ -319,11 +318,3 @@ const routeTree = rootRoute.addChildren([
     nodesRoute,
   ]),
 ]);
-
-const router = createRouter({
-  routeTree,
-  context: undefined!,
-});
-
-export { router };
-export type { RouterContext };

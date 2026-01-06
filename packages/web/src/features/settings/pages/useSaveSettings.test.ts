@@ -18,8 +18,8 @@ vi.mock("@core/hooks/useToast", () => ({
   useToast: vi.fn(),
 }));
 
-vi.mock("@core/services/adminMessageService", () => ({
-  AdminMessageService: {
+vi.mock("@core/services/adminCommands", () => ({
+  adminCommands: {
     sendQueuedMessages: vi.fn().mockResolvedValue(undefined),
   },
 }));

@@ -12,14 +12,10 @@ export function useChannels(deviceId: number) {
     [deviceId],
   );
 
-  const { data, status } = useReactiveQuery<Channel>(
-    channelRepo.getClient(),
-    query,
-  );
+  const { data } = useReactiveQuery<Channel>(channelRepo.getClient(), query);
 
   return {
     channels: data ?? [],
-    isLoading: status === "pending" && !data,
   };
 }
 

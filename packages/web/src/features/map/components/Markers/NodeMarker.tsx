@@ -74,7 +74,7 @@ export const NodeMarker = memo(function NodeMarker({
                 )}
                 showError={hasError}
                 showFavorite={isFavorite}
-                clickable={false}
+                clickable={true}
               />
             </button>
           </TooltipTrigger>

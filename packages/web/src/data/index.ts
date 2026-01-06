@@ -28,17 +28,17 @@ export { PacketBatcher, packetBatcher } from "./packetBatcher.ts";
 export {
   ChannelRepository,
   ConnectionRepository,
-  DeviceRepository,
-  MessageRepository,
-  NodeRepository,
-  PreferencesRepository,
-  TracerouteRepository,
   channelRepo,
   connectionRepo,
+  DeviceRepository,
   deviceRepo,
+  MessageRepository,
   messageRepo,
+  NodeRepository,
   nodeRepo,
+  PreferencesRepository,
   preferencesRepo,
+  TracerouteRepository,
   tracerouteRepo,
 } from "./repositories/index.ts";
 // Export schema types
@@ -81,7 +81,7 @@ export {
   tracerouteLogs,
 } from "./schema.ts";
 // Export subscription service
-export { SubscriptionService } from "./subscriptionService.ts";
+export { subscribeToDevice } from "./subscriptionService.ts";
 export type { ConversationType } from "./types.ts";
 
 /**

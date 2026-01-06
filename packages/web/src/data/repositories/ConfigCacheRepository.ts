@@ -1,8 +1,8 @@
 import { and, eq, sql } from "drizzle-orm";
 import { dbClient } from "../client.ts";
 import {
-  type ConfigChange,
-  configChanges,
+  // type ConfigChange,
+  // configChanges,
   type DeviceConfig,
   deviceConfigs,
 } from "../schema.ts";
@@ -28,18 +28,11 @@ export interface ConflictInfo {
   originalValue: unknown;
 }
 
-/**
- * Repository for device config caching and change tracking
- */
 export class ConfigCacheRepository {
   private get db() {
     return dbClient.db;
   }
 
-
-  /**
-   * Get cached config for a device
-   */
   async getCachedConfig(
     ownerNodeNum: number,
   ): Promise<CachedConfig | undefined> {
@@ -62,9 +55,6 @@ export class ConfigCacheRepository {
     };
   }
 
-  /**
-   * Save or update cached config
-   */
   async saveCachedConfig(
     ownerNodeNum: number,
     config: Record<string, unknown>,
@@ -104,9 +94,6 @@ export class ConfigCacheRepository {
       });
   }
 
-  /**
-   * Update just the config hash (after computing it)
-   */
   async updateConfigHash(
     ownerNodeNum: number,
     configHash: string,
@@ -120,26 +107,16 @@ export class ConfigCacheRepository {
       .where(eq(deviceConfigs.ownerNodeNum, ownerNodeNum));
   }
 
-  /**
-   * Delete cached config for a device
-   */
   async deleteCachedConfig(ownerNodeNum: number): Promise<void> {
     await this.db
       .delete(deviceConfigs)
       .where(eq(deviceConfigs.ownerNodeNum, ownerNodeNum));
   }
 
-  /**
-   * Get all cached configs (for debugging/admin)
-   */
   async getAllCachedConfigs(): Promise<DeviceConfig[]> {
     return this.db.select().from(deviceConfigs);
   }
 
-
-  /**
-   * Get all pending local changes for a device
-   */
   async getLocalChanges(ownerNodeNum: number): Promise<ConfigChange[]> {
     return this.db
       .select()
@@ -147,9 +124,6 @@ export class ConfigCacheRepository {
       .where(eq(configChanges.ownerNodeNum, ownerNodeNum));
   }
 
-  /**
-   * Get local changes for a specific config type/variant
-   */
   async getLocalChangesForVariant(
     ownerNodeNum: number,
     changeType: ChangeType,
@@ -170,9 +144,6 @@ export class ConfigCacheRepository {
       .where(and(...conditions));
   }
 
-  /**
-   * Save a local change
-   */
   async saveLocalChange(
     ownerNodeNum: number,
     change: {
@@ -216,9 +187,6 @@ export class ConfigCacheRepository {
       });
   }
 
-  /**
-   * Check if a specific config has local changes
-   */
   async hasLocalChanges(
     ownerNodeNum: number,
     changeType: ChangeType,
@@ -240,9 +208,6 @@ export class ConfigCacheRepository {
     return (result[0]?.count ?? 0) > 0;
   }
 
-  /**
-   * Clear a specific local change
-   */
   async clearLocalChange(
     ownerNodeNum: number,
     changeType: ChangeType,
@@ -250,55 +215,49 @@ export class ConfigCacheRepository {
     channelIndex: number | null,
     fieldPath: string | null,
   ): Promise<void> {
-    await this.db.delete(configChanges).where(
-      and(
-        eq(configChanges.ownerNodeNum, ownerNodeNum),
-        eq(configChanges.changeType, changeType),
-        variant !== null
-          ? eq(configChanges.variant, variant)
-          : sql`${configChanges.variant} IS NULL`,
-        channelIndex !== null
-          ? eq(configChanges.channelIndex, channelIndex)
-          : sql`${configChanges.channelIndex} IS NULL`,
-        fieldPath !== null
-          ? eq(configChanges.fieldPath, fieldPath)
-          : sql`${configChanges.fieldPath} IS NULL`,
-      ),
-    );
+    await this.db
+      .delete(configChanges)
+      .where(
+        and(
+          eq(configChanges.ownerNodeNum, ownerNodeNum),
+          eq(configChanges.changeType, changeType),
+          variant !== null
+            ? eq(configChanges.variant, variant)
+            : sql`${configChanges.variant} IS NULL`,
+          channelIndex !== null
+            ? eq(configChanges.channelIndex, channelIndex)
+            : sql`${configChanges.channelIndex} IS NULL`,
+          fieldPath !== null
+            ? eq(configChanges.fieldPath, fieldPath)
+            : sql`${configChanges.fieldPath} IS NULL`,
+        ),
+      );
   }
 
-  /**
-   * Clear all local changes for a device (after successful save)
-   */
   async clearAllLocalChanges(ownerNodeNum: number): Promise<void> {
     await this.db
       .delete(configChanges)
       .where(eq(configChanges.ownerNodeNum, ownerNodeNum));
   }
 
-  /**
-   * Clear local changes for a specific variant (after saving that config)
-   */
   async clearLocalChangesForVariant(
     ownerNodeNum: number,
     changeType: ChangeType,
     variant: string | null,
   ): Promise<void> {
-    await this.db.delete(configChanges).where(
-      and(
-        eq(configChanges.ownerNodeNum, ownerNodeNum),
-        eq(configChanges.changeType, changeType),
-        variant !== null
-          ? eq(configChanges.variant, variant)
-          : sql`${configChanges.variant} IS NULL`,
-      ),
-    );
+    await this.db
+      .delete(configChanges)
+      .where(
+        and(
+          eq(configChanges.ownerNodeNum, ownerNodeNum),
+          eq(configChanges.changeType, changeType),
+          variant !== null
+            ? eq(configChanges.variant, variant)
+            : sql`${configChanges.variant} IS NULL`,
+        ),
+      );
   }
 
-
-  /**
-   * Get all conflicts for a device
-   */
   async getConflicts(ownerNodeNum: number): Promise<ConflictInfo[]> {
     const results = await this.db
       .select()
@@ -321,9 +280,6 @@ export class ConfigCacheRepository {
     }));
   }
 
-  /**
-   * Check if device has any conflicts
-   */
   async hasConflicts(ownerNodeNum: number): Promise<boolean> {
     const result = await this.db
       .select({ count: sql<number>`count(*)` })
@@ -338,9 +294,6 @@ export class ConfigCacheRepository {
     return (result[0]?.count ?? 0) > 0;
   }
 
-  /**
-   * Mark a change as having a conflict
-   */
   async markConflict(
     ownerNodeNum: number,
     changeType: ChangeType,
@@ -373,9 +326,6 @@ export class ConfigCacheRepository {
       );
   }
 
-  /**
-   * Resolve a conflict by accepting local or remote value
-   */
   async resolveConflict(
     ownerNodeNum: number,
     changeType: ChangeType,
@@ -399,10 +349,8 @@ export class ConfigCacheRepository {
     );
 
     if (resolution === "remote") {
-      // Accept remote: delete the local change entirely
       await this.db.delete(configChanges).where(whereCondition);
     } else {
-      // Accept local: clear conflict flag, keep the local change
       await this.db
         .update(configChanges)
         .set({
@@ -414,15 +362,11 @@ export class ConfigCacheRepository {
     }
   }
 
-  /**
-   * Resolve all conflicts for a device
-   */
   async resolveAllConflicts(
     ownerNodeNum: number,
     resolution: "local" | "remote",
   ): Promise<void> {
     if (resolution === "remote") {
-      // Accept remote: delete all conflicting changes
       await this.db
         .delete(configChanges)
         .where(
@@ -432,7 +376,6 @@ export class ConfigCacheRepository {
           ),
         );
     } else {
-      // Accept local: clear conflict flags
       await this.db
         .update(configChanges)
         .set({

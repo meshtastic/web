@@ -39,7 +39,6 @@ export interface BluetoothDeviceInfo {
  * Browser hardware capability detection and access
  */
 export const BrowserHardware = {
-
   /**
    * Check if Web Serial API is available
    */
@@ -62,7 +61,6 @@ export const BrowserHardware = {
     const bt = this.getBluetoothAPI();
     return typeof bt?.getDevices === "function";
   },
-
 
   /**
    * Get the Serial API interface
@@ -106,8 +104,7 @@ export const BrowserHardware = {
   ): Promise<SerialPort | null> {
     const ports = await this.getSerialPorts();
     const found = ports.find(
-      (p) =>
-        p.usbVendorId === usbVendorId && p.usbProductId === usbProductId,
+      (p) => p.usbVendorId === usbVendorId && p.usbProductId === usbProductId,
     );
     return found?.port ?? null;
   },
@@ -144,6 +141,24 @@ export const BrowserHardware = {
       writable: WritableStream | null;
       close: () => Promise<void>;
     };
+
+    // Release locked streams before closing
+    try {
+      if (portWithStreams.readable?.locked) {
+        await portWithStreams.readable.cancel().catch(() => {});
+      }
+    } catch {
+      // Ignore cancel errors
+    }
+
+    try {
+      if (portWithStreams.writable?.locked) {
+        await portWithStreams.writable.abort().catch(() => {});
+      }
+    } catch {
+      // Ignore abort errors
+    }
+
     if (portWithStreams.readable || portWithStreams.writable) {
       try {
         await portWithStreams.close();
@@ -182,7 +197,6 @@ export const BrowserHardware = {
       serial.removeEventListener("disconnect", handler);
     };
   },
-
 
   /**
    * Get the Bluetooth API interface
@@ -233,7 +247,9 @@ export const BrowserHardware = {
       const device = await bt.requestDevice({
         acceptAllDevices: !gattServiceUUID,
         optionalServices: gattServiceUUID ? [gattServiceUUID] : undefined,
-        filters: gattServiceUUID ? [{ services: [gattServiceUUID] }] : undefined,
+        filters: gattServiceUUID
+          ? [{ services: [gattServiceUUID] }]
+          : undefined,
       });
       return device;
     } catch {

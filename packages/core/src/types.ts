@@ -65,6 +65,9 @@ export interface PacketMetadata<T> {
   rxSnr: number;
   viaMqtt: boolean;
   replyId?: number;
+  emoji?: number;
+  hopsLimit: number;
+  hopsStart: number;
   data: T;
 }
 

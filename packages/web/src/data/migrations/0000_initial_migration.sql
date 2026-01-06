@@ -7,8 +7,10 @@ CREATE TABLE `channels` (
 	`uplink_enabled` integer DEFAULT false,
 	`downlink_enabled` integer DEFAULT false,
 	`position_precision` integer DEFAULT 32,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
-	PRIMARY KEY(`owner_node_num`, `channel_index`)
+	PRIMARY KEY(`owner_node_num`, `channel_index`),
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `channels_owner_idx` ON `channels` (`owner_node_num`);--> statement-breakpoint
@@ -24,7 +26,8 @@ CREATE TABLE `config_changes` (
 	`has_conflict` integer DEFAULT false NOT NULL,
 	`remote_value` text,
 	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
-	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `config_changes_owner_idx` ON `config_changes` (`owner_node_num`);--> statement-breakpoint
@@ -32,11 +35,11 @@ CREATE INDEX `config_changes_conflict_idx` ON `config_changes` (`owner_node_num`
 CREATE UNIQUE INDEX `config_changes_owner_unique` ON `config_changes` (`owner_node_num`,`change_type`,`variant`,`channel_index`,`field_path`);--> statement-breakpoint
 CREATE TABLE `connections` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`node_num` integer,
 	`type` text NOT NULL,
 	`name` text NOT NULL,
 	`status` text DEFAULT 'disconnected' NOT NULL,
 	`error` text,
-	`mesh_device_id` integer,
 	`url` text,
 	`device_id` text,
 	`device_name` text,
@@ -46,7 +49,8 @@ CREATE TABLE `connections` (
 	`is_default` integer DEFAULT false NOT NULL,
 	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`last_connected_at` integer,
-	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `connections_default_idx` ON `connections` (`is_default`);--> statement-breakpoint
@@ -61,18 +65,32 @@ CREATE TABLE `device_configs` (
 	`firmware_version` text,
 	`last_synced_at` integer NOT NULL,
 	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
-	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `device_configs_owner_idx` ON `device_configs` (`owner_node_num`);--> statement-breakpoint
 CREATE UNIQUE INDEX `device_configs_owner_unique` ON `device_configs` (`owner_node_num`);--> statement-breakpoint
+CREATE TABLE `devices` (
+	`node_num` integer PRIMARY KEY NOT NULL,
+	`short_name` text,
+	`long_name` text,
+	`hw_model` integer,
+	`first_seen` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`last_seen` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `last_read` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`owner_node_num` integer NOT NULL,
 	`type` text NOT NULL,
 	`conversation_id` text NOT NULL,
 	`message_id` integer NOT NULL,
-	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `last_read_owner_unique_idx` ON `last_read` (`owner_node_num`,`type`,`conversation_id`);--> statement-breakpoint
@@ -82,10 +100,25 @@ CREATE TABLE `message_drafts` (
 	`type` text NOT NULL,
 	`target_id` integer NOT NULL,
 	`content` text NOT NULL,
-	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `message_drafts_owner_unique_idx` ON `message_drafts` (`owner_node_num`,`type`,`target_id`);--> statement-breakpoint
+CREATE TABLE `message_reactions` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`owner_node_num` integer NOT NULL,
+	`target_message_id` integer NOT NULL,
+	`from_node` integer NOT NULL,
+	`emoji` text NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE INDEX `message_reactions_message_idx` ON `message_reactions` (`owner_node_num`,`target_message_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `message_reactions_unique` ON `message_reactions` (`owner_node_num`,`target_message_id`,`from_node`,`emoji`);--> statement-breakpoint
 CREATE TABLE `messages` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`owner_node_num` integer NOT NULL,
@@ -97,6 +130,7 @@ CREATE TABLE `messages` (
 	`message` text NOT NULL,
 	`date` integer NOT NULL,
 	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`state` text NOT NULL,
 	`rx_snr` real DEFAULT 0 NOT NULL,
 	`rx_rssi` real DEFAULT 0 NOT NULL,
@@ -108,7 +142,9 @@ CREATE TABLE `messages` (
 	`ack_error` integer DEFAULT 0 NOT NULL,
 	`ack_timestamp` integer,
 	`ack_snr` real DEFAULT 0,
-	`real_ack` integer DEFAULT false NOT NULL
+	`real_ack` integer DEFAULT false NOT NULL,
+	`reply_id` integer,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `messages_owner_idx` ON `messages` (`owner_node_num`);--> statement-breakpoint
@@ -147,8 +183,10 @@ CREATE TABLE `nodes` (
 	`air_util_tx` real,
 	`uptime_seconds` integer,
 	`private_note` text,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
-	PRIMARY KEY(`owner_node_num`, `node_num`)
+	PRIMARY KEY(`owner_node_num`, `node_num`),
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `nodes_owner_idx` ON `nodes` (`owner_node_num`);--> statement-breakpoint
@@ -168,7 +206,9 @@ CREATE TABLE `packet_logs` (
 	`rx_snr` real,
 	`rx_rssi` real,
 	`rx_time` integer DEFAULT (unixepoch() * 1000) NOT NULL,
-	`raw_packet` text
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`raw_packet` text,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `packet_logs_from_node_idx` ON `packet_logs` (`owner_node_num`,`from_node`,`rx_time`);--> statement-breakpoint
@@ -185,7 +225,9 @@ CREATE TABLE `position_logs` (
 	`ground_speed` integer,
 	`ground_track` integer,
 	`sats_in_view` integer,
-	`rx_time` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`rx_time` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `position_logs_node_time_idx` ON `position_logs` (`owner_node_num`,`node_num`,`time`);--> statement-breakpoint
@@ -194,6 +236,7 @@ CREATE INDEX `position_logs_spatial_idx` ON `position_logs` (`latitude_i`,`longi
 CREATE TABLE `preferences` (
 	`key` text PRIMARY KEY NOT NULL,
 	`value` text NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
 );
 --> statement-breakpoint
@@ -211,7 +254,9 @@ CREATE TABLE `telemetry_logs` (
 	`barometric_pressure` real,
 	`current` real,
 	`time` integer,
-	`rx_time` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`rx_time` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `telemetry_logs_node_time_idx` ON `telemetry_logs` (`owner_node_num`,`node_num`,`time`);--> statement-breakpoint
@@ -224,7 +269,8 @@ CREATE TABLE `traceroute_logs` (
 	`route_back` text,
 	`snr_towards` text,
 	`snr_back` text,
-	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	FOREIGN KEY (`owner_node_num`) REFERENCES `devices`(`node_num`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `traceroute_logs_target_idx` ON `traceroute_logs` (`owner_node_num`,`target_node_num`,`created_at`);--> statement-breakpoint

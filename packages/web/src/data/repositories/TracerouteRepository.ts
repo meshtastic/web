@@ -6,24 +6,15 @@ import {
   tracerouteLogs,
 } from "../schema.ts";
 
-/**
- * Repository for traceroute log operations
- */
 export class TracerouteRepository {
   private get db() {
     return dbClient.db;
   }
 
-  /**
-   * Log a traceroute result
-   */
   async logTraceroute(traceroute: NewTracerouteLog): Promise<void> {
     await this.db.insert(tracerouteLogs).values(traceroute);
   }
 
-  /**
-   * Get traceroute history for a specific target node
-   */
   async getTraceroutesForNode(
     ownerNodeNum: number,
     targetNodeNum: number,
@@ -42,9 +33,6 @@ export class TracerouteRepository {
       .limit(limit);
   }
 
-  /**
-   * Get the most recent traceroute for a target node
-   */
   async getLatestTraceroute(
     ownerNodeNum: number,
     targetNodeNum: number,
@@ -64,9 +52,6 @@ export class TracerouteRepository {
     return results[0];
   }
 
-  /**
-   * Get all traceroutes for a device
-   */
   async getAllTraceroutes(
     ownerNodeNum: number,
     limit = 100,
@@ -79,9 +64,6 @@ export class TracerouteRepository {
       .limit(limit);
   }
 
-  /**
-   * Delete traceroute logs for a specific target
-   */
   async deleteTraceroutesForNode(
     ownerNodeNum: number,
     targetNodeNum: number,
@@ -96,9 +78,6 @@ export class TracerouteRepository {
       );
   }
 
-  /**
-   * Delete all traceroute logs for a device
-   */
   async deleteAllTraceroutes(ownerNodeNum: number): Promise<void> {
     await this.db
       .delete(tracerouteLogs)

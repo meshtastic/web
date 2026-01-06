@@ -11,11 +11,6 @@ const mockNode = {
 const mockToast = vi.fn();
 const mockSetFavoriteNode = vi.fn();
 const mockGetNode = vi.fn();
-const mockDevice = { id: 1 };
-
-vi.mock("@state/index.ts", () => ({
-  useDevice: () => mockDevice,
-}));
 
 vi.mock("@shared/hooks/useMyNode", () => ({
   useMyNode: () => ({ myNodeNum: 1234, myNode: null }),
@@ -34,14 +29,10 @@ vi.mock("@data/index", () => ({
   },
 }));
 
-vi.mock("@core/services/adminMessageService", () => ({
-  AdminMessageService: {
-    setFavoriteNode: (
-      _device: unknown,
-      _deviceId: number,
-      _nodeNum: number,
-      _isFavorite: boolean,
-    ) => mockSetFavoriteNode(_device, _deviceId, _nodeNum, _isFavorite),
+vi.mock("@core/services/adminCommands", () => ({
+  adminCommands: {
+    setFavoriteNode: (nodeNum: number, isFavorite: boolean) =>
+      mockSetFavoriteNode(nodeNum, isFavorite),
   },
 }));
 
@@ -51,19 +42,14 @@ describe("useFavoriteNode hook", () => {
     mockGetNode.mockResolvedValue(mockNode);
   });
 
-  it("calls AdminMessageService.setFavoriteNode and shows toast", async () => {
+  it("calls adminCommands.setFavoriteNode and shows toast", async () => {
     const { result } = renderHook(() => useFavoriteNode());
 
     await act(async () => {
       await result.current.updateFavorite({ nodeNum: 1234, isFavorite: true });
     });
 
-    expect(mockSetFavoriteNode).toHaveBeenCalledWith(
-      mockDevice,
-      1234,
-      1234,
-      true,
-    );
+    expect(mockSetFavoriteNode).toHaveBeenCalledWith(1234, true);
     expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
     expect(mockToast).toHaveBeenCalled();
   });
@@ -75,17 +61,12 @@ describe("useFavoriteNode hook", () => {
       await result.current.updateFavorite({ nodeNum: 1234, isFavorite: false });
     });
 
-    expect(mockSetFavoriteNode).toHaveBeenCalledWith(
-      mockDevice,
-      1234,
-      1234,
-      false,
-    );
+    expect(mockSetFavoriteNode).toHaveBeenCalledWith(1234, false);
     expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
     expect(mockToast).toHaveBeenCalled();
   });
 
-  it("does not call AdminMessageService if node not found", async () => {
+  it("does not call adminCommands if node not found", async () => {
     mockGetNode.mockResolvedValueOnce(null);
 
     const { result } = renderHook(() => useFavoriteNode());

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "526d0f55-b112-4f5c-9b57-d615def270b7",
+  "id": "b3192ec8-5e59-4c82-9b78-58391ed1521d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "channels": {
@@ -66,6 +66,14 @@
           "autoincrement": false,
           "default": 32
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "integer",
@@ -84,7 +92,21 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "channels_owner_node_num_devices_node_num_fk": {
+          "name": "channels_owner_node_num_devices_node_num_fk",
+          "tableFrom": "channels",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "channels_owner_node_num_channel_index_pk": {
           "columns": [
@@ -216,7 +238,21 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "config_changes_owner_node_num_devices_node_num_fk": {
+          "name": "config_changes_owner_node_num_devices_node_num_fk",
+          "tableFrom": "config_changes",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -230,6 +266,13 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "node_num": {
+          "name": "node_num",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "type": {
           "name": "type",
@@ -256,13 +299,6 @@
         "error": {
           "name": "error",
           "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "mesh_device_id": {
-          "name": "mesh_device_id",
-          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -357,7 +393,21 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "connections_node_num_devices_node_num_fk": {
+          "name": "connections_node_num_devices_node_num_fk",
+          "tableFrom": "connections",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -454,6 +504,90 @@
           "isUnique": true
         }
       },
+      "foreignKeys": {
+        "device_configs_owner_node_num_devices_node_num_fk": {
+          "name": "device_configs_owner_node_num_devices_node_num_fk",
+          "tableFrom": "device_configs",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "devices": {
+      "name": "devices",
+      "columns": {
+        "node_num": {
+          "name": "node_num",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "short_name": {
+          "name": "short_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "long_name": {
+          "name": "long_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "hw_model": {
+          "name": "hw_model",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "first_seen": {
+          "name": "first_seen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "last_seen": {
+          "name": "last_seen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -497,6 +631,14 @@
           "notNull": true,
           "autoincrement": false
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "integer",
@@ -517,7 +659,21 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "last_read_owner_node_num_devices_node_num_fk": {
+          "name": "last_read_owner_node_num_devices_node_num_fk",
+          "tableFrom": "last_read",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -560,6 +716,14 @@
           "notNull": true,
           "autoincrement": false
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "integer",
@@ -580,7 +744,115 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "message_drafts_owner_node_num_devices_node_num_fk": {
+          "name": "message_drafts_owner_node_num_devices_node_num_fk",
+          "tableFrom": "message_drafts",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "message_reactions": {
+      "name": "message_reactions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "owner_node_num": {
+          "name": "owner_node_num",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "target_message_id": {
+          "name": "target_message_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "from_node": {
+          "name": "from_node",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "emoji": {
+          "name": "emoji",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        }
+      },
+      "indexes": {
+        "message_reactions_message_idx": {
+          "name": "message_reactions_message_idx",
+          "columns": [
+            "owner_node_num",
+            "target_message_id"
+          ],
+          "isUnique": false
+        },
+        "message_reactions_unique": {
+          "name": "message_reactions_unique",
+          "columns": [
+            "owner_node_num",
+            "target_message_id",
+            "from_node",
+            "emoji"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "message_reactions_owner_node_num_devices_node_num_fk": {
+          "name": "message_reactions_owner_node_num_devices_node_num_fk",
+          "tableFrom": "message_reactions",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -653,6 +925,14 @@
         },
         "created_at": {
           "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
+        "updated_at": {
+          "name": "updated_at",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -752,6 +1032,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": false
+        },
+        "reply_id": {
+          "name": "reply_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -816,7 +1103,21 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "messages_owner_node_num_devices_node_num_fk": {
+          "name": "messages_owner_node_num_devices_node_num_fk",
+          "tableFrom": "messages",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1024,6 +1325,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "integer",
@@ -1066,7 +1375,21 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "nodes_owner_node_num_devices_node_num_fk": {
+          "name": "nodes_owner_node_num_devices_node_num_fk",
+          "tableFrom": "nodes",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "nodes_owner_node_num_node_num_pk": {
           "columns": [
@@ -1167,6 +1490,14 @@
           "autoincrement": false,
           "default": "(unixepoch() * 1000)"
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
+        },
         "raw_packet": {
           "name": "raw_packet",
           "type": "text",
@@ -1194,7 +1525,21 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "packet_logs_owner_node_num_devices_node_num_fk": {
+          "name": "packet_logs_owner_node_num_devices_node_num_fk",
+          "tableFrom": "packet_logs",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1286,6 +1631,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch() * 1000)"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
         }
       },
       "indexes": {
@@ -1315,7 +1668,21 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "position_logs_owner_node_num_devices_node_num_fk": {
+          "name": "position_logs_owner_node_num_devices_node_num_fk",
+          "tableFrom": "position_logs",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1336,6 +1703,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
         },
         "updated_at": {
           "name": "updated_at",
@@ -1453,6 +1828,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch() * 1000)"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch() * 1000)"
         }
       },
       "indexes": {
@@ -1474,7 +1857,21 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "telemetry_logs_owner_node_num_devices_node_num_fk": {
+          "name": "telemetry_logs_owner_node_num_devices_node_num_fk",
+          "tableFrom": "telemetry_logs",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1559,7 +1956,21 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "traceroute_logs_owner_node_num_devices_node_num_fk": {
+          "name": "traceroute_logs_owner_node_num_devices_node_num_fk",
+          "tableFrom": "traceroute_logs",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "owner_node_num"
+          ],
+          "columnsTo": [
+            "node_num"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

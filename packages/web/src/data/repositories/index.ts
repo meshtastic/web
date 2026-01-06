@@ -15,6 +15,7 @@ export { MessageRepository } from "./MessageRepository.ts";
 export { NodeRepository } from "./NodeRepository.ts";
 export { PacketLogRepository } from "./PacketLogRepository.ts";
 export { PreferencesRepository } from "./PreferencesRepository.ts";
+export { ReactionRepository } from "./ReactionRepository.ts";
 export { TracerouteRepository } from "./TracerouteRepository.ts";
 
 // Singleton instances for convenience
@@ -26,6 +27,7 @@ import { MessageRepository } from "./MessageRepository.ts";
 import { NodeRepository } from "./NodeRepository.ts";
 import { PacketLogRepository } from "./PacketLogRepository.ts";
 import { PreferencesRepository } from "./PreferencesRepository.ts";
+import { ReactionRepository } from "./ReactionRepository.ts";
 import { TracerouteRepository } from "./TracerouteRepository.ts";
 
 export const channelRepo = new ChannelRepository();
@@ -36,4 +38,5 @@ export const messageRepo = new MessageRepository();
 export const nodeRepo = new NodeRepository();
 export const packetLogRepo = new PacketLogRepository();
 export const preferencesRepo = new PreferencesRepository();
+export const reactionRepo = new ReactionRepository();
 export const tracerouteRepo = new TracerouteRepository();

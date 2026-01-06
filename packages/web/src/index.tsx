@@ -21,7 +21,8 @@ import {
 import { useDeviceStore } from "@state/device";
 import { useUIStore } from "@state/ui";
 import { RouterProvider } from "@tanstack/react-router";
-import { type RouterContext, router } from "./app/routes.tsx";
+import { router } from "./app/router.ts";
+import type { RouterContext } from "./app/routerContext.ts";
 import { WelcomeSplash } from "./shared/components/WelcomeSplash.tsx";
 
 enableMapSet();

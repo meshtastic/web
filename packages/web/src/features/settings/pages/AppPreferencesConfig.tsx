@@ -1,4 +1,4 @@
-import { useTheme } from "@app/shared/components/ui/theme-provider";
+import { useTheme } from "@app/shared/components/ui/useTheme";
 import { usePreference } from "@data/hooks";
 import { DevicesPanel } from "../components/panels/DevicesPanel";
 import { Button } from "@shared/components/ui/button";

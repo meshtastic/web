@@ -1,6 +1,11 @@
 import logger from "@core/services/logger";
-import type { Message } from "@data/schema";
+import type { Message, Reaction } from "@data/schema";
 import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@shared/components/ui/popover";
 import {
   Tooltip,
   TooltipArrow,
@@ -12,6 +17,7 @@ import { getAvatarColors } from "@shared/utils/color";
 import { Reply } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { groupReactions } from "../hooks/useReactions";
 import { EmojiReactionButton } from "./EmojiReactionButton.tsx";
 import { MessageStatusIndicator } from "./MessageStatusIndicator.tsx";
 import { RetryButton } from "./RetryButton.tsx";
@@ -26,6 +32,9 @@ interface MessageBubbleProps {
   onReply?: (message: Message) => void;
   replyToMessage?: Message;
   replyToSenderName?: string;
+  reactions?: Reaction[];
+  onReact?: (emoji: string) => void;
+  nodeNameResolver?: (nodeNum: number) => string | undefined;
 }
 
 export const MessageBubble = memo(function MessageBubble({
@@ -38,9 +47,18 @@ export const MessageBubble = memo(function MessageBubble({
   onReply,
   replyToMessage,
   replyToSenderName,
+  reactions = [],
+  onReact,
+  nodeNameResolver,
 }: MessageBubbleProps) {
   const { t } = useTranslation("messages");
   const avatarColors = getAvatarColors(message.fromNode);
+
+  // Group reactions by emoji
+  const groupedReactions = useMemo(
+    () => groupReactions(reactions),
+    [reactions],
+  );
 
   // Memoize the background color style to prevent new object creation on every render
   const bubbleStyle = useMemo(
@@ -138,7 +156,8 @@ export const MessageBubble = memo(function MessageBubble({
               <TooltipTrigger asChild>
                 <EmojiReactionButton
                   onEmojiSelect={(emoji) => {
-                    logger.debug("Selected emoji:", emoji.emoji);
+                    logger.debug("Selected emoji:", emoji);
+                    onReact?.(emoji);
                   }}
                 />
               </TooltipTrigger>
@@ -203,6 +222,54 @@ export const MessageBubble = memo(function MessageBubble({
             </time>
           )}
         </div>
+
+        {/* Reactions overlay */}
+        {groupedReactions.length > 0 && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className={cn(
+                  "absolute -bottom-3 flex gap-0.5 bg-background/95 backdrop-blur-sm rounded-full px-1.5 py-0.5 shadow-sm border border-border cursor-pointer hover:bg-accent transition-colors",
+                  isMine ? "right-2" : "left-2",
+                )}
+              >
+                {groupedReactions.slice(0, 5).map(({ emoji, count }) => (
+                  <span key={emoji} className="flex items-center text-sm">
+                    {emoji}
+                    {count > 1 && (
+                      <span className="text-xs text-muted-foreground ml-0.5">
+                        {count}
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto p-2"
+              side="top"
+              align={isMine ? "end" : "start"}
+            >
+              <div className="space-y-1">
+                {groupedReactions.map(({ emoji, fromNodes }) => (
+                  <div key={emoji} className="flex items-center gap-2 text-sm">
+                    <span className="text-base">{emoji}</span>
+                    <span className="text-muted-foreground">
+                      {fromNodes
+                        .map(
+                          (node) =>
+                            nodeNameResolver?.(node) ||
+                            `!${node.toString(16).toLowerCase()}`,
+                        )
+                        .join(", ")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
 
         {isMine && (
           <div className="absolute -bottom-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">

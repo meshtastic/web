@@ -13,7 +13,9 @@ import { useMyNode } from "@shared/hooks";
 import { Hash } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useReactions } from "../hooks/useReactions";
 import type { Contact } from "../pages/MessagesPage.tsx";
+import { ReactionService } from "../services/ReactionService";
 import { MessageBubble } from "./MessageBubble.tsx";
 import { MessageInput } from "./MessageInput.tsx";
 import { groupMessagesByDay, toTimestamp } from "./MessageUtils.tsx";
@@ -74,6 +76,50 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
   const messageByMessageId = useMemo(
     () => messageRepo.createMessageIdMap(currentMessages),
     [currentMessages],
+  );
+
+  // Fetch reactions for all displayed messages
+  const messageIds = useMemo(
+    () => currentMessages.map((m) => m.messageId),
+    [currentMessages],
+  );
+
+  const { reactions: reactionsByMessageId } = useReactions(
+    myNodeNum,
+    messageIds,
+  );
+
+  // Handler for when user reacts to a message
+  const handleReact = useCallback(
+    (message: Message, emoji: string) => {
+      if (!myNodeNum || !contact) return;
+
+      const destination =
+        contact.type === "channel"
+          ? "broadcast"
+          : (contact.nodeNum ?? contact.id);
+      const channel =
+        contact.type === "channel"
+          ? (contact.id as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7)
+          : undefined;
+
+      ReactionService.toggleReaction(
+        myNodeNum,
+        message.messageId,
+        emoji,
+        destination,
+        channel,
+      );
+    },
+    [myNodeNum, contact],
+  );
+
+  // Helper to resolve node numbers to names
+  const resolveNodeName = useCallback(
+    (nodeNum: number): string | undefined => {
+      return nodeMap.get(nodeNum)?.longName ?? undefined;
+    },
+    [nodeMap],
   );
 
   const locale = useMemo(
@@ -209,6 +255,9 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
                       onReply={handleReply}
                       replyToMessage={replyToMessage}
                       replyToSenderName={replyToSenderName}
+                      reactions={reactionsByMessageId.get(message.messageId)}
+                      onReact={(emoji) => handleReact(message, emoji)}
+                      nodeNameResolver={resolveNodeName}
                     />
                   );
                 })}

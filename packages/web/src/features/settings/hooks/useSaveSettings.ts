@@ -1,4 +1,4 @@
-import { AdminMessageService } from "@core/services/adminMessageService";
+import { adminCommands } from "@core/services/adminCommands";
 import { useToast } from "@shared/hooks/useToast";
 import { useDevice } from "@state/index.ts";
 import { useCallback, useState } from "react";
@@ -77,7 +77,7 @@ export function useSettingsSave() {
       }
 
       if (adminMessages.length > 0 && connection) {
-        await AdminMessageService.sendQueuedMessages(connection, adminMessages);
+        await adminCommands.sendQueuedMessages(adminMessages);
       }
 
       channelChanges.forEach((newChannel) => {

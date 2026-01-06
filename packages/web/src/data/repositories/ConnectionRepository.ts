@@ -14,36 +14,19 @@ export type ConnectionStatus =
   | "online"
   | "error";
 
-/**
- * Repository for connection operations
- */
 export class ConnectionRepository {
   private get db() {
     return dbClient.db;
   }
 
-  /**
-   * Get the SQLocal client for reactive queries
-   * @param client - Optional client override for dependency injection
-   */
   getClient(client?: SQLocalDrizzle) {
     return client ?? dbClient.client;
   }
 
-  // ===================
-  // Query Builders 
-  // ===================
-
-  /**
-   * Build a query to get all connections
-   */
   buildConnectionsQuery() {
     return this.db.select().from(connections);
   }
 
-  /**
-   * Build a query to get a connection by ID
-   */
   buildConnectionQuery(id: number) {
     return this.db
       .select()
@@ -51,9 +34,6 @@ export class ConnectionRepository {
       .where(eq(connections.id, id));
   }
 
-  /**
-   * Build a query to get the default connection
-   */
   buildDefaultConnectionQuery() {
     return this.db
       .select()
@@ -61,13 +41,6 @@ export class ConnectionRepository {
       .where(eq(connections.isDefault, true));
   }
 
-  // ===================
-  // Async Methods (execute queries)
-  // ===================
-
-  /**
-   * Get all connections
-   */
   async getConnections(): Promise<Connection[]> {
     return this.db
       .select()
@@ -75,9 +48,6 @@ export class ConnectionRepository {
       .orderBy(desc(connections.lastConnectedAt));
   }
 
-  /**
-   * Get a connection by ID
-   */
   async getConnection(id: number): Promise<Connection | undefined> {
     const result = await this.db
       .select()
@@ -88,9 +58,6 @@ export class ConnectionRepository {
     return result[0];
   }
 
-  /**
-   * Get the default connection
-   */
   async getDefaultConnection(): Promise<Connection | undefined> {
     const result = await this.db
       .select()
@@ -101,10 +68,6 @@ export class ConnectionRepository {
     return result[0];
   }
 
-  /**
-   * Get the last active device ID (most recently connected device with a meshDeviceId)
-   * Used to restore active device on app reload
-   */
   async getLastActiveDeviceId(): Promise<number | null> {
     const result = await this.db
       .select({ meshDeviceId: connections.meshDeviceId })
@@ -116,10 +79,6 @@ export class ConnectionRepository {
     return result[0]?.meshDeviceId ?? null;
   }
 
-  /**
-   * Get the last connected connection (most recently connected)
-   * Used for auto-reconnect on app startup
-   */
   async getLastConnectedConnection(): Promise<Connection | undefined> {
     const result = await this.db
       .select()
@@ -131,9 +90,6 @@ export class ConnectionRepository {
     return result[0];
   }
 
-  /**
-   * Create a new connection
-   */
   async createConnection(
     connection: Omit<NewConnection, "id" | "createdAt" | "updatedAt">,
   ): Promise<Connection> {
@@ -148,9 +104,6 @@ export class ConnectionRepository {
     return result[0];
   }
 
-  /**
-   * Update a connection
-   */
   async updateConnection(
     id: number,
     updates: Partial<Omit<Connection, "id" | "createdAt">>,
@@ -164,9 +117,6 @@ export class ConnectionRepository {
       .where(eq(connections.id, id));
   }
 
-  /**
-   * Update connection status
-   */
   async updateStatus(
     id: number,
     status: ConnectionStatus,
@@ -178,7 +128,6 @@ export class ConnectionRepository {
       updatedAt: new Date(),
     };
 
-    // Update lastConnectedAt when successfully connecting
     if (status === "connected" || status === "configured") {
       updates.lastConnectedAt = new Date();
     }
@@ -189,9 +138,6 @@ export class ConnectionRepository {
       .where(eq(connections.id, id));
   }
 
-  /**
-   * Link a mesh device to a connection
-   */
   async linkMeshDevice(id: number, meshDeviceId: number): Promise<void> {
     await this.db
       .update(connections)
@@ -202,35 +148,23 @@ export class ConnectionRepository {
       .where(eq(connections.id, id));
   }
 
-  /**
-   * Set a connection as default (and unset others)
-   */
   async setDefault(id: number, isDefault: boolean): Promise<void> {
     if (isDefault) {
-      // First, unset all defaults
       await this.db
         .update(connections)
         .set({ isDefault: false, updatedAt: new Date() });
     }
 
-    // Set this one
     await this.db
       .update(connections)
       .set({ isDefault, updatedAt: new Date() })
       .where(eq(connections.id, id));
   }
 
-  /**
-   * Delete a connection
-   */
   async deleteConnection(id: number): Promise<void> {
     await this.db.delete(connections).where(eq(connections.id, id));
   }
 
-  /**
-   * Reset all connection statuses to disconnected
-   * (Called on app startup)
-   */
   async resetAllStatuses(): Promise<void> {
     await this.db.update(connections).set({
       status: "disconnected",

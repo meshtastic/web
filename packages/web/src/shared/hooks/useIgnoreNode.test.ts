@@ -11,11 +11,6 @@ const mockNode = {
 const mockToast = vi.fn();
 const mockSetIgnoredNode = vi.fn();
 const mockGetNode = vi.fn();
-const mockDevice = { id: 1 };
-
-vi.mock("@state/index.ts", () => ({
-  useDevice: () => mockDevice,
-}));
 
 vi.mock("@shared/hooks/useMyNode", () => ({
   useMyNode: () => ({ myNodeNum: 1234, myNode: null }),
@@ -34,14 +29,10 @@ vi.mock("@data/index", () => ({
   },
 }));
 
-vi.mock("@core/services/adminMessageService", () => ({
-  AdminMessageService: {
-    setIgnoredNode: (
-      _device: unknown,
-      _deviceId: number,
-      _nodeNum: number,
-      _isIgnored: boolean,
-    ) => mockSetIgnoredNode(_device, _deviceId, _nodeNum, _isIgnored),
+vi.mock("@core/services/adminCommands", () => ({
+  adminCommands: {
+    setIgnoredNode: (nodeNum: number, isIgnored: boolean) =>
+      mockSetIgnoredNode(nodeNum, isIgnored),
   },
 }));
 
@@ -51,19 +42,14 @@ describe("useIgnoreNode hook", () => {
     mockGetNode.mockResolvedValue(mockNode);
   });
 
-  it("calls AdminMessageService.setIgnoredNode and shows toast", async () => {
+  it("calls adminCommands.setIgnoredNode and shows toast", async () => {
     const { result } = renderHook(() => useIgnoreNode());
 
     await act(async () => {
       await result.current.updateIgnored({ nodeNum: 1234, isIgnored: true });
     });
 
-    expect(mockSetIgnoredNode).toHaveBeenCalledWith(
-      mockDevice,
-      1234,
-      1234,
-      true,
-    );
+    expect(mockSetIgnoredNode).toHaveBeenCalledWith(1234, true);
     expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
     expect(mockToast).toHaveBeenCalled();
   });
@@ -75,17 +61,12 @@ describe("useIgnoreNode hook", () => {
       await result.current.updateIgnored({ nodeNum: 1234, isIgnored: false });
     });
 
-    expect(mockSetIgnoredNode).toHaveBeenCalledWith(
-      mockDevice,
-      1234,
-      1234,
-      false,
-    );
+    expect(mockSetIgnoredNode).toHaveBeenCalledWith(1234, false);
     expect(mockGetNode).toHaveBeenCalledWith(1234, 1234);
     expect(mockToast).toHaveBeenCalled();
   });
 
-  it("does not call AdminMessageService if node not found", async () => {
+  it("does not call adminCommands if node not found", async () => {
     mockGetNode.mockResolvedValueOnce(null);
 
     const { result } = renderHook(() => useIgnoreNode());

@@ -128,18 +128,15 @@ export default function MessagesPage() {
       });
     });
 
-    // Add channels from database (at the top of the list)
-    // Only show PRIMARY (1) or SECONDARY (2) channels, not DISABLED (0)
     if (dbChannels) {
       dbChannels
         .filter((channel) => channel.role === 1 || channel.role === 2)
         .forEach((channel) => {
-          // Use custom name only if non-empty, otherwise use role-based naming
+          // Channel 1 is always "Primary", others use custom name or fallback
           const name =
-            channel.name?.trim() ||
-            (channel.role === 1
+            channel.channelIndex === 1
               ? "Primary"
-              : `Channel ${channel.channelIndex}`);
+              : channel.name?.trim() || `Channel ${channel.channelIndex}`;
           contactsList.unshift({
             id: channel.channelIndex,
             name,
@@ -205,12 +202,15 @@ export default function MessagesPage() {
   const getContactOrPlaceholder = (
     tab: { contactId: number; type: ConversationType } | undefined,
   ): Contact | null => {
-    if (!tab) return null;
+    if (!tab) {
+      return null;
+    }
     const found = contacts.find(
       (c) => c.id === tab.contactId && c.type === tab.type,
     );
-    if (found) return found;
-    // Create placeholder
+    if (found) {
+      return found;
+    }
     return {
       id: tab.contactId,
       name:
@@ -300,7 +300,9 @@ export default function MessagesPage() {
                 id: tab.contactId,
                 name:
                   tab.type === "channel"
-                    ? `Channel ${tab.contactId}`
+                    ? tab.contactId === 0
+                      ? "Primary"
+                      : `Channel ${tab.contactId}`
                     : `Node ${tab.contactId}`,
                 nodeId:
                   tab.type === "channel"
@@ -344,7 +346,7 @@ export default function MessagesPage() {
                         longName={displayContact.name}
                         size="xs"
                         showFavorite={displayContact.isFavorite}
-                        clickable={false}
+                        clickable={true}
                       />
                       {displayContact.online &&
                         displayContact.type === "direct" && (
@@ -510,24 +512,58 @@ export default function MessagesPage() {
           <div className="p-2">
             {filteredContacts.map((contact) =>
               contact.type === "channel" ? (
-                <div
-                  key={`${contact.type}-${contact.id}`}
-                  className="w-full flex items-center gap-3 rounded-lg p-3 text-left"
-                >
-                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Hash className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="font-medium truncate">{contact.name}</span>
-                  </div>
-                </div>
-              ) : (
                 <button
                   type="button"
                   key={`${contact.type}-${contact.id}`}
                   onClick={() => openChat(contact)}
                   className={cn(
                     "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
+                    selectedContact?.id === contact.id &&
+                      selectedContact?.type === "channel"
+                      ? "bg-sidebar-accent"
+                      : "hover:bg-sidebar-accent/50",
+                  )}
+                >
+                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Hash className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium truncate">
+                        {contact.name}
+                      </span>
+                      <span className="text-xs md:text-sm text-muted-foreground">
+                        {contact.time}
+                      </span>
+                    </div>
+                    {(contact.lastMessage || contact.unread > 0) && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm md:text-base text-muted-foreground truncate">
+                          {contact.lastMessage}
+                        </span>
+                        {contact.unread > 0 && (
+                          <Badge className="h-5 min-w-5 justify-center bg-primary text-primary-foreground">
+                            {contact.unread}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </button>
+              ) : (
+                <div
+                  key={`${contact.type}-${contact.id}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openChat(contact)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openChat(contact);
+                    }
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors cursor-pointer",
                     selectedContact?.id === contact.id
                       ? "bg-sidebar-accent"
                       : "hover:bg-sidebar-accent/50",
@@ -565,7 +601,7 @@ export default function MessagesPage() {
                       )}
                     </div>
                   </div>
-                </button>
+                </div>
               ),
             )}
           </div>

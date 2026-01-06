@@ -1,4 +1,4 @@
-import { AdminMessageService } from "@core/services/adminMessageService";
+import { adminCommands } from "@core/services/adminCommands";
 import { useNodes } from "@data/hooks";
 import { useMyNode } from "@shared/hooks";
 import { usePositionFlags } from "@shared/hooks/usePositionFlags";
@@ -65,52 +65,54 @@ export function usePositionForm() {
   const prevValuesRef = useRef<PositionValidation | undefined>(undefined);
 
   // Sync form changes to store and field registry (excluding position coordinates)
-  const onFormChange = useEffectEvent((formData: Partial<PositionValidation>) => {
-    if (!baseConfig || !formData) {
-      return;
-    }
-
-    const currentValues = formData as PositionValidation;
-    const prevValues = prevValuesRef.current;
-
-    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-      return;
-    }
-
-    prevValuesRef.current = currentValues;
-
-    // Exclude position coordinates - they're handled via admin message
-    const {
-      latitude: _lat,
-      longitude: _lon,
-      altitude: _alt,
-      ...configData
-    } = currentValues;
-
-    // Include computed flags value
-    const payload = { ...configData, positionFlags: flagsValue };
-
-    // Track per-field changes for Activity panel and build changes object
-    const changes: Partial<typeof payload> = {};
-    let hasChanges = false;
-
-    for (const key of Object.keys(payload) as Array<keyof typeof payload>) {
-      const newValue = payload[key];
-      const originalValue = baseConfig[key as keyof typeof baseConfig];
-
-      if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        changes[key] = newValue;
-        hasChanges = true;
-        trackChange(SECTION, key as string, newValue, originalValue);
-      } else {
-        removeChange(SECTION, key as string);
+  const onFormChange = useEffectEvent(
+    (formData: Partial<PositionValidation>) => {
+      if (!baseConfig || !formData) {
+        return;
       }
-    }
 
-    if (hasChanges) {
-      setChange(SECTION, { ...baseConfig, ...changes }, baseConfig);
-    }
-  });
+      const currentValues = formData as PositionValidation;
+      const prevValues = prevValuesRef.current;
+
+      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+        return;
+      }
+
+      prevValuesRef.current = currentValues;
+
+      // Exclude position coordinates - they're handled via admin message
+      const {
+        latitude: _lat,
+        longitude: _lon,
+        altitude: _alt,
+        ...configData
+      } = currentValues;
+
+      // Include computed flags value
+      const payload = { ...configData, positionFlags: flagsValue };
+
+      // Track per-field changes for Activity panel and build changes object
+      const changes: Partial<typeof payload> = {};
+      let hasChanges = false;
+
+      for (const key of Object.keys(payload) as Array<keyof typeof payload>) {
+        const newValue = payload[key];
+        const originalValue = baseConfig[key as keyof typeof baseConfig];
+
+        if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
+          changes[key] = newValue;
+          hasChanges = true;
+          trackChange(SECTION, key as string, newValue, originalValue);
+        } else {
+          removeChange(SECTION, key as string);
+        }
+      }
+
+      if (hasChanges) {
+        setChange(SECTION, { ...baseConfig, ...changes }, baseConfig);
+      }
+    },
+  );
 
   useEffect(() => {
     const subscription = watch(onFormChange);
@@ -126,7 +128,7 @@ export function usePositionForm() {
       data.latitude !== undefined &&
       data.longitude !== undefined
     ) {
-      const message = AdminMessageService.createSetFixedPositionMessage({
+      const message = adminCommands.createSetFixedPositionMessage({
         latitudeI: Math.round(data.latitude * 1e7),
         longitudeI: Math.round(data.longitude * 1e7),
         altitude: data.altitude || 0,
