@@ -361,7 +361,7 @@ function ConnectionCard({
       </CardHeader>
       <CardContent className="pt-0">
         {connection.status === "configuring" ? (
-          <ConfigProgressIndicator meshDeviceId={connection.meshDeviceId} />
+          <ConfigProgressIndicator />
         ) : connection.error ? (
           <p className="text-sm md:text-base text-red-600 dark:text-red-400">
             {connection.error}

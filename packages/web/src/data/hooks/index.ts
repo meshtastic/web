@@ -1,4 +1,20 @@
 export {
+  useConfig,
+  useConfigVariant,
+  useModuleConfigVariant,
+} from "./useConfig.ts";
+export {
+  useWorkingHashes,
+  useInitializeBaseHashes,
+} from "./useWorkingHashes.ts";
+export {
+  usePendingChanges,
+  useEffectiveConfig,
+  useEffectiveModuleConfig,
+  mergeConfigChanges,
+} from "./usePendingChanges.ts";
+export { useDrizzleQuery } from "./useDrizzleLive.ts";
+export {
   useFavoriteNodes,
   useNode,
   useNodes,

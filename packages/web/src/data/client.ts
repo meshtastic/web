@@ -2,9 +2,15 @@ import { drizzle } from "drizzle-orm/sqlite-proxy";
 import { SQLocalDrizzle } from "sqlocal/drizzle";
 import logger from "../core/services/logger.ts";
 import initialMigration from "./migrations/0000_initial_migration.sql?raw";
+import configHashesMigration from "./migrations/0001_config_hashes.sql?raw";
+import workingHashesMigration from "./migrations/0002_working_hashes.sql?raw";
 import * as schema from "./schema.ts";
 
-const migrations = [{ id: "0000_initial_migration", sql: initialMigration }];
+const migrations = [
+  { id: "0000_initial_migration", sql: initialMigration },
+  { id: "0001_config_hashes", sql: configHashesMigration },
+  { id: "0002_working_hashes", sql: workingHashesMigration },
+];
 
 class DatabaseClient {
   private static instance: DatabaseClient;
@@ -199,6 +205,8 @@ class DatabaseClient {
       "traceroute_logs",
       "device_configs",
       "config_changes",
+      "config_hashes",
+      "working_hashes",
       "devices",
     ];
 

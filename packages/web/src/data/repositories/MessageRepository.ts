@@ -27,6 +27,9 @@ export class MessageRepository {
     nodeB: number,
     limit = 50,
   ) {
+    logger.debug(
+      `[MessageRepo] buildDirectMessagesQuery: ownerNodeNum=${ownerNodeNum}, nodeA=${nodeA}, nodeB=${nodeB}, limit=${limit}`,
+    );
     return this.db
       .select()
       .from(messages)
@@ -221,10 +224,31 @@ export class MessageRepository {
   }
 
   async saveMessage(message: NewMessage): Promise<void> {
-    logger.debug(
-      `[MessageRepo] saveMessage: ownerNodeNum=${message.ownerNodeNum}, type=${message.type}, channelId=${message.channelId}, from=${message.fromNode}`,
+    logger.info(
+      `[MessageRepo] saveMessage: ownerNodeNum=${message.ownerNodeNum}, type=${message.type}, channelId=${message.channelId}, from=${message.fromNode}, to=${message.toNode}, messageId=${message.messageId}`,
     );
-    await this.db.insert(messages).values(message);
+    try {
+      await this.db.insert(messages).values(message);
+      logger.info(`[MessageRepo] Message saved successfully`);
+
+      // Verify the message was saved
+      const verify = await this.db
+        .select()
+        .from(messages)
+        .where(
+          and(
+            eq(messages.ownerNodeNum, message.ownerNodeNum),
+            eq(messages.messageId, message.messageId),
+          ),
+        )
+        .limit(1);
+      logger.info(
+        `[MessageRepo] Verification: found ${verify.length} message(s) with messageId=${message.messageId}`,
+      );
+    } catch (error) {
+      logger.error(`[MessageRepo] Failed to save message:`, error);
+      throw error;
+    }
   }
 
   async updateMessageState(

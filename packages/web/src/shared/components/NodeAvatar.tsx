@@ -6,7 +6,7 @@ import {
 } from "@shared/components/ui/tooltip";
 import { cn } from "@shared/utils/cn";
 import { getAvatarColors } from "@shared/utils/color";
-import { useDevice, useUIStore } from "@state/index.ts";
+import { useUIStore } from "@state/index.ts";
 import { LockKeyholeOpenIcon, StarIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -34,8 +34,8 @@ export const NodeAvatar = ({
   className,
 }: NodeAvatarProps) => {
   const { t } = useTranslation();
-  const { setNodeNumDetails } = useUIStore();
-  const { setDialogOpen } = useDevice();
+  const setNodeNumDetails = useUIStore((s) => s.setNodeNumDetails);
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
 
   const { bgColor, textColor } = getAvatarColors(nodeNum);
   const initials = (longName || nodeNum?.toString() || "")

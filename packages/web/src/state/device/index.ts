@@ -2,7 +2,6 @@
 export {
   deviceActions,
   type ConfigConflict,
-  type ConnectionPhase,
   type Device,
   type DeviceState,
   TOTAL_CONFIG_COUNT,

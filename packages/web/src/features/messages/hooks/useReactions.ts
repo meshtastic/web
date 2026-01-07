@@ -2,28 +2,26 @@
  * Reaction hooks for fetching message reactions
  */
 
+import { useDrizzleQuery } from "@data/hooks/useDrizzleLive.ts";
 import { reactionRepo } from "@data/repositories";
 import type { Reaction } from "@data/schema";
 import { useMemo } from "react";
-import { useReactiveQuery } from "sqlocal/react";
 
 /**
  * Hook to fetch reactions for multiple messages
  * Returns a Map of messageId -> Reaction[]
  */
 export function useReactions(ownerNodeNum: number, messageIds: number[]) {
-  // Always build a valid query - use [-1] as a placeholder that will match nothing
-  const safeMessageIds = messageIds.length > 0 ? messageIds : [-1];
+  // Use a stable key for the messageIds array to prevent unnecessary re-renders
+  const messageIdsKey = messageIds.join(",");
 
-  const query = useMemo(
-    () =>
-      reactionRepo.buildReactionsForMessagesQuery(ownerNodeNum, safeMessageIds),
-    [ownerNodeNum, safeMessageIds],
-  );
-
-  const { data, status } = useReactiveQuery<Reaction>(
-    reactionRepo.getClient(),
-    query,
+  const { data, isLoading } = useDrizzleQuery<Reaction>(
+    () => {
+      const ids = messageIds.length > 0 ? messageIds : [-1];
+      return reactionRepo.buildReactionsForMessagesQuery(ownerNodeNum, ids);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ownerNodeNum, messageIdsKey],
   );
 
   // Group reactions by targetMessageId
@@ -42,7 +40,7 @@ export function useReactions(ownerNodeNum: number, messageIds: number[]) {
 
   return {
     reactions: reactionsByMessage,
-    isLoading: status === "pending",
+    isLoading,
   };
 }
 
@@ -53,19 +51,14 @@ export function useMessageReactions(
   ownerNodeNum: number,
   targetMessageId: number,
 ) {
-  const query = useMemo(
+  const { data, isLoading } = useDrizzleQuery<Reaction>(
     () => reactionRepo.buildReactionsQuery(ownerNodeNum, targetMessageId),
     [ownerNodeNum, targetMessageId],
   );
 
-  const { data, status } = useReactiveQuery<Reaction>(
-    reactionRepo.getClient(),
-    query,
-  );
-
   return {
     reactions: data ?? [],
-    isLoading: status === "pending",
+    isLoading,
   };
 }
 

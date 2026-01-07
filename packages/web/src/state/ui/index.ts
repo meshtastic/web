@@ -3,6 +3,8 @@ export {
   DEFAULT_PREFERENCES,
   useUIStore,
   type CoordinateFormat,
+  type Dialogs,
+  type DialogVariant,
   type DistanceUnits,
   type Language,
   type MapStyle,

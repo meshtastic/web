@@ -103,16 +103,11 @@ export class TransportWebSerial implements Types.Transport {
         console.debug("[Serial] Connected, waiting for data...");
 
         try {
-          let packetCount = 0;
           while (true) {
             const { value, done } = await reader.read();
             if (done) {
               console.debug("[Serial] Read stream done");
               break;
-            }
-            packetCount++;
-            if (packetCount <= 5 || packetCount % 10 === 0) {
-              console.debug(`[Serial] Received packet #${packetCount}`, value.type);
             }
             ctrl.enqueue(value);
           }

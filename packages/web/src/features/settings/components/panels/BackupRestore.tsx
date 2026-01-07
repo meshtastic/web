@@ -6,7 +6,7 @@ import { ImportConfigDialog } from "@shared/components/Dialog/ImportConfigDialog
 import { Button } from "@shared/components/ui/button";
 import { Label } from "@shared/components/ui/label";
 import { useToast } from "@shared/hooks/useToast";
-import { useDevice } from "@state/index.ts";
+import { useDevice, useUIStore } from "@state/index.ts";
 import { Download, Key, Upload } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,7 @@ export function BackupRestore() {
   const { t } = useTranslation("config");
   const { toast } = useToast();
   const device = useDevice();
-  const { setDialogOpen } = device;
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const exportConfig = async (type: "full" | "channels-only" = "full") => {
@@ -110,8 +110,15 @@ export function BackupRestore() {
               <Download className="h-4 w-4 mr-2" />
               {t("settings.advanced.backupRestore.export.button", "Export")}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => exportConfig("channels-only")}>
-              {t("settings.advanced.backupRestore.export.channelsOnly", "Channels Only")}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => exportConfig("channels-only")}
+            >
+              {t(
+                "settings.advanced.backupRestore.export.channelsOnly",
+                "Channels Only",
+              )}
             </Button>
           </div>
         </div>

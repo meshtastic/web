@@ -1,5 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import type { SQLocalDrizzle } from "sqlocal/drizzle";
+import logger from "../../core/services/logger.ts";
 import { dbClient } from "../client.ts";
 import {
   messageReactions,
@@ -17,10 +18,19 @@ export class ReactionRepository {
   }
 
   async addReaction(reaction: NewReaction): Promise<void> {
-    await this.db
-      .insert(messageReactions)
-      .values(reaction)
-      .onConflictDoNothing();
+    logger.debug(
+      `[ReactionRepo] Adding reaction: owner=${reaction.ownerNodeNum}, target=${reaction.targetMessageId}, from=${reaction.fromNode}, emoji=${reaction.emoji}`,
+    );
+    try {
+      const result = await this.db
+        .insert(messageReactions)
+        .values(reaction)
+        .onConflictDoNothing();
+      logger.debug(`[ReactionRepo] Insert result:`, result);
+    } catch (error) {
+      logger.error(`[ReactionRepo] Failed to add reaction:`, error);
+      throw error;
+    }
   }
 
   async removeReaction(
@@ -42,31 +52,60 @@ export class ReactionRepository {
   }
 
   async toggleReaction(reaction: NewReaction): Promise<boolean> {
-    const existing = await this.db
-      .select()
-      .from(messageReactions)
-      .where(
-        and(
-          eq(messageReactions.ownerNodeNum, reaction.ownerNodeNum),
-          eq(messageReactions.targetMessageId, reaction.targetMessageId),
-          eq(messageReactions.fromNode, reaction.fromNode),
-          eq(messageReactions.emoji, reaction.emoji),
-        ),
-      )
-      .limit(1);
+    logger.debug(
+      `[ReactionRepo] Toggle reaction: owner=${reaction.ownerNodeNum}, target=${reaction.targetMessageId}, from=${reaction.fromNode}, emoji=${reaction.emoji}`,
+    );
+    try {
+      const existing = await this.db
+        .select()
+        .from(messageReactions)
+        .where(
+          and(
+            eq(messageReactions.ownerNodeNum, reaction.ownerNodeNum),
+            eq(messageReactions.targetMessageId, reaction.targetMessageId),
+            eq(messageReactions.fromNode, reaction.fromNode),
+            eq(messageReactions.emoji, reaction.emoji),
+          ),
+        )
+        .limit(1);
 
-    if (existing.length > 0) {
-      await this.removeReaction(
-        reaction.ownerNodeNum,
-        reaction.targetMessageId,
-        reaction.fromNode,
-        reaction.emoji,
+      logger.debug(
+        `[ReactionRepo] Existing reactions found: ${existing.length}`,
       );
-      return false;
-    }
 
-    await this.addReaction(reaction);
-    return true;
+      if (existing.length > 0) {
+        await this.removeReaction(
+          reaction.ownerNodeNum,
+          reaction.targetMessageId,
+          reaction.fromNode,
+          reaction.emoji,
+        );
+        logger.debug(`[ReactionRepo] Removed existing reaction`);
+        return false;
+      }
+
+      await this.addReaction(reaction);
+      logger.debug(`[ReactionRepo] Added new reaction`);
+
+      // Verify the insert worked by querying immediately
+      const verify = await this.db
+        .select()
+        .from(messageReactions)
+        .where(
+          and(
+            eq(messageReactions.ownerNodeNum, reaction.ownerNodeNum),
+            eq(messageReactions.targetMessageId, reaction.targetMessageId),
+          ),
+        );
+      logger.debug(
+        `[ReactionRepo] Verification query returned ${verify.length} reactions for message ${reaction.targetMessageId}`,
+      );
+
+      return true;
+    } catch (error) {
+      logger.error(`[ReactionRepo] Toggle reaction failed:`, error);
+      throw error;
+    }
   }
 
   async hasReaction(

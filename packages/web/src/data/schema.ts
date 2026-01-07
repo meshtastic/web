@@ -771,3 +771,89 @@ export const messageReactions = sqliteTable(
 
 export type Reaction = typeof messageReactions.$inferSelect;
 export type NewReaction = typeof messageReactions.$inferInsert;
+
+/**
+ * Config hashes - Merkle tree leaf hashes for efficient config change detection
+ * Stores per-leaf hashes to enable quick diff detection without deep object comparison
+ */
+export const configHashes = sqliteTable(
+  "config_hashes",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    // Device identity - the node number of the device that owns this config
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
+
+    // Leaf key - identifies which config this hash is for
+    // e.g., "config:device", "moduleConfig:mqtt", "channel:0", "user"
+    leafKey: text("leaf_key").notNull(),
+
+    // Hash value - cyrb53 hash of the config content
+    hash: text("hash").notNull(),
+
+    // Timestamps
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (table) => [
+    // One hash per leaf per device
+    unique("config_hashes_owner_leaf_unique").on(
+      table.ownerNodeNum,
+      table.leafKey,
+    ),
+    // Query all hashes for a device
+    index("config_hashes_owner_idx").on(table.ownerNodeNum),
+  ],
+);
+
+export type ConfigHash = typeof configHashes.$inferSelect;
+export type NewConfigHash = typeof configHashes.$inferInsert;
+
+/**
+ * Working hashes - Merkle tree leaf hashes for pending config changes
+ * Separate from config_hashes (base) to enable efficient change detection
+ */
+export const workingHashes = sqliteTable(
+  "working_hashes",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    // Device identity - the node number of the device that owns this config
+    ownerNodeNum: integer("owner_node_num")
+      .notNull()
+      .references(() => devices.nodeNum, { onDelete: "cascade" }),
+
+    // Leaf key - identifies which config this hash is for
+    // e.g., "config:device", "moduleConfig:mqtt", "channel:0", "user"
+    leafKey: text("leaf_key").notNull(),
+
+    // Hash value - cyrb53 hash of the config content (including pending changes)
+    hash: text("hash").notNull(),
+
+    // Timestamps
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (table) => [
+    // One hash per leaf per device
+    unique("working_hashes_owner_leaf_unique").on(
+      table.ownerNodeNum,
+      table.leafKey,
+    ),
+    // Query all hashes for a device
+    index("working_hashes_owner_idx").on(table.ownerNodeNum),
+  ],
+);
+
+export type WorkingHash = typeof workingHashes.$inferSelect;
+export type NewWorkingHash = typeof workingHashes.$inferInsert;

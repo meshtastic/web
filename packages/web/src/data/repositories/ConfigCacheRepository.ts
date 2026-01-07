@@ -1,8 +1,8 @@
 import { and, eq, sql } from "drizzle-orm";
 import { dbClient } from "../client.ts";
 import {
-  // type ConfigChange,
-  // configChanges,
+  type ConfigChange,
+  configChanges,
   type DeviceConfig,
   deviceConfigs,
 } from "../schema.ts";
@@ -31,6 +31,29 @@ export interface ConflictInfo {
 export class ConfigCacheRepository {
   private get db() {
     return dbClient.db;
+  }
+
+  /**
+   * Build a query to fetch config for a device.
+   * Can be used with useDrizzleQuery for reactive updates.
+   */
+  buildConfigQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(deviceConfigs)
+      .where(eq(deviceConfigs.ownerNodeNum, ownerNodeNum))
+      .limit(1);
+  }
+
+  /**
+   * Build a query to fetch all pending config changes for a device.
+   * Can be used with useDrizzleQuery for reactive updates.
+   */
+  buildChangesQuery(ownerNodeNum: number) {
+    return this.db
+      .select()
+      .from(configChanges)
+      .where(eq(configChanges.ownerNodeNum, ownerNodeNum));
   }
 
   async getCachedConfig(

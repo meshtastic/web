@@ -104,7 +104,7 @@ const SortIcon = ({
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { current } = useLanguage();
-  const { hardware, connection, setDialogOpen } = useDevice();
+  const { hardware, connection } = useDevice();
   const { myNodeNum } = useMyNode();
   const { nodes: allNodes } = useNodes(myNodeNum);
   const { nodes: onlineNodes } = useOnlineNodes(myNodeNum);
@@ -115,7 +115,8 @@ const NodesPage = (): JSX.Element => {
     [onlineNodes],
   );
 
-  const { setNodeNumDetails } = useUIStore();
+  const setNodeNumDetails = useUIStore((s) => s.setNodeNumDetails);
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
 
   const [columnVisibility, setColumnVisibility] = usePreference<
     Record<NodeColumnKey, boolean>

@@ -1,15 +1,24 @@
 import { fromByteArray, toByteArray } from "base64-js";
 import yaml from "js-yaml";
 import { describe, expect, it, vi } from "vitest";
-import { z } from "zod/v4";
-import {
-  ConfigBackupExportSchema,
-  ConfigBackupValidationService,
-} from "../../features/settings/components/panels/configBackup.ts";
+import { ConfigBackupExportSchema } from "../../features/settings/components/panels/configBackup.ts";
 import {
   type ConfigBackupData,
   ConfigBackupService,
 } from "./configBackupService.ts";
+
+// Helper type for channel entries in ConfigBackupData
+interface ExportedChannel {
+  index: number;
+  role: number;
+  settings: {
+    name?: string;
+    psk?: string;
+    uplinkEnabled?: boolean;
+    downlinkEnabled?: boolean;
+    moduleSettings?: { positionPrecision?: number };
+  };
+}
 
 const mockGetChannels = vi.fn();
 const mockGetNode = vi.fn();
@@ -67,14 +76,11 @@ describe("ConfigBackupService", () => {
       const parsed = yaml.load(yamlContent) as ConfigBackupData;
 
       // Security config should have Base64 encoded keys
-      expect(parsed.config.security).toBeDefined();
-      expect(parsed.config.security.privateKey).toBe(
-        fromByteArray(mockPrivateKey),
-      );
-      expect(parsed.config.security.publicKey as unknown).toBe(
-        fromByteArray(mockPublicKey),
-      );
-      expect(parsed.config.security.adminKey[0]).toBe(
+      const security = parsed.config.security as Record<string, unknown>;
+      expect(security).toBeDefined();
+      expect(security.privateKey).toBe(fromByteArray(mockPrivateKey));
+      expect(security.publicKey).toBe(fromByteArray(mockPublicKey));
+      expect((security.adminKey as string[])[0]).toBe(
         fromByteArray(mockAdminKey),
       );
     });
@@ -110,11 +116,12 @@ describe("ConfigBackupService", () => {
       const parsed = yaml.load(yamlContent) as ConfigBackupData;
 
       // BigInt values should be converted to numbers
-      expect(parsed.config.lora).toBeDefined();
-      expect(parsed.config.lora.txPower).toBe(20);
-      expect(typeof parsed.config.lora.txPower).toBe("number");
-      expect(parsed.config.lora.channelNum).toBe(0);
-      expect(parsed.config.lora.hopLimit).toBe(3);
+      const lora = parsed.config.lora as Record<string, unknown>;
+      expect(lora).toBeDefined();
+      expect(lora.txPower).toBe(20);
+      expect(typeof lora.txPower).toBe("number");
+      expect(lora.channelNum).toBe(0);
+      expect(lora.hopLimit).toBe(3);
     });
 
     it("should export user config from node database, including isUnmessageable", async () => {
@@ -200,22 +207,21 @@ describe("ConfigBackupService", () => {
       expect(mockGetChannels).toHaveBeenCalledWith(12345);
 
       // Verify channels are in export
-      expect(parsed.channels).toHaveLength(2);
-      expect(parsed.channels[0].index).toBe(0);
-      expect(parsed.channels[0].settings.name).toBe("Primary");
-      expect(parsed.channels[0].settings.psk).toBe(mockPsk);
-      expect(parsed.channels[0].settings.moduleSettings.positionPrecision).toBe(
-        12,
-      );
-      expect(parsed.channels[0].role).toBe(1);
+      const channels = parsed.channels as ExportedChannel[];
+      expect(channels).toHaveLength(2);
+      const ch0 = channels[0];
+      const ch1 = channels[1];
+      expect(ch0?.index).toBe(0);
+      expect(ch0?.settings.name).toBe("Primary");
+      expect(ch0?.settings.psk).toBe(mockPsk);
+      expect(ch0?.settings.moduleSettings?.positionPrecision).toBe(12);
+      expect(ch0?.role).toBe(1);
 
-      expect(parsed.channels[1].index).toBe(1);
-      expect(parsed.channels[1].settings.name).toBe("Secondary");
-      expect(parsed.channels[1].settings.psk).toBe("c2Vjb25kcHNr");
-      expect(parsed.channels[1].settings.uplinkEnabled).toBe(true);
-      expect(parsed.channels[1].settings.moduleSettings.positionPrecision).toBe(
-        0,
-      );
+      expect(ch1?.index).toBe(1);
+      expect(ch1?.settings.name).toBe("Secondary");
+      expect(ch1?.settings.psk).toBe("c2Vjb25kcHNr");
+      expect(ch1?.settings.uplinkEnabled).toBe(true);
+      expect(ch1?.settings.moduleSettings?.positionPrecision).toBe(0);
     });
   });
 
@@ -417,7 +423,8 @@ channels: []
 `;
       expect(() => ConfigBackupService.parseBackup(securityYAML)).not.toThrow();
       const parsedData = ConfigBackupService.parseBackup(securityYAML);
-      expect(parsedData.config.security.adminKey).toEqual([validKey]);
+      const security = parsedData.config.security as Record<string, unknown>;
+      expect(security.adminKey).toEqual([validKey]);
     });
   });
 

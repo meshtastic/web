@@ -1,6 +1,9 @@
 import logger from "@core/services/logger";
+import { computeLeafHashes } from "@core/utils/merkleConfig.ts";
 import {
+  channelRepo,
   configCacheRepo,
+  configHashRepo,
   connectionRepo,
   deviceRepo,
   nodeRepo,
@@ -91,18 +94,33 @@ class ConnectionServiceClass {
 
     await this.updateStatus(conn.id, "connecting");
 
+    let strategy: ConnectionStrategy | undefined;
+    let nativeHandle: unknown | undefined;
+
     try {
-      const strategy = this.createStrategy(conn.type);
+      strategy = this.createStrategy(conn.type);
       const result = await strategy.connect(conn, opts);
+      nativeHandle = result.nativeHandle;
 
       const state = this.getOrCreateState(conn.id);
       state.strategy = strategy;
-      state.nativeHandle = result.nativeHandle;
+      state.nativeHandle = nativeHandle;
       state.cleanup = result.onDisconnect;
+
+      // Update connection record if user selected a different serial port
+      if (result.updatedPortInfo) {
+        await connectionRepo.updateConnection(conn.id, {
+          usbVendorId: result.updatedPortInfo.usbVendorId ?? null,
+          usbProductId: result.updatedPortInfo.usbProductId ?? null,
+        });
+        logger.debug(
+          `[ConnectionService] Updated serial port info: vendor=${result.updatedPortInfo.usbVendorId}, product=${result.updatedPortInfo.usbProductId}`,
+        );
+      }
 
       if (conn.type === "bluetooth" && result.nativeHandle) {
         const unsub = BrowserHardware.onBluetoothDisconnect(
-          result.nativeHandle,
+          result.nativeHandle as BluetoothDevice,
           () => this.updateStatus(conn.id, "disconnected"),
         );
         state.subscriptions.push(unsub);
@@ -113,6 +131,26 @@ class ConnectionServiceClass {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       logger.error(`[ConnectionService] Connection failed: ${msg}`);
+
+      // Clean up any resources that were allocated before the failure
+      if (strategy && nativeHandle) {
+        try {
+          await strategy.disconnect(nativeHandle);
+        } catch (cleanupErr) {
+          logger.warn(
+            `[ConnectionService] Cleanup after failure also failed:`,
+            cleanupErr,
+          );
+        }
+      }
+
+      // Clean up any state that was created
+      const state = this.state.get(conn.id);
+      if (state) {
+        this.cleanupState(conn.id, state);
+        this.state.delete(conn.id);
+      }
+
       await this.updateStatus(conn.id, "error", msg);
       return false;
     }
@@ -127,9 +165,8 @@ class ConnectionServiceClass {
     state.cancelled = true;
     this.cleanupState(conn.id, state);
 
-    if (conn.meshDeviceId) {
-      this.disconnectMeshDevice(conn.meshDeviceId);
-    }
+    // Disconnect the MeshDevice and clear device store
+    this.disconnectMeshDevice();
 
     if (state.strategy) {
       await state.strategy.disconnect(state.nativeHandle);
@@ -145,13 +182,6 @@ class ConnectionServiceClass {
 
   async remove(conn: Connection): Promise<void> {
     await this.disconnect(conn);
-
-    if (conn.meshDeviceId) {
-      try {
-        useDeviceStore.getState().removeDevice(conn.meshDeviceId);
-      } catch {}
-    }
-
     await connectionRepo.deleteConnection(conn.id);
     this.notify();
   }
@@ -196,14 +226,14 @@ class ConnectionServiceClass {
     connectionId: number,
     transport: PacketTransport,
     skipConfig?: boolean,
-  ): Promise<number> {
-    const conn = await connectionRepo.getConnection(connectionId);
-    const deviceId = conn?.meshDeviceId ?? randId();
+  ): Promise<void> {
+    // Use a simple random ID for the MeshDevice instance (not persisted)
+    const meshDeviceId = randId();
 
     const { initializeDevice, setConnection } = useDeviceStore.getState();
     const device = initializeDevice();
 
-    const meshDevice = new MeshDevice(transport, deviceId);
+    const meshDevice = new MeshDevice(transport, meshDeviceId);
     setConnection(meshDevice);
 
     // Build context for helpers
@@ -214,7 +244,7 @@ class ConnectionServiceClass {
 
     const ctx: SetupContext = {
       connectionId,
-      deviceId,
+      deviceId: meshDeviceId,
       meshDevice,
       device,
       state: this.getOrCreateState(connectionId),
@@ -230,21 +260,17 @@ class ConnectionServiceClass {
     this.subscribeToDeviceStatus(ctx);
 
     device.resetConfigProgress();
-    device.setConnectionPhase("configuring");
     await this.updateStatus(connectionId, "configuring");
 
     if (skipConfig) {
       logger.info("[ConnectionService] Skipping config (debug mode)");
-      device.setConnectionPhase("connected");
       await this.updateStatus(connectionId, "connected");
       this.startHeartbeat(ctx);
     } else {
       this.runConfigSync(ctx);
     }
 
-    await connectionRepo.linkMeshDevice(connectionId, deviceId);
     this.notify();
-    return deviceId;
   }
 
   private subscribeToNodeInfo(ctx: SetupContext): void {
@@ -306,7 +332,7 @@ class ConnectionServiceClass {
   }
 
   private subscribeToConfigComplete(ctx: SetupContext): void {
-    const { meshDevice, device, connectionId, state } = ctx;
+    const { meshDevice, connectionId, state } = ctx;
 
     const unsub = meshDevice.events.onConfigComplete.subscribe(
       async (nonce) => {
@@ -316,7 +342,6 @@ class ConnectionServiceClass {
           await this.handleConfigStage1Complete(ctx);
         } else if (nonce === CONFIG_COMPLETE_STAGE2) {
           unsub();
-          device.setConnectionPhase("configured");
           await this.updateStatus(connectionId, "configured");
           logger.debug("[ConnectionService] NodeDB sync complete");
         }
@@ -327,14 +352,13 @@ class ConnectionServiceClass {
   }
 
   private subscribeToDeviceStatus(ctx: SetupContext): void {
-    const { meshDevice, device, connectionId, state } = ctx;
+    const { meshDevice, connectionId, state } = ctx;
 
     const unsub = meshDevice.events.onDeviceStatus.subscribe(async (status) => {
       if (status === Types.DeviceStatusEnum.DeviceDisconnected) {
         logger.debug(
           `[ConnectionService] Device disconnected (id: ${connectionId})`,
         );
-        device.setConnectionPhase("disconnected");
         await connectionRepo.updateStatus(connectionId, "disconnected");
         this.clearHeartbeat(connectionId);
         this.notify();
@@ -382,7 +406,6 @@ class ConnectionServiceClass {
         cachedConfig.config as Protobuf.LocalOnly.LocalConfig,
         cachedConfig.moduleConfig as Protobuf.LocalOnly.LocalModuleConfig,
       );
-      ctx.device.setConnectionPhase("cached");
 
       await this.updateStatus(ctx.connectionId, "connected");
       this.emitNavigationIntent(ctx.connectionId, nodeNum, true);
@@ -397,20 +420,76 @@ class ConnectionServiceClass {
     const wasCached = device.isCachedConfig;
 
     device.setIsCachedConfig(false);
-    device.setConnectionPhase("connected");
 
     if (!wasCached) {
       await this.updateStatus(connectionId, "connected");
     }
 
-    // Save fresh config to cache
+    // Save fresh config to cache and compute base hashes
     if (myNodeNum) {
-      await this.saveConfigToCache(ctx, myNodeNum);
+      await Promise.all([
+        this.saveConfigToCache(ctx, myNodeNum),
+        this.saveBaseHashes(ctx, myNodeNum),
+      ]);
     }
 
     if (!wasCached && myNodeNum) {
       await ctx.deviceUpserted;
       this.emitNavigationIntent(connectionId, myNodeNum, false);
+    }
+  }
+
+  /**
+   * Compute and save base hashes for the current config.
+   * These hashes form the baseline for change detection.
+   */
+  private async saveBaseHashes(
+    ctx: SetupContext,
+    nodeNum: number,
+  ): Promise<void> {
+    try {
+      // Fetch channels and user data from DB (they were saved during config phase)
+      const [dbChannels, myNode] = await Promise.all([
+        channelRepo.getChannels(nodeNum),
+        nodeRepo.getNode(nodeNum, nodeNum),
+      ]);
+
+      // Convert DB channels to array indexed by channel position
+      const channels: unknown[] = [];
+      for (const ch of dbChannels) {
+        channels[ch.channelIndex] = {
+          role: ch.role,
+          name: ch.name,
+          psk: ch.psk,
+          uplinkEnabled: ch.uplinkEnabled,
+          downlinkEnabled: ch.downlinkEnabled,
+          positionPrecision: ch.positionPrecision,
+        };
+      }
+
+      // Extract user fields that should be tracked for changes
+      const user = myNode
+        ? {
+            shortName: myNode.shortName,
+            longName: myNode.longName,
+            role: myNode.role,
+            isLicensed: myNode.isLicensed,
+          }
+        : undefined;
+
+      const hashes = computeLeafHashes({
+        config: ctx.device.config,
+        moduleConfig: ctx.device.moduleConfig,
+        channels,
+        user,
+      });
+
+      await configHashRepo.saveBaseHashes(nodeNum, hashes);
+      logger.debug(
+        `[ConnectionService] Saved ${hashes.size} base config hashes`,
+      );
+    } catch (err) {
+      logger.warn("[ConnectionService] Failed to save base hashes:", err);
     }
   }
 
@@ -515,9 +594,8 @@ class ConnectionServiceClass {
     state.cleanup?.();
   }
 
-  private disconnectMeshDevice(meshDeviceId: number): void {
-    const { getDevice } = useDeviceStore.getState();
-    const device = getDevice(meshDeviceId);
+  private disconnectMeshDevice(): void {
+    const { device, clearDevice } = useDeviceStore.getState();
 
     try {
       device?.connection?.disconnect();
@@ -525,10 +603,7 @@ class ConnectionServiceClass {
       logger.warn("[ConnectionService] Disconnect error:", err);
     }
 
-    if (device) {
-      device.setConnectionId(null);
-      device.setConnectionPhase("disconnected");
-    }
+    clearDevice();
   }
 
   private createStrategy(type: Connection["type"]): ConnectionStrategy {

@@ -26,8 +26,8 @@ import {
 } from "@shared/components/ui/tooltip";
 import { cn } from "@shared/utils/cn";
 import { type SplitMode, useUIStore } from "@state/index.ts";
-import { useSearch } from "@tanstack/react-router";
-import { Columns, Hash, Plus, Rows, Search, Users, X } from "lucide-react";
+import { Link, useSearch } from "@tanstack/react-router";
+import { Columns, Hash, Rows, Search, Users, X } from "lucide-react";
 import type React from "react";
 import { Activity, useEffect, useMemo, useState } from "react";
 import { ChatPanel } from "../components/index.ts";
@@ -64,7 +64,6 @@ export default function MessagesPage() {
   const splitMode = useUIStore((state) => state.messageSplitMode);
   const openMessageTab = useUIStore((state) => state.openMessageTab);
   const closeMessageTab = useUIStore((state) => state.closeMessageTab);
-  const setActiveMessageTab = useUIStore((state) => state.setActiveMessageTab);
   const setSecondaryMessageTab = useUIStore(
     (state) => state.setSecondaryMessageTab,
   );
@@ -255,10 +254,6 @@ export default function MessagesPage() {
     });
   }, [contactsWithUnread, searchQuery, contactFilter]);
 
-  const openChat = (contact: Contact) => {
-    openMessageTab(contact.id, contact.type);
-  };
-
   const closeTab = (tabId: number, e: React.MouseEvent) => {
     e.stopPropagation();
     if (openTabs.length === 1) {
@@ -267,11 +262,10 @@ export default function MessagesPage() {
     closeMessageTab(tabId);
   };
 
+  // Only used for secondary panel tabs (primary panel uses <Link>)
   const handleTabClick = (tabId: number, isSecondaryPanel = false) => {
     if (isSecondaryPanel) {
       setSecondaryMessageTab(tabId);
-    } else {
-      setActiveMessageTab(tabId);
     }
   };
 
@@ -318,25 +312,8 @@ export default function MessagesPage() {
 
               const isActive = currentTabId === tab.id;
 
-              return (
-                <div
-                  key={tab.id}
-                  role="tab"
-                  tabIndex={0}
-                  onClick={() => handleTabClick(tab.id, isSecondaryPanel)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleTabClick(tab.id, isSecondaryPanel);
-                    }
-                  }}
-                  className={cn(
-                    "group flex items-center gap-2 px-4 py-2 border-r cursor-pointer transition-colors max-w-50",
-                    isActive
-                      ? "bg-background border-b-2 border-b-primary"
-                      : "hover:bg-muted/50",
-                  )}
-                >
+              const tabContent = (
+                <>
                   {displayContact.type === "channel" ? (
                     <Hash className="h-4 w-4 text-primary shrink-0" />
                   ) : (
@@ -372,26 +349,56 @@ export default function MessagesPage() {
                       <X className="h-3 w-3 text-muted-foreground" />
                     </button>
                   )}
-                </div>
+                </>
+              );
+
+              const tabClassName = cn(
+                "group flex items-center gap-2 px-4 py-2 border-r cursor-pointer transition-colors max-w-50",
+                isActive
+                  ? "bg-background border-b-2 border-b-primary"
+                  : "hover:bg-muted/50",
+              );
+
+              // For secondary panel, use button; for primary panel, use Link
+              if (isSecondaryPanel) {
+                return (
+                  <div
+                    key={tab.id}
+                    role="tab"
+                    tabIndex={0}
+                    onClick={() => handleTabClick(tab.id, true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleTabClick(tab.id, true);
+                      }
+                    }}
+                    className={tabClassName}
+                  >
+                    {tabContent}
+                  </div>
+                );
+              }
+
+              // Primary panel uses Link to update URL
+              return (
+                <Link
+                  key={tab.id}
+                  to="/$nodeNum/messages"
+                  params={{ nodeNum: String(myNodeNum) }}
+                  search={
+                    tab.type === "channel"
+                      ? { channel: tab.contactId }
+                      : { node: tab.contactId }
+                  }
+                  className={tabClassName}
+                >
+                  {tabContent}
+                </Link>
               );
             })}
           </div>
         </ScrollArea>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 shrink-0 mx-1"
-          onClick={() => {
-            const availableContact = contacts.find(
-              (c) => !openTabs.some((t) => t.contactId === c.id),
-            );
-            if (availableContact) {
-              openChat(availableContact);
-            }
-          }}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
         {!isSecondaryPanel && (
           <>
             <Tooltip>
@@ -510,23 +517,46 @@ export default function MessagesPage() {
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2">
-            {filteredContacts.map((contact) =>
-              contact.type === "channel" ? (
-                <button
-                  type="button"
+            {filteredContacts.map((contact) => {
+              const isSelected =
+                selectedContact?.id === contact.id &&
+                selectedContact?.type === contact.type;
+
+              return (
+                <Link
                   key={`${contact.type}-${contact.id}`}
-                  onClick={() => openChat(contact)}
+                  to="/$nodeNum/messages"
+                  params={{ nodeNum: String(myNodeNum) }}
+                  search={
+                    contact.type === "channel"
+                      ? { channel: contact.id }
+                      : { node: contact.id }
+                  }
                   className={cn(
                     "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
-                    selectedContact?.id === contact.id &&
-                      selectedContact?.type === "channel"
+                    isSelected
                       ? "bg-sidebar-accent"
                       : "hover:bg-sidebar-accent/50",
                   )}
                 >
-                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Hash className="h-5 w-5 text-primary" />
-                  </div>
+                  {contact.type === "channel" ? (
+                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Hash className="h-5 w-5 text-primary" />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <NodeAvatar
+                        nodeNum={contact.nodeNum || contact.id}
+                        longName={contact.name}
+                        size="sm"
+                        showFavorite={contact.isFavorite}
+                        clickable={true}
+                      />
+                      {contact.online && (
+                        <OnlineIndicator className="absolute bottom-0 right-0 h-3 w-3" />
+                      )}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <span className="font-medium truncate">
@@ -549,61 +579,9 @@ export default function MessagesPage() {
                       </div>
                     )}
                   </div>
-                </button>
-              ) : (
-                <div
-                  key={`${contact.type}-${contact.id}`}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => openChat(contact)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      openChat(contact);
-                    }
-                  }}
-                  className={cn(
-                    "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors cursor-pointer",
-                    selectedContact?.id === contact.id
-                      ? "bg-sidebar-accent"
-                      : "hover:bg-sidebar-accent/50",
-                  )}
-                >
-                  <div className="relative">
-                    <NodeAvatar
-                      nodeNum={contact.nodeNum || contact.id}
-                      longName={contact.name}
-                      size="sm"
-                      showFavorite={contact.isFavorite}
-                      clickable={true}
-                    />
-                    {contact.online && (
-                      <OnlineIndicator className="absolute bottom-0 right-0 h-3 w-3" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium truncate">
-                        {contact.name}
-                      </span>
-                      <span className="text-xs md:text-sm text-muted-foreground">
-                        {contact.time}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm md:text-base text-muted-foreground truncate">
-                        {contact.lastMessage}
-                      </span>
-                      {contact.unread > 0 && (
-                        <Badge className="h-5 min-w-5 justify-center bg-primary text-primary-foreground">
-                          {contact.unread}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ),
-            )}
+                </Link>
+              );
+            })}
           </div>
         </ScrollArea>
       </div>

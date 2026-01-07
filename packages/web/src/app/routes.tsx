@@ -87,6 +87,21 @@ function ConnectedLayout() {
     }
   }, [autoReconnectStatus, navigate]);
 
+  // Show loading state while attempting to reconnect
+  // This prevents the jarring flash of content before redirect
+  if (autoReconnectStatus === "connecting") {
+    return (
+      <AppLayout>
+        <div className="flex h-full items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Spinner size="lg" />
+            <p className="text-muted-foreground">Reconnecting...</p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <Outlet />

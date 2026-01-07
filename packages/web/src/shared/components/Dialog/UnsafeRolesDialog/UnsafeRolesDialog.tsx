@@ -11,7 +11,7 @@ import {
 } from "@shared/components/ui/dialog";
 import { Link } from "@shared/components/ui/link";
 import { eventBus } from "@shared/utils/eventBus";
-import { useDevice } from "@state/index.ts";
+import { useUIStore } from "@state/index.ts";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -26,7 +26,7 @@ export const UnsafeRolesDialog = ({
 }: RouterRoleDialogProps) => {
   const { t } = useTranslation("dialog");
   const [confirmState, setConfirmState] = useState(false);
-  const { setDialogOpen } = useDevice();
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
 
   const deviceRoleLink =
     "https://meshtastic.org/docs/configuration/radio/device/";

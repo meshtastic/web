@@ -10,8 +10,13 @@ export type PacketTransport =
 
 export interface ConnectionResult {
   transport: PacketTransport;
-  nativeHandle?: any;
+  nativeHandle?: unknown;
   onDisconnect?: () => void;
+  /** Updated port info (for serial connections when user re-selects port) */
+  updatedPortInfo?: {
+    usbVendorId?: number;
+    usbProductId?: number;
+  };
 }
 
 export interface ConnectionStrategy {

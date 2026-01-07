@@ -3,15 +3,16 @@ import { nodeRepo } from "@data/repositories";
 import type { Node, PositionLog, TelemetryLog } from "@data/schema";
 import { ResultAsync } from "neverthrow";
 import { useEffect, useMemo, useState } from "react";
-import { useReactiveQuery } from "sqlocal/react";
+import { useDrizzleQuery } from "./useDrizzleLive.ts";
 
 /**
  * Hook to fetch all nodes for a device
  */
 export function useNodes(deviceId: number) {
-  const query = useMemo(() => nodeRepo.buildNodesQuery(deviceId), [deviceId]);
-
-  const { data } = useReactiveQuery<Node>(nodeRepo.getClient(), query);
+  const { data } = useDrizzleQuery<Node>(
+    () => nodeRepo.buildNodesQuery(deviceId),
+    [deviceId],
+  );
 
   const nodeMap = useMemo(
     () => new Map(data.map((node) => [node.nodeNum, node])),
@@ -53,12 +54,10 @@ export function useFavoriteNodes(deviceId: number) {
  * Hook to fetch online nodes (heard within last 15 minutes)
  */
 export function useOnlineNodes(deviceId: number) {
-  const query = useMemo(
+  const { data } = useDrizzleQuery<Node>(
     () => nodeRepo.buildOnlineNodesQuery(deviceId),
     [deviceId],
   );
-
-  const { data } = useReactiveQuery<Node>(nodeRepo.getClient(), query);
 
   const onlineNodeIds = useMemo(
     () => new Set(data.map((n) => n.nodeNum)),
@@ -88,19 +87,14 @@ export function usePositionHistory(
   since?: number,
   limit = 100,
 ) {
-  const query = useMemo(
+  const { data, isLoading } = useDrizzleQuery<PositionLog>(
     () => nodeRepo.buildPositionHistoryQuery(deviceId, nodeNum, since, limit),
     [deviceId, nodeNum, since, limit],
   );
 
-  const { data, status } = useReactiveQuery<PositionLog>(
-    nodeRepo.getClient(),
-    query,
-  );
-
   return {
     positions: data,
-    isLoading: status === "pending" && data.length === 0,
+    isLoading,
   };
 }
 
@@ -113,19 +107,14 @@ export function useTelemetryHistory(
   since?: number,
   limit = 100,
 ) {
-  const query = useMemo(
+  const { data, isLoading } = useDrizzleQuery<TelemetryLog>(
     () => nodeRepo.buildTelemetryHistoryQuery(deviceId, nodeNum, since, limit),
     [deviceId, nodeNum, since, limit],
   );
 
-  const { data, status } = useReactiveQuery<TelemetryLog>(
-    nodeRepo.getClient(),
-    query,
-  );
-
   return {
     telemetry: data,
-    isLoading: status === "pending" && data.length === 0,
+    isLoading,
   };
 }
 

@@ -6,7 +6,7 @@ import type {
   ConfigChangeKey,
   ValidConfigType,
   ValidModuleConfigType,
-} from "@shared/components/Settings/types.ts";
+} from "@features/settings/components/types.ts";
 import { toByteArray } from "base64-js";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
@@ -89,14 +89,6 @@ type DeviceData = {
   config: Protobuf.LocalOnly.LocalConfig;
   moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
 };
-export type ConnectionPhase =
-  | "disconnected"
-  | "connecting"
-  | "cached" // Using cached config, fresh config still loading
-  | "configuring"
-  | "connected" // Config-only stage complete, node-info still loading
-  | "configured"; // Full two-stage configuration complete
-
 export interface ConfigConflict {
   variant: string;
   localValue: unknown;
@@ -107,7 +99,7 @@ export interface ConfigConflict {
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
   status: Types.DeviceStatusEnum;
-  connectionPhase: ConnectionPhase;
+  connectionId?: ConnectionId | null;
   configProgress: ConfigProgress; // Track config loading progress
   changes: Map<string, ChangeEntry>; // Unified change tracking
   queuedAdminMessages: Protobuf.Admin.AdminMessage[]; // Queued admin messages
@@ -128,7 +120,6 @@ export interface Device extends DeviceData {
   recentlyConnectedNodes: number[]; // History of nodes (local + remote admin targets)
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
-  setConnectionPhase: (phase: ConnectionPhase) => void;
   setConnectionId: (id: ConnectionId | null) => void;
   resetConfigProgress: () => void;
   setConfig: (config: Protobuf.Config.Config) => void;
@@ -150,18 +141,12 @@ export interface Device extends DeviceData {
   ) => void;
   removeWaypoint: (waypointId: number, toMesh: boolean) => Promise<void>;
   getWaypoint: (waypointId: number) => WaypointWithMetadata | undefined;
-  addConnection: (connection: MeshDevice) => void;
   addTraceRoute: (
     traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
   ) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   getDialogOpen: (dialog: DialogVariant) => boolean;
-  setMessageDraft: (message: string) => void;
-  incrementUnread: (nodeNum: number) => void;
-  resetUnread: (nodeNum: number) => void;
-  getUnreadCount: (nodeNum: number) => number;
-  getAllUnreadCount: () => number;
   sendAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
   addClientNotification: (
     clientNotificationPacket: Protobuf.Mesh.ClientNotification,
@@ -253,10 +238,6 @@ interface PrivateDeviceState extends DeviceState {
   getActiveConnectionId: () => ConnectionId | null;
 }
 
-type DevicePersisted = {
-  devices: Map<number, DeviceData>;
-};
-
 function deviceFactory(
   id: number,
   get: () => PrivateDeviceState,
@@ -308,8 +289,6 @@ function deviceFactory(
       tracerouteResponse: false,
     },
     pendingSettingsChanges: false,
-    messageDraft: "",
-    unreadCounts: new Map(),
     clientNotifications: [],
 
     // Config caching state
@@ -324,19 +303,9 @@ function deviceFactory(
     setStatus: (status: Types.DeviceStatusEnum) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.status = status;
-          }
-        }),
-      );
-    },
-    setConnectionPhase: (phase: ConnectionPhase) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (device) {
-            device.connectionPhase = phase;
           }
         }),
       );
@@ -344,7 +313,7 @@ function deviceFactory(
     setConnectionId: (connectionId: ConnectionId | null) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.connectionId = connectionId;
           }
@@ -354,7 +323,7 @@ function deviceFactory(
     resetConfigProgress: () => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.configProgress = {
               receivedConfigs: new Set<string>(),
@@ -370,7 +339,7 @@ function deviceFactory(
       );
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             logger.warn(
               `[DeviceStore] setConfig: device ${id} not found in store`,
@@ -406,13 +375,14 @@ function deviceFactory(
               break;
             }
             case "display": {
-              device.config.display = config.payloadVariant.value;
+              const displayConfig = config.payloadVariant.value;
+              device.config.display = displayConfig;
               // Persist display units to preferences for easy access across UI
               import("@data/repositories/index.ts").then(
                 ({ preferencesRepo }) => {
                   preferencesRepo.set(
                     `device:${id}:displayUnits`,
-                    config.payloadVariant.value.units,
+                    displayConfig.units,
                   );
                 },
               );
@@ -439,7 +409,7 @@ function deviceFactory(
     setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             // Track config progress (only count known module config types)
             if (
@@ -522,7 +492,7 @@ function deviceFactory(
       if (!payloadVariant) {
         return;
       }
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return;
       }
@@ -539,7 +509,7 @@ function deviceFactory(
     getEffectiveModuleConfig<K extends ValidModuleConfigType>(
       payloadVariant: K,
     ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return;
       }
@@ -557,7 +527,7 @@ function deviceFactory(
     setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const newDevice = draft.devices.get(id);
+          const newDevice = draft.device;
           if (!newDevice) {
             throw new Error(`No DeviceStore found for id: ${id}`);
           }
@@ -588,7 +558,7 @@ function deviceFactory(
     setPendingSettingsChanges: (state) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.pendingSettingsChanges = state;
           }
@@ -599,7 +569,7 @@ function deviceFactory(
       // Channels are now stored in the database
       const { channelRepo } = await import("@data/index");
       const { fromByteArray } = await import("base64-js");
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device?.hardware.myNodeNum) return;
 
       await channelRepo.upsertChannel({
@@ -618,7 +588,7 @@ function deviceFactory(
     addWaypoint: (waypoint, channel, from, rxTime) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return undefined;
           }
@@ -645,7 +615,7 @@ function deviceFactory(
           } else if (
             // only add if set to never expire or not already expired
             waypoint.expire === 0 ||
-            (waypoint.expire !== 0 && waypoint.expire < Date.now())
+            (waypoint.expire !== 0 && waypoint.expire > Date.now())
           ) {
             device.waypoints.push({
               ...waypoint,
@@ -659,7 +629,7 @@ function deviceFactory(
       );
     },
     removeWaypoint: async (waypointId: number, toMesh: boolean) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return;
       }
@@ -693,7 +663,7 @@ function deviceFactory(
       // Remove from store
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return;
           }
@@ -708,7 +678,7 @@ function deviceFactory(
       );
     },
     getWaypoint: (waypointId: number) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return;
       }
@@ -718,7 +688,7 @@ function deviceFactory(
     addMetadata: (from, metadata) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.metadata.set(from, metadata);
           }
@@ -728,7 +698,7 @@ function deviceFactory(
     addTraceRoute: (traceroute) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return;
           }
@@ -748,7 +718,7 @@ function deviceFactory(
     setDialogOpen: (dialog: DialogVariant, open: boolean) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.dialog[dialog] = open;
           }
@@ -756,70 +726,15 @@ function deviceFactory(
       );
     },
     getDialogOpen: (dialog: DialogVariant) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         throw new Error(`Device ${id} not found`);
       }
       return device.dialog[dialog];
     },
 
-    setMessageDraft: (message: string) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (device) {
-            device.messageDraft = message;
-          }
-        }),
-      );
-    },
-    incrementUnread: (nodeNum: number) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          const currentCount = device.unreadCounts.get(nodeNum) ?? 0;
-          device.unreadCounts.set(nodeNum, currentCount + 1);
-        }),
-      );
-    },
-    getUnreadCount: (nodeNum: number): number => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-      return device.unreadCounts.get(nodeNum) ?? 0;
-    },
-    getAllUnreadCount: (): number => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-      let totalUnread = 0;
-      device.unreadCounts.forEach((count) => {
-        totalUnread += count;
-      });
-      return totalUnread;
-    },
-    resetUnread: (nodeNum: number) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          device.unreadCounts.set(nodeNum, 0);
-          if (device.unreadCounts.get(nodeNum) === 0) {
-            device.unreadCounts.delete(nodeNum);
-          }
-        }),
-      );
-    },
-
     sendAdminMessage(message: Protobuf.Admin.AdminMessage) {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return;
       }
@@ -837,7 +752,7 @@ function deviceFactory(
     ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return;
           }
@@ -848,7 +763,7 @@ function deviceFactory(
     removeClientNotification: (index: number) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return;
           }
@@ -857,7 +772,7 @@ function deviceFactory(
       );
     },
     getClientNotification: (index: number) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return;
       }
@@ -869,7 +784,7 @@ function deviceFactory(
     ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return;
           }
@@ -881,7 +796,7 @@ function deviceFactory(
     },
 
     getNeighborInfo: (nodeNum: number) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return;
       }
@@ -889,7 +804,7 @@ function deviceFactory(
     },
 
     getMyNodeNum: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       return device?.hardware.myNodeNum;
     },
 
@@ -901,7 +816,7 @@ function deviceFactory(
     ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return;
           }
@@ -919,7 +834,7 @@ function deviceFactory(
     clearAllChanges: () => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return;
           }
@@ -930,7 +845,7 @@ function deviceFactory(
     },
 
     hasConfigChange: (variant: ValidConfigType) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return false;
       }
@@ -938,7 +853,7 @@ function deviceFactory(
     },
 
     hasModuleConfigChange: (variant: ValidModuleConfigType) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return false;
       }
@@ -948,7 +863,7 @@ function deviceFactory(
     },
 
     hasChannelChange: (index: Types.ChannelNumber) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return false;
       }
@@ -956,7 +871,7 @@ function deviceFactory(
     },
 
     hasUserChange: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return false;
       }
@@ -964,7 +879,7 @@ function deviceFactory(
     },
 
     getConfigChangeCount: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return 0;
       }
@@ -978,7 +893,7 @@ function deviceFactory(
     },
 
     getModuleConfigChangeCount: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return 0;
       }
@@ -992,7 +907,7 @@ function deviceFactory(
     },
 
     getChannelChangeCount: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return 0;
       }
@@ -1006,7 +921,7 @@ function deviceFactory(
     },
 
     getAllConfigChanges: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return [];
       }
@@ -1018,7 +933,8 @@ function deviceFactory(
             create(Protobuf.Config.ConfigSchema, {
               payloadVariant: {
                 case: variant,
-                value: entry.value,
+                // biome-ignore lint/suspicious/noExplicitAny: dynamic config value from change tracking
+                value: entry.value as any,
               },
             }),
           );
@@ -1028,7 +944,7 @@ function deviceFactory(
     },
 
     getAllModuleConfigChanges: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return [];
       }
@@ -1040,7 +956,8 @@ function deviceFactory(
             create(Protobuf.ModuleConfig.ModuleConfigSchema, {
               payloadVariant: {
                 case: variant,
-                value: entry.value,
+                // biome-ignore lint/suspicious/noExplicitAny: dynamic config value from change tracking
+                value: entry.value as any,
               },
             }),
           );
@@ -1050,7 +967,7 @@ function deviceFactory(
     },
 
     getAllChannelChanges: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return [];
       }
@@ -1066,7 +983,7 @@ function deviceFactory(
     queueAdminMessage: (message: Protobuf.Admin.AdminMessage) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (!device) {
             return;
           }
@@ -1076,7 +993,7 @@ function deviceFactory(
     },
 
     getAllQueuedAdminMessages: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return [];
       }
@@ -1084,7 +1001,7 @@ function deviceFactory(
     },
 
     getAdminMessageChangeCount: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return 0;
       }
@@ -1098,7 +1015,7 @@ function deviceFactory(
     ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.config = config;
             device.moduleConfig = moduleConfig;
@@ -1111,7 +1028,7 @@ function deviceFactory(
     setIsCachedConfig: (isCached: boolean) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.isCachedConfig = isCached;
           }
@@ -1126,7 +1043,7 @@ function deviceFactory(
     ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             const key = `${type}:${variant}`;
             device.configConflicts.set(key, conflict);
@@ -1136,7 +1053,7 @@ function deviceFactory(
     },
 
     hasAnyConflicts: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return false;
       }
@@ -1144,7 +1061,7 @@ function deviceFactory(
     },
 
     getConfigConflict: (type: "config" | "moduleConfig", variant: string) => {
-      const device = get().devices.get(id);
+      const device = get().device;
       if (!device) {
         return undefined;
       }
@@ -1155,7 +1072,7 @@ function deviceFactory(
     clearConfigConflicts: () => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.configConflicts.clear();
           }
@@ -1170,7 +1087,7 @@ function deviceFactory(
     ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
+          const device = draft.device;
           if (device) {
             device.remoteAdminTargetNode = nodeNum;
 
@@ -1214,7 +1131,7 @@ function deviceFactory(
     },
 
     getAdminDestination: () => {
-      const device = get().devices.get(id);
+      const device = get().device;
       return device?.remoteAdminTargetNode ?? "self";
     },
   };
@@ -1280,7 +1197,7 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   activeConnectionId: null,
 
   addDevice: (id) => {
-    const existing = get().devices.get(id);
+    const existing = get().device;
     if (existing) {
       return existing;
     }
@@ -1311,15 +1228,18 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
       }),
     );
   },
-  getDevices: () => Array.from(get().devices.values()),
-  getDevice: (id) => get().devices.get(id),
+  getDevices: () => {
+    const device = get().device;
+    return device ? [device] : [];
+  },
+  getDevice: (_id) => get().device ?? undefined,
 
   setActiveDeviceId: (id) => {
     set(
       produce<PrivateDeviceState>((draft) => {
         draft.activeDeviceId = id;
         // Keep new API in sync
-        draft.device = draft.devices.get(id) ?? null;
+        draft.device = draft.device ?? null;
       }),
     );
   },

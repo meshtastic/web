@@ -2,7 +2,7 @@ import type { Protobuf } from "@meshtastic/core";
 import type {
   ValidConfigType,
   ValidModuleConfigType,
-} from "@shared/components/Settings/types.ts";
+} from "@features/settings/components/types.ts";
 
 interface Dialogs {
   import: boolean;

@@ -25,7 +25,7 @@ vi.stubGlobal("localStorage", {
 });
 
 // Helper to load a fresh copy of the store with persist flag on/off
-async function freshStore(persist = false) {
+async function freshStore(_persist = false) {
   vi.resetModules();
 
   // suppress console output from the store during tests (for github actions)
@@ -34,8 +34,7 @@ async function freshStore(persist = false) {
   vi.spyOn(console, "info").mockImplementation(() => {});
 
   const storeMod = await import("./index.ts");
-  const { useNodeDB } = await import("../index.ts");
-  return { ...storeMod, useNodeDB };
+  return { ...storeMod };
 }
 
 function makeHardware(myNodeNum: number) {
@@ -56,46 +55,74 @@ function makeWaypoint(id: number, expire?: number) {
   return create(Protobuf.Mesh.WaypointSchema, { id, expire });
 }
 
-function makeAdminMessage(fields: Record<string, any>) {
+function makeAdminMessage(fields: Record<string, unknown>) {
   return create(Protobuf.Admin.AdminMessageSchema, fields);
 }
 
-describe("DeviceStore – basic map ops & retention", () => {
+describe("DeviceStore – single device lifecycle", () => {
   beforeEach(() => {
     idbMem.clear();
     vi.clearAllMocks();
   });
 
-  it("addDevice returns same instance on repeated calls; getDevice(s) works; retention evicts oldest after cap", async () => {
+  it("initializeDevice returns device instance", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
 
-    const a = state.addDevice(1);
-    const b = state.addDevice(1);
-    expect(a).toBe(b);
-    expect(state.getDevice(1)).toBe(a);
-    expect(state.getDevices().length).toBe(1);
+    expect(state.device).toBeNull();
 
-    // DEVICESTORE_RETENTION_NUM = 10; create 11 to evict #1
-    for (let i = 2; i <= 11; i++) {
-      state.addDevice(i);
-    }
-    expect(state.getDevice(1)).toBeUndefined();
-    expect(state.getDevice(11)).toBeDefined();
-    expect(state.getDevices().length).toBe(10);
+    const device = state.initializeDevice();
+    expect(device).toBeDefined();
+    expect(state.device).toBeNull(); // Not updated yet - need to get fresh state
+    expect(useDeviceStore.getState().device).toBe(device);
   });
 
-  it("removeDevice deletes only that entry", async () => {
+  it("initializeDevice returns same instance on repeated calls", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    state.addDevice(10);
-    state.addDevice(11);
-    expect(state.getDevices().length).toBe(2);
 
-    state.removeDevice(10);
-    expect(state.getDevice(10)).toBeUndefined();
-    expect(state.getDevice(11)).toBeDefined();
+    const a = state.initializeDevice();
+    const b = useDeviceStore.getState().initializeDevice();
+    expect(a).toBe(b);
+  });
+
+  it("clearDevice removes the device", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+
+    state.initializeDevice();
+    expect(useDeviceStore.getState().device).toBeDefined();
+
+    useDeviceStore.getState().clearDevice();
+    expect(useDeviceStore.getState().device).toBeNull();
+  });
+
+  it("legacy addDevice/getDevice/getDevices work with single device", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+
+    // Legacy API should still work
+    const device = state.addDevice(1);
+    expect(device).toBeDefined();
+    expect(state.getDevice(1)).toBe(device);
     expect(state.getDevices().length).toBe(1);
+
+    // Second addDevice returns same device (single device model)
+    const device2 = useDeviceStore.getState().addDevice(2);
+    expect(device2).toBe(device);
+    expect(useDeviceStore.getState().getDevices().length).toBe(1);
+  });
+
+  it("legacy removeDevice clears the device", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+
+    state.addDevice(10);
+    expect(state.getDevices().length).toBe(1);
+
+    useDeviceStore.getState().removeDevice(10);
+    expect(useDeviceStore.getState().device).toBeNull();
+    expect(useDeviceStore.getState().getDevices().length).toBe(0);
   });
 });
 
@@ -108,7 +135,7 @@ describe("DeviceStore – change registry API", () => {
   it("setChange/hasChange/getChange for config and getEffectiveConfig merges base + working", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(42);
+    const device = state.initializeDevice();
 
     // config deviceConfig.role = CLIENT
     device.setConfig(
@@ -130,11 +157,6 @@ describe("DeviceStore – change registry API", () => {
 
     // expect change is tracked
     expect(device.hasConfigChange("device")).toBe(true);
-    const working = device.getChange({
-      type: "config",
-      variant: "device",
-    }) as Protobuf.Config.Config_DeviceConfig;
-    expect(working?.role).toBe(Protobuf.Config.Config_DeviceConfig_Role.ROUTER);
 
     // expect effective deviceConfig.role = ROUTER
     const effective = device.getEffectiveConfig("device");
@@ -143,24 +165,17 @@ describe("DeviceStore – change registry API", () => {
     );
 
     // remove change, effective should equal base
-    device.removeChange({ type: "config", variant: "device" });
+    device.clearAllChanges();
     expect(device.hasConfigChange("device")).toBe(false);
     expect(device.getEffectiveConfig("device")?.role).toBe(
       Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
     );
-
-    // add multiple, then clear all
-    device.setChange({ type: "config", variant: "device" }, routerConfig);
-    device.setChange({ type: "config", variant: "position" }, {});
-    device.clearAllChanges();
-    expect(device.hasConfigChange("device")).toBe(false);
-    expect(device.hasConfigChange("position")).toBe(false);
   });
 
   it("setChange/hasChange for moduleConfig and getEffectiveModuleConfig", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(7);
+    const device = state.initializeDevice();
 
     // base moduleConfig.mqtt with base address
     device.setModuleConfig(
@@ -182,34 +197,24 @@ describe("DeviceStore – change registry API", () => {
     device.setChange({ type: "moduleConfig", variant: "mqtt" }, workingMqtt);
 
     expect(device.hasModuleConfigChange("mqtt")).toBe(true);
-    const mqtt = device.getChange({
-      type: "moduleConfig",
-      variant: "mqtt",
-    }) as Protobuf.ModuleConfig.ModuleConfig_MQTTConfig;
-    expect(mqtt?.address).toBe("mqtt://working");
 
     // effective should return working value
     expect(device.getEffectiveModuleConfig("mqtt")?.address).toBe(
       "mqtt://working",
     );
 
-    // remove change
-    device.removeChange({ type: "moduleConfig", variant: "mqtt" });
+    // Clear all changes
+    device.clearAllChanges();
     expect(device.hasModuleConfigChange("mqtt")).toBe(false);
     expect(device.getEffectiveModuleConfig("mqtt")?.address).toBe(
       "mqtt://base",
     );
-
-    // Clear all
-    device.setChange({ type: "moduleConfig", variant: "mqtt" }, workingMqtt);
-    device.clearAllChanges();
-    expect(device.hasModuleConfigChange("mqtt")).toBe(false);
   });
 
-  it("channel change tracking add/update/remove/get", async () => {
+  it("channel change tracking add/update/remove", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(9);
+    const device = state.initializeDevice();
 
     const channel0 = makeChannel(0);
     const channel1 = create(Protobuf.Channel.ChannelSchema, {
@@ -222,14 +227,6 @@ describe("DeviceStore – change registry API", () => {
 
     expect(device.hasChannelChange(0)).toBe(true);
     expect(device.hasChannelChange(1)).toBe(true);
-    const ch0 = device.getChange({ type: "channel", index: 0 }) as
-      | Protobuf.Channel.Channel
-      | undefined;
-    expect(ch0?.index).toBe(0);
-    const ch1 = device.getChange({ type: "channel", index: 1 }) as
-      | Protobuf.Channel.Channel
-      | undefined;
-    expect(ch1?.settings?.name).toBe("one");
 
     // update channel 1
     const channel1Updated = create(Protobuf.Channel.ChannelSchema, {
@@ -237,22 +234,16 @@ describe("DeviceStore – change registry API", () => {
       settings: { name: "uno" },
     });
     device.setChange({ type: "channel", index: 1 }, channel1Updated);
-    const ch1Updated = device.getChange({ type: "channel", index: 1 }) as
-      | Protobuf.Channel.Channel
-      | undefined;
-    expect(ch1Updated?.settings?.name).toBe("uno");
-
-    // remove specific
-    device.removeChange({ type: "channel", index: 1 });
-    expect(device.hasChannelChange(1)).toBe(false);
+    expect(device.getChannelChangeCount()).toBe(2);
 
     // remove all
     device.clearAllChanges();
     expect(device.hasChannelChange(0)).toBe(false);
+    expect(device.hasChannelChange(1)).toBe(false);
   });
 });
 
-describe("DeviceStore – metadata, dialogs, unread counts, message draft", () => {
+describe("DeviceStore – metadata, dialogs", () => {
   beforeEach(() => {
     idbMem.clear();
     vi.clearAllMocks();
@@ -261,236 +252,107 @@ describe("DeviceStore – metadata, dialogs, unread counts, message draft", () =
   it("addMetadata stores by node id", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(1);
+    const device = state.initializeDevice();
 
     const metadata = create(Protobuf.Mesh.DeviceMetadataSchema, {
       firmwareVersion: "1.2.3",
     });
     device.addMetadata(123, metadata);
 
-    expect(useDeviceStore.getState().devices.get(1)?.metadata.get(123)).toEqual(
+    expect(useDeviceStore.getState().device?.metadata.get(123)).toEqual(
       metadata,
     );
   });
 
-  it("dialogs set/get work and throw if device missing", async () => {
+  it("dialogs set/get work", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(5);
+    const device = state.initializeDevice();
 
     device.setDialogOpen("reboot", true);
     expect(device.getDialogOpen("reboot")).toBe(true);
     device.setDialogOpen("reboot", false);
     expect(device.getDialogOpen("reboot")).toBe(false);
-
-    // getDialogOpen uses getDevice or throws if device missing
-    state.removeDevice(5);
-    expect(() => device.getDialogOpen("reboot")).toThrow(/Device 5 not found/);
-  });
-
-  it("unread counts: increment/get/getAll/reset", async () => {
-    const { useDeviceStore } = await freshStore(false);
-    const state = useDeviceStore.getState();
-    const device = state.addDevice(2);
-
-    expect(device.getUnreadCount(10)).toBe(0);
-    device.incrementUnread(10);
-    device.incrementUnread(10);
-    device.incrementUnread(11);
-    expect(device.getUnreadCount(10)).toBe(2);
-    expect(device.getUnreadCount(11)).toBe(1);
-    expect(device.getAllUnreadCount()).toBe(3);
-
-    device.resetUnread(10);
-    expect(device.getUnreadCount(10)).toBe(0);
-    expect(device.getAllUnreadCount()).toBe(1);
-  });
-
-  it("setMessageDraft stores the text", async () => {
-    const { useDeviceStore } = await freshStore(false);
-    const device = useDeviceStore.getState().addDevice(3);
-    device.setMessageDraft("hello");
-
-    expect(useDeviceStore.getState().devices.get(3)?.messageDraft).toBe(
-      "hello",
-    );
   });
 });
 
-describe("DeviceStore – traceroutes & waypoints retention + merge on setHardware", () => {
+describe("DeviceStore – traceroutes & waypoints", () => {
   beforeEach(() => {
     idbMem.clear();
     vi.clearAllMocks();
   });
 
-  it("addTraceRoute appends and enforces per-target and target caps", async () => {
+  it("addTraceRoute appends routes", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(100);
+    const device = state.initializeDevice();
 
-    // Per target: cap = 100; push 101 for from=7
-    for (let i = 0; i < 101; i++) {
-      device.addTraceRoute(makeRoute(7, i));
-    }
+    device.addTraceRoute(makeRoute(7, 1));
+    device.addTraceRoute(makeRoute(7, 2));
+    device.addTraceRoute(makeRoute(8, 1));
 
-    const routesFor7 = useDeviceStore
-      .getState()
-      .devices.get(100)
-      ?.traceroutes.get(7)!;
-    expect(routesFor7.length).toBe(100);
-    expect(routesFor7[0]?.rxTime).toBe(1); // first (0) evicted
-
-    // Target map cap: 100 keys, add 101 unique "from"
-    for (let from = 0; from <= 100; from++) {
-      device.addTraceRoute(makeRoute(1000 + from));
-    }
-
-    const keys = Array.from(
-      useDeviceStore.getState().devices.get(100)!.traceroutes.keys(),
-    );
-    expect(keys.length).toBe(100);
+    const deviceState = useDeviceStore.getState().device;
+    expect(deviceState?.traceroutes.get(7)?.length).toBe(2);
+    expect(deviceState?.traceroutes.get(8)?.length).toBe(1);
   });
 
-  it("addWaypoint upserts by id and enforces retention; setHardware moves traceroutes + prunes expired waypoints", async () => {
+  it("addWaypoint upserts by id and handles expiration", async () => {
     vi.setSystemTime(new Date("2025-01-01T00:00:00Z"));
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
 
-    // Old device with myNodeNum=777 and some waypoints (one expired)
-    const oldDevice = state.addDevice(1);
-    const mockSendWaypoint = vi.fn();
-    oldDevice.addConnection({ sendWaypoint: mockSendWaypoint } as any);
+    const device = state.initializeDevice();
 
-    oldDevice.setHardware(makeHardware(777));
-    oldDevice.addWaypoint(
-      makeWaypoint(1, Date.parse("2024-12-31T23:59:59Z")), // This is expired, will not be added
-      0,
-      0,
-      new Date(),
-    ); // expired
-    oldDevice.addWaypoint(makeWaypoint(2, 0), 0, 0, new Date()); // no expire
-    oldDevice.addWaypoint(
-      makeWaypoint(3, Date.parse("2026-01-01T00:00:00Z")),
-      0,
-      0,
-      new Date(),
-    ); // ok
-    oldDevice.addTraceRoute(makeRoute(55));
-    oldDevice.addTraceRoute(makeRoute(56));
-
-    // Upsert waypoint by id
-    oldDevice.addWaypoint(
-      makeWaypoint(2, Date.parse("2027-01-01T00:00:00Z")),
+    // Add non-expiring waypoint
+    device.addWaypoint(makeWaypoint(1, 0), 0, 0, new Date());
+    // Add future-expiring waypoint
+    device.addWaypoint(
+      makeWaypoint(2, Date.parse("2026-01-01T00:00:00Z")),
       0,
       0,
       new Date(),
     );
 
-    const wps = useDeviceStore.getState().devices.get(1)!.waypoints;
+    const wps = useDeviceStore.getState().device?.waypoints ?? [];
     expect(wps.length).toBe(2);
-    expect(wps.find((w) => w.id === 2)?.expire).toBe(
+
+    // Update waypoint 1
+    device.addWaypoint(
+      makeWaypoint(1, Date.parse("2027-01-01T00:00:00Z")),
+      0,
+      0,
+      new Date(),
+    );
+
+    const wpsAfter = useDeviceStore.getState().device?.waypoints ?? [];
+    expect(wpsAfter.length).toBe(2);
+    expect(wpsAfter.find((w) => w.id === 1)?.expire).toBe(
       Date.parse("2027-01-01T00:00:00Z"),
     );
 
-    // Retention: push 102 total waypoints -> capped at 100. Oldest evicted
-    for (let i = 3; i <= 102; i++) {
-      oldDevice.addWaypoint(makeWaypoint(i), 0, 0, new Date());
-    }
-
-    expect(useDeviceStore.getState().devices.get(1)!.waypoints.length).toBe(
-      100,
-    );
-
-    // Remove waypoint
-    oldDevice.removeWaypoint(102, false);
-    expect(mockSendWaypoint).not.toHaveBeenCalled();
-
-    await oldDevice.removeWaypoint(101, true); // toMesh=true
-    expect(mockSendWaypoint).toHaveBeenCalled();
-
-    expect(useDeviceStore.getState().devices.get(1)!.waypoints.length).toBe(98);
-
-    // New device shares myNodeNum; setHardware should:
-    // - move traceroutes from old device
-    // - copy waypoints minus expired
-    // - delete old device entry
-    const newDevice = state.addDevice(2);
-    newDevice.setHardware(makeHardware(777));
-
-    expect(state.getDevice(1)).toBeUndefined();
-    expect(state.getDevice(2)).toBeDefined();
-
-    // traceroutes moved:
-    expect(state.getDevice(2)!.traceroutes.size).toBe(2);
-
-    // Getter for waypoint by id works
-    expect(newDevice.getWaypoint(1)).toBeUndefined();
-    expect(newDevice.getWaypoint(2)).toBeUndefined();
-    expect(newDevice.getWaypoint(3)).toBeTruthy();
+    // getWaypoint works
+    expect(device.getWaypoint(1)).toBeTruthy();
+    expect(device.getWaypoint(999)).toBeUndefined();
 
     vi.useRealTimers();
   });
-});
 
-describe("DeviceStore – persistence partialize & rehydrate", () => {
-  beforeEach(() => {
-    idbMem.clear();
-    vi.clearAllMocks();
-  });
+  it("removeWaypoint removes from store", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
 
-  it("partialize stores only DeviceData; onRehydrateStorage rebuilds only devices with myNodeNum set (orphans dropped)", async () => {
-    // First run: persist=true
-    {
-      const { useDeviceStore } = await freshStore(true);
-      const state = useDeviceStore.getState();
+    device.addWaypoint(makeWaypoint(1), 0, 0, new Date());
+    device.addWaypoint(makeWaypoint(2), 0, 0, new Date());
 
-      const orphan = state.addDevice(500); // no myNodeNum -> should be dropped
-      orphan.addWaypoint(makeWaypoint(123), 0, 0, new Date());
+    expect(useDeviceStore.getState().device?.waypoints.length).toBe(2);
 
-      const good = state.addDevice(501);
-      good.setHardware(makeHardware(42)); // sets myNodeNum
-      good.addTraceRoute(makeRoute(77));
-      good.addWaypoint(makeWaypoint(1), 0, 0, new Date());
-      // ensure some ephemeral fields differ so we can verify methods work after rehydrate
-      good.setMessageDraft("draft");
-    }
+    // Remove without mesh broadcast
+    await device.removeWaypoint(1, false);
 
-    // Reload: persist=true -> rehydrate from idbMem
-    {
-      const { useDeviceStore } = await freshStore(true);
-      const state = useDeviceStore.getState();
-
-      expect(state.getDevice(500)).toBeUndefined(); // orphan dropped
-      const device = state.getDevice(501)!;
-      expect(device).toBeDefined();
-
-      // methods should work
-      device.addWaypoint(makeWaypoint(2), 0, 0, new Date());
-      expect(
-        useDeviceStore.getState().devices.get(501)!.waypoints.length,
-      ).toBeGreaterThan(0);
-
-      // traceroutes survived
-      expect(
-        useDeviceStore.getState().devices.get(501)!.traceroutes.size,
-      ).toBeGreaterThan(0);
-    }
-  });
-
-  it("removing a device persists across reload", async () => {
-    {
-      const { useDeviceStore } = await freshStore(true);
-      const state = useDeviceStore.getState();
-      const device = state.addDevice(900);
-      device.setHardware(makeHardware(9)); // ensure it will be rehydrated
-      expect(state.getDevice(900)).toBeDefined();
-      state.removeDevice(900);
-      expect(state.getDevice(900)).toBeUndefined();
-    }
-    {
-      const { useDeviceStore } = await freshStore(true);
-      expect(useDeviceStore.getState().getDevice(900)).toBeUndefined();
-    }
+    expect(useDeviceStore.getState().device?.waypoints.length).toBe(1);
+    expect(device.getWaypoint(1)).toBeUndefined();
+    expect(device.getWaypoint(2)).toBeTruthy();
   });
 });
 
@@ -503,10 +365,10 @@ describe("DeviceStore – connection & sendAdminMessage", () => {
   it("sendAdminMessage calls through to connection.sendPacket with correct args", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(77);
+    const device = state.initializeDevice();
 
     const sendPacket = vi.fn();
-    device.addConnection({ sendPacket } as any);
+    useDeviceStore.getState().setConnection({ sendPacket } as never);
 
     const message = makeAdminMessage({ logVerbosity: 1 });
     device.sendAdminMessage(message);
@@ -534,17 +396,17 @@ describe("DeviceStore – config progress tracking", () => {
   it("initializes configProgress with empty set and correct total", async () => {
     const { useDeviceStore, TOTAL_CONFIG_COUNT } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(1);
+    const device = state.initializeDevice();
 
     expect(device.configProgress.receivedConfigs.size).toBe(0);
     expect(device.configProgress.total).toBe(TOTAL_CONFIG_COUNT);
-    expect(TOTAL_CONFIG_COUNT).toBe(20); // 8 device configs + 12 module configs
+    expect(TOTAL_CONFIG_COUNT).toBe(21); // 8 device configs + 13 module configs
   });
 
   it("tracks config progress when setConfig is called", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(2);
+    const device = state.initializeDevice();
 
     // Set device config
     device.setConfig(
@@ -556,7 +418,7 @@ describe("DeviceStore – config progress tracking", () => {
       }),
     );
 
-    const updatedDevice = state.getDevice(2)!;
+    const updatedDevice = useDeviceStore.getState().device!;
     expect(
       updatedDevice.configProgress.receivedConfigs.has("config:device"),
     ).toBe(true);
@@ -572,7 +434,7 @@ describe("DeviceStore – config progress tracking", () => {
       }),
     );
 
-    const afterLora = state.getDevice(2)!;
+    const afterLora = useDeviceStore.getState().device!;
     expect(afterLora.configProgress.receivedConfigs.has("config:lora")).toBe(
       true,
     );
@@ -582,7 +444,7 @@ describe("DeviceStore – config progress tracking", () => {
   it("tracks module config progress when setModuleConfig is called", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(3);
+    const device = state.initializeDevice();
 
     // Set mqtt module config
     device.setModuleConfig(
@@ -597,7 +459,7 @@ describe("DeviceStore – config progress tracking", () => {
       }),
     );
 
-    const updatedDevice = state.getDevice(3)!;
+    const updatedDevice = useDeviceStore.getState().device!;
     expect(
       updatedDevice.configProgress.receivedConfigs.has("moduleConfig:mqtt"),
     ).toBe(true);
@@ -616,7 +478,7 @@ describe("DeviceStore – config progress tracking", () => {
       }),
     );
 
-    const afterTelemetry = state.getDevice(3)!;
+    const afterTelemetry = useDeviceStore.getState().device!;
     expect(
       afterTelemetry.configProgress.receivedConfigs.has(
         "moduleConfig:telemetry",
@@ -628,7 +490,7 @@ describe("DeviceStore – config progress tracking", () => {
   it("resetConfigProgress clears received configs", async () => {
     const { useDeviceStore, TOTAL_CONFIG_COUNT } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(4);
+    const device = state.initializeDevice();
 
     // Add some configs
     device.setConfig(
@@ -651,12 +513,14 @@ describe("DeviceStore – config progress tracking", () => {
       }),
     );
 
-    expect(state.getDevice(4)!.configProgress.receivedConfigs.size).toBe(2);
+    expect(
+      useDeviceStore.getState().device!.configProgress.receivedConfigs.size,
+    ).toBe(2);
 
     // Reset progress
     device.resetConfigProgress();
 
-    const afterReset = state.getDevice(4)!;
+    const afterReset = useDeviceStore.getState().device!;
     expect(afterReset.configProgress.receivedConfigs.size).toBe(0);
     expect(afterReset.configProgress.total).toBe(TOTAL_CONFIG_COUNT);
   });
@@ -665,12 +529,12 @@ describe("DeviceStore – config progress tracking", () => {
     const { useDeviceStore, getConfigProgressPercent, TOTAL_CONFIG_COUNT } =
       await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(5);
+    const device = state.initializeDevice();
 
     // Initially 0%
     expect(getConfigProgressPercent(device.configProgress)).toBe(0);
 
-    // Add 10 configs (half of 20)
+    // Add 8 device configs
     const deviceConfigs = [
       "device",
       "position",
@@ -688,38 +552,42 @@ describe("DeviceStore – config progress tracking", () => {
             case: variant,
             value: {},
           },
+          // biome-ignore lint/suspicious/noExplicitAny: test helper
         } as any),
       );
     }
 
-    // 8 configs out of 20 = 40%
-    const afterDeviceConfigs = state.getDevice(5)!;
+    // 8 configs out of 21 = ~38%
+    const afterDeviceConfigs = useDeviceStore.getState().device!;
     expect(getConfigProgressPercent(afterDeviceConfigs.configProgress)).toBe(
-      40,
+      Math.round((8 / TOTAL_CONFIG_COUNT) * 100),
     );
 
-    // Add 2 module configs to get to 10/20 = 50%
+    // Add 2 module configs
     device.setModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: { case: "mqtt", value: {} },
+        // biome-ignore lint/suspicious/noExplicitAny: test helper
       } as any),
     );
     device.setModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: { case: "serial", value: {} },
+        // biome-ignore lint/suspicious/noExplicitAny: test helper
       } as any),
     );
 
-    const afterModuleConfigs = state.getDevice(5)!;
+    // 10 configs out of 21 = ~48%
+    const afterModuleConfigs = useDeviceStore.getState().device!;
     expect(getConfigProgressPercent(afterModuleConfigs.configProgress)).toBe(
-      50,
+      Math.round((10 / TOTAL_CONFIG_COUNT) * 100),
     );
   });
 
   it("does not duplicate config entries on repeated setConfig calls", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
-    const device = state.addDevice(6);
+    const device = state.initializeDevice();
 
     // Set same config multiple times
     for (let i = 0; i < 5; i++) {
@@ -733,10 +601,196 @@ describe("DeviceStore – config progress tracking", () => {
       );
     }
 
-    const updatedDevice = state.getDevice(6)!;
+    const updatedDevice = useDeviceStore.getState().device!;
     expect(updatedDevice.configProgress.receivedConfigs.size).toBe(1);
     expect(
       updatedDevice.configProgress.receivedConfigs.has("config:device"),
     ).toBe(true);
+  });
+});
+
+describe("DeviceStore – hardware & neighbor info", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("setHardware updates hardware info", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    const hardware = makeHardware(12345);
+    device.setHardware(hardware);
+
+    expect(useDeviceStore.getState().device?.hardware.myNodeNum).toBe(12345);
+  });
+
+  it("getMyNodeNum returns the myNodeNum from hardware", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    // Protobuf default for unset number is 0
+    expect(device.getMyNodeNum()).toBe(0);
+
+    device.setHardware(makeHardware(99999));
+    expect(device.getMyNodeNum()).toBe(99999);
+  });
+
+  it("addNeighborInfo/getNeighborInfo work", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    const neighborInfo = create(Protobuf.Mesh.NeighborInfoSchema, {
+      nodeId: 123,
+      lastSentById: 456,
+    });
+
+    device.addNeighborInfo(123, neighborInfo);
+
+    expect(device.getNeighborInfo(123)).toEqual(neighborInfo);
+    expect(device.getNeighborInfo(999)).toBeUndefined();
+  });
+});
+
+describe("DeviceStore – client notifications", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("addClientNotification/getClientNotification/removeClientNotification work", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    const notification = create(Protobuf.Mesh.ClientNotificationSchema, {
+      time: 123456,
+    });
+
+    device.addClientNotification(notification);
+    expect(device.getClientNotification(0)).toEqual(notification);
+
+    device.removeClientNotification(0);
+    expect(device.getClientNotification(0)).toBeUndefined();
+  });
+});
+
+describe("DeviceStore – config caching", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("setCachedConfig sets config and isCachedConfig flag", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    const config = create(Protobuf.LocalOnly.LocalConfigSchema, {
+      device: create(Protobuf.Config.Config_DeviceConfigSchema, {
+        role: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
+      }),
+    });
+    const moduleConfig = create(Protobuf.LocalOnly.LocalModuleConfigSchema, {});
+
+    device.setCachedConfig(config, moduleConfig);
+
+    const updatedDevice = useDeviceStore.getState().device!;
+    expect(updatedDevice.isCachedConfig).toBe(true);
+    expect(updatedDevice.config.device?.role).toBe(
+      Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
+    );
+  });
+
+  it("config conflicts can be set, checked, and cleared", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    expect(device.hasAnyConflicts()).toBe(false);
+
+    device.setConfigConflict("config", "device", {
+      variant: "device",
+      localValue: { role: 1 },
+      remoteValue: { role: 2 },
+    });
+
+    expect(device.hasAnyConflicts()).toBe(true);
+    expect(device.getConfigConflict("config", "device")).toBeDefined();
+
+    device.clearConfigConflicts();
+    expect(device.hasAnyConflicts()).toBe(false);
+  });
+});
+
+describe("DeviceStore – remote administration", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("setRemoteAdminTarget updates target and authorization", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    // Initially local (null target)
+    expect(device.getAdminDestination()).toBe("self");
+
+    // Set remote target without authorization
+    device.setRemoteAdminTarget(12345);
+    expect(device.getAdminDestination()).toBe(12345);
+
+    const updatedDevice = useDeviceStore.getState().device!;
+    expect(updatedDevice.remoteAdminTargetNode).toBe(12345);
+    expect(updatedDevice.remoteAdminAuthorized).toBe(false);
+
+    // Clear remote admin (back to local)
+    device.setRemoteAdminTarget(null);
+    expect(device.getAdminDestination()).toBe("self");
+    expect(useDeviceStore.getState().device!.remoteAdminAuthorized).toBe(true);
+  });
+
+  it("tracks recently connected nodes", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    device.setRemoteAdminTarget(100);
+    device.setRemoteAdminTarget(200);
+    device.setRemoteAdminTarget(300);
+
+    const updatedDevice = useDeviceStore.getState().device!;
+    expect(updatedDevice.recentlyConnectedNodes).toContain(100);
+    expect(updatedDevice.recentlyConnectedNodes).toContain(200);
+    expect(updatedDevice.recentlyConnectedNodes).toContain(300);
+  });
+});
+
+describe("DeviceStore – queued admin messages", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("queueAdminMessage and getAllQueuedAdminMessages work", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.initializeDevice();
+
+    const message1 = makeAdminMessage({ logVerbosity: 1 });
+    const message2 = makeAdminMessage({ logVerbosity: 2 });
+
+    device.queueAdminMessage(message1);
+    device.queueAdminMessage(message2);
+
+    expect(device.getAdminMessageChangeCount()).toBe(2);
+    expect(device.getAllQueuedAdminMessages().length).toBe(2);
+
+    device.clearAllChanges();
+    expect(device.getAdminMessageChangeCount()).toBe(0);
   });
 });

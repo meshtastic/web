@@ -1,19 +1,11 @@
 import type { DeviceOutput } from "../../types.ts";
 
 export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
-  (
-    // onReleaseEvent: SimpleEventDispatcher<boolean>,
-  ) => {
+  () => {
     let byteBuffer = new Uint8Array([]);
     const textDecoder = new TextDecoder();
-    let chunkCount = 0;
     return new TransformStream<Uint8Array, DeviceOutput>({
       transform(chunk: Uint8Array, controller): void {
-        chunkCount++;
-        console.debug(`[fromDevice] Chunk #${chunkCount}, size: ${chunk.length} bytes`);
-        // onReleaseEvent.subscribe(() => {
-        //   controller.terminate();
-        // });
         byteBuffer = new Uint8Array([...byteBuffer, ...chunk]);
         let processingExhausted = false;
         while (byteBuffer.length !== 0 && !processingExhausted) {
@@ -81,13 +73,9 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
                 );
 
                 byteBuffer = byteBuffer.subarray(4 + malformedDetectorIndex);
-                continue; // Loop again to process this new header
               } else {
                 byteBuffer = byteBuffer.subarray(4 + packetLen);
 
-                console.debug(
-                  `[fromDevice] Parsed packet, size: ${packet.length} bytes`,
-                );
                 controller.enqueue({
                   type: "packet",
                   data: packet,

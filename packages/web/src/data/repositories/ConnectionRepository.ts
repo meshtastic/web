@@ -28,10 +28,7 @@ export class ConnectionRepository {
   }
 
   buildConnectionQuery(id: number) {
-    return this.db
-      .select()
-      .from(connections)
-      .where(eq(connections.id, id));
+    return this.db.select().from(connections).where(eq(connections.id, id));
   }
 
   buildDefaultConnectionQuery() {
@@ -68,15 +65,15 @@ export class ConnectionRepository {
     return result[0];
   }
 
-  async getLastActiveDeviceId(): Promise<number | null> {
+  async getLastActiveNodeNum(): Promise<number | null> {
     const result = await this.db
-      .select({ meshDeviceId: connections.meshDeviceId })
+      .select({ nodeNum: connections.nodeNum })
       .from(connections)
-      .where(isNotNull(connections.meshDeviceId))
+      .where(isNotNull(connections.nodeNum))
       .orderBy(desc(connections.lastConnectedAt))
       .limit(1);
 
-    return result[0]?.meshDeviceId ?? null;
+    return result[0]?.nodeNum ?? null;
   }
 
   async getLastConnectedConnection(): Promise<Connection | undefined> {
@@ -101,6 +98,9 @@ export class ConnectionRepository {
       })
       .returning();
 
+    if (!result[0]) {
+      throw new Error("Failed to create connection");
+    }
     return result[0];
   }
 
@@ -138,11 +138,11 @@ export class ConnectionRepository {
       .where(eq(connections.id, id));
   }
 
-  async linkMeshDevice(id: number, meshDeviceId: number): Promise<void> {
+  async linkNodeNum(id: number, nodeNum: number): Promise<void> {
     await this.db
       .update(connections)
       .set({
-        meshDeviceId,
+        nodeNum,
         updatedAt: new Date(),
       })
       .where(eq(connections.id, id));

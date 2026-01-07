@@ -1,12 +1,12 @@
 import { eventBus } from "@shared/utils/eventBus";
-import { useDevice } from "@state/index.ts";
+import { useUIStore } from "@state/index.ts";
 import { useCallback } from "react";
 
 export const UNSAFE_ROLES = ["ROUTER", "ROUTER_LATE", "REPEATER"];
 export type UnsafeRole = (typeof UNSAFE_ROLES)[number];
 
 export const useUnsafeRolesDialog = () => {
-  const { setDialogOpen } = useDevice();
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
 
   const handleCloseDialog = useCallback(() => {
     setDialogOpen("unsafeRoles", false);

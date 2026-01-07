@@ -2,7 +2,6 @@ import type { ConversationType } from "@data/types";
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 
-
 export interface MessageTab {
   id: number;
   contactId: number;
@@ -10,6 +9,30 @@ export interface MessageTab {
 }
 
 export type SplitMode = "none" | "vertical" | "horizontal";
+
+// Dialog types - moved from device store
+export interface Dialogs {
+  import: boolean;
+  QR: boolean;
+  shutdown: boolean;
+  reboot: boolean;
+  deviceName: boolean;
+  deviceShare: boolean;
+  nodeRemoval: boolean;
+  pkiBackup: boolean;
+  nodeDetails: boolean;
+  unsafeRoles: boolean;
+  refreshKeys: boolean;
+  deleteMessages: boolean;
+  managedMode: boolean;
+  clientNotification: boolean;
+  resetNodeDb: boolean;
+  factoryResetDevice: boolean;
+  factoryResetConfig: boolean;
+  tracerouteResponse: boolean;
+}
+
+export type DialogVariant = keyof Dialogs;
 
 // These are exported for type-safety when using the usePreference hook
 
@@ -108,14 +131,15 @@ export const DEFAULT_PREFERENCES = {
   rasterSources: [] as RasterSource[],
 };
 
-
 export interface UIState {
   // Ephemeral app state (not persisted)
   nodeNumToBeRemoved: number;
   connectDialogOpen: boolean;
   nodeNumDetails: number;
   tracerouteNodeNum: number;
-  commandPaletteOpen: boolean;
+
+  // Dialog state (moved from device store)
+  dialogs: Dialogs;
 
   // Messages page state (ephemeral)
   messageTabs: MessageTab[];
@@ -124,11 +148,14 @@ export interface UIState {
   messageSplitMode: SplitMode;
 
   // Actions
-  setCommandPaletteOpen: (open: boolean) => void;
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setConnectDialogOpen: (open: boolean) => void;
   setNodeNumDetails: (nodeNum: number) => void;
   setTracerouteNodeNum: (nodeNum: number) => void;
+
+  // Dialog actions
+  setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
+  getDialogOpen: (dialog: DialogVariant) => boolean;
 
   // Messages page actions
   openMessageTab: (contactId: number, type: ConversationType) => void;
@@ -138,13 +165,36 @@ export interface UIState {
   setMessageSplitMode: (mode: SplitMode) => void;
 }
 
+const defaultDialogs: Dialogs = {
+  import: false,
+  QR: false,
+  shutdown: false,
+  reboot: false,
+  deviceName: false,
+  deviceShare: false,
+  nodeRemoval: false,
+  pkiBackup: false,
+  nodeDetails: false,
+  unsafeRoles: false,
+  refreshKeys: false,
+  deleteMessages: false,
+  managedMode: false,
+  clientNotification: false,
+  resetNodeDb: false,
+  factoryResetDevice: false,
+  factoryResetConfig: false,
+  tracerouteResponse: false,
+};
+
 const defaultState = {
   // Ephemeral state defaults
-  commandPaletteOpen: false,
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
   tracerouteNodeNum: 0,
+
+  // Dialog state
+  dialogs: defaultDialogs,
 
   // Messages page defaults
   messageTabs: [] as MessageTab[],
@@ -154,15 +204,21 @@ const defaultState = {
 };
 
 export const useUIStore = create<UIState>()(
-  subscribeWithSelector((set) => ({
+  subscribeWithSelector((set, get) => ({
     ...defaultState,
 
     // Ephemeral state actions
-    setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
     setNodeNumToBeRemoved: (nodeNum) => set({ nodeNumToBeRemoved: nodeNum }),
     setConnectDialogOpen: (open) => set({ connectDialogOpen: open }),
     setNodeNumDetails: (nodeNum) => set({ nodeNumDetails: nodeNum }),
     setTracerouteNodeNum: (nodeNum) => set({ tracerouteNodeNum: nodeNum }),
+
+    // Dialog actions
+    setDialogOpen: (dialog, open) =>
+      set((state) => ({
+        dialogs: { ...state.dialogs, [dialog]: open },
+      })),
+    getDialogOpen: (dialog) => get().dialogs[dialog],
 
     // Messages page actions
     openMessageTab: (contactId, type) =>

@@ -174,19 +174,27 @@ src/
 │   ├── subscriptionService.ts   # Data subscription service
 │   ├── migrationService.ts      # Database migration service
 │   ├── repositories/            # Data access layer
+│   │   ├── ChannelRepository.ts
+│   │   ├── ConfigCacheRepository.ts  # Cached config + pending changes
+│   │   ├── ConfigHashRepository.ts   # Base config hashes
+│   │   ├── ConnectionRepository.ts
 │   │   ├── MessageRepository.ts
 │   │   ├── NodeRepository.ts
-│   │   ├── ChannelRepository.ts
-│   │   ├── ConnectionRepository.ts
 │   │   ├── PacketLogRepository.ts
 │   │   ├── PreferencesRepository.ts
-│   │   └── TracerouteRepository.ts
+│   │   ├── TracerouteRepository.ts
+│   │   └── WorkingHashRepository.ts  # Working config hashes
 │   ├── hooks/                   # Database hooks
 │   │   ├── useChannels.ts
+│   │   ├── useConfig.ts          # Base config from DB
 │   │   ├── useDevicePreference.ts
+│   │   ├── useDrizzleLive.ts     # Reactive query wrapper
+│   │   ├── useNodes.ts
 │   │   ├── usePacketLogs.ts
+│   │   ├── usePendingChanges.ts  # Pending config changes CRUD
 │   │   ├── usePreferences.ts
-│   │   └── useSignalLogs.ts
+│   │   ├── useSignalLogs.ts
+│   │   └── useWorkingHashes.ts   # Hash-based change detection
 │   └── migrations/              # SQL migration files
 │
 ├── core/                        # Core services
@@ -225,31 +233,44 @@ The project uses TypeScript path aliases for clean imports:
 ## State Management
 
 ### Device Store (`src/state/device/store.ts`)
-- Manages connected Meshtastic devices
+- Manages the active Meshtastic device connection
 - Tracks connection phase: `disconnected → connecting → configuring → connected → configured`
-- Stores device config, module config, and ephemeral state
-- Handles change tracking for settings forms
-- `activeDeviceId` tracks which device is currently selected
+- Stores **ephemeral state** (not persisted):
+  - `connection` - MeshDevice instance for sending packets
+  - `hardware` - MyNodeInfo from device
+  - `status` - DeviceStatusEnum
+  - `configProgress` - Config loading progress during connection
+  - `remoteAdminTargetNode` - Node being remotely administered
+- **Note:** Device config is now stored in SQLite (`device_configs` table), not Zustand. Use `useConfig()` hook to read config.
 
 ### Accessing the Current Device
 
-Use the `useDevice()` hook from `@state/index.ts` to access the current device:
+Use the `useDevice()` hook from `@state/index.ts` to access the device connection:
 
 ```typescript
 import { useDevice } from "@state/index.ts";
 
 function MyComponent() {
-  const { connection, config, setDialogOpen } = useDevice();
-  // Access device properties and methods
+  const { connection, hardware, remoteAdminTargetNode } = useDevice();
+  // connection - MeshDevice for sending packets
+  // hardware - MyNodeInfo from device
 }
 ```
 
-**How it works:**
-- `useDevice()` reads `activeDeviceId` from the Zustand store
-- Returns the `Device` object for the active device
-- Auto-creates a device if one doesn't exist for the `activeDeviceId`
+**For config data**, use the DB hooks instead:
 
-**Note:** For database queries that need the device's node number (not the Zustand store ID), use `useMyNode()` instead:
+```typescript
+import { useConfig, useEffectiveConfig } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
+
+function MyComponent() {
+  const { myNodeNum } = useMyNode();
+  const { config } = useConfig(myNodeNum); // Base config from DB
+  const { config: effectiveConfig } = useEffectiveConfig(myNodeNum, "lora"); // With pending changes
+}
+```
+
+**Note:** For database queries that need the device's node number, use `useMyNode()`:
 
 ```typescript
 import { useMyNode } from "@shared/hooks";
@@ -262,10 +283,13 @@ function MyComponent() {
 
 ### UI Store (`src/state/ui/store.ts`)
 - **Ephemeral state only** (not persisted):
-  - Modal/dialog visibility (`connectDialogOpen`, `nodeNumDetails`, `tracerouteNodeNum`)
+  - Modal/dialog visibility via `dialogs` object and `setDialogOpen()`/`getDialogOpen()` methods
   - Command palette state
   - Message tab state (`messageTabs`, `activeMessageTabId`, `secondaryMessageTabId`, `messageSplitMode`)
+  - Connect dialog state (`connectDialogOpen`)
+  - Node details state (`nodeNumDetails`, `tracerouteNodeNum`)
 - Exports `DEFAULT_PREFERENCES` for use with the preferences hook
+- Exports `Dialogs` and `DialogVariant` types
 
 ### Preferences System
 
@@ -399,6 +423,10 @@ Uses Drizzle ORM with SQLite (sqlocal) for client-side persistence:
 | `packetLogs` | Raw packet metadata for debugging |
 | `tracerouteLogs` | Route discovery results |
 | `preferences` | Key-value user preferences |
+| `deviceConfigs` | Cached device and module configuration (enables instant UI on reconnect) |
+| `configChanges` | Pending local config changes not yet saved to device |
+| `configHashes` | Base config hashes for change detection (Merkle tree leaves) |
+| `workingHashes` | Working config hashes including pending changes |
 
 ### Repository Pattern
 
@@ -410,6 +438,9 @@ Data access is abstracted through repositories in `src/data/repositories/`:
 - `PacketLogRepository` - Raw packet logging for debugging
 - `PreferencesRepository` - Key-value user preferences
 - `TracerouteRepository` - Route discovery results
+- `ConfigCacheRepository` - Cached device config and pending changes
+- `ConfigHashRepository` - Base config hashes (from device)
+- `WorkingHashRepository` - Working config hashes (base + pending changes)
 
 #### Query Builder Pattern with Reactive Updates
 
@@ -452,6 +483,9 @@ export function useNodes(deviceId: number) {
 | `ChannelRepository` | `buildChannelsQuery()`, `buildChannelQuery()`, `buildPrimaryChannelQuery()` |
 | `PacketLogRepository` | `buildPacketLogsQuery()`, `buildSignalLogsQuery()` |
 | `PreferencesRepository` | `buildPreferenceQuery()`, `buildAllPreferencesQuery()` |
+| `ConfigCacheRepository` | `buildConfigQuery()`, `buildChangesQuery()` |
+| `ConfigHashRepository` | `buildHashesQuery()` |
+| `WorkingHashRepository` | `buildHashesQuery()` |
 
 **Dependency injection:** Each repository exposes `getClient(client?: SQLocalDrizzle)` for testing:
 ```typescript
@@ -460,6 +494,97 @@ const { data } = useReactiveQuery(nodeRepo.getClient(), query);
 
 // Testing - inject mock client
 const { data } = useReactiveQuery(nodeRepo.getClient(mockClient), query);
+```
+
+## Config Management Architecture
+
+The application uses a **database-centric architecture** for device configuration, enabling:
+- Instant UI on reconnect (cached config displayed immediately)
+- Offline config viewing
+- Pending change tracking across page refreshes
+- Conflict detection when device config changes remotely
+
+### Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Config Data Flow                                 │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  Device ──(packets)──▶ device_configs table ──▶ useConfig() ──▶ UI     │
+│                              (base config)                               │
+│                                                                          │
+│  Form edits ──▶ config_changes table ──▶ usePendingChanges() ──▶ UI    │
+│                    (pending changes)                                     │
+│                                                                          │
+│  base + changes ──▶ useWorkingHashes() ──▶ working_hashes table        │
+│                     (hash-based change detection)                        │
+│                                                                          │
+│  Save button ──▶ device.connection.sendPacket() ──▶ Device             │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Config Tables
+
+| Table | Purpose |
+|-------|---------|
+| `device_configs` | Base config from device (LocalConfig + LocalModuleConfig) |
+| `config_changes` | Field-level pending changes (not yet saved to device) |
+| `config_hashes` | Merkle tree leaf hashes of base config |
+| `working_hashes` | Merkle tree leaf hashes of base + pending changes |
+
+### Config Hooks
+
+| Hook | File | Purpose |
+|------|------|---------|
+| `useConfig` | `useConfig.ts` | Read base config from DB |
+| `useConfigVariant` | `useConfig.ts` | Read specific base config variant (e.g., "lora") |
+| `useModuleConfigVariant` | `useConfig.ts` | Read specific base module config variant |
+| `usePendingChanges` | `usePendingChanges.ts` | CRUD for pending config changes |
+| `useEffectiveConfig` | `usePendingChanges.ts` | Read base + pending changes merged |
+| `useEffectiveModuleConfig` | `usePendingChanges.ts` | Read base + pending module config merged |
+| `useWorkingHashes` | `useWorkingHashes.ts` | Hash-based change detection with debounce |
+| `useInitializeBaseHashes` | `useWorkingHashes.ts` | Initialize hashes when config first received |
+
+### Change Detection with Merkle Hashes
+
+The application uses Merkle tree-style hashing for efficient change detection:
+
+```typescript
+// Leaf keys for config hashing
+const ALL_LEAF_KEYS = [
+  "config:device", "config:position", "config:power", "config:network",
+  "config:display", "config:lora", "config:bluetooth", "config:security",
+  "moduleConfig:mqtt", "moduleConfig:serial", "moduleConfig:telemetry", ...
+  "channel:0", "channel:1", ... "channel:7",
+  "user"
+];
+
+// Change detection
+const { hasChanges, configChanges, moduleConfigChanges } = useWorkingHashes(myNodeNum);
+if (hasChanges) {
+  console.log("Changed configs:", configChanges); // e.g., ["lora", "device"]
+}
+```
+
+### Form Integration
+
+Settings forms use the DB-backed hooks instead of Zustand:
+
+```typescript
+// Reading config for forms
+const { config, baseConfig, hasChanges } = useEffectiveConfig(myNodeNum, "lora");
+
+// Saving field changes
+const { saveChange, clearChange } = usePendingChanges(myNodeNum);
+await saveChange({
+  changeType: "config",
+  variant: "lora",
+  fieldPath: "region",
+  value: newRegion,
+  originalValue: baseConfig.region,
+});
 ```
 
 ## Feature Modules
@@ -623,13 +748,18 @@ pnpm db:check     # Validate migrations
 |------|---------|
 | `src/app/routes.tsx` | Route definitions with guards |
 | `src/data/schema.ts` | Database schema definitions |
-| `src/state/device/store.ts` | Device state management |
-| `src/state/ui/store.ts` | Ephemeral UI state and DEFAULT_PREFERENCES |
-| `src/data/hooks/usePreferences.ts` | Preferences hook |
+| `src/state/device/store.ts` | Device connection state (ephemeral) |
+| `src/state/ui/store.ts` | UI state, dialogs, and DEFAULT_PREFERENCES |
+| `src/data/hooks/useConfig.ts` | Base config from database |
+| `src/data/hooks/usePendingChanges.ts` | Pending config changes CRUD |
+| `src/data/hooks/useWorkingHashes.ts` | Hash-based change detection |
+| `src/data/hooks/usePreferences.ts` | User preferences hook |
+| `src/data/repositories/ConfigCacheRepository.ts` | Config and changes persistence |
 | `src/data/repositories/PreferencesRepository.ts` | Preferences persistence |
 | `src/shared/hooks/useMyNode.ts` | Device context hooks (useMyNode, useNodeNum, useNodeNumSafe) |
 | `src/features/nodes/utils/signalColor.ts` | Signal grading algorithm |
 | `src/shared/utils/typeGuards.ts` | Type guard utilities |
+| `src/core/utils/merkleConfig.ts` | Config hashing utilities |
 | `src/core/services/adminMessageService.ts` | Admin message handling |
 | `src/data/repositories/NodeRepository.ts` | Node data access |
 | `src/shared/hooks/useFavoriteNode.ts` | Favorite node management |

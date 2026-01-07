@@ -2,11 +2,11 @@
  * Message hooks for fetching and managing messages
  */
 
+import { useDrizzleQuery } from "@data/hooks/useDrizzleLive.ts";
 import { messageRepo } from "@data/repositories";
 import type { LastRead, Message } from "@data/schema";
 import type { ConversationType } from "@data/types";
 import { useMemo } from "react";
-import { useReactiveQuery } from "sqlocal/react";
 
 /**
  * Hook to fetch direct messages between two nodes
@@ -17,19 +17,14 @@ export function useDirectMessages(
   nodeB: number,
   limit = 50,
 ) {
-  const query = useMemo(
+  const { data, isLoading } = useDrizzleQuery<Message>(
     () => messageRepo.buildDirectMessagesQuery(myNodeNum, nodeA, nodeB, limit),
     [myNodeNum, nodeA, nodeB, limit],
   );
 
-  const { data, status } = useReactiveQuery<Message>(
-    messageRepo.getClient(),
-    query,
-  );
-
   return {
     messages: data,
-    isLoading: status === "pending" && data.length === 0,
+    isLoading,
   };
 }
 
@@ -41,19 +36,14 @@ export function useChannelMessages(
   channelId: number,
   limit = 50,
 ) {
-  const query = useMemo(
+  const { data, isLoading } = useDrizzleQuery<Message>(
     () => messageRepo.buildBroadcastMessagesQuery(myNodeNum, channelId, limit),
     [myNodeNum, channelId, limit],
   );
 
-  const { data, status } = useReactiveQuery<Message>(
-    messageRepo.getClient(),
-    query,
-  );
-
   return {
     messages: data,
-    isLoading: status === "pending" && data.length === 0,
+    isLoading,
   };
 }
 
@@ -61,19 +51,14 @@ export function useChannelMessages(
  * Hook to fetch all messages for a device (paginated)
  */
 export function useAllMessages(myNodeNum: number, limit = 100, offset = 0) {
-  const query = useMemo(
+  const { data, isLoading } = useDrizzleQuery<Message>(
     () => messageRepo.buildAllMessagesQuery(myNodeNum, limit, offset),
     [myNodeNum, limit, offset],
   );
 
-  const { data, status } = useReactiveQuery<Message>(
-    messageRepo.getClient(),
-    query,
-  );
-
   return {
     messages: data,
-    isLoading: status === "pending" && data.length === 0,
+    isLoading,
   };
 }
 
@@ -81,19 +66,14 @@ export function useAllMessages(myNodeNum: number, limit = 100, offset = 0) {
  * Hook to fetch pending messages (for retry logic)
  */
 export function usePendingMessages(myNodeNum: number) {
-  const query = useMemo(
+  const { data, isLoading } = useDrizzleQuery<Message>(
     () => messageRepo.buildPendingMessagesQuery(myNodeNum),
     [myNodeNum],
   );
 
-  const { data, status } = useReactiveQuery<Message>(
-    messageRepo.getClient(),
-    query,
-  );
-
   return {
     messages: data,
-    isLoading: status === "pending" && data.length === 0,
+    isLoading,
   };
 }
 
@@ -163,33 +143,21 @@ function computeChannelUnreadCount(
  */
 export function useConversations(myNodeNum: number) {
   // Query all direct messages
-  const directQuery = useMemo(
+  const { data: directMessages } = useDrizzleQuery<Message>(
     () => messageRepo.buildAllDirectMessagesQuery(myNodeNum),
     [myNodeNum],
   );
-  const { data: directMessages } = useReactiveQuery<Message>(
-    messageRepo.getClient(),
-    directQuery,
-  );
 
   // Query all channel messages
-  const channelQuery = useMemo(
+  const { data: channelMessages } = useDrizzleQuery<Message>(
     () => messageRepo.buildAllChannelMessagesQuery(myNodeNum),
     [myNodeNum],
   );
-  const { data: channelMessages } = useReactiveQuery<Message>(
-    messageRepo.getClient(),
-    channelQuery,
-  );
 
   // Query all lastRead entries
-  const lastReadQuery = useMemo(
+  const { data: lastReadEntries } = useDrizzleQuery<LastRead>(
     () => messageRepo.buildLastReadQuery(myNodeNum),
     [myNodeNum],
-  );
-  const { data: lastReadEntries } = useReactiveQuery<LastRead>(
-    messageRepo.getClient(),
-    lastReadQuery,
   );
 
   // Compute conversations from the reactive data

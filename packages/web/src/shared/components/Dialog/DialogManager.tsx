@@ -1,5 +1,5 @@
 import { useChannels } from "@data/hooks";
-import { useDevice } from "@state/index.ts";
+import { useDevice, useUIStore } from "@state/index.ts";
 import { toByteArray } from "base64-js";
 import { Activity, useMemo } from "react";
 import { ClientNotificationDialog } from "./ClientNotificationDialog/ClientNotificationDialog.tsx";
@@ -19,7 +19,9 @@ import { TracerouteResponseDialog } from "./TracerouteResponseDialog.tsx";
 import { UnsafeRolesDialog } from "./UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 
 export const DialogManager = () => {
-  const { dialog, setDialogOpen, id: deviceId, config } = useDevice();
+  const { id: deviceId, config } = useDevice();
+  const dialogs = useUIStore((s) => s.dialogs);
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
   const { channels: dbChannels } = useChannels(deviceId);
 
   // Convert DB channels to Map format for QRDialog
@@ -43,7 +45,7 @@ export const DialogManager = () => {
   return (
     <>
       <QRDialog
-        open={dialog.QR}
+        open={dialogs.QR}
         onOpenChange={(open) => {
           setDialogOpen("QR", open);
         }}
@@ -51,74 +53,74 @@ export const DialogManager = () => {
         loraConfig={config.lora}
       />
       <ShutdownDialog
-        open={dialog.shutdown}
+        open={dialogs.shutdown}
         onOpenChange={() => {
           setDialogOpen("shutdown", false);
         }}
       />
       <RebootDialog
-        open={dialog.reboot}
+        open={dialogs.reboot}
         onOpenChange={() => {
           setDialogOpen("reboot", false);
         }}
       />
       <RemoveNodeDialog
-        open={dialog.nodeRemoval}
+        open={dialogs.nodeRemoval}
         onOpenChange={(open) => {
           setDialogOpen("nodeRemoval", open);
         }}
       />
       <PkiBackupDialog
-        open={dialog.pkiBackup}
+        open={dialogs.pkiBackup}
         onOpenChange={(open) => {
           setDialogOpen("pkiBackup", open);
         }}
       />
       <UnsafeRolesDialog
-        open={dialog.unsafeRoles}
+        open={dialogs.unsafeRoles}
         onOpenChange={(open) => {
           setDialogOpen("unsafeRoles", open);
         }}
       />
       <RefreshKeysDialog
-        open={dialog.refreshKeys}
+        open={dialogs.refreshKeys}
         onOpenChange={(open) => {
           setDialogOpen("refreshKeys", open);
         }}
       />
       <DeleteMessagesDialog
-        open={dialog.deleteMessages}
+        open={dialogs.deleteMessages}
         onOpenChange={(open) => {
           setDialogOpen("deleteMessages", open);
         }}
       />
       <ClientNotificationDialog
-        open={dialog.clientNotification}
+        open={dialogs.clientNotification}
         onOpenChange={(open) => {
           setDialogOpen("clientNotification", open);
         }}
       />
       <ResetNodeDbDialog
-        open={dialog.resetNodeDb}
+        open={dialogs.resetNodeDb}
         onOpenChange={(open) => {
           setDialogOpen("resetNodeDb", open);
         }}
       />
       <FactoryResetDeviceDialog
-        open={dialog.factoryResetDevice}
+        open={dialogs.factoryResetDevice}
         onOpenChange={(open) => {
           setDialogOpen("factoryResetDevice", open);
         }}
       />
       <FactoryResetConfigDialog
-        open={dialog.factoryResetConfig}
+        open={dialogs.factoryResetConfig}
         onOpenChange={(open) => {
           setDialogOpen("factoryResetConfig", open);
         }}
       />
       <Activity>
         <NodeDetailsDrawer
-          open={dialog.nodeDetails}
+          open={dialogs.nodeDetails}
           onOpenChange={(open) => {
             setDialogOpen("nodeDetails", open);
           }}
@@ -126,7 +128,7 @@ export const DialogManager = () => {
       </Activity>
       <TracerouteResponseDialog />
       <DeviceShareDialog
-        open={dialog.deviceShare}
+        open={dialogs.deviceShare}
         onOpenChange={(open) => {
           setDialogOpen("deviceShare", open);
         }}

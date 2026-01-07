@@ -145,9 +145,10 @@ export const NodeDetailsDrawer = ({
   open,
   onOpenChange,
 }: NodeDetailsDrawerProps) => {
-  const { hardware, setDialogOpen, setRemoteAdminTarget } = useDevice();
+  const { hardware, setRemoteAdminTarget } = useDevice();
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
   const { current } = useLanguage();
-  const { nodeNumDetails } = useUIStore();
+  const nodeNumDetails = useUIStore((s) => s.nodeNumDetails);
   const { updateFavorite } = useFavoriteNode();
   const { updateIgnored } = useIgnoreNode();
   const { myNodeNum, myNode } = useMyNode();
@@ -255,7 +256,11 @@ export const NodeDetailsDrawer = ({
   const handleDirectMessage = () => {
     onOpenChange(false);
     if (myNodeNum) {
-      navigate({ to: "/$nodeNum/messages", params: { nodeNum: String(myNodeNum) }, search: { node: node.nodeNum } });
+      navigate({
+        to: "/$nodeNum/messages",
+        params: { nodeNum: String(myNodeNum) },
+        search: { node: node.nodeNum },
+      });
     }
   };
 
@@ -563,7 +568,12 @@ export const NodeDetailsDrawer = ({
                       if (myNodeNum) {
                         navigate({
                           to: "/$nodeNum/map/$long/$lat/$zoom",
-                          params: { nodeNum: String(myNodeNum), long, lat, zoom: 15 },
+                          params: {
+                            nodeNum: String(myNodeNum),
+                            long,
+                            lat,
+                            zoom: 15,
+                          },
                         });
                       }
                     }}

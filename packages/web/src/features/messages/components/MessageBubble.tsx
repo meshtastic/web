@@ -17,7 +17,7 @@ import { getAvatarColors } from "@shared/utils/color";
 import { Reply } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { groupReactions } from "../hooks/useReactions";
+import { groupReactions } from "../hooks/useReactions.ts";
 import { EmojiReactionButton } from "./EmojiReactionButton.tsx";
 import { MessageStatusIndicator } from "./MessageStatusIndicator.tsx";
 import { RetryButton } from "./RetryButton.tsx";
@@ -54,7 +54,6 @@ export const MessageBubble = memo(function MessageBubble({
   const { t } = useTranslation("messages");
   const avatarColors = getAvatarColors(message.fromNode);
 
-  // Group reactions by emoji
   const groupedReactions = useMemo(
     () => groupReactions(reactions),
     [reactions],
@@ -99,20 +98,20 @@ export const MessageBubble = memo(function MessageBubble({
         isMine ? "flex-row-reverse" : "flex-row",
       )}
     >
-      {showAvatar && (
+      {showAvatar ? (
         <NodeAvatar
           nodeNum={message.fromNode}
           longName={senderName}
           size="sm"
         />
-      )}
+      ) : null}
 
       <div
         className="max-w-[70%] rounded-2xl px-3 py-2 relative group shrink-0 text-white"
         style={bubbleStyle}
       >
         {/* Reply preview - shown when this message is a reply */}
-        {message.replyId && (
+        {message.replyId ? (
           <div className="mb-2 text-xs opacity-70 border-l-2 border-white/40 pl-2">
             {replyToMessage ? (
               <>
@@ -132,7 +131,7 @@ export const MessageBubble = memo(function MessageBubble({
               </p>
             )}
           </div>
-        )}
+        ) : null}
 
         <div className="flex items-center justify-between gap-2 mb-0.5">
           <div className="flex items-center gap-1.5">

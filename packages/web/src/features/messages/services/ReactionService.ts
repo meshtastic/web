@@ -93,35 +93,47 @@ class ReactionServiceClass {
     destination: number | "broadcast",
     channel?: Types.ChannelNumber,
   ): Promise<boolean> {
-    logger.debug(
-      `[ReactionService] Toggling reaction ${emoji} on message ${targetMessageId}`,
+    logger.info(
+      `[ReactionService] Toggling reaction: owner=${ownerNodeNum}, messageId=${targetMessageId}, emoji=${emoji}, dest=${destination}, channel=${channel}`,
     );
 
     // Track emoji usage
     this.trackEmojiUsage(emoji);
 
     // Toggle in database
-    const wasAdded = await reactionRepo.toggleReaction({
-      ownerNodeNum,
-      targetMessageId,
-      fromNode: ownerNodeNum,
-      emoji,
-      createdAt: new Date(),
-    });
-
-    // Send over mesh (same message acts as toggle on receiving end)
     try {
-      await deviceCommands.sendReaction(
+      const wasAdded = await reactionRepo.toggleReaction({
+        ownerNodeNum,
         targetMessageId,
+        fromNode: ownerNodeNum,
         emoji,
-        destination,
-        channel,
+        createdAt: new Date(),
+      });
+      logger.info(
+        `[ReactionService] Toggle result: ${wasAdded ? "added" : "removed"}`,
       );
-    } catch (error) {
-      logger.error("[ReactionService] Failed to send reaction toggle:", error);
-    }
 
-    return wasAdded;
+      // Send over mesh (same message acts as toggle on receiving end)
+      try {
+        await deviceCommands.sendReaction(
+          targetMessageId,
+          emoji,
+          destination,
+          channel,
+        );
+        logger.debug(`[ReactionService] Sent reaction over mesh`);
+      } catch (error) {
+        logger.error(
+          "[ReactionService] Failed to send reaction toggle:",
+          error,
+        );
+      }
+
+      return wasAdded;
+    } catch (error) {
+      logger.error("[ReactionService] Failed to toggle reaction in DB:", error);
+      throw error;
+    }
   }
 
   /**

@@ -6,9 +6,6 @@ import "@testing-library/user-event";
 import channelsEN from "@public/i18n/locales/en/channels.json" with {
   type: "json",
 };
-import commandPaletteEN from "@public/i18n/locales/en/commandPalette.json" with {
-  type: "json",
-};
 import commonEN from "@public/i18n/locales/en/common.json" with {
   type: "json",
 };
@@ -84,7 +81,6 @@ globalThis.matchMedia = vi.fn().mockImplementation((query: string) => ({
 
 const appNamespaces = [
   "channels",
-  "commandPalette",
   "common",
   "config",
   "moduleConfig",
@@ -107,7 +103,6 @@ i18n.use(initReactI18next).init({
   resources: {
     en: {
       channels: channelsEN,
-      commandPalette: commandPaletteEN,
       common: commonEN,
       config: configEN,
       moduleConfig: moduleConfigEN,

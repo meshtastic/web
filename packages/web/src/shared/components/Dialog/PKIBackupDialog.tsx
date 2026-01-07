@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@shared/components/ui/dialog";
 import { useMyNode } from "@shared/hooks/useMyNode";
-import { useDevice } from "@state/index.ts";
+import { useDevice, useUIStore } from "@state/index.ts";
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
@@ -25,7 +25,8 @@ export const PkiBackupDialog = ({
   onOpenChange,
 }: PkiBackupDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { config, setDialogOpen } = useDevice();
+  const { config } = useDevice();
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
   const { myNode } = useMyNode();
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;

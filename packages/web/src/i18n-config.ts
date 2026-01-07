@@ -51,7 +51,6 @@ i18next
     ns: [
       "channels",
       "connections",
-      "commandPalette",
       "common",
       "config",
       "moduleConfig",

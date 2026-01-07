@@ -1,19 +1,9 @@
-import { SettingsSearchBar } from "../components/SettingsSearchBar";
-import { AdvancedConfig } from "./AdvancedConfig";
-import { useSettingsSave } from "../hooks/useSaveSettings";
-import { ActivityPanel } from "../components/activity";
 import { Badge } from "@shared/components/ui/badge";
 import { Button } from "@shared/components/ui/button";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@shared/components/ui/sheet";
-import { useFieldRegistry } from "../services/fieldRegistry";
 import { useRemoteAdminAuth } from "@shared/hooks";
 import { cn } from "@shared/utils/cn";
-import { AppPreferencesConfig } from "./AppPreferencesConfig";
-import { BackupRestoreConfig } from "./BackupRestoreConfig";
-import { DeviceConfig } from "./DeviceConfig";
-import { ModuleConfig } from "./ModuleConfig";
-import { RadioConfig } from "./RadioConfig";
 import { t } from "i18next";
 import {
   AlertCircleIcon,
@@ -29,6 +19,16 @@ import {
   Settings2,
 } from "lucide-react";
 import { Suspense, useState } from "react";
+import { ActivityPanel } from "../components/activity/index.ts";
+import { SettingsSearchBar } from "../components/SettingsSearchBar.tsx";
+import { useSettingsSave } from "../hooks/useSaveSettings.ts";
+import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
+import { AdvancedConfig } from "./AdvancedConfig.tsx";
+import { AppPreferencesConfig } from "./AppPreferencesConfig.tsx";
+import { BackupRestoreConfig } from "./BackupRestoreConfig.tsx";
+import { DeviceConfig } from "./DeviceConfig.tsx";
+import { ModuleConfig } from "./ModuleConfig.tsx";
+import { RadioConfig } from "./RadioConfig.tsx";
 import { SettingsLoadingSkeleton } from "./SettingsLoading.tsx";
 
 type SettingsSection =
@@ -72,19 +72,109 @@ const configSections = [
   },
 ];
 
-export default function SettingsPage() {
+interface SettingsHeaderActionsProps {
+  onActivityOpen: () => void;
+}
+
+/**
+ * Header actions that depend on device state (useSettingsSave uses useDevice).
+ * Must be rendered inside a Suspense boundary.
+ */
+function SettingsHeaderActions({ onActivityOpen }: SettingsHeaderActionsProps) {
   const { handleSave, handleReset, isSaving, hasPending, saveDisabled } =
     useSettingsSave();
-
   const { getChangeCount } = useFieldRegistry();
+  const totalChangeCount = getChangeCount();
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        className="relative hidden lg:flex"
+        onClick={onActivityOpen}
+      >
+        <FileEdit className="h-4 w-4 mr-2" />
+        Activity
+        {totalChangeCount > 0 && (
+          <Badge
+            variant="destructive"
+            className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+          >
+            {totalChangeCount}
+          </Badge>
+        )}
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        className="hidden lg:flex"
+        onClick={handleReset}
+        disabled={!hasPending}
+      >
+        <RotateCcw className="h-4 w-4 mr-2" />
+        {t("button.reset")}
+      </Button>
+      <Button
+        size="sm"
+        className="hidden sm:flex"
+        onClick={handleSave}
+        disabled={saveDisabled}
+      >
+        <Save className="h-4 w-4 mr-2" />
+        {isSaving ? `${t("button.saving")}...` : t("button.save")}
+      </Button>
+    </>
+  );
+}
+
+interface SettingsContentProps {
+  activeSection: SettingsSection;
+  searchQuery: string;
+}
+
+/**
+ * Content area that depends on device state.
+ * Must be rendered inside a Suspense boundary.
+ */
+function SettingsContent({ activeSection, searchQuery }: SettingsContentProps) {
   const { isRemoteAdmin, isAuthorized } = useRemoteAdminAuth();
 
+  return (
+    <>
+      {isRemoteAdmin && !isAuthorized && (
+        <div className="mb-6 flex items-start gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+          <AlertCircleIcon className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-medium text-destructive">Not Authorized</h4>
+            <p className="text-sm text-muted-foreground mt-1">
+              Add this node's public key to your admin keys in Security settings
+              to enable remote configuration.
+            </p>
+          </div>
+        </div>
+      )}
+      {activeSection === "radio" && <RadioConfig searchQuery={searchQuery} />}
+      {activeSection === "device" && <DeviceConfig searchQuery={searchQuery} />}
+      {activeSection === "module" && <ModuleConfig searchQuery={searchQuery} />}
+      {activeSection === "backup" && (
+        <BackupRestoreConfig searchQuery={searchQuery} />
+      )}
+      {activeSection === "advanced" && (
+        <AdvancedConfig searchQuery={searchQuery} />
+      )}
+      {activeSection === "app" && (
+        <AppPreferencesConfig searchQuery={searchQuery} />
+      )}
+    </>
+  );
+}
+
+export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<SettingsSection>("radio");
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
-
-  const totalChangeCount = getChangeCount();
 
   const handleSectionChange = (section: SettingsSection) => {
     setActiveSection(section);
@@ -150,77 +240,21 @@ export default function SettingsPage() {
             <div className="hidden sm:block">
               <SettingsSearchBar onSearch={setSearchQuery} />
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="relative hidden lg:flex"
-              onClick={() => setActivityOpen(true)}
-            >
-              <FileEdit className="h-4 w-4 mr-2" />
-              Activity
-              {totalChangeCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                >
-                  {totalChangeCount}
-                </Badge>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden lg:flex"
-              onClick={handleReset}
-              disabled={!hasPending}
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              {t("button.reset")}
-            </Button>
-            <Button
-              size="sm"
-              className="hidden sm:flex"
-              onClick={handleSave}
-              disabled={saveDisabled}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isSaving ? `${t("button.saving")}...` : t("button.save")}
-            </Button>
+            <Suspense fallback={null}>
+              <SettingsHeaderActions
+                onActivityOpen={() => setActivityOpen(true)}
+              />
+            </Suspense>
           </div>
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto [scrollbar-gutter:stable]">
           <div className="p-4 sm:p-6">
-            {isRemoteAdmin && !isAuthorized && (
-              <div className="mb-6 flex items-start gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
-                <AlertCircleIcon className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-destructive">Not Authorized</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Add this node's public key to your admin keys in Security settings to enable remote configuration.
-                  </p>
-                </div>
-              </div>
-            )}
             <Suspense fallback={<SettingsLoadingSkeleton />}>
-              {activeSection === "radio" && (
-                <RadioConfig searchQuery={searchQuery} />
-              )}
-              {activeSection === "device" && (
-                <DeviceConfig searchQuery={searchQuery} />
-              )}
-              {activeSection === "module" && (
-                <ModuleConfig searchQuery={searchQuery} />
-              )}
-              {activeSection === "backup" && (
-                <BackupRestoreConfig searchQuery={searchQuery} />
-              )}
-              {activeSection === "advanced" && (
-                <AdvancedConfig searchQuery={searchQuery} />
-              )}
-              {activeSection === "app" && (
-                <AppPreferencesConfig searchQuery={searchQuery} />
-              )}
+              <SettingsContent
+                activeSection={activeSection}
+                searchQuery={searchQuery}
+              />
             </Suspense>
           </div>
         </div>

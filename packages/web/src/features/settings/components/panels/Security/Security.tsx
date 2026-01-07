@@ -1,7 +1,7 @@
 import { ManagedModeDialog } from "@shared/components/Dialog/ManagedModeDialog";
 import { PkiRegenerateDialog } from "@shared/components/Dialog/PkiRegenerateDialog";
 import { useRemoteAdminAuth } from "@shared/hooks";
-import { useDevice } from "@state/index.ts";
+import { useUIStore } from "@state/index.ts";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSecurityForm } from "../../../hooks/index.ts";
@@ -14,7 +14,7 @@ import {
 
 export const Security = () => {
   const { t } = useTranslation("config");
-  const { setDialogOpen } = useDevice();
+  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
   const { isAuthorized } = useRemoteAdminAuth();
   const {
     form,

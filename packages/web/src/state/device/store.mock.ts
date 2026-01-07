@@ -15,8 +15,6 @@ import type { Device } from "./index.ts";
 export const mockDeviceStore: Device = {
   id: 0,
   status: 5 as const,
-  connectionPhase: "disconnected" as const,
-  connectionId: null,
   config: {} as Protobuf.LocalOnly.LocalConfig,
   moduleConfig: {} as Protobuf.LocalOnly.LocalModuleConfig,
   changes: new Map(),
@@ -25,11 +23,8 @@ export const mockDeviceStore: Device = {
   metadata: new Map(),
   traceroutes: new Map(),
   connection: undefined,
-  activeNode: 0,
   waypoints: [],
   pendingSettingsChanges: false,
-  messageDraft: "",
-  unreadCounts: new Map(),
   dialog: {
     import: false,
     QR: false,
@@ -52,38 +47,44 @@ export const mockDeviceStore: Device = {
   },
   clientNotifications: [],
   neighborInfo: new Map(),
+  configProgress: {
+    receivedConfigs: new Set(),
+    total: 21,
+  },
+
+  // Config caching state
+  isCachedConfig: false,
+  configConflicts: new Map(),
+
+  // Remote administration state
+  remoteAdminTargetNode: null,
+  remoteAdminAuthorized: true,
+  recentlyConnectedNodes: [],
 
   setStatus: vi.fn(),
-  setConnectionPhase: vi.fn(),
   setConnectionId: vi.fn(),
   setConfig: vi.fn(),
   setModuleConfig: vi.fn(),
   getEffectiveConfig: vi.fn(),
   getEffectiveModuleConfig: vi.fn(),
   setHardware: vi.fn(),
-  setActiveNode: vi.fn(),
   setPendingSettingsChanges: vi.fn(),
   addChannel: vi.fn(),
   addWaypoint: vi.fn(),
   removeWaypoint: vi.fn(),
   getWaypoint: vi.fn(),
-  addConnection: vi.fn(),
   addTraceRoute: vi.fn(),
   addMetadata: vi.fn(),
   setDialogOpen: vi.fn(),
   getDialogOpen: vi.fn().mockReturnValue(false),
-  setMessageDraft: vi.fn(),
-  incrementUnread: vi.fn(),
-  resetUnread: vi.fn(),
   sendAdminMessage: vi.fn(),
   addClientNotification: vi.fn(),
   removeClientNotification: vi.fn(),
   getClientNotification: vi.fn(),
-  getAllUnreadCount: vi.fn().mockReturnValue(0),
-  getUnreadCount: vi.fn().mockReturnValue(0),
   getNeighborInfo: vi.fn(),
   addNeighborInfo: vi.fn(),
   getMyNodeNum: vi.fn().mockReturnValue(123456),
+  resetConfigProgress: vi.fn(),
 
   // Change tracking methods
   setChange: vi.fn(),
@@ -101,4 +102,16 @@ export const mockDeviceStore: Device = {
   queueAdminMessage: vi.fn(),
   getAllQueuedAdminMessages: vi.fn().mockReturnValue([]),
   getAdminMessageChangeCount: vi.fn().mockReturnValue(0),
+
+  // Config caching methods
+  setCachedConfig: vi.fn(),
+  setIsCachedConfig: vi.fn(),
+  setConfigConflict: vi.fn(),
+  hasAnyConflicts: vi.fn().mockReturnValue(false),
+  getConfigConflict: vi.fn(),
+  clearConfigConflicts: vi.fn(),
+
+  // Remote administration methods
+  setRemoteAdminTarget: vi.fn(),
+  getAdminDestination: vi.fn().mockReturnValue("self"),
 };

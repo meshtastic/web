@@ -6,25 +6,20 @@ import {
 } from "@state/device";
 import { useTranslation } from "react-i18next";
 
-interface ConfigProgressIndicatorProps {
-  meshDeviceId: number | null;
-}
-
-export function ConfigProgressIndicator({
-  meshDeviceId,
-}: ConfigProgressIndicatorProps) {
+/**
+ * Shows config loading progress during device configuration.
+ * Parent component should only render this when connection.status === "configuring"
+ */
+export function ConfigProgressIndicator() {
   const { t } = useTranslation("connections");
-  const device = useDeviceStore((s) =>
-    meshDeviceId ? s.devices.get(meshDeviceId) : undefined,
-  );
+  const configProgress = useDeviceStore((s) => s.device?.configProgress);
 
-  if (!device || device.connectionPhase !== "configuring") {
+  if (!configProgress) {
     return null;
   }
 
-  const progress = device.configProgress;
-  const percent = getConfigProgressPercent(progress);
-  const received = progress.receivedConfigs.size;
+  const percent = getConfigProgressPercent(configProgress);
+  const received = configProgress.receivedConfigs.size;
 
   return (
     <div className="flex flex-col gap-1">

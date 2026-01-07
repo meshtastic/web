@@ -1,7 +1,7 @@
 import type { Connection } from "@data/schema";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import logger from "@core/services/logger";
-import { BrowserHardware } from "../BrowserHardware";
+import { BrowserHardware, type SerialDeviceInfo } from "../BrowserHardware";
 import type { ConnectionStrategy, ConnectionResult } from "./types";
 
 export class SerialStrategy implements ConnectionStrategy {
@@ -14,8 +14,9 @@ export class SerialStrategy implements ConnectionStrategy {
     }
 
     logger.debug(`[SerialStrategy] Looking for Serial port`);
-    
+
     let port: SerialPort | undefined;
+    let newPortInfo: SerialDeviceInfo | undefined;
 
     // Try to find existing permission
     if (!port) {
@@ -34,6 +35,7 @@ export class SerialStrategy implements ConnectionStrategy {
       logger.debug(`[SerialStrategy] Requesting serial port from user`);
       const result = await BrowserHardware.requestSerialPort();
       port = result?.port;
+      newPortInfo = result ?? undefined;
     }
 
     if (!port) {
@@ -50,10 +52,17 @@ export class SerialStrategy implements ConnectionStrategy {
       logger.debug(`[SerialStrategy] Creating Serial transport`);
       const transport = await TransportWebSerial.createFromPort(port);
       logger.info(`[SerialStrategy] Serial transport created successfully`);
-      
+
       return {
         transport,
         nativeHandle: port,
+        // Include updated port info if user selected a new port
+        updatedPortInfo: newPortInfo
+          ? {
+              usbVendorId: newPortInfo.usbVendorId,
+              usbProductId: newPortInfo.usbProductId,
+            }
+          : undefined,
       };
     } catch (serialErr: unknown) {
       const msg =
