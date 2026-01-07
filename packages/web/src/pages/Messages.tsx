@@ -103,7 +103,7 @@ export const MessagesPage = () => {
     }, true)
       .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
-        unreadCount: getUnreadCount(node.num) ?? 0,
+        unreadCount: getUnreadCount(node?.num) ?? 0,
       }))
       .sort((a: NodeInfoWithUnread, b: NodeInfoWithUnread) => {
         const diff = b.unreadCount - a.unreadCount;
@@ -141,7 +141,7 @@ export const MessagesPage = () => {
           } else {
             setMessageState({
               type: MessageType.Direct,
-              nodeA: getMyNode().num,
+              nodeA: getMyNode()?.num,
               nodeB: numericChatId,
               messageId,
               newState: MessageState.Ack,
@@ -163,7 +163,7 @@ export const MessagesPage = () => {
         } else {
           setMessageState({
             type: MessageType.Direct,
-            nodeA: getMyNode().num,
+            nodeA: getMyNode()?.num,
             nodeB: numericChatId,
             messageId: failedId,
             newState: MessageState.Failed,
@@ -190,7 +190,7 @@ export const MessagesPage = () => {
           <ChannelChat
             messages={getMessages({
               type: MessageType.Direct,
-              nodeA: getMyNode().num,
+              nodeA: getMyNode()?.num,
               nodeB: numericChatId,
             }).reverse()}
           />
@@ -270,22 +270,22 @@ export const MessagesPage = () => {
       >
         {filteredNodes()?.map((node) => (
           <SidebarButton
-            key={node.num}
+            key={node?.num}
             preventCollapse
             label={node.user?.longName ?? t("unknown.shortName")}
             count={node.unreadCount > 0 ? node.unreadCount : undefined}
             active={
-              numericChatId === node.num && chatType === MessageType.Direct
+              numericChatId === node?.num && chatType === MessageType.Direct
             }
             onClick={() => {
-              navigateToChat(MessageType.Direct, node.num.toString());
-              resetUnread(node.num);
+              navigateToChat(MessageType.Direct, node?.num.toString());
+              resetUnread(node?.num);
             }}
           >
             <Avatar
-              nodeNum={node.num}
-              className={cn(hasNodeError(node.num) && "text-red-500")}
-              showError={hasNodeError(node.num)}
+              nodeNum={node?.num}
+              className={cn(hasNodeError(node?.num) && "text-red-500")}
+              showError={hasNodeError(node?.num)}
               showFavorite={node.isFavorite}
               size="sm"
             />
