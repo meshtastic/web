@@ -1,16 +1,16 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "未找到结果。",
   "page": {
-    "title": "Command Menu"
+    "title": "命令菜单"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "固定命令组"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "取消固定命令组"
   },
   "goto": {
-    "label": "Goto",
+    "label": "前 往",
     "command": {
       "messages": "消息",
       "map": "地图",
@@ -19,33 +19,33 @@
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "管理",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "路由节点",
+      "connectNewNode": "连接新节点"
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "上下文",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
+      "qrCode": "二维码",
+      "qrGenerator": "创建",
       "qrImport": "导入",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Reboot Device",
-      "resetNodeDb": "Reset Node DB",
+      "scheduleShutdown": "计划关机",
+      "scheduleReboot": "重启设备",
+      "resetNodeDb": "重置节点数据库",
       "dfuMode": "进入 DFU 模式",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config",
+      "factoryResetDevice": "恢复出厂设置配置",
+      "factoryResetConfig": "恢复出厂设置配置",
       "disconnect": "断开"
     }
   },
   "debug": {
     "label": "调试",
     "command": {
-      "reconfigure": "Reconfigure",
+      "reconfigure": "重新配置",
       "clearAllStoredMessages": "Clear All Stored Message",
-      "clearAllStores": "Clear All Local Storage"
+      "clearAllStores": "清除所有本地存储"
     }
   }
 }
