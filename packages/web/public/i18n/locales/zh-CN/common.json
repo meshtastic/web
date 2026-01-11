@@ -1,58 +1,57 @@
 {
   "button": {
     "apply": "申请",
-    "addConnection": "Add Connection",
-    "saveConnection": "Save connection",
-    "backupKey": "Backup Key",
+    "addConnection": "添加连接",
+    "saveConnection": "保存连接",
+    "backupKey": "备份密钥",
     "cancel": "取消",
     "connect": "连接",
-    "clearMessages": "Clear Messages",
+    "clearMessages": "清除消息",
     "close": "关闭",
-    "confirm": "Confirm",
+    "confirm": "确认",
     "delete": "删除",
     "dismiss": "收起键盘",
     "download": "下载",
     "disconnect": "断开",
-    "export": "Export",
-    "generate": "Generate",
-    "regenerate": "Regenerate",
+    "export": "导出",
+    "generate": "创建",
+    "regenerate": "重新生成",
     "import": "导入",
     "message": "信息",
-    "now": "Now",
+    "now": "当前",
     "ok": "确定",
-    "print": "Print",
+    "print": "打印",
     "remove": "移除",
-    "requestNewKeys": "Request New Keys",
-    "requestPosition": "Request Position",
+    "requestNewKeys": "要求新密钥",
+    "requestPosition": "请求位置",
     "reset": "重置",
-    "retry": "Retry",
+    "retry": "重试",
     "save": "保存",
-    "setDefault": "Set as default",
-    "unsetDefault": "Unset default",
+    "setDefault": "设为默认",
+    "unsetDefault": "取消设为默认",
     "scanQr": "扫描二维码",
-    "traceRoute": "Trace Route",
-    "submit": "Submit"
+    "traceRoute": "追踪路径",
+    "submit": "提交"
   },
   "app": {
     "title": "Meshtastic",
-    "fullTitle": "Meshtastic Web Client"
+    "fullTitle": "Meshtastic Web客户端"
   },
-  "loading": "Loading...",
+  "loading": "加载中…",
   "unit": {
     "cps": "CPS",
     "dbm": "dBm",
-    "hertz": "Hz",
+    "hertz": "赫兹",
     "hop": {
-      "one": "Hop",
-      "plural": "Hops"
+      "one": "跳",
+      "plural": "跳数"
     },
     "hopsAway": {
-      "one": "{{count}} hop away",
-      "plural": "{{count}} hops away",
-      "unknown": "Unknown hops away"
+      "one": "相隔{{count}} 跳",
+      "plural": "相隔{{count}}跳",
+      "unknown": "未知的跳跃"
     },
     "megahertz": "MHz",
-    "kilohertz": "kHz",
     "raw": "raw",
     "meter": {
       "one": "Meter",
@@ -60,9 +59,9 @@
       "suffix": "m"
     },
     "kilometer": {
-      "one": "Kilometer",
-      "plural": "Kilometers",
-      "suffix": "km"
+      "one": "公里",
+      "plural": "公里",
+      "suffix": "公里"
     },
     "minute": {
       "one": "Minute",
@@ -73,27 +72,27 @@
       "plural": "Hours"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
+      "one": "毫秒",
+      "plural": "毫秒",
       "suffix": "ms"
     },
     "second": {
-      "one": "Second",
-      "plural": "Seconds"
+      "one": "秒",
+      "plural": "秒数。"
     },
     "day": {
-      "one": "Day",
-      "plural": "Days",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "one": "天",
+      "plural": "天",
+      "today": "今天",
+      "yesterday": "昨天"
     },
     "month": {
-      "one": "Month",
-      "plural": "Months"
+      "one": "月",
+      "plural": "月"
     },
     "year": {
-      "one": "Year",
-      "plural": "Years"
+      "one": "年",
+      "plural": "年"
     },
     "snr": "SNR",
     "volt": {
@@ -102,13 +101,13 @@
       "suffix": "V"
     },
     "record": {
-      "one": "Records",
-      "plural": "Records"
+      "one": "记录",
+      "plural": "记录"
     },
     "degree": {
       "one": "Degree",
       "plural": "Degrees",
-      "suffix": "°"
+      "suffix": "."
     }
   },
   "security": {
@@ -121,45 +120,45 @@
     "longName": "未知",
     "shortName": "UNK",
     "notAvailable": "N/A",
-    "num": "??"
+    "num": "？？"
   },
-  "nodeUnknownPrefix": "!",
-  "unset": "UNSET",
+  "nodeUnknownPrefix": "！",
+  "unset": "未设置",
   "fallbackName": "Meshtastic {{last4}}",
-  "node": "Node",
+  "node": "节点",
   "formValidation": {
-    "unsavedChanges": "Unsaved changes",
+    "unsavedChanges": "未保存的更改",
     "tooBig": {
-      "string": "Too long, expected less than or equal to {{maximum}} characters.",
-      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+      "string": "太长了，预期不超过{{maximum}}个字符。",
+      "number": "太大了，预期是一个小于或等于{{maximum}}的数字。",
+      "bytes": "太大了，预期小于或等于 {{params.maximum}} 字节。"
     },
     "tooSmall": {
-      "string": "Too short, expected more than or equal to {{minimum}} characters.",
-      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+      "string": "太短了，预期长度大于或等于{{minimum}}个字符。",
+      "number": "太小了，预期是一个大于或等于{{minimum}}的数字。"
     },
     "invalidFormat": {
-      "ipv4": "Invalid format, expected an IPv4 address.",
-      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+      "ipv4": "无效格式，需要IPv4地址。",
+      "key": "无效格式，需要一个 Base64 编码预共享密钥 (PSK)。"
     },
     "invalidType": {
-      "number": "Invalid type, expected a number."
+      "number": "无效类型，需要数字。"
     },
     "pskLength": {
-      "0bit": "Key is required to be empty.",
-      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+      "0bit": "密钥为空。",
+      "8bit": "密钥必须是 8 位预共享密钥(PSK)。",
+      "128bit": "密钥必须是 128 位预共享密钥(PSK)。",
+      "256bit": "密钥必须是 256 位预共享密钥(PSK)。"
     },
     "required": {
-      "generic": "This field is required.",
-      "managed": "At least one admin key is requred if the node is managed.",
-      "key": "Key is required."
+      "generic": "此字段必填。",
+      "managed": "如果节点被远程管理，至少有一个管理员密钥。",
+      "key": "密钥不能为空。"
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+      "number": "无效格式，期望值为 410-930 MHz 或 0 (使用默认值)。"
     }
   },
-  "yes": "Yes",
-  "no": "No"
+  "yes": "是",
+  "no": "否"
 }

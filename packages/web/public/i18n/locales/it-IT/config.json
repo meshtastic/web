@@ -124,7 +124,7 @@
     "title": "Impostazioni Mesh",
     "description": "Impostazioni per la mesh LoRa",
     "bandwidth": {
-      "description": "Larghezza di banda del canale in kHz",
+      "description": "Larghezza di banda del canale in MHz",
       "label": "Larghezza di banda"
     },
     "boostedRxGain": {

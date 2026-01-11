@@ -124,7 +124,7 @@
     "title": "Mesh-verkon asetukset",
     "description": "LoRa-verkon asetukset",
     "bandwidth": {
-      "description": "Kanavan kaistanleveys kHz",
+      "description": "Kanavan kaistanleveys MHz",
       "label": "Kaistanleveys"
     },
     "boostedRxGain": {

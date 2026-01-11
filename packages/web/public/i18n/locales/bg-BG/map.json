@@ -13,7 +13,7 @@
     "remoteNeighbors": "Показване на отдалечени връзки",
     "positionPrecision": "Show position precision",
     "traceroutes": "Show traceroutes",
-    "waypoints": "Show waypoints"
+    "waypoints": "Показване на пътни точки"
   },
   "mapMenu": {
     "locateAria": "Locate my node",
