@@ -33,6 +33,7 @@
     "@meshtastic/transport-http": "workspace:*",
     "@meshtastic/transport-web-bluetooth": "workspace:*",
     "@meshtastic/transport-web-serial": "workspace:*",
+    "@meshtastic/transport-ws": "workspace:*",
     "@noble/curves": "^1.9.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",

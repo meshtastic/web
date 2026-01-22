@@ -7,10 +7,11 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
     let byteBuffer = new Uint8Array([]);
     const textDecoder = new TextDecoder();
     return new TransformStream<Uint8Array, DeviceOutput>({
-      transform(chunk: Uint8Array, controller): void {
+      transform(raw: Uint8Array | ArrayBuffer, controller): void {
         // onReleaseEvent.subscribe(() => {
         //   controller.terminate();
         // });
+        let chunk = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
         byteBuffer = new Uint8Array([...byteBuffer, ...chunk]);
         let processingExhausted = false;
         while (byteBuffer.length !== 0 && !processingExhausted) {
