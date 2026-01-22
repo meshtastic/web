@@ -152,9 +152,9 @@ export const Connections = () => {
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
                     ? t("toasts.nowConnected", {
-                        name: c.name,
-                        interpolation: { escapeValue: false },
-                      })
+                      name: c.name,
+                      interpolation: { escapeValue: false },
+                    })
                     : t("toasts.checkConnection"),
                 });
                 if (ok) {
@@ -198,9 +198,9 @@ export const Connections = () => {
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
                     ? t("toasts.nowConnected", {
-                        name: c.name,
-                        interpolation: { escapeValue: false },
-                      })
+                      name: c.name,
+                      interpolation: { escapeValue: false },
+                    })
                     : t("toasts.pickConnectionAgain"),
                 });
                 if (ok) {
@@ -248,7 +248,7 @@ export const Connections = () => {
 function TypeBadge({ type }: { type: Connection["type"] }) {
   const Icon = connectionTypeIcon(type);
   const label =
-    type === "http" ? "HTTP" : type === "bluetooth" ? "Bluetooth" : "Serial";
+    type === "http" ? "HTTP" : type === "ws" ? "WS" : type === "bluetooth" ? "Bluetooth" : type === "serial" ? "Serial" : "Unknown";
   return (
     <Badge variant="default" className="gap-1.5">
       <Icon className="h-3.5 w-3.5" />

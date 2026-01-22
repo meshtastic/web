@@ -20,6 +20,7 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
+import { TransportWebSocket } from "@meshtastic/transport-ws";
 import { useCallback } from "react";
 
 // Local storage for cleanup only (not in Zustand)
@@ -91,7 +92,7 @@ export function useConnections() {
           // Disconnect MeshDevice
           try {
             device.connection.disconnect();
-          } catch {}
+          } catch { }
         }
 
         // Close transport if it's BT or Serial
@@ -101,14 +102,14 @@ export function useConnections() {
           if (bt.gatt?.connected) {
             try {
               bt.gatt.disconnect();
-            } catch {}
+            } catch { }
           }
 
           const sp = transport as SerialPort & { close?: () => Promise<void> };
           if (sp.close) {
             try {
               sp.close();
-            } catch {}
+            } catch { }
           }
 
           transports.delete(id);
@@ -117,7 +118,7 @@ export function useConnections() {
         // Clean up orphaned Device
         try {
           removeDevice(conn.meshDeviceId);
-        } catch {}
+        } catch { }
       }
 
       removeSavedConnectionFromStore(id);
@@ -144,7 +145,8 @@ export function useConnections() {
       transport:
         | Awaited<ReturnType<typeof TransportHTTP.create>>
         | Awaited<ReturnType<typeof TransportWebBluetooth.createFromDevice>>
-        | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>,
+        | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>
+        | Awaited<ReturnType<typeof TransportWebSocket.createFromUrl>>,
       btDevice?: BluetoothDevice,
       serialPort?: SerialPort,
     ): number => {
@@ -401,6 +403,13 @@ export function useConnections() {
 
           const transport = await TransportWebSerial.createFromPort(port);
           setupMeshDevice(id, transport, undefined, port);
+          // Status will be set to "configured" by onConfigComplete event
+          return true;
+        }
+
+        if (conn.type === "ws") {
+          const transport = await TransportWebSocket.createFromUrl(conn.url);
+          setupMeshDevice(id, transport);
           // Status will be set to "configured" by onConfigComplete event
           return true;
         }

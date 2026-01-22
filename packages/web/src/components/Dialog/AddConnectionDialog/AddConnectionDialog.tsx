@@ -26,6 +26,7 @@ import {
   Bluetooth,
   Cable,
   CheckCircle2,
+  EthernetPort,
   Globe,
   Loader2,
   type LucideIcon,
@@ -42,12 +43,12 @@ type TestingStatus = "idle" | "testing" | "success" | "failure";
 type DialogState = {
   tab: TabKey;
   name: string;
-  protocol: "http" | "https";
+  protocol: "http" | "https" | "ws" | "wss";
   url: string;
   testStatus: TestingStatus;
   btSelected:
-    | { id: string; name?: string; device?: BluetoothDevice }
-    | undefined;
+  | { id: string; name?: string; device?: BluetoothDevice }
+  | undefined;
   serialSelected: { vendorId?: number; productId?: number } | undefined;
 };
 
@@ -55,19 +56,19 @@ type DialogAction =
   | { type: "RESET"; payload?: { isHTTPS?: boolean } }
   | { type: "SET_TAB"; payload: TabKey }
   | { type: "SET_NAME"; payload: string }
-  | { type: "SET_PROTOCOL"; payload: "http" | "https" }
+  | { type: "SET_PROTOCOL"; payload: "http" | "https" | "ws" | "wss" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
   | {
-      type: "SET_BT_SELECTED";
-      payload:
-        | { id: string; name?: string; device?: BluetoothDevice }
-        | undefined;
-    }
+    type: "SET_BT_SELECTED";
+    payload:
+    | { id: string; name?: string; device?: BluetoothDevice }
+    | undefined;
+  }
   | {
-      type: "SET_SERIAL_SELECTED";
-      payload: { vendorId?: number; productId?: number } | undefined;
-    }
+    type: "SET_SERIAL_SELECTED";
+    payload: { vendorId?: number; productId?: number } | undefined;
+  }
   | { type: "SET_URL_AND_RESET_TEST"; payload: string };
 
 interface FeatureErrorProps {
@@ -83,20 +84,20 @@ type Pane = {
 };
 
 const featureErrors: Record<BrowserFeature, { href: string; i18nKey: string }> =
-  {
-    "Web Bluetooth": {
-      href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
-      i18nKey: "addConnection.validation.requiresWebBluetooth",
-    },
-    "Web Serial": {
-      href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
-      i18nKey: "addConnection.validation.requiresWebSerial",
-    },
-    "Secure Context": {
-      href: "https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts",
-      i18nKey: "addConnection.validation.requiresSecureContext",
-    },
-  };
+{
+  "Web Bluetooth": {
+    href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
+    i18nKey: "addConnection.validation.requiresWebBluetooth",
+  },
+  "Web Serial": {
+    href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
+    i18nKey: "addConnection.validation.requiresWebSerial",
+  },
+  "Secure Context": {
+    href: "https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts",
+    i18nKey: "addConnection.validation.requiresSecureContext",
+  },
+};
 
 const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
   if (missingFeatures.length === 0) {
@@ -245,14 +246,15 @@ function PickerRow({
 
 const TAB_META: Array<{ key: TabKey; label: string; Icon: LucideIcon }> = [
   { key: "http", label: "HTTP", Icon: Globe },
+  { key: "ws", label: "WebSocket", Icon: EthernetPort },
   { key: "bluetooth", label: "Bluetooth", Icon: Bluetooth },
   { key: "serial", label: "Serial", Icon: Cable },
 ];
 
 export default function AddConnectionDialog({
   open = false,
-  onOpenChange = () => {},
-  onSave = async () => {},
+  onOpenChange = () => { },
+  onSave = async () => { },
   isHTTPS = false,
 }: {
   open?: boolean;
@@ -318,8 +320,8 @@ export default function AddConnectionDialog({
           type: "SET_NAME",
           payload: device.name
             ? t("addConnection.bluetoothConnection.short", {
-                deviceName: device.name,
-              })
+              deviceName: device.name,
+            })
             : t("addConnection.bluetoothConnection.long"),
         });
       }
@@ -380,8 +382,7 @@ export default function AddConnectionDialog({
   }, [serialSupported, state.name, toast, makeToastErrorHandler, t]);
 
   const handleTestHttp = useCallback(async () => {
-    const fullUrl = `${state.protocol}://${state.url}`;
-    const validatedURL = urlOrIpv4Schema.safeParse(fullUrl);
+    const validatedURL = urlOrIpv4Schema.safeParse(state.url);
     if (validatedURL.success === false) {
       toast({
         title: t("addConnection.httpConnection.invalidUrl.title"),
@@ -402,6 +403,19 @@ export default function AddConnectionDialog({
         ),
       });
     }
+  }, [state.protocol, state.url, toast, t]);
+
+  const handleTestWs = useCallback(async () => {
+    const validatedURL = urlOrIpv4Schema.safeParse(state.url);
+    if (validatedURL.success === false) {
+      toast({
+        title: t("addConnection.wsConnection.invalidUrl.title"),
+        description: t("addConnection.wsConnection.invalidUrl.description") + validatedURL.error + state.url,
+      });
+      return;
+    }
+    dispatch({ type: "SET_TEST_STATUS", payload: "testing" });
+    dispatch({ type: "SET_TEST_STATUS", payload: "success" });
   }, [state.protocol, state.url, toast, t]);
 
   const PANES: Record<TabKey, Pane> = useMemo(
@@ -448,7 +462,7 @@ export default function AddConnectionDialog({
                 className="gap-2"
                 onClick={handleTestHttp}
                 disabled={
-                  urlOrIpv4Schema.safeParse(`${state.protocol}://${state.url}`)
+                  urlOrIpv4Schema.safeParse(`${state.url}`)
                     .success === false || state.testStatus === "testing"
                 }
               >
@@ -489,10 +503,97 @@ export default function AddConnectionDialog({
           </div>
         ),
         validate: () =>
-          urlOrIpv4Schema.safeParse(`${state.protocol}://${state.url}`)
+          urlOrIpv4Schema.safeParse(`${state.url}`)
             .success === true && state.testStatus === "success",
         build: () => ({
           type: "http",
+          name: state.name.trim(),
+          url: `${state.protocol}://${state.url.trim()}`,
+        }),
+      },
+      ws: {
+        placeholder: t("addConnection.wsConnection.namePlaceholder"),
+        children: () => (
+          <div className="flex flex-col gap-4">
+            <Label htmlFor="url">
+              {t("addConnection.wsConnection.heading")}
+            </Label>
+
+            <Input
+              id={"url"}
+              inputMode="url"
+              placeholder={t("addConnection.wsConnection.inputPlaceholder")}
+              prefix={`${state.protocol}://`}
+              value={state.url}
+              onChange={(e) => {
+                dispatch({
+                  type: "SET_URL_AND_RESET_TEST",
+                  payload: e.target.value,
+                });
+              }}
+            />
+            <div className="flex items-center gap-2 mt-1">
+              <Switch
+                value={state.protocol}
+                disabled={!!isURLHTTPS}
+                checked={state.protocol === "wss"}
+                onCheckedChange={(value) => {
+                  dispatch({
+                    type: "SET_PROTOCOL",
+                    payload: value ? "wss" : "ws",
+                  });
+                  dispatch({ type: "SET_TEST_STATUS", payload: "idle" });
+                }}
+              ></Switch>
+              <Label>{t("addConnection.wsConnection.useWss")}</Label>
+            </div>
+            <div className="flex items-center gap-2 mt-4">
+              <Button
+                variant="subtle"
+                className="gap-2"
+                onClick={handleTestWs}
+              >
+                {state.testStatus === "testing" ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t(
+                      "addConnection.wsConnection.connectionTest.button.loading",
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <MousePointerClick className="h-4 w-4" />
+                    {t(
+                      "addConnection.wsConnection.connectionTest.button.label",
+                    )}
+                  </>
+                )}
+              </Button>
+              {state.testStatus === "success" && (
+                <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {t("addConnection.wsConnection.connectionTest.reachable")}
+                </div>
+              )}
+              {state.testStatus === "failure" && (
+                <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+                  <XCircle className="h-4 w-4" />
+                  {t(
+                    "addConnection.wsConnection.connectionTest.notReachable",
+                  )}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {t("addConnection.wsConnection.connectionTest.description")}
+            </p>
+          </div>
+        ),
+        validate: () =>
+          urlOrIpv4Schema.safeParse(`${state.url}`)
+            .success === true && state.testStatus === "success",
+        build: () => ({
+          type: "ws",
           name: state.name.trim(),
           url: `${state.protocol}://${state.url.trim()}`,
         }),
@@ -558,11 +659,11 @@ export default function AddConnectionDialog({
               display={
                 state.serialSelected
                   ? t("addConnection.serialConnection.deviceName", {
-                      vendorId:
-                        state.serialSelected.vendorId?.toString(16) ?? "?",
-                      productId:
-                        state.serialSelected.productId?.toString(16) ?? "?",
-                    })
+                    vendorId:
+                      state.serialSelected.vendorId?.toString(16) ?? "?",
+                    productId:
+                      state.serialSelected.productId?.toString(16) ?? "?",
+                  })
                   : t("addConnection.serialConnection.notSelected")
               }
               helper={t("addConnection.serialConnection.helperText")}
@@ -599,19 +700,19 @@ export default function AddConnectionDialog({
 
   const submit =
     (fn: (p: NewConnection, device?: BluetoothDevice) => Promise<void>) =>
-    async () => {
-      if (!canCreate) {
-        return;
-      }
-      const payload = currentPane.build();
+      async () => {
+        if (!canCreate) {
+          return;
+        }
+        const payload = currentPane.build();
 
-      if (!payload) {
-        return;
-      }
-      const btDevice =
-        state.tab === "bluetooth" ? state.btSelected?.device : undefined;
-      await fn(payload, btDevice);
-    };
+        if (!payload) {
+          return;
+        }
+        const btDevice =
+          state.tab === "bluetooth" ? state.btSelected?.device : undefined;
+        await fn(payload, btDevice);
+      };
 
   return (
     <DialogWrapper

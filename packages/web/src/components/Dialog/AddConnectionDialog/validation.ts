@@ -3,18 +3,18 @@ import z from "zod";
 export const urlOrIpv4Schema = z
   .string()
   .trim()
-  .refine((val) => {
-    const input = val.replace(/^https?:\/\//i, "");
-
+  .refine((input) => {
     // Split input into host and port (port is optional)
-    const lastColonIndex = input.lastIndexOf(":");
-    let host = input;
+    const firstSlashIndex = input.indexOf("/");
+    const host_port = (firstSlashIndex === -1) ? input : input.substring(0, firstSlashIndex);
+    const lastColonIndex = host_port.lastIndexOf(":");
+    let host = host_port;
     let port = null;
 
     if (lastColonIndex !== -1) {
-      const potentialPort = input.substring(lastColonIndex + 1);
+      const potentialPort = host_port.substring(lastColonIndex + 1);
       if (/^\d+$/.test(potentialPort)) {
-        host = input.substring(0, lastColonIndex);
+        host = host_port.substring(0, lastColonIndex);
         port = parseInt(potentialPort, 10);
       }
     }
@@ -40,7 +40,4 @@ export const urlOrIpv4Schema = z
       domainRegex.test(host) ||
       localDomainRegex.test(host)
     );
-  }, "Must be a valid IPv4 address or domain name with optional port (10-65535)")
-  .transform((val) => {
-    return /^https?:\/\//i.test(val) ? val : `http://${val}`;
-  });
+  }, "Must be a valid IPv4 address or domain name with optional port (10-65535)");

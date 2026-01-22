@@ -98,25 +98,27 @@ export function runTransportContract(contract: TransportContract) {
 
       const reader = transport.fromDevice.getReader();
 
-      await contract.triggerDisconnect?.();
+      if (contract.triggerDisconnect) {
+        await contract.triggerDisconnect?.();
 
-      // As above, read a few events and assert we eventually see "disconnected"
-      let sawDrop = false;
-      for (let i = 0; i < 10; i++) {
-        const { value } = await reader.read();
-        if (
-          value &&
-          value.type === "status" &&
-          value.data.status === Types.DeviceStatusEnum.DeviceDisconnected
-        ) {
-          sawDrop = true;
-          break;
+        // As above, read a few events and assert we eventually see "disconnected"
+        let sawDrop = false;
+        for (let i = 0; i < 10; i++) {
+          const { value } = await reader.read();
+          if (
+            value &&
+            value.type === "status" &&
+            value.data.status === Types.DeviceStatusEnum.DeviceDisconnected
+          ) {
+            sawDrop = true;
+            break;
+          }
         }
-      }
-      expect(sawDrop).toBe(true);
+        expect(sawDrop).toBe(true);
 
-      reader.releaseLock();
-      await contract.teardown?.();
+        reader.releaseLock();
+        await contract.teardown?.();
+      }
     });
   });
 }

@@ -29,7 +29,7 @@ type DialogVariant = keyof Dialogs;
 type Page = "messages" | "map" | "settings" | "channels" | "nodes";
 
 export type ConnectionId = number;
-export type ConnectionType = "http" | "bluetooth" | "serial";
+export type ConnectionType = "http" | "bluetooth" | "serial" | "ws";
 export type ConnectionStatus =
   | "connected"
   | "connecting"
@@ -55,18 +55,23 @@ export type Connection = {
 export type NewConnection =
   | { type: "http"; name: string; url: string }
   | {
-      type: "bluetooth";
-      name: string;
-      deviceId?: string;
-      deviceName?: string;
-      gattServiceUUID?: string;
-    }
+    type: "bluetooth";
+    name: string;
+    deviceId?: string;
+    deviceName?: string;
+    gattServiceUUID?: string;
+  }
   | {
-      type: "serial";
-      name: string;
-      usbVendorId?: number;
-      usbProductId?: number;
-    };
+    type: "serial";
+    name: string;
+    usbVendorId?: number;
+    usbProductId?: number;
+  }
+  | {
+    type: "ws";
+    name: string;
+    url: URL;
+  };
 
 type WaypointWithMetadata = Protobuf.Mesh.Waypoint & {
   metadata: {

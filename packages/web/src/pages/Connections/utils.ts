@@ -5,7 +5,7 @@ import type {
   NewConnection,
 } from "@app/core/stores/deviceStore/types";
 import { randId } from "@app/core/utils/randId";
-import { Bluetooth, Cable, Globe, type LucideIcon } from "lucide-react";
+import { Bluetooth, Cable, Globe, EthernetPort, type LucideIcon } from "lucide-react";
 
 export function createConnectionFromInput(input: NewConnection): Connection {
   const base = {
@@ -32,12 +32,24 @@ export function createConnectionFromInput(input: NewConnection): Connection {
       gattServiceUUID: input.gattServiceUUID,
     };
   }
-  return {
-    ...base,
-    type: "serial",
-    usbVendorId: input.usbVendorId,
-    usbProductId: input.usbProductId,
-  };
+  if (input.type === "serial") {
+    return {
+      ...base,
+      type: "serial",
+      usbVendorId: input.usbVendorId,
+      usbProductId: input.usbProductId,
+    };
+  }
+  if (input.type === "ws") {
+    return {
+      ...base,
+      type: "ws",
+      url: input.url,
+      isDefault: false,
+      name: input.name.length === 0 ? input.url.toString() : input.name,
+    };
+  }
+  throw new Error(`Unknown connection type: ${input.type}`);
 }
 
 export async function testHttpReachable(
@@ -68,7 +80,12 @@ export function connectionTypeIcon(type: ConnectionType): LucideIcon {
   if (type === "bluetooth") {
     return Bluetooth;
   }
-  return Cable;
+  if (type === "serial") {
+    return Cable;
+  }
+  if (type === "ws") {
+    return EthernetPort;
+  }
 }
 
 export function formatConnectionSubtext(conn: Connection): string {
@@ -78,7 +95,12 @@ export function formatConnectionSubtext(conn: Connection): string {
   if (conn.type === "bluetooth") {
     return conn.deviceName || conn.deviceId || "No device selected";
   }
-  const v = conn.usbVendorId ? conn.usbVendorId.toString(16) : "?";
-  const p = conn.usbProductId ? conn.usbProductId.toString(16) : "?";
-  return `USB ${v}:${p}`;
+  if (conn.type === "serial") {
+    const v = conn.usbVendorId ? conn.usbVendorId.toString(16) : "?";
+    const p = conn.usbProductId ? conn.usbProductId.toString(16) : "?";
+    return `USB ${v}:${p}`;
+  }
+  if (conn.type === "ws") {
+    return conn.url.toString();
+  }
 }
