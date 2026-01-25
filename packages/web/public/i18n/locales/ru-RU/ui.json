@@ -1,111 +1,111 @@
 {
   "navigation": {
-    "title": "Navigation",
+    "title": "Навигация",
     "messages": "Сообщения",
     "map": "Карта",
     "settings": "Настройки",
     "channels": "Каналы",
-    "radioConfig": "Radio Config",
+    "radioConfig": "Настройка радио",
     "deviceConfig": "Настройки устройства",
-    "moduleConfig": "Module Config",
-    "manageConnections": "Manage Connections",
+    "moduleConfig": "Настройка модуля",
+    "manageConnections": "Управление подключениями",
     "nodes": "Узлы"
   },
   "app": {
     "title": "Meshtastic",
-    "logo": "Meshtastic Logo"
+    "logo": "Логотип Meshtastic"
   },
   "sidebar": {
     "collapseToggle": {
       "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
+        "open": "Открыть боковую панель",
+        "close": "Закрыть боковую панель"
       }
     },
     "deviceInfo": {
-      "volts": "{{voltage}} volts",
+      "volts": "{{voltage}} вольт",
       "firmware": {
         "title": "Прошивка",
-        "version": "v{{version}}",
-        "buildDate": "Build date: {{date}}"
+        "version": "верс.{{version}}",
+        "buildDate": "Дата сборки: {{date}}"
       }
     }
   },
   "batteryStatus": {
-    "charging": "{{level}}% charging",
-    "pluggedIn": "Plugged in",
+    "charging": "Зарядка {{level}}%",
+    "pluggedIn": "Заряжается ",
     "title": "Батарея"
   },
   "search": {
-    "nodes": "Search nodes...",
-    "channels": "Search channels...",
-    "commandPalette": "Search commands..."
+    "nodes": "Поиск узлов...",
+    "channels": "Поиск каналов...",
+    "commandPalette": "Поиск команд..."
   },
   "toast": {
     "positionRequestSent": {
-      "title": "Position request sent."
+      "title": "Запрос местоположения отправлен"
     },
     "requestingPosition": {
-      "title": "Requesting position, please wait..."
+      "title": "Запрос местоположения, пожалуйста, подождите..."
     },
     "sendingTraceroute": {
-      "title": "Sending Traceroute, please wait..."
+      "title": "Трассировка соединения, пожалуйста, подождите..."
     },
     "tracerouteSent": {
-      "title": "Traceroute sent."
+      "title": "Трассировка отправлена"
     },
     "savedChannel": {
-      "title": "Saved Channel: {{channelName}}"
+      "title": "Сохраненный канал: {{channelName}}"
     },
     "messages": {
       "pkiEncryption": {
-        "title": "Chat is using PKI encryption."
+        "title": "Чат использует PKI-шифрование"
       },
       "pskEncryption": {
-        "title": "Chat is using PSK encryption."
+        "title": "Чат использует PSK-шифрование."
       }
     },
     "configSaveError": {
-      "title": "Error Saving Config",
-      "description": "An error occurred while saving the configuration."
+      "title": "Ошибка при сохранении конфигурации",
+      "description": "Произошла ошибка при сохранении конфигурации"
     },
     "validationError": {
-      "title": "Config Errors Exist",
-      "description": "Please fix the configuration errors before saving."
+      "title": "Обнаружены ошибки конфигурации",
+      "description": "Пожалуйста, исправьте ошибки конфигурации перед сохранением"
     },
     "saveSuccess": {
-      "title": "Saving Config",
-      "description": "The configuration change {{case}} has been saved."
+      "title": "Сохранение конфигурации",
+      "description": "Изменение конфигурации {{case}} было сохранено"
     },
     "saveAllSuccess": {
-      "title": "Saved",
-      "description": "All configuration changes have been saved."
+      "title": "Сохранено",
+      "description": "Все изменения были сохранены"
     },
     "favoriteNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "title": "{{action}}{{nodeName}}{{direction}} в списке избранных",
       "action": {
-        "added": "Added",
-        "removed": "Removed",
-        "to": "to",
-        "from": "from"
+        "added": "Добавлено",
+        "removed": "Удалено",
+        "to": "до",
+        "from": "от"
       }
     },
     "ignoreNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "title": "{{action}}{{nodeName}}{{direction}} игнорируется",
       "action": {
-        "added": "Added",
-        "removed": "Removed",
-        "to": "to",
-        "from": "from"
+        "added": "Добавлено",
+        "removed": "Удалено",
+        "to": "до",
+        "from": "от"
       }
     }
   },
   "notifications": {
     "copied": {
-      "label": "Copied!"
+      "label": "Скопировано!"
     },
     "copyToClipboard": {
-      "label": "Copy to clipboard"
+      "label": "Скопировать в буфер обмена"
     },
     "hidePassword": {
       "label": "Скрыть пароль"
@@ -114,20 +114,20 @@
       "label": "Показать пароль"
     },
     "deliveryStatus": {
-      "delivered": "Delivered",
-      "failed": "Delivery Failed",
-      "waiting": "Waiting",
+      "delivered": "Доставлено",
+      "failed": "Ошибка отправки",
+      "waiting": "Ожидание",
       "unknown": "Неизвестно"
     }
   },
   "general": {
-    "label": "General"
+    "label": "Общие"
   },
   "hardware": {
     "label": "Оборудование"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "Показатели"
   },
   "role": {
     "label": "Роль"
@@ -139,92 +139,92 @@
     "label": "Расширенные"
   },
   "clearInput": {
-    "label": "Clear input"
+    "label": "Очистить поле"
   },
   "resetFilters": {
-    "label": "Reset Filters"
+    "label": "Сбросить фильтры"
   },
   "nodeName": {
-    "label": "Node name/number",
+    "label": "Имя/номер узла",
     "placeholder": "Meshtastic 1234"
   },
   "airtimeUtilization": {
-    "label": "Airtime Utilization (%)",
-    "short": "Airtime Util. (%)"
+    "label": "Использование эфира (%)",
+    "short": "Исп. эфира (%)"
   },
   "batteryLevel": {
-    "label": "Battery level (%)",
-    "labelText": "Battery level (%): {{value}}"
+    "label": "Уровень заряда батареи (%)",
+    "labelText": "Уровень заряда батареи (%): {{value}}"
   },
   "batteryVoltage": {
-    "label": "Battery voltage (V)",
+    "label": "Напряжение батареи (В)",
     "title": "Напряжение"
   },
   "channelUtilization": {
-    "label": "Channel Utilization (%)",
-    "short": "Channel Util. (%)"
+    "label": "Использование канала (%)",
+    "short": "Исп. канала (%)"
   },
   "hops": {
     "direct": "Прямой",
-    "label": "Number of hops",
-    "text": "Number of hops: {{value}}"
+    "label": "Количество хопов",
+    "text": "Количество хопов: {{value}}"
   },
   "lastHeard": {
     "label": "Последний раз слышен",
-    "labelText": "Last heard: {{value}}",
-    "nowLabel": "Now"
+    "labelText": "Последний раз слышали в: {{value}}",
+    "nowLabel": "Только что"
   },
   "snr": {
-    "label": "SNR (db)"
+    "label": "Сигнал/Шум SNR (Дб)"
   },
   "favorites": {
-    "label": "Favorites"
+    "label": "Избранное"
   },
   "hide": {
-    "label": "Hide"
+    "label": "Скрыть"
   },
   "showOnly": {
-    "label": "Show Only"
+    "label": "Показывать"
   },
   "viaMqtt": {
-    "label": "Connected via MQTT"
+    "label": "Подключено через MQTT"
   },
   "hopsUnknown": {
-    "label": "Unknown number of hops"
+    "label": "Неизвестное число хопов"
   },
   "showUnheard": {
-    "label": "Unknown last heard"
+    "label": "Неизвестно время последней активности"
   },
   "language": {
     "label": "Язык",
-    "changeLanguage": "Change Language"
+    "changeLanguage": "Сменить язык"
   },
   "theme": {
     "dark": "Темная",
     "light": "Светлая",
-    "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
+    "system": "Автоматически",
+    "changeTheme": "Сменить цветовую схему"
   },
   "errorPage": {
-    "title": "This is a little embarrassing...",
-    "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
-    "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
-    "reportInstructions": "Please include the following information in your report:",
+    "title": "Упссс...",
+    "description1": "Мы очень сожалеем, но в веб-клиенте произошла ошибка, которая привела к его сбою. <br /> Это не должно было произойти, и мы прилагаем все усилия, чтобы исправить эту проблему.",
+    "description2": "Самый лучший способ предотвратить это повторение вам или кому-либо другим - сообщить нам об этой проблеме.",
+    "reportInstructions": "Пожалуйста, включите в свой отчет следующую информацию:",
     "reportSteps": {
-      "step1": "What you were doing when the error occurred",
-      "step2": "What you expected to happen",
-      "step3": "What actually happened",
-      "step4": "Any other relevant information"
+      "step1": "Что вы делали, когда произошла ошибка",
+      "step2": "Что должно было произойти",
+      "step3": "Что действительно произошло",
+      "step4": "Любая другая важная информация"
     },
-    "reportLink": "You can report the issue to our <0>GitHub</0>",
-    "connectionsLink": "Return to the <0>connections</0>",
-    "detailsSummary": "Error Details",
-    "errorMessageLabel": "Error message:",
-    "stackTraceLabel": "Stack trace:",
+    "reportLink": "Вы можете сообщить о проблеме на нашем  <0>GitHub</0>",
+    "connectionsLink": "Вернуться к <0>подключениям</0>",
+    "detailsSummary": "Сведения об ошибке",
+    "errorMessageLabel": "Сообщение об ошибке:",
+    "stackTraceLabel": "Диагностический отчёт:",
     "fallbackError": "{{error}}"
   },
   "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
-    "commitSha": "Commit SHA: {{sha}}"
+    "text": "Работает на <0>▲ Vercel</0> | Meshtastic® является зарегистрированной торговой маркой Meshtastic LLC. | <1>Юридическая информация</1>",
+    "commitSha": "Хеш коммита (SHA): {{sha}}"
   }
 }

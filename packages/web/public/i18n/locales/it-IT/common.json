@@ -1,8 +1,8 @@
 {
   "button": {
     "apply": "Applica",
-    "addConnection": "Add Connection",
-    "saveConnection": "Save connection",
+    "addConnection": "Aggiungi Connessione",
+    "saveConnection": "Salva connessione",
     "backupKey": "Backup della chiave",
     "cancel": "Annulla",
     "connect": "Connetti",
@@ -25,13 +25,13 @@
     "requestNewKeys": "Richiedi Nuove Chiavi",
     "requestPosition": "Richiedi posizione",
     "reset": "Reset",
-    "retry": "Retry",
+    "retry": "Riprova",
     "save": "Salva",
-    "setDefault": "Set as default",
-    "unsetDefault": "Unset default",
+    "setDefault": "Imposta come predefinito",
+    "unsetDefault": "Annulla impostazione predefinita",
     "scanQr": "Scansiona codice QR",
     "traceRoute": "Trace Route",
-    "submit": "Submit"
+    "submit": "Invia"
   },
   "app": {
     "title": "Meshtastic",
@@ -52,7 +52,6 @@
       "unknown": "Hop sconosciuti"
     },
     "megahertz": "MHz",
-    "kilohertz": "kHz",
     "raw": "grezzo",
     "meter": {
       "one": "Metro",
@@ -60,8 +59,8 @@
       "suffix": "m"
     },
     "kilometer": {
-      "one": "Kilometer",
-      "plural": "Kilometers",
+      "one": "Chilometro",
+      "plural": "Chilometri",
       "suffix": "km"
     },
     "minute": {
@@ -69,8 +68,8 @@
       "plural": "Minuti"
     },
     "hour": {
-      "one": "Hour",
-      "plural": "Hours"
+      "one": "Ora",
+      "plural": "Ore"
     },
     "millisecond": {
       "one": "Millisecondo",
@@ -82,18 +81,18 @@
       "plural": "Secondi"
     },
     "day": {
-      "one": "Day",
-      "plural": "Days",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "one": "Giorno",
+      "plural": "Giorni",
+      "today": "Oggi",
+      "yesterday": "Ieri"
     },
     "month": {
-      "one": "Month",
-      "plural": "Months"
+      "one": "Mese",
+      "plural": "Mesi"
     },
     "year": {
-      "one": "Year",
-      "plural": "Years"
+      "one": "Anno",
+      "plural": "Anni"
     },
     "snr": "SNR",
     "volt": {
@@ -106,13 +105,13 @@
       "plural": "Record"
     },
     "degree": {
-      "one": "Degree",
-      "plural": "Degrees",
+      "one": "Grado",
+      "plural": "Gradi",
       "suffix": "°"
     }
   },
   "security": {
-    "0bit": "Empty",
+    "0bit": "Vuoto",
     "8bit": "8 bit",
     "128bit": "128 bit",
     "256bit": "256 bit"
@@ -126,9 +125,9 @@
   "nodeUnknownPrefix": "!",
   "unset": "ANNULLA",
   "fallbackName": "Meshtastic {{last4}}",
-  "node": "Node",
+  "node": "Nodo",
   "formValidation": {
-    "unsavedChanges": "Unsaved changes",
+    "unsavedChanges": "Modifiche non Salvate",
     "tooBig": {
       "string": "Troppo lungo, atteso minore o uguale a {{maximum}} caratteri.",
       "number": "Troppo grande, ci si aspetta un numero minore o uguale a {{maximum}}.",
@@ -157,7 +156,7 @@
       "key": "La chiave è obbligatoria."
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+      "number": "Formato non valido, atteso un valore nell'intervallo 410-930 MHz o 0 (utilizza il valore predefinito)."
     }
   },
   "yes": "Sì",

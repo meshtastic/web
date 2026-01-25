@@ -25,7 +25,7 @@
     "requestNewKeys": "Заявка за нови ключове",
     "requestPosition": "Request Position",
     "reset": "Нулиране",
-    "retry": "Retry",
+    "retry": "Опитайте отново",
     "save": "Запис",
     "setDefault": "Задаване по подразбиране",
     "unsetDefault": "Unset default",
@@ -52,7 +52,6 @@
       "unknown": "Unknown hops away"
     },
     "megahertz": "MHz",
-    "kilohertz": "kHz",
     "raw": "raw",
     "meter": {
       "one": "Метър",

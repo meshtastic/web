@@ -4,18 +4,18 @@
     "title": "Supprimer tous les messages"
   },
   "import": {
-    "description": "La configuration LoRa actuelle sera écrasée.",
+    "description": "Importer une liste de canaux depuis une adresse Meshtastic. <br />Une adresse valide commence par \"<italic>https://meshtastic.org/e/...</italic>\"",
     "error": {
       "invalidUrl": "URL Meshtastic invalide"
     },
-    "channelPrefix": "Canal: ",
-    "primary": "Primary ",
-    "doNotImport": "No not import",
+    "channelPrefix": "Canal : ",
+    "primary": "Primaire ",
+    "doNotImport": "Ne pas importer",
     "channelName": "Nom",
     "channelSlot": "Emplacement",
     "channelSetUrl": "URL du set de canaux ou du QR code",
-    "useLoraConfig": "Import LoRa Config",
-    "presetDescription": "The current LoRa Config will be replaced.",
+    "useLoraConfig": "Importer la configuration LoRa",
+    "presetDescription": "La configuration LoRa actuelle va être remplacée.",
     "title": "Importer un ensemble de canaux"
   },
   "locationResponse": {
@@ -30,8 +30,8 @@
     "regenerate": "Régénérer"
   },
   "addConnection": {
-    "title": "Add connection",
-    "description": "Choose a connection type and fill in the details",
+    "title": "Ajouter une connexion",
+    "description": "Choisissez un type de connexion et remplissez les informations",
     "validation": {
       "requiresWebBluetooth": "Ce type de connexion nécessite <0>Web Bluetooth</0>. Veuillez utiliser un navigateur compatible, comme Chrome ou Edge.<0>",
       "requiresWebSerial": "Ce type de connexion nécessite <0>Web Serial</0>. Veuillez utiliser un navigateur compatible, comme Chrome ou Edge.",
@@ -39,65 +39,65 @@
       "additionallyRequiresSecureContext": "Elle nécessite également un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost."
     },
     "bluetoothConnection": {
-      "namePlaceholder": "My Bluetooth Node",
+      "namePlaceholder": "Mon nœud Bluetooth",
       "supported": {
-        "title": "Web Bluetooth supported"
+        "title": "Bluetooth via le Web supporté"
       },
       "notSupported": {
-        "title": "Web Bluetooth not supported",
-        "description": "Your browser or device does not support Web Bluetooth"
+        "title": "Bluetooth via le Web non supporté",
+        "description": "Votre navigateur ou appareil ne supporte pas la connexion Bluetooth via le Web"
       },
-      "short": "BT: {{deviceName}}",
-      "long": "Bluetooth Device",
+      "short": "BT : {{deviceName}}",
+      "long": "Appareil Bluetooth",
       "device": "Appareil",
-      "selectDevice": "Select device",
-      "selected": "Bluetooth device selected",
-      "notSelected": "No device selected",
-      "helperText": "Uses the Meshtastic Bluetooth service for discovery."
+      "selectDevice": "Sélectionner l'appareil",
+      "selected": "Appareil Bluetooth sélectionné",
+      "notSelected": "Aucun appareil sélectionné",
+      "helperText": "Utilise le service Bluetooth Meshtastic pour la découverte."
     },
     "serialConnection": {
-      "namePlaceholder": "My Serial Node",
-      "helperText": "Selecting a port grants permission so the app can open it to connect.",
+      "namePlaceholder": "Mon nœud série",
+      "helperText": "Sélectionner un port autorise l'application à l'ouvrir pour s'y connecter",
       "supported": {
-        "title": "Web Serial supported"
+        "title": "Connexion au port série via le Web supporté"
       },
       "notSupported": {
-        "title": "Web Serial not supported",
-        "description": "Your browser or device does not support Web Serial"
+        "title": "Connexion au port série via le Web non supporté",
+        "description": "Votre navigateur ou appareil ne supporte pas la connexion série via le Web"
       },
       "portSelected": {
-        "title": "Serial port selected",
-        "description": "Port permissions granted."
+        "title": "Port série sélectionné",
+        "description": "Autorisations d'accès au port accordées."
       },
       "port": "Port",
-      "selectPort": "Select port",
-      "deviceName": "USB {{vendorId}}:{{productId}}",
-      "notSelected": "No port selected"
+      "selectPort": "Sélectionnez le port",
+      "deviceName": "USB {{vendorId}} : {{productId}}",
+      "notSelected": "Aucun port sélectionné"
     },
     "httpConnection": {
-      "namePlaceholder": "My HTTP Node",
-      "inputPlaceholder": "192.168.1.10 or meshtastic.local",
-      "heading": "URL or IP",
-      "useHttps": "Use HTTTPS",
+      "namePlaceholder": "Mon nœud HTTP",
+      "inputPlaceholder": "192.168.1.10 ou meshtastic.local",
+      "heading": "URL ou IP",
+      "useHttps": "Utiliser HTTPS",
       "invalidUrl": {
-        "title": "Invalid URL",
-        "description": "Please enter a valid HTTP or HTTPS URL."
+        "title": "URL invalide",
+        "description": "Veuillez saisir une URL HTTP ou HTTPS valide."
       },
       "connectionTest": {
-        "description": "Test the connetion before saving to verify the device is reachable.",
+        "description": "Testez la connexion avant d'enregistrer pour vérifier que l'appareil est accessible.",
         "button": {
-          "loading": "Testing...",
-          "label": "Test connection"
+          "loading": "Test en cours...",
+          "label": "Test de la connexion"
         },
-        "reachable": "Reachable",
-        "notReachable": "Not reachable",
+        "reachable": "Joignable",
+        "notReachable": "Non joignable",
         "success": {
-          "title": "Connection test successful",
-          "description": "The device appears to be reachable."
+          "title": "Test de connexion réussi",
+          "description": "L'appareil semble joignable."
         },
         "failure": {
-          "title": "Connection test failed",
-          "description": "Could not reach the device. Check the URL and try again."
+          "title": "Échec du test de connexion",
+          "description": "Impossible de joindre l'appareil. Vérifiez l'URL et réessayez."
         }
       }
     }
@@ -124,9 +124,9 @@
     "ignoreNode": "Ignorer le nœud",
     "removeNode": "Supprimer le nœud",
     "unignoreNode": "Ne plus ignorer le nœud",
-    "security": "Sécurité:",
-    "publicKey": "Clé publique: ",
-    "messageable": "Messageable ",
+    "security": "Sécurité :",
+    "publicKey": "Clé publique : ",
+    "messageable": "Messageable : ",
     "KeyManuallyVerifiedTrue": "La clé publique a été vérifiée manuellement",
     "KeyManuallyVerifiedFalse": "La clé publique n'est pas vérifiée manuellement"
   },
@@ -212,27 +212,27 @@
     "Compromised keys were detected and regenerated.": "Les clés compromises ont été détectées et régénérées."
   },
   "resetNodeDb": {
-    "title": "Reset Node Database",
-    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
-    "confirm": "Reset Node Database",
-    "failedTitle": "There was an error resetting the Node DB. Please try again."
+    "title": "Réinitialiser la base de nœuds",
+    "description": "Cela effacera tous les nœuds de la base de données des nœuds de l'appareil connecté et effacera tout l'historique des messages dans le client. Cette opération ne peut pas être annulée. Êtes-vous sûr de vouloir continuer ?",
+    "confirm": "Réinitialiser la base de nœuds",
+    "failedTitle": "Il y a eu une erreur lors de la réinitialisation de la base de données des nœuds. Merci de réessayer."
   },
   "clearAllStores": {
-    "title": "Clear All Local Storage",
-    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
-    "confirm": "Clear all local storage",
-    "failedTitle": "There was an error clearing local storage. Please try again."
+    "title": "Effacer tout le stockage local",
+    "description": "Cela effacera toutes les données stockées localement, y compris l'historique des messages et les bases de données des nœuds pour tous les appareils précédemment connectés. Vous devrez vous reconnecter à votre nœud une fois l'opération terminée et celle-ci ne pourra pas être annulée. Êtes-vous sûr de vouloir continuer ?",
+    "confirm": "Effacer tout le stockage local",
+    "failedTitle": "Une erreur s'est produite lors de la suppression du stockage local. Merci de réessayer."
   },
   "factoryResetDevice": {
     "title": "Réinitialisation d'usine de l'appareil",
-    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
+    "description": "Cela réinitialisera les paramètres d'usine de l'appareil connecté, effaçant toutes les configurations et données sur l'appareil ainsi que tous les nœuds et messages enregistrés dans le client. Cette opération ne peut pas être annulée. Êtes-vous sûr de vouloir continuer ?",
     "confirm": "Réinitialisation d'usine de l'appareil",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "failedTitle": "Une erreur s'est produite lors de la réinitialisation d'usine. Merci de réessayer."
   },
   "factoryResetConfig": {
     "title": "Réinitialisation d'usine de la config",
-    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
+    "description": "Cela réinitialisera la configuration d'usine de l'appareil connecté, effaçant toutes les configurations de l'appareil. Cette opération ne peut pas être annulée. Êtes-vous sûr de vouloir continuer ?",
     "confirm": "Réinitialisation d'usine de la config",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "failedTitle": "Une erreur s'est produite lors de la réinitialisation d'usine. Merci de réessayer."
   }
 }

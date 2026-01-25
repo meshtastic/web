@@ -3,66 +3,66 @@
     "sectionLabel": "Каналы",
     "channelName": "Канал: {{channelName}}",
     "broadcastLabel": "Первичный",
-    "channelIndex": "Кн {{index}}",
+    "channelIndex": "Канал {{index}}",
     "import": "Импортировать",
     "export": "Экспорт"
   },
   "validation": {
-    "pskInvalid": "Введите правильный {{bits}} бит PSK."
+    "pskInvalid": "Введите правильный {{bits}}-битовый PSK-ключ"
   },
   "settings": {
     "label": "Настройки канала",
-    "description": "Настройка шифрования, MQTT и пр"
+    "description": "Настройка шифрования, MQTT и прочее"
   },
   "role": {
     "label": "Роль",
-    "description": "Телеметрия устройства отправляется через ГЛАВНЫЙ. Только один ГЛАВНЫЙ разрешен",
+    "description": "Телеметрия устройства отправляется через первичный канал. Только один первичный канал разрешен.",
     "options": {
-      "primary": "ГЛАВНЫЙ",
-      "disabled": "ЗАПРЕЩЕННЫЙ",
-      "secondary": "ВТОРИЧНЫЙ"
+      "primary": "Первичный",
+      "disabled": "Отключен",
+      "secondary": "Вторичный"
     }
   },
   "psk": {
-    "label": "Pre-Shared Ключ",
+    "label": "Общий ключ сети (PSK)",
     "description": "Поддерживаемая длина PSK: 256-бит, 128-бит, 8-бит, Пустое (0-бит)",
     "generate": "Сгенерировать"
   },
   "name": {
     "label": "Имя",
-    "description": "ЗАПРЕЩЕННЫЙ"
+    "description": "Уникальное имя канала < 12 байт, оставьте пустым для значения по умолчанию"
   },
   "uplinkEnabled": {
-    "label": "Выгрузка Разрешена",
-    "description": "Отправлять сообщения из местного mesh в MQTT"
+    "label": "Отправка в MQTT",
+    "description": "Отправлять сообщения в MQTT из Mesh-сети"
   },
   "downlinkEnabled": {
-    "label": "Загрузка Разрешена",
-    "description": "Отправлять сообщения из MQTT в местный mesh"
+    "label": "Приём из MQTT",
+    "description": "Отправлять сообщения из MQTT в Mesh-сеть (изучите документацию вашего MQTT-брокера перед включением)"
   },
   "positionPrecision": {
-    "label": "Позиция",
-    "description": "Точность позиции для отправки в канал. Можно запретить.",
+    "label": "Местоположение",
+    "description": "Точность местоположения для отправки в канал. Можно отключить.",
     "options": {
-      "none": "Не делиться позицией",
-      "precise": "Точная позиция",
-      "metric_km23": "Около 23 километров",
-      "metric_km12": "Около 12 километров",
-      "metric_km5_8": "Within 5.8 kilometers",
-      "metric_km2_9": "Within 2.9 kilometers",
-      "metric_km1_5": "Около 1,5 километров",
-      "metric_m700": "Около 700 метров",
-      "metric_m350": "Около 350 метров",
-      "metric_m200": "Около 200 метров",
-      "metric_m90": "Около 90 метров",
-      "metric_m50": "Около 50 метров",
+      "none": "Не делиться местоположением",
+      "precise": "Точное местоположение",
+      "metric_km23": "В пределах 23 километрoв",
+      "metric_km12": "В пределах 12 километрoв",
+      "metric_km5_8": "В пределах 5,8 километров",
+      "metric_km2_9": "В пределах 2,9 километров",
+      "metric_km1_5": "В пределах 1,5 километра",
+      "metric_m700": "В пределах 700 метров",
+      "metric_m350": "В пределах 350 метров",
+      "metric_m200": "В пределах 200 метров",
+      "metric_m90": "В пределах 90 метров",
+      "metric_m50": "В пределах 50 метров",
       "imperial_mi15": "Около 15 миль",
-      "imperial_mi7_3": "Within 7.3 miles",
-      "imperial_mi3_6": "Within 3.6 miles",
-      "imperial_mi1_8": "Within 1.8 miles",
-      "imperial_mi0_9": "Within 0.9 miles",
-      "imperial_mi0_5": "Within 0.5 miles",
-      "imperial_mi0_2": "Около 0,2 миль",
+      "imperial_mi7_3": "Около 7,3 миль",
+      "imperial_mi3_6": "Около 3.6 миль",
+      "imperial_mi1_8": "Около 1.8 миль",
+      "imperial_mi0_9": "Около 0.9 миль",
+      "imperial_mi0_5": "Около 0.5 миль",
+      "imperial_mi0_2": "Около 0.2 миль",
       "imperial_ft600": "Около 600 футов",
       "imperial_ft300": "Около 300 футов",
       "imperial_ft150": "Около 150 футов"
