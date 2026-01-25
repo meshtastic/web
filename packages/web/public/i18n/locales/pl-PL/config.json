@@ -124,7 +124,7 @@
     "title": "Ustawienia sieci",
     "description": "Ustawienia sieci LoRa",
     "bandwidth": {
-      "description": "Szerokość kanału w kHz",
+      "description": "Szerokość kanału w MHz",
       "label": "Pasmo"
     },
     "boostedRxGain": {
