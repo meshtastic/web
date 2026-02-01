@@ -12,24 +12,37 @@ import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
 import type { Connection } from "@data/schema";
 import { subscribeToDevice } from "@data/subscriptionService";
 import { MeshDevice, type Protobuf, Types } from "@meshtastic/core";
+import { TransportHTTP } from "@meshtastic/transport-http";
+import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
+import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { randId } from "@shared/utils/randId";
 import { useDeviceStore } from "@state/index.ts";
 import { testHttpReachable } from "../utils.ts";
-import { BrowserHardware } from "./BrowserHardware.ts";
-import { BluetoothStrategy } from "./strategies/BluetoothStrategy.ts";
-import { HttpStrategy } from "./strategies/HttpStrategy.ts";
-import { SerialStrategy } from "./strategies/SerialStrategy.ts";
-import type {
-  ConnectionStrategy,
-  PacketTransport,
-} from "./strategies/types.ts";
+import { BrowserHardware, type SerialDeviceInfo } from "./BrowserHardware.ts";
+
+/** Transport type from SDK transports */
+type PacketTransport =
+  | Awaited<ReturnType<typeof TransportHTTP.create>>
+  | Awaited<ReturnType<typeof TransportWebBluetooth.createFromDevice>>
+  | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>;
+
+/** Result of creating a transport connection */
+interface TransportResult {
+  transport: PacketTransport;
+  nativeHandle?: unknown;
+  onDisconnect?: () => void;
+  updatedPortInfo?: {
+    usbVendorId?: number;
+    usbProductId?: number;
+  };
+}
 
 const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
 const CONFIG_COMPLETE_STAGE1 = 69420;
 const CONFIG_COMPLETE_STAGE2 = 69421;
 
 interface ConnectionState {
-  strategy?: ConnectionStrategy;
+  connectionType?: Connection["type"];
   nativeHandle?: unknown;
   cleanup?: () => void;
   heartbeat?: ReturnType<typeof setInterval>;
@@ -94,16 +107,14 @@ class ConnectionServiceClass {
 
     await this.updateStatus(conn.id, "connecting");
 
-    let strategy: ConnectionStrategy | undefined;
     let nativeHandle: unknown | undefined;
 
     try {
-      strategy = this.createStrategy(conn.type);
-      const result = await strategy.connect(conn, opts);
+      const result = await this.createTransport(conn, opts);
       nativeHandle = result.nativeHandle;
 
       const state = this.getOrCreateState(conn.id);
-      state.strategy = strategy;
+      state.connectionType = conn.type;
       state.nativeHandle = nativeHandle;
       state.cleanup = result.onDisconnect;
 
@@ -133,9 +144,9 @@ class ConnectionServiceClass {
       logger.error(`[ConnectionService] Connection failed: ${msg}`);
 
       // Clean up any resources that were allocated before the failure
-      if (strategy && nativeHandle) {
+      if (nativeHandle) {
         try {
-          await strategy.disconnect(nativeHandle);
+          await this.disconnectTransport(conn.type, nativeHandle);
         } catch (cleanupErr) {
           logger.warn(
             `[ConnectionService] Cleanup after failure also failed:`,
@@ -168,8 +179,8 @@ class ConnectionServiceClass {
     // Disconnect the MeshDevice and clear device store
     this.disconnectMeshDevice();
 
-    if (state.strategy) {
-      await state.strategy.disconnect(state.nativeHandle);
+    if (state.connectionType && state.nativeHandle) {
+      await this.disconnectTransport(state.connectionType, state.nativeHandle);
     }
 
     await connectionRepo.updateConnection(conn.id, {
@@ -606,16 +617,208 @@ class ConnectionServiceClass {
     clearDevice();
   }
 
-  private createStrategy(type: Connection["type"]): ConnectionStrategy {
-    switch (type) {
+  // =============================================================================
+  // Transport Creation (inlined from strategy classes)
+  // =============================================================================
+
+  private async createTransport(
+    conn: Connection,
+    opts?: { allowPrompt?: boolean },
+  ): Promise<TransportResult> {
+    switch (conn.type) {
       case "http":
-        return new HttpStrategy();
+        return this.createHttpTransport(conn);
       case "bluetooth":
-        return new BluetoothStrategy();
+        return this.createBluetoothTransport(conn, opts);
       case "serial":
-        return new SerialStrategy();
+        return this.createSerialTransport(conn, opts);
       default:
-        throw new Error(`Unknown connection type: ${type}`);
+        throw new Error(`Unknown connection type: ${conn.type}`);
+    }
+  }
+
+  private async createHttpTransport(
+    conn: Connection,
+  ): Promise<TransportResult> {
+    if (!conn.url) {
+      throw new Error("HTTP connection missing URL");
+    }
+
+    logger.debug(`[ConnectionService] Testing HTTP reachability: ${conn.url}`);
+    const ok = await testHttpReachable(conn.url);
+
+    if (!ok) {
+      const url = new URL(conn.url);
+      throw new Error(
+        url.protocol === "https:"
+          ? `Cannot reach HTTPS endpoint. Open ${conn.url} in a new tab to accept the certificate.`
+          : "HTTP endpoint not reachable",
+      );
+    }
+
+    const url = new URL(conn.url);
+    logger.debug(`[ConnectionService] Creating HTTP transport for ${url.host}`);
+
+    const transport = await TransportHTTP.create(
+      url.host,
+      url.protocol === "https:",
+    );
+
+    logger.info(`[ConnectionService] HTTP transport created successfully`);
+
+    return { transport, nativeHandle: undefined };
+  }
+
+  private async createBluetoothTransport(
+    conn: Connection,
+    opts?: { allowPrompt?: boolean },
+  ): Promise<TransportResult> {
+    if (!BrowserHardware.hasBluetooth()) {
+      throw new Error("Web Bluetooth not supported");
+    }
+
+    logger.debug(`[ConnectionService] Looking for Bluetooth device`);
+
+    let bleDevice: BluetoothDevice | undefined;
+
+    // Try to find existing permission
+    if (conn.deviceId) {
+      bleDevice =
+        (await BrowserHardware.findBluetoothDevice(conn.deviceId)) ?? undefined;
+      if (bleDevice) {
+        logger.debug(`[ConnectionService] Found existing BT device`);
+      }
+    }
+
+    // Prompt user if allowed and not found
+    if (!bleDevice && opts?.allowPrompt) {
+      logger.debug(`[ConnectionService] Requesting new BT device from user`);
+      bleDevice =
+        (await BrowserHardware.requestBluetoothDevice(conn.gattServiceUUID)) ??
+        undefined;
+    }
+
+    if (!bleDevice) {
+      throw new Error("Bluetooth device not available. Re-select the device.");
+    }
+
+    logger.debug(`[ConnectionService] Creating Bluetooth transport`);
+    const transport = await TransportWebBluetooth.createFromDevice(bleDevice);
+    logger.info(`[ConnectionService] Bluetooth transport created successfully`);
+
+    return { transport, nativeHandle: bleDevice };
+  }
+
+  private async createSerialTransport(
+    conn: Connection,
+    opts?: { allowPrompt?: boolean },
+  ): Promise<TransportResult> {
+    if (!BrowserHardware.hasSerial()) {
+      throw new Error("Web Serial not supported");
+    }
+
+    logger.debug(`[ConnectionService] Looking for Serial port`);
+
+    let port: SerialPort | undefined;
+    let newPortInfo: SerialDeviceInfo | undefined;
+
+    // Try to find existing permission
+    port =
+      (await BrowserHardware.findSerialPort(
+        conn.usbVendorId,
+        conn.usbProductId,
+      )) ?? undefined;
+    if (port) {
+      logger.debug(`[ConnectionService] Found existing serial port`);
+    }
+
+    // Prompt user if allowed and not found
+    if (!port && opts?.allowPrompt) {
+      logger.debug(`[ConnectionService] Requesting serial port from user`);
+      const result = await BrowserHardware.requestSerialPort();
+      port = result?.port;
+      newPortInfo = result ?? undefined;
+    }
+
+    if (!port) {
+      throw new Error("Serial port not available. Re-select the port.");
+    }
+
+    // Ensure port is closed before trying to open
+    if (BrowserHardware.isSerialPortOpen(port)) {
+      logger.debug(`[ConnectionService] Closing already-open serial port`);
+      await BrowserHardware.closeSerialPort(port);
+    }
+
+    try {
+      logger.debug(`[ConnectionService] Creating Serial transport`);
+      const transport = await TransportWebSerial.createFromPort(port);
+      logger.info(`[ConnectionService] Serial transport created successfully`);
+
+      return {
+        transport,
+        nativeHandle: port,
+        updatedPortInfo: newPortInfo
+          ? {
+              usbVendorId: newPortInfo.usbVendorId,
+              usbProductId: newPortInfo.usbProductId,
+            }
+          : undefined,
+      };
+    } catch (serialErr: unknown) {
+      const msg =
+        serialErr instanceof Error ? serialErr.message : String(serialErr);
+
+      if (
+        msg.includes("Failed to open") ||
+        msg.includes("already open") ||
+        msg.includes("NetworkError")
+      ) {
+        throw new Error(
+          "Port is locked or in use by another application. Close other apps using this device and try again.",
+        );
+      }
+      throw serialErr;
+    }
+  }
+
+  private async disconnectTransport(
+    type: Connection["type"],
+    nativeHandle: unknown,
+  ): Promise<void> {
+    switch (type) {
+      case "bluetooth": {
+        const device = nativeHandle as BluetoothDevice | undefined;
+        if (device) {
+          logger.debug(`[ConnectionService] Disconnecting Bluetooth device`);
+          try {
+            BrowserHardware.disconnectBluetoothDevice(device);
+          } catch (err) {
+            logger.warn(
+              `[ConnectionService] Error disconnecting Bluetooth device:`,
+              err,
+            );
+          }
+        }
+        break;
+      }
+
+      case "serial": {
+        const port = nativeHandle as SerialPort | undefined;
+        if (port) {
+          logger.debug(`[ConnectionService] Closing Serial port`);
+          try {
+            await BrowserHardware.closeSerialPort(port);
+          } catch (err) {
+            logger.warn(`[ConnectionService] Error closing Serial port:`, err);
+          }
+        }
+        break;
+      }
+
+      case "http":
+        // HTTP transport is stateless, no persistent connection to close
+        break;
     }
   }
 
