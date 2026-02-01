@@ -3,24 +3,23 @@ import { nodeRepo } from "@data/repositories";
 import type { Node, PositionLog, TelemetryLog } from "@data/schema";
 import { ResultAsync } from "neverthrow";
 import { useEffect, useMemo, useState } from "react";
-import { useDrizzleQuery } from "./useDrizzleLive.ts";
+import { useReactiveQuery } from "sqlocal/react";
 
 /**
  * Hook to fetch all nodes for a device
  */
 export function useNodes(deviceId: number) {
-  const { data } = useDrizzleQuery<Node>(
-    () => nodeRepo.buildNodesQuery(deviceId),
-    [deviceId],
-  );
+  const query = useMemo(() => nodeRepo.buildNodesQuery(deviceId), [deviceId]);
+
+  const { data } = useReactiveQuery<Node>(nodeRepo.getClient(), query);
 
   const nodeMap = useMemo(
-    () => new Map(data.map((node) => [node.nodeNum, node])),
+    () => new Map((data ?? []).map((node) => [node.nodeNum, node])),
     [data],
   );
 
   return {
-    nodes: data,
+    nodes: data ?? [],
     nodeMap,
   };
 }
@@ -54,17 +53,19 @@ export function useFavoriteNodes(deviceId: number) {
  * Hook to fetch online nodes (heard within last 15 minutes)
  */
 export function useOnlineNodes(deviceId: number) {
-  const { data } = useDrizzleQuery<Node>(
+  const query = useMemo(
     () => nodeRepo.buildOnlineNodesQuery(deviceId),
     [deviceId],
   );
 
+  const { data } = useReactiveQuery<Node>(nodeRepo.getClient(), query);
+
   const onlineNodeIds = useMemo(
-    () => new Set(data.map((n) => n.nodeNum)),
+    () => new Set((data ?? []).map((n) => n.nodeNum)),
     [data],
   );
 
-  return { nodes: data, onlineNodeIds };
+  return { nodes: data ?? [], onlineNodeIds };
 }
 
 /**
@@ -87,14 +88,19 @@ export function usePositionHistory(
   since?: number,
   limit = 100,
 ) {
-  const { data, isLoading } = useDrizzleQuery<PositionLog>(
+  const query = useMemo(
     () => nodeRepo.buildPositionHistoryQuery(deviceId, nodeNum, since, limit),
     [deviceId, nodeNum, since, limit],
   );
 
+  const { data, status } = useReactiveQuery<PositionLog>(
+    nodeRepo.getClient(),
+    query,
+  );
+
   return {
-    positions: data,
-    isLoading,
+    positions: data ?? [],
+    isLoading: status === "pending" && data.length === 0,
   };
 }
 
@@ -107,14 +113,19 @@ export function useTelemetryHistory(
   since?: number,
   limit = 100,
 ) {
-  const { data, isLoading } = useDrizzleQuery<TelemetryLog>(
+  const query = useMemo(
     () => nodeRepo.buildTelemetryHistoryQuery(deviceId, nodeNum, since, limit),
     [deviceId, nodeNum, since, limit],
   );
 
+  const { data, status } = useReactiveQuery<TelemetryLog>(
+    nodeRepo.getClient(),
+    query,
+  );
+
   return {
-    telemetry: data,
-    isLoading,
+    telemetry: data ?? [],
+    isLoading: status === "pending" && data.length === 0,
   };
 }
 

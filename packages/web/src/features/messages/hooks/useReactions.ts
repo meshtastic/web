@@ -2,10 +2,11 @@
  * Reaction hooks for fetching message reactions
  */
 
-import { useDrizzleQuery } from "@data/hooks/useDrizzleLive.ts";
+import logger from "@core/services/logger";
 import { reactionRepo } from "@data/repositories";
 import type { Reaction } from "@data/schema";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+import { useReactiveQuery } from "sqlocal/react";
 
 /**
  * Hook to fetch reactions for multiple messages
@@ -15,14 +16,24 @@ export function useReactions(ownerNodeNum: number, messageIds: number[]) {
   // Use a stable key for the messageIds array to prevent unnecessary re-renders
   const messageIdsKey = messageIds.join(",");
 
-  const { data, isLoading } = useDrizzleQuery<Reaction>(
-    () => {
-      const ids = messageIds.length > 0 ? messageIds : [-1];
-      return reactionRepo.buildReactionsForMessagesQuery(ownerNodeNum, ids);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ownerNodeNum, messageIdsKey],
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- messageIdsKey is stable key for messageIds
+  const query = useMemo(() => {
+    const ids = messageIds.length > 0 ? messageIds : [-1];
+    return reactionRepo.buildReactionsForMessagesQuery(ownerNodeNum, ids);
+  }, [ownerNodeNum, messageIdsKey]);
+
+  const { data, status } = useReactiveQuery<Reaction>(
+    reactionRepo.getClient(),
+    query,
   );
+
+  // Debug logging for reactive query results
+  useEffect(() => {
+    logger.info(
+      `[useReactions] Query result: status=${status}, reactions=${data.length}, messageIds=${messageIds.slice(0, 5).join(",")}${messageIds.length > 5 ? "..." : ""}`,
+      data,
+    );
+  }, [data, status, messageIds]);
 
   // Group reactions by targetMessageId
   const reactionsByMessage = useMemo(() => {
@@ -40,7 +51,7 @@ export function useReactions(ownerNodeNum: number, messageIds: number[]) {
 
   return {
     reactions: reactionsByMessage,
-    isLoading,
+    isLoading: status === "pending" && data.length === 0,
   };
 }
 
@@ -51,14 +62,19 @@ export function useMessageReactions(
   ownerNodeNum: number,
   targetMessageId: number,
 ) {
-  const { data, isLoading } = useDrizzleQuery<Reaction>(
+  const query = useMemo(
     () => reactionRepo.buildReactionsQuery(ownerNodeNum, targetMessageId),
     [ownerNodeNum, targetMessageId],
   );
 
+  const { data, status } = useReactiveQuery<Reaction>(
+    reactionRepo.getClient(),
+    query,
+  );
+
   return {
     reactions: data ?? [],
-    isLoading,
+    isLoading: status === "pending" && data.length === 0,
   };
 }
 

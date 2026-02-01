@@ -21,7 +21,7 @@ import {
   workingHashRepo,
 } from "@data/repositories/index.ts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useDrizzleQuery } from "./useDrizzleLive.ts";
+import { useReactiveQuery } from "sqlocal/react";
 import { usePendingChanges } from "./usePendingChanges.ts";
 import type { ConfigChange, ConfigHash, DeviceConfig } from "../schema.ts";
 
@@ -142,13 +142,15 @@ export function useWorkingHashes(
   // Load base hashes from database (reactive)
   // ==========================================================================
 
+  const baseHashQuery = useMemo(() => {
+    if (!ownerNodeNum) {
+      return configHashRepo.buildHashesQuery(0);
+    }
+    return configHashRepo.buildHashesQuery(ownerNodeNum);
+  }, [ownerNodeNum]);
+
   const { data: storedBaseHashes, status: baseHashStatus } =
-    useDrizzleQuery<ConfigHash>(() => {
-      if (!ownerNodeNum) {
-        return configHashRepo.buildHashesQuery(0);
-      }
-      return configHashRepo.buildHashesQuery(ownerNodeNum);
-    }, [ownerNodeNum]);
+    useReactiveQuery<ConfigHash>(configHashRepo.getClient(), baseHashQuery);
 
   // Update base hashes when DB data changes
   useEffect(() => {
@@ -167,13 +169,15 @@ export function useWorkingHashes(
   // Load base config from database (reactive)
   // ==========================================================================
 
+  const configQuery = useMemo(() => {
+    if (!ownerNodeNum) {
+      return configCacheRepo.buildConfigQuery(0);
+    }
+    return configCacheRepo.buildConfigQuery(ownerNodeNum);
+  }, [ownerNodeNum]);
+
   const { data: configData, status: configStatus } =
-    useDrizzleQuery<DeviceConfig>(() => {
-      if (!ownerNodeNum) {
-        return configCacheRepo.buildConfigQuery(0);
-      }
-      return configCacheRepo.buildConfigQuery(ownerNodeNum);
-    }, [ownerNodeNum]);
+    useReactiveQuery<DeviceConfig>(configCacheRepo.getClient(), configQuery);
 
   // ==========================================================================
   // Load pending changes via usePendingChanges hook (avoids duplicate query)

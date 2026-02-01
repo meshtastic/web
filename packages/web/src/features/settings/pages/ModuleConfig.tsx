@@ -1,3 +1,5 @@
+import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
+import type { ValidModuleConfigType } from "@features/settings/components/types.ts";
 import {
   Card,
   CardContent,
@@ -11,7 +13,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@shared/components/ui/tabs";
-import { useDevice, type ValidModuleConfigType } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { AmbientLighting } from "../components/modules/AmbientLighting.tsx";
@@ -39,75 +41,85 @@ type TabItem = {
 };
 
 export const ModuleConfig = ({ searchQuery = "" }: ConfigPageProps) => {
-  const { hasModuleConfigChange } = useDevice();
+  const { myNodeNum } = useMyNode();
+  const { hasVariantChanges } = usePendingChanges(myNodeNum);
   const { t } = useTranslation("moduleConfig");
-  const tabs: TabItem[] = [
-    {
-      case: "mqtt",
-      label: t("page.mqtt"),
-      element: MQTT,
-    },
-    {
-      case: "serial",
-      label: t("page.serial"),
-      element: Serial,
-    },
-    {
-      case: "externalNotification",
-      label: t("page.externalNotification"),
-      element: ExternalNotification,
-    },
-    {
-      case: "storeForward",
-      label: t("page.storeAndForward"),
-      element: StoreForward,
-    },
-    {
-      case: "rangeTest",
-      label: t("page.rangeTest"),
-      element: RangeTest,
-    },
-    {
-      case: "telemetry",
-      label: t("page.telemetry"),
-      element: Telemetry,
-    },
-    {
-      case: "cannedMessage",
-      label: t("page.cannedMessage"),
-      element: CannedMessage,
-    },
-    {
-      case: "audio",
-      label: t("page.audio"),
-      element: Audio,
-    },
-    {
-      case: "neighborInfo",
-      label: t("page.neighborInfo"),
-      element: NeighborInfo,
-    },
-    {
-      case: "ambientLighting",
-      label: t("page.ambientLighting"),
-      element: AmbientLighting,
-    },
-    {
-      case: "detectionSensor",
-      label: t("page.detectionSensor"),
-      element: DetectionSensor,
-    },
-    {
-      case: "paxcounter",
-      label: t("page.paxcounter"),
-      element: Paxcounter,
-    },
-  ];
+
+  const tabs: TabItem[] = useMemo(
+    () => [
+      {
+        case: "mqtt",
+        label: t("page.mqtt"),
+        element: MQTT,
+      },
+      {
+        case: "serial",
+        label: t("page.serial"),
+        element: Serial,
+      },
+      {
+        case: "externalNotification",
+        label: t("page.externalNotification"),
+        element: ExternalNotification,
+      },
+      {
+        case: "storeForward",
+        label: t("page.storeAndForward"),
+        element: StoreForward,
+      },
+      {
+        case: "rangeTest",
+        label: t("page.rangeTest"),
+        element: RangeTest,
+      },
+      {
+        case: "telemetry",
+        label: t("page.telemetry"),
+        element: Telemetry,
+      },
+      {
+        case: "cannedMessage",
+        label: t("page.cannedMessage"),
+        element: CannedMessage,
+      },
+      {
+        case: "audio",
+        label: t("page.audio"),
+        element: Audio,
+      },
+      {
+        case: "neighborInfo",
+        label: t("page.neighborInfo"),
+        element: NeighborInfo,
+      },
+      {
+        case: "ambientLighting",
+        label: t("page.ambientLighting"),
+        element: AmbientLighting,
+      },
+      {
+        case: "detectionSensor",
+        label: t("page.detectionSensor"),
+        element: DetectionSensor,
+      },
+      {
+        case: "paxcounter",
+        label: t("page.paxcounter"),
+        element: Paxcounter,
+      },
+    ],
+    [t],
+  );
 
   const flags = useMemo(
     () =>
-      new Map(tabs.map((tab) => [tab.case, hasModuleConfigChange(tab.case)])),
-    [tabs, hasModuleConfigChange],
+      new Map(
+        tabs.map((tab) => [
+          tab.case,
+          hasVariantChanges("moduleConfig", tab.case),
+        ]),
+      ),
+    [tabs, hasVariantChanges],
   );
 
   const filteredTabs = useMemo(() => {

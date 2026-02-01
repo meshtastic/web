@@ -1,13 +1,14 @@
 import type { ChannelValidation } from "./validation";
 import type { Channel as DbChannel } from "@data/index";
+import { useDisplayUnits } from "@data/hooks";
 import {
   ConfigFormFields,
   type FieldGroup,
 } from "@features/settings/components/form/ConfigFormFields";
 import { useChannelForm } from "@features/settings/hooks";
+import { Protobuf } from "@meshtastic/core";
 import { PkiRegenerateDialog } from "@shared/components/Dialog/PkiRegenerateDialog";
-import { useRemoteAdminAuth } from "@shared/hooks";
-import { useDevice } from "@state/index.ts";
+import { useMyNode, useRemoteAdminAuth } from "@shared/hooks";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -16,7 +17,10 @@ export interface SettingsPanelProps {
 }
 
 export const Channel = ({ channel }: SettingsPanelProps) => {
-  const { config } = useDevice();
+  const { myNodeNum } = useMyNode();
+  const displayUnits = useDisplayUnits(myNodeNum);
+  const isMetric =
+    displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.METRIC;
   const { t } = useTranslation(["channels", "ui", "dialog"]);
   const { isAuthorized } = useRemoteAdminAuth();
   const [preSharedDialogOpen, setPreSharedDialogOpen] = useState(false);
@@ -98,36 +102,35 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
           label: t("positionPrecision.label"),
           description: t("positionPrecision.description"),
           properties: {
-            enumValue:
-              config.display?.units === 0
-                ? {
-                    [t("positionPrecision.options.none")]: 0,
-                    [t("positionPrecision.options.metric_km23")]: 10,
-                    [t("positionPrecision.options.metric_km12")]: 11,
-                    [t("positionPrecision.options.metric_km5_8")]: 12,
-                    [t("positionPrecision.options.metric_km2_9")]: 13,
-                    [t("positionPrecision.options.metric_km1_5")]: 14,
-                    [t("positionPrecision.options.metric_m700")]: 15,
-                    [t("positionPrecision.options.metric_m350")]: 16,
-                    [t("positionPrecision.options.metric_m200")]: 17,
-                    [t("positionPrecision.options.metric_m90")]: 18,
-                    [t("positionPrecision.options.metric_m50")]: 19,
-                    [t("positionPrecision.options.precise")]: 32,
-                  }
-                : {
-                    [t("positionPrecision.options.none")]: 0,
-                    [t("positionPrecision.options.imperial_mi15")]: 10,
-                    [t("positionPrecision.options.imperial_mi7_3")]: 11,
-                    [t("positionPrecision.options.imperial_mi3_6")]: 12,
-                    [t("positionPrecision.options.imperial_mi1_8")]: 13,
-                    [t("positionPrecision.options.imperial_mi0_9")]: 14,
-                    [t("positionPrecision.options.imperial_mi0_5")]: 15,
-                    [t("positionPrecision.options.imperial_mi0_2")]: 16,
-                    [t("positionPrecision.options.imperial_ft600")]: 17,
-                    [t("positionPrecision.options.imperial_ft300")]: 18,
-                    [t("positionPrecision.options.imperial_ft150")]: 19,
-                    [t("positionPrecision.options.precise")]: 32,
-                  },
+            enumValue: isMetric
+              ? {
+                  [t("positionPrecision.options.none")]: 0,
+                  [t("positionPrecision.options.metric_km23")]: 10,
+                  [t("positionPrecision.options.metric_km12")]: 11,
+                  [t("positionPrecision.options.metric_km5_8")]: 12,
+                  [t("positionPrecision.options.metric_km2_9")]: 13,
+                  [t("positionPrecision.options.metric_km1_5")]: 14,
+                  [t("positionPrecision.options.metric_m700")]: 15,
+                  [t("positionPrecision.options.metric_m350")]: 16,
+                  [t("positionPrecision.options.metric_m200")]: 17,
+                  [t("positionPrecision.options.metric_m90")]: 18,
+                  [t("positionPrecision.options.metric_m50")]: 19,
+                  [t("positionPrecision.options.precise")]: 32,
+                }
+              : {
+                  [t("positionPrecision.options.none")]: 0,
+                  [t("positionPrecision.options.imperial_mi15")]: 10,
+                  [t("positionPrecision.options.imperial_mi7_3")]: 11,
+                  [t("positionPrecision.options.imperial_mi3_6")]: 12,
+                  [t("positionPrecision.options.imperial_mi1_8")]: 13,
+                  [t("positionPrecision.options.imperial_mi0_9")]: 14,
+                  [t("positionPrecision.options.imperial_mi0_5")]: 15,
+                  [t("positionPrecision.options.imperial_mi0_2")]: 16,
+                  [t("positionPrecision.options.imperial_ft600")]: 17,
+                  [t("positionPrecision.options.imperial_ft300")]: 18,
+                  [t("positionPrecision.options.imperial_ft150")]: 19,
+                  [t("positionPrecision.options.precise")]: 32,
+                },
           },
         },
       ],

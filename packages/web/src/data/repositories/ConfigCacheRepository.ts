@@ -1,4 +1,5 @@
 import { and, eq, sql } from "drizzle-orm";
+import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
 import {
   type ConfigChange,
@@ -33,9 +34,13 @@ export class ConfigCacheRepository {
     return dbClient.db;
   }
 
+  getClient(client?: SQLocalDrizzle) {
+    return client ?? dbClient.client;
+  }
+
   /**
    * Build a query to fetch config for a device.
-   * Can be used with useDrizzleQuery for reactive updates.
+   * Can be used with useReactiveQuery for reactive updates.
    */
   buildConfigQuery(ownerNodeNum: number) {
     return this.db
@@ -47,10 +52,20 @@ export class ConfigCacheRepository {
 
   /**
    * Build a query to fetch all pending config changes for a device.
-   * Can be used with useDrizzleQuery for reactive updates.
+   * Can be used with useReactiveQuery for reactive updates.
    */
   buildChangesQuery(ownerNodeNum: number) {
     return this.db
+      .select()
+      .from(configChanges)
+      .where(eq(configChanges.ownerNodeNum, ownerNodeNum));
+  }
+
+  /**
+   * Get all pending changes for a device (async version of buildChangesQuery)
+   */
+  async getPendingChanges(ownerNodeNum: number): Promise<ConfigChange[]> {
+    return await this.db
       .select()
       .from(configChanges)
       .where(eq(configChanges.ownerNodeNum, ownerNodeNum));

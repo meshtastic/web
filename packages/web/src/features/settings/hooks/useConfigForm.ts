@@ -1,5 +1,10 @@
-import { useDevice, type ValidConfigType } from "@state/index.ts";
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
+import {
+  useEffectiveConfig,
+  usePendingChanges,
+} from "@data/hooks/usePendingChanges.ts";
+import type { ValidConfigType } from "@features/settings/components/types.ts";
+import { useMyNode } from "@shared/hooks";
+import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import {
   type DefaultValues,
   type FieldValues,
@@ -9,7 +14,6 @@ import {
 } from "react-hook-form";
 import type { ZodType } from "zod/v4";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 
 interface UseConfigFormOptions<T extends FieldValues> {
   configType: ValidConfigType;
@@ -33,24 +37,26 @@ export function useConfigForm<T extends FieldValues>({
   configType,
   schema,
 }: UseConfigFormOptions<T>): UseConfigFormReturn<T> {
-  const { config, getEffectiveConfig, setChange } = useDevice();
-  const { trackChange, removeChange } = useFieldRegistry();
+  // Get myNodeNum for database lookups
+  const { myNodeNum } = useMyNode();
 
-  // Memoize section to prevent effect re-runs on every render
-  const section = useMemo(
-    () => ({ type: "config", variant: configType }) as const,
-    [configType],
-  );
+  // Load config from database (base + pending changes merged)
+  const {
+    config: effectiveConfig,
+    baseConfig,
+    isLoading,
+  } = useEffectiveConfig(myNodeNum, configType);
 
-  const baseConfig = config[configType] as DefaultValues<T> | undefined;
-  const effectiveConfig = getEffectiveConfig(configType) as T | undefined;
-  const isReady = baseConfig !== undefined;
+  // Get pending changes methods
+  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
+
+  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
 
   const form = useForm<T>({
     mode: "onChange",
     resolver: createZodResolver(schema),
-    defaultValues: baseConfig,
-    values: effectiveConfig,
+    defaultValues: baseConfig as DefaultValues<T> | undefined,
+    values: effectiveConfig as T | undefined,
   });
 
   const { watch, getValues } = form;
@@ -60,7 +66,7 @@ export function useConfigForm<T extends FieldValues>({
   // Track whether we've completed initial sync (skip first watch fire)
   const hasInitialSyncRef = useRef(false);
 
-  // Sync form changes to store and field registry
+  // Sync form changes to database
   const onFormChange = useEffectEvent((formValues: Partial<T>) => {
     if (!baseConfig || !formValues) {
       return;
@@ -85,27 +91,28 @@ export function useConfigForm<T extends FieldValues>({
 
     prevValuesRef.current = currentValues;
 
-    // Build the change object with only modified fields
-    const changes: Partial<T> = {};
-    let hasChanges = false;
-
+    // Process each field and save/clear changes to database
     for (const key of Object.keys(currentValues) as Array<keyof T>) {
       const newValue = currentValues[key];
-      const originalValue = (baseConfig as T)[key];
+      const originalValue = (baseConfig as unknown as T)[key];
 
       if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        changes[key] = newValue;
-        hasChanges = true;
-        // Track per-field change for Activity panel
-        trackChange(section, key as string, newValue, originalValue);
+        // Save change to database
+        saveChange({
+          changeType: "config",
+          variant: configType,
+          fieldPath: key as string,
+          value: newValue,
+          originalValue: originalValue,
+        });
       } else {
-        // Remove from Activity if reverted to original
-        removeChange(section, key as string);
+        // Clear change from database if reverted to original
+        clearChange({
+          changeType: "config",
+          variant: configType,
+          fieldPath: key as string,
+        });
       }
-    }
-
-    if (hasChanges) {
-      setChange(section, { ...baseConfig, ...changes }, baseConfig);
     }
   });
 

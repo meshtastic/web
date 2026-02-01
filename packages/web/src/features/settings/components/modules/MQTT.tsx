@@ -1,5 +1,6 @@
-import { useRemoteAdminAuth } from "@shared/hooks";
-import { useDevice } from "@state/index.ts";
+import { useDisplayUnits } from "@data/hooks";
+import { Protobuf } from "@meshtastic/core";
+import { useMyNode, useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 import { useModuleConfigForm } from "../../hooks/useModuleConfigForm.ts";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading.tsx";
@@ -15,7 +16,8 @@ import {
 export const MQTT = () => {
   const { t } = useTranslation("moduleConfig");
   const { isAuthorized } = useRemoteAdminAuth();
-  const { config } = useDevice();
+  const { myNodeNum } = useMyNode();
+  const displayUnits = useDisplayUnits(myNodeNum);
 
   const { form, isReady, isDisabledByField } =
     useModuleConfigForm<MqttValidation>({
@@ -37,61 +39,47 @@ export const MQTT = () => {
     return <ConfigFormSkeleton />;
   }
 
-  const positionPrecisionOptions =
-    config.display?.units === 0
-      ? {
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km23")]:
-            10,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km12")]:
-            11,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km5_8")]:
-            12,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km2_9")]:
-            13,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km1_5")]:
-            14,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_m700")]:
-            15,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_m350")]:
-            16,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_m200")]:
-            17,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_m90")]:
-            18,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_m50")]:
-            19,
-        }
-      : {
-          [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi15")]:
-            10,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3",
-          )]: 11,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6",
-          )]: 12,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8",
-          )]: 13,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9",
-          )]: 14,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5",
-          )]: 15,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_2",
-          )]: 16,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_ft600",
-          )]: 17,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_ft300",
-          )]: 18,
-          [t(
-            "mqtt.mapReportSettings.positionPrecision.options.imperial_ft150",
-          )]: 19,
-        };
+  const isMetric =
+    displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.METRIC;
+
+  const positionPrecisionOptions = isMetric
+    ? {
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km23")]: 10,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km12")]: 11,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km5_8")]:
+          12,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km2_9")]:
+          13,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km1_5")]:
+          14,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m700")]: 15,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m350")]: 16,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m200")]: 17,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m90")]: 18,
+        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m50")]: 19,
+      }
+    : {
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi15")]:
+          10,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3")]:
+          11,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6")]:
+          12,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8")]:
+          13,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9")]:
+          14,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5")]:
+          15,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_2")]:
+          16,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft600")]:
+          17,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft300")]:
+          18,
+        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft150")]:
+          19,
+      };
 
   const fieldGroups: FieldGroup<MqttValidation>[] = [
     {

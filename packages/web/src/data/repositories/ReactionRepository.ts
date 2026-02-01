@@ -52,7 +52,7 @@ export class ReactionRepository {
   }
 
   async toggleReaction(reaction: NewReaction): Promise<boolean> {
-    logger.debug(
+    logger.info(
       `[ReactionRepo] Toggle reaction: owner=${reaction.ownerNodeNum}, target=${reaction.targetMessageId}, from=${reaction.fromNode}, emoji=${reaction.emoji}`,
     );
     try {
@@ -69,7 +69,7 @@ export class ReactionRepository {
         )
         .limit(1);
 
-      logger.debug(
+      logger.info(
         `[ReactionRepo] Existing reactions found: ${existing.length}`,
       );
 
@@ -80,12 +80,13 @@ export class ReactionRepository {
           reaction.fromNode,
           reaction.emoji,
         );
-        logger.debug(`[ReactionRepo] Removed existing reaction`);
+        logger.info(`[ReactionRepo] Removed existing reaction`);
         return false;
       }
 
+      logger.info(`[ReactionRepo] About to add reaction...`);
       await this.addReaction(reaction);
-      logger.debug(`[ReactionRepo] Added new reaction`);
+      logger.info(`[ReactionRepo] Added new reaction, now verifying...`);
 
       // Verify the insert worked by querying immediately
       const verify = await this.db
@@ -97,8 +98,16 @@ export class ReactionRepository {
             eq(messageReactions.targetMessageId, reaction.targetMessageId),
           ),
         );
-      logger.debug(
-        `[ReactionRepo] Verification query returned ${verify.length} reactions for message ${reaction.targetMessageId}`,
+      logger.info(
+        `[ReactionRepo] Verification: found ${verify.length} reactions for message ${reaction.targetMessageId}`,
+        verify,
+      );
+
+      // Also check ALL reactions in the table
+      const allReactions = await this.db.select().from(messageReactions);
+      logger.info(
+        `[ReactionRepo] Total reactions in database: ${allReactions.length}`,
+        allReactions,
       );
 
       return true;

@@ -394,11 +394,11 @@ function ConnectedSidebarContent() {
               {isRemoteAdmin && (
                 <div className="text-xs text-muted-foreground mt-3 space-y-1">
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-chart-2" />
+                    <div className="h-2 w-2 rounded-md bg-chart-2" />
                     <span>Authorized - can configure</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-red-500" />
+                    <div className="h-2 w-2 rounded-md bg-red-500" />
                     <span>Not authorized - read only</span>
                   </div>
                 </div>

@@ -1,3 +1,5 @@
+import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
+import type { ValidConfigType } from "@features/settings/components/types.ts";
 import {
   Card,
   CardContent,
@@ -11,7 +13,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@shared/components/ui/tabs";
-import { useDevice, type ValidConfigType } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Bluetooth } from "../components/panels/Bluetooth.tsx";
@@ -34,7 +36,8 @@ type ConfigSection = {
 };
 
 export const DeviceConfig = ({ searchQuery = "" }: ConfigPageProps) => {
-  const { hasConfigChange, hasUserChange } = useDevice();
+  const { myNodeNum } = useMyNode();
+  const { hasVariantChanges } = usePendingChanges(myNodeNum);
   const { t } = useTranslation("config");
 
   const sections: ConfigSection[] = useMemo(
@@ -99,9 +102,10 @@ export const DeviceConfig = ({ searchQuery = "" }: ConfigPageProps) => {
   }, [sections, searchQuery]);
 
   const hasChanges = (configCase: ValidConfigType | "user"): boolean => {
-    return configCase === "user"
-      ? hasUserChange()
-      : hasConfigChange(configCase as ValidConfigType);
+    if (configCase === "user") {
+      return hasVariantChanges("user", null);
+    }
+    return hasVariantChanges("config", configCase);
   };
 
   return (

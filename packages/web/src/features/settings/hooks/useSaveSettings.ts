@@ -1,143 +1,74 @@
 import { adminCommands } from "@core/services/adminCommands";
+import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
+import { useMyNode } from "@shared/hooks";
 import { useToast } from "@shared/hooks/useToast";
-import { useDevice } from "@state/index.ts";
 import { useCallback, useState } from "react";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 
 export function useSettingsSave() {
-  const {
-    getAllConfigChanges,
-    getAllModuleConfigChanges,
-    getAllChannelChanges,
-    getAllQueuedAdminMessages,
-    connection,
-    clearAllChanges,
-    setConfig,
-    setModuleConfig,
-    addChannel,
-    getConfigChangeCount,
-    getModuleConfigChangeCount,
-    getChannelChangeCount,
-    getAdminMessageChangeCount,
-  } = useDevice();
-
-  const { clearAllChanges: clearRegistryChanges } = useFieldRegistry();
+  const { myNodeNum } = useMyNode();
+  const { hasChanges, clearAllChanges } = usePendingChanges(myNodeNum);
 
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  const configChangeCount = getConfigChangeCount();
-  const moduleConfigChangeCount = getModuleConfigChangeCount();
-  const channelChangeCount = getChannelChangeCount();
-  const adminMessageChangeCount = getAdminMessageChangeCount();
-
   const handleSave = useCallback(async () => {
+    if (!myNodeNum) {
+      toast({
+        title: "Error",
+        description: "No device connected",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
 
     try {
-      const channelChanges = getAllChannelChanges();
-      const configChanges = getAllConfigChanges();
-      const moduleConfigChanges = getAllModuleConfigChanges();
-      const adminMessages = getAllQueuedAdminMessages();
+      const result = await adminCommands.saveAllPendingChanges(myNodeNum);
 
-      await Promise.all(
-        channelChanges.map((channel) =>
-          connection?.setChannel(channel).then(() => {
-            toast({
-              title: `Saved channel: ${channel.settings?.name}`,
-            });
-          }),
-        ),
-      );
+      const totalSaved =
+        result.configCount + result.moduleConfigCount + result.channelCount;
 
-      await Promise.all(
-        configChanges.map((newConfig) =>
-          connection?.setConfig(newConfig).then(() => {
-            toast({
-              title: "Configuration saved",
-              description: `Saved ${newConfig.payloadVariant.case}`,
-            });
-          }),
-        ),
-      );
-
-      await Promise.all(
-        moduleConfigChanges.map((newModuleConfig) =>
-          connection?.setModuleConfig(newModuleConfig).then(() =>
-            toast({
-              title: "Module configuration saved",
-              description: `Saved ${newModuleConfig.payloadVariant.case}`,
-            }),
-          ),
-        ),
-      );
-
-      if (configChanges.length > 0 || moduleConfigChanges.length > 0) {
-        await connection?.commitEditSettings();
+      if (totalSaved > 0) {
+        toast({
+          title: "All changes saved",
+          description: `Saved ${result.configCount} config(s), ${result.moduleConfigCount} module config(s), ${result.channelCount} channel(s)`,
+        });
+      } else {
+        toast({
+          title: "No changes to save",
+          description: "All settings are up to date",
+        });
       }
-
-      if (adminMessages.length > 0 && connection) {
-        await adminCommands.sendQueuedMessages(adminMessages);
-      }
-
-      channelChanges.forEach((newChannel) => {
-        addChannel(newChannel);
-      });
-      configChanges.forEach((newConfig) => {
-        setConfig(newConfig);
-      });
-      moduleConfigChanges.forEach((newModuleConfig) => {
-        setModuleConfig(newModuleConfig);
-      });
-
-      clearAllChanges();
-      clearRegistryChanges();
-
-      toast({
-        title: "All changes saved",
-        description: "Your settings have been applied to the device",
-      });
-    } catch (_error) {
+    } catch (error) {
       toast({
         title: "Error saving configuration",
-        description: "Failed to save changes to the device",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to save changes to the device",
         variant: "destructive",
       });
     } finally {
       setIsSaving(false);
     }
-  }, [
-    toast,
-    getAllConfigChanges,
-    connection,
-    getAllModuleConfigChanges,
-    getAllChannelChanges,
-    getAllQueuedAdminMessages,
-    addChannel,
-    setConfig,
-    setModuleConfig,
-    clearAllChanges,
-    clearRegistryChanges,
-  ]);
+  }, [myNodeNum, toast]);
 
-  const handleReset = useCallback(() => {
-    clearAllChanges();
-    clearRegistryChanges();
-  }, [clearAllChanges, clearRegistryChanges]);
+  const handleReset = useCallback(async () => {
+    await clearAllChanges();
+    toast({
+      title: "Changes reset",
+      description: "All pending changes have been discarded",
+    });
+  }, [clearAllChanges, toast]);
 
-  const hasPending =
-    configChangeCount > 0 ||
-    moduleConfigChangeCount > 0 ||
-    channelChangeCount > 0 ||
-    adminMessageChangeCount > 0;
-
-  const saveDisabled = isSaving || !hasPending;
+  const saveDisabled = isSaving || !hasChanges;
 
   return {
     handleSave,
     handleReset,
     isSaving,
-    hasPending,
+    hasPending: hasChanges,
     saveDisabled,
   };
 }

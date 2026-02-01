@@ -1,28 +1,35 @@
+import {
+  useEffectiveConfig,
+  usePendingChanges,
+} from "@data/hooks/usePendingChanges.ts";
+import type { Protobuf } from "@meshtastic/core";
+import { useMyNode } from "@shared/hooks";
 import { getX25519PrivateKey, getX25519PublicKey } from "@shared/utils/x25519";
-import { useDevice } from "@state/index.ts";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
+import type { DeepPartial } from "react-hook-form";
 import { type DefaultValues, type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type ParsedSecurity,
   type RawSecurity,
   RawSecuritySchema,
 } from "../validation/config/security.ts";
 
-const SECTION = { type: "config", variant: "security" } as const;
-
 export function useSecurityForm() {
-  const { config, getEffectiveConfig, setChange } = useDevice();
-  const { trackChange, removeChange } = useFieldRegistry();
-
-  const baseConfig = config.security;
-  const effectiveConfig = getEffectiveConfig("security");
+  const { myNodeNum } = useMyNode();
+  const {
+    config: effectiveConfig,
+    baseConfig,
+    isLoading,
+  } = useEffectiveConfig(myNodeNum, "security");
+  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
   // Convert Uint8Array to base64 strings for form
   const toFormValues = useCallback(
-    (cfg: ParsedSecurity | undefined): RawSecurity | undefined => {
+    (
+      cfg: Protobuf.Config.Config_SecurityConfig | null | undefined,
+    ): RawSecurity | undefined => {
       if (!cfg) {
         return undefined;
       }
@@ -64,7 +71,7 @@ export function useSecurityForm() {
     [effectiveConfig, toFormValues],
   );
 
-  const isReady = baseConfig !== undefined;
+  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
 
   const form = useForm<RawSecurity>({
     mode: "onChange",
@@ -79,14 +86,25 @@ export function useSecurityForm() {
 
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<RawSecurity | undefined>(undefined);
+  // Track whether we've completed initial sync (skip first watch fire)
+  const hasInitialSyncRef = useRef(false);
 
-  // Sync form changes to store and field registry
-  const onFormChange = useEffectEvent((formData: Partial<RawSecurity>) => {
+  // Sync form changes to database
+  const onFormChange = useEffectEvent((formData: DeepPartial<RawSecurity>) => {
     if (!baseConfig || !formData || !defaultValues) {
       return;
     }
 
     const currentValues = formData as RawSecurity;
+
+    // Skip the first watch fire - just capture initial values without tracking
+    // This prevents spurious change detection during form initialization
+    if (!hasInitialSyncRef.current) {
+      prevValuesRef.current = currentValues;
+      hasInitialSyncRef.current = true;
+      return;
+    }
+
     const prevValues = prevValuesRef.current;
 
     if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
@@ -95,32 +113,39 @@ export function useSecurityForm() {
 
     prevValuesRef.current = currentValues;
 
-    // Convert for store
+    // Convert form values to store format (with Uint8Array)
     const parsed = fromFormValues(currentValues);
+    const originalParsed = fromFormValues(defaultValues);
 
-    // Track per-field changes for Activity panel
-    for (const key of Object.keys(currentValues) as Array<
-      keyof RawSecurity
-    >) {
-      const newValue = currentValues[key];
-      const originalValue = defaultValues[key];
+    // Process each field and save/clear changes to database
+    for (const key of Object.keys(parsed) as Array<keyof typeof parsed>) {
+      const newValue = parsed[key];
+      const originalValue = originalParsed[key];
 
       if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        trackChange(SECTION, key, newValue, originalValue);
+        // Save change to database
+        saveChange({
+          changeType: "config",
+          variant: "security",
+          fieldPath: key,
+          value: newValue,
+          originalValue: originalValue,
+        });
       } else {
-        removeChange(SECTION, key);
+        // Clear change from database if reverted to original
+        clearChange({
+          changeType: "config",
+          variant: "security",
+          fieldPath: key,
+        });
       }
-    }
-
-    // Send full config to device store
-    const hasChanges = JSON.stringify(parsed) !== JSON.stringify(baseConfig);
-
-    if (hasChanges) {
-      setChange(SECTION, parsed, baseConfig);
     }
   });
 
   useEffect(() => {
+    // Reset initial sync flag when effect re-runs
+    hasInitialSyncRef.current = false;
+
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);

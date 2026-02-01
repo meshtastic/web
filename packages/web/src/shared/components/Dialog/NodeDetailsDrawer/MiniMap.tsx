@@ -1,8 +1,8 @@
-import { useDevicePreference } from "@data/hooks";
+import { useDisplayUnits } from "@data/hooks";
 import { BaseMap } from "@features/map/components/Map";
 import { Protobuf } from "@meshtastic/core";
+import { useMyNode } from "@shared/hooks";
 import { cn } from "@shared/utils/cn";
-import { useDevice } from "@state/index.ts";
 import { useMemo } from "react";
 import { Marker } from "react-map-gl/maplibre";
 
@@ -21,12 +21,8 @@ export function MiniMap({
   altitude,
   className,
 }: MiniMapProps) {
-  const device = useDevice();
-  const displayUnits = useDevicePreference<number>(
-    device.id,
-    "displayUnits",
-    Protobuf.Config.Config_DisplayConfig_DisplayUnits.METRIC,
-  );
+  const { myNodeNum } = useMyNode();
+  const displayUnits = useDisplayUnits(myNodeNum);
 
   const initialViewState = useMemo(
     () => ({

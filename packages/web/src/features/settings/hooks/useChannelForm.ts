@@ -3,29 +3,29 @@ import {
   makeChannelSchema,
 } from "../components/panels/Channels/validation";
 import type { Channel as DbChannel } from "@data/index";
+import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
+import { useMyNode } from "@shared/hooks";
 import cryptoRandomString from "crypto-random-string";
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import type { DeepPartial } from "react-hook-form";
 import { type DefaultValues, type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver";
-import { useFieldRegistry } from "../services/fieldRegistry";
 
 export interface UseChannelFormOptions {
   channel: DbChannel;
 }
 
 export function useChannelForm({ channel }: UseChannelFormOptions) {
-  const { trackChange, removeChange, getChange } = useFieldRegistry();
-
-  // Memoize section to prevent unnecessary re-renders
-  const section = useMemo(
-    () =>
-      ({
-        type: "channel",
-        variant: channel.channelIndex.toString(),
-      }) as const,
-    [channel.channelIndex],
-  );
-  const fieldName = `channel_${channel.channelIndex}`;
+  const { myNodeNum } = useMyNode();
+  const { pendingChanges, saveChange, clearChange } =
+    usePendingChanges(myNodeNum);
 
   // Convert flat DB channel to nested form structure
   const dbToFormValues = useCallback(
@@ -61,7 +61,7 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
       createdAt: channel.createdAt,
       updatedAt: new Date(),
     }),
-    [channel.ownerNodeNum],
+    [channel.ownerNodeNum, channel.createdAt],
   );
 
   const defaultValues = useMemo(
@@ -69,10 +69,15 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
     [channel, dbToFormValues],
   );
 
-  // Get working channel from field registry if there are pending changes
-  const workingChannel = getChange(section, fieldName)?.newValue as
-    | DbChannel
-    | undefined;
+  // Get working channel from pending changes if there are any
+  const workingChannelChange = useMemo(() => {
+    return pendingChanges.find(
+      (c) =>
+        c.changeType === "channel" && c.channelIndex === channel.channelIndex,
+    );
+  }, [pendingChanges, channel.channelIndex]);
+
+  const workingChannel = workingChannelChange?.value as DbChannel | undefined;
   const effectiveChannel = workingChannel ?? channel;
   const formValues = useMemo(
     () => dbToFormValues(effectiveChannel),
@@ -112,7 +117,7 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
     }
   }, [effectiveByteCount, trigger]);
 
-  // Submit handler that tracks changes
+  // Submit handler that tracks changes to database
   const submitChanges = useCallback(
     (data: ChannelValidation) => {
       if (!formState.isReady) {
@@ -122,21 +127,23 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
       const payload = formToDbChannel(data);
 
       if (JSON.stringify(payload) === JSON.stringify(channel)) {
-        removeChange(section, fieldName);
+        // Reverted to original - clear the change
+        clearChange({
+          changeType: "channel",
+          channelIndex: channel.channelIndex,
+        });
         return;
       }
 
-      trackChange(section, fieldName, payload, channel);
+      // Save the whole channel as a change
+      saveChange({
+        changeType: "channel",
+        channelIndex: channel.channelIndex,
+        value: payload,
+        originalValue: channel,
+      });
     },
-    [
-      formState.isReady,
-      formToDbChannel,
-      channel,
-      section,
-      fieldName,
-      trackChange,
-      removeChange,
-    ],
+    [formState.isReady, formToDbChannel, channel, saveChange, clearChange],
   );
 
   // Track changes on form value updates
@@ -144,30 +151,32 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
   // Track whether we've completed initial sync (skip first watch fire)
   const hasInitialSyncRef = useRef(false);
 
-  const onFormChange = useEffectEvent((formData: Partial<ChannelValidation>) => {
-    if (!formData) {
-      return;
-    }
+  const onFormChange = useEffectEvent(
+    (formData: DeepPartial<ChannelValidation>) => {
+      if (!formData) {
+        return;
+      }
 
-    const currentValues = formData as ChannelValidation;
+      const currentValues = formData as ChannelValidation;
 
-    // Skip the first watch fire - just capture initial values without tracking
-    // This prevents spurious change detection during form initialization
-    if (!hasInitialSyncRef.current) {
+      // Skip the first watch fire - just capture initial values without tracking
+      // This prevents spurious change detection during form initialization
+      if (!hasInitialSyncRef.current) {
+        prevValuesRef.current = currentValues;
+        hasInitialSyncRef.current = true;
+        return;
+      }
+
+      const prevValues = prevValuesRef.current;
+
+      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+        return;
+      }
+
       prevValuesRef.current = currentValues;
-      hasInitialSyncRef.current = true;
-      return;
-    }
-
-    const prevValues = prevValuesRef.current;
-
-    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-      return;
-    }
-
-    prevValuesRef.current = currentValues;
-    submitChanges(currentValues);
-  });
+      submitChanges(currentValues);
+    },
+  );
 
   useEffect(() => {
     // Reset initial sync flag when effect re-runs

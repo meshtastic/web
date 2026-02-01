@@ -1,29 +1,29 @@
 import { create } from "@bufbuild/protobuf";
+import { adminCommands } from "@core/services/adminCommands";
 import { useNodes } from "@data/hooks";
-import { useMyNode } from "@shared/hooks";
+import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
 import { Protobuf } from "@meshtastic/core";
-import { useDevice } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type UserValidation,
   UserValidationSchema,
 } from "../validation/config/user.ts";
 
-const SECTION = { type: "config", variant: "user" } as const;
-
 export function useUserForm() {
-  const { hardware, connection, setChange } = useDevice();
-  const { trackChange, removeChange } = useFieldRegistry();
   const { myNodeNum } = useMyNode();
   const { nodes: allNodes } = useNodes(myNodeNum);
+  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
-  // Get user data from node, not config
+  // Get user data from node in database
   const myNode = useMemo(() => {
-    return allNodes.find((n) => n.nodeNum === hardware.myNodeNum);
-  }, [allNodes, hardware.myNodeNum]);
+    if (!myNodeNum) {
+      return undefined;
+    }
+    return allNodes.find((n) => n.nodeNum === myNodeNum);
+  }, [allNodes, myNodeNum]);
 
   const defaultValues = useMemo(
     (): UserValidation => ({
@@ -49,19 +49,30 @@ export function useUserForm() {
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<UserValidation | undefined>(undefined);
   const originalValuesRef = useRef<UserValidation>(defaultValues);
+  // Track whether we've completed initial sync (skip first watch fire)
+  const hasInitialSyncRef = useRef(false);
 
   // Store original values on mount
   useEffect(() => {
     originalValuesRef.current = defaultValues;
   }, [defaultValues]);
 
-  // Sync form changes to store and field registry
+  // Sync form changes to database
   const onFormChange = useEffectEvent((formData: Partial<UserValidation>) => {
     if (!formData) {
       return;
     }
 
     const currentValues = formData as UserValidation;
+
+    // Skip the first watch fire - just capture initial values without tracking
+    // This prevents spurious change detection during form initialization
+    if (!hasInitialSyncRef.current) {
+      prevValuesRef.current = currentValues;
+      hasInitialSyncRef.current = true;
+      return;
+    }
+
     const prevValues = prevValuesRef.current;
 
     if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
@@ -72,8 +83,7 @@ export function useUserForm() {
 
     const original = originalValuesRef.current;
 
-    // Track per-field changes for Activity panel
-    let hasChanges = false;
+    // Process each field and save/clear changes to database
     for (const key of Object.keys(currentValues) as Array<
       keyof UserValidation
     >) {
@@ -81,31 +91,39 @@ export function useUserForm() {
       const originalValue = original[key];
 
       if (newValue !== originalValue) {
-        hasChanges = true;
-        trackChange(SECTION, key, newValue, originalValue);
+        // Save change to database
+        saveChange({
+          changeType: "user",
+          fieldPath: key,
+          value: newValue,
+          originalValue: originalValue,
+        });
       } else {
-        removeChange(SECTION, key);
+        // Clear change from database if reverted to original
+        clearChange({
+          changeType: "user",
+          fieldPath: key,
+        });
       }
-    }
-
-    if (hasChanges) {
-      setChange(SECTION, currentValues, original);
     }
   });
 
   useEffect(() => {
+    // Reset initial sync flag when effect re-runs
+    hasInitialSyncRef.current = false;
+
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  // Send user data directly to device (called on save)
-  const sendToDevice = useCallback(() => {
+  // Send user data directly to device via adminCommands
+  const sendToDevice = useCallback(async () => {
     const data = getValues();
     const userData = create(Protobuf.Mesh.UserSchema, {
       ...data,
     });
-    connection?.setOwner(userData);
-  }, [connection, getValues]);
+    await adminCommands.setOwner(userData);
+  }, [getValues]);
 
   const isDisabledByField = useCallback(
     (

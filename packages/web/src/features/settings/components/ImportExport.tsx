@@ -4,9 +4,9 @@ import {
 } from "@core/services/configBackupService.ts";
 import { ImportConfigDialog } from "@shared/components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
 import { Button } from "@shared/components/ui/button";
+import { useMyNode } from "@shared/hooks";
 import { useToast } from "@shared/hooks/useToast";
 import { cn } from "@shared/utils/cn";
-import { useDevice } from "@state/index.ts";
 import { Download, Upload } from "lucide-react";
 import { useState } from "react";
 
@@ -16,13 +16,22 @@ interface ImportExportProps {
 
 export const ImportExport = ({ variant = "default" }: ImportExportProps) => {
   const { toast } = useToast();
-  const device = useDevice();
+  const { myNodeNum } = useMyNode();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const exportConfig = async () => {
+    if (!myNodeNum) {
+      toast({
+        title: "Export Failed",
+        description: "No device connected",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const yamlContent = await ConfigBackupService.createBackup(device);
-      const filename = `meshtastic_${device.hardware?.myNodeNum || "config"}.yaml`;
+      const yamlContent = await ConfigBackupService.createBackup(myNodeNum);
+      const filename = `meshtastic_${myNodeNum || "config"}.yaml`;
       ConfigBackupService.downloadBackup(yamlContent, filename);
 
       toast({
@@ -44,12 +53,7 @@ export const ImportExport = ({ variant = "default" }: ImportExportProps) => {
   ) => {
     try {
       // The first argument _parsedData is unused in applyToDevice
-      await ConfigBackupService.applyToDevice(
-        {} as any,
-        fields,
-        device,
-        onProgress,
-      );
+      await ConfigBackupService.applyToDevice({} as never, fields, onProgress);
 
       toast({
         title: "Import Successful",

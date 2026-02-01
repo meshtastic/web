@@ -16,7 +16,7 @@ export class WorkingHashRepository {
 
   /**
    * Build query to fetch all working hashes for a device.
-   * Can be used with useDrizzleQuery for reactive updates.
+   * Can be used with useReactiveQuery for reactive updates.
    */
   buildHashesQuery(ownerNodeNum: number) {
     return this.db

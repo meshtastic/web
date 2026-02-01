@@ -25,5 +25,5 @@ export interface ConnectionStrategy {
     opts?: { allowPrompt?: boolean },
   ): Promise<ConnectionResult>;
 
-  disconnect(nativeHandle?: any): Promise<void>;
+  disconnect(nativeHandle?: unknown): Promise<void>;
 }

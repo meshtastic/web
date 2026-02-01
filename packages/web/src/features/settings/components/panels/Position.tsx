@@ -1,7 +1,7 @@
+import { useDisplayUnits } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
 import type { FlagName } from "@shared/hooks/usePositionFlags";
-import { useRemoteAdminAuth } from "@shared/hooks";
-import { useDevice } from "@state/index.ts";
+import { useMyNode, useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 import { usePositionForm } from "../../hooks/index.ts";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading.tsx";
@@ -14,7 +14,8 @@ import {
 export const Position = () => {
   const { t } = useTranslation("config");
   const { isAuthorized } = useRemoteAdminAuth();
-  const { getEffectiveConfig } = useDevice();
+  const { myNodeNum } = useMyNode();
+  const displayUnits = useDisplayUnits(myNodeNum);
   const {
     form,
     isReady,
@@ -27,8 +28,6 @@ export const Position = () => {
   if (!isReady) {
     return <ConfigFormSkeleton />;
   }
-
-  const displayUnits = getEffectiveConfig("display")?.units;
 
   const fieldGroups: FieldGroup<PositionValidation>[] = [
     {

@@ -5,27 +5,38 @@ import {
 import { ImportConfigDialog } from "@shared/components/Dialog/ImportConfigDialog/ImportConfigDialog.tsx";
 import { Button } from "@shared/components/ui/button";
 import { Label } from "@shared/components/ui/label";
+import { useMyNode } from "@shared/hooks";
 import { useToast } from "@shared/hooks/useToast";
-import { useDevice, useUIStore } from "@state/index.ts";
-import { Download, Key, Upload } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export function BackupRestore() {
   const { t } = useTranslation("config");
   const { toast } = useToast();
-  const device = useDevice();
-  const setDialogOpen = useUIStore((s) => s.setDialogOpen);
+  const { myNodeNum } = useMyNode();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const exportConfig = async (type: "full" | "channels-only" = "full") => {
+    if (!myNodeNum) {
+      toast({
+        title: t(
+          "settings.advanced.backupRestore.export.failedTitle",
+          "Export Failed",
+        ),
+        description: "No device connected",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const yamlContent =
         type === "full"
-          ? await ConfigBackupService.createBackup(device)
-          : await ConfigBackupService.createChannelOnlyBackup(device);
+          ? await ConfigBackupService.createBackup(myNodeNum)
+          : await ConfigBackupService.createChannelOnlyBackup(myNodeNum);
       const suffix = type === "channels-only" ? "_channels" : "";
-      const filename = `meshtastic_${device.hardware?.myNodeNum || "config"}${suffix}.yaml`;
+      const filename = `meshtastic_${myNodeNum || "config"}${suffix}.yaml`;
       ConfigBackupService.downloadBackup(yamlContent, filename);
 
       toast({
@@ -59,7 +70,6 @@ export function BackupRestore() {
       await ConfigBackupService.applyToDevice(
         {} as never,
         fields,
-        device,
         onProgress,
         options,
       );
@@ -141,30 +151,6 @@ export function BackupRestore() {
           <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
             <Upload className="h-4 w-4 mr-2" />
             {t("settings.advanced.backupRestore.import.button", "Import")}
-          </Button>
-        </div>
-
-        <div className="flex items-center justify-between gap-4">
-          <div className="space-y-1">
-            <Label className="text-base font-medium">
-              {t(
-                "settings.advanced.backupRestore.backupKeys.title",
-                "Backup Keys",
-              )}
-            </Label>
-            <p className="text-sm text-muted-foreground">
-              {t(
-                "settings.advanced.backupRestore.backupKeys.description",
-                "Download your encryption keys for safekeeping",
-              )}
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => setDialogOpen("pkiBackup", true)}
-          >
-            <Key className="h-4 w-4 mr-2" />
-            {t("settings.advanced.backupRestore.backupKeys.button", "Backup")}
           </Button>
         </div>
       </div>

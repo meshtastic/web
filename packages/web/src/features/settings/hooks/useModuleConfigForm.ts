@@ -1,5 +1,10 @@
-import { useDevice, type ValidModuleConfigType } from "@state/index.ts";
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
+import {
+  useEffectiveModuleConfig,
+  usePendingChanges,
+} from "@data/hooks/usePendingChanges.ts";
+import type { ValidModuleConfigType } from "@features/settings/components/types.ts";
+import { useMyNode } from "@shared/hooks";
+import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import {
   type DefaultValues,
   type FieldValues,
@@ -9,7 +14,6 @@ import {
 } from "react-hook-form";
 import type { ZodType } from "zod/v4";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 
 interface UseModuleConfigFormOptions<T extends FieldValues> {
   moduleConfigType: ValidModuleConfigType;
@@ -39,29 +43,31 @@ export function useModuleConfigForm<T extends FieldValues>({
   schema,
   transformDefaults,
 }: UseModuleConfigFormOptions<T>): UseModuleConfigFormReturn<T> {
-  const { moduleConfig, getEffectiveModuleConfig, setChange } = useDevice();
-  const { trackChange, removeChange } = useFieldRegistry();
+  // Get myNodeNum for database lookups
+  const { myNodeNum } = useMyNode();
 
-  // Memoize section to prevent effect re-runs on every render
-  const section = useMemo(
-    () => ({ type: "moduleConfig", variant: moduleConfigType }) as const,
-    [moduleConfigType],
-  );
+  // Load module config from database (base + pending changes merged)
+  const {
+    config: rawEffectiveConfig,
+    baseConfig: rawBaseConfig,
+    isLoading,
+  } = useEffectiveModuleConfig(myNodeNum, moduleConfigType);
 
-  const rawBaseConfig = moduleConfig[moduleConfigType] as T | undefined;
-  const rawEffectiveConfig = getEffectiveModuleConfig(moduleConfigType) as
-    | T
-    | undefined;
+  // Get pending changes methods
+  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
   // Apply transforms if provided
   const baseConfig = (
-    transformDefaults ? transformDefaults(rawBaseConfig) : rawBaseConfig
+    transformDefaults
+      ? transformDefaults(rawBaseConfig as T | undefined)
+      : rawBaseConfig
   ) as DefaultValues<T> | undefined;
-  const effectiveConfig = transformDefaults
-    ? transformDefaults(rawEffectiveConfig)
-    : rawEffectiveConfig;
 
-  const isReady = baseConfig !== undefined;
+  const effectiveConfig = transformDefaults
+    ? transformDefaults(rawEffectiveConfig as T | undefined)
+    : (rawEffectiveConfig as T | undefined);
+
+  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
 
   const form = useForm<T>({
     mode: "onChange",
@@ -77,7 +83,7 @@ export function useModuleConfigForm<T extends FieldValues>({
   // Track whether we've completed initial sync (skip first watch fire)
   const hasInitialSyncRef = useRef(false);
 
-  // Sync form changes to store and field registry
+  // Sync form changes to database
   const onFormChange = useEffectEvent((formValues: Partial<T>) => {
     if (!baseConfig || !formValues) {
       return;
@@ -102,27 +108,28 @@ export function useModuleConfigForm<T extends FieldValues>({
 
     prevValuesRef.current = currentValues;
 
-    // Build the change object with only modified fields
-    const changes: Partial<T> = {};
-    let hasChanges = false;
-
+    // Process each field and save/clear changes to database
     for (const key of Object.keys(currentValues) as Array<keyof T>) {
       const newValue = currentValues[key];
-      const originalValue = (baseConfig as T)[key];
+      const originalValue = (baseConfig as unknown as T)[key];
 
       if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        changes[key] = newValue;
-        hasChanges = true;
-        // Track per-field change for Activity panel
-        trackChange(section, key as string, newValue, originalValue);
+        // Save change to database
+        saveChange({
+          changeType: "moduleConfig",
+          variant: moduleConfigType,
+          fieldPath: key as string,
+          value: newValue,
+          originalValue: originalValue,
+        });
       } else {
-        // Remove from Activity if reverted to original
-        removeChange(section, key as string);
+        // Clear change from database if reverted to original
+        clearChange({
+          changeType: "moduleConfig",
+          variant: moduleConfigType,
+          fieldPath: key as string,
+        });
       }
-    }
-
-    if (hasChanges) {
-      setChange(section, { ...baseConfig, ...changes }, baseConfig);
     }
   });
 

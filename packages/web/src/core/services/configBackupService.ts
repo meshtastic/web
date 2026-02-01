@@ -1,12 +1,10 @@
 import { create } from "@bufbuild/protobuf";
 import { channelRepo, nodeRepo } from "@data/index";
+import { configCacheRepo } from "@data/repositories";
 import { ConfigBackupValidationService } from "@features/settings/components/panels/configBackup";
 import { Protobuf, type Types } from "@meshtastic/core";
-import type {
-  Device,
-  ValidConfigType,
-  ValidModuleConfigType,
-} from "@state/device";
+import type { ValidConfigType, ValidModuleConfigType } from "@state/device";
+import { useDeviceStore } from "@state/index.ts";
 import { fromByteArray, toByteArray } from "base64-js";
 import yaml from "js-yaml";
 
@@ -46,6 +44,10 @@ export interface ParsedConfigBackupField {
   originalPath: string;
 }
 
+export interface BackupMetadata {
+  firmwareVersion?: string;
+}
+
 const CONFIG_TYPES: ValidConfigType[] = [
   "device",
   "position",
@@ -80,79 +82,84 @@ function serializeForConfigBackup(obj: unknown): unknown {
   if (Array.isArray(obj)) return obj.map(serializeForConfigBackup);
   if (obj && typeof obj === "object") {
     return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [
-        key,
-        serializeForConfigBackup(value),
-      ]),
+      Object.entries(obj).map(([k, v]) => [k, serializeForConfigBackup(v)]),
     );
   }
   return obj;
 }
 
-function processFieldValue(field: string, value: unknown): unknown {
-  if (BYTE_FIELDS.has(field) && typeof value === "string") {
-    return toByteArray(value);
-  }
-  if (field === "adminKey" && Array.isArray(value)) {
-    return value.map((v) => (typeof v === "string" ? toByteArray(v) : v));
+function processFieldValue(fieldName: string, value: unknown): unknown {
+  if (BYTE_FIELDS.has(fieldName)) {
+    if (typeof value === "string") {
+      return toByteArray(value);
+    }
+    if (Array.isArray(value)) {
+      return value.map((v) =>
+        typeof v === "string" ? toByteArray(v) : new Uint8Array(),
+      );
+    }
   }
   return value;
 }
 
-function extractSectionFields(
-  data: Record<string, unknown>,
-  type: ParsedConfigBackupField["type"],
-  pathPrefix: string,
-): ParsedConfigBackupField[] {
-  return Object.entries(data).flatMap(([section, config]) => {
-    if (!config || typeof config !== "object") return [];
-    return Object.entries(config)
-      .filter(([, value]) => value !== undefined)
-      .map(([field, value]) => ({
-        path: [pathPrefix, section, field],
-        value,
-        type,
-        section,
-        field,
-        originalPath: `${pathPrefix}.${section}.${field}`,
-      }));
-  });
-}
-
 function buildConfigMap<T extends string>(
   types: T[],
-  getConfig: (type: T) => Record<string, unknown> | undefined,
+  getConfig: (type: T) => unknown,
 ): Record<string, unknown> {
   return Object.fromEntries(
     types
       .map((type) => {
         const config = getConfig(type);
-        return config && Object.keys(config).length > 0
-          ? [type, serializeForConfigBackup(config)]
-          : null;
+        if (!config) return null;
+        return [type, serializeForConfigBackup(config)];
       })
       .filter((entry): entry is [string, unknown] => entry !== null),
   );
 }
 
 export class ConfigBackupService {
-  static async createBackup(device: Device): Promise<string> {
-    return this.createBackupInternal(device, "full");
+  /**
+   * Get the active device from the store (for import operations)
+   */
+  private static getDevice() {
+    const device = useDeviceStore.getState().device;
+    if (!device) {
+      throw new Error("No active device");
+    }
+    return device;
   }
 
-  static async createChannelOnlyBackup(device: Device): Promise<string> {
-    return this.createBackupInternal(device, "channels-only");
+  /**
+   * Create a full config backup from the database
+   */
+  static async createBackup(
+    ownerNodeNum: number,
+    metadata?: BackupMetadata,
+  ): Promise<string> {
+    return this.createBackupInternal(ownerNodeNum, "full", metadata);
+  }
+
+  /**
+   * Create a channels-only backup from the database
+   */
+  static async createChannelOnlyBackup(ownerNodeNum: number): Promise<string> {
+    return this.createBackupInternal(ownerNodeNum, "channels-only");
   }
 
   private static async createBackupInternal(
-    device: Device,
+    ownerNodeNum: number,
     backupType: "full" | "channels-only",
+    metadata?: BackupMetadata,
   ): Promise<string> {
-    const myNodeNum = device.getMyNodeNum();
-    const dbChannels = await channelRepo.getChannels(myNodeNum);
+    const dbChannels = await channelRepo.getChannels(ownerNodeNum);
 
     const userConfig =
-      backupType === "full" ? await this.fetchUserConfig(myNodeNum) : undefined;
+      backupType === "full"
+        ? await this.fetchUserConfig(ownerNodeNum)
+        : undefined;
+
+    // Load config from database cache
+    const cachedConfig = await configCacheRepo.getCachedConfig(ownerNodeNum);
 
     const protoChannels = dbChannels.map((ch) => ({
       index: ch.channelIndex as Types.ChannelNumber,
@@ -168,32 +175,42 @@ export class ConfigBackupService {
       role: ch.role,
     }));
 
+    // Build config maps from database cache
+    const configData =
+      backupType === "full" && cachedConfig
+        ? buildConfigMap(CONFIG_TYPES, (type) => {
+            const config = cachedConfig.config as Record<string, unknown>;
+            return config[type];
+          })
+        : {};
+
+    const moduleConfigData =
+      backupType === "full" && cachedConfig
+        ? buildConfigMap(MODULE_CONFIG_TYPES, (type) => {
+            const moduleConfig = cachedConfig.moduleConfig as Record<
+              string,
+              unknown
+            >;
+            return moduleConfig[type];
+          })
+        : {};
+
     const exportData: ConfigBackupData = {
       version: "1.0",
       backupType,
       metadata: {
         exportedAt: new Date().toISOString(),
-        deviceName:
-          userConfig?.longName ?? device.hardware.myNodeNum?.toString(),
+        deviceName: userConfig?.longName ?? ownerNodeNum.toString(),
         hardwareModel: undefined,
-        firmwareVersion: device.hardware.firmwareEdition
-          ? Protobuf.Mesh.FirmwareEdition[device.hardware.firmwareEdition]
-          : undefined,
-        nodeId: myNodeNum,
+        firmwareVersion:
+          metadata?.firmwareVersion ??
+          cachedConfig?.firmwareVersion ??
+          undefined,
+        nodeId: ownerNodeNum,
       },
       user: userConfig,
-      config:
-        backupType === "full"
-          ? buildConfigMap(CONFIG_TYPES, (type) =>
-              device.getEffectiveConfig(type),
-            )
-          : {},
-      moduleConfig:
-        backupType === "full"
-          ? buildConfigMap(MODULE_CONFIG_TYPES, (type) =>
-              device.getEffectiveModuleConfig(type),
-            )
-          : {},
+      config: configData,
+      moduleConfig: moduleConfigData,
       channels: protoChannels,
     };
 
@@ -218,72 +235,103 @@ export class ConfigBackupService {
       longName: myNode.longName ?? undefined,
       shortName: myNode.shortName ?? undefined,
       isLicensed: myNode.isLicensed ?? undefined,
-      isUnmessageable: myNode.isUnmessageable ?? undefined,
+      isUnmessageable: false,
     };
   }
 
   static parseBackup(yamlContent: string): ConfigBackupData {
-    const parsed = yaml.load(yamlContent);
-    return ConfigBackupValidationService.validateConfigBackupStructure(
-      parsed,
-    ) as ConfigBackupData;
+    const parsed = yaml.load(yamlContent) as ConfigBackupData;
+    ConfigBackupValidationService.validateConfigBackupStructure(parsed);
+    return parsed;
   }
 
-  static extractFields(
-    parsedData: ConfigBackupData,
-  ): ParsedConfigBackupField[] {
-    const configFields = extractSectionFields(
-      parsedData.config,
-      "config",
-      "config",
-    );
-    const moduleConfigFields = extractSectionFields(
-      parsedData.moduleConfig,
-      "moduleConfig",
-      "moduleConfig",
-    );
+  static extractFields(data: ConfigBackupData): ParsedConfigBackupField[] {
+    const fields: ParsedConfigBackupField[] = [];
 
-    const channelFields = (
-      parsedData.channels as Array<{
+    // Extract config fields
+    for (const [section, config] of Object.entries(data.config)) {
+      if (config && typeof config === "object") {
+        for (const [field, value] of Object.entries(
+          config as Record<string, unknown>,
+        )) {
+          fields.push({
+            path: ["config", section, field],
+            value,
+            type: "config",
+            section,
+            field,
+            originalPath: `config.${section}.${field}`,
+          });
+        }
+      }
+    }
+
+    // Extract module config fields
+    for (const [section, config] of Object.entries(data.moduleConfig)) {
+      if (config && typeof config === "object") {
+        for (const [field, value] of Object.entries(
+          config as Record<string, unknown>,
+        )) {
+          fields.push({
+            path: ["moduleConfig", section, field],
+            value,
+            type: "moduleConfig",
+            section,
+            field,
+            originalPath: `moduleConfig.${section}.${field}`,
+          });
+        }
+      }
+    }
+
+    // Extract channel fields
+    for (const channel of data.channels) {
+      const ch = channel as {
         index: number;
         settings?: Record<string, unknown>;
-      }>
-    ).flatMap((channel, index) =>
-      channel.settings
-        ? Object.entries(channel.settings)
-            .filter(([, value]) => value !== undefined)
-            .map(([field, value]) => ({
-              path: ["channels", index.toString(), field],
-              value,
-              type: "channel" as const,
-              section: `Channel ${channel.index}`,
-              field,
-              originalPath: `channels.${channel.index}.${field}`,
-            }))
-        : [],
-    );
+      };
+      if (ch.settings) {
+        for (const [field, value] of Object.entries(ch.settings)) {
+          fields.push({
+            path: ["channels", String(ch.index), "settings", field],
+            value,
+            type: "channel",
+            section: String(ch.index),
+            field,
+            originalPath: `channels.${ch.index}.settings.${field}`,
+          });
+        }
+      }
+    }
 
-    const userFields =
-      parsedData.user && typeof parsedData.user === "object"
-        ? Object.entries(parsedData.user)
-            .filter(([, value]) => value !== undefined)
-            .map(([field, value]) => ({
-              path: ["user", field],
-              value,
-              type: "user" as const,
-              section: "User",
-              field,
-              originalPath: `user.${field}`,
-            }))
-        : [];
+    // Extract user fields
+    const userFields: ParsedConfigBackupField[] = [];
+    if (data.user) {
+      for (const [field, value] of Object.entries(data.user)) {
+        userFields.push({
+          path: ["user", field],
+          value,
+          type: "user",
+          section: "user",
+          field,
+          originalPath: `user.${field}`,
+        });
+      }
+    }
 
-    return [...configFields, ...moduleConfigFields, ...channelFields, ...userFields];
+    return [
+      ...fields.sort((a, b) => a.originalPath.localeCompare(b.originalPath)),
+      ...userFields,
+    ];
   }
 
+  /**
+   * Apply selected fields to the device.
+   * Uses the active device from the store.
+   */
   static async applyToDevice(
     _parsedData: ConfigBackupData,
     selectedFields: ParsedConfigBackupField[],
-    device: Device,
     onProgress?: (percent: number, status: string) => void,
     options?: { channelImportMode?: "merge" | "replace" },
   ): Promise<void> {
@@ -305,20 +353,22 @@ export class ConfigBackupService {
       );
     };
 
-    this.applyConfigUpdates(grouped.config, device, updateProgress);
-    this.applyModuleConfigUpdates(grouped.moduleConfig, device, updateProgress);
+    this.applyConfigUpdates(grouped.config, updateProgress);
+    this.applyModuleConfigUpdates(grouped.moduleConfig, updateProgress);
     await this.applyChannelUpdates(
       grouped.channels,
-      device,
       updateProgress,
       channelImportMode,
     );
-    await this.applyUserUpdates(grouped.user, device, updateProgress);
+    await this.applyUserUpdates(grouped.user, updateProgress);
   }
 
   private static groupFieldsByType(fields: ParsedConfigBackupField[]) {
     const config = new Map<ValidConfigType, Record<string, unknown>>();
-    const moduleConfig = new Map<ValidModuleConfigType, Record<string, unknown>>();
+    const moduleConfig = new Map<
+      ValidModuleConfigType,
+      Record<string, unknown>
+    >();
     const channels = new Map<number, Record<string, unknown>>();
     const user: Record<string, unknown> = {};
 
@@ -329,19 +379,28 @@ export class ConfigBackupService {
         case "config": {
           const configType = field.section as ValidConfigType;
           const existing = config.get(configType) ?? {};
-          config.set(configType, { ...existing, [field.field]: processedValue });
+          config.set(configType, {
+            ...existing,
+            [field.field]: processedValue,
+          });
           break;
         }
         case "moduleConfig": {
           const moduleType = field.section as ValidModuleConfigType;
           const existing = moduleConfig.get(moduleType) ?? {};
-          moduleConfig.set(moduleType, { ...existing, [field.field]: processedValue });
+          moduleConfig.set(moduleType, {
+            ...existing,
+            [field.field]: processedValue,
+          });
           break;
         }
         case "channel": {
-          const channelIndex = Number.parseInt(field.path[1] ?? "0", 10);
+          const channelIndex = Number.parseInt(field.section, 10);
           const existing = channels.get(channelIndex) ?? {};
-          channels.set(channelIndex, { ...existing, [field.field]: processedValue });
+          channels.set(channelIndex, {
+            ...existing,
+            [field.field]: processedValue,
+          });
           break;
         }
         case "user":
@@ -355,10 +414,10 @@ export class ConfigBackupService {
 
   private static applyConfigUpdates(
     updates: Map<ValidConfigType, Record<string, unknown>>,
-    device: Device,
     updateProgress: (status: string) => void,
   ): void {
     for (const [configType, fieldUpdates] of updates) {
+      const device = this.getDevice();
       updateProgress(`Applying ${configType} config...`);
       const currentConfig = device.getEffectiveConfig(configType) ?? {};
       const mergedConfig = { ...currentConfig, ...fieldUpdates };
@@ -378,9 +437,9 @@ export class ConfigBackupService {
 
   private static applyModuleConfigUpdates(
     updates: Map<ValidModuleConfigType, Record<string, unknown>>,
-    device: Device,
     updateProgress: (status: string) => void,
   ): void {
+    const device = this.getDevice();
     for (const [moduleType, fieldUpdates] of updates) {
       updateProgress(`Applying ${moduleType} module config...`);
       const currentConfig = device.getEffectiveModuleConfig(moduleType) ?? {};
@@ -401,12 +460,12 @@ export class ConfigBackupService {
 
   private static async applyChannelUpdates(
     updates: Map<number, Record<string, unknown>>,
-    device: Device,
     updateProgress: (status: string) => void,
     mode: "merge" | "replace" = "merge",
   ): Promise<void> {
     if (updates.size === 0) return;
 
+    const device = this.getDevice();
     const dbChannels = await channelRepo.getChannels(device.id);
     const channelsMap = new Map(dbChannels.map((ch) => [ch.channelIndex, ch]));
 
@@ -464,11 +523,11 @@ export class ConfigBackupService {
 
   private static async applyUserUpdates(
     updates: Record<string, unknown>,
-    device: Device,
     updateProgress: (status: string) => void,
   ): Promise<void> {
     if (Object.keys(updates).length === 0) return;
 
+    const device = this.getDevice();
     updateProgress("Applying user config...");
     const currentUser = await this.fetchUserConfig(device.getMyNodeNum());
 

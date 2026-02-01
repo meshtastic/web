@@ -49,7 +49,9 @@ export function ImportConfigDialog({
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
   const [importStatus, setImportStatus] = useState("");
-  const [channelImportMode, setChannelImportMode] = useState<"merge" | "replace">("merge");
+  const [channelImportMode, setChannelImportMode] = useState<
+    "merge" | "replace"
+  >("merge");
 
   // Parse YAML content and extract fields
   useEffect(() => {
@@ -80,7 +82,7 @@ export function ImportConfigDialog({
 
       if (validationErrors.length > 0) {
         setValidationError(
-          `Validation errors:\n${validationErrors.map((e: any) => e.error).join("\n")}`,
+          `Validation errors:\n${validationErrors.map((e) => e.error).join("\n")}`,
         );
       } else {
         setValidationError(null);
@@ -141,15 +143,18 @@ export function ImportConfigDialog({
   // Check if there are channel fields selected
   const hasChannelFieldsSelected = useMemo(() => {
     return allFields.some(
-      (field) => field.type === "channel" && selectedFields.has(field.originalPath),
+      (field) =>
+        field.type === "channel" && selectedFields.has(field.originalPath),
     );
   }, [allFields, selectedFields]);
 
   // Debounced search
-  const debouncedSearch = useCallback(
-    debounce((query: string) => {
-      setSearchQuery(query);
-    }, 250),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((query: string) => {
+        setSearchQuery(query);
+      }, 250),
     [],
   );
 
@@ -211,7 +216,7 @@ export function ImportConfigDialog({
         ConfigBackupValidationService.getFieldValidationErrors(fieldsToImport);
       if (validationErrors.length > 0) {
         setValidationError(
-          `Validation errors:\n${validationErrors.map((e: any) => e.error).join("\n")}`,
+          `Validation errors:\n${validationErrors.map((e) => e.error).join("\n")}`,
         );
         setIsImporting(false);
         return;
@@ -237,7 +242,14 @@ export function ImportConfigDialog({
     } finally {
       setIsImporting(false);
     }
-  }, [selectedFields, allFields, onImport, onOpenChange, channelImportMode, hasChannelFieldsSelected]);
+  }, [
+    selectedFields,
+    allFields,
+    onImport,
+    onOpenChange,
+    channelImportMode,
+    hasChannelFieldsSelected,
+  ]);
 
   const isGroupSelected = useCallback(
     (groupFields: ParsedConfigBackupField[]) => {
@@ -397,7 +409,10 @@ export function ImportConfigDialog({
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">
-                          {t("importConfig.channelImportMode", "Channel Import Mode")}
+                          {t(
+                            "importConfig.channelImportMode",
+                            "Channel Import Mode",
+                          )}
                         </h3>
                         <p className="text-sm text-muted-foreground">
                           {channelImportMode === "merge"
@@ -413,14 +428,22 @@ export function ImportConfigDialog({
                       </div>
                       <div className="flex gap-2">
                         <Button
-                          variant={channelImportMode === "merge" ? "default" : "outline"}
+                          variant={
+                            channelImportMode === "merge"
+                              ? "default"
+                              : "outline"
+                          }
                           size="sm"
                           onClick={() => setChannelImportMode("merge")}
                         >
                           {t("importConfig.merge", "Merge")}
                         </Button>
                         <Button
-                          variant={channelImportMode === "replace" ? "default" : "outline"}
+                          variant={
+                            channelImportMode === "replace"
+                              ? "default"
+                              : "outline"
+                          }
                           size="sm"
                           onClick={() => setChannelImportMode("replace")}
                         >

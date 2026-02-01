@@ -8,10 +8,15 @@
  * - Effective config by merging base + changes
  */
 
-import type { Protobuf } from "@meshtastic/core";
+import { create } from "@bufbuild/protobuf";
+import { Protobuf } from "@meshtastic/core";
 import { configCacheRepo } from "@data/repositories/index.ts";
-import { useCallback, useMemo } from "react";
-import { useDrizzleQuery } from "./useDrizzleLive.ts";
+import type {
+  ValidConfigType,
+  ValidModuleConfigType,
+} from "@features/settings/components/types.ts";
+import { useCallback, useMemo, useRef } from "react";
+import { useReactiveQuery } from "sqlocal/react";
 import type { ConfigChange, DeviceConfig } from "../schema.ts";
 
 // =============================================================================
@@ -84,14 +89,30 @@ export function usePendingChanges(
   ownerNodeNum: number | undefined,
 ): UsePendingChangesResult {
   // Load pending changes from database (reactive)
-  const { data: pendingChanges, status } = useDrizzleQuery<ConfigChange>(() => {
+  const query = useMemo(() => {
     if (!ownerNodeNum) {
       return configCacheRepo.buildChangesQuery(0);
     }
     return configCacheRepo.buildChangesQuery(ownerNodeNum);
   }, [ownerNodeNum]);
 
-  const isLoading = status === "pending" && pendingChanges.length === 0;
+  const { data, status } = useReactiveQuery<ConfigChange>(
+    configCacheRepo.getClient(),
+    query,
+  );
+  const pendingChanges = data ?? [];
+
+  // Track if we've ever received data to avoid showing loading on subsequent renders
+  const hasHydratedRef = useRef(false);
+  if (data.length > 0 || status === "ok") {
+    hasHydratedRef.current = true;
+  }
+
+  // Only show loading if we haven't hydrated yet AND query is pending with no data
+  const isLoading =
+    !hasHydratedRef.current &&
+    status === "pending" &&
+    pendingChanges.length === 0;
   const hasChanges = pendingChanges.length > 0;
   const changeCount = pendingChanges.length;
 
@@ -160,26 +181,28 @@ export function usePendingChanges(
   );
 
   // Get changes for a specific variant
-  const getVariantChanges = useCallback(
-    (changeType: ChangeType, variant: string | null): ConfigChange[] => {
-      return pendingChanges.filter(
-        (c) =>
-          c.changeType === changeType &&
-          (variant === null ? c.variant === null : c.variant === variant),
-      );
-    },
+  const getVariantChanges = useMemo(
+    () =>
+      (changeType: ChangeType, variant: string | null): ConfigChange[] => {
+        return pendingChanges.filter(
+          (c) =>
+            c.changeType === changeType &&
+            (variant === null ? c.variant === null : c.variant === variant),
+        );
+      },
     [pendingChanges],
   );
 
   // Check if a specific variant has changes
-  const hasVariantChanges = useCallback(
-    (changeType: ChangeType, variant: string | null): boolean => {
-      return pendingChanges.some(
-        (c) =>
-          c.changeType === changeType &&
-          (variant === null ? c.variant === null : c.variant === variant),
-      );
-    },
+  const hasVariantChanges = useMemo(
+    () =>
+      (changeType: ChangeType, variant: string | null): boolean => {
+        return pendingChanges.some(
+          (c) =>
+            c.changeType === changeType &&
+            (variant === null ? c.variant === null : c.variant === variant),
+        );
+      },
     [pendingChanges],
   );
 
@@ -249,13 +272,21 @@ export function useEffectiveConfig<
   hasChanges: boolean;
 } {
   // Load base config
+  const configQuery = useMemo(() => {
+    if (!ownerNodeNum) {
+      return configCacheRepo.buildConfigQuery(0);
+    }
+    return configCacheRepo.buildConfigQuery(ownerNodeNum);
+  }, [ownerNodeNum]);
+
   const { data: configData, status: configStatus } =
-    useDrizzleQuery<DeviceConfig>(() => {
-      if (!ownerNodeNum) {
-        return configCacheRepo.buildConfigQuery(0);
-      }
-      return configCacheRepo.buildConfigQuery(ownerNodeNum);
-    }, [ownerNodeNum]);
+    useReactiveQuery<DeviceConfig>(configCacheRepo.getClient(), configQuery);
+
+  // Track if we've ever received data to avoid showing loading on subsequent renders
+  const configHydratedRef = useRef(false);
+  if (configData.length > 0 || configStatus === "ok") {
+    configHydratedRef.current = true;
+  }
 
   // Load pending changes
   const { pendingChanges, isLoading: changesLoading } =
@@ -263,8 +294,12 @@ export function useEffectiveConfig<
 
   // Compute effective config
   const result = useMemo(() => {
+    // Only show loading if we haven't hydrated yet AND query is pending with no data
     const isLoading =
-      (configStatus === "pending" && configData.length === 0) || changesLoading;
+      (!configHydratedRef.current &&
+        configStatus === "pending" &&
+        configData.length === 0) ||
+      changesLoading;
     const baseConfigRow = configData[0];
 
     if (!baseConfigRow) {
@@ -304,6 +339,138 @@ export function useEffectiveConfig<
   return result;
 }
 
+// =============================================================================
+// Protobuf Conversion Utilities
+// =============================================================================
+
+/**
+ * Convert database config changes to protobuf Config objects for device.setConfig()
+ *
+ * Groups field-level changes by variant and creates protobuf objects with merged values.
+ *
+ * @param pendingChanges - All pending changes from database
+ * @param baseConfig - Base config from database to merge changes into
+ * @returns Array of Protobuf.Config.Config objects ready for device.setConfig()
+ */
+export function buildConfigProtobuf(
+  pendingChanges: ConfigChange[],
+  baseConfig: Protobuf.LocalOnly.LocalConfig | null,
+): Protobuf.Config.Config[] {
+  if (!baseConfig) return [];
+
+  // Group changes by variant
+  const changesByVariant = new Map<string, ConfigChange[]>();
+  for (const change of pendingChanges) {
+    if (change.changeType === "config" && change.variant) {
+      const existing = changesByVariant.get(change.variant) ?? [];
+      existing.push(change);
+      changesByVariant.set(change.variant, existing);
+    }
+  }
+
+  const configs: Protobuf.Config.Config[] = [];
+
+  for (const [variant, changes] of changesByVariant) {
+    // Get base config for this variant
+    const variantBase = baseConfig[variant as ValidConfigType];
+    if (!variantBase) continue;
+
+    // Merge changes into base
+    const merged = { ...variantBase } as Record<string, unknown>;
+    for (const change of changes) {
+      if (change.fieldPath) {
+        merged[change.fieldPath] = change.value;
+      }
+    }
+
+    // Create protobuf object
+    configs.push(
+      create(Protobuf.Config.ConfigSchema, {
+        payloadVariant: {
+          case: variant as ValidConfigType,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic config value from change tracking
+          value: merged as never,
+        },
+      }),
+    );
+  }
+
+  return configs;
+}
+
+/**
+ * Convert database module config changes to protobuf ModuleConfig objects
+ *
+ * @param pendingChanges - All pending changes from database
+ * @param baseModuleConfig - Base module config from database
+ * @returns Array of Protobuf.ModuleConfig.ModuleConfig objects
+ */
+export function buildModuleConfigProtobuf(
+  pendingChanges: ConfigChange[],
+  baseModuleConfig: Protobuf.LocalOnly.LocalModuleConfig | null,
+): Protobuf.ModuleConfig.ModuleConfig[] {
+  if (!baseModuleConfig) return [];
+
+  // Group changes by variant
+  const changesByVariant = new Map<string, ConfigChange[]>();
+  for (const change of pendingChanges) {
+    if (change.changeType === "moduleConfig" && change.variant) {
+      const existing = changesByVariant.get(change.variant) ?? [];
+      existing.push(change);
+      changesByVariant.set(change.variant, existing);
+    }
+  }
+
+  const configs: Protobuf.ModuleConfig.ModuleConfig[] = [];
+
+  for (const [variant, changes] of changesByVariant) {
+    // Get base config for this variant
+    const variantBase = baseModuleConfig[variant as ValidModuleConfigType];
+    if (!variantBase) continue;
+
+    // Merge changes into base
+    const merged = { ...variantBase } as Record<string, unknown>;
+    for (const change of changes) {
+      if (change.fieldPath) {
+        merged[change.fieldPath] = change.value;
+      }
+    }
+
+    // Create protobuf object
+    configs.push(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: {
+          case: variant as ValidModuleConfigType,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic config value from change tracking
+          value: merged as never,
+        },
+      }),
+    );
+  }
+
+  return configs;
+}
+
+/**
+ * Convert database channel changes to protobuf Channel objects
+ *
+ * @param pendingChanges - All pending changes from database
+ * @returns Array of Protobuf.Channel.Channel objects
+ */
+export function buildChannelProtobuf(
+  pendingChanges: ConfigChange[],
+): Protobuf.Channel.Channel[] {
+  const channels: Protobuf.Channel.Channel[] = [];
+
+  for (const change of pendingChanges) {
+    if (change.changeType === "channel" && change.value) {
+      channels.push(change.value as Protobuf.Channel.Channel);
+    }
+  }
+
+  return channels;
+}
+
 /**
  * Hook for getting effective module config with pending changes merged.
  *
@@ -323,13 +490,24 @@ export function useEffectiveModuleConfig<
   hasChanges: boolean;
 } {
   // Load base config
+  const moduleConfigQuery = useMemo(() => {
+    if (!ownerNodeNum) {
+      return configCacheRepo.buildConfigQuery(0);
+    }
+    return configCacheRepo.buildConfigQuery(ownerNodeNum);
+  }, [ownerNodeNum]);
+
   const { data: configData, status: configStatus } =
-    useDrizzleQuery<DeviceConfig>(() => {
-      if (!ownerNodeNum) {
-        return configCacheRepo.buildConfigQuery(0);
-      }
-      return configCacheRepo.buildConfigQuery(ownerNodeNum);
-    }, [ownerNodeNum]);
+    useReactiveQuery<DeviceConfig>(
+      configCacheRepo.getClient(),
+      moduleConfigQuery,
+    );
+
+  // Track if we've ever received data to avoid showing loading on subsequent renders
+  const moduleConfigHydratedRef = useRef(false);
+  if (configData.length > 0 || configStatus === "ok") {
+    moduleConfigHydratedRef.current = true;
+  }
 
   // Load pending changes
   const { pendingChanges, isLoading: changesLoading } =
@@ -337,8 +515,12 @@ export function useEffectiveModuleConfig<
 
   // Compute effective config
   const result = useMemo(() => {
+    // Only show loading if we haven't hydrated yet AND query is pending with no data
     const isLoading =
-      (configStatus === "pending" && configData.length === 0) || changesLoading;
+      (!moduleConfigHydratedRef.current &&
+        configStatus === "pending" &&
+        configData.length === 0) ||
+      changesLoading;
     const baseConfigRow = configData[0];
 
     if (!baseConfigRow) {

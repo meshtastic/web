@@ -561,6 +561,13 @@ export class MessageRepository {
     conversationId: string,
     messageId: number,
   ): Promise<void> {
+    // Check current last read to avoid unnecessary writes
+    const current = await this.getLastRead(ownerNodeNum, type, conversationId);
+    if (current !== null && current >= messageId) {
+      // Already marked as read up to this point or beyond
+      return;
+    }
+
     await this.db
       .insert(lastRead)
       .values({

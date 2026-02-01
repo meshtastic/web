@@ -12,7 +12,6 @@ interface Dialogs {
   deviceName: boolean;
   deviceShare: boolean;
   nodeRemoval: boolean;
-  pkiBackup: boolean;
   nodeDetails: boolean;
   unsafeRoles: boolean;
   refreshKeys: boolean;

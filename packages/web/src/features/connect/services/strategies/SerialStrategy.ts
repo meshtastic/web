@@ -81,8 +81,8 @@ export class SerialStrategy implements ConnectionStrategy {
     }
   }
 
-  async disconnect(nativeHandle?: any): Promise<void> {
-    const port = nativeHandle as SerialPort;
+  async disconnect(nativeHandle?: unknown): Promise<void> {
+    const port = nativeHandle as SerialPort | undefined;
     if (port) {
       logger.debug(`[SerialStrategy] Closing Serial port`);
       try {

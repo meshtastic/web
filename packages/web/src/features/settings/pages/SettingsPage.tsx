@@ -1,8 +1,9 @@
+import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
 import { Badge } from "@shared/components/ui/badge";
 import { Button } from "@shared/components/ui/button";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@shared/components/ui/sheet";
-import { useRemoteAdminAuth } from "@shared/hooks";
+import { useMyNode, useRemoteAdminAuth } from "@shared/hooks";
 import { cn } from "@shared/utils/cn";
 import { t } from "i18next";
 import {
@@ -22,7 +23,6 @@ import { Suspense, useState } from "react";
 import { ActivityPanel } from "../components/activity/index.ts";
 import { SettingsSearchBar } from "../components/SettingsSearchBar.tsx";
 import { useSettingsSave } from "../hooks/useSaveSettings.ts";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import { AdvancedConfig } from "./AdvancedConfig.tsx";
 import { AppPreferencesConfig } from "./AppPreferencesConfig.tsx";
 import { BackupRestoreConfig } from "./BackupRestoreConfig.tsx";
@@ -83,8 +83,8 @@ interface SettingsHeaderActionsProps {
 function SettingsHeaderActions({ onActivityOpen }: SettingsHeaderActionsProps) {
   const { handleSave, handleReset, isSaving, hasPending, saveDisabled } =
     useSettingsSave();
-  const { getChangeCount } = useFieldRegistry();
-  const totalChangeCount = getChangeCount();
+  const { myNodeNum } = useMyNode();
+  const { changeCount: totalChangeCount } = usePendingChanges(myNodeNum);
 
   return (
     <>

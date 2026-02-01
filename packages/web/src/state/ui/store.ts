@@ -19,7 +19,6 @@ export interface Dialogs {
   deviceName: boolean;
   deviceShare: boolean;
   nodeRemoval: boolean;
-  pkiBackup: boolean;
   nodeDetails: boolean;
   unsafeRoles: boolean;
   refreshKeys: boolean;
@@ -173,7 +172,6 @@ const defaultDialogs: Dialogs = {
   deviceName: false,
   deviceShare: false,
   nodeRemoval: false,
-  pkiBackup: false,
   nodeDetails: false,
   unsafeRoles: false,
   refreshKeys: false,

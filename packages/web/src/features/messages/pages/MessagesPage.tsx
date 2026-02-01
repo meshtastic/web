@@ -334,21 +334,21 @@ export default function MessagesPage() {
                   <span className="text-sm md:text-base truncate flex-1">
                     {displayContact.name}
                   </span>
-                  {tab.unreadCount > 0 && (
+                  <Activity mode={tab.unreadCount > 0 ? "visible" : "hidden"}>
                     <Badge className="h-5 min-w-5 justify-center bg-primary text-primary-foreground shrink-0">
                       {tab.unreadCount}
                     </Badge>
-                  )}
-                  {openTabs.length > 1 && (
+                  </Activity>
+                  <Activity mode={openTabs.length > 1 ? "visible" : "hidden"}>
                     <button
                       type="button"
                       onClick={(e) => closeTab(tab.id, e)}
                       className="opacity-0 group-hover:opacity-100 hover:bg-muted rounded p-0.5 transition-opacity shrink-0"
                       title="Close tab"
                     >
-                      <X className="h-3 w-3 text-muted-foreground" />
+                      <X className="size-4 text-muted-foreground" />
                     </button>
-                  )}
+                  </Activity>
                 </>
               );
 
@@ -365,6 +365,7 @@ export default function MessagesPage() {
                   <div
                     key={tab.id}
                     role="tab"
+                    aria-selected={tab.id === activeTabId}
                     tabIndex={0}
                     onClick={() => handleTabClick(tab.id, true)}
                     onKeyDown={(e) => {
@@ -440,12 +441,16 @@ export default function MessagesPage() {
   );
 
   const renderChatArea = () => {
+    // Key forces ChatPanel to remount when contact changes, ensuring hooks reinitialize
+    const primaryKey = `${selectedContact?.type}-${selectedContact?.id}`;
+    const secondaryKey = `${secondaryContact?.type}-${secondaryContact?.id}`;
+
     return (
       <>
         <Activity mode={splitMode === "none" ? "visible" : "hidden"}>
           <div className="flex-1 flex flex-col overflow-hidden">
             {renderTabBar(false, activeTabId)}
-            <ChatPanel contact={selectedContact} />
+            <ChatPanel key={primaryKey} contact={selectedContact} />
           </div>
         </Activity>
         <Activity mode={splitMode !== "none" ? "visible" : "hidden"}>
@@ -456,14 +461,20 @@ export default function MessagesPage() {
             <ResizablePanel defaultSize={50} minSize={25}>
               <div className="flex flex-col h-full overflow-hidden">
                 {renderTabBar(false, activeTabId)}
-                <ChatPanel contact={selectedContact} />
+                <ChatPanel
+                  key={`split-${primaryKey}`}
+                  contact={selectedContact}
+                />
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={50} minSize={25}>
               <div className="flex flex-col h-full overflow-hidden">
                 {renderTabBar(true, secondaryTabId)}
-                <ChatPanel contact={secondaryContact} />
+                <ChatPanel
+                  key={`split-${secondaryKey}`}
+                  contact={secondaryContact}
+                />
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>

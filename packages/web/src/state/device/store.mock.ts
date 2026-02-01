@@ -33,7 +33,6 @@ export const mockDeviceStore: Device = {
     deviceName: false,
     deviceShare: false,
     nodeRemoval: false,
-    pkiBackup: false,
     nodeDetails: false,
     unsafeRoles: false,
     refreshKeys: false,

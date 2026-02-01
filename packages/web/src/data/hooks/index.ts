@@ -13,7 +13,6 @@ export {
   useEffectiveModuleConfig,
   mergeConfigChanges,
 } from "./usePendingChanges.ts";
-export { useDrizzleQuery } from "./useDrizzleLive.ts";
 export {
   useFavoriteNodes,
   useNode,
@@ -47,14 +46,13 @@ export {
   useUnreadCountBroadcast,
   useUnreadCountDirect,
 } from "@features/messages/hooks/useUnreadCount";
-export {
-  useChannel,
-  useChannels,
-} from "./useChannels.ts";
+export { useChannel, useChannels } from "./useChannels.ts";
 export {
   invalidateDevicePreferenceCache,
   useDevicePreference,
 } from "./useDevicePreference.ts";
+export { useDisplayUnits } from "./useDisplayUnits.ts";
+export { useLoraConfig } from "./useLoraConfig.ts";
 export { useDevices } from "./useDevices.ts";
 export { usePacketLogs } from "./usePacketLogs.ts";
 export type { PreferenceKey } from "./usePreferences.ts";

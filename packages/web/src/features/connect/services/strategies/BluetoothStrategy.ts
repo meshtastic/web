@@ -14,7 +14,7 @@ export class BluetoothStrategy implements ConnectionStrategy {
     }
 
     logger.debug(`[BluetoothStrategy] Looking for Bluetooth device`);
-    
+
     let bleDevice: BluetoothDevice | undefined;
 
     // Try to find existing permission
@@ -50,12 +50,12 @@ export class BluetoothStrategy implements ConnectionStrategy {
     };
   }
 
-  async disconnect(nativeHandle?: any): Promise<void> {
-    const device = nativeHandle as BluetoothDevice;
+  async disconnect(nativeHandle?: unknown): Promise<void> {
+    const device = nativeHandle as BluetoothDevice | undefined;
     if (device) {
       logger.debug(`[BluetoothStrategy] Disconnecting Bluetooth device`);
       try {
-          BrowserHardware.disconnectBluetoothDevice(device);
+        BrowserHardware.disconnectBluetoothDevice(device);
       } catch (err) {
         logger.warn(
           `[BluetoothStrategy] Error disconnecting Bluetooth device:`,

@@ -1,45 +1,59 @@
+import {
+  useEffectiveConfig,
+  usePendingChanges,
+} from "@data/hooks/usePendingChanges.ts";
 import { useUnsafeRolesDialog } from "@shared/components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
-import { useDevice } from "@state/index.ts";
+import { useMyNode } from "@shared/hooks";
 import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type DeviceValidation,
   DeviceValidationSchema,
 } from "../validation/config/device.ts";
 
-const SECTION = { type: "config", variant: "device" } as const;
-
 export function useDeviceForm() {
-  const { config, getEffectiveConfig, setChange } = useDevice();
-  const { trackChange, removeChange } = useFieldRegistry();
+  const { myNodeNum } = useMyNode();
+  const {
+    config: effectiveConfig,
+    baseConfig,
+    isLoading,
+  } = useEffectiveConfig(myNodeNum, "device");
+  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
-  const baseConfig = config.device;
-  const effectiveConfig = getEffectiveConfig("device");
-
-  const isReady = baseConfig !== undefined;
+  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
 
   const form = useForm<DeviceValidation>({
     mode: "onChange",
     resolver: createZodResolver(DeviceValidationSchema),
-    defaultValues: baseConfig,
-    values: effectiveConfig,
+    defaultValues: baseConfig as DeviceValidation | undefined,
+    values: effectiveConfig as DeviceValidation | undefined,
   });
 
   const { watch, getValues, setValue } = form;
 
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<DeviceValidation | undefined>(undefined);
+  // Track whether we've completed initial sync (skip first watch fire)
+  const hasInitialSyncRef = useRef(false);
 
-  // Sync form changes to store and field registry
+  // Sync form changes to database
   const onFormChange = useEffectEvent((formData: Partial<DeviceValidation>) => {
     if (!baseConfig || !formData) {
       return;
     }
 
     const currentValues = formData as DeviceValidation;
+
+    // Skip the first watch fire - just capture initial values without tracking
+    // This prevents spurious change detection during form initialization
+    if (!hasInitialSyncRef.current) {
+      prevValuesRef.current = currentValues;
+      hasInitialSyncRef.current = true;
+      return;
+    }
+
     const prevValues = prevValuesRef.current;
 
     if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
@@ -48,31 +62,37 @@ export function useDeviceForm() {
 
     prevValuesRef.current = currentValues;
 
-    // Track per-field changes for Activity panel and build changes object
-    const changes: Partial<DeviceValidation> = {};
-    let hasChanges = false;
-
+    // Process each field and save/clear changes to database
     for (const key of Object.keys(currentValues) as Array<
       keyof DeviceValidation
     >) {
       const newValue = currentValues[key];
-      const originalValue = baseConfig[key];
+      const originalValue = (baseConfig as DeviceValidation)[key];
 
       if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        (changes as Record<string, unknown>)[key] = newValue;
-        hasChanges = true;
-        trackChange(SECTION, key, newValue, originalValue);
+        // Save change to database
+        saveChange({
+          changeType: "config",
+          variant: "device",
+          fieldPath: key,
+          value: newValue,
+          originalValue: originalValue,
+        });
       } else {
-        removeChange(SECTION, key);
+        // Clear change from database if reverted to original
+        clearChange({
+          changeType: "config",
+          variant: "device",
+          fieldPath: key,
+        });
       }
-    }
-
-    if (hasChanges) {
-      setChange(SECTION, { ...baseConfig, ...changes }, baseConfig);
     }
   });
 
   useEffect(() => {
+    // Reset initial sync flag when effect re-runs
+    hasInitialSyncRef.current = false;
+
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
@@ -83,7 +103,7 @@ export function useDeviceForm() {
       const isAllowed = await validateRoleSelection(newRole);
 
       if (isAllowed) {
-        setValue("role", newRole as DeviceValidation["role"], {
+        setValue("role", newRole as unknown as DeviceValidation["role"], {
           shouldDirty: true,
         });
       }

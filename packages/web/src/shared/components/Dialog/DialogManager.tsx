@@ -1,5 +1,6 @@
-import { useChannels } from "@data/hooks";
-import { useDevice, useUIStore } from "@state/index.ts";
+import { useChannels, useLoraConfig } from "@data/hooks";
+import { useMyNode } from "@shared/hooks";
+import { useUIStore } from "@state/index.ts";
 import { toByteArray } from "base64-js";
 import { Activity, useMemo } from "react";
 import { ClientNotificationDialog } from "./ClientNotificationDialog/ClientNotificationDialog.tsx";
@@ -8,7 +9,6 @@ import { DeviceShareDialog } from "./DeviceShareDialog.tsx";
 import { FactoryResetConfigDialog } from "./FactoryResetConfigDialog/FactoryResetConfigDialog.tsx";
 import { FactoryResetDeviceDialog } from "./FactoryResetDeviceDialog/FactoryResetDeviceDialog.tsx";
 import { NodeDetailsDrawer } from "./NodeDetailsDrawer/index.ts";
-import { PkiBackupDialog } from "./PKIBackupDialog.tsx";
 import { QRDialog } from "./QRDialog.tsx";
 import { RebootDialog } from "./RebootDialog.tsx";
 import { RefreshKeysDialog } from "./RefreshKeysDialog/RefreshKeysDialog.tsx";
@@ -19,10 +19,11 @@ import { TracerouteResponseDialog } from "./TracerouteResponseDialog.tsx";
 import { UnsafeRolesDialog } from "./UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 
 export const DialogManager = () => {
-  const { id: deviceId, config } = useDevice();
+  const { myNodeNum } = useMyNode();
   const dialogs = useUIStore((s) => s.dialogs);
   const setDialogOpen = useUIStore((s) => s.setDialogOpen);
-  const { channels: dbChannels } = useChannels(deviceId);
+  const { channels: dbChannels } = useChannels(myNodeNum);
+  const loraConfig = useLoraConfig(myNodeNum);
 
   // Convert DB channels to Map format for QRDialog
   const channelsMap = useMemo(() => {
@@ -50,7 +51,7 @@ export const DialogManager = () => {
           setDialogOpen("QR", open);
         }}
         channels={channelsMap}
-        loraConfig={config.lora}
+        loraConfig={loraConfig}
       />
       <ShutdownDialog
         open={dialogs.shutdown}
@@ -68,12 +69,6 @@ export const DialogManager = () => {
         open={dialogs.nodeRemoval}
         onOpenChange={(open) => {
           setDialogOpen("nodeRemoval", open);
-        }}
-      />
-      <PkiBackupDialog
-        open={dialogs.pkiBackup}
-        onOpenChange={(open) => {
-          setDialogOpen("pkiBackup", open);
         }}
       />
       <UnsafeRolesDialog

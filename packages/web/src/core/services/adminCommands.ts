@@ -1,18 +1,16 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { nodeRepo } from "@data/repositories";
+import {
+  buildChannelProtobuf,
+  buildConfigProtobuf,
+  buildModuleConfigProtobuf,
+} from "@data/hooks/usePendingChanges.ts";
+import { configCacheRepo, nodeRepo } from "@data/repositories";
 import { Protobuf } from "@meshtastic/core";
 import { useDeviceStore } from "@state/index.ts";
-import logger from "./logger";
+import logger from "./logger.ts";
 
 /**
  * AdminCommandService - Centralized service for sending admin messages to devices
- *
- * This singleton service provides a single point of access for all admin operations,
- * handling both the protobuf message sending and local database updates.
- *
- * Usage:
- * - Components call adminCommands.setFavoriteNode(...) instead of passing device around
- * - The service automatically uses the active device from the store
  */
 class AdminCommandService {
   /**
@@ -300,6 +298,189 @@ class AdminCommandService {
         ),
       ),
     );
+  }
+
+  // ===========================================================================
+  // Config Operations
+  // ===========================================================================
+
+  /**
+   * Get the connection for config operations
+   */
+  private getConnection() {
+    const connection = this.getDevice().connection;
+    if (!connection) {
+      throw new Error("No connection available");
+    }
+    return connection;
+  }
+
+  /**
+   * Save a single config variant to the device
+   */
+  async saveConfig(config: Protobuf.Config.Config): Promise<void> {
+    const connection = this.getConnection();
+    logger.debug(
+      `[AdminCommands] Saving config: ${config.payloadVariant.case}`,
+    );
+    await connection.setConfig(config);
+  }
+
+  /**
+   * Save a single module config variant to the device
+   */
+  async saveModuleConfig(
+    moduleConfig: Protobuf.ModuleConfig.ModuleConfig,
+  ): Promise<void> {
+    const connection = this.getConnection();
+    logger.debug(
+      `[AdminCommands] Saving module config: ${moduleConfig.payloadVariant.case}`,
+    );
+    await connection.setModuleConfig(moduleConfig);
+  }
+
+  /**
+   * Save a channel to the device
+   */
+  async saveChannel(channel: Protobuf.Channel.Channel): Promise<void> {
+    const connection = this.getConnection();
+    logger.debug(
+      `[AdminCommands] Saving channel: ${channel.settings?.name ?? channel.index}`,
+    );
+    await connection.setChannel(channel);
+  }
+
+  /**
+   * Commit config changes on the device (required after setConfig/setModuleConfig)
+   */
+  async commitConfig(): Promise<void> {
+    const connection = this.getConnection();
+    logger.debug("[AdminCommands] Committing config changes");
+    await connection.commitEditSettings();
+  }
+
+  /**
+   * Set owner/user info on the device
+   */
+  async setOwner(user: Protobuf.Mesh.User): Promise<void> {
+    const connection = this.getConnection();
+    logger.debug(
+      `[AdminCommands] Setting owner: ${user.longName} (${user.shortName})`,
+    );
+    await connection.setOwner(user);
+  }
+
+  /**
+   * Save all pending config changes from database to device
+   *
+   * @param ownerNodeNum - The device's node number
+   * @returns Object with counts of saved changes
+   */
+  async saveAllPendingChanges(ownerNodeNum: number): Promise<{
+    configCount: number;
+    moduleConfigCount: number;
+    channelCount: number;
+  }> {
+    const connection = this.getConnection();
+
+    // Load pending changes from database
+    const pendingChanges =
+      await configCacheRepo.getPendingChanges(ownerNodeNum);
+
+    // Load base config from database
+    const cachedConfig = await configCacheRepo.getCachedConfig(ownerNodeNum);
+
+    if (!cachedConfig) {
+      throw new Error("No cached config found for device");
+    }
+
+    // Convert to protobuf format
+    const configProtobufs = buildConfigProtobuf(
+      pendingChanges,
+      cachedConfig.config as Protobuf.LocalOnly.LocalConfig,
+    );
+    const moduleConfigProtobufs = buildModuleConfigProtobuf(
+      pendingChanges,
+      cachedConfig.moduleConfig as Protobuf.LocalOnly.LocalModuleConfig,
+    );
+    const channelProtobufs = buildChannelProtobuf(pendingChanges);
+
+    logger.info(
+      `[AdminCommands] Saving ${configProtobufs.length} configs, ${moduleConfigProtobufs.length} module configs, ${channelProtobufs.length} channels`,
+    );
+
+    // Save channels first (they don't need commit)
+    for (const channel of channelProtobufs) {
+      await connection.setChannel(channel);
+    }
+
+    // Save configs
+    for (const config of configProtobufs) {
+      await connection.setConfig(config);
+    }
+
+    // Save module configs
+    for (const moduleConfig of moduleConfigProtobufs) {
+      await connection.setModuleConfig(moduleConfig);
+    }
+
+    // Commit if there were config changes
+    if (configProtobufs.length > 0 || moduleConfigProtobufs.length > 0) {
+      await connection.commitEditSettings();
+    }
+
+    // Clear pending changes from database after successful save
+    await configCacheRepo.clearAllLocalChanges(ownerNodeNum);
+
+    return {
+      configCount: configProtobufs.length,
+      moduleConfigCount: moduleConfigProtobufs.length,
+      channelCount: channelProtobufs.length,
+    };
+  }
+
+  /**
+   * Get count of pending changes from database
+   */
+  async getPendingChangeCount(ownerNodeNum: number): Promise<{
+    config: number;
+    moduleConfig: number;
+    channel: number;
+    total: number;
+  }> {
+    const pendingChanges =
+      await configCacheRepo.getPendingChanges(ownerNodeNum);
+
+    const configChanges = pendingChanges.filter(
+      (c) => c.changeType === "config",
+    );
+    const moduleConfigChanges = pendingChanges.filter(
+      (c) => c.changeType === "moduleConfig",
+    );
+    const channelChanges = pendingChanges.filter(
+      (c) => c.changeType === "channel",
+    );
+
+    // Count unique variants (not individual field changes)
+    const configVariants = new Set(configChanges.map((c) => c.variant));
+    const moduleConfigVariants = new Set(
+      moduleConfigChanges.map((c) => c.variant),
+    );
+
+    return {
+      config: configVariants.size,
+      moduleConfig: moduleConfigVariants.size,
+      channel: channelChanges.length,
+      total:
+        configVariants.size + moduleConfigVariants.size + channelChanges.length,
+    };
+  }
+
+  /**
+   * Clear all pending changes from database
+   */
+  async clearPendingChanges(ownerNodeNum: number): Promise<void> {
+    await configCacheRepo.clearAllLocalChanges(ownerNodeNum);
   }
 }
 

@@ -1,28 +1,32 @@
 import { adminCommands } from "@core/services/adminCommands";
 import { useNodes } from "@data/hooks";
+import {
+  useEffectiveConfig,
+  usePendingChanges,
+} from "@data/hooks/usePendingChanges.ts";
 import { useMyNode } from "@shared/hooks";
 import { usePositionFlags } from "@shared/hooks/usePositionFlags";
 import { useDevice } from "@state/index.ts";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type PositionValidation,
   PositionValidationSchema,
 } from "../validation/config/position.ts";
 
-const SECTION = { type: "config", variant: "position" } as const;
-
 export function usePositionForm() {
-  const { config, getEffectiveConfig, setChange, queueAdminMessage, hardware } =
-    useDevice();
-  const { trackChange, removeChange } = useFieldRegistry();
   const { myNodeNum } = useMyNode();
+  const {
+    config: effectiveConfig,
+    baseConfig,
+    isLoading,
+  } = useEffectiveConfig(myNodeNum, "position");
+  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
   const { nodes: allNodes } = useNodes(myNodeNum);
 
-  const effectiveConfig = getEffectiveConfig("position");
-  const baseConfig = config.position;
+  // Keep queueAdminMessage from device store for admin message queueing
+  const { queueAdminMessage } = useDevice();
 
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     effectiveConfig?.positionFlags ?? 0,
@@ -30,14 +34,13 @@ export function usePositionForm() {
 
   // Get current node for position coordinates
   const myNode = useMemo(() => {
-    const myNodeNum = hardware.myNodeNum;
     if (!myNodeNum) {
       return undefined;
     }
     return allNodes.find((n) => n.nodeNum === myNodeNum);
-  }, [allNodes, hardware.myNodeNum]);
+  }, [allNodes, myNodeNum]);
 
-  // Merge config with node position data
+  // Merge config with node position data for form values
   const formValues = useMemo((): PositionValidation | undefined => {
     if (!effectiveConfig) {
       return undefined;
@@ -50,12 +53,25 @@ export function usePositionForm() {
     };
   }, [effectiveConfig, myNode]);
 
-  const isReady = baseConfig !== undefined;
+  // Base config merged with node position for default values
+  const defaultFormValues = useMemo((): PositionValidation | undefined => {
+    if (!baseConfig) {
+      return undefined;
+    }
+    return {
+      ...baseConfig,
+      latitude: myNode?.latitudeI ? myNode.latitudeI / 1e7 : undefined,
+      longitude: myNode?.longitudeI ? myNode.longitudeI / 1e7 : undefined,
+      altitude: myNode?.altitude ?? 0,
+    };
+  }, [baseConfig, myNode]);
+
+  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
 
   const form = useForm<PositionValidation>({
     mode: "onChange",
     resolver: createZodResolver(PositionValidationSchema),
-    defaultValues: baseConfig,
+    defaultValues: defaultFormValues,
     values: formValues,
   });
 
@@ -63,8 +79,10 @@ export function usePositionForm() {
 
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<PositionValidation | undefined>(undefined);
+  // Track whether we've completed initial sync (skip first watch fire)
+  const hasInitialSyncRef = useRef(false);
 
-  // Sync form changes to store and field registry (excluding position coordinates)
+  // Sync form changes to database (excluding position coordinates)
   const onFormChange = useEffectEvent(
     (formData: Partial<PositionValidation>) => {
       if (!baseConfig || !formData) {
@@ -72,6 +90,15 @@ export function usePositionForm() {
       }
 
       const currentValues = formData as PositionValidation;
+
+      // Skip the first watch fire - just capture initial values without tracking
+      // This prevents spurious change detection during form initialization
+      if (!hasInitialSyncRef.current) {
+        prevValuesRef.current = currentValues;
+        hasInitialSyncRef.current = true;
+        return;
+      }
+
       const prevValues = prevValuesRef.current;
 
       if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
@@ -91,30 +118,36 @@ export function usePositionForm() {
       // Include computed flags value
       const payload = { ...configData, positionFlags: flagsValue };
 
-      // Track per-field changes for Activity panel and build changes object
-      const changes: Partial<typeof payload> = {};
-      let hasChanges = false;
-
+      // Process each field and save/clear changes to database
       for (const key of Object.keys(payload) as Array<keyof typeof payload>) {
         const newValue = payload[key];
         const originalValue = baseConfig[key as keyof typeof baseConfig];
 
         if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-          changes[key] = newValue;
-          hasChanges = true;
-          trackChange(SECTION, key as string, newValue, originalValue);
+          // Save change to database
+          saveChange({
+            changeType: "config",
+            variant: "position",
+            fieldPath: key,
+            value: newValue,
+            originalValue: originalValue,
+          });
         } else {
-          removeChange(SECTION, key as string);
+          // Clear change from database if reverted to original
+          clearChange({
+            changeType: "config",
+            variant: "position",
+            fieldPath: key,
+          });
         }
-      }
-
-      if (hasChanges) {
-        setChange(SECTION, { ...baseConfig, ...changes }, baseConfig);
       }
     },
   );
 
   useEffect(() => {
+    // Reset initial sync flag when effect re-runs
+    hasInitialSyncRef.current = false;
+
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);

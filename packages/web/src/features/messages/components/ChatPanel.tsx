@@ -1,3 +1,4 @@
+import logger from "@core/services/logger";
 import {
   markConversationAsRead,
   useChannelMessages,
@@ -47,28 +48,33 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
     setReplyingTo(null);
   }, []);
 
-  const directMessages = useDirectMessages(
-    myNodeNum,
-    myNodeNum,
-    contact?.type === "direct" ? contact.id : 0,
-    100,
-  );
+  const otherNodeNum = contact?.type === "direct" ? contact.id : 0;
+  const directMessages = useDirectMessages(myNodeNum, otherNodeNum, 100);
 
-  const channelMessages = useChannelMessages(
-    myNodeNum,
-    contact?.type === "channel" ? contact.id : -1,
-    100,
+  const channelId = contact?.type === "channel" ? contact.id : -1;
+  const channelMessages = useChannelMessages(myNodeNum, channelId, 100);
+
+  // Debug logging
+  logger.debug(
+    `[ChatPanel] contact=${contact?.type}:${contact?.id}, myNodeNum=${myNodeNum}, directMessages=${directMessages.messages.length}, channelMessages=${channelMessages.messages.length}`,
   );
 
   const currentMessages = useMemo(() => {
     if (!contact || !myNodeNum) {
+      logger.debug("[ChatPanel] currentMessages: no contact or myNodeNum");
       return [];
     }
 
     if (contact.type === "channel") {
+      logger.debug(
+        `[ChatPanel] currentMessages: channel ${contact.id}, ${channelMessages.messages.length} messages`,
+      );
       return channelMessages.messages;
     }
 
+    logger.debug(
+      `[ChatPanel] currentMessages: direct ${contact.id}, ${directMessages.messages.length} messages`,
+    );
     return directMessages.messages;
   }, [contact, directMessages.messages, channelMessages.messages, myNodeNum]);
 
@@ -153,15 +159,14 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
     [sortedMessages, t, dayLabelFmt],
   );
 
-  // Mark conversation as read when messages are displayed
-  useEffect(() => {
-    if (!contact || !myNodeNum || sortedMessages.length === 0) {
-      return;
-    }
+  // Get the newest message ID (stable value for effect dependency)
+  const newestMessageId = sortedMessages[0]?.id;
 
-    // sortedMessages is newest-first, so index 0 is the most recent message
-    const newestMessage = sortedMessages[0];
-    if (!newestMessage) {
+  // Mark conversation as read when viewing it
+  // Only runs when contact changes OR a new message arrives (newestMessageId changes)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- using specific contact properties to avoid re-running on unrelated contact changes
+  useEffect(() => {
+    if (!contact || !myNodeNum || newestMessageId === undefined) {
       return;
     }
 
@@ -170,7 +175,7 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
         myNodeNum,
         "channel",
         contact.id.toString(),
-        newestMessage.id,
+        newestMessageId,
       );
     } else {
       // Conversation ID format: myNodeNum:otherNodeNum (from user's perspective)
@@ -179,10 +184,16 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
         myNodeNum,
         "direct",
         `${myNodeNum}:${otherNode}`,
-        newestMessage.id,
+        newestMessageId,
       );
     }
-  }, [contact, sortedMessages, myNodeNum]);
+  }, [
+    contact?.id,
+    contact?.type,
+    contact?.nodeNum,
+    myNodeNum,
+    newestMessageId,
+  ]);
 
   if (!contact) {
     return (
@@ -264,7 +275,7 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
               </div>
               <div className="sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-2">
                 <div className="text-center">
-                  <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                  <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-lg">
                     {group.label}
                   </span>
                 </div>

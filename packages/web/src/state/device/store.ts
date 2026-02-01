@@ -276,7 +276,6 @@ function deviceFactory(
       deviceName: false,
       deviceShare: false,
       nodeRemoval: false,
-      pkiBackup: false,
       nodeDetails: false,
       unsafeRoles: false,
       refreshKeys: false,
@@ -933,8 +932,8 @@ function deviceFactory(
             create(Protobuf.Config.ConfigSchema, {
               payloadVariant: {
                 case: variant,
-                // biome-ignore lint/suspicious/noExplicitAny: dynamic config value from change tracking
-                value: entry.value as any,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic config value from change tracking
+                value: entry.value as never,
               },
             }),
           );
@@ -956,8 +955,8 @@ function deviceFactory(
             create(Protobuf.ModuleConfig.ModuleConfigSchema, {
               payloadVariant: {
                 case: variant,
-                // biome-ignore lint/suspicious/noExplicitAny: dynamic config value from change tracking
-                value: entry.value as any,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic config value from change tracking
+                value: entry.value as never,
               },
             }),
           );

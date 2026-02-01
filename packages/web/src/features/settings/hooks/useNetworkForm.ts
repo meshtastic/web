@@ -1,28 +1,34 @@
 import { create } from "@bufbuild/protobuf";
+import {
+  useEffectiveConfig,
+  usePendingChanges,
+} from "@data/hooks/usePendingChanges.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useMyNode } from "@shared/hooks";
 import { convertIntToIpAddress, convertIpAddressToInt } from "@shared/utils/ip";
-import { useDevice } from "@state/index.ts";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
+import type { DeepPartial } from "react-hook-form";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
-import { useFieldRegistry } from "../services/fieldRegistry/index.ts";
 import {
   type NetworkValidation,
   NetworkValidationSchema,
 } from "../validation/config/network.ts";
 
-const SECTION = { type: "config", variant: "network" } as const;
-
 export function useNetworkForm() {
-  const { config, getEffectiveConfig, setChange } = useDevice();
-  const { trackChange, removeChange } = useFieldRegistry();
-
-  const baseConfig = config.network;
-  const effectiveConfig = getEffectiveConfig("network");
+  const { myNodeNum } = useMyNode();
+  const {
+    config: effectiveConfig,
+    baseConfig,
+    isLoading,
+  } = useEffectiveConfig(myNodeNum, "network");
+  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
   // Convert integer IPs to string for form display
   const toFormValues = useCallback(
-    (cfg: typeof baseConfig): NetworkValidation | undefined => {
+    (
+      cfg: Protobuf.Config.Config_NetworkConfig | null,
+    ): NetworkValidation | undefined => {
       if (!cfg) {
         return undefined;
       }
@@ -59,16 +65,16 @@ export function useNetworkForm() {
   }, []);
 
   const defaultValues = useMemo(
-    () => toFormValues(baseConfig),
+    () => toFormValues(baseConfig ?? null),
     [baseConfig, toFormValues],
   );
 
   const formValues = useMemo(
-    () => toFormValues(effectiveConfig),
+    () => toFormValues(effectiveConfig ?? null),
     [effectiveConfig, toFormValues],
   );
 
-  const isReady = baseConfig !== undefined;
+  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
 
   const form = useForm<NetworkValidation>({
     mode: "onChange",
@@ -81,48 +87,68 @@ export function useNetworkForm() {
 
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<NetworkValidation | undefined>(undefined);
+  // Track whether we've completed initial sync (skip first watch fire)
+  const hasInitialSyncRef = useRef(false);
 
-  // Sync form changes to store and field registry
-  const onFormChange = useEffectEvent((formData: Partial<NetworkValidation>) => {
-    if (!baseConfig || !formData || !defaultValues) {
-      return;
-    }
-
-    const currentValues = formData as NetworkValidation;
-    const prevValues = prevValuesRef.current;
-
-    if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
-      return;
-    }
-
-    prevValuesRef.current = currentValues;
-
-    // Convert for store
-    const parsed = fromFormValues(currentValues);
-
-    // Track per-field changes for Activity panel
-    for (const key of Object.keys(currentValues) as Array<
-      keyof NetworkValidation
-    >) {
-      const newValue = currentValues[key];
-      const originalValue = defaultValues[key];
-
-      if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        trackChange(SECTION, key, newValue, originalValue);
-      } else {
-        removeChange(SECTION, key);
+  // Sync form changes to database
+  const onFormChange = useEffectEvent(
+    (formData: DeepPartial<NetworkValidation>) => {
+      if (!baseConfig || !formData || !defaultValues) {
+        return;
       }
-    }
 
-    // Send full config to device store
-    const hasChanges = JSON.stringify(parsed) !== JSON.stringify(baseConfig);
+      const currentValues = formData as NetworkValidation;
 
-    if (hasChanges) {
-      setChange(SECTION, parsed, baseConfig);
-    }
-  });
+      // Skip the first watch fire - just capture initial values without tracking
+      // This prevents spurious change detection during form initialization
+      if (!hasInitialSyncRef.current) {
+        prevValuesRef.current = currentValues;
+        hasInitialSyncRef.current = true;
+        return;
+      }
+
+      const prevValues = prevValuesRef.current;
+
+      if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
+        return;
+      }
+
+      prevValuesRef.current = currentValues;
+
+      // Convert form values to store format (with integer IPs)
+      const parsed = fromFormValues(currentValues);
+      const originalParsed = fromFormValues(defaultValues);
+
+      // Process each field and save/clear changes to database
+      for (const key of Object.keys(parsed) as Array<keyof typeof parsed>) {
+        const newValue = parsed[key];
+        const originalValue = originalParsed[key];
+
+        if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
+          // Save change to database
+          saveChange({
+            changeType: "config",
+            variant: "network",
+            fieldPath: key,
+            value: newValue,
+            originalValue: originalValue,
+          });
+        } else {
+          // Clear change from database if reverted to original
+          clearChange({
+            changeType: "config",
+            variant: "network",
+            fieldPath: key,
+          });
+        }
+      }
+    },
+  );
 
   useEffect(() => {
+    // Reset initial sync flag when effect re-runs
+    hasInitialSyncRef.current = false;
+
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);

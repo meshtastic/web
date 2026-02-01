@@ -9,8 +9,8 @@
 
 import type { Protobuf } from "@meshtastic/core";
 import { configCacheRepo } from "@data/repositories/index.ts";
-import { useMemo } from "react";
-import { useDrizzleQuery } from "./useDrizzleLive.ts";
+import { useMemo, useRef } from "react";
+import { useReactiveQuery } from "sqlocal/react";
 import type { DeviceConfig } from "../schema.ts";
 
 // =============================================================================
@@ -68,7 +68,7 @@ export interface UseConfigResult {
  */
 export function useConfig(ownerNodeNum: number | undefined): UseConfigResult {
   // Build query for device config
-  const { data, status, error } = useDrizzleQuery<DeviceConfig>(() => {
+  const query = useMemo(() => {
     if (!ownerNodeNum) {
       // Return a query that returns empty results
       return configCacheRepo.buildConfigQuery(0);
@@ -76,9 +76,22 @@ export function useConfig(ownerNodeNum: number | undefined): UseConfigResult {
     return configCacheRepo.buildConfigQuery(ownerNodeNum);
   }, [ownerNodeNum]);
 
+  const { data, status, error } = useReactiveQuery<DeviceConfig>(
+    configCacheRepo.getClient(),
+    query,
+  );
+
+  // Track if we've ever received data to avoid showing loading on subsequent renders
+  const hasHydratedRef = useRef(false);
+  if (data.length > 0 || status === "ok") {
+    hasHydratedRef.current = true;
+  }
+
   // Parse the config data
   const result = useMemo((): UseConfigResult => {
-    const isLoading = status === "pending" && data.length === 0;
+    // Only show loading if we haven't hydrated yet AND query is pending with no data
+    const isLoading =
+      !hasHydratedRef.current && status === "pending" && data.length === 0;
     const row = data[0];
 
     if (!row) {

@@ -59,7 +59,6 @@ export const MessageBubble = memo(function MessageBubble({
     [reactions],
   );
 
-  // Memoize the background color style to prevent new object creation on every render
   const bubbleStyle = useMemo(
     () => ({
       backgroundColor: `color-mix(in srgb, ${avatarColors.bgColor} 40%, black)`,
@@ -67,7 +66,6 @@ export const MessageBubble = memo(function MessageBubble({
     [avatarColors.bgColor],
   );
 
-  // Darker version of avatar color for metadata (hops, SNR, RSSI)
   const metadataColorStyle = useMemo(
     () => ({
       color: `color-mix(in srgb, ${avatarColors.bgColor} 20%, white)`,
@@ -75,7 +73,6 @@ export const MessageBubble = memo(function MessageBubble({
     [avatarColors.bgColor],
   );
 
-  // Memoize formatted time string
   const formattedTime = useMemo(
     () =>
       new Date(message.date).toLocaleTimeString([], {
@@ -222,7 +219,6 @@ export const MessageBubble = memo(function MessageBubble({
           )}
         </div>
 
-        {/* Reactions overlay */}
         {groupedReactions.length > 0 && (
           <Popover>
             <PopoverTrigger asChild>
@@ -271,7 +267,7 @@ export const MessageBubble = memo(function MessageBubble({
         )}
 
         {isMine && (
-          <div className="absolute -bottom-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="z-10 absolute -bottom-2 -right-2  opacity-80 group-hover:opacity-100 transition-opacity">
             <RetryButton
               message={message}
               className="bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"

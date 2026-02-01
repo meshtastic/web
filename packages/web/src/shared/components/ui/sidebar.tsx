@@ -483,6 +483,8 @@ const SidebarMenuButton = React.forwardRef<
   React.ComponentProps<"button"> & {
     asChild?: boolean;
     isActive?: boolean;
+    variant?: "default" | "outline";
+    size?: "default" | "sm" | "md" | "lg";
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   }
 >(
@@ -490,7 +492,8 @@ const SidebarMenuButton = React.forwardRef<
     {
       asChild = false,
       isActive = false,
-      variant = "default",
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured for future use
+      variant: _variant = "default",
       size = "default",
       tooltip,
       className,
@@ -580,7 +583,7 @@ const SidebarMenuBadge = React.forwardRef<
       ref={ref}
       data-sidebar="menu-badge"
       className={cn(
-        "absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums text-sidebar-foreground select-none pointer-events-none",
+        "absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-lg px-1 text-xs font-medium tabular-nums text-sidebar-foreground select-none pointer-events-none",
         "peer-hover/menu-button:text-sidebar-accent-foreground peer-data-[active=true]/menu-button:text-sidebar-accent-foreground",
         "peer-data-[size=sm]/menu-button:top-1",
         "peer-data-[size=default]/menu-button:top-1.5",

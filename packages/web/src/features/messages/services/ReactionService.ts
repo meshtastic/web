@@ -102,6 +102,7 @@ class ReactionServiceClass {
 
     // Toggle in database
     try {
+      logger.info(`[ReactionService] Calling reactionRepo.toggleReaction...`);
       const wasAdded = await reactionRepo.toggleReaction({
         ownerNodeNum,
         targetMessageId,
@@ -115,13 +116,16 @@ class ReactionServiceClass {
 
       // Send over mesh (same message acts as toggle on receiving end)
       try {
-        await deviceCommands.sendReaction(
+        logger.info(`[ReactionService] Sending reaction over mesh...`);
+        const messageId = await deviceCommands.sendReaction(
           targetMessageId,
           emoji,
           destination,
           channel,
         );
-        logger.debug(`[ReactionService] Sent reaction over mesh`);
+        logger.info(
+          `[ReactionService] Sent reaction over mesh, messageId=${messageId}`,
+        );
       } catch (error) {
         logger.error(
           "[ReactionService] Failed to send reaction toggle:",
