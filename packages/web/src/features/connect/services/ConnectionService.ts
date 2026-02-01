@@ -1,17 +1,10 @@
 import logger from "@core/services/logger";
-import { computeLeafHashes } from "@core/utils/merkleConfig.ts";
-import {
-  channelRepo,
-  configCacheRepo,
-  configHashRepo,
-  connectionRepo,
-  deviceRepo,
-  nodeRepo,
-} from "@data/repositories";
+import { connectionRepo, deviceRepo } from "@data/repositories";
 import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
 import type { Connection } from "@data/schema";
 import { subscribeToDevice } from "@data/subscriptionService";
-import { MeshDevice, type Protobuf, Types } from "@meshtastic/core";
+import { MeshDevice, Types } from "@meshtastic/core";
+import * as configSync from "./ConfigSyncService";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
@@ -400,31 +393,18 @@ class ConnectionServiceClass {
     ctx: SetupContext,
     nodeNum: number,
   ): Promise<void> {
-    try {
-      const [cachedConfig, cachedNodes] = await Promise.all([
-        configCacheRepo.getCachedConfig(nodeNum),
-        nodeRepo.getNodes(nodeNum),
-      ]);
+    const result = await configSync.tryLoadCachedConfig(nodeNum, {
+      config: ctx.device.config,
+      moduleConfig: ctx.device.moduleConfig,
+      metadata: ctx.device.metadata,
+      setCachedConfig: ctx.device.setCachedConfig,
+    });
 
-      if (!cachedConfig || cachedNodes.length === 0) {
-        return;
-      }
-
-      logger.info(
-        `[ConnectionService] Using cache: ${cachedNodes.length} nodes`,
-      );
+    if (result.usedCache) {
       ctx.usedCache = true;
-
-      ctx.device.setCachedConfig(
-        cachedConfig.config as Protobuf.LocalOnly.LocalConfig,
-        cachedConfig.moduleConfig as Protobuf.LocalOnly.LocalModuleConfig,
-      );
-
       await this.updateStatus(ctx.connectionId, "connected");
       this.emitNavigationIntent(ctx.connectionId, nodeNum, true);
       this.startHeartbeat(ctx);
-    } catch (err) {
-      logger.warn("[ConnectionService] Cache check failed:", err);
     }
   }
 
@@ -440,86 +420,17 @@ class ConnectionServiceClass {
 
     // Save fresh config to cache and compute base hashes
     if (myNodeNum) {
-      await Promise.all([
-        this.saveConfigToCache(ctx, myNodeNum),
-        this.saveBaseHashes(ctx, myNodeNum),
-      ]);
+      await configSync.saveFreshConfig(myNodeNum, {
+        config: device.config,
+        moduleConfig: device.moduleConfig,
+        metadata: device.metadata,
+        setCachedConfig: device.setCachedConfig,
+      });
     }
 
     if (!wasCached && myNodeNum) {
       await ctx.deviceUpserted;
       this.emitNavigationIntent(connectionId, myNodeNum, false);
-    }
-  }
-
-  /**
-   * Compute and save base hashes for the current config.
-   * These hashes form the baseline for change detection.
-   */
-  private async saveBaseHashes(
-    ctx: SetupContext,
-    nodeNum: number,
-  ): Promise<void> {
-    try {
-      // Fetch channels and user data from DB (they were saved during config phase)
-      const [dbChannels, myNode] = await Promise.all([
-        channelRepo.getChannels(nodeNum),
-        nodeRepo.getNode(nodeNum, nodeNum),
-      ]);
-
-      // Convert DB channels to array indexed by channel position
-      const channels: unknown[] = [];
-      for (const ch of dbChannels) {
-        channels[ch.channelIndex] = {
-          role: ch.role,
-          name: ch.name,
-          psk: ch.psk,
-          uplinkEnabled: ch.uplinkEnabled,
-          downlinkEnabled: ch.downlinkEnabled,
-          positionPrecision: ch.positionPrecision,
-        };
-      }
-
-      // Extract user fields that should be tracked for changes
-      const user = myNode
-        ? {
-            shortName: myNode.shortName,
-            longName: myNode.longName,
-            role: myNode.role,
-            isLicensed: myNode.isLicensed,
-          }
-        : undefined;
-
-      const hashes = computeLeafHashes({
-        config: ctx.device.config,
-        moduleConfig: ctx.device.moduleConfig,
-        channels,
-        user,
-      });
-
-      await configHashRepo.saveBaseHashes(nodeNum, hashes);
-      logger.debug(
-        `[ConnectionService] Saved ${hashes.size} base config hashes`,
-      );
-    } catch (err) {
-      logger.warn("[ConnectionService] Failed to save base hashes:", err);
-    }
-  }
-
-  private async saveConfigToCache(
-    ctx: SetupContext,
-    nodeNum: number,
-  ): Promise<void> {
-    try {
-      await configCacheRepo.saveCachedConfig(
-        nodeNum,
-        ctx.device.config as unknown as Record<string, unknown>,
-        ctx.device.moduleConfig as unknown as Record<string, unknown>,
-        { firmwareVersion: ctx.device.metadata.get(nodeNum)?.firmwareVersion },
-      );
-      logger.debug("[ConnectionService] Saved config to cache");
-    } catch (err) {
-      logger.warn("[ConnectionService] Failed to cache config:", err);
     }
   }
 

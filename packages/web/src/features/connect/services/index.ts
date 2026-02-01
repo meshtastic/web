@@ -7,3 +7,6 @@ export { BrowserHardware } from "./BrowserHardware";
 
 // Connection management
 export { ConnectionService } from "./ConnectionService";
+
+// Config synchronization
+export * as configSync from "./ConfigSyncService";
