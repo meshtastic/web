@@ -18,7 +18,9 @@ import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { randId } from "@shared/utils/randId";
 import { useDeviceStore } from "@state/index.ts";
 import { testHttpReachable } from "../utils.ts";
-import { BrowserHardware, type SerialDeviceInfo } from "./BrowserHardware.ts";
+import * as browserSerial from "./browserSerial";
+import * as browserBluetooth from "./browserBluetooth";
+import type { SerialDeviceInfo } from "./browserSerial";
 
 /** Transport type from SDK transports */
 type PacketTransport =
@@ -130,7 +132,7 @@ class ConnectionServiceClass {
       }
 
       if (conn.type === "bluetooth" && result.nativeHandle) {
-        const unsub = BrowserHardware.onBluetoothDisconnect(
+        const unsub = browserBluetooth.onBluetoothDisconnect(
           result.nativeHandle as BluetoothDevice,
           () => this.updateStatus(conn.id, "disconnected"),
         );
@@ -673,7 +675,7 @@ class ConnectionServiceClass {
     conn: Connection,
     opts?: { allowPrompt?: boolean },
   ): Promise<TransportResult> {
-    if (!BrowserHardware.hasBluetooth()) {
+    if (!browserBluetooth.hasBluetooth()) {
       throw new Error("Web Bluetooth not supported");
     }
 
@@ -684,7 +686,8 @@ class ConnectionServiceClass {
     // Try to find existing permission
     if (conn.deviceId) {
       bleDevice =
-        (await BrowserHardware.findBluetoothDevice(conn.deviceId)) ?? undefined;
+        (await browserBluetooth.findBluetoothDevice(conn.deviceId)) ??
+        undefined;
       if (bleDevice) {
         logger.debug(`[ConnectionService] Found existing BT device`);
       }
@@ -694,7 +697,7 @@ class ConnectionServiceClass {
     if (!bleDevice && opts?.allowPrompt) {
       logger.debug(`[ConnectionService] Requesting new BT device from user`);
       bleDevice =
-        (await BrowserHardware.requestBluetoothDevice(conn.gattServiceUUID)) ??
+        (await browserBluetooth.requestBluetoothDevice(conn.gattServiceUUID)) ??
         undefined;
     }
 
@@ -713,7 +716,7 @@ class ConnectionServiceClass {
     conn: Connection,
     opts?: { allowPrompt?: boolean },
   ): Promise<TransportResult> {
-    if (!BrowserHardware.hasSerial()) {
+    if (!browserSerial.hasSerial()) {
       throw new Error("Web Serial not supported");
     }
 
@@ -724,7 +727,7 @@ class ConnectionServiceClass {
 
     // Try to find existing permission
     port =
-      (await BrowserHardware.findSerialPort(
+      (await browserSerial.findSerialPort(
         conn.usbVendorId,
         conn.usbProductId,
       )) ?? undefined;
@@ -735,7 +738,7 @@ class ConnectionServiceClass {
     // Prompt user if allowed and not found
     if (!port && opts?.allowPrompt) {
       logger.debug(`[ConnectionService] Requesting serial port from user`);
-      const result = await BrowserHardware.requestSerialPort();
+      const result = await browserSerial.requestSerialPort();
       port = result?.port;
       newPortInfo = result ?? undefined;
     }
@@ -745,9 +748,9 @@ class ConnectionServiceClass {
     }
 
     // Ensure port is closed before trying to open
-    if (BrowserHardware.isSerialPortOpen(port)) {
+    if (browserSerial.isSerialPortOpen(port)) {
       logger.debug(`[ConnectionService] Closing already-open serial port`);
-      await BrowserHardware.closeSerialPort(port);
+      await browserSerial.closeSerialPort(port);
     }
 
     try {
@@ -792,7 +795,7 @@ class ConnectionServiceClass {
         if (device) {
           logger.debug(`[ConnectionService] Disconnecting Bluetooth device`);
           try {
-            BrowserHardware.disconnectBluetoothDevice(device);
+            browserBluetooth.disconnectBluetoothDevice(device);
           } catch (err) {
             logger.warn(
               `[ConnectionService] Error disconnecting Bluetooth device:`,
@@ -808,7 +811,7 @@ class ConnectionServiceClass {
         if (port) {
           logger.debug(`[ConnectionService] Closing Serial port`);
           try {
-            await BrowserHardware.closeSerialPort(port);
+            await browserSerial.closeSerialPort(port);
           } catch (err) {
             logger.warn(`[ConnectionService] Error closing Serial port:`, err);
           }
@@ -856,10 +859,10 @@ class ConnectionServiceClass {
     id: number,
     deviceId: string | null,
   ): Promise<void> {
-    if (!BrowserHardware.hasBluetooth()) {
+    if (!browserBluetooth.hasBluetooth()) {
       return;
     }
-    const devices = await BrowserHardware.getBluetoothDevices();
+    const devices = await browserBluetooth.getBluetoothDevices();
     const found = devices.some((d) => d.id === deviceId);
     await connectionRepo.updateStatus(id, found ? "online" : "disconnected");
   }
@@ -869,10 +872,10 @@ class ConnectionServiceClass {
     vendorId: number | null,
     productId: number | null,
   ): Promise<void> {
-    if (!BrowserHardware.hasSerial()) {
+    if (!browserSerial.hasSerial()) {
       return;
     }
-    const ports = await BrowserHardware.getSerialPorts();
+    const ports = await browserSerial.getSerialPorts();
     const found = ports.some(
       (p) => p.usbVendorId === vendorId && p.usbProductId === productId,
     );
@@ -882,10 +885,10 @@ class ConnectionServiceClass {
   private async checkHardwareAvailable(conn: Connection): Promise<boolean> {
     switch (conn.type) {
       case "serial": {
-        if (!BrowserHardware.hasSerial()) {
+        if (!browserSerial.hasSerial()) {
           return false;
         }
-        const port = await BrowserHardware.findSerialPort(
+        const port = await browserSerial.findSerialPort(
           conn.usbVendorId,
           conn.usbProductId,
         );
@@ -893,10 +896,12 @@ class ConnectionServiceClass {
       }
 
       case "bluetooth": {
-        if (!BrowserHardware.hasBluetoothGetDevices() || !conn.deviceId) {
+        if (!browserBluetooth.hasBluetoothGetDevices() || !conn.deviceId) {
           return false;
         }
-        const device = await BrowserHardware.findBluetoothDevice(conn.deviceId);
+        const device = await browserBluetooth.findBluetoothDevice(
+          conn.deviceId,
+        );
         return device !== null;
       }
 
