@@ -18,15 +18,18 @@ import {
 export function usePositionForm() {
   const { myNodeNum } = useMyNode();
   const {
-    config: effectiveConfig,
-    baseConfig,
+    config: dbEffectiveConfig,
+    baseConfig: dbBaseConfig,
     isLoading,
   } = useEffectiveConfig(myNodeNum, "position");
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
   const { nodes: allNodes } = useNodes(myNodeNum);
 
   // Keep queueAdminMessage from device store for admin message queueing
-  const { queueAdminMessage } = useDevice();
+  const device = useDevice();
+  const { queueAdminMessage } = device;
+  const baseConfig = dbBaseConfig ?? device.config.position ?? null;
+  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
 
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     effectiveConfig?.positionFlags ?? 0,

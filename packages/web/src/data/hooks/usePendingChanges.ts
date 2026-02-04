@@ -104,7 +104,7 @@ export function usePendingChanges(
 
   // Track if we've ever received data to avoid showing loading on subsequent renders
   const hasHydratedRef = useRef(false);
-  if (data.length > 0 || status === "ok") {
+  if (pendingChanges.length > 0 || status === "ok") {
     hasHydratedRef.current = true;
   }
 
@@ -270,6 +270,7 @@ export function useEffectiveConfig<
   baseConfig: Protobuf.LocalOnly.LocalConfig[K] | null;
   isLoading: boolean;
   hasChanges: boolean;
+  error: Error | null;
 } {
   // Load base config
   const configQuery = useMemo(() => {
@@ -279,12 +280,16 @@ export function useEffectiveConfig<
     return configCacheRepo.buildConfigQuery(ownerNodeNum);
   }, [ownerNodeNum]);
 
-  const { data: configData, status: configStatus } =
-    useReactiveQuery<DeviceConfig>(configCacheRepo.getClient(), configQuery);
+  const {
+    data: configData,
+    status: configStatus,
+    error: configError,
+  } = useReactiveQuery<DeviceConfig>(configCacheRepo.getClient(), configQuery);
 
   // Track if we've ever received data to avoid showing loading on subsequent renders
   const configHydratedRef = useRef(false);
-  if (configData.length > 0 || configStatus === "ok") {
+  const configDataArray = configData ?? [];
+  if (configDataArray.length > 0 || configStatus === "ok") {
     configHydratedRef.current = true;
   }
 
@@ -298,9 +303,9 @@ export function useEffectiveConfig<
     const isLoading =
       (!configHydratedRef.current &&
         configStatus === "pending" &&
-        configData.length === 0) ||
+        configDataArray.length === 0) ||
       changesLoading;
-    const baseConfigRow = configData[0];
+    const baseConfigRow = configDataArray[0];
 
     if (!baseConfigRow) {
       return {
@@ -308,6 +313,7 @@ export function useEffectiveConfig<
         baseConfig: null,
         isLoading,
         hasChanges: false,
+        error: configError ?? null,
       };
     }
 
@@ -333,8 +339,16 @@ export function useEffectiveConfig<
       baseConfig,
       isLoading,
       hasChanges,
+      error: configError ?? null,
     };
-  }, [configData, configStatus, pendingChanges, changesLoading, configType]);
+  }, [
+    configDataArray,
+    configStatus,
+    configError,
+    pendingChanges,
+    changesLoading,
+    configType,
+  ]);
 
   return result;
 }
@@ -488,6 +502,7 @@ export function useEffectiveModuleConfig<
   baseConfig: Protobuf.LocalOnly.LocalModuleConfig[K] | null;
   isLoading: boolean;
   hasChanges: boolean;
+  error: Error | null;
 } {
   // Load base config
   const moduleConfigQuery = useMemo(() => {
@@ -497,15 +512,19 @@ export function useEffectiveModuleConfig<
     return configCacheRepo.buildConfigQuery(ownerNodeNum);
   }, [ownerNodeNum]);
 
-  const { data: configData, status: configStatus } =
-    useReactiveQuery<DeviceConfig>(
-      configCacheRepo.getClient(),
-      moduleConfigQuery,
-    );
+  const {
+    data: configData,
+    status: configStatus,
+    error: configError,
+  } = useReactiveQuery<DeviceConfig>(
+    configCacheRepo.getClient(),
+    moduleConfigQuery,
+  );
 
   // Track if we've ever received data to avoid showing loading on subsequent renders
   const moduleConfigHydratedRef = useRef(false);
-  if (configData.length > 0 || configStatus === "ok") {
+  const moduleConfigDataArray = configData ?? [];
+  if (moduleConfigDataArray.length > 0 || configStatus === "ok") {
     moduleConfigHydratedRef.current = true;
   }
 
@@ -519,9 +538,9 @@ export function useEffectiveModuleConfig<
     const isLoading =
       (!moduleConfigHydratedRef.current &&
         configStatus === "pending" &&
-        configData.length === 0) ||
+        moduleConfigDataArray.length === 0) ||
       changesLoading;
-    const baseConfigRow = configData[0];
+    const baseConfigRow = moduleConfigDataArray[0];
 
     if (!baseConfigRow) {
       return {
@@ -529,6 +548,7 @@ export function useEffectiveModuleConfig<
         baseConfig: null,
         isLoading,
         hasChanges: false,
+        error: configError ?? null,
       };
     }
 
@@ -555,10 +575,12 @@ export function useEffectiveModuleConfig<
       baseConfig,
       isLoading,
       hasChanges,
+      error: configError ?? null,
     };
   }, [
-    configData,
+    moduleConfigDataArray,
     configStatus,
+    configError,
     pendingChanges,
     changesLoading,
     moduleConfigType,

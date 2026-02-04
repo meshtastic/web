@@ -90,18 +90,15 @@ src/
 │       │   ├── modules/         # MQTT, Telemetry, CannedMessage, etc.
 │       │   ├── form/            # ConfigFormFields, FormInput, FormSelect
 │       │   └── activity/        # ActivityPanel, ActivityItem
-│       ├── validation/
-│       │   ├── config/          # Zod schemas for device config
-│       │   └── moduleConfig/    # Zod schemas for module config
-│       └── services/
-│           └── fieldRegistry/   # Form field tracking service
+│       └── validation/
+│           ├── config/          # Zod schemas for device config
+│           └── moduleConfig/    # Zod schemas for module config
 │
 ├── shared/                      # Truly shared code
 │   ├── components/
 │   │   ├── ui/                  # shadcn/ui primitives (button, card, dialog, etc.)
 │   │   ├── Badge/               # ConnectionStatusBadge
-│   │   ├── CommandPalette/      # Command palette component
-│   │   ├── Dialog/              # Modal dialogs (PKIBackupDialog, RemoveNodeDialog, etc.)
+│   │   ├── Dialog/              # Modal dialogs (RemoveNodeDialog, UnsafeRolesDialog, etc.)
 │   │   ├── Filter/              # Filter components
 │   │   ├── Table/               # Table component
 │   │   ├── BatteryStatus.tsx    # Battery status indicator
@@ -188,10 +185,11 @@ src/
 │   │   ├── useChannels.ts
 │   │   ├── useConfig.ts          # Base config from DB
 │   │   ├── useDevicePreference.ts
-│   │   ├── useDrizzleLive.ts     # Reactive query wrapper
+│   │   ├── useDisplayUnits.ts    # Display unit preferences
+│   │   ├── useLoraConfig.ts      # LoRa config hook
 │   │   ├── useNodes.ts
 │   │   ├── usePacketLogs.ts
-│   │   ├── usePendingChanges.ts  # Pending config changes CRUD
+│   │   ├── usePendingChanges.ts  # Pending config changes CRUD + effective config
 │   │   ├── usePreferences.ts
 │   │   ├── useSignalLogs.ts
 │   │   └── useWorkingHashes.ts   # Hash-based change detection
@@ -238,10 +236,11 @@ The project uses TypeScript path aliases for clean imports:
 - Stores **ephemeral state** (not persisted):
   - `connection` - MeshDevice instance for sending packets
   - `hardware` - MyNodeInfo from device
-  - `status` - DeviceStatusEnum
   - `configProgress` - Config loading progress during connection
   - `remoteAdminTargetNode` - Node being remotely administered
-- **Note:** Device config is now stored in SQLite (`device_configs` table), not Zustand. Use `useConfig()` hook to read config.
+  - `queuedAdminMessages` - Admin messages waiting to be sent
+  - `configConflicts` - Detected conflicts between local and remote config
+- **Note:** Device config and pending changes are stored in SQLite, not Zustand. Use `useConfig()` for base config and `usePendingChanges()` for change tracking.
 
 ### Accessing the Current Device
 
@@ -501,8 +500,18 @@ const { data } = useReactiveQuery(nodeRepo.getClient(mockClient), query);
 The application uses a **database-centric architecture** for device configuration, enabling:
 - Instant UI on reconnect (cached config displayed immediately)
 - Offline config viewing
-- Pending change tracking across page refreshes
+- Pending change tracking across page refreshes (no in-memory state)
 - Conflict detection when device config changes remotely
+- Single source of truth for all config state (SQLite database)
+
+### Design Decision: Database-Only Change Tracking
+
+All config changes are tracked in SQLite, not in-memory Zustand state. This eliminates:
+- Duplicate state (no in-memory `changes` Map in DeviceStore)
+- State synchronization bugs between memory and database
+- Lost changes on page refresh
+
+The DeviceStore now only holds ephemeral connection state (MeshDevice, hardware info, admin message queue). All config data flows through the database.
 
 ### Data Flow
 
@@ -520,7 +529,7 @@ The application uses a **database-centric architecture** for device configuratio
 │  base + changes ──▶ useWorkingHashes() ──▶ working_hashes table        │
 │                     (hash-based change detection)                        │
 │                                                                          │
-│  Save button ──▶ device.connection.sendPacket() ──▶ Device             │
+│  Save button ──▶ adminCommands.saveAllPendingChanges() ──▶ Device      │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -751,7 +760,7 @@ pnpm db:check     # Validate migrations
 | `src/state/device/store.ts` | Device connection state (ephemeral) |
 | `src/state/ui/store.ts` | UI state, dialogs, and DEFAULT_PREFERENCES |
 | `src/data/hooks/useConfig.ts` | Base config from database |
-| `src/data/hooks/usePendingChanges.ts` | Pending config changes CRUD |
+| `src/data/hooks/usePendingChanges.ts` | Pending config changes CRUD + effective config (base + changes) |
 | `src/data/hooks/useWorkingHashes.ts` | Hash-based change detection |
 | `src/data/hooks/usePreferences.ts` | User preferences hook |
 | `src/data/repositories/ConfigCacheRepository.ts` | Config and changes persistence |

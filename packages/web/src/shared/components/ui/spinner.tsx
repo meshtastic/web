@@ -1,17 +1,115 @@
 import { cn } from "@shared/utils/cn";
 
 interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  /** When true, renders without wrapper div for inline use */
+  inline?: boolean;
 }
 
 const sizeClasses = {
+  xs: "h-3 w-3",
   sm: "h-4 w-4",
   md: "h-8 w-8",
   lg: "h-12 w-12",
   xl: "h-24 w-24",
 };
 
-export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
+export function Spinner({
+  className,
+  size = "md",
+  inline = false,
+  ...props
+}: SpinnerProps) {
+  const svg = (
+    <svg
+      className={cn(
+        "animate-spin [animation-duration:4s] stroke-current",
+        sizeClasses[size],
+        inline && className,
+      )}
+      role="img"
+      viewBox="0 0 256 256"
+    >
+      <title className="sr-only">Loading spinner</title>
+      <line
+        x1="128"
+        y1="32"
+        x2="128"
+        y2="64"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="24"
+      />
+      <line
+        x1="195.9"
+        y1="60.1"
+        x2="173.3"
+        y2="82.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="24"
+      />
+      <line
+        x1="224"
+        y1="128"
+        x2="192"
+        y2="128"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="24"
+      />
+      <line
+        x1="195.9"
+        y1="195.9"
+        x2="173.3"
+        y2="173.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="24"
+      />
+      <line
+        x1="128"
+        y1="224"
+        x2="128"
+        y2="192"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="24"
+      />
+      <line
+        x1="60.1"
+        y1="195.9"
+        x2="82.7"
+        y2="173.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="24"
+      />
+      <line
+        x1="32"
+        y1="128"
+        x2="64"
+        y2="128"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="24"
+      />
+      <line
+        x1="60.1"
+        y1="60.1"
+        x2="82.7"
+        y2="82.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="24"
+      />
+    </svg>
+  );
+
+  if (inline) {
+    return svg;
+  }
+
   return (
     <div
       className={cn(
@@ -20,88 +118,7 @@ export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
       )}
       {...props}
     >
-      <svg
-        className={cn(
-          "animate-spin [animation-duration:4s] stroke-current",
-          sizeClasses[size],
-        )}
-        role="img"
-        viewBox="0 0 256 256"
-      >
-        <title className="sr-only">Loading spinner</title>
-        <line
-          x1="128"
-          y1="32"
-          x2="128"
-          y2="64"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="24"
-        />
-        <line
-          x1="195.9"
-          y1="60.1"
-          x2="173.3"
-          y2="82.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="24"
-        />
-        <line
-          x1="224"
-          y1="128"
-          x2="192"
-          y2="128"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="24"
-        />
-        <line
-          x1="195.9"
-          y1="195.9"
-          x2="173.3"
-          y2="173.3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="24"
-        />
-        <line
-          x1="128"
-          y1="224"
-          x2="128"
-          y2="192"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="24"
-        />
-        <line
-          x1="60.1"
-          y1="195.9"
-          x2="82.7"
-          y2="173.3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="24"
-        />
-        <line
-          x1="32"
-          y1="128"
-          x2="64"
-          y2="128"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="24"
-        />
-        <line
-          x1="60.1"
-          y1="60.1"
-          x2="82.7"
-          y2="82.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="24"
-        />
-      </svg>
+      {svg}
     </div>
   );
 }

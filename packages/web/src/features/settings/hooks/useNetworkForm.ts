@@ -5,6 +5,7 @@ import {
 } from "@data/hooks/usePendingChanges.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useMyNode } from "@shared/hooks";
+import { useDevice } from "@state/index.ts";
 import { convertIntToIpAddress, convertIpAddressToInt } from "@shared/utils/ip";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import type { DeepPartial } from "react-hook-form";
@@ -18,10 +19,13 @@ import {
 export function useNetworkForm() {
   const { myNodeNum } = useMyNode();
   const {
-    config: effectiveConfig,
-    baseConfig,
+    config: dbEffectiveConfig,
+    baseConfig: dbBaseConfig,
     isLoading,
   } = useEffectiveConfig(myNodeNum, "network");
+  const device = useDevice();
+  const baseConfig = dbBaseConfig ?? device.config.network ?? null;
+  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
   // Convert integer IPs to string for form display

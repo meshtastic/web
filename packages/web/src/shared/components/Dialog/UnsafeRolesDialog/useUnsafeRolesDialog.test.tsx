@@ -32,14 +32,16 @@ vi.mock("@shared/utils/eventBus", () => ({
   },
 }));
 
-const mockDevice = {
+const mockUIStore = {
   setDialogOpen: vi.fn(),
 };
 
 vi.mock("@state/index.ts", () => ({
-  useDevice: () => ({
-    setDialogOpen: mockDevice.setDialogOpen,
-  }),
+  useUIStore: (
+    selector: (state: {
+      setDialogOpen: typeof mockUIStore.setDialogOpen;
+    }) => unknown,
+  ) => selector({ setDialogOpen: mockUIStore.setDialogOpen }),
 }));
 
 describe("useUnsafeRolesDialog", () => {
@@ -62,7 +64,7 @@ describe("useUnsafeRolesDialog", () => {
 
       result.current.handleCloseDialog();
 
-      expect(mockDevice.setDialogOpen).toHaveBeenCalledWith(
+      expect(mockUIStore.setDialogOpen).toHaveBeenCalledWith(
         "unsafeRoles",
         false,
       );
@@ -78,7 +80,7 @@ describe("useUnsafeRolesDialog", () => {
         await result.current.validateRoleSelection(safeRole);
 
       expect(validationResult).toBe(true);
-      expect(mockDevice.setDialogOpen).not.toHaveBeenCalled();
+      expect(mockUIStore.setDialogOpen).not.toHaveBeenCalled();
     });
 
     it("should open dialog for unsafe roles and resolve with true when confirmed", async () => {
@@ -88,7 +90,7 @@ describe("useUnsafeRolesDialog", () => {
         UNSAFE_ROLES[0]!,
       );
 
-      expect(mockDevice.setDialogOpen).toHaveBeenCalledWith(
+      expect(mockUIStore.setDialogOpen).toHaveBeenCalledWith(
         "unsafeRoles",
         true,
       );
@@ -146,13 +148,13 @@ describe("useUnsafeRolesDialog", () => {
     const { result } = renderUnsafeRolesHook();
 
     for (const unsafeRole of UNSAFE_ROLES) {
-      mockDevice.setDialogOpen.mockClear();
+      mockUIStore.setDialogOpen.mockClear();
       (eventBus.on as Mock).mockClear();
 
       const validationPromise =
         result.current.validateRoleSelection(unsafeRole);
 
-      expect(mockDevice.setDialogOpen).toHaveBeenCalledWith(
+      expect(mockUIStore.setDialogOpen).toHaveBeenCalledWith(
         "unsafeRoles",
         true,
       );

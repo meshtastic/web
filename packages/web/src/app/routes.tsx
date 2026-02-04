@@ -8,6 +8,7 @@ import {
   createRoute,
   Outlet,
   redirect,
+  useLocation,
   useNavigate,
 } from "@tanstack/react-router";
 import { Activity, lazy, Suspense, useCallback, useEffect } from "react";
@@ -33,22 +34,6 @@ const SettingsPage = lazy(() =>
   })),
 );
 
-const RadioConfig = lazy(() =>
-  import("@features/settings/pages/RadioConfig").then((m) => ({
-    default: m.RadioConfig,
-  })),
-);
-const DeviceConfig = lazy(() =>
-  import("@features/settings/pages/DeviceConfig").then((m) => ({
-    default: m.DeviceConfig,
-  })),
-);
-const ModuleConfig = lazy(() =>
-  import("@features/settings/pages/ModuleConfig").then((m) => ({
-    default: m.ModuleConfig,
-  })),
-);
-
 function RouteLoader() {
   return (
     <div className="flex h-full items-center justify-center">
@@ -62,16 +47,30 @@ function RouteLoader() {
  */
 function ConnectedLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleNavigationIntent = useCallback(
     (intent: { nodeNum: number }) => {
+      const prefix = `/${intent.nodeNum}`;
+      const currentPath = location.pathname;
+
+      // If already on a valid connected route for this device, don't redirect
+      const validSegments = ["messages", "map", "settings", "nodes"];
+      const isOnValidRoute = validSegments.some((seg) =>
+        currentPath.startsWith(`${prefix}/${seg}`),
+      );
+
+      if (isOnValidRoute) {
+        return;
+      }
+
       navigate({
         to: "/$nodeNum/messages",
         params: { nodeNum: String(intent.nodeNum) },
         search: { channel: 0 },
       });
     },
-    [navigate],
+    [navigate, location.pathname],
   );
 
   const { autoReconnectStatus } = useConnect({
@@ -276,39 +275,6 @@ export const settingsRoute = createRoute({
   errorComponent: ErrorPage,
 });
 
-export const radioRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: "radio",
-  component: () => (
-    <Suspense fallback={<RouteLoader />}>
-      <RadioConfig />
-    </Suspense>
-  ),
-  errorComponent: ErrorPage,
-});
-
-export const deviceRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: "device",
-  component: () => (
-    <Suspense fallback={<RouteLoader />}>
-      <DeviceConfig />
-    </Suspense>
-  ),
-  errorComponent: ErrorPage,
-});
-
-export const moduleRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: "module",
-  component: () => (
-    <Suspense fallback={<RouteLoader />}>
-      <ModuleConfig />
-    </Suspense>
-  ),
-  errorComponent: ErrorPage,
-});
-
 const nodesRoute = createRoute({
   getParentRoute: () => connectedLayoutRoute,
   path: "/nodes",
@@ -329,7 +295,7 @@ export const routeTree = rootRoute.addChildren([
     messagesRoute,
     mapRoute,
     mapWithParamsRoute,
-    settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
+    settingsRoute,
     nodesRoute,
   ]),
 ]);

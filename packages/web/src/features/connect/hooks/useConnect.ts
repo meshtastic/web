@@ -17,10 +17,7 @@ import {
 import { useReactiveQuery } from "sqlocal/react";
 import type { NewConnectionInput } from "../components/AddConnectionDialog/AddConnectionDialog.tsx";
 import { BrowserHardware } from "../services/BrowserHardware.ts";
-import {
-  ConnectionService,
-  type NavigationIntent,
-} from "../services/ConnectionService.ts";
+import { ConnectionService, type NavigationIntent } from "../services";
 
 export type { ConnectionStatus, ConnectionType };
 export type { NavigationIntent };

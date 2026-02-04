@@ -55,7 +55,10 @@ export class NodeRepository {
     ];
 
     if (unknownOnly) {
-      conditions.push(or(isNull(nodes.longName), eq(nodes.longName, "")));
+      const nameCondition = or(isNull(nodes.longName), eq(nodes.longName, ""));
+      if (nameCondition) {
+        conditions.push(nameCondition);
+      }
     }
 
     return and(...conditions);

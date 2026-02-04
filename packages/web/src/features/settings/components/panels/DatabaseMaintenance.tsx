@@ -25,6 +25,7 @@ export function DatabaseMaintenance() {
     unknownOnly: false,
     lastRun: null,
   });
+  const [sliderValue, setSliderValue] = useState(settings.daysOld);
   const [nodeCount, setNodeCount] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +35,10 @@ export function DatabaseMaintenance() {
     if (!myNodeNum) {
       return;
     }
-    getNodeCleanupSettings(myNodeNum).then(setSettings);
+    getNodeCleanupSettings(myNodeNum).then((s) => {
+      setSettings(s);
+      setSliderValue(s.daysOld);
+    });
   }, [myNodeNum]);
 
   const refreshCount = useCallback(async () => {
@@ -92,7 +96,14 @@ export function DatabaseMaintenance() {
     }
   };
 
-  const handleDaysChange = (value: number[]) => {
+  const handleDaysSlide = (value: number[]) => {
+    const newDays = value[0];
+    if (newDays !== undefined) {
+      setSliderValue(newDays);
+    }
+  };
+
+  const handleDaysCommit = (value: number[]) => {
     const newDays = value[0];
     if (newDays !== undefined) {
       handleSettingChange({ daysOld: newDays });
@@ -133,17 +144,18 @@ export function DatabaseMaintenance() {
               {t(
                 "settings.database.cleanNodes.daysLabel",
                 "Clean up nodes last seen older than {{days}} days",
-                { days: settings.daysOld },
+                { days: sliderValue },
               )}
             </Label>
           </div>
           <Slider
             id="days-slider"
-            value={[settings.daysOld]}
+            value={[sliderValue]}
             min={1}
             max={365}
             step={1}
-            onValueCommit={handleDaysChange}
+            onValueChange={handleDaysSlide}
+            onValueCommit={handleDaysCommit}
             className="w-full"
             rangeClassName="bg-primary"
           />

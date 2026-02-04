@@ -4,28 +4,6 @@ import type {
   ValidModuleConfigType,
 } from "@features/settings/components/types.ts";
 
-interface Dialogs {
-  import: boolean;
-  QR: boolean;
-  shutdown: boolean;
-  reboot: boolean;
-  deviceName: boolean;
-  deviceShare: boolean;
-  nodeRemoval: boolean;
-  nodeDetails: boolean;
-  unsafeRoles: boolean;
-  refreshKeys: boolean;
-  deleteMessages: boolean;
-  managedMode: boolean;
-  clientNotification: boolean;
-  resetNodeDb: boolean;
-  factoryResetDevice: boolean;
-  factoryResetConfig: boolean;
-  tracerouteResponse: boolean;
-}
-
-type DialogVariant = keyof Dialogs;
-
 type Page = "messages" | "map" | "settings" | "channels" | "nodes";
 
 type WaypointWithMetadata = Protobuf.Mesh.Waypoint & {
@@ -39,8 +17,6 @@ type WaypointWithMetadata = Protobuf.Mesh.Waypoint & {
 
 export type {
   Page,
-  Dialogs,
-  DialogVariant,
   ValidConfigType,
   ValidModuleConfigType,
   WaypointWithMetadata,

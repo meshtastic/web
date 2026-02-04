@@ -1,7 +1,7 @@
 import logger from "@core/services/logger";
 import type { Connection } from "@data/index";
 import type { ConnectionType } from "@data/repositories/ConnectionRepository";
-import { Bluetooth, Cable, Globe, type LucideIcon } from "lucide-react";
+import { Bluetooth, Cable, Globe, type LucideIcon, Play } from "lucide-react";
 
 async function tryFetch(url: string, timeoutMs: number): Promise<boolean> {
   const controller = new AbortController();
@@ -59,15 +59,21 @@ export function connectionTypeIcon(type: ConnectionType): LucideIcon {
   if (type === "bluetooth") {
     return Bluetooth;
   }
+  if (type === "demo") {
+    return Play;
+  }
   return Cable;
 }
 
 export function formatConnectionSubtext(conn: Connection): string {
   if (conn.type === "http") {
-    return conn.url;
+    return conn.url ?? "No URL configured";
   }
   if (conn.type === "bluetooth") {
-    return conn.deviceName || conn.deviceId || "No device selected";
+    return conn.deviceName ?? conn.deviceId ?? "No device selected";
+  }
+  if (conn.type === "demo") {
+    return "Simulated device for development";
   }
   const v = conn.usbVendorId ? conn.usbVendorId.toString(16) : "?";
   const p = conn.usbProductId ? conn.usbProductId.toString(16) : "?";

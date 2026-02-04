@@ -103,7 +103,6 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
 
   const { setValue, trigger, handleSubmit, formState, watch } = form;
 
-  // Sync byteCount when effective channel changes
   const effectivePskLength = effectiveChannel.psk?.length ?? 0;
   const effectiveByteCount =
     effectivePskLength > 0 ? Math.floor((effectivePskLength * 3) / 4) : 16;

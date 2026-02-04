@@ -1,9 +1,10 @@
+import type { LucideIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export interface FilterOption<T = string> {
   id: T;
   label: string;
-  icon?: any;
+  icon?: LucideIcon;
   disabled?: boolean;
 }
 
@@ -18,7 +19,9 @@ export const useFilter = <T>({
   defaultFilter,
   variant = "radio",
 }: UseFilterOptions<T>) => {
-  const [activeFilter, setActiveFilter] = useState<T>(defaultFilter as T);
+  const [activeFilter, setActiveFilter] = useState<T | undefined>(
+    defaultFilter,
+  );
 
   const filteredData = useMemo(() => {
     if (!activeFilter) {

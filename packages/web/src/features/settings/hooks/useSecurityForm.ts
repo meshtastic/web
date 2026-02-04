@@ -4,6 +4,7 @@ import {
 } from "@data/hooks/usePendingChanges.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { useMyNode } from "@shared/hooks";
+import { useDevice } from "@state/index.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@shared/utils/x25519";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
@@ -19,10 +20,13 @@ import {
 export function useSecurityForm() {
   const { myNodeNum } = useMyNode();
   const {
-    config: effectiveConfig,
-    baseConfig,
+    config: dbEffectiveConfig,
+    baseConfig: dbBaseConfig,
     isLoading,
   } = useEffectiveConfig(myNodeNum, "security");
+  const device = useDevice();
+  const baseConfig = dbBaseConfig ?? device.config.security ?? null;
+  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
   // Convert Uint8Array to base64 strings for form

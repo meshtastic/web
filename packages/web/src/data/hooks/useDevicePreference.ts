@@ -17,7 +17,7 @@ export function useDevicePreference<T>(
     [cacheKey],
   );
 
-  const { data, status } = useReactiveQuery(preferencesRepo.getClient(), query);
+  const { data } = useReactiveQuery(preferencesRepo.getClient(), query);
 
   const value = useMemo((): T => {
     const row = data?.[0];
@@ -30,12 +30,6 @@ export function useDevicePreference<T>(
     }
     return defaultValue;
   }, [data, defaultValue]);
-
-  // To maintain Suspense compatibility, we throw the query (which is thenable)
-  // when the status is pending and we don't have data yet.
-  if (status === "pending" && !data) {
-    throw query;
-  }
 
   return value;
 }

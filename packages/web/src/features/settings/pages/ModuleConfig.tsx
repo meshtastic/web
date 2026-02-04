@@ -134,7 +134,7 @@ export const ModuleConfig = ({ searchQuery = "" }: ConfigPageProps) => {
   return (
     <div className="space-y-6">
       {filteredTabs.length === 0 ? (
-        <Card className="max-w-7xl">
+        <Card>
           <CardContent className="pt-6">
             <p className="text-muted-foreground text-center">
               No modules found matching "{searchQuery}"
@@ -158,7 +158,7 @@ export const ModuleConfig = ({ searchQuery = "" }: ConfigPageProps) => {
           </TabsList>
           {filteredTabs.map((tab) => (
             <TabsContent key={tab.case} value={tab.case}>
-              <Card className="max-w-7xl">
+              <Card>
                 <CardHeader>
                   <CardTitle>{tab.label}</CardTitle>
                   <CardDescription>

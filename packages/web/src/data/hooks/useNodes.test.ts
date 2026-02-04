@@ -36,7 +36,6 @@ describe("useNodes hooks", () => {
     expect(useNodes).toBeDefined();
     expect(useNode).toBeDefined();
     expect(useFavoriteNodes).toBeDefined();
-    expect(useRecentNodes).toBeDefined();
     expect(usePositionHistory).toBeDefined();
     expect(useTelemetryHistory).toBeDefined();
     expect(usePositionTrails).toBeDefined();

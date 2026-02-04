@@ -17,15 +17,16 @@ import {
   useBrowserFeatureDetection,
 } from "@shared/hooks/useBrowserFeatureDetection.ts";
 import { useToast } from "@shared/hooks/useToast.ts";
+import { Spinner } from "@shared/components/ui/spinner";
 import {
   AlertCircle,
   Bluetooth,
   Cable,
   CheckCircle2,
   Globe,
-  Loader2,
   type LucideIcon,
   MousePointerClick,
+  Play,
   XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
@@ -48,7 +49,8 @@ export type NewConnectionInput =
       name: string;
       usbVendorId?: number;
       usbProductId?: number;
-    };
+    }
+  | { type: "demo"; name: string };
 
 type TabKey = ConnectionType;
 type TestingStatus = "idle" | "testing" | "success" | "failure";
@@ -278,6 +280,7 @@ const TAB_META: Array<{ key: TabKey; label: string; Icon: LucideIcon }> = [
   { key: "http", label: "HTTP", Icon: Globe },
   { key: "bluetooth", label: "Bluetooth", Icon: Bluetooth },
   { key: "serial", label: "Serial", Icon: Cable },
+  { key: "demo", label: "Demo", Icon: Play },
 ];
 
 export function AddConnectionDialog({
@@ -492,7 +495,7 @@ export function AddConnectionDialog({
               >
                 {state.testStatus === "testing" ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Spinner size="sm" inline />
                     {state.testAttempt
                       ? t(
                           "addConnection.httpConnection.connectionTest.button.testing",
@@ -625,6 +628,55 @@ export function AddConnectionDialog({
           name: state.name.trim(),
           usbVendorId: state.serialSelected?.vendorId,
           usbProductId: state.serialSelected?.productId,
+        }),
+      },
+      demo: {
+        placeholder: "Demo Device",
+        children: () => (
+          <div className="flex flex-col gap-4">
+            <div className="rounded-lg bg-muted p-4">
+              <p className="text-sm text-muted-foreground">
+                {t("addConnection.demoConnection.description", {
+                  defaultValue:
+                    "Connect to a simulated Meshtastic device for development and testing. No real hardware required.",
+                })}
+              </p>
+            </div>
+            <div className="text-sm">
+              <p className="font-medium mb-2">
+                {t("addConnection.demoConnection.features.title", {
+                  defaultValue: "The demo device simulates:",
+                })}
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                <li>
+                  {t("addConnection.demoConnection.features.mesh", {
+                    defaultValue: "A mesh network with 5 nodes",
+                  })}
+                </li>
+                <li>
+                  {t("addConnection.demoConnection.features.messages", {
+                    defaultValue: "Periodic messages from other nodes",
+                  })}
+                </li>
+                <li>
+                  {t("addConnection.demoConnection.features.positions", {
+                    defaultValue: "Position updates and telemetry",
+                  })}
+                </li>
+                <li>
+                  {t("addConnection.demoConnection.features.config", {
+                    defaultValue: "Full device configuration",
+                  })}
+                </li>
+              </ul>
+            </div>
+          </div>
+        ),
+        validate: () => state.name.trim().length > 0,
+        build: () => ({
+          type: "demo",
+          name: state.name.trim(),
         }),
       },
     }),

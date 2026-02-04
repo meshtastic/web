@@ -27,12 +27,13 @@ export function useReactions(ownerNodeNum: number, messageIds: number[]) {
     query,
   );
 
-  // Debug logging for reactive query results
+  // Debug logging for reactive query results (only in development)
   useEffect(() => {
-    logger.info(
-      `[useReactions] Query result: status=${status}, reactions=${data.length}, messageIds=${messageIds.slice(0, 5).join(",")}${messageIds.length > 5 ? "..." : ""}`,
-      data,
-    );
+    if (import.meta.env.DEV) {
+      logger.debug(
+        `[useReactions] Query result: status=${status}, reactions=${data.length}, messageIds=${messageIds.slice(0, 5).join(",")}${messageIds.length > 5 ? "..." : ""}`,
+      );
+    }
   }, [data, status, messageIds]);
 
   // Group reactions by targetMessageId

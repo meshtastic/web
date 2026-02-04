@@ -111,7 +111,7 @@ export const DeviceConfig = ({ searchQuery = "" }: ConfigPageProps) => {
   return (
     <div className="space-y-6">
       {filteredSections.length === 0 ? (
-        <Card className="max-w-7xl">
+        <Card>
           <CardContent className="pt-6">
             <p className="text-muted-foreground text-center">
               No settings found matching "{searchQuery}"
@@ -139,7 +139,7 @@ export const DeviceConfig = ({ searchQuery = "" }: ConfigPageProps) => {
           </TabsList>
           {filteredSections.map((section) => (
             <TabsContent key={section.case} value={section.case}>
-              <Card className="max-w-7xl">
+              <Card>
                 <CardHeader>
                   <CardTitle>{section.label}</CardTitle>
                   <CardDescription>{section.description}</CardDescription>

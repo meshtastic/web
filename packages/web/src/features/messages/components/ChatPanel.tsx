@@ -1,4 +1,3 @@
-import logger from "@core/services/logger";
 import {
   markConversationAsRead,
   useChannelMessages,
@@ -54,27 +53,15 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
   const channelId = contact?.type === "channel" ? contact.id : -1;
   const channelMessages = useChannelMessages(myNodeNum, channelId, 100);
 
-  // Debug logging
-  logger.debug(
-    `[ChatPanel] contact=${contact?.type}:${contact?.id}, myNodeNum=${myNodeNum}, directMessages=${directMessages.messages.length}, channelMessages=${channelMessages.messages.length}`,
-  );
-
   const currentMessages = useMemo(() => {
     if (!contact || !myNodeNum) {
-      logger.debug("[ChatPanel] currentMessages: no contact or myNodeNum");
       return [];
     }
 
     if (contact.type === "channel") {
-      logger.debug(
-        `[ChatPanel] currentMessages: channel ${contact.id}, ${channelMessages.messages.length} messages`,
-      );
       return channelMessages.messages;
     }
 
-    logger.debug(
-      `[ChatPanel] currentMessages: direct ${contact.id}, ${directMessages.messages.length} messages`,
-    );
     return directMessages.messages;
   }, [contact, directMessages.messages, channelMessages.messages, myNodeNum]);
 

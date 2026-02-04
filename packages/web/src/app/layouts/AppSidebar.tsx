@@ -4,7 +4,7 @@ import {
   useNodes,
   useOnlineCount,
 } from "@data/hooks";
-import { ConnectionService } from "@features/connect/services/ConnectionService";
+import { ConnectionService } from "@features/connect/services";
 import {
   getEffectiveStatus,
   getStatusColor,

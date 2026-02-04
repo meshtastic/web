@@ -1,3 +1,4 @@
+import logger from "@core/services/logger";
 import { messageRepo } from "@data/repositories";
 import type { ConversationType } from "@data/types";
 import { useDebounce } from "@shared/hooks/useDebounce";
@@ -24,7 +25,7 @@ export function useMessageDraft(
           setDraft(savedDraft.content);
         }
       } catch (error) {
-        console.error("[useMessageDraft] Error loading draft:", error);
+        logger.error("[useMessageDraft] Error loading draft:", error);
       } finally {
         setLoading(false);
       }
@@ -50,7 +51,7 @@ export function useMessageDraft(
           await messageRepo.deleteDraft(deviceId, type, targetId);
         }
       } catch (error) {
-        console.error("[useMessageDraft] Error saving draft:", error);
+        logger.error("[useMessageDraft] Error saving draft:", error);
       }
     };
 
@@ -63,7 +64,7 @@ export function useMessageDraft(
     try {
       await messageRepo.deleteDraft(deviceId, type, targetId);
     } catch (error) {
-      console.error("[useMessageDraft] Error clearing draft:", error);
+      logger.error("[useMessageDraft] Error clearing draft:", error);
     }
   }, [deviceId, type, targetId]);
 

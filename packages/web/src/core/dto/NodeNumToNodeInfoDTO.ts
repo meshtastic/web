@@ -1,4 +1,5 @@
 import { create } from "@bufbuild/protobuf";
+import logger from "@core/services/logger";
 import { Protobuf } from "@meshtastic/core";
 
 function createDefaultUser(num: number): Protobuf.Mesh.User {
@@ -24,7 +25,7 @@ export function ensureDefaultUser(
 
   if (!node.user) {
     if (node.num === undefined || node.num === null) {
-      console.error(
+      logger.error(
         `NodeInfoFactory.ensureDefaultUser: Cannot create default user for node because 'num' is missing.`,
         node,
       );

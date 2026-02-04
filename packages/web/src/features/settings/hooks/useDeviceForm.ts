@@ -4,6 +4,7 @@ import {
 } from "@data/hooks/usePendingChanges.ts";
 import { useUnsafeRolesDialog } from "@shared/components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
 import { useMyNode } from "@shared/hooks";
+import { useDevice } from "@state/index.ts";
 import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
@@ -14,15 +15,15 @@ import {
 
 export function useDeviceForm() {
   const { myNodeNum } = useMyNode();
-  const {
-    config: effectiveConfig,
-    baseConfig,
-    isLoading,
-  } = useEffectiveConfig(myNodeNum, "device");
+  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
+    useEffectiveConfig(myNodeNum, "device");
+  const device = useDevice();
+  const baseConfig = dbBaseConfig ?? device.config.device ?? null;
+  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
-  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
+  const isReady = baseConfig !== undefined && baseConfig !== null;
 
   const form = useForm<DeviceValidation>({
     mode: "onChange",

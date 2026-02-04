@@ -75,7 +75,7 @@ const Generator = ({
       ];
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
       <Input
         type={type}
         id={id}
@@ -86,23 +86,23 @@ const Generator = ({
         showCopyButton={showCopyButton}
         showPasswordToggle={showPasswordToggle}
       />
-      <Select
-        value={devicePSKBitCount?.toString()}
-        onValueChange={(e) => selectChange(e)}
-        disabled={disabled}
-      >
-        <SelectTrigger className="w-36 ml-2">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className="w-36">
-          {passwordRequiredBitSize.map(({ text, value, key }) => (
-            <SelectItem key={key} value={value} className="w-36">
-              {text}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <div className="flex ml-2 space-x-2">
+      <div className="flex items-center gap-2">
+        <Select
+          value={devicePSKBitCount?.toString()}
+          onValueChange={(e) => selectChange(e)}
+          disabled={disabled}
+        >
+          <SelectTrigger className="w-36">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="w-36">
+            {passwordRequiredBitSize.map(({ text, value, key }) => (
+              <SelectItem key={key} value={value} className="w-36">
+                {text}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {actionButtons?.map(({ text, onClick, variant, className }) => (
           <Button
             key={text}
@@ -117,7 +117,7 @@ const Generator = ({
           </Button>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 Generator.displayName = "Button";

@@ -1,0 +1,50 @@
+{
+  "name": "@meshtastic/transport-mock",
+  "version": "0.1.0",
+  "description": "A mock transport layer for Meshtastic applications for development and testing.",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "type": "module",
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
+  "main": "./dist/mod.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/mod.d.ts",
+  "license": "GPL-3.0-only",
+  "tsdown": {
+    "entry": "mod.ts",
+    "dts": true,
+    "format": [
+      "esm"
+    ],
+    "splitting": false,
+    "clean": true
+  },
+  "jsrInclude": [
+    "mod.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "jsrExclude": [
+    "src/**/*.test.ts"
+  ],
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "clean": "rm -rf dist LICENSE",
+    "build:npm": "tsdown",
+    "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public --no-git-checks",
+    "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
+    "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.0.0",
+    "@meshtastic/core": "workspace:*"
+  }
+}

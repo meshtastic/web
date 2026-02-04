@@ -36,7 +36,7 @@ export const DevicesPanel = ({ searchQuery = "" }: DevicesPanelProps) => {
 
   return (
     <>
-      <Card className="max-w-7xl">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Smartphone className="h-5 w-5" />

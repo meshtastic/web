@@ -12,7 +12,7 @@ export function SettingsLoadingSkeleton() {
         <Skeleton className="h-full rounded-md" />
       </div>
 
-      <div className="rounded-lg border bg-card max-w-7xl">
+      <div className="rounded-lg border bg-card">
         <div className="p-6 space-y-2">
           <Skeleton className="h-6 w-32" />
           <Skeleton className="h-4 w-64" />

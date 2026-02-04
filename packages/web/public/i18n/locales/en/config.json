@@ -78,31 +78,6 @@
         "packetCount": "{{count}} packets",
         "refresh": "Refresh",
         "noPackets": "No packets logged"
-      },
-      "backupRestore": {
-        "title": "Backup & Restore",
-        "description": "Export and import device configuration and encryption keys",
-        "export": {
-          "title": "Export Configuration",
-          "description": "Download device configuration as a YAML file",
-          "button": "Export",
-          "successTitle": "Export Successful",
-          "successDescription": "Configuration exported successfully.",
-          "failedTitle": "Export Failed"
-        },
-        "import": {
-          "title": "Import Configuration",
-          "description": "Restore device configuration from a YAML file",
-          "button": "Import",
-          "successTitle": "Import Successful",
-          "successDescription": "Configuration imported successfully.",
-          "failedTitle": "Import Failed"
-        },
-        "backupKeys": {
-          "title": "Backup Keys",
-          "description": "Download your encryption keys for safekeeping",
-          "button": "Backup"
-        }
       }
     }
   },
@@ -591,19 +566,6 @@
       "description": "Settings for Logging",
       "label": "Logging Settings"
     }
-  },
-  "importConfig": {
-    "title": "Import Configuration",
-    "description": "Import configuration settings from a YAML file",
-    "selectFile": "Select YAML File",
-    "yamlContent": "YAML Content",
-    "placeholder": "Paste or upload YAML content here...",
-    "searchPlaceholder": "Search configuration fields",
-    "fieldCount": "{{count}} fields found",
-    "selectedCount": "{{count}} selected",
-    "importSelected": "Import Selected {{count}}",
-    "selectAll": "Select All",
-    "deselectAll": "Deselect All"
   },
   "user": {
     "title": "User Settings",

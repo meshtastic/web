@@ -35,7 +35,7 @@ export function useUserForm() {
     [myNode],
   );
 
-  const isReady = myNode !== undefined;
+  const isReady = myNodeNum !== undefined;
 
   const form = useForm<UserValidation>({
     mode: "onChange",

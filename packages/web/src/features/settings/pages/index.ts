@@ -6,4 +6,3 @@ export { ModuleConfig } from "./ModuleConfig";
 export { SettingsLoading } from "./SettingsLoading";
 export { AdvancedConfig } from "./AdvancedConfig";
 export { AppPreferencesConfig } from "./AppPreferencesConfig";
-export { BackupRestoreConfig } from "./BackupRestoreConfig";

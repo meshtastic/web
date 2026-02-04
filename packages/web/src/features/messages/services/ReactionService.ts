@@ -93,7 +93,7 @@ class ReactionServiceClass {
     destination: number | "broadcast",
     channel?: Types.ChannelNumber,
   ): Promise<boolean> {
-    logger.info(
+    logger.debug(
       `[ReactionService] Toggling reaction: owner=${ownerNodeNum}, messageId=${targetMessageId}, emoji=${emoji}, dest=${destination}, channel=${channel}`,
     );
 
@@ -102,7 +102,6 @@ class ReactionServiceClass {
 
     // Toggle in database
     try {
-      logger.info(`[ReactionService] Calling reactionRepo.toggleReaction...`);
       const wasAdded = await reactionRepo.toggleReaction({
         ownerNodeNum,
         targetMessageId,
@@ -110,20 +109,19 @@ class ReactionServiceClass {
         emoji,
         createdAt: new Date(),
       });
-      logger.info(
+      logger.debug(
         `[ReactionService] Toggle result: ${wasAdded ? "added" : "removed"}`,
       );
 
       // Send over mesh (same message acts as toggle on receiving end)
       try {
-        logger.info(`[ReactionService] Sending reaction over mesh...`);
         const messageId = await deviceCommands.sendReaction(
           targetMessageId,
           emoji,
           destination,
           channel,
         );
-        logger.info(
+        logger.debug(
           `[ReactionService] Sent reaction over mesh, messageId=${messageId}`,
         );
       } catch (error) {

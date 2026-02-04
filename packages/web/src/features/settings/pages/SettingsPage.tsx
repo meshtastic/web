@@ -8,7 +8,6 @@ import { cn } from "@shared/utils/cn";
 import { t } from "i18next";
 import {
   AlertCircleIcon,
-  Archive,
   Database,
   FileEdit,
   LayersIcon,
@@ -19,25 +18,17 @@ import {
   Save,
   Settings2,
 } from "lucide-react";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { ActivityPanel } from "../components/activity/index.ts";
 import { SettingsSearchBar } from "../components/SettingsSearchBar.tsx";
 import { useSettingsSave } from "../hooks/useSaveSettings.ts";
 import { AdvancedConfig } from "./AdvancedConfig.tsx";
 import { AppPreferencesConfig } from "./AppPreferencesConfig.tsx";
-import { BackupRestoreConfig } from "./BackupRestoreConfig.tsx";
 import { DeviceConfig } from "./DeviceConfig.tsx";
 import { ModuleConfig } from "./ModuleConfig.tsx";
 import { RadioConfig } from "./RadioConfig.tsx";
-import { SettingsLoadingSkeleton } from "./SettingsLoading.tsx";
 
-type SettingsSection =
-  | "radio"
-  | "device"
-  | "module"
-  | "app"
-  | "backup"
-  | "advanced";
+type SettingsSection = "radio" | "device" | "module" | "app" | "advanced";
 
 const configSections = [
   {
@@ -54,11 +45,6 @@ const configSections = [
     key: "module" as const,
     label: "Module Config",
     icon: LayersIcon,
-  },
-  {
-    key: "backup" as const,
-    label: "Backup & Restore",
-    icon: Archive,
   },
   {
     key: "advanced" as const,
@@ -78,7 +64,6 @@ interface SettingsHeaderActionsProps {
 
 /**
  * Header actions that depend on device state (useSettingsSave uses useDevice).
- * Must be rendered inside a Suspense boundary.
  */
 function SettingsHeaderActions({ onActivityOpen }: SettingsHeaderActionsProps) {
   const { handleSave, handleReset, isSaving, hasPending, saveDisabled } =
@@ -135,7 +120,6 @@ interface SettingsContentProps {
 
 /**
  * Content area that depends on device state.
- * Must be rendered inside a Suspense boundary.
  */
 function SettingsContent({ activeSection, searchQuery }: SettingsContentProps) {
   const { isRemoteAdmin, isAuthorized } = useRemoteAdminAuth();
@@ -157,9 +141,6 @@ function SettingsContent({ activeSection, searchQuery }: SettingsContentProps) {
       {activeSection === "radio" && <RadioConfig searchQuery={searchQuery} />}
       {activeSection === "device" && <DeviceConfig searchQuery={searchQuery} />}
       {activeSection === "module" && <ModuleConfig searchQuery={searchQuery} />}
-      {activeSection === "backup" && (
-        <BackupRestoreConfig searchQuery={searchQuery} />
-      )}
       {activeSection === "advanced" && (
         <AdvancedConfig searchQuery={searchQuery} />
       )}
@@ -240,22 +221,18 @@ export default function SettingsPage() {
             <div className="hidden sm:block">
               <SettingsSearchBar onSearch={setSearchQuery} />
             </div>
-            <Suspense fallback={null}>
-              <SettingsHeaderActions
-                onActivityOpen={() => setActivityOpen(true)}
-              />
-            </Suspense>
+            <SettingsHeaderActions
+              onActivityOpen={() => setActivityOpen(true)}
+            />
           </div>
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto [scrollbar-gutter:stable]">
           <div className="p-4 sm:p-6">
-            <Suspense fallback={<SettingsLoadingSkeleton />}>
-              <SettingsContent
-                activeSection={activeSection}
-                searchQuery={searchQuery}
-              />
-            </Suspense>
+            <SettingsContent
+              activeSection={activeSection}
+              searchQuery={searchQuery}
+            />
           </div>
         </div>
       </div>

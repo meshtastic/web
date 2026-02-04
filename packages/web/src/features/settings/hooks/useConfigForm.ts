@@ -4,6 +4,7 @@ import {
 } from "@data/hooks/usePendingChanges.ts";
 import type { ValidConfigType } from "@features/settings/components/types.ts";
 import { useMyNode } from "@shared/hooks";
+import { useDevice } from "@state/index.ts";
 import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import {
   type DefaultValues,
@@ -42,10 +43,17 @@ export function useConfigForm<T extends FieldValues>({
 
   // Load config from database (base + pending changes merged)
   const {
-    config: effectiveConfig,
-    baseConfig,
+    config: dbEffectiveConfig,
+    baseConfig: dbBaseConfig,
     isLoading,
   } = useEffectiveConfig(myNodeNum, configType);
+
+  // Fall back to device store config when DB has no cached row yet.
+  // The device store always has config with protobuf defaults, populated
+  // with real values as config packets arrive from the device.
+  const device = useDevice();
+  const baseConfig = dbBaseConfig ?? device.config[configType] ?? null;
+  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
 
   // Get pending changes methods
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
@@ -55,8 +63,8 @@ export function useConfigForm<T extends FieldValues>({
   const form = useForm<T>({
     mode: "onChange",
     resolver: createZodResolver(schema),
-    defaultValues: baseConfig as DefaultValues<T> | undefined,
-    values: effectiveConfig as T | undefined,
+    defaultValues: baseConfig as unknown as DefaultValues<T> | undefined,
+    values: effectiveConfig as unknown as T | undefined,
   });
 
   const { watch, getValues } = form;

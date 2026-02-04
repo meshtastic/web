@@ -1,37 +1,14 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import logger from "@core/services/logger";
 import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
-import type {
-  ChangeEntry,
-  ConfigChangeKey,
-  ValidConfigType,
-  ValidModuleConfigType,
-} from "@features/settings/components/types.ts";
 import { toByteArray } from "base64-js";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
-import type { Dialogs, DialogVariant, WaypointWithMetadata } from "./types.ts";
+import type { WaypointWithMetadata } from "./types.ts";
 
 // ConnectionId is now just a number (database ID)
 type ConnectionId = number;
-
-// Helper function to serialize change keys for Map storage
-function serializeKey(key: ConfigChangeKey): string {
-  if (key.type === "config" || key.type === "moduleConfig") {
-    return `${key.type}:${key.variant}`;
-  }
-  if (key.type === "channel") {
-    return `${key.type}:${key.index}`;
-  }
-  if (key.type === "user") {
-    return "user";
-  }
-  if (key.type === "adminMessage") {
-    return `${key.type}:${key.variant}:${key.id}`;
-  }
-  return "";
-}
 
 // Config types expected during Stage 1 configuration
 const DEVICE_CONFIG_TYPES = [
@@ -98,16 +75,13 @@ export interface ConfigConflict {
 
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
-  status: Types.DeviceStatusEnum;
   connectionId?: ConnectionId | null;
   configProgress: ConfigProgress; // Track config loading progress
-  changes: Map<string, ChangeEntry>; // Unified change tracking
   queuedAdminMessages: Protobuf.Admin.AdminMessage[]; // Queued admin messages
   hardware: Protobuf.Mesh.MyNodeInfo;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
   connection?: MeshDevice;
   pendingSettingsChanges: boolean;
-  dialog: Dialogs;
   clientNotifications: Protobuf.Mesh.ClientNotification[];
 
   // Config caching state
@@ -119,17 +93,10 @@ export interface Device extends DeviceData {
   remoteAdminAuthorized: boolean; // Whether authorized to admin the target node
   recentlyConnectedNodes: number[]; // History of nodes (local + remote admin targets)
 
-  setStatus: (status: Types.DeviceStatusEnum) => void;
   setConnectionId: (id: ConnectionId | null) => void;
   resetConfigProgress: () => void;
   setConfig: (config: Protobuf.Config.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
-  getEffectiveConfig<K extends ValidConfigType>(
-    payloadVariant: K,
-  ): Protobuf.LocalOnly.LocalConfig[K] | undefined;
-  getEffectiveModuleConfig<K extends ValidModuleConfigType>(
-    payloadVariant: K,
-  ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   setPendingSettingsChanges: (state: boolean) => void;
   addChannel: (channel: Protobuf.Channel.Channel) => void;
@@ -145,8 +112,6 @@ export interface Device extends DeviceData {
     traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
   ) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
-  setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
-  getDialogOpen: (dialog: DialogVariant) => boolean;
   sendAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
   addClientNotification: (
     clientNotificationPacket: Protobuf.Mesh.ClientNotification,
@@ -161,25 +126,10 @@ export interface Device extends DeviceData {
   ) => void;
   getNeighborInfo: (nodeNum: number) => Protobuf.Mesh.NeighborInfo | undefined;
   getMyNodeNum: () => number | undefined;
-  setChange: (
-    key: ConfigChangeKey,
-    value: unknown,
-    originalValue?: unknown,
-  ) => void;
-  clearAllChanges: () => void;
-  hasConfigChange: (variant: ValidConfigType) => boolean;
-  hasModuleConfigChange: (variant: ValidModuleConfigType) => boolean;
-  hasChannelChange: (index: Types.ChannelNumber) => boolean;
-  hasUserChange: () => boolean;
-  getConfigChangeCount: () => number;
-  getModuleConfigChangeCount: () => number;
-  getChannelChangeCount: () => number;
-  getAllConfigChanges: () => Protobuf.Config.Config[];
-  getAllModuleConfigChanges: () => Protobuf.ModuleConfig.ModuleConfig[];
-  getAllChannelChanges: () => Protobuf.Channel.Channel[];
   queueAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
   getAllQueuedAdminMessages: () => Protobuf.Admin.AdminMessage[];
   getAdminMessageChangeCount: () => number;
+  clearQueuedAdminMessages: () => void;
 
   // Config caching methods
   setCachedConfig: (
@@ -256,7 +206,6 @@ function deviceFactory(
     waypoints,
     neighborInfo,
 
-    status: Types.DeviceStatusEnum.DeviceDisconnected,
     configProgress: {
       receivedConfigs: new Set<string>(),
       total: TOTAL_CONFIG_COUNT,
@@ -264,29 +213,9 @@ function deviceFactory(
     config: data?.config ?? create(Protobuf.LocalOnly.LocalConfigSchema),
     moduleConfig:
       data?.moduleConfig ?? create(Protobuf.LocalOnly.LocalModuleConfigSchema),
-    changes: new Map(),
     queuedAdminMessages: [],
     hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
     metadata: new Map(),
-    dialog: {
-      import: false,
-      QR: false,
-      shutdown: false,
-      reboot: false,
-      deviceName: false,
-      deviceShare: false,
-      nodeRemoval: false,
-      nodeDetails: false,
-      unsafeRoles: false,
-      refreshKeys: false,
-      deleteMessages: false,
-      managedMode: false,
-      clientNotification: false,
-      resetNodeDb: false,
-      factoryResetDevice: false,
-      factoryResetConfig: false,
-      tracerouteResponse: false,
-    },
     pendingSettingsChanges: false,
     clientNotifications: [],
 
@@ -299,16 +228,6 @@ function deviceFactory(
     remoteAdminAuthorized: true, // Local is always authorized
     recentlyConnectedNodes: [],
 
-    setStatus: (status: Types.DeviceStatusEnum) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.device;
-          if (device) {
-            device.status = status;
-          }
-        }),
-      );
-    },
     setConnectionId: (connectionId: ConnectionId | null) => {
       set(
         produce<PrivateDeviceState>((draft) => {
@@ -485,44 +404,6 @@ function deviceFactory(
         }),
       );
     },
-    getEffectiveConfig<K extends ValidConfigType>(
-      payloadVariant: K,
-    ): Protobuf.LocalOnly.LocalConfig[K] | undefined {
-      if (!payloadVariant) {
-        return;
-      }
-      const device = get().device;
-      if (!device) {
-        return;
-      }
-
-      const workingValue = device.changes.get(
-        serializeKey({ type: "config", variant: payloadVariant }),
-      )?.value as Protobuf.LocalOnly.LocalConfig[K] | undefined;
-
-      return {
-        ...device.config[payloadVariant],
-        ...workingValue,
-      };
-    },
-    getEffectiveModuleConfig<K extends ValidModuleConfigType>(
-      payloadVariant: K,
-    ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined {
-      const device = get().device;
-      if (!device) {
-        return;
-      }
-
-      const workingValue = device.changes.get(
-        serializeKey({ type: "moduleConfig", variant: payloadVariant }),
-      )?.value as Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
-
-      return {
-        ...device.moduleConfig[payloadVariant],
-        ...workingValue,
-      };
-    },
-
     setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
       set(
         produce<PrivateDeviceState>((draft) => {
@@ -714,23 +595,6 @@ function deviceFactory(
         }),
       );
     },
-    setDialogOpen: (dialog: DialogVariant, open: boolean) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.device;
-          if (device) {
-            device.dialog[dialog] = open;
-          }
-        }),
-      );
-    },
-    getDialogOpen: (dialog: DialogVariant) => {
-      const device = get().device;
-      if (!device) {
-        throw new Error(`Device ${id} not found`);
-      }
-      return device.dialog[dialog];
-    },
 
     sendAdminMessage(message: Protobuf.Admin.AdminMessage) {
       const device = get().device;
@@ -807,178 +671,6 @@ function deviceFactory(
       return device?.hardware.myNodeNum;
     },
 
-    // Change tracking methods
-    setChange: (
-      key: ConfigChangeKey,
-      value: unknown,
-      originalValue?: unknown,
-    ) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.device;
-          if (!device) {
-            return;
-          }
-          const serializedKey = serializeKey(key);
-          device.changes.set(serializedKey, {
-            key,
-            value,
-            timestamp: Date.now(),
-            originalValue,
-          });
-        }),
-      );
-    },
-
-    clearAllChanges: () => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.device;
-          if (!device) {
-            return;
-          }
-          device.changes.clear();
-          device.queuedAdminMessages = [];
-        }),
-      );
-    },
-
-    hasConfigChange: (variant: ValidConfigType) => {
-      const device = get().device;
-      if (!device) {
-        return false;
-      }
-      return device.changes.has(serializeKey({ type: "config", variant }));
-    },
-
-    hasModuleConfigChange: (variant: ValidModuleConfigType) => {
-      const device = get().device;
-      if (!device) {
-        return false;
-      }
-      return device.changes.has(
-        serializeKey({ type: "moduleConfig", variant }),
-      );
-    },
-
-    hasChannelChange: (index: Types.ChannelNumber) => {
-      const device = get().device;
-      if (!device) {
-        return false;
-      }
-      return device.changes.has(serializeKey({ type: "channel", index }));
-    },
-
-    hasUserChange: () => {
-      const device = get().device;
-      if (!device) {
-        return false;
-      }
-      return device.changes.has(serializeKey({ type: "user" }));
-    },
-
-    getConfigChangeCount: () => {
-      const device = get().device;
-      if (!device) {
-        return 0;
-      }
-      let count = 0;
-      for (const [key] of device.changes) {
-        if (key.startsWith("config:")) {
-          count++;
-        }
-      }
-      return count;
-    },
-
-    getModuleConfigChangeCount: () => {
-      const device = get().device;
-      if (!device) {
-        return 0;
-      }
-      let count = 0;
-      for (const [key] of device.changes) {
-        if (key.startsWith("moduleConfig:")) {
-          count++;
-        }
-      }
-      return count;
-    },
-
-    getChannelChangeCount: () => {
-      const device = get().device;
-      if (!device) {
-        return 0;
-      }
-      let count = 0;
-      for (const [key] of device.changes) {
-        if (key.startsWith("channel:")) {
-          count++;
-        }
-      }
-      return count;
-    },
-
-    getAllConfigChanges: () => {
-      const device = get().device;
-      if (!device) {
-        return [];
-      }
-      const changes: Protobuf.Config.Config[] = [];
-      for (const [key, entry] of device.changes) {
-        if (key.startsWith("config:")) {
-          const variant = key.split(":")[1] as ValidConfigType;
-          changes.push(
-            create(Protobuf.Config.ConfigSchema, {
-              payloadVariant: {
-                case: variant,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic config value from change tracking
-                value: entry.value as never,
-              },
-            }),
-          );
-        }
-      }
-      return changes;
-    },
-
-    getAllModuleConfigChanges: () => {
-      const device = get().device;
-      if (!device) {
-        return [];
-      }
-      const changes: Protobuf.ModuleConfig.ModuleConfig[] = [];
-      for (const [key, entry] of device.changes) {
-        if (key.startsWith("moduleConfig:")) {
-          const variant = key.split(":")[1] as ValidModuleConfigType;
-          changes.push(
-            create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-              payloadVariant: {
-                case: variant,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic config value from change tracking
-                value: entry.value as never,
-              },
-            }),
-          );
-        }
-      }
-      return changes;
-    },
-
-    getAllChannelChanges: () => {
-      const device = get().device;
-      if (!device) {
-        return [];
-      }
-      const changes: Protobuf.Channel.Channel[] = [];
-      for (const [key, entry] of device.changes) {
-        if (key.startsWith("channel:")) {
-          changes.push(entry.value as Protobuf.Channel.Channel);
-        }
-      }
-      return changes;
-    },
-
     queueAdminMessage: (message: Protobuf.Admin.AdminMessage) => {
       set(
         produce<PrivateDeviceState>((draft) => {
@@ -1005,6 +697,18 @@ function deviceFactory(
         return 0;
       }
       return device.queuedAdminMessages.length;
+    },
+
+    clearQueuedAdminMessages: () => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.device;
+          if (!device) {
+            return;
+          }
+          device.queuedAdminMessages = [];
+        }),
+      );
     },
 
     // Config caching methods

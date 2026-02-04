@@ -29,10 +29,9 @@ import {
   ClipboardCopyIcon,
   DownloadIcon,
   FileText,
-  RefreshCwIcon,
   Trash2Icon,
 } from "lucide-react";
-import { Suspense, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 // Derive packet type filter options from portNumMap
@@ -257,8 +256,7 @@ function PacketLogContent() {
       const rawPacket = packet.rawPacket as Record<string, unknown> | null;
       const decoded = rawPacket?.decoded as Record<string, unknown> | undefined;
       const portnum = decoded?.portnum as number | string | undefined;
-      const portName =
-        portnum !== undefined ? getPortName(portnum) : "";
+      const portName = portnum !== undefined ? getPortName(portnum) : "";
 
       // Apply packet type filter
       if (packetTypeFilter !== "all" && portName !== packetTypeFilter) {
@@ -372,15 +370,7 @@ function DebugLogDrawer({ open, onOpenChange }: DebugLogDrawerProps) {
             </Tooltip>
           </SheetHeader>
           <div className="h-[calc(100vh-5rem)]">
-            <Suspense
-              fallback={
-                <div className="flex items-center justify-center h-full">
-                  <RefreshCwIcon className="size-6 animate-spin text-muted-foreground" />
-                </div>
-              }
-            >
-              <PacketLogContent />
-            </Suspense>
+            <PacketLogContent />
           </div>
         </TooltipProvider>
       </SheetContent>

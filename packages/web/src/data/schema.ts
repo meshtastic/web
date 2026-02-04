@@ -438,7 +438,9 @@ export const connections = sqliteTable(
     nodeNum: integer("node_num").references(() => devices.nodeNum, {
       onDelete: "cascade",
     }),
-    type: text("type", { enum: ["http", "bluetooth", "serial"] }).notNull(),
+    type: text("type", {
+      enum: ["http", "bluetooth", "serial", "demo"],
+    }).notNull(),
     name: text("name").notNull(),
     status: text("status", {
       enum: [

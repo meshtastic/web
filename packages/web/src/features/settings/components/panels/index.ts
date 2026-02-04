@@ -1,6 +1,5 @@
 // Settings panel components
 export * from "./Administration";
-export * from "./BackupRestore";
 export * from "./Bluetooth";
 export * from "./DatabaseMaintenance";
 export * from "./DebugLog";

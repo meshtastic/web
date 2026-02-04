@@ -120,7 +120,7 @@ export const MessageInput = ({
     try {
       await messageRepo.saveMessage(newMessage);
     } catch (error) {
-      console.error("[sendMessage] Failed to save message:", error);
+      logger.error("[sendMessage] Failed to save message:", error);
       return;
     }
 
@@ -163,7 +163,7 @@ export const MessageInput = ({
           }
         })
         .catch(async (error) => {
-          console.error("[sendMessage] Failed to send:", error);
+          logger.error("[sendMessage] Failed to send:", error);
           await messageRepo.updateMessageStateByMessageId(
             tempMessageId,
             myNodeNum,
@@ -171,7 +171,7 @@ export const MessageInput = ({
           );
         });
     } catch (error) {
-      console.error("[sendMessage] Failed to send message:", error);
+      logger.error("[sendMessage] Failed to send message:", error);
       await messageRepo.updateMessageStateByMessageId(
         tempMessageId,
         myNodeNum,

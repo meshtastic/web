@@ -191,7 +191,7 @@ export const AppPreferencesConfig = ({
   ];
   if (!isVisible) {
     return (
-      <Card className="max-w-7xl">
+      <Card>
         <CardContent className="pt-6">
           <p className="text-muted-foreground text-center">
             No settings found matching "{searchQuery}"
@@ -204,7 +204,7 @@ export const AppPreferencesConfig = ({
   return (
     <div className="space-y-6">
       <Activity mode={appearanceVisible ? "visible" : "hidden"}>
-        <Card className="max-w-7xl">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Palette className="h-5 w-5" />
@@ -282,7 +282,7 @@ export const AppPreferencesConfig = ({
       </Activity>
 
       <Activity mode={localizationVisible ? "visible" : "hidden"}>
-        <Card className="max-w-7xl">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5" />
@@ -387,7 +387,7 @@ export const AppPreferencesConfig = ({
       </Activity>
 
       <Activity mode={mapVisible ? "visible" : "hidden"}>
-        <Card className="max-w-7xl">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
@@ -480,7 +480,7 @@ export const AppPreferencesConfig = ({
       </Activity>
 
       <Activity mode={audioVisible ? "visible" : "hidden"}>
-        <Card className="max-w-7xl">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Volume2 className="h-5 w-5" />
@@ -534,7 +534,9 @@ export const AppPreferencesConfig = ({
               </div>
               <Switch
                 checked={alertSoundEnabled}
-                onCheckedChange={(checked) => void setAlertSoundEnabled(checked)}
+                onCheckedChange={(checked) =>
+                  void setAlertSoundEnabled(checked)
+                }
               />
             </div>
           </CardContent>
@@ -542,7 +544,7 @@ export const AppPreferencesConfig = ({
       </Activity>
 
       <Activity mode={performanceVisible ? "visible" : "hidden"}>
-        <Card className="max-w-7xl">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Database className="h-5 w-5" />

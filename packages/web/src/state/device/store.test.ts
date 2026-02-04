@@ -48,9 +48,6 @@ function makeRoute(from: number, time = Date.now() / 1000) {
     data: create(Protobuf.Mesh.RouteDiscoverySchema, {}),
   } as unknown as Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>;
 }
-function makeChannel(index: number) {
-  return create(Protobuf.Channel.ChannelSchema, { index });
-}
 function makeWaypoint(id: number, expire?: number) {
   return create(Protobuf.Mesh.WaypointSchema, { id, expire });
 }
@@ -126,124 +123,7 @@ describe("DeviceStore – single device lifecycle", () => {
   });
 });
 
-describe("DeviceStore – change registry API", () => {
-  beforeEach(() => {
-    idbMem.clear();
-    vi.clearAllMocks();
-  });
-
-  it("setChange/hasChange/getChange for config and getEffectiveConfig merges base + working", async () => {
-    const { useDeviceStore } = await freshStore(false);
-    const state = useDeviceStore.getState();
-    const device = state.initializeDevice();
-
-    // config deviceConfig.role = CLIENT
-    device.setConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "device",
-          value: create(Protobuf.Config.Config_DeviceConfigSchema, {
-            role: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
-          }),
-        },
-      }),
-    );
-
-    // working deviceConfig.role = ROUTER
-    const routerConfig = create(Protobuf.Config.Config_DeviceConfigSchema, {
-      role: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
-    });
-    device.setChange({ type: "config", variant: "device" }, routerConfig);
-
-    // expect change is tracked
-    expect(device.hasConfigChange("device")).toBe(true);
-
-    // expect effective deviceConfig.role = ROUTER
-    const effective = device.getEffectiveConfig("device");
-    expect(effective?.role).toBe(
-      Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
-    );
-
-    // remove change, effective should equal base
-    device.clearAllChanges();
-    expect(device.hasConfigChange("device")).toBe(false);
-    expect(device.getEffectiveConfig("device")?.role).toBe(
-      Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
-    );
-  });
-
-  it("setChange/hasChange for moduleConfig and getEffectiveModuleConfig", async () => {
-    const { useDeviceStore } = await freshStore(false);
-    const state = useDeviceStore.getState();
-    const device = state.initializeDevice();
-
-    // base moduleConfig.mqtt with base address
-    device.setModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "mqtt",
-          value: create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, {
-            address: "mqtt://base",
-          }),
-        },
-      }),
-    );
-
-    // working mqtt config
-    const workingMqtt = create(
-      Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema,
-      { address: "mqtt://working" },
-    );
-    device.setChange({ type: "moduleConfig", variant: "mqtt" }, workingMqtt);
-
-    expect(device.hasModuleConfigChange("mqtt")).toBe(true);
-
-    // effective should return working value
-    expect(device.getEffectiveModuleConfig("mqtt")?.address).toBe(
-      "mqtt://working",
-    );
-
-    // Clear all changes
-    device.clearAllChanges();
-    expect(device.hasModuleConfigChange("mqtt")).toBe(false);
-    expect(device.getEffectiveModuleConfig("mqtt")?.address).toBe(
-      "mqtt://base",
-    );
-  });
-
-  it("channel change tracking add/update/remove", async () => {
-    const { useDeviceStore } = await freshStore(false);
-    const state = useDeviceStore.getState();
-    const device = state.initializeDevice();
-
-    const channel0 = makeChannel(0);
-    const channel1 = create(Protobuf.Channel.ChannelSchema, {
-      index: 1,
-      settings: { name: "one" },
-    });
-
-    device.setChange({ type: "channel", index: 0 }, channel0);
-    device.setChange({ type: "channel", index: 1 }, channel1);
-
-    expect(device.hasChannelChange(0)).toBe(true);
-    expect(device.hasChannelChange(1)).toBe(true);
-
-    // update channel 1
-    const channel1Updated = create(Protobuf.Channel.ChannelSchema, {
-      index: 1,
-      settings: { name: "uno" },
-    });
-    device.setChange({ type: "channel", index: 1 }, channel1Updated);
-    expect(device.getChannelChangeCount()).toBe(2);
-
-    // remove all
-    device.clearAllChanges();
-    expect(device.hasChannelChange(0)).toBe(false);
-    expect(device.hasChannelChange(1)).toBe(false);
-  });
-});
-
-describe("DeviceStore – metadata, dialogs", () => {
+describe("DeviceStore – metadata", () => {
   beforeEach(() => {
     idbMem.clear();
     vi.clearAllMocks();
@@ -262,17 +142,6 @@ describe("DeviceStore – metadata, dialogs", () => {
     expect(useDeviceStore.getState().device?.metadata.get(123)).toEqual(
       metadata,
     );
-  });
-
-  it("dialogs set/get work", async () => {
-    const { useDeviceStore } = await freshStore(false);
-    const state = useDeviceStore.getState();
-    const device = state.initializeDevice();
-
-    device.setDialogOpen("reboot", true);
-    expect(device.getDialogOpen("reboot")).toBe(true);
-    device.setDialogOpen("reboot", false);
-    expect(device.getDialogOpen("reboot")).toBe(false);
   });
 });
 
@@ -790,7 +659,7 @@ describe("DeviceStore – queued admin messages", () => {
     expect(device.getAdminMessageChangeCount()).toBe(2);
     expect(device.getAllQueuedAdminMessages().length).toBe(2);
 
-    device.clearAllChanges();
+    device.clearQueuedAdminMessages();
     expect(device.getAdminMessageChangeCount()).toBe(0);
   });
 });

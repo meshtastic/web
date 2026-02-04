@@ -4,9 +4,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
+import { Spinner } from "@shared/components/ui/spinner";
 import { cn } from "@shared/utils/cn";
 import type { Message } from "@data/schema";
-import { Check, Clock, CloudCheck, Loader2, X } from "lucide-react";
+import { Check, Clock, CloudCheck, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface MessageStatusIndicatorProps {
@@ -36,9 +37,7 @@ export const MessageStatusIndicator = ({
         return <Clock className="size-4 md:size-5 text-muted-foreground" />;
 
       case "sending":
-        return (
-          <Loader2 className="size-4 md:size-5 text-blue-500 animate-spin [animation-duration:4s]" />
-        );
+        return <Spinner size="sm" inline className="text-blue-500" />;
 
       case "sent":
         return (

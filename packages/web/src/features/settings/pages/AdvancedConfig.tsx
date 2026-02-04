@@ -47,7 +47,7 @@ export const AdvancedConfig = ({
 
   if (!isVisible) {
     return (
-      <Card className="max-w-7xl">
+      <Card>
         <CardContent className="pt-6">
           <p className="text-muted-foreground text-center">
             No settings found matching "{searchQuery}"
@@ -61,7 +61,7 @@ export const AdvancedConfig = ({
   return (
     <div className="space-y-6">
       <Activity mode={administrationVisible ? "visible" : "hidden"}>
-        <Card className="max-w-7xl">
+        <Card>
           <CardHeader>
             <CardTitle>
               {t("settings.advanced.administration.title", "Administration")}
@@ -79,7 +79,7 @@ export const AdvancedConfig = ({
         </Card>
       </Activity>
       <Activity mode={databaseVisible ? "visible" : "hidden"}>
-        <Card className="max-w-7xl">
+        <Card>
           <CardHeader>
             <CardTitle>
               {t("settings.advanced.database.title", "Database")}
@@ -97,7 +97,7 @@ export const AdvancedConfig = ({
         </Card>
       </Activity>
       <Activity mode={debugLogVisible ? "visible" : "hidden"}>
-        <Card className="max-w-7xl">
+        <Card>
           <CardHeader>
             <CardTitle>
               {t("settings.advanced.debugLog.title", "Debug Log")}

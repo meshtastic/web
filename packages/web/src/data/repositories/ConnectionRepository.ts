@@ -3,7 +3,16 @@ import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
 import { type Connection, connections, type NewConnection } from "../schema.ts";
 
-export type ConnectionType = "http" | "bluetooth" | "serial";
+export type ConnectionType = "http" | "bluetooth" | "serial" | "demo";
+
+/** Connection type constants to avoid magic strings */
+export const ConnectionTypes = {
+  HTTP: "http",
+  BLUETOOTH: "bluetooth",
+  SERIAL: "serial",
+  DEMO: "demo",
+} as const satisfies Record<string, ConnectionType>;
+
 export type ConnectionStatus =
   | "connected"
   | "connecting"

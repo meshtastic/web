@@ -20,10 +20,18 @@ export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
       max?: number;
       currentValueLength?: number;
       showCharacterCount?: boolean;
+      /** Count bytes (UTF-8) instead of characters */
+      countBytes?: boolean;
     };
     showPasswordToggle?: boolean;
     showCopyButton?: boolean;
   };
+}
+
+const encoder = new TextEncoder();
+
+function getByteLength(value: string): number {
+  return encoder.encode(value).length;
 }
 
 export function GenericInput<T extends FieldValues>({
@@ -32,6 +40,7 @@ export function GenericInput<T extends FieldValues>({
   field,
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
   const { fieldLength, ...restProperties } = field.properties || {};
+  const countBytes = fieldLength?.countBytes ?? false;
 
   const {
     field: controllerField,
@@ -41,18 +50,18 @@ export function GenericInput<T extends FieldValues>({
     control,
     rules: {
       minLength: field.properties?.fieldLength?.min,
-      maxLength: field.properties?.fieldLength?.max,
+      maxLength: countBytes ? undefined : field.properties?.fieldLength?.max,
     },
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
 
-    if (
-      field.properties?.fieldLength?.max &&
-      newValue.length > field.properties.fieldLength.max
-    ) {
-      return;
+    if (field.properties?.fieldLength?.max) {
+      const len = countBytes ? getByteLength(newValue) : newValue.length;
+      if (len > field.properties.fieldLength.max) {
+        return;
+      }
     }
 
     if (field.inputChange) {
@@ -67,36 +76,36 @@ export function GenericInput<T extends FieldValues>({
   };
 
   const currentLength = controllerField.value
-    ? String(controllerField.value).length
+    ? countBytes
+      ? getByteLength(String(controllerField.value))
+      : String(controllerField.value).length
     : 0;
 
-  return (
-    <div className="relative w-full">
-      <Input
-        type={field.type}
-        step={field.properties?.step}
-        value={
-          field.type === "number"
-            ? String(controllerField.value)
-            : controllerField.value
-        }
-        id={field.name}
-        onChange={handleInputChange}
-        showCopyButton={field.properties?.showCopyButton}
-        showPasswordToggle={
-          field.properties?.showPasswordToggle || field.type === "password"
-        }
-        className={field.properties?.className}
-        {...restProperties}
-        disabled={disabled}
-        variant={error ? "invalid" : isDirty ? "dirty" : "default"}
-      />
+  const counterSuffix =
+    fieldLength?.showCharacterCount && fieldLength.max
+      ? `${currentLength}/${fieldLength.max}`
+      : undefined;
 
-      {fieldLength?.showCharacterCount && fieldLength.max && (
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-sm text-slate-900 dark:text-slate-200">
-          {currentLength}/{fieldLength.max}
-        </div>
-      )}
-    </div>
+  return (
+    <Input
+      type={field.type}
+      step={field.properties?.step}
+      value={
+        field.type === "number"
+          ? String(controllerField.value)
+          : controllerField.value
+      }
+      id={field.name}
+      onChange={handleInputChange}
+      showCopyButton={field.properties?.showCopyButton}
+      showPasswordToggle={
+        field.properties?.showPasswordToggle || field.type === "password"
+      }
+      className={field.properties?.className}
+      {...restProperties}
+      suffix={counterSuffix ?? restProperties.suffix}
+      disabled={disabled}
+      variant={error ? "invalid" : isDirty ? "dirty" : "default"}
+    />
   );
 }

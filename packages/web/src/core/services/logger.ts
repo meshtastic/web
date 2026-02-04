@@ -51,7 +51,6 @@ export const connectionLogger = createLogger("Connection");
 export const configLogger = createLogger("Config");
 export const dbLogger = createLogger("DB");
 export const uiLogger = createLogger("UI");
-export const yamlLogger = createLogger("YAML");
 
 export const setLogLevel = (level: LogLevel): void => {
   localStorage.setItem("meshtastic-log-level", level);

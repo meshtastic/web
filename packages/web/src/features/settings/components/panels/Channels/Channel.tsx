@@ -83,18 +83,13 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
           name: "settings.name",
           label: t("name.label"),
           description: t("name.description"),
-        },
-        {
-          type: "toggle",
-          name: "settings.uplinkEnabled",
-          label: t("uplinkEnabled.label"),
-          description: t("uplinkEnabled.description"),
-        },
-        {
-          type: "toggle",
-          name: "settings.downlinkEnabled",
-          label: t("downlinkEnabled.label"),
-          description: t("downlinkEnabled.description"),
+          properties: {
+            fieldLength: {
+              max: 12,
+              showCharacterCount: true,
+              countBytes: true,
+            },
+          },
         },
         {
           type: "select",
@@ -132,6 +127,25 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                   [t("positionPrecision.options.precise")]: 32,
                 },
           },
+        },
+      ],
+    },
+    {
+      label: t("mqttLink.label", "MQTT"),
+      description: t("mqttLink.description", "Uplink and downlink settings"),
+      columns: 2,
+      fields: [
+        {
+          type: "toggle",
+          name: "settings.uplinkEnabled",
+          label: t("uplinkEnabled.label"),
+          description: t("uplinkEnabled.description"),
+        },
+        {
+          type: "toggle",
+          name: "settings.downlinkEnabled",
+          label: t("downlinkEnabled.label"),
+          description: t("downlinkEnabled.description"),
         },
       ],
     },

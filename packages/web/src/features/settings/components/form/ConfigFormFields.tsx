@@ -70,7 +70,9 @@ export interface FieldConfig<T extends FieldValues> {
     fieldLength?: {
       min?: number;
       max?: number;
+      currentValueLength?: number;
       showCharacterCount?: boolean;
+      countBytes?: boolean;
     };
     // For multiSelect type
     value?: string[];
@@ -106,6 +108,8 @@ export interface FieldGroup<T extends FieldValues> {
   description: string;
   notes?: string;
   fields: FieldConfig<T>[];
+  /** Number of columns for field layout (default: 1, stacked) */
+  columns?: number;
 }
 
 interface ConfigFormFieldsProps<T extends FieldValues> {
@@ -274,15 +278,19 @@ function ConfigFormField<T extends FieldValues>({
       control={control}
       name={field.name}
       render={({ fieldState }) => (
-        <FormItem>
-          <FormLabel>{field.label}</FormLabel>
-          {field.description && (
-            <FormDescription>{field.description}</FormDescription>
-          )}
-          <FormControl>
-            {renderFieldInput(field, control, disabled, fieldState)}
-          </FormControl>
-          <FormMessage />
+        <FormItem className="flex flex-col md:flex-row md:items-start md:gap-6 md:space-y-0">
+          <div className="md:w-1/3 md:pt-2.5 shrink-0">
+            <FormLabel>{field.label}</FormLabel>
+            {field.description && (
+              <FormDescription>{field.description}</FormDescription>
+            )}
+          </div>
+          <div className="flex-1 min-w-0 space-y-2">
+            <FormControl>
+              {renderFieldInput(field, control, disabled, fieldState)}
+            </FormControl>
+            <FormMessage />
+          </div>
         </FormItem>
       )}
     />
@@ -309,16 +317,32 @@ export function ConfigFormFields<T extends FieldValues>({
                 <Subtle className="font-semibold">{group.notes}</Subtle>
               )}
             </div>
-            {group.fields.map((field) => (
-              <ConfigFormField
-                key={field.name}
-                field={field}
-                control={form.control}
-                disabled={
-                  disabled || isDisabledByField(field.disabledBy, field.disabled)
-                }
-              />
-            ))}
+            <div
+              className={
+                group.columns && group.columns > 1
+                  ? "grid gap-4"
+                  : "space-y-8 sm:space-y-5"
+              }
+              style={
+                group.columns && group.columns > 1
+                  ? {
+                      gridTemplateColumns: `repeat(${group.columns}, minmax(0, 1fr))`,
+                    }
+                  : undefined
+              }
+            >
+              {group.fields.map((field) => (
+                <ConfigFormField
+                  key={field.name}
+                  field={field}
+                  control={form.control}
+                  disabled={
+                    disabled ||
+                    isDisabledByField(field.disabledBy, field.disabled)
+                  }
+                />
+              ))}
+            </div>
           </div>
         ))}
       </form>

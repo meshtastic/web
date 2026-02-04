@@ -4,6 +4,7 @@ import {
 } from "@data/hooks/usePendingChanges.ts";
 import type { ValidModuleConfigType } from "@features/settings/components/types.ts";
 import { useMyNode } from "@shared/hooks";
+import { useDevice } from "@state/index.ts";
 import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import {
   type DefaultValues,
@@ -48,10 +49,16 @@ export function useModuleConfigForm<T extends FieldValues>({
 
   // Load module config from database (base + pending changes merged)
   const {
-    config: rawEffectiveConfig,
-    baseConfig: rawBaseConfig,
+    config: dbRawEffectiveConfig,
+    baseConfig: dbRawBaseConfig,
     isLoading,
   } = useEffectiveModuleConfig(myNodeNum, moduleConfigType);
+
+  // Fall back to device store module config when DB has no cached row yet
+  const device = useDevice();
+  const rawBaseConfig =
+    dbRawBaseConfig ?? device.moduleConfig[moduleConfigType] ?? null;
+  const rawEffectiveConfig = dbRawEffectiveConfig ?? rawBaseConfig;
 
   // Get pending changes methods
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
@@ -59,13 +66,13 @@ export function useModuleConfigForm<T extends FieldValues>({
   // Apply transforms if provided
   const baseConfig = (
     transformDefaults
-      ? transformDefaults(rawBaseConfig as T | undefined)
+      ? transformDefaults(rawBaseConfig as unknown as T | undefined)
       : rawBaseConfig
   ) as DefaultValues<T> | undefined;
 
   const effectiveConfig = transformDefaults
-    ? transformDefaults(rawEffectiveConfig as T | undefined)
-    : (rawEffectiveConfig as T | undefined);
+    ? transformDefaults(rawEffectiveConfig as unknown as T | undefined)
+    : (rawEffectiveConfig as unknown as T | undefined);
 
   const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
 

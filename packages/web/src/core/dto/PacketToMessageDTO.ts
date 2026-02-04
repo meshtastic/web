@@ -1,3 +1,4 @@
+import logger from "@core/services/logger";
 import type { NewMessage } from "@data/schema";
 import type { ConversationType } from "@data/types";
 import type { Types } from "@meshtastic/core";
@@ -33,7 +34,7 @@ class PacketToMessageDTO {
         dateTimestamp = timeValue;
       }
     } else if (data.rxTime != null) {
-      console.warn(
+      logger.warn(
         `Received rxTime in PacketToMessageDTO was not a Date object as expected (type: ${typeof data.rxTime}, value: ${data.rxTime}). Using current time as fallback.`,
       );
     }

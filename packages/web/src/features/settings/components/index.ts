@@ -1,5 +1,4 @@
 // Settings feature components
-export * from "./ImportExport";
 export * from "./SettingsSearchBar";
 export * from "./SidebarNavigation";
 export * from "./useConfigSearch";
