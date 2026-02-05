@@ -1,7 +1,7 @@
 import { useDisplayUnits } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
 import type { FlagName } from "@shared/hooks/usePositionFlags";
-import { useMyNode, useRemoteAdminAuth } from "@shared/hooks";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 import { usePositionForm } from "../../hooks/index.ts";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading.tsx";
@@ -14,8 +14,7 @@ import {
 export const Position = () => {
   const { t } = useTranslation("config");
   const { isAuthorized } = useRemoteAdminAuth();
-  const { myNodeNum } = useMyNode();
-  const displayUnits = useDisplayUnits(myNodeNum);
+  const displayUnits = useDisplayUnits();
   const {
     form,
     isReady,

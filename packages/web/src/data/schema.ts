@@ -859,3 +859,25 @@ export const workingHashes = sqliteTable(
 
 export type WorkingHash = typeof workingHashes.$inferSelect;
 export type NewWorkingHash = typeof workingHashes.$inferInsert;
+
+/**
+ * Notification sounds - user-uploaded audio files for notification slots
+ * Stored as base64-encoded audio data
+ */
+export const notificationSounds = sqliteTable("notification_sounds", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  slot: text("slot").notNull().unique(),
+  name: text("name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  data: text("data").notNull(),
+  size: integer("size").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+});
+
+export type NotificationSound = typeof notificationSounds.$inferSelect;
+export type NewNotificationSound = typeof notificationSounds.$inferInsert;

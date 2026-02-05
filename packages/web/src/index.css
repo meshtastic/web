@@ -58,6 +58,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-accent-hover: var(--accent-hover);
 }
 
 /* Blue accent theme with improved contrast */
@@ -100,6 +101,7 @@
   --sidebar-accent-foreground: oklch(0.2 0 0);
   --sidebar-border: oklch(0.88 0 0);
   --sidebar-ring: oklch(0.50 0.15 245);
+  --accent-hover: oklch(0.93 0.02 245);
 }
 
 .dark {
@@ -135,11 +137,46 @@
   --sidebar-accent-foreground: oklch(0.94 0 0);
   --sidebar-border: oklch(0.30 0 0);
   --sidebar-ring: oklch(0.80 0.10 240);
+  --accent-hover: oklch(0.45 0.04 245);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.7 0 0 / 0.5) transparent;
+  }
+
+  .dark * {
+    scrollbar-color: oklch(0.4 0 0 / 0.5) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: oklch(0.7 0 0 / 0.5);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.6 0 0 / 0.7);
+  }
+
+  .dark *::-webkit-scrollbar-thumb {
+    background-color: oklch(0.4 0 0 / 0.5);
+  }
+
+  .dark *::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.5 0 0 / 0.7);
   }
 
   html {
@@ -151,6 +188,17 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 

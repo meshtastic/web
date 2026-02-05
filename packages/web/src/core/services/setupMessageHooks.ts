@@ -1,7 +1,12 @@
 import { nodeRepo } from "@data/repositories";
 import { adminCommands } from "./adminCommands";
 import logger from "./logger";
-import { registerSendHook, type OutgoingMessage } from "./messageHooks";
+import {
+  registerReceiveHook,
+  registerSendHook,
+  type OutgoingMessage,
+} from "./messageHooks";
+import { playNotificationSound } from "./notificationSound";
 
 /**
  * Setup Message Hooks
@@ -63,7 +68,12 @@ async function autoFavoriteOnDM(
 // Receive Hooks
 // ============================================================================
 
-// Future receive hooks can be added here
+/**
+ * Play the message notification sound when a new message is received
+ */
+async function playMessageSound(): Promise<void> {
+  await playNotificationSound("message");
+}
 
 // ============================================================================
 // ACK Hooks
@@ -91,7 +101,7 @@ export function setupMessageHooks(): void {
   registerSendHook(autoFavoriteOnDM);
 
   // Register receive hooks
-  // (none yet)
+  registerReceiveHook(playMessageSound);
 
   // Register ACK hooks
   // (none yet)

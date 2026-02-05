@@ -9,7 +9,18 @@ import type { Message, NewMessage } from "@data/schema";
 import type { Types } from "@meshtastic/core";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@shared/components/ui/button";
+import {
+  EmojiPicker,
+  EmojiPickerContent,
+  EmojiPickerFooter,
+  EmojiPickerSearch,
+} from "@shared/components/ui/emoji-picker";
 import { Input } from "@shared/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@shared/components/ui/popover";
 import {
   Tooltip,
   TooltipContent,
@@ -18,8 +29,9 @@ import {
 } from "@shared/components/ui/tooltip";
 import { useMyNode } from "@shared/hooks";
 import { useDeviceCommands } from "@shared/hooks/useDeviceCommands";
-import { ArrowUp, X } from "lucide-react";
-import { useMemo } from "react";
+import type { Emoji } from "frimousse";
+import { ArrowUp, Smile, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Contact } from "../pages/MessagesPage.tsx";
 
@@ -39,6 +51,8 @@ export const MessageInput = ({
   const { t } = useTranslation("messages");
   const { myNodeNum } = useMyNode();
   const commands = useDeviceCommands();
+
+  const [emojiOpen, setEmojiOpen] = useState(false);
 
   const { draft, setDraft, clearDraft } = useMessageDraft(
     myNodeNum,
@@ -62,7 +76,7 @@ export const MessageInput = ({
     }
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (textOverride?: string) => {
     if (!selectedContact || !commands.isConnected() || !myNodeNum) {
       logger.warn(
         `[MessageInput] Cannot send: selectedContact=${!!selectedContact}, isConnected=${commands.isConnected()}, myNodeNum=${myNodeNum}`,
@@ -70,7 +84,7 @@ export const MessageInput = ({
       return;
     }
 
-    const trimmedMessage = draft.trim();
+    const trimmedMessage = textOverride ?? draft.trim();
 
     if (!trimmedMessage) {
       return;
@@ -86,7 +100,9 @@ export const MessageInput = ({
       ? 0
       : (selectedContact.id as Types.ChannelNumber);
 
-    await clearDraft();
+    if (!textOverride) {
+      await clearDraft();
+    }
     const tempMessageId = Math.floor(Date.now() / 1000); //
     logger.info(
       `[MessageInput] Saving message with ownerNodeNum=${myNodeNum}, channelId=${channelValue}, type=${isDirect ? "direct" : "channel"}`,
@@ -223,6 +239,36 @@ export const MessageInput = ({
             {messageBytes}/{MAX_MESSAGE_BYTES}
           </span>
         </div>
+        <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+            >
+              <Smile className="h-5 w-5" />
+              <span className="sr-only">
+                {t("input.emojiButton", "Send emoji")}
+              </span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-fit p-0" side="top" sideOffset={8}>
+            <EmojiPicker
+              className="h-80"
+              onEmojiSelect={(emoji: Emoji) => {
+                setEmojiOpen(false);
+                void sendMessage(emoji.emoji);
+              }}
+            >
+              <EmojiPickerSearch
+                placeholder={t("emojiPicker.search", "Search emoji...")}
+              />
+              <EmojiPickerContent />
+              <EmojiPickerFooter />
+            </EmojiPicker>
+          </PopoverContent>
+        </Popover>
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>

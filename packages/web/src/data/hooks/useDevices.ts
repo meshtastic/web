@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useReactiveQuery } from "sqlocal/react";
 import { deviceRepo } from "../repositories/index.ts";
 import type { Device } from "../schema.ts";
@@ -18,4 +18,18 @@ export function useDevices() {
     devices: data ?? [],
     isLoading: status === "pending" && !data,
   };
+}
+
+/**
+ * Hook to compute approximate storage bytes per device.
+ * Fetches once on mount (not reactive — storage changes infrequently).
+ */
+export function useDeviceStorage() {
+  const [storage, setStorage] = useState<Map<number, number>>(new Map());
+
+  useEffect(() => {
+    void deviceRepo.getStoragePerDevice().then(setStorage);
+  }, []);
+
+  return storage;
 }

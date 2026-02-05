@@ -8,7 +8,7 @@ import {
 import { useChannelForm } from "@features/settings/hooks";
 import { Protobuf } from "@meshtastic/core";
 import { PkiRegenerateDialog } from "@shared/components/Dialog/PkiRegenerateDialog";
-import { useMyNode, useRemoteAdminAuth } from "@shared/hooks";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -17,8 +17,7 @@ export interface SettingsPanelProps {
 }
 
 export const Channel = ({ channel }: SettingsPanelProps) => {
-  const { myNodeNum } = useMyNode();
-  const displayUnits = useDisplayUnits(myNodeNum);
+  const displayUnits = useDisplayUnits();
   const isMetric =
     displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.METRIC;
   const { t } = useTranslation(["channels", "ui", "dialog"]);

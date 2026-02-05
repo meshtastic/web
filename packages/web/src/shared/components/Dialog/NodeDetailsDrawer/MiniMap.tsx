@@ -1,7 +1,6 @@
 import { useDisplayUnits } from "@data/hooks";
 import { BaseMap } from "@features/map/components/Map";
 import { Protobuf } from "@meshtastic/core";
-import { useMyNode } from "@shared/hooks";
 import { cn } from "@shared/utils/cn";
 import { useMemo } from "react";
 import { Marker } from "react-map-gl/maplibre";
@@ -21,8 +20,7 @@ export function MiniMap({
   altitude,
   className,
 }: MiniMapProps) {
-  const { myNodeNum } = useMyNode();
-  const displayUnits = useDisplayUnits(myNodeNum);
+  const displayUnits = useDisplayUnits();
 
   const initialViewState = useMemo(
     () => ({

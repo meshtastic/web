@@ -59,10 +59,8 @@ export type Language =
   | "tr-TR"
   | "uk-UA"
   | "zh-CN";
-export type TimeFormat = "12h" | "24h";
-export type DistanceUnits = "imperial" | "metric";
-export type CoordinateFormat = "dd" | "dms" | "utm";
 export type MapStyle = "dark" | "light" | "satellite" | "terrain" | "streets";
+export type DateFormat = "none" | "short" | "long";
 
 export interface RasterSource {
   enabled: boolean;
@@ -90,16 +88,10 @@ export const DEFAULT_PREFERENCES = {
   compactMode: false,
   showNodeAvatars: true,
   language: "en" as Language,
-  timeFormat: "12h" as TimeFormat,
-  distanceUnits: "imperial" as DistanceUnits,
-  coordinateFormat: "dd" as CoordinateFormat,
-  mapStyle: "dark" as MapStyle,
-  showNodeLabels: true,
-  showConnectionLines: true,
-  autoCenterOnPosition: false,
-  masterVolume: 75,
+  dateFormat: "short" as DateFormat,
   messageSoundEnabled: true,
   alertSoundEnabled: true,
+  notificationVolume: 100,
   packetBatchSize: 25,
   nodesTableColumnVisibility: {
     encryption: true,

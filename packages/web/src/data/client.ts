@@ -4,12 +4,14 @@ import logger from "../core/services/logger.ts";
 import initialMigration from "./migrations/0000_initial_migration.sql?raw";
 import configHashesMigration from "./migrations/0001_config_hashes.sql?raw";
 import workingHashesMigration from "./migrations/0002_working_hashes.sql?raw";
+import notificationSoundsMigration from "./migrations/0003_notification_sounds.sql?raw";
 import * as schema from "./schema.ts";
 
 const migrations = [
   { id: "0000_initial_migration", sql: initialMigration },
   { id: "0001_config_hashes", sql: configHashesMigration },
   { id: "0002_working_hashes", sql: workingHashesMigration },
+  { id: "0003_notification_sounds", sql: notificationSoundsMigration },
 ];
 
 class DatabaseClient {
@@ -168,6 +170,23 @@ class DatabaseClient {
    */
   get sql() {
     return this.client.sql;
+  }
+
+  /**
+   * Download the database as a File object
+   */
+  async getDatabaseFile(): Promise<File> {
+    return this.client.getDatabaseFile();
+  }
+
+  /**
+   * Delete the database file and reinitialize
+   */
+  async deleteDatabaseFile(): Promise<void> {
+    await this.client.deleteDatabaseFile(async () => {
+      await this.runMigrations();
+    });
+    logger.debug("[DB] Database file deleted and reinitialized");
   }
 
   /**

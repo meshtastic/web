@@ -170,20 +170,18 @@ export default function SettingsPage() {
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
           {configSections.map((section) => (
-            <button
+            <Button
               key={section.key}
-              type="button"
+              variant="ghost"
               onClick={() => handleSectionChange(section.key)}
               className={cn(
-                "flex items-center gap-3 rounded-lg p-3 text-left transition-colors w-full",
-                activeSection === section.key
-                  ? "bg-sidebar-accent"
-                  : "hover:bg-sidebar-accent/50",
+                "flex items-center gap-3 rounded-lg p-3 text-left w-full h-auto justify-start",
+                activeSection === section.key && "bg-sidebar-accent",
               )}
             >
               <section.icon className="h-4 w-4" />
               <span className="text-sm md:text-base">{section.label}</span>
-            </button>
+            </Button>
           ))}
         </div>
       </ScrollArea>

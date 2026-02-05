@@ -1,6 +1,12 @@
 import { useTheme } from "@app/shared/components/ui/useTheme";
+import {
+  invalidateCache,
+  playNotificationSound,
+  type NotificationSlot,
+} from "@core/services/notificationSound";
 import { usePreference } from "@data/hooks";
-import { DevicesPanel } from "../components/panels/DevicesPanel";
+import { notificationSoundRepo } from "@data/repositories";
+import type { NotificationSound } from "@data/schema";
 import { Button } from "@shared/components/ui/button";
 import {
   Card,
@@ -21,29 +27,162 @@ import {
 import { Separator } from "@shared/components/ui/separator";
 import { Slider } from "@shared/components/ui/slider";
 import { Switch } from "@shared/components/ui/switch";
+import { toast } from "@shared/hooks/useToast";
+import { DEFAULT_PREFERENCES, type DateFormat } from "@state/ui";
 import {
-  type CoordinateFormat,
-  DEFAULT_PREFERENCES,
-  type DistanceUnits,
-  type MapStyle,
-  type TimeFormat,
-} from "@state/ui";
-import {
-  Database,
   Globe,
-  MapPin,
   Monitor,
   Moon,
   Palette,
+  Play,
   Sun,
+  Trash2,
+  Upload,
   Volume2,
 } from "lucide-react";
-import { Activity, useCallback } from "react";
+
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const PACKET_BATCH_SIZE_MIN = 10;
-const PACKET_BATCH_SIZE_MAX = 100;
-const PACKET_BATCH_SIZE_STEP = 5;
+const MAX_SOUND_SIZE = 512 * 1024; // 512 KB
+
+interface NotificationSoundSlotProps {
+  slot: NotificationSlot;
+  enabled: boolean;
+}
+
+function NotificationSoundSlot({ slot, enabled }: NotificationSoundSlotProps) {
+  const { t } = useTranslation("ui");
+  const [sound, setSound] = useState<NotificationSound | undefined>();
+  const [loading, setLoading] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const loadSound = useCallback(async () => {
+    const result = await notificationSoundRepo.getBySlot(slot);
+    setSound(result);
+    setLoading(false);
+  }, [slot]);
+
+  useEffect(() => {
+    void loadSound();
+  }, [loadSound]);
+
+  const handleUpload = useCallback(
+    async (file: File) => {
+      if (file.type !== "audio/mpeg") {
+        toast({
+          title: t("preferences.audio.invalidFormat"),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (file.size > MAX_SOUND_SIZE) {
+        toast({
+          title: t("preferences.audio.fileTooLarge"),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i] ?? 0);
+      }
+      const base64 = btoa(binary);
+
+      await notificationSoundRepo.upsert(
+        slot,
+        file.name,
+        file.type,
+        base64,
+        file.size,
+      );
+      invalidateCache(slot);
+      await loadSound();
+    },
+    [slot, loadSound, t],
+  );
+
+  const handleRemove = useCallback(async () => {
+    await notificationSoundRepo.deleteBySlot(slot);
+    invalidateCache(slot);
+    setSound(undefined);
+  }, [slot]);
+
+  const handlePreview = useCallback(() => {
+    void playNotificationSound(slot);
+  }, [slot]);
+
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        handleUpload(file);
+      }
+      // Reset input so the same file can be re-selected
+      e.target.value = "";
+    },
+    [handleUpload],
+  );
+
+  if (loading) {
+    return null;
+  }
+
+  return (
+    <div className="flex items-center gap-2 ml-0 pl-0">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="audio/mpeg"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+      {sound ? (
+        <>
+          <span className="text-xs text-muted-foreground truncate max-w-37.5">
+            {sound.name}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handlePreview}
+            disabled={!enabled}
+            className="h-7 px-2"
+          >
+            <Play className="h-3.5 w-3.5" />
+            <span className="sr-only">{t("preferences.audio.preview")}</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void handleRemove()}
+            className="h-7 px-2 text-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            <span className="sr-only">{t("preferences.audio.remove")}</span>
+          </Button>
+        </>
+      ) : (
+        <span className="text-xs text-muted-foreground">
+          {t("preferences.audio.noSound")}
+        </span>
+      )}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => fileInputRef.current?.click()}
+        className="h-7 px-2"
+      >
+        <Upload className="h-3.5 w-3.5 mr-1" />
+        {t("preferences.audio.upload")}
+      </Button>
+    </div>
+  );
+}
 
 interface AppPreferencesConfigProps {
   searchQuery?: string;
@@ -56,133 +195,66 @@ export const AppPreferencesConfig = ({
   const { theme: themeFromProvider, setTheme: setThemeInProvider } = useTheme();
 
   // Preferences with persistence
-  const [compactMode, setCompactMode] = usePreference(
-    "compactMode",
-    DEFAULT_PREFERENCES.compactMode,
-  );
-  const [showNodeAvatars, setShowNodeAvatars] = usePreference(
-    "showNodeAvatars",
-    DEFAULT_PREFERENCES.showNodeAvatars,
-  );
+  const notify = { notify: true } as const;
   const [language, setLanguage] = usePreference(
     "language",
     DEFAULT_PREFERENCES.language,
-  );
-  const [timeFormat, setTimeFormat] = usePreference<TimeFormat>(
-    "timeFormat",
-    DEFAULT_PREFERENCES.timeFormat,
-  );
-  const [distanceUnits, setDistanceUnits] = usePreference<DistanceUnits>(
-    "distanceUnits",
-    DEFAULT_PREFERENCES.distanceUnits,
-  );
-  const [coordinateFormat, setCoordinateFormat] =
-    usePreference<CoordinateFormat>(
-      "coordinateFormat",
-      DEFAULT_PREFERENCES.coordinateFormat,
-    );
-  const [mapStyle, setMapStyle] = usePreference<MapStyle>(
-    "mapStyle",
-    DEFAULT_PREFERENCES.mapStyle,
-  );
-  const [showNodeLabels, setShowNodeLabels] = usePreference(
-    "showNodeLabels",
-    DEFAULT_PREFERENCES.showNodeLabels,
-  );
-  const [showConnectionLines, setShowConnectionLines] = usePreference(
-    "showConnectionLines",
-    DEFAULT_PREFERENCES.showConnectionLines,
-  );
-  const [autoCenterOnPosition, setAutoCenterOnPosition] = usePreference(
-    "autoCenterOnPosition",
-    DEFAULT_PREFERENCES.autoCenterOnPosition,
-  );
-  const [masterVolume, setMasterVolume] = usePreference(
-    "masterVolume",
-    DEFAULT_PREFERENCES.masterVolume,
+    notify,
   );
   const [messageSoundEnabled, setMessageSoundEnabled] = usePreference(
     "messageSoundEnabled",
     DEFAULT_PREFERENCES.messageSoundEnabled,
+    notify,
   );
   const [alertSoundEnabled, setAlertSoundEnabled] = usePreference(
     "alertSoundEnabled",
     DEFAULT_PREFERENCES.alertSoundEnabled,
+    notify,
   );
-  const [packetBatchSize, setPacketBatchSize] = usePreference(
-    "packetBatchSize",
-    DEFAULT_PREFERENCES.packetBatchSize,
+  const [notificationVolume, setNotificationVolume] = usePreference(
+    "notificationVolume",
+    DEFAULT_PREFERENCES.notificationVolume,
+    notify,
   );
-
+  const [dateFormat, setDateFormat] = usePreference<DateFormat>(
+    "dateFormat",
+    DEFAULT_PREFERENCES.dateFormat,
+    notify,
+  );
   const resetToDefaults = useCallback(async () => {
     await Promise.all([
-      setCompactMode(DEFAULT_PREFERENCES.compactMode),
-      setShowNodeAvatars(DEFAULT_PREFERENCES.showNodeAvatars),
       setLanguage(DEFAULT_PREFERENCES.language),
-      setTimeFormat(DEFAULT_PREFERENCES.timeFormat),
-      setDistanceUnits(DEFAULT_PREFERENCES.distanceUnits),
-      setCoordinateFormat(DEFAULT_PREFERENCES.coordinateFormat),
-      setMapStyle(DEFAULT_PREFERENCES.mapStyle),
-      setShowNodeLabels(DEFAULT_PREFERENCES.showNodeLabels),
-      setShowConnectionLines(DEFAULT_PREFERENCES.showConnectionLines),
-      setAutoCenterOnPosition(DEFAULT_PREFERENCES.autoCenterOnPosition),
-      setMasterVolume(DEFAULT_PREFERENCES.masterVolume),
+      setDateFormat(DEFAULT_PREFERENCES.dateFormat),
       setMessageSoundEnabled(DEFAULT_PREFERENCES.messageSoundEnabled),
       setAlertSoundEnabled(DEFAULT_PREFERENCES.alertSoundEnabled),
-      setPacketBatchSize(DEFAULT_PREFERENCES.packetBatchSize),
+      setNotificationVolume(DEFAULT_PREFERENCES.notificationVolume),
     ]);
   }, [
-    setCompactMode,
-    setShowNodeAvatars,
     setLanguage,
-    setTimeFormat,
-    setDistanceUnits,
-    setCoordinateFormat,
-    setMapStyle,
-    setShowNodeLabels,
-    setShowConnectionLines,
-    setAutoCenterOnPosition,
-    setMasterVolume,
+    setDateFormat,
     setMessageSoundEnabled,
     setAlertSoundEnabled,
-    setPacketBatchSize,
+    setNotificationVolume,
   ]);
 
   const query = searchQuery.toLowerCase().trim();
 
   const appearanceVisible =
     !query ||
-    "appearance theme compact mode avatars light dark".includes(query) ||
+    "appearance theme light dark".includes(query) ||
     t("preferences.appearance.title").toLowerCase().includes(query);
 
   const localizationVisible =
     !query ||
-    "localization language time format distance units coordinates".includes(
-      query,
-    ) ||
+    "localization language".includes(query) ||
     t("preferences.localization.title").toLowerCase().includes(query);
-
-  const mapVisible =
-    !query ||
-    "map style labels connection lines auto center".includes(query) ||
-    t("preferences.map.title").toLowerCase().includes(query);
 
   const audioVisible =
     !query ||
-    "audio sound volume message alert".includes(query) ||
+    "audio sound message alert notification".includes(query) ||
     t("preferences.audio.title").toLowerCase().includes(query);
 
-  const performanceVisible =
-    !query ||
-    "performance packet batch database".includes(query) ||
-    t("preferences.performance.title").toLowerCase().includes(query);
-
-  const isVisible =
-    appearanceVisible ||
-    localizationVisible ||
-    mapVisible ||
-    audioVisible ||
-    performanceVisible;
+  const isVisible = appearanceVisible || localizationVisible || audioVisible;
 
   const themeOptions = [
     { value: "light", label: t("preferences.appearance.light") },
@@ -202,7 +274,7 @@ export const AppPreferencesConfig = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Activity mode={appearanceVisible ? "visible" : "hidden"}>
         <Card>
           <CardHeader>
@@ -250,33 +322,6 @@ export const AppPreferencesConfig = ({
                 ))}
               </RadioGroup>
             </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>{t("preferences.appearance.compactMode.label")}</Label>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {t("preferences.appearance.compactMode.description")}
-                </p>
-              </div>
-              <Switch
-                checked={compactMode}
-                onCheckedChange={(checked) => void setCompactMode(checked)}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>
-                  {t("preferences.appearance.showNodeAvatars.label")}
-                </Label>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {t("preferences.appearance.showNodeAvatars.description")}
-                </p>
-              </div>
-              <Switch
-                checked={showNodeAvatars}
-                onCheckedChange={(checked) => void setShowNodeAvatars(checked)}
-              />
-            </div>
           </CardContent>
         </Card>
       </Activity>
@@ -293,187 +338,48 @@ export const AppPreferencesConfig = ({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label>{t("preferences.localization.language")}</Label>
-                <Select
-                  value={language}
-                  onValueChange={(value) => void setLanguage(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
-                    <SelectItem value="de">Deutsch</SelectItem>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="pt">Português</SelectItem>
-                    <SelectItem value="zh">中文</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>{t("preferences.localization.timeFormat")}</Label>
-                <Select
-                  value={timeFormat}
-                  onValueChange={(value) =>
-                    void setTimeFormat(value as "12h" | "24h")
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="12h">
-                      {t("preferences.localization.12hour")}
-                    </SelectItem>
-                    <SelectItem value="24h">
-                      {t("preferences.localization.24hour")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label>{t("preferences.localization.distanceUnits")}</Label>
-                <Select
-                  value={distanceUnits}
-                  onValueChange={(value) =>
-                    void setDistanceUnits(value as "imperial" | "metric")
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="imperial">
-                      {t("preferences.localization.imperial")}
-                    </SelectItem>
-                    <SelectItem value="metric">
-                      {t("preferences.localization.metric")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>{t("preferences.localization.coordinateFormat")}</Label>
-                <Select
-                  value={coordinateFormat}
-                  onValueChange={(value) =>
-                    void setCoordinateFormat(value as "dd" | "dms" | "utm")
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dd">
-                      {t("preferences.localization.decimalDegrees")}
-                    </SelectItem>
-                    <SelectItem value="dms">
-                      {t("preferences.localization.dms")}
-                    </SelectItem>
-                    <SelectItem value="utm">
-                      {t("preferences.localization.utm")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Activity>
-
-      <Activity mode={mapVisible ? "visible" : "hidden"}>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              {t("preferences.map.title")}
-            </CardTitle>
-            <CardDescription>
-              {t("preferences.map.description")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>{t("preferences.map.mapStyle")}</Label>
+              <Label>{t("preferences.localization.language")}</Label>
               <Select
-                value={mapStyle}
+                value={language}
+                onValueChange={(value) => void setLanguage(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="de">Deutsch</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="pt">Português</SelectItem>
+                  <SelectItem value="zh">中文</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>{t("preferences.localization.dateFormat")}</Label>
+              <Select
+                value={dateFormat}
                 onValueChange={(value) =>
-                  void setMapStyle(
-                    value as
-                      | "dark"
-                      | "light"
-                      | "satellite"
-                      | "terrain"
-                      | "streets",
-                  )
+                  void setDateFormat(value as DateFormat)
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dark">
-                    {t("preferences.map.dark")}
+                  <SelectItem value="none">
+                    {t("preferences.localization.dateFormat.none")}
                   </SelectItem>
-                  <SelectItem value="light">
-                    {t("preferences.map.light")}
+                  <SelectItem value="short">
+                    {t("preferences.localization.dateFormat.short")}
                   </SelectItem>
-                  <SelectItem value="satellite">
-                    {t("preferences.map.satellite")}
-                  </SelectItem>
-                  <SelectItem value="terrain">
-                    {t("preferences.map.terrain")}
-                  </SelectItem>
-                  <SelectItem value="streets">
-                    {t("preferences.map.streets")}
+                  <SelectItem value="long">
+                    {t("preferences.localization.dateFormat.long")}
                   </SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>{t("preferences.map.showNodeLabels.label")}</Label>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {t("preferences.map.showNodeLabels.description")}
-                </p>
-              </div>
-              <Switch
-                checked={showNodeLabels}
-                onCheckedChange={(checked) => void setShowNodeLabels(checked)}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>{t("preferences.map.showConnectionLines.label")}</Label>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {t("preferences.map.showConnectionLines.description")}
-                </p>
-              </div>
-              <Switch
-                checked={showConnectionLines}
-                onCheckedChange={(checked) =>
-                  void setShowConnectionLines(checked)
-                }
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>{t("preferences.map.autoCenterOnPosition.label")}</Label>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {t("preferences.map.autoCenterOnPosition.description")}
-                </p>
-              </div>
-              <Switch
-                checked={autoCenterOnPosition}
-                onCheckedChange={(checked) =>
-                  void setAutoCenterOnPosition(checked)
-                }
-              />
             </div>
           </CardContent>
         </Card>
@@ -491,102 +397,76 @@ export const AppPreferencesConfig = ({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label>{t("preferences.audio.masterVolume")}</Label>
-                <span className="text-xs md:text-sm text-muted-foreground">
-                  {masterVolume}%
-                </span>
-              </div>
-              <Slider
-                value={[masterVolume]}
-                onValueChange={(value) => {
-                  const vol = value[0];
-                  if (vol !== undefined) {
-                    void setMasterVolume(vol);
+                <div className="space-y-0.5">
+                  <Label>{t("preferences.audio.messageSound.label")}</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
+                    {t("preferences.audio.messageSound.description")}
+                  </p>
+                </div>
+                <Switch
+                  checked={messageSoundEnabled}
+                  onCheckedChange={(checked) =>
+                    void setMessageSoundEnabled(checked)
                   }
-                }}
-                max={100}
-                step={1}
+                />
+              </div>
+              <NotificationSoundSlot
+                slot="message"
+                enabled={messageSoundEnabled}
               />
             </div>
             <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>{t("preferences.audio.messageSound.label")}</Label>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {t("preferences.audio.messageSound.description")}
-                </p>
-              </div>
-              <Switch
-                checked={messageSoundEnabled}
-                onCheckedChange={(checked) =>
-                  void setMessageSoundEnabled(checked)
-                }
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>{t("preferences.audio.alertSound.label")}</Label>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {t("preferences.audio.alertSound.description")}
-                </p>
-              </div>
-              <Switch
-                checked={alertSoundEnabled}
-                onCheckedChange={(checked) =>
-                  void setAlertSoundEnabled(checked)
-                }
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </Activity>
-
-      <Activity mode={performanceVisible ? "visible" : "hidden"}>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="h-5 w-5" />
-              {t("preferences.performance.title")}
-            </CardTitle>
-            <CardDescription>
-              {t("preferences.performance.description")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>
-                    {t("preferences.performance.packetBatchSize.label")}
-                  </Label>
+                  <Label>{t("preferences.audio.alertSound.label")}</Label>
                   <p className="text-xs md:text-sm text-muted-foreground">
-                    {t("preferences.performance.packetBatchSize.description")}
+                    {t("preferences.audio.alertSound.description")}
+                  </p>
+                </div>
+                <Switch
+                  checked={alertSoundEnabled}
+                  onCheckedChange={(checked) =>
+                    void setAlertSoundEnabled(checked)
+                  }
+                />
+              </div>
+              <NotificationSoundSlot slot="alert" enabled={alertSoundEnabled} />
+            </div>
+            <Separator />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>{t("preferences.audio.volume.label", "Volume")}</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
+                    {t(
+                      "preferences.audio.volume.description",
+                      "Notification sound volume",
+                    )}
                   </p>
                 </div>
                 <span className="text-xs md:text-sm text-muted-foreground tabular-nums">
-                  {packetBatchSize}
+                  {notificationVolume}%
                 </span>
               </div>
               <Slider
-                value={[packetBatchSize]}
+                value={[notificationVolume]}
                 onValueChange={(value) => {
-                  const size = value[0];
-                  if (size !== undefined) {
-                    void setPacketBatchSize(size);
+                  const vol = value[0];
+                  if (vol !== undefined) {
+                    void setNotificationVolume(vol);
                   }
                 }}
-                min={PACKET_BATCH_SIZE_MIN}
-                max={PACKET_BATCH_SIZE_MAX}
-                step={PACKET_BATCH_SIZE_STEP}
+                min={0}
+                max={100}
+                step={5}
               />
             </div>
           </CardContent>
         </Card>
       </Activity>
-
-      <DevicesPanel searchQuery={searchQuery} />
 
       <div className="flex justify-end">
         <Button variant="outline" onClick={resetToDefaults}>

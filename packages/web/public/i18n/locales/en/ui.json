@@ -226,6 +226,10 @@
       "title": "Localization",
       "description": "Language and regional settings",
       "language": "Language",
+      "dateFormat": "Date Format",
+      "dateFormat.none": "Time only",
+      "dateFormat.short": "Short date",
+      "dateFormat.long": "Long date",
       "timeFormat": "Time Format",
       "12hour": "12 Hour (AM/PM)",
       "24hour": "24 Hour",
@@ -261,8 +265,7 @@
     },
     "audio": {
       "title": "Audio",
-      "description": "Sound and audio settings",
-      "masterVolume": "Master Volume",
+      "description": "Sound and audio settings. MP3 uploads are limited to 512 KB.",
       "messageSound": {
         "label": "Message Sound",
         "description": "Play sound for incoming messages"
@@ -270,7 +273,14 @@
       "alertSound": {
         "label": "Alert Sound",
         "description": "Play sound for network alerts"
-      }
+      },
+      "upload": "Upload",
+      "preview": "Preview",
+      "remove": "Remove",
+      "currentSound": "Current: {{name}}",
+      "noSound": "No sound uploaded",
+      "fileTooLarge": "File exceeds 512 KB limit",
+      "invalidFormat": "Only MP3 files are supported"
     },
     "performance": {
       "title": "Performance",
@@ -285,7 +295,11 @@
       "description": "Manage saved devices and their data",
       "noDevices": "No devices found",
       "lastSeen": "Last seen",
-      "remove": "Remove device"
+      "remove": "Remove device",
+      "database": "Database",
+      "databaseDescription": "Download a backup or delete all stored data",
+      "downloadDatabase": "Download",
+      "deleteDatabase": "Delete"
     }
   }
 }

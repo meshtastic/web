@@ -293,17 +293,7 @@ function deviceFactory(
               break;
             }
             case "display": {
-              const displayConfig = config.payloadVariant.value;
-              device.config.display = displayConfig;
-              // Persist display units to preferences for easy access across UI
-              import("@data/repositories/index.ts").then(
-                ({ preferencesRepo }) => {
-                  preferencesRepo.set(
-                    `device:${id}:displayUnits`,
-                    displayConfig.units,
-                  );
-                },
-              );
+              device.config.display = config.payloadVariant.value;
               break;
             }
             case "lora": {

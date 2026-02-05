@@ -10,7 +10,7 @@ const buttonVariants = cva(
         default:
           "bg-slate-900 text-white dark:bg-slate-50 hover:dark:bg-slate-200 dark:text-slate-900 hover:bg-slate-500",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 dark:hover:bg-white",
         destructive:
           "bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-600",
         success:
@@ -20,7 +20,7 @@ const buttonVariants = cva(
         subtle:
           "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-500 dark:text-white dark:hover:bg-slate-400",
         ghost:
-          "bg-transparent hover:bg-accent/20 dark:text-slate-100 dark:hover:text-slate-100 data-[state=open]:bg-transparent dark:data-[state=open]:bg-transparent",
+          "bg-transparent hover:bg-accent-hover dark:text-slate-100 dark:hover:text-slate-100 data-[state=open]:bg-transparent dark:data-[state=open]:bg-transparent",
         link: "bg-transparent underline-offset-4 hover:underline text-slate-900 dark:text-slate-100 hover:bg-transparent dark:hover:bg-transparent",
       },
       size: {
@@ -40,7 +40,8 @@ const buttonVariants = cva(
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   icon?: React.ReactNode;
   iconAlignment?: "left" | "right";

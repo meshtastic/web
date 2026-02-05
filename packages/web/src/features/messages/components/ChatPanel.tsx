@@ -96,7 +96,7 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
           ? (contact.id as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7)
           : undefined;
 
-      ReactionService.toggleReaction(
+      void ReactionService.toggleReaction(
         myNodeNum,
         message.messageId,
         emoji,

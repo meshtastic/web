@@ -60,7 +60,7 @@ export class TransportMock implements Types.Transport {
   private scenario: MockScenario;
   private options: Required<MockTransportOptions>;
   private packetId = 1;
-  private activityInterval?: ReturnType<typeof setInterval>;
+  private activityInterval?: ReturnType<typeof setTimeout>;
   private isDisconnected = false;
 
   /** Device state - stores config changes made by the client */
@@ -182,7 +182,7 @@ export class TransportMock implements Types.Transport {
 
   private cleanup(): void {
     if (this.activityInterval) {
-      clearInterval(this.activityInterval);
+      clearTimeout(this.activityInterval);
       this.activityInterval = undefined;
     }
   }
@@ -760,19 +760,29 @@ export class TransportMock implements Types.Transport {
   }
 
   /**
+   * Schedule the next random activity tick with a random 1–10 minute delay
+   */
+  private scheduleNextActivity(): void {
+    const minMs = 60_000;
+    const maxMs = 600_000;
+    const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+
+    this.activityInterval = setTimeout(() => {
+      this.simulateRandomActivity();
+      this.scheduleNextActivity();
+    }, delay);
+
+    this.log(`Next activity in ${Math.round(delay / 1000)}s`);
+  }
+
+  /**
    * Start simulating mesh activity (messages, positions, telemetry)
    */
   private startActivitySimulation(): void {
-    if (!this.scenario.activityIntervalMs) return;
     if (this.scenario.nodes.length === 0) return;
 
-    this.log(
-      `Starting activity simulation every ${this.scenario.activityIntervalMs}ms`,
-    );
-
-    this.activityInterval = setInterval(() => {
-      this.simulateRandomActivity();
-    }, this.scenario.activityIntervalMs);
+    this.log("Starting activity simulation (1–10 min random intervals)");
+    this.scheduleNextActivity();
   }
 
   /**

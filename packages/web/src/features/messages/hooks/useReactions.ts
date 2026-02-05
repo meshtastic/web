@@ -2,15 +2,18 @@
  * Reaction hooks for fetching message reactions
  */
 
-import logger from "@core/services/logger";
 import { reactionRepo } from "@data/repositories";
 import type { Reaction } from "@data/schema";
-import { useMemo, useEffect } from "react";
-import { useReactiveQuery } from "sqlocal/react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 /**
  * Hook to fetch reactions for multiple messages
  * Returns a Map of messageId -> Reaction[]
+ *
+ * Uses useSyncExternalStore + useMemo instead of sqlocal's useReactiveQuery
+ * because useReactiveQuery captures the query via useState's lazy initializer,
+ * which only runs on mount. When messageIds changes (e.g. from [] to real IDs),
+ * the query is never updated, so reactions are never found.
  */
 export function useReactions(ownerNodeNum: number, messageIds: number[]) {
   // Use a stable key for the messageIds array to prevent unnecessary re-renders
@@ -22,19 +25,22 @@ export function useReactions(ownerNodeNum: number, messageIds: number[]) {
     return reactionRepo.buildReactionsForMessagesQuery(ownerNodeNum, ids);
   }, [ownerNodeNum, messageIdsKey]);
 
-  const { data, status } = useReactiveQuery<Reaction>(
-    reactionRepo.getClient(),
-    query,
+  const reactiveQuery = useMemo(
+    () => reactionRepo.getClient().reactiveQuery(query),
+    [query],
   );
 
-  // Debug logging for reactive query results (only in development)
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      logger.debug(
-        `[useReactions] Query result: status=${status}, reactions=${data.length}, messageIds=${messageIds.slice(0, 5).join(",")}${messageIds.length > 5 ? "..." : ""}`,
-      );
-    }
-  }, [data, status, messageIds]);
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      const subscription = reactiveQuery.subscribe(() => callback());
+      return () => subscription.unsubscribe();
+    },
+    [reactiveQuery],
+  );
+
+  const getSnapshot = useCallback(() => reactiveQuery.value, [reactiveQuery]);
+
+  const data = useSyncExternalStore(subscribe, getSnapshot) as Reaction[];
 
   // Group reactions by targetMessageId
   const reactionsByMessage = useMemo(() => {
@@ -52,7 +58,7 @@ export function useReactions(ownerNodeNum: number, messageIds: number[]) {
 
   return {
     reactions: reactionsByMessage,
-    isLoading: status === "pending" && data.length === 0,
+    isLoading: !data || data.length === 0,
   };
 }
 
@@ -68,14 +74,26 @@ export function useMessageReactions(
     [ownerNodeNum, targetMessageId],
   );
 
-  const { data, status } = useReactiveQuery<Reaction>(
-    reactionRepo.getClient(),
-    query,
+  const reactiveQuery = useMemo(
+    () => reactionRepo.getClient().reactiveQuery(query),
+    [query],
   );
+
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      const subscription = reactiveQuery.subscribe(() => callback());
+      return () => subscription.unsubscribe();
+    },
+    [reactiveQuery],
+  );
+
+  const getSnapshot = useCallback(() => reactiveQuery.value, [reactiveQuery]);
+
+  const data = useSyncExternalStore(subscribe, getSnapshot) as Reaction[];
 
   return {
     reactions: data ?? [],
-    isLoading: status === "pending" && data.length === 0,
+    isLoading: !data || data.length === 0,
   };
 }
 

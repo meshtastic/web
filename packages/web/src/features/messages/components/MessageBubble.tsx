@@ -1,4 +1,5 @@
 import logger from "@core/services/logger";
+import { useDateFormat, useUse12hClock } from "@data/hooks";
 import type { Message, Reaction } from "@data/schema";
 import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
 import {
@@ -73,15 +74,25 @@ export const MessageBubble = memo(function MessageBubble({
     [avatarColors.bgColor],
   );
 
-  const formattedTime = useMemo(
-    () =>
-      new Date(message.date).toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      }),
-    [message.date],
-  );
+  const use12hClock = useUse12hClock();
+  const dateFormat = useDateFormat();
+
+  const formattedDateTime = useMemo(() => {
+    const date = new Date(message.date);
+    const timeStr = date.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: use12hClock,
+    });
+
+    if (dateFormat === "none") return timeStr;
+
+    const dateStr = date.toLocaleDateString([], {
+      dateStyle: dateFormat === "short" ? "short" : "long",
+    });
+
+    return `${dateStr} ${timeStr}`;
+  }, [message.date, use12hClock, dateFormat]);
 
   const isoDate = useMemo(
     () => new Date(message.date).toISOString(),
@@ -214,7 +225,7 @@ export const MessageBubble = memo(function MessageBubble({
           )}
           {showTimestamp && (
             <time dateTime={isoDate} className="ml-auto">
-              {formattedTime}
+              {formattedDateTime}
             </time>
           )}
         </div>

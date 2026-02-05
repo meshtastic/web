@@ -51,9 +51,11 @@ export {
   invalidateDevicePreferenceCache,
   useDevicePreference,
 } from "./useDevicePreference.ts";
+export { useDateFormat } from "./useDateFormat.ts";
 export { useDisplayUnits } from "./useDisplayUnits.ts";
+export { useUse12hClock } from "./useUse12hClock.ts";
 export { useLoraConfig } from "./useLoraConfig.ts";
-export { useDevices } from "./useDevices.ts";
+export { useDevices, useDeviceStorage } from "./useDevices.ts";
 export { usePacketLogs } from "./usePacketLogs.ts";
 export type { PreferenceKey } from "./usePreferences.ts";
 export {

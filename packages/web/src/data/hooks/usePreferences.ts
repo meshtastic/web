@@ -2,9 +2,14 @@
  * Preferences hooks for managing user preferences
  */
 
+import { toast } from "@shared/hooks/useToast";
 import { useCallback, useMemo } from "react";
 import { useReactiveQuery } from "sqlocal/react";
 import { preferencesRepo } from "../repositories/index.ts";
+
+interface UsePreferenceOptions {
+  notify?: boolean;
+}
 
 /**
  * Hook to get and set a single preference value
@@ -12,6 +17,7 @@ import { preferencesRepo } from "../repositories/index.ts";
 export function usePreference<T>(
   key: string,
   defaultValue: T,
+  options?: UsePreferenceOptions,
 ): [T, (value: T) => Promise<void>] {
   const query = useMemo(() => preferencesRepo.buildPreferenceQuery(key), [key]);
 
@@ -32,8 +38,11 @@ export function usePreference<T>(
   const setValue = useCallback(
     async (newValue: T): Promise<void> => {
       await preferencesRepo.set(key, newValue);
+      if (options?.notify) {
+        toast({ title: "Saved", duration: 2000 });
+      }
     },
-    [key],
+    [key, options?.notify],
   );
 
   return [value, setValue];
@@ -80,14 +89,7 @@ export const PREFERENCE_KEYS = {
   COMPACT_MODE: "compactMode",
   SHOW_NODE_AVATARS: "showNodeAvatars",
   LANGUAGE: "language",
-  TIME_FORMAT: "timeFormat",
-  DISTANCE_UNITS: "distanceUnits",
-  COORDINATE_FORMAT: "coordinateFormat",
-  MAP_STYLE: "mapStyle",
-  SHOW_NODE_LABELS: "showNodeLabels",
-  SHOW_CONNECTION_LINES: "showConnectionLines",
-  AUTO_CENTER_ON_POSITION: "autoCenterOnPosition",
-  MASTER_VOLUME: "masterVolume",
+  DATE_FORMAT: "dateFormat",
   MESSAGE_SOUND_ENABLED: "messageSoundEnabled",
   ALERT_SOUND_ENABLED: "alertSoundEnabled",
   PACKET_BATCH_SIZE: "packetBatchSize",

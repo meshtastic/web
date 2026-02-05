@@ -75,7 +75,7 @@ const Generator = ({
       ];
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col 2xl:flex-row 2xl:items-center gap-2">
       <Input
         type={type}
         id={id}
@@ -86,7 +86,7 @@ const Generator = ({
         showCopyButton={showCopyButton}
         showPasswordToggle={showPasswordToggle}
       />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <Select
           value={devicePSKBitCount?.toString()}
           onValueChange={(e) => selectChange(e)}

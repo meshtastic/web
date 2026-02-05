@@ -19,6 +19,7 @@ export { PacketLogRepository } from "./PacketLogRepository.ts";
 export { PreferencesRepository } from "./PreferencesRepository.ts";
 export { ReactionRepository } from "./ReactionRepository.ts";
 export { TracerouteRepository } from "./TracerouteRepository.ts";
+export { NotificationSoundRepository } from "./NotificationSoundRepository.ts";
 
 // Singleton instances for convenience
 import { ChannelRepository } from "./ChannelRepository.ts";
@@ -33,6 +34,7 @@ import { PacketLogRepository } from "./PacketLogRepository.ts";
 import { PreferencesRepository } from "./PreferencesRepository.ts";
 import { ReactionRepository } from "./ReactionRepository.ts";
 import { TracerouteRepository } from "./TracerouteRepository.ts";
+import { NotificationSoundRepository } from "./NotificationSoundRepository.ts";
 
 export const channelRepo = new ChannelRepository();
 export const configCacheRepo = new ConfigCacheRepository();
@@ -46,3 +48,4 @@ export const packetLogRepo = new PacketLogRepository();
 export const preferencesRepo = new PreferencesRepository();
 export const reactionRepo = new ReactionRepository();
 export const tracerouteRepo = new TracerouteRepository();
+export const notificationSoundRepo = new NotificationSoundRepository();

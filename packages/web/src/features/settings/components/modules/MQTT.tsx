@@ -1,6 +1,6 @@
 import { useDisplayUnits } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
-import { useMyNode, useRemoteAdminAuth } from "@shared/hooks";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 import { useModuleConfigForm } from "../../hooks/useModuleConfigForm.ts";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading.tsx";
@@ -16,8 +16,7 @@ import {
 export const MQTT = () => {
   const { t } = useTranslation("moduleConfig");
   const { isAuthorized } = useRemoteAdminAuth();
-  const { myNodeNum } = useMyNode();
-  const displayUnits = useDisplayUnits(myNodeNum);
+  const displayUnits = useDisplayUnits();
 
   const { form, isReady, isDisabledByField } =
     useModuleConfigForm<MqttValidation>({
