@@ -48,6 +48,12 @@ export const NodeAvatar = ({
     lg: "h-16 w-16 text-lg",
   };
 
+  const indicatorSizeClasses = {
+    xs: "h-3 w-3",
+    sm: "h-4 w-4",
+    lg: "h-6 w-6",
+  };
+
   const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
     if (!clickable) {
       return;
@@ -77,7 +83,10 @@ export const NodeAvatar = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <StarIcon
-              className="absolute -top-0.5 -right-0.5 z-10 h-4 w-4 fill-yellow-400 text-yellow-500"
+              className={cn(
+                "absolute -top-0.5 -right-0.5 z-10 fill-yellow-400 text-yellow-500",
+                indicatorSizeClasses[size],
+              )}
               aria-hidden="true"
             />
           </TooltipTrigger>
@@ -91,7 +100,10 @@ export const NodeAvatar = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <LockKeyholeOpenIcon
-              className="absolute -bottom-0.5 -right-0.5 z-10 h-4 w-4 stroke-3 text-red-500"
+              className={cn(
+                "absolute -bottom-0.5 -right-0.5 z-10 stroke-3 text-red-500",
+                indicatorSizeClasses[size],
+              )}
               aria-hidden="true"
             />
           </TooltipTrigger>

@@ -10,7 +10,7 @@
 import type { Protobuf } from "@meshtastic/core";
 import { configCacheRepo } from "@data/repositories/index.ts";
 import { useMemo, useRef } from "react";
-import { useReactiveQuery } from "sqlocal/react";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { DeviceConfig } from "../schema.ts";
 
 // =============================================================================
@@ -76,7 +76,7 @@ export function useConfig(ownerNodeNum: number | undefined): UseConfigResult {
     return configCacheRepo.buildConfigQuery(ownerNodeNum);
   }, [ownerNodeNum]);
 
-  const { data, status, error } = useReactiveQuery<DeviceConfig>(
+  const { data, status, error } = useReactiveSQL<DeviceConfig>(
     configCacheRepo.getClient(),
     query,
   );

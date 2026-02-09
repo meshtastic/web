@@ -58,7 +58,8 @@ export const NodesLayer = ({
     (num: number, offset: PxOffset, e: { originalEvent: MouseEvent }) => {
       e.originalEvent?.stopPropagation();
       setPopupState({ type: "node", num, offset });
-      const node = filteredNodes.find((node) => node.nodeNum === num) ?? undefined;
+      const node =
+        filteredNodes.find((node) => node.nodeNum === num) ?? undefined;
       if (node && hasNodePosition(node)) {
         focusLngLat(toLngLatFromNode(node));
       }

@@ -5,6 +5,7 @@ import {
 import type { Protobuf } from "@meshtastic/core";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
+import { useUIStore } from "@state/ui/store.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@shared/utils/x25519";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
@@ -153,6 +154,23 @@ export function useSecurityForm() {
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  // Subscribe to pending field resets from activity undo
+  const pendingReset = useUIStore((s) => s.pendingFieldReset);
+
+  useEffect(() => {
+    if (
+      pendingReset?.changeType === "config" &&
+      pendingReset.variant === "security" &&
+      pendingReset.fieldPath
+    ) {
+      form.setValue(
+        pendingReset.fieldPath as Path<RawSecurity>,
+        pendingReset.value as RawSecurity[keyof RawSecurity],
+      );
+      useUIStore.getState().clearPendingReset();
+    }
+  }, [pendingReset, form]);
 
   // Generate new private/public key pair
   const regenerateKeys = useCallback(() => {

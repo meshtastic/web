@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useReactiveQuery } from "sqlocal/react";
 import { packetLogRepo } from "../repositories/index.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 export interface SignalLog {
   id: number;
@@ -25,7 +25,7 @@ export function useSignalLogs(
     [deviceId, nodeNum, limit],
   );
 
-  const { data, status } = useReactiveQuery(packetLogRepo.getClient(), query);
+  const { data, status } = useReactiveSQL(packetLogRepo.getClient(), query);
 
   const logs: SignalLog[] = useMemo(() => {
     return (data ?? []).reduce<SignalLog[]>((acc, p) => {

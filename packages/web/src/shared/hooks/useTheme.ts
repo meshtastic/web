@@ -12,7 +12,6 @@ type ActualTheme = "light" | "dark";
 
 const STORAGE_KEY = "theme";
 
-
 const systemThemeStore = {
   getSnapshot(): ActualTheme {
     return globalThis.matchMedia("(prefers-color-scheme: dark)").matches
@@ -27,7 +26,6 @@ const systemThemeStore = {
     return () => media.removeEventListener("change", handler);
   },
 };
-
 
 const themePreferenceStore = {
   getSnapshot(): Theme {
@@ -69,7 +67,6 @@ const themePreferenceStore = {
     );
   },
 };
-
 
 export function useTheme() {
   // Subscribe to system theme changes

@@ -107,6 +107,15 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
     [myNodeNum, contact],
   );
 
+  // Handler for deleting a message
+  const handleDelete = useCallback(
+    (message: Message) => {
+      if (!myNodeNum) return;
+      void messageRepo.deleteMessage(message.id, myNodeNum);
+    },
+    [myNodeNum],
+  );
+
   // Helper to resolve node numbers to names
   const resolveNodeName = useCallback(
     (nodeNum: number): string | undefined => {
@@ -223,7 +232,7 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
           </div>
         )}
 
-        <div className="flex-1 min-h-0 overflow-y-auto flex flex-col-reverse px-3 xl:px-6 xl:pb-14 lg:pb-10 styled-scrollbar">
+        <div className="flex-1 min-h-0 overflow-y-auto flex flex-col-reverse px-3 xl:px-6 xl:pb-14 lg:pb-10 styled-scrollbar isolate">
           {messageGroups.map((group) => (
             <Fragment key={group.dayKey}>
               <div className="flex flex-col-reverse gap-3">
@@ -251,6 +260,7 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
                       senderName={senderName}
                       isMine={message.fromNode === myNodeNum}
                       onReply={handleReply}
+                      onDelete={handleDelete}
                       replyToMessage={replyToMessage}
                       replyToSenderName={replyToSenderName}
                       reactions={reactionsByMessageId.get(message.messageId)}

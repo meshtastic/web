@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useReactiveQuery } from "sqlocal/react";
 import { channelRepo } from "../repositories/index.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { Channel } from "../schema.ts";
 
 /**
@@ -12,7 +12,7 @@ export function useChannels(deviceId: number) {
     [deviceId],
   );
 
-  const { data } = useReactiveQuery<Channel>(channelRepo.getClient(), query);
+  const { data } = useReactiveSQL<Channel>(channelRepo.getClient(), query);
 
   return {
     channels: data ?? [],
@@ -28,7 +28,7 @@ export function useChannel(deviceId: number, channelIndex: number) {
     [deviceId, channelIndex],
   );
 
-  const { data, status } = useReactiveQuery<Channel>(
+  const { data, status } = useReactiveSQL<Channel>(
     channelRepo.getClient(),
     query,
   );

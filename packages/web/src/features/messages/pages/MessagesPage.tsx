@@ -12,6 +12,7 @@ import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
 import { OnlineIndicator } from "@shared/components/OnlineIndicator";
 import { Badge } from "@shared/components/ui/badge";
 import { Button } from "@shared/components/ui/button";
+import { IconButton } from "@shared/components/ui/icon-button";
 import { Input } from "@shared/components/ui/input";
 import {
   ResizableHandle,
@@ -19,15 +20,10 @@ import {
   ResizablePanelGroup,
 } from "@shared/components/ui/resizable";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@shared/components/ui/tooltip";
 import { cn } from "@shared/utils/cn";
 import { type SplitMode, useUIStore } from "@state/index.ts";
 import { Link, useSearch } from "@tanstack/react-router";
-import { Columns, Hash, Rows, Search, Users, X } from "lucide-react";
+import { Columns, Hash, ListX, Rows, Search, Users, X } from "lucide-react";
 import type React from "react";
 import { Activity, useEffect, useMemo, useState } from "react";
 import { ChatPanel } from "../components/index.ts";
@@ -64,6 +60,7 @@ export default function MessagesPage() {
   const splitMode = useUIStore((state) => state.messageSplitMode);
   const openMessageTab = useUIStore((state) => state.openMessageTab);
   const closeMessageTab = useUIStore((state) => state.closeMessageTab);
+  const closeAllMessageTabs = useUIStore((state) => state.closeAllMessageTabs);
   const setSecondaryMessageTab = useUIStore(
     (state) => state.setSecondaryMessageTab,
   );
@@ -400,41 +397,34 @@ export default function MessagesPage() {
             })}
           </div>
         </ScrollArea>
-        {!isSecondaryPanel && (
+        {!isSecondaryPanel ? (
           <>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    "h-9 w-9 shrink-0",
-                    splitMode === "vertical" && "bg-accent",
-                  )}
-                  onClick={() => toggleSplitMode("vertical")}
-                >
-                  <Columns className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Split vertical</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    "h-9 w-9 shrink-0 mr-1",
-                    splitMode === "horizontal" && "bg-accent",
-                  )}
-                  onClick={() => toggleSplitMode("horizontal")}
-                >
-                  <Rows className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Split horizontal</TooltipContent>
-            </Tooltip>
+            <IconButton
+              tooltip="Close all tabs"
+              icon={<ListX className="h-4 w-4" />}
+              onClick={closeAllMessageTabs}
+              disabled={openTabs.length === 0}
+            />
+            <IconButton
+              tooltip="Split vertical"
+              icon={<Columns className="h-4 w-4" />}
+              className={cn(splitMode === "vertical" && "bg-accent")}
+              onClick={() => toggleSplitMode("vertical")}
+            />
+            <IconButton
+              tooltip="Split horizontal"
+              icon={<Rows className="h-4 w-4" />}
+              className={cn("mr-1", splitMode === "horizontal" && "bg-accent")}
+              onClick={() => toggleSplitMode("horizontal")}
+            />
           </>
+        ) : (
+          <IconButton
+            tooltip="Close split"
+            icon={<X className="h-4 w-4" />}
+            className="mr-1"
+            onClick={() => setMessageSplitMode("none")}
+          />
         )}
       </div>
     </div>

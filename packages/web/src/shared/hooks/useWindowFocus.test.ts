@@ -1,10 +1,17 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { useWindowFocus } from "./useWindowFocus.ts";
 
 describe("useWindowFocus", () => {
+  afterEach(() => {
+    // Reset document.hidden to default (not hidden)
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      get: () => false,
+    });
+  });
+
   it("should initialize with true (focused)", () => {
-    // Mock document.hidden to be false initially
     Object.defineProperty(document, "hidden", {
       configurable: true,
       get: () => false,
@@ -17,6 +24,10 @@ describe("useWindowFocus", () => {
   it("should update to false on window blur", () => {
     const { result } = renderHook(() => useWindowFocus());
 
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      get: () => true,
+    });
     act(() => {
       window.dispatchEvent(new Event("blur"));
     });
@@ -28,12 +39,20 @@ describe("useWindowFocus", () => {
     const { result } = renderHook(() => useWindowFocus());
 
     // Blur first
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      get: () => true,
+    });
     act(() => {
       window.dispatchEvent(new Event("blur"));
     });
     expect(result.current).toBe(false);
 
     // Focus
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      get: () => false,
+    });
     act(() => {
       window.dispatchEvent(new Event("focus"));
     });

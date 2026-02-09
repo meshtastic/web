@@ -36,12 +36,7 @@ export class ChannelRepository {
     return this.db
       .select()
       .from(channels)
-      .where(
-        and(
-          eq(channels.ownerNodeNum, ownerNodeNum),
-          eq(channels.role, 1),
-        ),
-      )
+      .where(and(eq(channels.ownerNodeNum, ownerNodeNum), eq(channels.role, 1)))
       .limit(1);
   }
 
@@ -78,7 +73,7 @@ export class ChannelRepository {
     );
 
     if (existing) {
-      const { createdAt, ...updateData } = channel;
+      const { createdAt: _createdAt, ...updateData } = channel;
       await this.db
         .update(channels)
         .set({

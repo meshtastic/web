@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useReactiveQuery } from "sqlocal/react";
 import { preferencesRepo } from "../repositories/index.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 /**
  * Hook to get a device-specific preference value
@@ -17,7 +17,7 @@ export function useDevicePreference<T>(
     [cacheKey],
   );
 
-  const { data } = useReactiveQuery(preferencesRepo.getClient(), query);
+  const { data } = useReactiveSQL(preferencesRepo.getClient(), query);
 
   const value = useMemo((): T => {
     const row = data?.[0];

@@ -13,7 +13,7 @@ import { Input } from "@shared/components/ui/input";
 import { Label } from "@shared/components/ui/label";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QRCode } from "react-qrcode-logo";
 
@@ -32,12 +32,11 @@ export const QRDialog = ({
 }: QRDialogProps) => {
   const { t } = useTranslation("dialog");
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [qrCodeAdd, setQrCodeAdd] = useState<boolean>();
 
   const allChannels = useMemo(() => Array.from(channels.values()), [channels]);
 
-  useEffect(() => {
+  const qrCodeUrl = useMemo(() => {
     const channelsToEncode = allChannels
       .filter((ch) => selectedChannels.includes(ch.index))
       .map((channel) => channel.settings)
@@ -56,9 +55,7 @@ export const QRDialog = ({
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
-    setQrCodeUrl(
-      `https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`,
-    );
+    return `https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`;
   }, [allChannels, selectedChannels, qrCodeAdd, loraConfig]);
 
   return (

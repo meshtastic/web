@@ -47,12 +47,12 @@ export const EmojiReactionButton = forwardRef<
           ref={ref}
           type="button"
           className={cn(
-            "p-1 rounded transition-colors hover:bg-white/20",
+            "p-2 rounded-lg transition-colors hover:bg-white/20",
             className,
           )}
           aria-label={t("actionsMenu.addReaction", "Add reaction")}
         >
-          <Smile className="size-4.5 opacity-90" />
+          <Smile className="size-5 opacity-90" />
         </button>
       </PopoverTrigger>
       <PopoverContent

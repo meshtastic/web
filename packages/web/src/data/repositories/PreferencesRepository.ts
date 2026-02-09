@@ -72,8 +72,7 @@ export class PreferencesRepository {
     for (const row of result) {
       try {
         map.set(row.key, JSON.parse(row.value));
-      } catch {
-      }
+      } catch {}
     }
 
     return map;

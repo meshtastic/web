@@ -596,6 +596,67 @@ await saveChange({
 });
 ```
 
+### Activity Panel Undo Mechanism
+
+The Activity Panel (`src/features/settings/components/activity/`) shows pending config changes and allows users to undo individual changes. When a change is removed, the corresponding form input must reset to its original value.
+
+**Problem:** Form hooks sync to `effectiveValues` (base + pending changes) on each keystroke. Simply removing a change from the database doesn't immediately reset the input because the form's internal state still holds the changed value.
+
+**Solution:** Explicit undo via Zustand store action with stored original value.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     Activity Undo Flow                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ActivityItem.originalValue ──▶ useActivityChanges.removeChange()       │
+│                                         │                                │
+│                                         ▼                                │
+│                    useUIStore.resetField({ changeType, variant,         │
+│                                            fieldPath, value })          │
+│                                         │                                │
+│                                         ▼                                │
+│                    Form hook subscribes to pendingFieldReset            │
+│                              (useUserForm, useConfigForm, etc.)         │
+│                                         │                                │
+│                                         ▼                                │
+│                    form.setValue(fieldPath, originalValue)              │
+│                    useUIStore.clearPendingReset()                       │
+│                                         │                                │
+│                                         ▼                                │
+│                    clearChange() removes from config_changes table      │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key components:**
+
+| Component | File | Role |
+|-----------|------|------|
+| `ActivityItem.originalValue` | `activity/types.ts` | Stores the value to restore when undoing |
+| `PendingFieldReset` | `ui/store.ts` | Interface for reset action payload |
+| `resetField()` | `ui/store.ts` | Zustand action to dispatch reset |
+| `clearPendingReset()` | `ui/store.ts` | Clears the pending reset after handling |
+| Form hooks | `useUserForm.ts`, `useConfigForm.ts`, etc. | Subscribe to `pendingFieldReset` and call `form.setValue()` |
+
+**Form hook subscription pattern:**
+
+```typescript
+// In each form hook (useUserForm, useConfigForm, useModuleConfigForm, etc.)
+const pendingReset = useUIStore((s) => s.pendingFieldReset);
+
+useEffect(() => {
+  if (
+    pendingReset?.changeType === "config" &&
+    pendingReset.variant === configType &&
+    pendingReset.fieldPath
+  ) {
+    form.setValue(pendingReset.fieldPath, pendingReset.value);
+    useUIStore.getState().clearPendingReset();
+  }
+}, [pendingReset, form, configType]);
+```
+
 ## Feature Modules
 
 ### Connections (`src/features/connections/`)

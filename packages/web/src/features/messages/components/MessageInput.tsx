@@ -134,7 +134,14 @@ export const MessageInput = ({
     };
 
     try {
-      await messageRepo.saveMessage(newMessage);
+      // Use View Transitions API if available for smooth animation
+      if (document.startViewTransition) {
+        await document.startViewTransition(async () => {
+          await messageRepo.saveMessage(newMessage);
+        }).finished;
+      } else {
+        await messageRepo.saveMessage(newMessage);
+      }
     } catch (error) {
       logger.error("[sendMessage] Failed to save message:", error);
       return;

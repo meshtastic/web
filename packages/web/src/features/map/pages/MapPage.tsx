@@ -8,7 +8,11 @@ import { useMyNode } from "@shared/hooks";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useMapFitting } from "@shared/hooks/useMapFitting";
 import { cn } from "@shared/utils/cn";
-import { boundsFromLngLat, hasNodePosition, toLngLatFromNode } from "@shared/utils/geo.ts";
+import {
+  boundsFromLngLat,
+  hasNodePosition,
+  toLngLatFromNode,
+} from "@shared/utils/geo.ts";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
   useCallback,

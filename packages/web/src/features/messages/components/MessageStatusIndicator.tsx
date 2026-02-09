@@ -1,5 +1,6 @@
 import {
   Tooltip,
+  TooltipArrow,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
@@ -109,8 +110,9 @@ export const MessageStatusIndicator = ({
               )}
           </div>
         </TooltipTrigger>
-        <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-2 py-1 rounded text-xs">
+        <TooltipContent className="bg-slate-800 text-white px-2 py-1 rounded text-xs">
           {getStatusText()}
+          <TooltipArrow className="fill-slate-800" />
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

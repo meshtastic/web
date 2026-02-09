@@ -122,6 +122,13 @@ export const DEFAULT_PREFERENCES = {
   rasterSources: [] as RasterSource[],
 };
 
+export interface PendingFieldReset {
+  changeType: string;
+  variant?: string;
+  fieldPath?: string;
+  value: unknown;
+}
+
 export interface UIState {
   // Ephemeral app state (not persisted)
   nodeNumToBeRemoved: number;
@@ -138,6 +145,9 @@ export interface UIState {
   secondaryMessageTabId: number | null;
   messageSplitMode: SplitMode;
 
+  // Pending field reset for activity undo
+  pendingFieldReset: PendingFieldReset | null;
+
   // Actions
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setConnectDialogOpen: (open: boolean) => void;
@@ -151,9 +161,14 @@ export interface UIState {
   // Messages page actions
   openMessageTab: (contactId: number, type: ConversationType) => void;
   closeMessageTab: (tabId: number) => void;
+  closeAllMessageTabs: () => void;
   setActiveMessageTab: (tabId: number) => void;
   setSecondaryMessageTab: (tabId: number | null) => void;
   setMessageSplitMode: (mode: SplitMode) => void;
+
+  // Field reset actions (for activity undo)
+  resetField: (reset: PendingFieldReset) => void;
+  clearPendingReset: () => void;
 }
 
 const defaultDialogs: Dialogs = {
@@ -191,6 +206,9 @@ const defaultState = {
   activeMessageTabId: null as number | null,
   secondaryMessageTabId: null as number | null,
   messageSplitMode: "none" as SplitMode,
+
+  // Pending field reset
+  pendingFieldReset: null as PendingFieldReset | null,
 };
 
 export const useUIStore = create<UIState>()(
@@ -251,6 +269,13 @@ export const useUIStore = create<UIState>()(
 
         return updates;
       }),
+    closeAllMessageTabs: () =>
+      set({
+        messageTabs: [],
+        activeMessageTabId: null,
+        secondaryMessageTabId: null,
+        messageSplitMode: "none",
+      }),
     setActiveMessageTab: (tabId) => set({ activeMessageTabId: tabId }),
     setSecondaryMessageTab: (tabId) => set({ secondaryMessageTabId: tabId }),
     setMessageSplitMode: (mode) =>
@@ -270,5 +295,9 @@ export const useUIStore = create<UIState>()(
         }
         return { messageSplitMode: mode };
       }),
+
+    // Field reset actions
+    resetField: (reset) => set({ pendingFieldReset: reset }),
+    clearPendingReset: () => set({ pendingFieldReset: null }),
   })),
 );

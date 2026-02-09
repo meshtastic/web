@@ -101,12 +101,7 @@ describe("MessageInput", () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockSendText).toHaveBeenCalledWith(
-        "Hello!",
-        200,
-        true,
-        undefined,
-      );
+      expect(mockSendText).toHaveBeenCalledWith("Hello!", 200, true, undefined);
     });
   });
 

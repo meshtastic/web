@@ -3,10 +3,7 @@ import {
   type DetectionSensorValidation,
   DetectionSensorValidationSchema,
 } from "../../validation/moduleConfig/detectionSensor";
-import {
-  ConfigFormFields,
-  type FieldGroup,
-} from "../form/ConfigFormFields";
+import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import { useRemoteAdminAuth } from "@shared/hooks";

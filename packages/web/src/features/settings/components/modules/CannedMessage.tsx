@@ -3,10 +3,7 @@ import {
   type CannedMessageValidation,
   CannedMessageValidationSchema,
 } from "../../validation/moduleConfig/cannedMessage";
-import {
-  ConfigFormFields,
-  type FieldGroup,
-} from "../form/ConfigFormFields";
+import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import { useRemoteAdminAuth } from "@shared/hooks";

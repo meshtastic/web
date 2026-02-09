@@ -60,8 +60,12 @@ describe("useLocalStorage", () => {
   });
 
   it("should sync across multiple hook instances", async () => {
-    const { result: result1 } = renderHook(() => useLocalStorage(key, "initial"));
-    const { result: result2 } = renderHook(() => useLocalStorage(key, "initial"));
+    const { result: result1 } = renderHook(() =>
+      useLocalStorage(key, "initial"),
+    );
+    const { result: result2 } = renderHook(() =>
+      useLocalStorage(key, "initial"),
+    );
 
     act(() => {
       result1.current[1]("synced");

@@ -1,12 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 
-// Note: These tests need to be rewritten to work with useReactiveQuery.
-// The hooks now use query builders (buildDirectMessagesQuery, etc.) with useReactiveQuery
+// Note: These tests need to be rewritten to work with useReactiveSQL.
+// The hooks now use query builders (buildDirectMessagesQuery, etc.) with useReactiveSQL
 // instead of calling async methods directly.
 // For now, we just verify the exports exist.
 
-vi.mock("sqlocal/react", () => ({
-  useReactiveQuery: vi.fn(() => ({ data: [], status: "success" })),
+vi.mock("@data/hooks/useReactiveSQL.ts", () => ({
+  useReactiveSQL: vi.fn(() => ({
+    data: [],
+    status: "ok",
+    error: undefined,
+  })),
 }));
 
 vi.mock("@data/repositories", () => ({

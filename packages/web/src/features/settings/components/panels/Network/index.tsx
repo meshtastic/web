@@ -1,8 +1,5 @@
 import type { NetworkValidation } from "../../../validation/config/network";
-import {
-  ConfigFormFields,
-  type FieldGroup,
-} from "../../form/ConfigFormFields";
+import { ConfigFormFields, type FieldGroup } from "../../form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
 import { useNetworkForm } from "../../../hooks";
 import { ConfigFormSkeleton } from "../../../pages/SettingsLoading";

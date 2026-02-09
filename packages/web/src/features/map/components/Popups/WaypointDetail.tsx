@@ -44,13 +44,15 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
     longitudeI: waypoint.longitudeI,
   });
 
-  const distance = myNode && hasNodePosition(myNode)
-    ? distanceMeters(toLngLatFromNode(myNode), waypointLngLat)
-    : undefined;
+  const distance =
+    myNode && hasNodePosition(myNode)
+      ? distanceMeters(toLngLatFromNode(myNode), waypointLngLat)
+      : undefined;
 
-  const bearing = myNode && hasNodePosition(myNode)
-    ? bearingDegrees(toLngLatFromNode(myNode), waypointLngLat)
-    : undefined;
+  const bearing =
+    myNode && hasNodePosition(myNode)
+      ? bearingDegrees(toLngLatFromNode(myNode), waypointLngLat)
+      : undefined;
 
   return (
     <article

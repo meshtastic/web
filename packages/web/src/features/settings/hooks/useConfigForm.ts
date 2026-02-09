@@ -5,6 +5,7 @@ import {
 import type { ValidConfigType } from "@features/settings/components/types.ts";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
+import { useUIStore } from "@state/ui/store.ts";
 import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import {
   type DefaultValues,
@@ -131,6 +132,23 @@ export function useConfigForm<T extends FieldValues>({
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  // Subscribe to pending field resets from activity undo
+  const pendingReset = useUIStore((s) => s.pendingFieldReset);
+
+  useEffect(() => {
+    if (
+      pendingReset?.changeType === "config" &&
+      pendingReset.variant === configType &&
+      pendingReset.fieldPath
+    ) {
+      form.setValue(
+        pendingReset.fieldPath as Path<T>,
+        pendingReset.value as T[keyof T],
+      );
+      useUIStore.getState().clearPendingReset();
+    }
+  }, [pendingReset, form, configType]);
 
   const isDisabledByField = useCallback(
     (

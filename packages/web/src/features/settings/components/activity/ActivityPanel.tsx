@@ -20,12 +20,12 @@ interface ActivityPanelProps {
 export function ActivityPanel({ open, onOpenChange }: ActivityPanelProps) {
   const { t } = useTranslation("config");
 
-  const { activityItems, totalCount, removeChange, clearAllChanges } =
+  const { activityItems, totalCount, removeChange, removeAllChanges } =
     useActivityChanges();
 
   const handleClearAll = () => {
-    if (confirm(t("activityList.discardChanges"))) {
-      clearAllChanges();
+    if (confirm(t("settings.activityList.discardChanges"))) {
+      removeAllChanges();
     }
   };
 
@@ -35,13 +35,13 @@ export function ActivityPanel({ open, onOpenChange }: ActivityPanelProps) {
         <SheetHeader className="p-6 pb-4 border-b">
           <SheetTitle className="flex items-center gap-2">
             <FileEdit className="h-5 w-5" />
-            {t("activityList.pendingChanges")}
+            {t("settings.activityList.pendingChanges")}
           </SheetTitle>
           <SheetDescription>
-            {t("activityList.changesWaitingToSave", {
+            {t("settings.activityList.changesWaitingToSave", {
               num: formatQuantity(totalCount, {
-                one: t("unit.change.one"),
-                other: t("unit.change.plural"),
+                one: t("common:unit.change.one"),
+                other: t("common:unit.change.plural"),
               }),
             })}
           </SheetDescription>
@@ -57,7 +57,7 @@ export function ActivityPanel({ open, onOpenChange }: ActivityPanelProps) {
               onClick={handleClearAll}
             >
               <RotateCcw className="h-4 w-4 mr-2" />
-              {t("activityList.clearAllChanges")}
+              {t("settings.activityList.clearAllChanges")}
             </Button>
           </div>
         )}

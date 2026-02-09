@@ -20,7 +20,8 @@ const initialState: ThemeProviderState = {
   setTheme: () => null,
 };
 
-export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+export const ThemeProviderContext =
+  createContext<ThemeProviderState>(initialState);
 
 const THEME_PREFERENCE_KEY = "appearance:theme";
 
@@ -39,7 +40,9 @@ function ThemeProviderInner({
   ...props
 }: ThemeProviderProps) {
   const storedTheme = use(getThemePromise());
-  const [theme, setThemeState] = useState<Theme>(storedTheme ?? defaultTheme ?? "system");
+  const [theme, setThemeState] = useState<Theme>(
+    storedTheme ?? defaultTheme ?? "system",
+  );
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() => {
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"

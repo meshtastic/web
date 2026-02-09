@@ -3,10 +3,7 @@ import {
   type RangeTestValidation,
   RangeTestValidationSchema,
 } from "../../validation/moduleConfig/rangeTest";
-import {
-  ConfigFormFields,
-  type FieldGroup,
-} from "../form/ConfigFormFields";
+import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";

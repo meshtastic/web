@@ -61,7 +61,7 @@ function EmojiPickerEmoji({
     <button
       {...props}
       className={cn(
-        "data-[active]:bg-accent flex size-7 items-center justify-center rounded-sm text-base",
+        "data-[active]:bg-accent flex size-9 items-center justify-center rounded-sm text-xl",
         className,
       )}
       data-slot="emoji-picker-emoji"
@@ -138,7 +138,7 @@ function EmojiPickerFooter({
         {({ emoji }) =>
           emoji ? (
             <>
-              <div className="flex size-7 flex-none items-center justify-center text-lg">
+              <div className="flex size-9 flex-none items-center justify-center text-2xl">
                 {emoji.emoji}
               </div>
               <span className="text-secondary-foreground truncate text-xs">

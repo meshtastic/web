@@ -2,6 +2,7 @@ import { usePacketLogs } from "@data/hooks/usePacketLogs";
 import { Protobuf, Utils } from "@meshtastic/core";
 import { Mono } from "@shared/components/Mono";
 import { Button } from "@shared/components/ui/button";
+import { IconButton } from "@shared/components/ui/icon-button";
 import { Input } from "@shared/components/ui/input";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import {
@@ -17,12 +18,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@shared/components/ui/sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@shared/components/ui/tooltip";
+import { TooltipProvider } from "@shared/components/ui/tooltip";
 import { useLanguage } from "@shared/hooks/useLanguage";
 import { useDevice } from "@state/index.ts";
 import {
@@ -131,19 +127,12 @@ function PacketEntry({
       <div className="flex items-center justify-between mb-3">
         <span className="font-semibold text-lg">Packet</span>
         <div className="flex items-center gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={copyPacketData}
-              >
-                <ClipboardCopyIcon className="size-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Copy packet JSON</TooltipContent>
-          </Tooltip>
+          <IconButton
+            tooltip="Copy packet JSON"
+            icon={<ClipboardCopyIcon className="size-5" />}
+            className="h-8 w-8"
+            onClick={copyPacketData}
+          />
           <Mono className="text-base text-muted-foreground">
             {formatTimestamp(packet.rxTime, locale)}
           </Mono>
@@ -315,14 +304,11 @@ function PacketLogContent() {
             ))}
           </SelectContent>
         </Select>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={handleExport}>
-              <DownloadIcon className="size-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Export logs as JSON</TooltipContent>
-        </Tooltip>
+        <IconButton
+          tooltip="Export logs as JSON"
+          icon={<DownloadIcon className="size-5" />}
+          onClick={handleExport}
+        />
       </div>
 
       <ScrollArea className="flex-1">
@@ -355,19 +341,12 @@ function DebugLogDrawer({ open, onOpenChange }: DebugLogDrawerProps) {
         <TooltipProvider>
           <SheetHeader className="p-4 border-b flex flex-row items-center justify-between">
             <SheetTitle>Debug Panel</SheetTitle>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => clearLogs()}
-                  className="h-8 w-8 mr-8"
-                >
-                  <Trash2Icon className="size-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Clear all logs</TooltipContent>
-            </Tooltip>
+            <IconButton
+              tooltip="Clear all logs"
+              icon={<Trash2Icon className="size-5" />}
+              onClick={() => clearLogs()}
+              className="h-8 w-8 mr-8"
+            />
           </SheetHeader>
           <div className="h-[calc(100vh-5rem)]">
             <PacketLogContent />

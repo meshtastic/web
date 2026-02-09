@@ -9,7 +9,6 @@ import { useSyncExternalStore } from "react";
 
 const MOBILE_BREAKPOINT = 768;
 
-
 const mobileStore = {
   getSnapshot(): boolean {
     return window.innerWidth < MOBILE_BREAKPOINT;
@@ -22,7 +21,6 @@ const mobileStore = {
     return () => mql.removeEventListener("change", handler);
   },
 };
-
 
 export function useIsMobile(): boolean {
   return useSyncExternalStore(

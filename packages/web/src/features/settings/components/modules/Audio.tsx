@@ -3,10 +3,7 @@ import {
   type AudioValidation,
   AudioValidationSchema,
 } from "../../validation/moduleConfig/audio";
-import {
-  ConfigFormFields,
-  type FieldGroup,
-} from "../form/ConfigFormFields";
+import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import { useRemoteAdminAuth } from "@shared/hooks";

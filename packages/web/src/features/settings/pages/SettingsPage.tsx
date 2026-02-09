@@ -22,13 +22,16 @@ import { useState } from "react";
 import { ActivityPanel } from "../components/activity/index.ts";
 import { SettingsSearchBar } from "../components/SettingsSearchBar.tsx";
 import { useSettingsSave } from "../hooks/useSaveSettings.ts";
+import {
+  SettingsNavigationProvider,
+  useSettingsNavigation,
+  type SettingsSection,
+} from "../search/index.ts";
 import { AdvancedConfig } from "./AdvancedConfig.tsx";
 import { AppPreferencesConfig } from "./AppPreferencesConfig.tsx";
 import { DeviceConfig } from "./DeviceConfig.tsx";
 import { ModuleConfig } from "./ModuleConfig.tsx";
 import { RadioConfig } from "./RadioConfig.tsx";
-
-type SettingsSection = "radio" | "device" | "module" | "app" | "advanced";
 
 const configSections = [
   {
@@ -113,16 +116,12 @@ function SettingsHeaderActions({ onActivityOpen }: SettingsHeaderActionsProps) {
   );
 }
 
-interface SettingsContentProps {
-  activeSection: SettingsSection;
-  searchQuery: string;
-}
-
 /**
  * Content area that depends on device state.
  */
-function SettingsContent({ activeSection, searchQuery }: SettingsContentProps) {
+function SettingsContent() {
   const { isRemoteAdmin, isAuthorized } = useRemoteAdminAuth();
+  const { activeSection } = useSettingsNavigation();
 
   return (
     <>
@@ -138,31 +137,28 @@ function SettingsContent({ activeSection, searchQuery }: SettingsContentProps) {
           </div>
         </div>
       )}
-      {activeSection === "radio" && <RadioConfig searchQuery={searchQuery} />}
-      {activeSection === "device" && <DeviceConfig searchQuery={searchQuery} />}
-      {activeSection === "module" && <ModuleConfig searchQuery={searchQuery} />}
-      {activeSection === "advanced" && (
-        <AdvancedConfig searchQuery={searchQuery} />
-      )}
-      {activeSection === "app" && (
-        <AppPreferencesConfig searchQuery={searchQuery} />
-      )}
+      {activeSection === "radio" && <RadioConfig />}
+      {activeSection === "device" && <DeviceConfig />}
+      {activeSection === "module" && <ModuleConfig />}
+      {activeSection === "advanced" && <AdvancedConfig />}
+      {activeSection === "app" && <AppPreferencesConfig />}
     </>
   );
 }
 
-export default function SettingsPage() {
-  const [activeSection, setActiveSection] = useState<SettingsSection>("radio");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activityOpen, setActivityOpen] = useState(false);
+interface SettingsSidebarProps {
+  onSectionChange?: () => void;
+}
+
+function SettingsSidebar({ onSectionChange }: SettingsSidebarProps) {
+  const { activeSection, setActiveSection } = useSettingsNavigation();
 
   const handleSectionChange = (section: SettingsSection) => {
     setActiveSection(section);
-    setMobileMenuOpen(false);
+    onSectionChange?.();
   };
 
-  const sidebarContent = (
+  return (
     <>
       <div className="p-4 border-b">
         <h2 className="font-semibold">{t("navigation.settings")}</h2>
@@ -187,11 +183,17 @@ export default function SettingsPage() {
       </ScrollArea>
     </>
   );
+}
+
+function SettingsPageContent() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+  const { activeSection } = useSettingsNavigation();
 
   return (
     <div className="flex h-full">
       <div className="hidden md:flex md:w-56 md:border-r md:flex-col">
-        {sidebarContent}
+        <SettingsSidebar />
       </div>
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -208,7 +210,9 @@ export default function SettingsPage() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
-                {sidebarContent}
+                <SettingsSidebar
+                  onSectionChange={() => setMobileMenuOpen(false)}
+                />
               </SheetContent>
             </Sheet>
             <h1 className="text-lg font-semibold truncate">
@@ -217,7 +221,7 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden sm:block">
-              <SettingsSearchBar onSearch={setSearchQuery} />
+              <SettingsSearchBar />
             </div>
             <SettingsHeaderActions
               onActivityOpen={() => setActivityOpen(true)}
@@ -227,15 +231,20 @@ export default function SettingsPage() {
 
         <div className="flex-1 min-h-0 overflow-y-auto [scrollbar-gutter:stable]">
           <div className="p-4 sm:p-6">
-            <SettingsContent
-              activeSection={activeSection}
-              searchQuery={searchQuery}
-            />
+            <SettingsContent />
           </div>
         </div>
       </div>
 
       <ActivityPanel open={activityOpen} onOpenChange={setActivityOpen} />
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <SettingsNavigationProvider>
+      <SettingsPageContent />
+    </SettingsNavigationProvider>
   );
 }

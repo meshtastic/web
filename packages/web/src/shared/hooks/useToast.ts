@@ -1,4 +1,7 @@
-import type { ToastActionElement, ToastProps } from "@shared/components/ui/toast";
+import type {
+  ToastActionElement,
+  ToastProps,
+} from "@shared/components/ui/toast";
 import { type ReactNode, useSyncExternalStore } from "react";
 
 const TOAST_LIMIT = 1;

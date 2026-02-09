@@ -49,6 +49,7 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CableIcon,
   CheckIcon,
+  ChevronUp,
   LayoutDashboard,
   LogOutIcon,
   MapIcon,
@@ -279,7 +280,7 @@ function ConnectedSidebarContent() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4">
+      <SidebarFooter className="border-t border-sidebar-border">
         <TooltipProvider>
           {displayNode && (
             <>
@@ -287,7 +288,7 @@ function ConnectedSidebarContent() {
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex items-center gap-3 w-full text-left hover:bg-sidebar-accent/50 rounded-md p-1 -m-1 transition-colors"
+                    className="flex items-center gap-3 w-full text-left hover:bg-sidebar-accent/50 p-4 transition-colors"
                   >
                     <NodeAvatar
                       nodeNum={displayNodeNum}
@@ -306,18 +307,24 @@ function ConnectedSidebarContent() {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div
-                          className={`ml-auto h-2 w-2 rounded-full ${statusColor}`}
+                          className={`h-2 w-2 rounded-full ${statusColor}`}
                         />
                       </TooltipTrigger>
                       <TooltipContent side="top">
                         <p>{statusText}</p>
                       </TooltipContent>
                     </Tooltip>
+                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" align="start" className="w-56">
-                  <DropdownMenuLabel>
-                    {isRemoteAdmin ? "Remote Administration" : "My Node"}
+                <DropdownMenuContent
+                  side="top"
+                  align="start"
+                  className="w-56 text-base"
+                >
+                  <DropdownMenuLabel className="text-sm font-normal text-muted-foreground">
+                    {import.meta.env.VITE_VERSION} (
+                    {import.meta.env.VITE_COMMIT_HASH})
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuSub>
@@ -325,7 +332,7 @@ function ConnectedSidebarContent() {
                       <Users className="mr-2 h-4 w-4" />
                       Recently Connected Nodes
                     </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
+                    <DropdownMenuSubContent className="text-base">
                       {/* Local node - always first */}
                       {myNode && (
                         <DropdownMenuItem
@@ -337,7 +344,7 @@ function ConnectedSidebarContent() {
                           <span className={!isRemoteAdmin ? "" : "ml-6"}>
                             {myNode.longName ?? myNode.shortName}
                           </span>
-                          <span className="ml-auto text-xs text-muted-foreground">
+                          <span className="ml-auto text-sm opacity-60">
                             Local
                           </span>
                         </DropdownMenuItem>
@@ -392,7 +399,7 @@ function ConnectedSidebarContent() {
                 </DropdownMenuContent>
               </DropdownMenu>
               {isRemoteAdmin && (
-                <div className="text-xs text-muted-foreground mt-3 space-y-1">
+                <div className="text-xs text-muted-foreground px-4 pb-4 space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-md bg-chart-2" />
                     <span>Authorized - can configure</span>

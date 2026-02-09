@@ -25,7 +25,9 @@ export class MigrationService {
     await db.delete(messages).where(eq(messages.ownerNodeNum, deviceId));
     await db.delete(nodes).where(eq(nodes.ownerNodeNum, deviceId));
     await db.delete(channels).where(eq(channels.ownerNodeNum, deviceId));
-    await db.delete(messageDrafts).where(eq(messageDrafts.ownerNodeNum, deviceId));
+    await db
+      .delete(messageDrafts)
+      .where(eq(messageDrafts.ownerNodeNum, deviceId));
     await db.delete(lastRead).where(eq(lastRead.ownerNodeNum, deviceId));
 
     logger.debug(`[MigrationService] Deleted all data for device ${deviceId}`);

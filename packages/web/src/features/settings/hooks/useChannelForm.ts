@@ -5,6 +5,7 @@ import {
 import type { Channel as DbChannel } from "@data/index";
 import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
 import { useMyNode } from "@shared/hooks";
+import { useUIStore } from "@state/ui/store.ts";
 import cryptoRandomString from "crypto-random-string";
 import {
   useCallback,
@@ -184,6 +185,23 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  // Subscribe to pending field resets from activity undo
+  const pendingReset = useUIStore((s) => s.pendingFieldReset);
+
+  useEffect(() => {
+    // Channel resets come with the whole original channel as value
+    if (pendingReset?.changeType === "channel" && !pendingReset.fieldPath) {
+      const originalChannel = pendingReset.value as DbChannel | undefined;
+      if (
+        originalChannel &&
+        originalChannel.channelIndex === channel.channelIndex
+      ) {
+        form.reset(dbToFormValues(originalChannel));
+        useUIStore.getState().clearPendingReset();
+      }
+    }
+  }, [pendingReset, form, channel.channelIndex, dbToFormValues]);
 
   // Regenerate PSK
   const regeneratePsk = useCallback(async () => {

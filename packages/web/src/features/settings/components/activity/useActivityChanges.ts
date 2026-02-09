@@ -1,11 +1,52 @@
 import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
 import { useMyNode } from "@shared/hooks";
+import { useUIStore } from "@state/ui/store.ts";
+import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import type { ActivityItem } from "./types.ts";
+
+/**
+ * Get the i18n translation key for a field path based on change type and variant.
+ */
+function getFieldLabelKey(
+  changeType: string,
+  variant: string | null,
+  fieldPath: string | null,
+): string | null {
+  if (!fieldPath) return null;
+
+  switch (changeType) {
+    case "config":
+      // config:<variant>.<fieldPath>.label
+      return variant ? `config:${variant}.${fieldPath}.label` : null;
+    case "moduleConfig":
+      // moduleConfig:<variant>.<fieldPath>.label
+      return variant ? `moduleConfig:${variant}.${fieldPath}.label` : null;
+    case "user":
+      // config:user.<fieldPath>.label
+      return `config:user.${fieldPath}.label`;
+    case "channel":
+      // channels:<fieldPath>.label
+      return `channels:${fieldPath}.label`;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Convert camelCase field path to Title Case as fallback when no translation exists.
+ */
+function formatFieldPath(fieldPath: string): string {
+  return fieldPath
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase())
+    .trim();
+}
 
 export function useActivityChanges() {
   const { myNodeNum } = useMyNode();
-  const { pendingChanges, clearChange, clearAllChanges } =
-    usePendingChanges(myNodeNum);
+  const { pendingChanges, clearChange } = usePendingChanges(myNodeNum);
+  const { t } = useTranslation(["config", "moduleConfig", "channels"]);
 
   // Transform database changes to activity items
   const activityItems: ActivityItem[] = pendingChanges.map((change) => {
@@ -70,34 +111,71 @@ export function useActivityChanges() {
       key = { type: "user" };
     }
 
+    // Get human-readable label from i18n, with fallback to formatted field path
+    const labelKey = getFieldLabelKey(
+      change.changeType,
+      change.variant,
+      change.fieldPath,
+    );
+    let label = change.fieldPath ?? change.variant ?? change.changeType;
+    if (labelKey) {
+      const translated = t(labelKey, { defaultValue: "" });
+      if (translated) {
+        label = translated;
+      } else if (change.fieldPath) {
+        // Fallback to formatted field path
+        label = formatFieldPath(change.fieldPath);
+      }
+    } else if (change.fieldPath) {
+      label = formatFieldPath(change.fieldPath);
+    }
+
     return {
       id: `${sectionKey}:${change.fieldPath ?? ""}`,
-      type: change.changeType as "config" | "moduleConfig" | "channel",
+      type: change.changeType as "config" | "moduleConfig" | "channel" | "user",
       category,
       variant: change.variant ?? "",
-      label: change.fieldPath ?? change.variant ?? change.changeType,
+      label,
       timestamp: change.createdAt?.getTime() ?? Date.now(),
       key,
+      fieldPath: change.fieldPath,
       hasChanges: true,
+      originalValue: change.originalValue,
     };
   });
+
+  // Remove a single change, resetting the form field first
+  const removeChange = useCallback(
+    (item: ActivityItem) => {
+      // First dispatch reset action so form hooks can reset the field
+      useUIStore.getState().resetField({
+        changeType: item.type,
+        variant: item.variant || undefined,
+        fieldPath: item.fieldPath ?? undefined,
+        value: item.originalValue,
+      });
+      // Then clear the change from DB
+      clearChange({
+        changeType: item.type,
+        variant: item.variant || undefined,
+        channelIndex: item.key.type === "channel" ? item.key.index : undefined,
+        fieldPath: item.fieldPath ?? undefined,
+      });
+    },
+    [clearChange],
+  );
+
+  // Remove all changes by iterating through each item
+  const removeAllChanges = useCallback(() => {
+    for (const item of activityItems) {
+      removeChange(item);
+    }
+  }, [activityItems, removeChange]);
 
   return {
     activityItems,
     totalCount: activityItems.length,
-    removeChange: (key: {
-      section: { type: string; variant?: string };
-      fieldName: string;
-    }) =>
-      clearChange({
-        changeType: key.section.type as
-          | "config"
-          | "moduleConfig"
-          | "channel"
-          | "user",
-        variant: key.section.variant,
-        fieldPath: key.fieldName,
-      }),
-    clearAllChanges,
+    removeChange,
+    removeAllChanges,
   };
 }

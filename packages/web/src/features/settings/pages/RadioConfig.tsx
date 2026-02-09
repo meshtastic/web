@@ -19,48 +19,41 @@ import { useTranslation } from "react-i18next";
 import { Channels } from "../components/panels/Channels";
 import { Lora } from "../components/panels/Lora.tsx";
 import { Security } from "../components/panels/Security/Security.tsx";
-
-interface ConfigPageProps {
-  searchQuery?: string;
-}
+import { useSettingsNavigation } from "../search/index.ts";
 
 type TabItem = {
   case: ValidConfigType | "channels";
   label: string;
-  element: ComponentType<ConfigPageProps>;
-  count?: number;
+  description: string;
+  element: ComponentType;
 };
 
-export const RadioConfig = ({ searchQuery = "" }: ConfigPageProps) => {
+export const RadioConfig = () => {
   const { myNodeNum } = useMyNode();
   const { hasVariantChanges } = usePendingChanges(myNodeNum);
   const { t } = useTranslation("config");
+  const { activeTab, setActiveTab } = useSettingsNavigation();
 
   const tabs: TabItem[] = [
     {
       case: "lora",
       label: t("page.lora.title"),
+      description: t("page.lora.description"),
       element: Lora,
     },
     {
       case: "channels",
       label: t("page.channels.title"),
-      element: Channels as ComponentType<ConfigPageProps>,
+      description: t("page.channels.description"),
+      element: Channels as ComponentType,
     },
     {
       case: "security",
       label: t("page.security.title"),
-      element: Security as ComponentType<ConfigPageProps>,
+      description: t("page.security.description"),
+      element: Security as ComponentType,
     },
   ];
-
-  const filteredTabs = tabs.filter((tab) => {
-    if (!searchQuery.trim()) {
-      return true;
-    }
-    const query = searchQuery.toLowerCase();
-    return tab.label.toLowerCase().includes(query);
-  });
 
   const hasChanges = (
     configCase: ValidConfigType | "user" | "channels",
@@ -71,54 +64,45 @@ export const RadioConfig = ({ searchQuery = "" }: ConfigPageProps) => {
     return hasVariantChanges("config", configCase);
   };
 
+  // Default to first tab if active tab doesn't match any tab
+  const currentTab = tabs.find((tab) => tab.case === activeTab)
+    ? activeTab
+    : (tabs[0]?.case ?? "lora");
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {filteredTabs.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-muted-foreground text-center">
-              No settings found matching "{searchQuery}"
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Tabs defaultValue={filteredTabs[0]?.case}>
-          <TabsList className="flex">
-            {filteredTabs.map((tab) => (
-              <TabsTrigger
-                key={tab.case}
-                value={tab.case}
-                className="relative text-foreground"
-              >
-                {tab.label}
-                {hasChanges(tab.case) && (
-                  <span className="absolute top-1 right-1 flex size-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-75" />
-                    <span className="relative inline-flex size-2 rounded-full bg-sky-500" />
-                  </span>
-                )}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {filteredTabs.map((tab) => (
-            <TabsContent key={tab.case} value={tab.case}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>{tab.label}</CardTitle>
-                  <CardDescription>
-                    {tab.case === "lora" && t("page.lora.description")}
-                    {tab.case === "channels" && t("page.channels.description")}
-                    {tab.case === "security" && t("page.security.description")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <tab.element searchQuery={searchQuery} />
-                </CardContent>
-              </Card>
-            </TabsContent>
+      <Tabs value={currentTab} onValueChange={setActiveTab}>
+        <TabsList className="flex">
+          {tabs.map((tab) => (
+            <TabsTrigger
+              key={tab.case}
+              value={tab.case}
+              className="relative text-foreground"
+            >
+              {tab.label}
+              {hasChanges(tab.case) && (
+                <span className="absolute top-1 right-1 flex size-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-sky-500" />
+                </span>
+              )}
+            </TabsTrigger>
           ))}
-        </Tabs>
-      )}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsContent key={tab.case} value={tab.case}>
+            <Card>
+              <CardHeader>
+                <CardTitle>{tab.label}</CardTitle>
+                <CardDescription>{tab.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <tab.element />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 };

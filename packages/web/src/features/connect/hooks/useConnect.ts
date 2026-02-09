@@ -14,7 +14,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useReactiveQuery } from "sqlocal/react";
+import { useReactiveSQL } from "@data/hooks/useReactiveSQL.ts";
 import type { NewConnectionInput } from "../components/AddConnectionDialog/AddConnectionDialog.tsx";
 import { BrowserHardware } from "../services/BrowserHardware.ts";
 import { ConnectionService, type NavigationIntent } from "../services";
@@ -43,7 +43,7 @@ export interface UseConnectOptions {
  */
 export function useConnect(options?: UseConnectOptions) {
   const query = useMemo(() => connectionRepo.buildConnectionsQuery(), []);
-  const { data } = useReactiveQuery(connectionRepo.getClient(), query);
+  const { data } = useReactiveSQL(connectionRepo.getClient(), query);
 
   const connList = data ?? [];
 
@@ -190,7 +190,7 @@ export function useConnect(options?: UseConnectOptions) {
  */
 export function useConnection(id: number) {
   const query = useMemo(() => connectionRepo.buildConnectionQuery(id), [id]);
-  const { data } = useReactiveQuery(connectionRepo.getClient(), query);
+  const { data } = useReactiveSQL(connectionRepo.getClient(), query);
 
   return { connection: data?.[0] };
 }
@@ -200,7 +200,7 @@ export function useConnection(id: number) {
  */
 export function useDefaultConnection() {
   const query = useMemo(() => connectionRepo.buildDefaultConnectionQuery(), []);
-  const { data } = useReactiveQuery(connectionRepo.getClient(), query);
+  const { data } = useReactiveSQL(connectionRepo.getClient(), query);
 
   return { connection: data?.[0] };
 }

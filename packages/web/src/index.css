@@ -235,3 +235,34 @@
     background-color: oklch(0.4 0 0);
   }
 }
+
+/* View Transitions for messages */
+@supports (view-transition-name: none) {
+  ::view-transition-old(message-*):only-child {
+    animation: message-fade-out 150ms ease-out;
+  }
+
+  ::view-transition-new(message-*):only-child {
+    animation: message-slide-in 200ms ease-out;
+  }
+
+  @keyframes message-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes message-fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}

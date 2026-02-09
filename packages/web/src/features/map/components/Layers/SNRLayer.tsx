@@ -220,7 +220,13 @@ function generateNeighborLines(
       }
     } else {
       // DirectInfo object
-      upsertPair(info.from.nodeNum, info.to.nodeNum, info.snr, pairs, idToLngLat);
+      upsertPair(
+        info.from.nodeNum,
+        info.to.nodeNum,
+        info.snr,
+        pairs,
+        idToLngLat,
+      );
     }
   }
 
@@ -309,9 +315,10 @@ export const SNRLayer = ({
                     return {
                       ...n,
                       num: foundNode?.nodeNum,
-                      lngLat: foundNode && hasNodePosition(foundNode)
-                        ? toLngLatFromNode(foundNode)
-                        : undefined,
+                      lngLat:
+                        foundNode && hasNodePosition(foundNode)
+                          ? toLngLatFromNode(foundNode)
+                          : undefined,
                     };
                   }),
                 },

@@ -2,15 +2,15 @@
  * Message hooks for fetching and managing messages
  */
 
+import { useReactiveSQL } from "@data/hooks/useReactiveSQL.ts";
 import { messageRepo } from "@data/repositories";
 import type { LastRead, Message } from "@data/schema";
 import type { ConversationType } from "@data/types";
 import { useMemo } from "react";
-import { useReactiveQuery } from "sqlocal/react";
 
 /**
  * Hook to fetch direct messages between the owner node and another node
- * Uses direct useReactiveQuery pattern (like useChannels) for reliable reactivity
+ * Uses direct useReactiveSQL pattern (like useChannels) for reliable reactivity
  *
  * @param ownerNodeNum - The device's node number (for multi-device filtering)
  * @param otherNodeNum - The other node in the conversation
@@ -32,7 +32,7 @@ export function useDirectMessages(
     [ownerNodeNum, otherNodeNum, limit],
   );
 
-  const { data, status } = useReactiveQuery<Message>(
+  const { data, status } = useReactiveSQL<Message>(
     messageRepo.getClient(),
     query,
   );
@@ -46,7 +46,7 @@ export function useDirectMessages(
 
 /**
  * Hook to fetch broadcast messages for a channel
- * Uses direct useReactiveQuery pattern (like useChannels) for reliable reactivity
+ * Uses direct useReactiveSQL pattern (like useChannels) for reliable reactivity
  */
 export function useChannelMessages(
   myNodeNum: number,
@@ -58,7 +58,7 @@ export function useChannelMessages(
     [myNodeNum, channelId, limit],
   );
 
-  const { data, status } = useReactiveQuery<Message>(
+  const { data, status } = useReactiveSQL<Message>(
     messageRepo.getClient(),
     query,
   );
@@ -79,7 +79,7 @@ export function useAllMessages(myNodeNum: number, limit = 100, offset = 0) {
     [myNodeNum, limit, offset],
   );
 
-  const { data, status } = useReactiveQuery<Message>(
+  const { data, status } = useReactiveSQL<Message>(
     messageRepo.getClient(),
     query,
   );
@@ -99,7 +99,7 @@ export function usePendingMessages(myNodeNum: number) {
     [myNodeNum],
   );
 
-  const { data, status } = useReactiveQuery<Message>(
+  const { data, status } = useReactiveSQL<Message>(
     messageRepo.getClient(),
     query,
   );
@@ -180,7 +180,7 @@ export function useConversations(myNodeNum: number) {
     () => messageRepo.buildAllDirectMessagesQuery(myNodeNum),
     [myNodeNum],
   );
-  const { data: directMessages } = useReactiveQuery<Message>(
+  const { data: directMessages } = useReactiveSQL<Message>(
     messageRepo.getClient(),
     directMessagesQuery,
   );
@@ -190,7 +190,7 @@ export function useConversations(myNodeNum: number) {
     () => messageRepo.buildAllChannelMessagesQuery(myNodeNum),
     [myNodeNum],
   );
-  const { data: channelMessages } = useReactiveQuery<Message>(
+  const { data: channelMessages } = useReactiveSQL<Message>(
     messageRepo.getClient(),
     channelMessagesQuery,
   );
@@ -200,7 +200,7 @@ export function useConversations(myNodeNum: number) {
     () => messageRepo.buildLastReadQuery(myNodeNum),
     [myNodeNum],
   );
-  const { data: lastReadEntries } = useReactiveQuery<LastRead>(
+  const { data: lastReadEntries } = useReactiveSQL<LastRead>(
     messageRepo.getClient(),
     lastReadQuery,
   );

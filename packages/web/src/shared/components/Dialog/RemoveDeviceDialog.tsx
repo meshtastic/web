@@ -28,7 +28,8 @@ export const RemoveDeviceDialog = ({
     onRemoved?.();
   };
 
-  const displayName = device.longName ?? device.shortName ?? `Node ${device.nodeNum}`;
+  const displayName =
+    device.longName ?? device.shortName ?? `Node ${device.nodeNum}`;
 
   return (
     <DialogWrapper

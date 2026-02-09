@@ -3,6 +3,12 @@ import { useDateFormat, useUse12hClock } from "@data/hooks";
 import type { Message, Reaction } from "@data/schema";
 import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@shared/components/ui/dropdown-menu";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -13,9 +19,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
+import { toast } from "@shared/hooks/useToast";
 import { cn } from "@shared/utils/cn";
 import { getAvatarColors } from "@shared/utils/color";
-import { Reply } from "lucide-react";
+import { Copy, MoreVertical, Reply, Trash2 } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { groupReactions } from "../hooks/useReactions.ts";
@@ -31,6 +38,7 @@ interface MessageBubbleProps {
   showAvatar?: boolean;
   showTimestamp?: boolean;
   onReply?: (message: Message) => void;
+  onDelete?: (message: Message) => void;
   replyToMessage?: Message;
   replyToSenderName?: string;
   reactions?: Reaction[];
@@ -46,6 +54,7 @@ export const MessageBubble = memo(function MessageBubble({
   showAvatar = true,
   showTimestamp = true,
   onReply,
+  onDelete,
   replyToMessage,
   replyToSenderName,
   reactions = [],
@@ -79,7 +88,7 @@ export const MessageBubble = memo(function MessageBubble({
 
   const formattedDateTime = useMemo(() => {
     const date = new Date(message.date);
-    const timeStr = date.toLocaleTimeString([], {
+    const timeStr = date.toLocaleTimeString(undefined, {
       hour: "numeric",
       minute: "2-digit",
       hour12: use12hClock,
@@ -87,7 +96,7 @@ export const MessageBubble = memo(function MessageBubble({
 
     if (dateFormat === "none") return timeStr;
 
-    const dateStr = date.toLocaleDateString([], {
+    const dateStr = date.toLocaleDateString(undefined, {
       dateStyle: dateFormat === "short" ? "short" : "long",
     });
 
@@ -115,7 +124,10 @@ export const MessageBubble = memo(function MessageBubble({
       ) : null}
 
       <div
-        className="max-w-[70%] rounded-2xl px-3 py-2 relative group shrink-0 text-white"
+        className={cn(
+          "max-w-[70%] rounded-2xl px-3 py-2 relative group shrink-0 text-white",
+          groupedReactions.length > 0 && "pb-5",
+        )}
         style={bubbleStyle}
       >
         {/* Reply preview - shown when this message is a reply */}
@@ -178,7 +190,7 @@ export const MessageBubble = memo(function MessageBubble({
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="p-2 rounded transition-colors hover:bg-white/20"
+                  className="p-2 rounded-lg transition-colors hover:bg-white/20"
                   aria-label={t("actionsMenu.reply", "Reply")}
                   onClick={() => onReply?.(message)}
                 >
@@ -190,6 +202,48 @@ export const MessageBubble = memo(function MessageBubble({
                 <TooltipArrow className="fill-slate-800" />
               </TooltipContent>
             </Tooltip>
+
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="p-2 rounded-lg transition-colors hover:bg-white/20"
+                      aria-label={t("actionsMenu.more", "More actions")}
+                    >
+                      <MoreVertical className="size-5 opacity-90" />
+                    </button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent className="bg-slate-800 text-white px-2 py-1 rounded text-xs">
+                  {t("actionsMenu.more", "More")}
+                  <TooltipArrow className="fill-slate-800" />
+                </TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigator.clipboard.writeText(message.message);
+                    toast({
+                      title: t("actionsMenu.copied", "Copied to clipboard"),
+                      duration: 2000,
+                    });
+                  }}
+                >
+                  <Copy className="size-4 mr-2" />
+                  {t("actionsMenu.copy", "Copy text")}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => onDelete?.(message)}
+                >
+                  <Trash2 className="size-4 mr-2" />
+                  {t("actionsMenu.delete", "Delete")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {isMine && (
               <MessageStatusIndicator
                 message={message}
@@ -199,7 +253,7 @@ export const MessageBubble = memo(function MessageBubble({
           </div>
         </div>
 
-        <p className="text-sm md:text-base leading-relaxed wrap-break-word">
+        <p className="text-base md:text-lg leading-relaxed wrap-break-word">
           {message.message}
         </p>
 
@@ -241,7 +295,7 @@ export const MessageBubble = memo(function MessageBubble({
                 )}
               >
                 {groupedReactions.slice(0, 5).map(({ emoji, count }) => (
-                  <span key={emoji} className="flex items-center text-sm">
+                  <span key={emoji} className="flex items-center text-lg">
                     {emoji}
                     {count > 1 && (
                       <span className="text-xs text-muted-foreground ml-0.5">
@@ -260,7 +314,7 @@ export const MessageBubble = memo(function MessageBubble({
               <div className="space-y-1">
                 {groupedReactions.map(({ emoji, fromNodes }) => (
                   <div key={emoji} className="flex items-center gap-2 text-sm">
-                    <span className="text-base">{emoji}</span>
+                    <span className="text-xl">{emoji}</span>
                     <span className="text-muted-foreground">
                       {fromNodes
                         .map(

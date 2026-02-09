@@ -3,7 +3,7 @@ import { nodeRepo } from "@data/repositories";
 import type { Node, PositionLog, TelemetryLog } from "@data/schema";
 import { ResultAsync } from "neverthrow";
 import { useEffect, useMemo, useState } from "react";
-import { useReactiveQuery } from "sqlocal/react";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 /**
  * Hook to fetch all nodes for a device
@@ -11,7 +11,7 @@ import { useReactiveQuery } from "sqlocal/react";
 export function useNodes(deviceId: number) {
   const query = useMemo(() => nodeRepo.buildNodesQuery(deviceId), [deviceId]);
 
-  const { data } = useReactiveQuery<Node>(nodeRepo.getClient(), query);
+  const { data } = useReactiveSQL<Node>(nodeRepo.getClient(), query);
 
   const nodeMap = useMemo(
     () => new Map((data ?? []).map((node) => [node.nodeNum, node])),
@@ -58,7 +58,7 @@ export function useOnlineNodes(deviceId: number) {
     [deviceId],
   );
 
-  const { data } = useReactiveQuery<Node>(nodeRepo.getClient(), query);
+  const { data } = useReactiveSQL<Node>(nodeRepo.getClient(), query);
 
   const onlineNodeIds = useMemo(
     () => new Set((data ?? []).map((n) => n.nodeNum)),
@@ -70,7 +70,7 @@ export function useOnlineNodes(deviceId: number) {
 
 /**
  * Hook to get the count of online nodes
- * Derives count from useOnlineNodes to avoid count(*) query issues with useReactiveQuery
+ * Derives count from useOnlineNodes to avoid count(*) query issues with useReactiveSQL
  */
 export function useOnlineCount(deviceId: number) {
   const { nodes } = useOnlineNodes(deviceId);
@@ -93,7 +93,7 @@ export function usePositionHistory(
     [deviceId, nodeNum, since, limit],
   );
 
-  const { data, status } = useReactiveQuery<PositionLog>(
+  const { data, status } = useReactiveSQL<PositionLog>(
     nodeRepo.getClient(),
     query,
   );
@@ -118,7 +118,7 @@ export function useTelemetryHistory(
     [deviceId, nodeNum, since, limit],
   );
 
-  const { data, status } = useReactiveQuery<TelemetryLog>(
+  const { data, status } = useReactiveSQL<TelemetryLog>(
     nodeRepo.getClient(),
     query,
   );

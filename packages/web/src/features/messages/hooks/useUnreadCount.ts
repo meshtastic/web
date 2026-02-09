@@ -1,10 +1,10 @@
+import { useReactiveSQL } from "@data/hooks/useReactiveSQL.ts";
 import { messageRepo } from "@data/index";
 import { type ConversationType } from "@data/types";
 import { useMemo } from "react";
 import { getDb } from "../../../data/client.ts";
 import { lastRead, messages } from "../../../data/schema.ts";
 import { and, eq, gt, isNull, ne, or, sql } from "drizzle-orm";
-import { useReactiveQuery } from "sqlocal/react";
 
 /**
  * Hook to get unread count for a direct conversation
@@ -44,7 +44,7 @@ export function useUnreadCountDirect(
     [deviceId, myNodeNum, otherNodeNum, conversationId],
   );
 
-  const { data, status } = useReactiveQuery(messageRepo.getClient(), query);
+  const { data, status } = useReactiveSQL(messageRepo.getClient(), query);
 
   return {
     unreadCount: data?.[0]?.count ?? 0,
@@ -87,7 +87,7 @@ export function useUnreadCountBroadcast(deviceId: number, channelId: number) {
     [deviceId, channelId, conversationId],
   );
 
-  const { data, status } = useReactiveQuery(messageRepo.getClient(), query);
+  const { data, status } = useReactiveSQL(messageRepo.getClient(), query);
 
   return {
     unreadCount: data?.[0]?.count ?? 0,

@@ -1,36 +1,24 @@
-import * as React from "react";
+import { useSyncExternalStore } from "react";
 
-export function useWindowFocus() {
-  const [isWindowFocused, setIsWindowFocused] = React.useState<boolean>(
-    typeof document !== "undefined" ? !document.hidden : true,
-  );
+function subscribe(callback: () => void): () => void {
+  document.addEventListener("visibilitychange", callback);
+  window.addEventListener("focus", callback);
+  window.addEventListener("blur", callback);
+  return () => {
+    document.removeEventListener("visibilitychange", callback);
+    window.removeEventListener("focus", callback);
+    window.removeEventListener("blur", callback);
+  };
+}
 
-  React.useEffect(() => {
-    const handleVisibilityChange = () => {
-      setIsWindowFocused(!document.hidden);
-    };
+function getSnapshot(): boolean {
+  return !document.hidden;
+}
 
-    const handleFocus = () => {
-      setIsWindowFocused(true);
-    };
+function getServerSnapshot(): boolean {
+  return true;
+}
 
-    const handleBlur = () => {
-      setIsWindowFocused(false);
-    };
-
-    // Listen to visibility change (tab switching)
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // Listen to window focus/blur events
-    window.addEventListener("focus", handleFocus);
-    window.addEventListener("blur", handleBlur);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleFocus);
-      window.removeEventListener("blur", handleBlur);
-    };
-  }, []);
-
-  return isWindowFocused;
+export function useWindowFocus(): boolean {
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

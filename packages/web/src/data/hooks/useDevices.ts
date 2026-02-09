@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useReactiveQuery } from "sqlocal/react";
 import { deviceRepo } from "../repositories/index.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { Device } from "../schema.ts";
 
 /**
@@ -9,7 +9,7 @@ import type { Device } from "../schema.ts";
 export function useDevices() {
   const query = useMemo(() => deviceRepo.buildDevicesQuery(), []);
 
-  const { data, status } = useReactiveQuery<Device>(
+  const { data, status } = useReactiveSQL<Device>(
     deviceRepo.getClient(),
     query,
   );

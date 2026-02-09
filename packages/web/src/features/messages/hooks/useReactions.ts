@@ -2,18 +2,14 @@
  * Reaction hooks for fetching message reactions
  */
 
+import { useReactiveSQL } from "@data/hooks/useReactiveSQL.ts";
 import { reactionRepo } from "@data/repositories";
 import type { Reaction } from "@data/schema";
-import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useMemo } from "react";
 
 /**
  * Hook to fetch reactions for multiple messages
  * Returns a Map of messageId -> Reaction[]
- *
- * Uses useSyncExternalStore + useMemo instead of sqlocal's useReactiveQuery
- * because useReactiveQuery captures the query via useState's lazy initializer,
- * which only runs on mount. When messageIds changes (e.g. from [] to real IDs),
- * the query is never updated, so reactions are never found.
  */
 export function useReactions(ownerNodeNum: number, messageIds: number[]) {
   // Use a stable key for the messageIds array to prevent unnecessary re-renders
@@ -25,22 +21,7 @@ export function useReactions(ownerNodeNum: number, messageIds: number[]) {
     return reactionRepo.buildReactionsForMessagesQuery(ownerNodeNum, ids);
   }, [ownerNodeNum, messageIdsKey]);
 
-  const reactiveQuery = useMemo(
-    () => reactionRepo.getClient().reactiveQuery(query),
-    [query],
-  );
-
-  const subscribe = useCallback(
-    (callback: () => void) => {
-      const subscription = reactiveQuery.subscribe(() => callback());
-      return () => subscription.unsubscribe();
-    },
-    [reactiveQuery],
-  );
-
-  const getSnapshot = useCallback(() => reactiveQuery.value, [reactiveQuery]);
-
-  const data = useSyncExternalStore(subscribe, getSnapshot) as Reaction[];
+  const { data } = useReactiveSQL<Reaction>(reactionRepo.getClient(), query);
 
   // Group reactions by targetMessageId
   const reactionsByMessage = useMemo(() => {
@@ -74,22 +55,7 @@ export function useMessageReactions(
     [ownerNodeNum, targetMessageId],
   );
 
-  const reactiveQuery = useMemo(
-    () => reactionRepo.getClient().reactiveQuery(query),
-    [query],
-  );
-
-  const subscribe = useCallback(
-    (callback: () => void) => {
-      const subscription = reactiveQuery.subscribe(() => callback());
-      return () => subscription.unsubscribe();
-    },
-    [reactiveQuery],
-  );
-
-  const getSnapshot = useCallback(() => reactiveQuery.value, [reactiveQuery]);
-
-  const data = useSyncExternalStore(subscribe, getSnapshot) as Reaction[];
+  const { data } = useReactiveSQL<Reaction>(reactionRepo.getClient(), query);
 
   return {
     reactions: data ?? [],

@@ -5,6 +5,7 @@ import {
 import { useUnsafeRolesDialog } from "@shared/components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
+import { useUIStore } from "@state/ui/store.ts";
 import { useCallback, useEffect, useEffectEvent, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
@@ -97,6 +98,23 @@ export function useDeviceForm() {
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  // Subscribe to pending field resets from activity undo
+  const pendingReset = useUIStore((s) => s.pendingFieldReset);
+
+  useEffect(() => {
+    if (
+      pendingReset?.changeType === "config" &&
+      pendingReset.variant === "device" &&
+      pendingReset.fieldPath
+    ) {
+      form.setValue(
+        pendingReset.fieldPath as Path<DeviceValidation>,
+        pendingReset.value as DeviceValidation[keyof DeviceValidation],
+      );
+      useUIStore.getState().clearPendingReset();
+    }
+  }, [pendingReset, form]);
 
   // Handle role change with validation dialog
   const handleRoleChange = useCallback(

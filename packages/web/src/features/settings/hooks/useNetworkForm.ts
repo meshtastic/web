@@ -6,6 +6,7 @@ import {
 import { Protobuf } from "@meshtastic/core";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
+import { useUIStore } from "@state/ui/store.ts";
 import { convertIntToIpAddress, convertIpAddressToInt } from "@shared/utils/ip";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import type { DeepPartial } from "react-hook-form";
@@ -156,6 +157,23 @@ export function useNetworkForm() {
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  // Subscribe to pending field resets from activity undo
+  const pendingReset = useUIStore((s) => s.pendingFieldReset);
+
+  useEffect(() => {
+    if (
+      pendingReset?.changeType === "config" &&
+      pendingReset.variant === "network" &&
+      pendingReset.fieldPath
+    ) {
+      form.setValue(
+        pendingReset.fieldPath as Path<NetworkValidation>,
+        pendingReset.value as NetworkValidation[keyof NetworkValidation],
+      );
+      useUIStore.getState().clearPendingReset();
+    }
+  }, [pendingReset, form]);
 
   const isDisabledByField = useCallback(
     (

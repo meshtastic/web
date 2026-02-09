@@ -4,6 +4,7 @@ import { useNodes } from "@data/hooks";
 import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useMyNode } from "@shared/hooks";
+import { useUIStore } from "@state/ui/store.ts";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
@@ -15,7 +16,8 @@ import {
 export function useUserForm() {
   const { myNodeNum } = useMyNode();
   const { nodes: allNodes } = useNodes(myNodeNum);
-  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
+  const { pendingChanges, saveChange, clearChange } =
+    usePendingChanges(myNodeNum);
 
   // Get user data from node in database
   const myNode = useMemo(() => {
@@ -25,7 +27,7 @@ export function useUserForm() {
     return allNodes.find((n) => n.nodeNum === myNodeNum);
   }, [allNodes, myNodeNum]);
 
-  const defaultValues = useMemo(
+  const baseValues = useMemo(
     (): UserValidation => ({
       longName: myNode?.longName ?? "",
       shortName: myNode?.shortName ?? "",
@@ -35,27 +37,41 @@ export function useUserForm() {
     [myNode],
   );
 
+  // Merge pending changes into base values
+  // Always create a new object to ensure react-hook-form detects changes
+  const effectiveValues = useMemo((): UserValidation => {
+    const userChanges = pendingChanges.filter((c) => c.changeType === "user");
+
+    const merged = { ...baseValues };
+    for (const change of userChanges) {
+      if (change.fieldPath && change.fieldPath in merged) {
+        (merged as Record<string, unknown>)[change.fieldPath] = change.value;
+      }
+    }
+    return merged;
+  }, [baseValues, pendingChanges]);
+
   const isReady = myNodeNum !== undefined;
 
   const form = useForm<UserValidation>({
     mode: "onChange",
     resolver: createZodResolver(UserValidationSchema),
-    defaultValues,
-    values: defaultValues,
+    defaultValues: baseValues,
+    values: effectiveValues,
   });
 
   const { watch, getValues } = form;
 
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<UserValidation | undefined>(undefined);
-  const originalValuesRef = useRef<UserValidation>(defaultValues);
+  const originalValuesRef = useRef<UserValidation>(baseValues);
   // Track whether we've completed initial sync (skip first watch fire)
   const hasInitialSyncRef = useRef(false);
 
   // Store original values on mount
   useEffect(() => {
-    originalValuesRef.current = defaultValues;
-  }, [defaultValues]);
+    originalValuesRef.current = baseValues;
+  }, [baseValues]);
 
   // Sync form changes to database
   const onFormChange = useEffectEvent((formData: Partial<UserValidation>) => {
@@ -115,6 +131,19 @@ export function useUserForm() {
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  // Subscribe to pending field resets from activity undo
+  const pendingReset = useUIStore((s) => s.pendingFieldReset);
+
+  useEffect(() => {
+    if (pendingReset?.changeType === "user" && pendingReset.fieldPath) {
+      form.setValue(
+        pendingReset.fieldPath as Path<UserValidation>,
+        pendingReset.value as UserValidation[keyof UserValidation],
+      );
+      useUIStore.getState().clearPendingReset();
+    }
+  }, [pendingReset, form]);
 
   // Send user data directly to device via adminCommands
   const sendToDevice = useCallback(async () => {

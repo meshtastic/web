@@ -4,8 +4,8 @@
 
 import { toast } from "@shared/hooks/useToast";
 import { useCallback, useMemo } from "react";
-import { useReactiveQuery } from "sqlocal/react";
 import { preferencesRepo } from "../repositories/index.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 interface UsePreferenceOptions {
   notify?: boolean;
@@ -21,7 +21,7 @@ export function usePreference<T>(
 ): [T, (value: T) => Promise<void>] {
   const query = useMemo(() => preferencesRepo.buildPreferenceQuery(key), [key]);
 
-  const { data } = useReactiveQuery(preferencesRepo.getClient(), query);
+  const { data } = useReactiveSQL(preferencesRepo.getClient(), query);
 
   const value = useMemo((): T => {
     const row = data?.[0];
@@ -53,7 +53,7 @@ export function usePreference<T>(
  */
 export function useAllPreferences(): Map<string, unknown> {
   const query = useMemo(() => preferencesRepo.buildAllPreferencesQuery(), []);
-  const { data } = useReactiveQuery(preferencesRepo.getClient(), query);
+  const { data } = useReactiveSQL(preferencesRepo.getClient(), query);
 
   return useMemo(() => {
     const map = new Map<string, unknown>();

@@ -1,4 +1,8 @@
-import { Dialog, DialogContent, DialogTitle } from "@shared/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@shared/components/ui/dialog";
 import { cn } from "@shared/utils/cn";
 import type { DialogProps } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";

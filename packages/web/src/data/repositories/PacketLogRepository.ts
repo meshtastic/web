@@ -136,14 +136,19 @@ export class PacketLogRepository {
     const result = await this.db
       .delete(packetLogs)
       .where(
-        and(eq(packetLogs.ownerNodeNum, ownerNodeNum), lt(packetLogs.id, cutoffId)),
+        and(
+          eq(packetLogs.ownerNodeNum, ownerNodeNum),
+          lt(packetLogs.id, cutoffId),
+        ),
       );
 
     return result.rowsAffected ?? 0;
   }
 
   async deleteAllPackets(ownerNodeNum: number): Promise<void> {
-    await this.db.delete(packetLogs).where(eq(packetLogs.ownerNodeNum, ownerNodeNum));
+    await this.db
+      .delete(packetLogs)
+      .where(eq(packetLogs.ownerNodeNum, ownerNodeNum));
   }
 
   async clearAllPackets(): Promise<void> {

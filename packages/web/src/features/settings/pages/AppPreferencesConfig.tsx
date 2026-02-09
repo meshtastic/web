@@ -28,7 +28,7 @@ import { Separator } from "@shared/components/ui/separator";
 import { Slider } from "@shared/components/ui/slider";
 import { Switch } from "@shared/components/ui/switch";
 import { toast } from "@shared/hooks/useToast";
-import { DEFAULT_PREFERENCES, type DateFormat } from "@state/ui";
+import { DEFAULT_PREFERENCES, type DateFormat, type Language } from "@state/ui";
 import {
   Globe,
   Monitor,
@@ -41,7 +41,7 @@ import {
   Volume2,
 } from "lucide-react";
 
-import { Activity, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const MAX_SOUND_SIZE = 512 * 1024; // 512 KB
@@ -184,13 +184,7 @@ function NotificationSoundSlot({ slot, enabled }: NotificationSoundSlotProps) {
   );
 }
 
-interface AppPreferencesConfigProps {
-  searchQuery?: string;
-}
-
-export const AppPreferencesConfig = ({
-  searchQuery = "",
-}: AppPreferencesConfigProps) => {
+export const AppPreferencesConfig = () => {
   const { t } = useTranslation("ui");
   const { theme: themeFromProvider, setTheme: setThemeInProvider } = useTheme();
 
@@ -237,236 +231,210 @@ export const AppPreferencesConfig = ({
     setNotificationVolume,
   ]);
 
-  const query = searchQuery.toLowerCase().trim();
-
-  const appearanceVisible =
-    !query ||
-    "appearance theme light dark".includes(query) ||
-    t("preferences.appearance.title").toLowerCase().includes(query);
-
-  const localizationVisible =
-    !query ||
-    "localization language".includes(query) ||
-    t("preferences.localization.title").toLowerCase().includes(query);
-
-  const audioVisible =
-    !query ||
-    "audio sound message alert notification".includes(query) ||
-    t("preferences.audio.title").toLowerCase().includes(query);
-
-  const isVisible = appearanceVisible || localizationVisible || audioVisible;
-
   const themeOptions = [
     { value: "light", label: t("preferences.appearance.light") },
     { value: "dark", label: t("preferences.appearance.dark") },
     { value: "system", label: t("preferences.appearance.system") },
   ];
-  if (!isVisible) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground text-center">
-            No settings found matching "{searchQuery}"
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Activity mode={appearanceVisible ? "visible" : "hidden"}>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
-              {t("preferences.appearance.title")}
-            </CardTitle>
-            <CardDescription>
-              {t("preferences.appearance.description")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <Label>{t("preferences.appearance.theme")}</Label>
-              <RadioGroup
-                value={themeFromProvider}
-                onValueChange={(value) =>
-                  setThemeInProvider(value as "light" | "dark" | "system")
-                }
-                className="grid grid-cols-3 gap-4"
-              >
-                {themeOptions.map((option) => (
-                  <div key={option.value}>
-                    <RadioGroupItem
-                      value={option.value}
-                      id={`theme-${option.value}`}
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor={`theme-${option.value}`}
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                    >
-                      {option.value === "light" && (
-                        <Sun className="mb-3 size-5" />
-                      )}
-                      {option.value === "dark" && (
-                        <Moon className="mb-3 size-5" />
-                      )}
-                      {option.value === "system" && (
-                        <Monitor className="mb-3 size-5" />
-                      )}
-                      {option.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-          </CardContent>
-        </Card>
-      </Activity>
-
-      <Activity mode={localizationVisible ? "visible" : "hidden"}>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
-              {t("preferences.localization.title")}
-            </CardTitle>
-            <CardDescription>
-              {t("preferences.localization.description")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>{t("preferences.localization.language")}</Label>
-              <Select
-                value={language}
-                onValueChange={(value) => void setLanguage(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
-                  <SelectItem value="de">Deutsch</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="pt">Português</SelectItem>
-                  <SelectItem value="zh">中文</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>{t("preferences.localization.dateFormat")}</Label>
-              <Select
-                value={dateFormat}
-                onValueChange={(value) =>
-                  void setDateFormat(value as DateFormat)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">
-                    {t("preferences.localization.dateFormat.none")}
-                  </SelectItem>
-                  <SelectItem value="short">
-                    {t("preferences.localization.dateFormat.short")}
-                  </SelectItem>
-                  <SelectItem value="long">
-                    {t("preferences.localization.dateFormat.long")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-      </Activity>
-
-      <Activity mode={audioVisible ? "visible" : "hidden"}>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Volume2 className="h-5 w-5" />
-              {t("preferences.audio.title")}
-            </CardTitle>
-            <CardDescription>
-              {t("preferences.audio.description")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>{t("preferences.audio.messageSound.label")}</Label>
-                  <p className="text-xs md:text-sm text-muted-foreground">
-                    {t("preferences.audio.messageSound.description")}
-                  </p>
-                </div>
-                <Switch
-                  checked={messageSoundEnabled}
-                  onCheckedChange={(checked) =>
-                    void setMessageSoundEnabled(checked)
-                  }
-                />
-              </div>
-              <NotificationSoundSlot
-                slot="message"
-                enabled={messageSoundEnabled}
-              />
-            </div>
-            <Separator />
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>{t("preferences.audio.alertSound.label")}</Label>
-                  <p className="text-xs md:text-sm text-muted-foreground">
-                    {t("preferences.audio.alertSound.description")}
-                  </p>
-                </div>
-                <Switch
-                  checked={alertSoundEnabled}
-                  onCheckedChange={(checked) =>
-                    void setAlertSoundEnabled(checked)
-                  }
-                />
-              </div>
-              <NotificationSoundSlot slot="alert" enabled={alertSoundEnabled} />
-            </div>
-            <Separator />
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>{t("preferences.audio.volume.label", "Volume")}</Label>
-                  <p className="text-xs md:text-sm text-muted-foreground">
-                    {t(
-                      "preferences.audio.volume.description",
-                      "Notification sound volume",
+      <Card data-section="appearance">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            {t("preferences.appearance.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("preferences.appearance.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-3">
+            <Label data-field-name="theme">
+              {t("preferences.appearance.theme")}
+            </Label>
+            <RadioGroup
+              value={themeFromProvider}
+              onValueChange={(value) =>
+                setThemeInProvider(value as "light" | "dark" | "system")
+              }
+              className="grid grid-cols-3 gap-4"
+            >
+              {themeOptions.map((option) => (
+                <div key={option.value}>
+                  <RadioGroupItem
+                    value={option.value}
+                    id={`theme-${option.value}`}
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor={`theme-${option.value}`}
+                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  >
+                    {option.value === "light" && (
+                      <Sun className="mb-3 size-5" />
                     )}
-                  </p>
+                    {option.value === "dark" && (
+                      <Moon className="mb-3 size-5" />
+                    )}
+                    {option.value === "system" && (
+                      <Monitor className="mb-3 size-5" />
+                    )}
+                    {option.label}
+                  </Label>
                 </div>
-                <span className="text-xs md:text-sm text-muted-foreground tabular-nums">
-                  {notificationVolume}%
-                </span>
+              ))}
+            </RadioGroup>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card data-section="localization">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            {t("preferences.localization.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("preferences.localization.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label data-field-name="language">
+              {t("preferences.localization.language")}
+            </Label>
+            <Select
+              value={language}
+              onValueChange={(value) => void setLanguage(value as Language)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="es">Español</SelectItem>
+                <SelectItem value="de">Deutsch</SelectItem>
+                <SelectItem value="fr">Français</SelectItem>
+                <SelectItem value="pt">Português</SelectItem>
+                <SelectItem value="zh">中文</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label data-field-name="dateFormat">
+              {t("preferences.localization.dateFormat")}
+            </Label>
+            <Select
+              value={dateFormat}
+              onValueChange={(value) => void setDateFormat(value as DateFormat)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">
+                  {t("preferences.localization.dateFormat.none")}
+                </SelectItem>
+                <SelectItem value="short">
+                  {t("preferences.localization.dateFormat.short")}
+                </SelectItem>
+                <SelectItem value="long">
+                  {t("preferences.localization.dateFormat.long")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card data-section="audio">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Volume2 className="h-5 w-5" />
+            {t("preferences.audio.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("preferences.audio.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label data-field-name="messageSound">
+                  {t("preferences.audio.messageSound.label")}
+                </Label>
+                <p className="text-xs md:text-sm text-muted-foreground">
+                  {t("preferences.audio.messageSound.description")}
+                </p>
               </div>
-              <Slider
-                value={[notificationVolume]}
-                onValueChange={(value) => {
-                  const vol = value[0];
-                  if (vol !== undefined) {
-                    void setNotificationVolume(vol);
-                  }
-                }}
-                min={0}
-                max={100}
-                step={5}
+              <Switch
+                checked={messageSoundEnabled}
+                onCheckedChange={(checked) =>
+                  void setMessageSoundEnabled(checked)
+                }
               />
             </div>
-          </CardContent>
-        </Card>
-      </Activity>
+            <NotificationSoundSlot
+              slot="message"
+              enabled={messageSoundEnabled}
+            />
+          </div>
+          <Separator />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label data-field-name="alertSound">
+                  {t("preferences.audio.alertSound.label")}
+                </Label>
+                <p className="text-xs md:text-sm text-muted-foreground">
+                  {t("preferences.audio.alertSound.description")}
+                </p>
+              </div>
+              <Switch
+                checked={alertSoundEnabled}
+                onCheckedChange={(checked) =>
+                  void setAlertSoundEnabled(checked)
+                }
+              />
+            </div>
+            <NotificationSoundSlot slot="alert" enabled={alertSoundEnabled} />
+          </div>
+          <Separator />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label data-field-name="volume">
+                  {t("preferences.audio.volume.label", "Volume")}
+                </Label>
+                <p className="text-xs md:text-sm text-muted-foreground">
+                  {t(
+                    "preferences.audio.volume.description",
+                    "Notification sound volume",
+                  )}
+                </p>
+              </div>
+              <span className="text-xs md:text-sm text-muted-foreground tabular-nums">
+                {notificationVolume}%
+              </span>
+            </div>
+            <Slider
+              value={[notificationVolume]}
+              onValueChange={(value) => {
+                const vol = value[0];
+                if (vol !== undefined) {
+                  void setNotificationVolume(vol);
+                }
+              }}
+              min={0}
+              max={100}
+              step={5}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="flex justify-end">
         <Button variant="outline" onClick={resetToDefaults}>

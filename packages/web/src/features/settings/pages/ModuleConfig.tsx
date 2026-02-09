@@ -28,83 +28,93 @@ import { RangeTest } from "../components/modules/RangeTest.tsx";
 import { Serial } from "../components/modules/Serial.tsx";
 import { StoreForward } from "../components/modules/StoreForward.tsx";
 import { Telemetry } from "../components/modules/Telemetry.tsx";
-
-interface ConfigPageProps {
-  searchQuery?: string;
-}
+import { useSettingsNavigation } from "../search/index.ts";
 
 type TabItem = {
   case: ValidModuleConfigType;
   label: string;
+  description: string;
   element: ComponentType;
-  count?: number;
 };
 
-export const ModuleConfig = ({ searchQuery = "" }: ConfigPageProps) => {
+export const ModuleConfig = () => {
   const { myNodeNum } = useMyNode();
   const { hasVariantChanges } = usePendingChanges(myNodeNum);
   const { t } = useTranslation("moduleConfig");
+  const { activeTab, setActiveTab } = useSettingsNavigation();
 
   const tabs: TabItem[] = useMemo(
     () => [
       {
         case: "mqtt",
         label: t("page.mqtt"),
+        description: t("mqtt.description"),
         element: MQTT,
       },
       {
         case: "serial",
         label: t("page.serial"),
+        description: t("serial.description"),
         element: Serial,
       },
       {
         case: "externalNotification",
         label: t("page.externalNotification"),
+        description: t("externalNotification.description"),
         element: ExternalNotification,
       },
       {
         case: "storeForward",
         label: t("page.storeAndForward"),
+        description: t("storeForward.description"),
         element: StoreForward,
       },
       {
         case: "rangeTest",
         label: t("page.rangeTest"),
+        description: t("rangeTest.description"),
         element: RangeTest,
       },
       {
         case: "telemetry",
         label: t("page.telemetry"),
+        description: t("telemetry.description"),
         element: Telemetry,
       },
       {
         case: "cannedMessage",
         label: t("page.cannedMessage"),
+        description: t("cannedMessage.description"),
         element: CannedMessage,
       },
       {
         case: "audio",
         label: t("page.audio"),
+        description: t("audio.description"),
         element: Audio,
       },
       {
         case: "neighborInfo",
         label: t("page.neighborInfo"),
+        description: t("neighborInfo.description"),
         element: NeighborInfo,
       },
       {
         case: "ambientLighting",
         label: t("page.ambientLighting"),
+        description: t("ambientLighting.description"),
         element: AmbientLighting,
       },
       {
         case: "detectionSensor",
         label: t("page.detectionSensor"),
+        description: t("detectionSensor.description"),
         element: DetectionSensor,
       },
       {
         case: "paxcounter",
         label: t("page.paxcounter"),
+        description: t("paxcounter.description"),
         element: Paxcounter,
       },
     ],
@@ -122,74 +132,41 @@ export const ModuleConfig = ({ searchQuery = "" }: ConfigPageProps) => {
     [tabs, hasVariantChanges],
   );
 
-  const filteredTabs = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return tabs;
-    }
-
-    const query = searchQuery.toLowerCase();
-    return tabs.filter((tab) => tab.label.toLowerCase().includes(query));
-  }, [tabs, searchQuery]);
+  // Default to first tab if active tab doesn't match any tab
+  const currentTab = tabs.find((tab) => tab.case === activeTab)
+    ? activeTab
+    : (tabs[0]?.case ?? "mqtt");
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {filteredTabs.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-muted-foreground text-center">
-              No modules found matching "{searchQuery}"
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Tabs defaultValue={filteredTabs[0]?.case}>
-          <TabsList className="flex w-full">
-            {filteredTabs.map((tab) => (
-              <TabsTrigger key={tab.case} value={tab.case} className="relative">
-                {tab.label}
-                {flags.get(tab.case) && (
-                  <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
-                    <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
-                  </span>
-                )}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {filteredTabs.map((tab) => (
-            <TabsContent key={tab.case} value={tab.case}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>{tab.label}</CardTitle>
-                  <CardDescription>
-                    {tab.case === "mqtt" && t("mqtt.description")}
-                    {tab.case === "serial" && t("serial.description")}
-                    {tab.case === "externalNotification" &&
-                      t("externalNotification.description")}
-                    {tab.case === "storeForward" &&
-                      t("storeForward.description")}
-                    {tab.case === "rangeTest" && t("rangeTest.description")}
-                    {tab.case === "telemetry" && t("telemetry.description")}
-                    {tab.case === "cannedMessage" &&
-                      t("cannedMessage.description")}
-                    {tab.case === "audio" && t("audio.description")}
-                    {tab.case === "neighborInfo" &&
-                      t("neighborInfo.description")}
-                    {tab.case === "ambientLighting" &&
-                      t("ambientLighting.description")}
-                    {tab.case === "detectionSensor" &&
-                      t("detectionSensor.description")}
-                    {tab.case === "paxcounter" && t("paxcounter.description")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <tab.element />
-                </CardContent>
-              </Card>
-            </TabsContent>
+      <Tabs value={currentTab} onValueChange={setActiveTab}>
+        <TabsList className="flex w-full">
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.case} value={tab.case} className="relative">
+              {tab.label}
+              {flags.get(tab.case) && (
+                <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
+                  <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
+                </span>
+              )}
+            </TabsTrigger>
           ))}
-        </Tabs>
-      )}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsContent key={tab.case} value={tab.case}>
+            <Card>
+              <CardHeader>
+                <CardTitle>{tab.label}</CardTitle>
+                <CardDescription>{tab.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <tab.element />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 };

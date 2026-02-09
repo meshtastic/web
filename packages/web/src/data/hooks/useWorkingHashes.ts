@@ -21,7 +21,7 @@ import {
   workingHashRepo,
 } from "@data/repositories/index.ts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useReactiveQuery } from "sqlocal/react";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 import { usePendingChanges } from "./usePendingChanges.ts";
 import type { ConfigChange, ConfigHash, DeviceConfig } from "../schema.ts";
 
@@ -150,7 +150,7 @@ export function useWorkingHashes(
   }, [ownerNodeNum]);
 
   const { data: storedBaseHashes, status: baseHashStatus } =
-    useReactiveQuery<ConfigHash>(configHashRepo.getClient(), baseHashQuery);
+    useReactiveSQL<ConfigHash>(configHashRepo.getClient(), baseHashQuery);
 
   // Update base hashes when DB data changes
   useEffect(() => {
@@ -177,7 +177,7 @@ export function useWorkingHashes(
   }, [ownerNodeNum]);
 
   const { data: configData, status: configStatus } =
-    useReactiveQuery<DeviceConfig>(configCacheRepo.getClient(), configQuery);
+    useReactiveSQL<DeviceConfig>(configCacheRepo.getClient(), configQuery);
 
   // ==========================================================================
   // Load pending changes via usePendingChanges hook (avoids duplicate query)

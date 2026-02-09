@@ -40,7 +40,7 @@ export class ConfigCacheRepository {
 
   /**
    * Build a query to fetch config for a device.
-   * Can be used with useReactiveQuery for reactive updates.
+   * Can be used with useReactiveSQL for reactive updates.
    */
   buildConfigQuery(ownerNodeNum: number) {
     return this.db
@@ -52,7 +52,7 @@ export class ConfigCacheRepository {
 
   /**
    * Build a query to fetch all pending config changes for a device.
-   * Can be used with useReactiveQuery for reactive updates.
+   * Can be used with useReactiveSQL for reactive updates.
    */
   buildChangesQuery(ownerNodeNum: number) {
     return this.db
@@ -194,35 +194,59 @@ export class ConfigCacheRepository {
     },
   ): Promise<void> {
     const now = new Date();
+    const variant = change.variant ?? null;
+    const channelIndex = change.channelIndex ?? null;
+    const fieldPath = change.fieldPath ?? null;
 
-    await this.db
-      .insert(configChanges)
-      .values({
+    // SQLite treats NULLs as distinct in unique constraints, so we need to
+    // explicitly check for existing rows and update them instead of relying
+    // on onConflictDoUpdate
+    const existing = await this.db
+      .select({ id: configChanges.id })
+      .from(configChanges)
+      .where(
+        and(
+          eq(configChanges.ownerNodeNum, ownerNodeNum),
+          eq(configChanges.changeType, change.changeType),
+          variant !== null
+            ? eq(configChanges.variant, variant)
+            : sql`${configChanges.variant} IS NULL`,
+          channelIndex !== null
+            ? eq(configChanges.channelIndex, channelIndex)
+            : sql`${configChanges.channelIndex} IS NULL`,
+          fieldPath !== null
+            ? eq(configChanges.fieldPath, fieldPath)
+            : sql`${configChanges.fieldPath} IS NULL`,
+        ),
+      )
+      .limit(1);
+
+    const existingRow = existing[0];
+    if (existingRow) {
+      // Update existing row
+      await this.db
+        .update(configChanges)
+        .set({
+          value: change.value,
+          updatedAt: now,
+        })
+        .where(eq(configChanges.id, existingRow.id));
+    } else {
+      // Insert new row
+      await this.db.insert(configChanges).values({
         ownerNodeNum,
         changeType: change.changeType,
-        variant: change.variant ?? null,
-        channelIndex: change.channelIndex ?? null,
-        fieldPath: change.fieldPath ?? null,
+        variant,
+        channelIndex,
+        fieldPath,
         value: change.value,
         originalValue: change.originalValue ?? null,
         hasConflict: false,
         remoteValue: null,
         createdAt: now,
         updatedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [
-          configChanges.ownerNodeNum,
-          configChanges.changeType,
-          configChanges.variant,
-          configChanges.channelIndex,
-          configChanges.fieldPath,
-        ],
-        set: {
-          value: change.value,
-          updatedAt: now,
-        },
       });
+    }
   }
 
   async hasLocalChanges(

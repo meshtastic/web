@@ -7,6 +7,7 @@ import {
 import { useMyNode } from "@shared/hooks";
 import { usePositionFlags } from "@shared/hooks/usePositionFlags";
 import { useDevice } from "@state/index.ts";
+import { useUIStore } from "@state/ui/store.ts";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
@@ -154,6 +155,23 @@ export function usePositionForm() {
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  // Subscribe to pending field resets from activity undo
+  const pendingReset = useUIStore((s) => s.pendingFieldReset);
+
+  useEffect(() => {
+    if (
+      pendingReset?.changeType === "config" &&
+      pendingReset.variant === "position" &&
+      pendingReset.fieldPath
+    ) {
+      form.setValue(
+        pendingReset.fieldPath as Path<PositionValidation>,
+        pendingReset.value as PositionValidation[keyof PositionValidation],
+      );
+      useUIStore.getState().clearPendingReset();
+    }
+  }, [pendingReset, form]);
 
   // Queue admin message for fixed position when saving
   const queueFixedPositionUpdate = useCallback(() => {

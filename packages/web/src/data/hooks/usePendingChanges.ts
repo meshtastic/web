@@ -16,7 +16,7 @@ import type {
   ValidModuleConfigType,
 } from "@features/settings/components/types.ts";
 import { useCallback, useMemo, useRef } from "react";
-import { useReactiveQuery } from "sqlocal/react";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { ConfigChange, DeviceConfig } from "../schema.ts";
 
 // =============================================================================
@@ -96,7 +96,7 @@ export function usePendingChanges(
     return configCacheRepo.buildChangesQuery(ownerNodeNum);
   }, [ownerNodeNum]);
 
-  const { data, status } = useReactiveQuery<ConfigChange>(
+  const { data, status } = useReactiveSQL<ConfigChange>(
     configCacheRepo.getClient(),
     query,
   );
@@ -284,7 +284,7 @@ export function useEffectiveConfig<
     data: configData,
     status: configStatus,
     error: configError,
-  } = useReactiveQuery<DeviceConfig>(configCacheRepo.getClient(), configQuery);
+  } = useReactiveSQL<DeviceConfig>(configCacheRepo.getClient(), configQuery);
 
   // Track if we've ever received data to avoid showing loading on subsequent renders
   const configHydratedRef = useRef(false);
@@ -516,7 +516,7 @@ export function useEffectiveModuleConfig<
     data: configData,
     status: configStatus,
     error: configError,
-  } = useReactiveQuery<DeviceConfig>(
+  } = useReactiveSQL<DeviceConfig>(
     configCacheRepo.getClient(),
     moduleConfigQuery,
   );

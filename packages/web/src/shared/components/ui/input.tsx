@@ -35,10 +35,8 @@ type InputActionType = {
 };
 
 export interface InputProps
-  extends Omit<
-      React.InputHTMLAttributes<HTMLInputElement>,
-      "prefix" | "suffix"
-    >,
+  extends
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix" | "suffix">,
     VariantProps<typeof inputVariants> {
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
