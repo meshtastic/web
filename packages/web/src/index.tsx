@@ -115,8 +115,20 @@ rootElement.innerHTML = `
   <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 `;
 
-initializeApp()
-  .then(({ isReturningUser }) => {
+const initTimeout = new Promise<never>((_, reject) =>
+  setTimeout(
+    () =>
+      reject(
+        new Error(
+          "App initialization timed out. Your browser may not support the required APIs (OPFS, SharedArrayBuffer). Ensure the page is served with Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers.",
+        ),
+      ),
+    10_000,
+  ),
+);
+
+Promise.race([initializeApp(), initTimeout])
+  .then(() => {
     root.render(<AppWithSplash isReturningUser={true} />);
   })
   .catch((error) => {
