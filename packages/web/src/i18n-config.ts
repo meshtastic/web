@@ -28,8 +28,13 @@ i18next
   .use(LanguageDetector)
   .init({
     backend: {
-      // With this setup, {{lng}} will correctly resolve to 'en-US', 'fi-FI', etc.
-      loadPath: "/i18n/locales/{{lng}}/{{ns}}.json",
+      // Use base language code (e.g., 'en' instead of 'en-GB') to avoid 404s
+      loadPath: (lngs: string[], _ns: string) => {
+        const lng = lngs[0] ?? FALLBACK_LANGUAGE_CODE;
+        // Extract base language code (e.g., 'en' from 'en-GB')
+        const baseLng = lng.split('-')[0];
+        return `/i18n/locales/${baseLng}/{{ns}}.json`;
+      },
     },
     react: {
       useSuspense: true,
@@ -41,10 +46,11 @@ i18next
     },
     fallbackLng: {
       default: [FALLBACK_LANGUAGE_CODE],
-      fi: ["fi-FI", FALLBACK_LANGUAGE_CODE],
-      fr: ["fr-FR", FALLBACK_LANGUAGE_CODE],
-      sv: ["sv-SE", FALLBACK_LANGUAGE_CODE],
-      de: ["de-DE", FALLBACK_LANGUAGE_CODE],
+      en: ["en", FALLBACK_LANGUAGE_CODE],
+      fi: ["fi", "fi-FI", FALLBACK_LANGUAGE_CODE],
+      fr: ["fr", "fr-FR", FALLBACK_LANGUAGE_CODE],
+      sv: ["sv", "sv-SE", FALLBACK_LANGUAGE_CODE],
+      de: ["de", "de-DE", FALLBACK_LANGUAGE_CODE],
     },
     fallbackNS: ["common", "ui", "dialog"],
     debug: import.meta.env.MODE === "development",
