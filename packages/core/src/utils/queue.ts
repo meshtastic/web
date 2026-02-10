@@ -48,11 +48,28 @@ export class Queue {
           decoded.payloadVariant.case === "wantConfigId"
         ) {
           // heartbeat and wantConfigId packets are not acknowledged by the device
-          // resolve immediately after sending (processQueue handles the actual send)
-          setTimeout(() => {
-            this.remove(item.id);
-            resolve(item.id);
-          }, 100);
+          // For these packets, resolve once they have actually been sent
+          const start = Date.now();
+          const intervalId = setInterval(() => {
+            // Resolve when processQueue() (or equivalent) marks the item as sent
+            if (queueItem.sent) {
+              clearInterval(intervalId);
+              this.remove(item.id);
+              resolve(item.id);
+              return;
+            }
+            // Guard against waiting forever if the item is never sent
+            if (Date.now() - start >= this.timeout) {
+              clearInterval(intervalId);
+              if (this.queue.findIndex((qi) => qi.id === item.id) !== -1) {
+                this.remove(item.id);
+              }
+              reject({
+                id: item.id,
+                error: Protobuf.Mesh.Routing_Error.TIMEOUT,
+              });
+            }
+          }, 50);
           return;
         }
 
