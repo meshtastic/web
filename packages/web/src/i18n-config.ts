@@ -29,17 +29,18 @@ i18next
   .init({
     backend: {
       // Use base language code (e.g., 'en' instead of 'en-GB') to avoid 404s
+      load: "languageOnly",
       loadPath: (lngs: string[], _ns: string) => {
         const lng = lngs[0] ?? FALLBACK_LANGUAGE_CODE;
         // Extract base language code (e.g., 'en' from 'en-GB')
-        const baseLng = lng.split('-')[0];
+        const baseLng = lng.split("-")[0];
         return `/i18n/locales/${baseLng}/{{ns}}.json`;
       },
     },
     react: {
       useSuspense: true,
     },
-    nonExplicitSupportedLngs: true,
+    nonExplicitSupportedLngs: false,
     detection: {
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
