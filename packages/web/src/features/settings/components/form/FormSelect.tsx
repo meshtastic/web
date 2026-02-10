@@ -1,7 +1,3 @@
-import type {
-  BaseFormBuilderProps,
-  GenericFormElementProps,
-} from "./FormTypes";
 import {
   Select,
   SelectContent,
@@ -11,6 +7,10 @@ import {
 } from "@shared/components/ui/select";
 import { cn } from "@shared/utils/cn";
 import { type FieldValues, useController } from "react-hook-form";
+import type {
+  BaseFormBuilderProps,
+  GenericFormElementProps,
+} from "./FormTypes";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";

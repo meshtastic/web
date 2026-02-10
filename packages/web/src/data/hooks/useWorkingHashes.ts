@@ -10,10 +10,10 @@
 
 import {
   type ComputeHashesInput,
+  type LeafKey,
   computeLeafHashes,
   getChangedLeaves,
   groupChangedLeaves,
-  type LeafKey,
 } from "@core/utils/merkleConfig.ts";
 import {
   configCacheRepo,
@@ -21,9 +21,9 @@ import {
   workingHashRepo,
 } from "@data/repositories/index.ts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useReactiveSQL } from "./useReactiveSQL.ts";
-import { usePendingChanges } from "./usePendingChanges.ts";
 import type { ConfigChange, ConfigHash, DeviceConfig } from "../schema.ts";
+import { usePendingChanges } from "./usePendingChanges.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 // =============================================================================
 // Types

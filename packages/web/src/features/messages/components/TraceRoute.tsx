@@ -1,6 +1,6 @@
 import { useNodes } from "@data/hooks";
-import { useMyNode } from "@shared/hooks";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useMyNode } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 
 interface NodeInfo {

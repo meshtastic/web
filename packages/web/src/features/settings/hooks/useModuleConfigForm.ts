@@ -49,11 +49,8 @@ export function useModuleConfigForm<T extends FieldValues>({
   const { myNodeNum } = useMyNode();
 
   // Load module config from database (base + pending changes merged)
-  const {
-    config: dbRawEffectiveConfig,
-    baseConfig: dbRawBaseConfig,
-    isLoading,
-  } = useEffectiveModuleConfig(myNodeNum, moduleConfigType);
+  const { config: dbRawEffectiveConfig, baseConfig: dbRawBaseConfig } =
+    useEffectiveModuleConfig(myNodeNum, moduleConfigType);
 
   // Fall back to device store module config when DB has no cached row yet
   const device = useDevice();
@@ -75,7 +72,7 @@ export function useModuleConfigForm<T extends FieldValues>({
     ? transformDefaults(rawEffectiveConfig as unknown as T | undefined)
     : (rawEffectiveConfig as unknown as T | undefined);
 
-  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
+  const isReady = baseConfig !== undefined && baseConfig !== null;
 
   const form = useForm<T>({
     mode: "onChange",

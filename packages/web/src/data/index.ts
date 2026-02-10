@@ -22,7 +22,7 @@ export {
   usePositionTrails,
   useTelemetryHistory,
 } from "./hooks/index.ts";
-export { MigrationService } from "./migrationService.ts";
+export { deleteDeviceData, hasDeviceData } from "./migrationService.ts";
 // Export packet batcher
 export { PacketBatcher, packetBatcher } from "./packetBatcher.ts";
 export {

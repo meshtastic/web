@@ -1,8 +1,8 @@
 import { dbClient } from "@data/client";
-import { useDevices, useDeviceStorage } from "@data/hooks";
+import { useDeviceStorage, useDevices } from "@data/hooks";
 import type { Device } from "@data/schema";
-import { RemoveDeviceDialog } from "@shared/components/Dialog/RemoveDeviceDialog";
 import { DialogWrapper } from "@shared/components/Dialog/DialogWrapper";
+import { RemoveDeviceDialog } from "@shared/components/Dialog/RemoveDeviceDialog";
 import { TimeAgo } from "@shared/components/TimeAgo";
 import { Button } from "@shared/components/ui/button";
 import { Label } from "@shared/components/ui/label";

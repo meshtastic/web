@@ -15,7 +15,7 @@ export const urlOrIpv4Schema = z
       const potentialPort = input.substring(lastColonIndex + 1);
       if (/^\d+$/.test(potentialPort)) {
         host = input.substring(0, lastColonIndex);
-        port = parseInt(potentialPort, 10);
+        port = Number.parseInt(potentialPort, 10);
       }
     }
 

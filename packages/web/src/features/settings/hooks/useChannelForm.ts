@@ -1,9 +1,5 @@
-import {
-  type ChannelValidation,
-  makeChannelSchema,
-} from "../components/panels/Channels/validation";
-import type { Channel as DbChannel } from "@data/index";
 import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
+import type { Channel as DbChannel } from "@data/index";
 import { useMyNode } from "@shared/hooks";
 import { useUIStore } from "@state/ui/store.ts";
 import cryptoRandomString from "crypto-random-string";
@@ -18,6 +14,10 @@ import {
 import type { DeepPartial } from "react-hook-form";
 import { type DefaultValues, type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver";
+import {
+  type ChannelValidation,
+  makeChannelSchema,
+} from "../components/panels/Channels/validation";
 
 export interface UseChannelFormOptions {
   channel: DbChannel;

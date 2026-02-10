@@ -3,9 +3,9 @@ import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import logger from "../../core/services/logger.ts";
 import { dbClient } from "../client.ts";
 import {
-  messageReactions,
   type NewReaction,
   type Reaction,
+  messageReactions,
 } from "../schema.ts";
 
 export class ReactionRepository {

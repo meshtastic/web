@@ -1,10 +1,10 @@
 import { useReactiveSQL } from "@data/hooks/useReactiveSQL.ts";
 import { messageRepo } from "@data/index";
-import { type ConversationType } from "@data/types";
+import type { ConversationType } from "@data/types";
+import { and, eq, gt, isNull, ne, or, sql } from "drizzle-orm";
 import { useMemo } from "react";
 import { getDb } from "../../../data/client.ts";
 import { lastRead, messages } from "../../../data/schema.ts";
-import { and, eq, gt, isNull, ne, or, sql } from "drizzle-orm";
 
 /**
  * Hook to get unread count for a direct conversation

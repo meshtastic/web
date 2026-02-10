@@ -6,8 +6,8 @@ import {
   EmojiPicker as EmojiPickerPrimitive,
 } from "frimousse";
 import { SearchIcon } from "lucide-react";
-import { Spinner } from "./spinner";
 import type * as React from "react";
+import { Spinner } from "./spinner";
 
 function EmojiPicker({
   className,

@@ -105,7 +105,9 @@ export const MessageInput = ({
     }
     const tempMessageId = Math.floor(Date.now() / 1000); //
     logger.info(
-      `[MessageInput] Saving message with ownerNodeNum=${myNodeNum}, channelId=${channelValue}, type=${isDirect ? "direct" : "channel"}`,
+      `[MessageInput] Saving message with ownerNodeNum=${myNodeNum}, channelId=${channelValue}, type=${
+        isDirect ? "direct" : "channel"
+      }`,
     );
 
     // For direct messages, use the destination node; for channels, use broadcast address
@@ -279,7 +281,6 @@ export const MessageInput = ({
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
-              {/** biome-ignore lint/correctness/useUniqueElementIds: its a single button and can have a static id*/}
               <Button
                 size="icon"
                 type="submit"

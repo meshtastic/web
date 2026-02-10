@@ -1,5 +1,5 @@
-import logger from "../core/services/logger.ts";
 import { DEFAULT_PREFERENCES } from "@state/ui";
+import logger from "../core/services/logger.ts";
 import { packetLogRepo, preferencesRepo } from "./repositories/index.ts";
 import type { NewPacketLog } from "./schema.ts";
 

@@ -1,8 +1,8 @@
 import { useTheme } from "@app/shared/components/ui/useTheme";
 import {
+  type NotificationSlot,
   invalidateCache,
   playNotificationSound,
-  type NotificationSlot,
 } from "@core/services/notificationSound";
 import { usePreference } from "@data/hooks";
 import { notificationSoundRepo } from "@data/repositories";

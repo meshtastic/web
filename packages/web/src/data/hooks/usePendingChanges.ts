@@ -9,15 +9,15 @@
  */
 
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/core";
 import { configCacheRepo } from "@data/repositories/index.ts";
 import type {
   ValidConfigType,
   ValidModuleConfigType,
 } from "@features/settings/components/types.ts";
+import { Protobuf } from "@meshtastic/core";
 import { useCallback, useMemo, useRef } from "react";
-import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { ConfigChange, DeviceConfig } from "../schema.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 // =============================================================================
 // Types

@@ -1,13 +1,13 @@
+import { Protobuf } from "@meshtastic/core";
+import { useRemoteAdminAuth } from "@shared/hooks";
+import { useTranslation } from "react-i18next";
 import { useConfigForm } from "../../hooks/useConfigForm";
+import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import {
   type LoRaValidation,
   LoRaValidationSchema,
 } from "../../validation/config/lora";
 import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
-import { Protobuf } from "@meshtastic/core";
-import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
-import { useRemoteAdminAuth } from "@shared/hooks";
-import { useTranslation } from "react-i18next";
 
 export const Lora = () => {
   const { t } = useTranslation("config");

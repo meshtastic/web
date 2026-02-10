@@ -1,9 +1,9 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import logger from "@core/services/logger";
-import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
+import { type MeshDevice, Protobuf, type Types } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { produce } from "immer";
-import { create as createStore, type StateCreator } from "zustand";
+import { type StateCreator, create as createStore } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import type { WaypointWithMetadata } from "./types.ts";
 

@@ -1,10 +1,5 @@
-import React, { useState } from "react";
 import "@app/index.css";
 import logger from "@core/services/logger";
-import { enableMapSet } from "immer";
-import "maplibre-gl/dist/maplibre-gl.css";
-import { createRoot } from "react-dom/client";
-import "./i18n-config.ts";
 import { dbClient } from "@data/client";
 import { initDatabase, resetConnectionStatuses } from "@data/index";
 import {
@@ -21,8 +16,13 @@ import {
 import { useDeviceStore } from "@state/device";
 import { useUIStore } from "@state/ui";
 import { RouterProvider } from "@tanstack/react-router";
+import { enableMapSet } from "immer";
+import "maplibre-gl/dist/maplibre-gl.css";
+import React, { useState } from "react";
+import { createRoot } from "react-dom/client";
 import { router } from "./app/router.ts";
 import type { RouterContext } from "./app/routerContext.ts";
+import "./i18n-config.ts";
 import { WelcomeSplash } from "./shared/components/WelcomeSplash.tsx";
 
 enableMapSet();

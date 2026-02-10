@@ -57,6 +57,7 @@ export { useUse12hClock } from "./useUse12hClock.ts";
 export { useLoraConfig } from "./useLoraConfig.ts";
 export { useDevices, useDeviceStorage } from "./useDevices.ts";
 export { usePacketLogs } from "./usePacketLogs.ts";
+export { useSignalLogs } from "./useSignalLogs.ts";
 export type { PreferenceKey } from "./usePreferences.ts";
 export {
   PREFERENCE_KEYS,

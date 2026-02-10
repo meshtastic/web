@@ -5,18 +5,18 @@ import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { MapRef } from "react-map-gl/maplibre";
 import {
-  fanOutOffsetsPx,
-  groupNodesByIdenticalCoords,
-  type PxOffset,
-} from "../cluster.ts";
-import {
-  generatePrecisionCircles,
   SourcePrecisionCircles,
+  generatePrecisionCircles,
 } from "../Layers/PrecisionLayer.tsx";
 import { NodeMarker } from "../Markers/NodeMarker.tsx";
 import { StackBadge } from "../Markers/StackBadge.tsx";
 import type { PopupState } from "../Popups/PopupWrapper.tsx";
 import { PopupWrapper } from "../Popups/PopupWrapper.tsx";
+import {
+  type PxOffset,
+  fanOutOffsetsPx,
+  groupNodesByIdenticalCoords,
+} from "../cluster.ts";
 
 export interface NodeMarkerProps {
   mapRef: MapRef | undefined;

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import type { SQLocal, ReactiveQueryStatus, StatementInput } from "sqlocal";
+import type { ReactiveQueryStatus, SQLocal, StatementInput } from "sqlocal";
 
 export function useReactiveSQL<Result extends Record<string, unknown>>(
   db: SQLocal,

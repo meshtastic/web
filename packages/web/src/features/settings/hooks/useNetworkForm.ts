@@ -5,9 +5,9 @@ import {
 } from "@data/hooks/usePendingChanges.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useMyNode } from "@shared/hooks";
+import { convertIntToIpAddress, convertIpAddressToInt } from "@shared/utils/ip";
 import { useDevice } from "@state/index.ts";
 import { useUIStore } from "@state/ui/store.ts";
-import { convertIntToIpAddress, convertIpAddressToInt } from "@shared/utils/ip";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import type { DeepPartial } from "react-hook-form";
 import { type Path, useForm } from "react-hook-form";
@@ -19,11 +19,8 @@ import {
 
 export function useNetworkForm() {
   const { myNodeNum } = useMyNode();
-  const {
-    config: dbEffectiveConfig,
-    baseConfig: dbBaseConfig,
-    isLoading,
-  } = useEffectiveConfig(myNodeNum, "network");
+  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
+    useEffectiveConfig(myNodeNum, "network");
   const device = useDevice();
   const baseConfig = dbBaseConfig ?? device.config.network ?? null;
   const effectiveConfig = dbEffectiveConfig ?? baseConfig;
@@ -79,7 +76,7 @@ export function useNetworkForm() {
     [effectiveConfig, toFormValues],
   );
 
-  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
+  const isReady = baseConfig !== undefined && baseConfig !== null;
 
   const form = useForm<NetworkValidation>({
     mode: "onChange",

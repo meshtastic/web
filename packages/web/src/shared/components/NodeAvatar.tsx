@@ -65,7 +65,7 @@ export const NodeAvatar = ({
       onClick();
     } else {
       const nodeNumber =
-        typeof nodeNum === "string" ? parseInt(nodeNum, 10) : nodeNum;
+        typeof nodeNum === "string" ? Number.parseInt(nodeNum, 10) : nodeNum;
       setNodeNumDetails(nodeNumber);
       setDialogOpen("nodeDetails", true);
     }

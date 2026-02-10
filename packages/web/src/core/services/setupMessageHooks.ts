@@ -2,9 +2,9 @@ import { nodeRepo } from "@data/repositories";
 import { adminCommands } from "./adminCommands";
 import logger from "./logger";
 import {
+  type OutgoingMessage,
   registerReceiveHook,
   registerSendHook,
-  type OutgoingMessage,
 } from "./messageHooks";
 import { playNotificationSound } from "./notificationSound";
 

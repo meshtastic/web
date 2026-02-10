@@ -5,6 +5,7 @@ import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import { Label } from "@shared/components/ui/label";
 import { Link } from "@shared/components/ui/link";
+import { Spinner } from "@shared/components/ui/spinner";
 import { Switch } from "@shared/components/ui/switch";
 import {
   Tabs,
@@ -17,7 +18,6 @@ import {
   useBrowserFeatureDetection,
 } from "@shared/hooks/useBrowserFeatureDetection.ts";
 import { useToast } from "@shared/hooks/useToast.ts";
-import { Spinner } from "@shared/components/ui/spinner";
 import {
   AlertCircle,
   Bluetooth,

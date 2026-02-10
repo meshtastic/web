@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  type RGBColor,
   getAvatarColors,
   getColorFromNodeNum,
   hexToRgb,
   isLightColor,
-  type RGBColor,
   rgbToHex,
 } from "./color.ts";
 

@@ -5,12 +5,12 @@ import {
 import { eventBus } from "@shared/utils/eventBus";
 import { renderHook } from "@testing-library/react";
 import {
+  type Mock,
   afterEach,
   beforeEach,
   describe,
   expect,
   it,
-  type Mock,
   vi,
 } from "vitest";
 

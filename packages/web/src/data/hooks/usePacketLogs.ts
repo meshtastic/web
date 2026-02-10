@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { packetLogRepo } from "../repositories/index.ts";
-import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { PacketLog } from "../schema.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 /**
  * Hook to get packet logs for a device

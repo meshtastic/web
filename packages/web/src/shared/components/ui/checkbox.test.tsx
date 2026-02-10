@@ -75,7 +75,6 @@ describe("Checkbox", () => {
   });
 
   it("uses provided id", () => {
-    // biome-ignore lint/correctness/useUniqueElementIds: <test>
     render(<Checkbox id="custom-id" />);
     expect(screen.getByRole("checkbox").id).toBe("custom-id");
   });

@@ -176,6 +176,17 @@ async function createSerialTransport(
     await browserSerial.closeSerialPort(port);
   }
 
+  // Check for locked streams and force cleanup if needed
+  const portWithStreams = port as SerialPort & {
+    readable: ReadableStream | null;
+    writable: WritableStream | null;
+  };
+
+  if (portWithStreams.readable?.locked || portWithStreams.writable?.locked) {
+    logger.debug(`[transportFactory] Detected locked streams, forcing cleanup`);
+    await browserSerial.forceReleaseStreams(port);
+  }
+
   try {
     logger.debug(`[transportFactory] Creating Serial transport`);
     const transport = await TransportWebSerial.createFromPort(port);

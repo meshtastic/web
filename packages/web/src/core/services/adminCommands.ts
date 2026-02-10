@@ -345,7 +345,9 @@ class AdminCommandService {
   async saveChannel(channel: Protobuf.Channel.Channel): Promise<void> {
     const connection = this.getConnection();
     logger.debug(
-      `[AdminCommands] Saving channel: ${channel.settings?.name ?? channel.index}`,
+      `[AdminCommands] Saving channel: ${
+        channel.settings?.name ?? channel.index
+      }`,
     );
     await connection.setChannel(channel);
   }

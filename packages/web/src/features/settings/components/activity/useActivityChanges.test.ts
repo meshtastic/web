@@ -1,7 +1,7 @@
+import type { ConfigChange } from "@data/schema.ts";
+import { useUIStore } from "@state/ui/store.ts";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useUIStore } from "@state/ui/store.ts";
-import type { ConfigChange } from "@data/schema.ts";
 
 // Mock usePendingChanges
 const mockClearChange = vi.fn();

@@ -35,7 +35,9 @@ class PacketToMessageDTO {
       }
     } else if (data.rxTime != null) {
       logger.warn(
-        `Received rxTime in PacketToMessageDTO was not a Date object as expected (type: ${typeof data.rxTime}, value: ${data.rxTime}). Using current time as fallback.`,
+        `Received rxTime in PacketToMessageDTO was not a Date object as expected (type: ${typeof data.rxTime}, value: ${
+          data.rxTime
+        }). Using current time as fallback.`,
       );
     }
     this.date = new Date(dateTimestamp);

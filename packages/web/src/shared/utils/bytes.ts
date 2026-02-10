@@ -5,7 +5,7 @@
 export function hexToUint8Array(hex: string): Uint8Array {
   const matches = hex.match(/.{1,2}/g);
   return matches
-    ? new Uint8Array(matches.map((byte) => parseInt(byte, 16)))
+    ? new Uint8Array(matches.map((byte) => Number.parseInt(byte, 16)))
     : new Uint8Array();
 }
 

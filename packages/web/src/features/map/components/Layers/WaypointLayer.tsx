@@ -1,6 +1,6 @@
 import type { Node } from "@data/schema";
 import { useMapFitting } from "@shared/hooks/useMapFitting.ts";
-import { useDevice, type WaypointWithMetadata } from "@state/index.ts";
+import { type WaypointWithMetadata, useDevice } from "@state/index.ts";
 import { useCallback } from "react";
 import type { MapRef } from "react-map-gl/maplibre";
 import { NodeMarker } from "../Markers/NodeMarker.tsx";

@@ -6,8 +6,10 @@
  */
 import logger from "@core/services/logger";
 import { connectionRepo } from "@data/repositories";
+import { configCacheRepo } from "@data/repositories";
 import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
 import type { Connection } from "@data/schema";
+import { toast } from "@shared/hooks/useToast";
 import * as browserBluetooth from "../browserBluetooth";
 import * as deviceSetup from "./deviceSetup";
 import type { NavigationIntent, SetupContext } from "./deviceSetup";
@@ -213,7 +215,107 @@ class ConnectionServiceClass {
       return false;
     }
 
-    return this.connect(lastConnection, { allowPrompt: false });
+    // Determine if we can use fast recovery (skip config sync)
+    const canUseFastRecovery = await this.canUseFastRecovery(lastConnection);
+
+    if (canUseFastRecovery) {
+      // Try fast recovery first (skip config sync)
+      logger.info(
+        "[ConnectionService] Attempting fast recovery (using cached config)",
+      );
+      toast({
+        title: "Reconnecting...",
+        description: "Restoring connection using cached configuration",
+        duration: 3000,
+      });
+
+      const fastRecoverySuccess = await this.connect(lastConnection, {
+        allowPrompt: false,
+        skipConfig: true,
+      });
+
+      if (fastRecoverySuccess) {
+        toast({
+          title: "Reconnected",
+          description: "Connection restored successfully",
+          duration: 3000,
+        });
+        return true;
+      }
+
+      // Fast recovery failed, try full recovery
+      logger.warn(
+        "[ConnectionService] Fast recovery failed, attempting full recovery",
+      );
+      toast({
+        title: "Reconnecting...",
+        description: "Performing full device sync",
+        duration: 5000,
+      });
+    }
+
+    // Full recovery (or fallback from fast recovery)
+    const success = await this.connect(lastConnection, { allowPrompt: false });
+
+    if (success) {
+      toast({
+        title: "Reconnected",
+        description: "Connection restored with full sync",
+        duration: 3000,
+      });
+    } else {
+      toast({
+        title: "Connection Failed",
+        description: "Unable to reconnect to device",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+
+    return success;
+  }
+
+  /**
+   * Check if fast recovery (skip config sync) can be used
+   */
+  private async canUseFastRecovery(conn: Connection): Promise<boolean> {
+    // Check if we have a last connection timestamp
+    if (!conn.lastConnectedAt) {
+      return false;
+    }
+
+    // Check if within 30-minute window
+    const timeSinceLastConnect = Date.now() - conn.lastConnectedAt.getTime();
+    const THIRTY_MINUTES = 30 * 60 * 1000;
+
+    if (timeSinceLastConnect >= THIRTY_MINUTES) {
+      logger.debug(
+        `[ConnectionService] Last connection was ${Math.round(
+          timeSinceLastConnect / 60000,
+        )} minutes ago, using full recovery`,
+      );
+      return false;
+    }
+
+    // Check if we have cached config for this device
+    if (!conn.nodeNum) {
+      return false;
+    }
+
+    const cachedConfig = await configCacheRepo.getCachedConfig(conn.nodeNum);
+    if (!cachedConfig) {
+      logger.debug(
+        `[ConnectionService] No cached config available for node ${conn.nodeNum}, using full recovery`,
+      );
+      return false;
+    }
+
+    logger.debug(
+      `[ConnectionService] Can use fast recovery: last connected ${Math.round(
+        timeSinceLastConnect / 60000,
+      )} minutes ago`,
+    );
+    return true;
   }
 
   private notify(): void {

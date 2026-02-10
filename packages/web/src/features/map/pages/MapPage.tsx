@@ -4,8 +4,8 @@ import {
   useFilterNode,
 } from "@app/shared/components/Filter/useFilterNode.ts";
 import { useNodes } from "@data/hooks";
-import { useMyNode } from "@shared/hooks";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useMyNode } from "@shared/hooks";
 import { useMapFitting } from "@shared/hooks/useMapFitting";
 import { cn } from "@shared/utils/cn";
 import {
@@ -36,9 +36,9 @@ import { WaypointLayer } from "../components/Layers/WaypointLayer.tsx";
 import { BaseMap } from "../components/Map.tsx";
 import type { PopupState } from "../components/Popups/PopupWrapper.tsx";
 import {
-  defaultVisibilityState,
   MapLayerTool,
   type VisibilityState,
+  defaultVisibilityState,
 } from "../components/Tools/MapLayerTool.tsx";
 
 export const MapPage = () => {

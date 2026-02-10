@@ -1,11 +1,11 @@
+import "@app/i18n-config.ts";
 import {
+  RouterProvider,
   createMemoryHistory,
   createRouter,
-  RouterProvider,
 } from "@tanstack/react-router";
 import { type RenderOptions, render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import "@app/i18n-config.ts";
 
 import { routeTree } from "../routeTree.gen.ts";
 

@@ -1,8 +1,8 @@
 import { Protobuf } from "@meshtastic/core";
+import { makePskHelpers } from "@shared/utils/pskSchema.ts";
 import { validateMaxByteLength } from "@shared/utils/string.ts";
 import { t } from "i18next";
 import { z } from "zod/v4";
-import { makePskHelpers } from "@shared/utils/pskSchema.ts";
 
 const RoleEnum = z.enum(Protobuf.Channel.Channel_Role);
 

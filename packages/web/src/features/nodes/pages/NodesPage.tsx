@@ -1,6 +1,7 @@
 import { useLanguage } from "@app/shared/hooks/useLanguage.ts";
 import { SignalIndicator } from "@app/shared/index.ts";
 import { useNodes, useOnlineNodes, usePreference } from "@data/hooks";
+import type { Node } from "@data/schema";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LocationResponseDialog } from "@shared/components/Dialog/LocationResponseDialog.tsx";
@@ -39,6 +40,7 @@ import {
   TableHeader,
   TableRow,
 } from "@shared/components/ui/table";
+import { useMyNode } from "@shared/hooks/useMyNode";
 import { cn } from "@shared/utils/cn";
 import {
   DEFAULT_PREFERENCES,
@@ -46,8 +48,6 @@ import {
   useDevice,
   useUIStore,
 } from "@state/index.ts";
-import { useMyNode } from "@shared/hooks/useMyNode";
-import type { Node } from "@data/schema";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -252,7 +252,9 @@ const NodesPage = (): JSX.Element => {
           const voltage = node.voltage;
           const text =
             batteryLevel !== null && batteryLevel > 0
-              ? `${batteryLevel}% ${voltage !== null ? `${voltage.toFixed(2)}V` : ""}`
+              ? `${batteryLevel}% ${
+                  voltage !== null ? `${voltage.toFixed(2)}V` : ""
+                }`
               : voltage !== null
                 ? `${voltage.toFixed(2)}V`
                 : node.voltage === 0
@@ -296,7 +298,9 @@ const NodesPage = (): JSX.Element => {
           const airUtil = node.airUtilTx;
           const text =
             chUtil !== null || airUtil !== null
-              ? `Ch ${chUtil?.toFixed(1) ?? "—"}%${airUtil !== null ? ` / Air ${airUtil.toFixed(1)}%` : ""}`
+              ? `Ch ${chUtil?.toFixed(1) ?? "—"}%${
+                  airUtil !== null ? ` / Air ${airUtil.toFixed(1)}%` : ""
+                }`
               : "—";
           return <Mono className="text-xs md:text-sm">{text}</Mono>;
         },

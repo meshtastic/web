@@ -1,7 +1,7 @@
 import { useNodes } from "@data/hooks";
-import { useMyNode } from "@shared/hooks";
 import { nodeRepo } from "@data/index";
 import { Label } from "@shared/components/ui/label";
+import { useMyNode } from "@shared/hooks";
 import { useDevice, useUIStore } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";

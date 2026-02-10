@@ -1,7 +1,7 @@
 import * as dbIndex from "@data/index";
-import type { Contact } from "../pages/MessagesPage";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Contact } from "../pages/MessagesPage";
 import { MessageInput } from "./MessageInput.tsx";
 
 // Mock sendText function

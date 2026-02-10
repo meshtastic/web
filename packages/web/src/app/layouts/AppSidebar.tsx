@@ -170,7 +170,9 @@ function ConnectedSidebarContent() {
   const displayNode = isRemoteAdmin ? remoteNode : myNode;
   const displayNodeNum = isRemoteAdmin ? remoteAdminTarget : myNodeNum;
   const displayName = isRemoteAdmin
-    ? `[Remote] ${remoteNode?.longName ?? remoteNode?.shortName ?? t("unknown.longName")}`
+    ? `[Remote] ${
+        remoteNode?.longName ?? remoteNode?.shortName ?? t("unknown.longName")
+      }`
     : (displayNode?.longName ??
       displayNode?.shortName ??
       t("unknown.longName"));

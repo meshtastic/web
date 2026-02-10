@@ -99,7 +99,9 @@ export const RetryButton = ({ message, className }: RetryButtonProps) => {
       onClick={handleRetry}
       disabled={isRetrying}
       className={className}
-      title={`Retry (attempt ${currentMessage.retryCount + 1}/${currentMessage.maxRetries})`}
+      title={`Retry (attempt ${currentMessage.retryCount + 1}/${
+        currentMessage.maxRetries
+      })`}
     >
       <RefreshCw className={cn("h-3 w-3", isRetrying && "animate-spin")} />
     </Button>

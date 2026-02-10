@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { deviceRepo } from "../repositories/index.ts";
-import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { Device } from "../schema.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 /**
  * Hook to get all devices

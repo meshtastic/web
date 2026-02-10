@@ -1,12 +1,12 @@
+import { useRemoteAdminAuth } from "@shared/hooks";
+import { useTranslation } from "react-i18next";
 import { useModuleConfigForm } from "../../hooks/useModuleConfigForm";
+import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import {
   type AmbientLightingValidation,
   AmbientLightingValidationSchema,
 } from "../../validation/moduleConfig/ambientLighting";
 import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
-import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
-import { useRemoteAdminAuth } from "@shared/hooks";
-import { useTranslation } from "react-i18next";
 
 export const AmbientLighting = () => {
   const { t } = useTranslation("moduleConfig");

@@ -1,10 +1,10 @@
-import type { NetworkValidation } from "../../../validation/config/network";
-import { ConfigFormFields, type FieldGroup } from "../../form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
-import { useNetworkForm } from "../../../hooks";
-import { ConfigFormSkeleton } from "../../../pages/SettingsLoading";
 import { useRemoteAdminAuth } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
+import { useNetworkForm } from "../../../hooks";
+import { ConfigFormSkeleton } from "../../../pages/SettingsLoading";
+import type { NetworkValidation } from "../../../validation/config/network";
+import { ConfigFormFields, type FieldGroup } from "../../form/ConfigFormFields";
 
 export const Network = () => {
   const { t } = useTranslation("config");

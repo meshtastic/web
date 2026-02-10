@@ -1,7 +1,7 @@
 import { desc, eq, isNotNull } from "drizzle-orm";
 import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
-import { type Connection, connections, type NewConnection } from "../schema.ts";
+import { type Connection, type NewConnection, connections } from "../schema.ts";
 
 export type ConnectionType = "http" | "bluetooth" | "serial" | "demo";
 

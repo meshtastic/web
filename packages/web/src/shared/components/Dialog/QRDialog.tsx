@@ -1,4 +1,5 @@
 import { create, toBinary } from "@bufbuild/protobuf";
+import { Protobuf, type Types } from "@meshtastic/core";
 import { Checkbox } from "@shared/components/ui/checkbox";
 import {
   Dialog,
@@ -11,7 +12,6 @@ import {
 } from "@shared/components/ui/dialog";
 import { Input } from "@shared/components/ui/input";
 import { Label } from "@shared/components/ui/label";
-import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";

@@ -277,10 +277,8 @@ const createMessageHandler =
     );
   };
 
-const createChannelHandler =
+export const createChannelHandler =
   (ownerNodeNum: number) => async (channel: Protobuf.Channel.Channel) => {
-    console.log(channel);
-
     await channelRepo.upsertChannel({
       ownerNodeNum,
       channelIndex: channel.index,
@@ -326,9 +324,6 @@ export function subscribeToDevice(
         "saving message",
         createMessageHandler(ownerNodeNum, myNodeNum),
       ),
-    ),
-    events.onChannelPacket.subscribe(
-      withErrorHandling("saving channel", createChannelHandler(ownerNodeNum)),
     ),
   ];
 

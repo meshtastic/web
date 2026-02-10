@@ -6,7 +6,10 @@
 import logger from "@core/services/logger";
 import { connectionRepo, deviceRepo } from "@data/repositories";
 import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
-import { subscribeToDevice } from "@data/subscriptionService";
+import {
+  createChannelHandler,
+  subscribeToDevice,
+} from "@data/subscriptionService";
 import { MeshDevice, Types } from "@meshtastic/core";
 import { randId } from "@shared/utils/randId";
 import { useDeviceStore } from "@state/index";
@@ -86,6 +89,7 @@ export async function setupMeshDevice(
   subscribeToNodeInfo(ctx, callbacks);
   subscribeToUserPackets(ctx);
   subscribeToConfig(ctx);
+  subscribeToChannels(ctx);
   subscribeToConfigComplete(ctx, callbacks);
   subscribeToDeviceStatus(ctx, callbacks);
 
@@ -177,6 +181,31 @@ function subscribeToConfig(ctx: SetupContext): void {
   );
 
   subscriptions.push(configUnsub, moduleUnsub);
+}
+
+/**
+ * Subscribe to channel packets early to avoid race with async onMyNodeInfo.
+ *
+ * Channels arrive during the config flow (after config/moduleConfig, before
+ * configComplete). The DB `channels` table has a FK on `devices.nodeNum`, so
+ * we await `deviceUpserted` to guarantee the device record exists before
+ * inserting. This subscription is set up synchronously — before any async
+ * work — so no channel events are missed.
+ */
+function subscribeToChannels(ctx: SetupContext): void {
+  const { meshDevice, subscriptions } = ctx;
+
+  const unsub = meshDevice.events.onChannelPacket.subscribe(async (channel) => {
+    try {
+      await ctx.deviceUpserted;
+      if (ctx.myNodeNum == null) return;
+      await createChannelHandler(ctx.myNodeNum)(channel);
+    } catch (error) {
+      logger.error("[deviceSetup] Error saving channel:", error);
+    }
+  });
+
+  subscriptions.push(unsub);
 }
 
 /**

@@ -1,12 +1,12 @@
-import { cn } from "@shared/utils/cn";
 import {
+  type SignalGrade,
+  type SignalGradeResult,
   getSignalColorForGrade,
   getSignalGrade,
   getSnrLimit,
-  type SignalGrade,
-  type SignalGradeResult,
 } from "@features/nodes/utils/signalColor";
 import { Protobuf } from "@meshtastic/core";
+import { cn } from "@shared/utils/cn";
 
 interface SignalIndicatorProps {
   snr: number;

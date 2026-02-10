@@ -1,8 +1,4 @@
 import { usePreference } from "@data/hooks";
-import { DEFAULT_PREFERENCES } from "@state/ui";
-import { Administration } from "../components/panels/Administration";
-import { DatabaseMaintenance } from "../components/panels/DatabaseMaintenance";
-import { DebugLog } from "../components/panels/DebugLog";
 import {
   Card,
   CardContent,
@@ -12,8 +8,12 @@ import {
 } from "@shared/components/ui/card";
 import { Label } from "@shared/components/ui/label";
 import { Slider } from "@shared/components/ui/slider";
+import { DEFAULT_PREFERENCES } from "@state/ui";
 import { Database } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Administration } from "../components/panels/Administration";
+import { DatabaseMaintenance } from "../components/panels/DatabaseMaintenance";
+import { DebugLog } from "../components/panels/DebugLog";
 
 const PACKET_BATCH_SIZE_MIN = 10;
 const PACKET_BATCH_SIZE_MAX = 100;

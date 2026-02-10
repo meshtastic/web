@@ -3,8 +3,8 @@ import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
 import {
   type ConfigChange,
-  configChanges,
   type DeviceConfig,
+  configChanges,
   deviceConfigs,
 } from "../schema.ts";
 

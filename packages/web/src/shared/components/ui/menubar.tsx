@@ -1,5 +1,5 @@
-import { cn } from "@shared/utils/cn";
 import * as MenubarPrimitive from "@radix-ui/react-menubar";
+import { cn } from "@shared/utils/cn";
 import { Check, ChevronRight, Circle } from "lucide-react";
 import * as React from "react";
 

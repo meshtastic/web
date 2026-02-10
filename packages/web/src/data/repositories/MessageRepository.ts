@@ -3,12 +3,12 @@ import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import logger from "../../core/services/logger.ts";
 import { dbClient } from "../client.ts";
 import {
-  lastRead,
   type Message,
   type MessageDraft,
+  type NewMessage,
+  lastRead,
   messageDrafts,
   messages,
-  type NewMessage,
 } from "../schema.ts";
 import type { ConversationType } from "../types.ts";
 

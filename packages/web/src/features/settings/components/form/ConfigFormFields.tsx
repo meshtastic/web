@@ -1,11 +1,3 @@
-import { GenericInput } from "./FormInput";
-import {
-  type MultiSelectFieldProps,
-  MultiSelectInput,
-} from "./FormMultiSelect";
-import { PasswordGenerator } from "./FormPasswordGenerator";
-import { SelectInput } from "./FormSelect";
-import { ToggleInput } from "./FormToggle";
 import type { ButtonVariant } from "@shared/components/ui/button";
 import {
   Form,
@@ -26,6 +18,14 @@ import type {
   Path,
   UseFormReturn,
 } from "react-hook-form";
+import { GenericInput } from "./FormInput";
+import {
+  type MultiSelectFieldProps,
+  MultiSelectInput,
+} from "./FormMultiSelect";
+import { PasswordGenerator } from "./FormPasswordGenerator";
+import { SelectInput } from "./FormSelect";
+import { ToggleInput } from "./FormToggle";
 
 // Field type definitions
 export type FieldType =

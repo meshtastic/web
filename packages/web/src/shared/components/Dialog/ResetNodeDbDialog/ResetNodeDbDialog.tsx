@@ -1,4 +1,4 @@
-import { MigrationService } from "@data/index";
+import { deleteDeviceData } from "@data/index";
 import { useDeleteMessages } from "@shared/hooks/useDeleteMessages.ts";
 import { toast } from "@shared/hooks/useToast.ts";
 import { useDevice } from "@state/index.ts";
@@ -24,7 +24,7 @@ export const ResetNodeDbDialog = ({
       .then(async () => {
         // Delete all messages and nodes from the database for this device
         await deleteAllMessages();
-        await MigrationService.deleteDeviceData(deviceId);
+        await deleteDeviceData(deviceId);
       })
       .catch((error) => {
         toast({

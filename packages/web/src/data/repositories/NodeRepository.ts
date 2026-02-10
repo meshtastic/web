@@ -17,10 +17,10 @@ import {
   type NewPositionLog,
   type NewTelemetryLog,
   type Node,
-  nodes,
   type PositionLog,
-  positionLogs,
   type TelemetryLog,
+  nodes,
+  positionLogs,
   telemetryLogs,
 } from "../schema.ts";
 

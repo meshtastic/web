@@ -1,7 +1,7 @@
 import { useDisplayUnits } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
-import type { FlagName } from "@shared/hooks/usePositionFlags";
 import { useRemoteAdminAuth } from "@shared/hooks";
+import type { FlagName } from "@shared/hooks/usePositionFlags";
 import { useTranslation } from "react-i18next";
 import { usePositionForm } from "../../hooks/index.ts";
 import { ConfigFormSkeleton } from "../../pages/SettingsLoading.tsx";
@@ -64,7 +64,9 @@ export const Position = () => {
           type: "number",
           name: "latitude",
           label: t("position.fixedPosition.latitude.label"),
-          description: `${t("position.fixedPosition.latitude.description")} (Max 7 decimal precision)`,
+          description: `${t(
+            "position.fixedPosition.latitude.description",
+          )} (Max 7 decimal precision)`,
           properties: {
             step: 0.0000001,
             suffix: "Degrees",
@@ -75,7 +77,9 @@ export const Position = () => {
           type: "number",
           name: "longitude",
           label: t("position.fixedPosition.longitude.label"),
-          description: `${t("position.fixedPosition.longitude.description")} (Max 7 decimal precision)`,
+          description: `${t(
+            "position.fixedPosition.longitude.description",
+          )} (Max 7 decimal precision)`,
           properties: {
             step: 0.0000001,
             suffix: "Degrees",

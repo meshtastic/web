@@ -1,6 +1,6 @@
 import type { TFunction } from "i18next";
-import type { SearchableField, SettingsSection } from "./types.ts";
 import { allFieldRegistries } from "./registry/index.ts";
+import type { SearchableField, SettingsSection } from "./types.ts";
 
 /** Section labels for display in search results */
 const SECTION_LABELS: Record<SettingsSection, string> = {

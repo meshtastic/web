@@ -1,8 +1,8 @@
-import type { Protobuf } from "@meshtastic/core";
 import type {
   ValidConfigType,
   ValidModuleConfigType,
 } from "@features/settings/components/types.ts";
+import type { Protobuf } from "@meshtastic/core";
 
 type Page = "messages" | "map" | "settings" | "channels" | "nodes";
 

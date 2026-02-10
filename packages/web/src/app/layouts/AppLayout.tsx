@@ -1,3 +1,4 @@
+import { DialogManager } from "@app/shared/components/Dialog/DialogManager.tsx";
 import { Separator } from "@shared/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@shared/components/ui/sidebar";
 import {
@@ -11,7 +12,6 @@ import { useDevice } from "@state/index.ts";
 import type React from "react";
 import { useTranslation } from "react-i18next";
 import { AppSidebar } from "./AppSidebar.tsx";
-import { DialogManager } from "@app/shared/components/Dialog/DialogManager.tsx";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation("ui");

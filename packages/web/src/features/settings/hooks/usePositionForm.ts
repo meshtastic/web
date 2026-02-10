@@ -18,11 +18,8 @@ import {
 
 export function usePositionForm() {
   const { myNodeNum } = useMyNode();
-  const {
-    config: dbEffectiveConfig,
-    baseConfig: dbBaseConfig,
-    isLoading,
-  } = useEffectiveConfig(myNodeNum, "position");
+  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
+    useEffectiveConfig(myNodeNum, "position");
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
   const { nodes: allNodes } = useNodes(myNodeNum);
 
@@ -70,7 +67,7 @@ export function usePositionForm() {
     };
   }, [baseConfig, myNode]);
 
-  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
+  const isReady = baseConfig !== undefined && baseConfig !== null;
 
   const form = useForm<PositionValidation>({
     mode: "onChange",

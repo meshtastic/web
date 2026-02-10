@@ -147,6 +147,42 @@ export function isSerialPortOpen(port: SerialPort): boolean {
   return !!(portWithStreams.readable || portWithStreams.writable);
 }
 
+/**
+ * Force release of locked streams on a serial port.
+ * Use when streams are locked but port appears closed.
+ */
+export async function forceReleaseStreams(port: SerialPort): Promise<void> {
+  const portWithStreams = port as SerialPort & {
+    readable: ReadableStream | null;
+    writable: WritableStream | null;
+  };
+
+  let neededCleanup = false;
+
+  try {
+    if (portWithStreams.readable?.locked) {
+      await portWithStreams.readable.cancel().catch(() => {});
+      neededCleanup = true;
+    }
+  } catch {
+    // Ignore errors
+  }
+
+  try {
+    if (portWithStreams.writable?.locked) {
+      await portWithStreams.writable.abort().catch(() => {});
+      neededCleanup = true;
+    }
+  } catch {
+    // Ignore errors
+  }
+
+  if (neededCleanup) {
+    // Give streams time to fully release
+    await new Promise((r) => setTimeout(r, 200));
+  }
+}
+
 // =============================================================================
 // Event Subscriptions
 // =============================================================================

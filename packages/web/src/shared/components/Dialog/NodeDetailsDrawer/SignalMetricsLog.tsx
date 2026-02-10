@@ -1,4 +1,3 @@
-import { SignalBars } from "@shared/components/SignalIndicator";
 import { type SignalLog, useSignalLogs } from "@data/hooks/useSignalLogs";
 import {
   getSignalColorForGrade,
@@ -6,6 +5,7 @@ import {
   getSnrLimit,
 } from "@features/nodes/utils/signalColor";
 import { Protobuf } from "@meshtastic/core";
+import { SignalBars } from "@shared/components/SignalIndicator";
 import { Button } from "@shared/components/ui/button";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { Skeleton } from "@shared/components/ui/skeleton";

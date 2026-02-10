@@ -326,7 +326,9 @@ export function MeshNetwork() {
             nodeColor = "#ffffff";
             break;
           case "receiving":
-            glowColor = `rgba(${PRIMARY_COLOR.r}, ${PRIMARY_COLOR.g}, ${PRIMARY_COLOR.b}, ${0.5 + intensity * 0.5})`;
+            glowColor = `rgba(${PRIMARY_COLOR.r}, ${PRIMARY_COLOR.g}, ${
+              PRIMARY_COLOR.b
+            }, ${0.5 + intensity * 0.5})`;
             glowRadius = 15 + intensity * 10;
             nodeColor = `rgb(${PRIMARY_COLOR.r}, ${PRIMARY_COLOR.g}, ${PRIMARY_COLOR.b})`;
             break;

@@ -81,7 +81,6 @@ export const ConnectPage = () => {
   });
 
   // On first mount, sync statuses and refresh
-  // biome-ignore lint/correctness/useExhaustiveDependencies: This can cause the icon to refresh too often
   useEffect(() => {
     syncConnectionStatuses();
     refreshStatuses();

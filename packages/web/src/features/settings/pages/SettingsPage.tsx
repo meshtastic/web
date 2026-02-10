@@ -19,13 +19,13 @@ import {
   Settings2,
 } from "lucide-react";
 import { useState } from "react";
-import { ActivityPanel } from "../components/activity/index.ts";
 import { SettingsSearchBar } from "../components/SettingsSearchBar.tsx";
+import { ActivityPanel } from "../components/activity/index.ts";
 import { useSettingsSave } from "../hooks/useSaveSettings.ts";
 import {
   SettingsNavigationProvider,
-  useSettingsNavigation,
   type SettingsSection,
+  useSettingsNavigation,
 } from "../search/index.ts";
 import { AdvancedConfig } from "./AdvancedConfig.tsx";
 import { AppPreferencesConfig } from "./AppPreferencesConfig.tsx";

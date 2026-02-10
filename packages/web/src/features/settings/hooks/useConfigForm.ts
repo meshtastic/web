@@ -43,11 +43,8 @@ export function useConfigForm<T extends FieldValues>({
   const { myNodeNum } = useMyNode();
 
   // Load config from database (base + pending changes merged)
-  const {
-    config: dbEffectiveConfig,
-    baseConfig: dbBaseConfig,
-    isLoading,
-  } = useEffectiveConfig(myNodeNum, configType);
+  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
+    useEffectiveConfig(myNodeNum, configType);
 
   // Fall back to device store config when DB has no cached row yet.
   // The device store always has config with protobuf defaults, populated
@@ -59,7 +56,7 @@ export function useConfigForm<T extends FieldValues>({
   // Get pending changes methods
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
-  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
+  const isReady = baseConfig !== undefined && baseConfig !== null;
 
   const form = useForm<T>({
     mode: "onChange",

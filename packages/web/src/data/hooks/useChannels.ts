@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { channelRepo } from "../repositories/index.ts";
-import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { Channel } from "../schema.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 /**
  * Hook to fetch all channels for a device

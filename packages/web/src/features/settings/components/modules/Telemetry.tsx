@@ -1,12 +1,12 @@
+import { useRemoteAdminAuth } from "@shared/hooks";
+import { useTranslation } from "react-i18next";
 import { useModuleConfigForm } from "../../hooks/useModuleConfigForm";
+import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import {
   type TelemetryValidation,
   TelemetryValidationSchema,
 } from "../../validation/moduleConfig/telemetry";
 import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
-import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
-import { useRemoteAdminAuth } from "@shared/hooks";
-import { useTranslation } from "react-i18next";
 
 export const Telemetry = () => {
   const { t } = useTranslation("moduleConfig");

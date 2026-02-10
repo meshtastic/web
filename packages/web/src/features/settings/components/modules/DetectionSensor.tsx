@@ -1,13 +1,13 @@
+import { Protobuf } from "@meshtastic/core";
+import { useRemoteAdminAuth } from "@shared/hooks";
+import { useTranslation } from "react-i18next";
 import { useModuleConfigForm } from "../../hooks/useModuleConfigForm";
+import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import {
   type DetectionSensorValidation,
   DetectionSensorValidationSchema,
 } from "../../validation/moduleConfig/detectionSensor";
 import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
-import { Protobuf } from "@meshtastic/core";
-import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
-import { useRemoteAdminAuth } from "@shared/hooks";
-import { useTranslation } from "react-i18next";
 
 export const DetectionSensor = () => {
   const { t } = useTranslation("moduleConfig");

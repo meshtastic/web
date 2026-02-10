@@ -1,7 +1,5 @@
-import { Channel } from "./Channel";
-import { useMyNode } from "@shared/hooks";
-import { type Channel as DbChannel, useChannels } from "@data/index";
 import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
+import { type Channel as DbChannel, useChannels } from "@data/index";
 import {
   Card,
   CardContent,
@@ -9,10 +7,12 @@ import {
   CardTitle,
 } from "@shared/components/ui/card";
 import { Switch } from "@shared/components/ui/switch";
+import { useMyNode } from "@shared/hooks";
 import i18next from "i18next";
 import { ChevronRight, Plus } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Channel } from "./Channel";
 
 export const getChannelName = (channel: DbChannel) => {
   return channel.name?.length
@@ -111,7 +111,11 @@ export const Channels = () => {
     (channel: DbChannel, enabled: boolean) => {
       const newRole = enabled ? 2 : 0; // 2 = SECONDARY, 0 = DISABLED
       const updated = { ...channel, role: newRole, updatedAt: new Date() };
-      if (JSON.stringify(updated) === JSON.stringify(channel)) {
+      const isEqual =
+        channel.role === updated.role &&
+        channel.updatedAt?.getTime?.() === updated.updatedAt?.getTime?.();
+
+      if (isEqual) {
         clearChange({
           changeType: "channel",
           channelIndex: channel.channelIndex,
@@ -142,6 +146,7 @@ export const Channels = () => {
     // Sort by channel index
     return result.sort((a, b) => a.channelIndex - b.channelIndex);
   }, [enabledChannels, disabledChannels, openChannels]);
+  console.log({ displayChannels });
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -161,7 +166,9 @@ export const Channels = () => {
             >
               <div className="flex items-center gap-2">
                 <ChevronRight
-                  className={`size-3.5 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`}
+                  className={`size-3.5 shrink-0 text-muted-foreground transition-transform ${
+                    isOpen ? "rotate-90" : ""
+                  }`}
                 />
                 <div className="flex-1 min-w-0">
                   <CardTitle className="text-sm font-medium truncate">

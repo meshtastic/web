@@ -4,9 +4,9 @@ import {
 } from "@data/hooks/usePendingChanges.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { useMyNode } from "@shared/hooks";
+import { getX25519PrivateKey, getX25519PublicKey } from "@shared/utils/x25519";
 import { useDevice } from "@state/index.ts";
 import { useUIStore } from "@state/ui/store.ts";
-import { getX25519PrivateKey, getX25519PublicKey } from "@shared/utils/x25519";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import type { DeepPartial } from "react-hook-form";
@@ -20,11 +20,8 @@ import {
 
 export function useSecurityForm() {
   const { myNodeNum } = useMyNode();
-  const {
-    config: dbEffectiveConfig,
-    baseConfig: dbBaseConfig,
-    isLoading,
-  } = useEffectiveConfig(myNodeNum, "security");
+  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
+    useEffectiveConfig(myNodeNum, "security");
   const device = useDevice();
   const baseConfig = dbBaseConfig ?? device.config.security ?? null;
   const effectiveConfig = dbEffectiveConfig ?? baseConfig;
@@ -76,7 +73,7 @@ export function useSecurityForm() {
     [effectiveConfig, toFormValues],
   );
 
-  const isReady = baseConfig !== undefined && baseConfig !== null && !isLoading;
+  const isReady = baseConfig !== undefined && baseConfig !== null;
 
   const form = useForm<RawSecurity>({
     mode: "onChange",

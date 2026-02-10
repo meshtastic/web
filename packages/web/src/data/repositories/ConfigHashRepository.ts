@@ -2,7 +2,7 @@ import { and, eq, sql } from "drizzle-orm";
 import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { ALL_LEAF_KEYS } from "../../core/utils/merkleConfig.ts";
 import { dbClient } from "../client.ts";
-import { configHashes, type NewConfigHash } from "../schema.ts";
+import { type NewConfigHash, configHashes } from "../schema.ts";
 
 /**
  * Repository for managing config hash storage (Merkle tree leaves).

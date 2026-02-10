@@ -7,11 +7,11 @@
  * - Separation of concerns (read from DB, write via device connection)
  */
 
-import type { Protobuf } from "@meshtastic/core";
 import { configCacheRepo } from "@data/repositories/index.ts";
+import type { Protobuf } from "@meshtastic/core";
 import { useMemo, useRef } from "react";
-import { useReactiveSQL } from "./useReactiveSQL.ts";
 import type { DeviceConfig } from "../schema.ts";
+import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 // =============================================================================
 // Types

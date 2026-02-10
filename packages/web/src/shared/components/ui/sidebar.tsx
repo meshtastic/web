@@ -1,8 +1,8 @@
+import { Slot } from "@radix-ui/react-slot";
 import { Button } from "@shared/components/ui/button";
 import { Input } from "@shared/components/ui/input";
 import { useIsMobile } from "@shared/hooks/useIsMobile";
 import { cn } from "@shared/utils/cn";
-import { Slot } from "@radix-ui/react-slot";
 import { PanelLeft } from "lucide-react";
 import * as React from "react";
 import { Sheet, SheetContent } from "./sheet.tsx";

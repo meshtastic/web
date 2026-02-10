@@ -1,4 +1,4 @@
-import { MigrationService } from "@data/index";
+import { deleteDeviceData } from "@data/index";
 import { toast } from "@shared/hooks/useToast.ts";
 import { useDevice, useDeviceStore } from "@state/index.ts";
 import { useTranslation } from "react-i18next";
@@ -27,7 +27,7 @@ export const FactoryResetDeviceDialog = ({
     // The device will be wiped and disconnected without resolving the promise
     // so we proceed to clear all data associated with the device immediately
     useDeviceStore.getState().removeDevice(id);
-    await MigrationService.deleteDeviceData(id);
+    await deleteDeviceData(id);
 
     // Reload the app to ensure all ephemeral state is cleared
     window.location.href = "/";

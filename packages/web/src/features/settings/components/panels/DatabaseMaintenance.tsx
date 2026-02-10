@@ -1,7 +1,7 @@
 import logger from "@core/services/logger";
 import {
-  getNodeCleanupSettings,
   type NodeCleanupSettings,
+  getNodeCleanupSettings,
   runNodeCleanup,
   updateNodeCleanupSettings,
 } from "@core/services/maintenanceService";

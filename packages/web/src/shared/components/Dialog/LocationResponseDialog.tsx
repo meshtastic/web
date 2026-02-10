@@ -1,7 +1,7 @@
 import { useNodes } from "@data/hooks";
-import { useMyNode } from "@shared/hooks";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useMyNode } from "@shared/hooks";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper";
 

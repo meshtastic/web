@@ -421,7 +421,6 @@ describe("DeviceStore – config progress tracking", () => {
             case: variant,
             value: {},
           },
-          // biome-ignore lint/suspicious/noExplicitAny: test helper
         } as any),
       );
     }
@@ -436,13 +435,11 @@ describe("DeviceStore – config progress tracking", () => {
     device.setModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: { case: "mqtt", value: {} },
-        // biome-ignore lint/suspicious/noExplicitAny: test helper
       } as any),
     );
     device.setModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: { case: "serial", value: {} },
-        // biome-ignore lint/suspicious/noExplicitAny: test helper
       } as any),
     );
 

@@ -7,13 +7,13 @@
 
 import {
   type ComputeHashesInput,
+  type LeafKey,
   computeLeafHashes,
   computeRootHash,
   createEmptyHashes,
   getChangedLeaves,
   groupChangedLeaves,
   hasAnyChanges,
-  type LeafKey,
 } from "@core/utils/merkleConfig.ts";
 
 // =============================================================================

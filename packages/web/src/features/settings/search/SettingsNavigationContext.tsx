@@ -1,10 +1,10 @@
 import {
+  type ReactNode,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useState,
-  type ReactNode,
 } from "react";
 import type { SearchableField, SettingsSection } from "./types.ts";
 

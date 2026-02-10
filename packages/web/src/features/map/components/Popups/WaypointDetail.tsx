@@ -1,8 +1,8 @@
 import { TimeAgo } from "@app/shared";
 import { useNodes } from "@data/hooks";
-import { useMyNode } from "@shared/hooks";
 import type { Node } from "@data/schema";
 import { Separator } from "@shared/components/ui/separator";
+import { useMyNode } from "@shared/hooks";
 import {
   bearingDegrees,
   distanceMeters,

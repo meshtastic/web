@@ -1,7 +1,7 @@
 import { useCopyToClipboard } from "@shared/hooks/useCopyToClipboard";
 import { usePasswordVisibilityToggle } from "@shared/hooks/usePasswordVisibilityToggle";
 import { cn } from "@shared/utils/cn";
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 import { Check, Copy, Eye, EyeOff, type LucideIcon, X } from "lucide-react";
 import * as React from "react";
 import { useTranslation } from "react-i18next";

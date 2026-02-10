@@ -1,5 +1,5 @@
-import { cn } from "@shared/utils/cn";
 import * as SliderPrimitive from "@radix-ui/react-slider";
+import { cn } from "@shared/utils/cn";
 import { useId, useState } from "react";
 
 export interface SliderProps {

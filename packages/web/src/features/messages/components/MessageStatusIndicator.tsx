@@ -1,3 +1,5 @@
+import type { Message } from "@data/schema";
+import { Spinner } from "@shared/components/ui/spinner";
 import {
   Tooltip,
   TooltipArrow,
@@ -5,9 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@shared/components/ui/tooltip";
-import { Spinner } from "@shared/components/ui/spinner";
 import { cn } from "@shared/utils/cn";
-import type { Message } from "@data/schema";
 import { Check, Clock, CloudCheck, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 

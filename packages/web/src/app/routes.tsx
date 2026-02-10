@@ -4,20 +4,25 @@ import { MessagesPage } from "@features/messages";
 import { ErrorPage } from "@shared/components/ui/error-page";
 import { Spinner } from "@shared/components/ui/spinner";
 import {
+  Outlet,
   createRootRouteWithContext,
   createRoute,
-  Outlet,
   redirect,
   useLocation,
   useNavigate,
 } from "@tanstack/react-router";
-import { Activity, lazy, Suspense, useCallback, useEffect } from "react";
+import { Activity, Suspense, lazy, useCallback, useEffect } from "react";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
 import { AppLayout } from "./layouts/AppLayout.tsx";
 import { AppSidebar } from "./layouts/AppSidebar.tsx";
 import type { RouterContext } from "./routerContext.ts";
 
+const DashboardPage = lazy(() =>
+  import("@features/dashboard/pages/DashboardPage").then((m) => ({
+    default: m.DashboardPage,
+  })),
+);
 const MapPage = lazy(() =>
   import("@features/map/pages/MapPage").then((m) => ({
     default: m.MapPage,
@@ -55,7 +60,13 @@ function ConnectedLayout() {
       const currentPath = location.pathname;
 
       // If already on a valid connected route for this device, don't redirect
-      const validSegments = ["messages", "map", "settings", "nodes"];
+      const validSegments = [
+        "dashboard",
+        "messages",
+        "map",
+        "settings",
+        "nodes",
+      ];
       const isOnValidRoute = validSegments.some((seg) =>
         currentPath.startsWith(`${prefix}/${seg}`),
       );
@@ -194,6 +205,17 @@ const connectedLayoutRoute = createRoute({
   },
 });
 
+const dashboardRoute = createRoute({
+  getParentRoute: () => connectedLayoutRoute,
+  path: "/dashboard",
+  errorComponent: ErrorPage,
+  component: () => (
+    <Suspense fallback={<RouteLoader />}>
+      <DashboardPage />
+    </Suspense>
+  ),
+});
+
 const messagesRoute = createRoute({
   getParentRoute: () => connectedLayoutRoute,
   path: "/messages",
@@ -292,6 +314,7 @@ export const routeTree = rootRoute.addChildren([
   indexRoute,
   connectRoute,
   connectedLayoutRoute.addChildren([
+    dashboardRoute,
     messagesRoute,
     mapRoute,
     mapWithParamsRoute,

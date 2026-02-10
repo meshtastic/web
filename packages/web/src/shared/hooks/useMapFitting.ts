@@ -1,5 +1,5 @@
 import type { Protobuf } from "@meshtastic/core";
-import { boundsFromLngLat, type LngLat, toLngLat } from "@shared/utils/geo";
+import { type LngLat, boundsFromLngLat, toLngLat } from "@shared/utils/geo";
 import { useCallback } from "react";
 import type { MapRef } from "react-map-gl/maplibre";
 

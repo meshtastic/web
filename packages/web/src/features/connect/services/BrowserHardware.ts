@@ -5,8 +5,8 @@
  * New code should import directly from browserSerial.ts or browserBluetooth.ts.
  */
 
-import * as serial from "./browserSerial";
 import * as bluetooth from "./browserBluetooth";
+import * as serial from "./browserSerial";
 
 // Re-export types
 export type { SerialDeviceInfo } from "./browserSerial";

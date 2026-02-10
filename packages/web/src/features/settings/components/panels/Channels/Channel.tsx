@@ -1,6 +1,5 @@
-import type { ChannelValidation } from "./validation";
-import type { Channel as DbChannel } from "@data/index";
 import { useDisplayUnits } from "@data/hooks";
+import type { Channel as DbChannel } from "@data/index";
 import {
   ConfigFormFields,
   type FieldGroup,
@@ -11,6 +10,7 @@ import { PkiRegenerateDialog } from "@shared/components/Dialog/PkiRegenerateDial
 import { useRemoteAdminAuth } from "@shared/hooks";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { ChannelValidation } from "./validation";
 
 export interface SettingsPanelProps {
   channel: DbChannel;

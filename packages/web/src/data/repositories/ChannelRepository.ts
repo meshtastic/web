@@ -1,7 +1,7 @@
 import { and, asc, eq } from "drizzle-orm";
 import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
-import { type Channel, channels, type NewChannel } from "../schema.ts";
+import { type Channel, type NewChannel, channels } from "../schema.ts";
 
 export class ChannelRepository {
   private get db() {

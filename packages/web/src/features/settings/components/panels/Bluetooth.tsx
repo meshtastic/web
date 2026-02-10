@@ -1,13 +1,13 @@
+import { Protobuf } from "@meshtastic/core";
+import { useRemoteAdminAuth } from "@shared/hooks";
+import { useTranslation } from "react-i18next";
 import { useConfigForm } from "../../hooks/useConfigForm";
+import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
 import {
   type BluetoothValidation,
   BluetoothValidationSchema,
 } from "../../validation/config/bluetooth";
 import { ConfigFormFields, type FieldGroup } from "../form/ConfigFormFields";
-import { Protobuf } from "@meshtastic/core";
-import { ConfigFormSkeleton } from "../../pages/SettingsLoading";
-import { useRemoteAdminAuth } from "@shared/hooks";
-import { useTranslation } from "react-i18next";
 
 export const Bluetooth = () => {
   const { t } = useTranslation("config");

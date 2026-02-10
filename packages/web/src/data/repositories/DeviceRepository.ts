@@ -1,7 +1,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 import type { SQLocalDrizzle } from "sqlocal/drizzle";
 import { dbClient } from "../client.ts";
-import { type Device, devices, type NewDevice } from "../schema.ts";
+import { type Device, type NewDevice, devices } from "../schema.ts";
 
 export class DeviceRepository {
   private get db() {
