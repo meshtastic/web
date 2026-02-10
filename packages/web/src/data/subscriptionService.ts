@@ -3,7 +3,7 @@ import { toJson } from "@bufbuild/protobuf";
 import { type MeshDevice, Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import logger from "../core/services/logger.ts";
-import { runReceiveHooks } from "../core/services/messageHooks.ts";
+import { playNotificationSound } from "../core/services/notificationSound.ts";
 import { packetBatcher } from "./packetBatcher.ts";
 import {
   channelRepo,
@@ -263,18 +263,7 @@ const createMessageHandler =
 
     await messageRepo.saveMessage(newMessage);
 
-    await runReceiveHooks(
-      {
-        id: messagePacket.id,
-        from: messagePacket.from,
-        to: messagePacket.to,
-        text: messageText,
-        channel: messagePacket.channel ?? 0,
-        replyId: messagePacket.replyId,
-        emoji: messagePacket.emoji,
-      },
-      ownerNodeNum,
-    );
+    await playNotificationSound("message");
   };
 
 export const createChannelHandler =

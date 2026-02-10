@@ -1,8 +1,6 @@
-import {
-  type OutgoingMessage,
-  runSendHooks,
-} from "@app/core/services/messageHooks.ts";
+import { adminCommands } from "@core/services/adminCommands";
 import logger from "@core/services/logger";
+import { nodeRepo } from "@data/repositories";
 import { useMessageDraft } from "@data/hooks";
 import { messageRepo } from "@data/index";
 import type { Message, NewMessage } from "@data/schema";
@@ -150,19 +148,24 @@ export const MessageInput = ({
     }
 
     try {
-      // Run pipeline handlers (auto-favorite, etc)
-      const outgoingMessage: OutgoingMessage = {
-        text: trimmedMessage,
-        to: toValue,
-        channelId: channelValue,
-        replyId: replyingTo?.messageId,
-        wantAck: true,
-      };
-
-      // Fire send hooks (auto-favorite on DM, etc.) - don't await, let them run in background
-      runSendHooks(outgoingMessage, myNodeNum).catch((error) => {
-        logger.warn("[MessageInput] Send hooks failed:", error);
-      });
+      // Auto-favorite node when sending a DM (fire-and-forget)
+      if (isDirect && destinationNodeNum !== myNodeNum) {
+        nodeRepo
+          .getNode(myNodeNum, destinationNodeNum)
+          .then((node) => {
+            if (node && !node.isFavorite) {
+              adminCommands
+                .setFavoriteNode(destinationNodeNum, true)
+                .catch((err) => {
+                  logger.warn(
+                    `[MessageInput] Failed to auto-favorite node ${destinationNodeNum}:`,
+                    err,
+                  );
+                });
+            }
+          })
+          .catch(() => {});
+      }
 
       const replyMessageId = replyingTo?.messageId;
 
