@@ -170,13 +170,11 @@ async function createSerialTransport(
     throw new Error("Serial port not available. Re-select the port.");
   }
 
-  // Ensure port is closed before trying to open
   if (browserSerial.isSerialPortOpen(port)) {
     logger.debug(`[transportFactory] Closing already-open serial port`);
     await browserSerial.closeSerialPort(port);
   }
 
-  // Check for locked streams and force cleanup if needed
   const portWithStreams = port as SerialPort & {
     readable: ReadableStream | null;
     writable: WritableStream | null;

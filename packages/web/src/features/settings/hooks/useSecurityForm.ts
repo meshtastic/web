@@ -27,7 +27,6 @@ export function useSecurityForm() {
   const effectiveConfig = dbEffectiveConfig ?? baseConfig;
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
-  // Convert Uint8Array to base64 strings for form
   const toFormValues = useCallback(
     (
       cfg: Protobuf.Config.Config_SecurityConfig | null | undefined,
@@ -49,7 +48,6 @@ export function useSecurityForm() {
     [],
   );
 
-  // Convert base64 strings back to Uint8Array for store
   const fromFormValues = useCallback((data: RawSecurity): ParsedSecurity => {
     return {
       ...data,
@@ -115,7 +113,6 @@ export function useSecurityForm() {
 
     prevValuesRef.current = currentValues;
 
-    // Convert form values to store format (with Uint8Array)
     const parsed = fromFormValues(currentValues);
     const originalParsed = fromFormValues(defaultValues);
 
@@ -125,7 +122,6 @@ export function useSecurityForm() {
       const originalValue = originalParsed[key];
 
       if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        // Save change to database
         saveChange({
           changeType: "config",
           variant: "security",
@@ -134,7 +130,6 @@ export function useSecurityForm() {
           originalValue: originalValue,
         });
       } else {
-        // Clear change from database if reverted to original
         clearChange({
           changeType: "config",
           variant: "security",
@@ -179,7 +174,6 @@ export function useSecurityForm() {
     trigger(["privateKey", "publicKey"]);
   }, [setValue, trigger]);
 
-  // Update public key when private key changes manually
   const updatePublicKeyFromPrivate = useCallback(
     async (privateKeyBase64: string) => {
       try {

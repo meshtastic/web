@@ -141,27 +141,38 @@ const createNodeInfoHandler =
 const createTelemetryHandler =
   (ownerNodeNum: number) =>
   async (telemetry: Types.PacketMetadata<Protobuf.Telemetry.Telemetry>) => {
-    await nodeRepo.updateMetrics(ownerNodeNum, telemetry.from, {
-      batteryLevel: telemetry.data.deviceMetrics?.batteryLevel,
-      voltage: telemetry.data.deviceMetrics?.voltage,
-      channelUtilization: telemetry.data.deviceMetrics?.channelUtilization,
-      airUtilTx: telemetry.data.deviceMetrics?.airUtilTx,
-      uptimeSeconds: telemetry.data.deviceMetrics?.uptimeSeconds,
-    });
+    const { variant } = telemetry.data;
+
+    const deviceMetrics =
+      variant.case === "deviceMetrics" ? variant.value : undefined;
+    const environmentMetrics =
+      variant.case === "environmentMetrics" ? variant.value : undefined;
+    const powerMetrics =
+      variant.case === "powerMetrics" ? variant.value : undefined;
+
+    if (deviceMetrics) {
+      await nodeRepo.updateMetrics(ownerNodeNum, telemetry.from, {
+        batteryLevel: deviceMetrics.batteryLevel,
+        voltage: deviceMetrics.voltage,
+        channelUtilization: deviceMetrics.channelUtilization,
+        airUtilTx: deviceMetrics.airUtilTx,
+        uptimeSeconds: deviceMetrics.uptimeSeconds,
+      });
+    }
 
     const telemetryLog: NewTelemetryLog = {
       ownerNodeNum,
       nodeNum: telemetry.from,
       time: unixToDate(telemetry.data.time),
-      batteryLevel: telemetry.data.deviceMetrics?.batteryLevel,
-      voltage: telemetry.data.deviceMetrics?.voltage,
-      channelUtilization: telemetry.data.deviceMetrics?.channelUtilization,
-      airUtilTx: telemetry.data.deviceMetrics?.airUtilTx,
-      uptimeSeconds: telemetry.data.deviceMetrics?.uptimeSeconds,
-      temperature: telemetry.data.environmentMetrics?.temperature,
-      relativeHumidity: telemetry.data.environmentMetrics?.relativeHumidity,
-      barometricPressure: telemetry.data.environmentMetrics?.barometricPressure,
-      current: telemetry.data.powerMetrics?.ch1Current,
+      batteryLevel: deviceMetrics?.batteryLevel,
+      voltage: deviceMetrics?.voltage,
+      channelUtilization: deviceMetrics?.channelUtilization,
+      airUtilTx: deviceMetrics?.airUtilTx,
+      uptimeSeconds: deviceMetrics?.uptimeSeconds,
+      temperature: environmentMetrics?.temperature,
+      relativeHumidity: environmentMetrics?.relativeHumidity,
+      barometricPressure: environmentMetrics?.barometricPressure,
+      current: powerMetrics?.ch1Current,
     };
 
     await nodeRepo.logTelemetry(telemetryLog);
@@ -234,9 +245,9 @@ const createMessageHandler =
     }
 
     const hops =
-      messagePacket.hopStart !== undefined &&
-      messagePacket.hopLimit !== undefined
-        ? messagePacket.hopStart - messagePacket.hopLimit
+      messagePacket.hopsStart !== undefined &&
+      messagePacket.hopsLimit !== undefined
+        ? messagePacket.hopsStart - messagePacket.hopsLimit
         : 0;
 
     const newMessage: NewMessage = {
@@ -247,7 +258,7 @@ const createMessageHandler =
       fromNode: messagePacket.from,
       toNode: messagePacket.to,
       message: messageText,
-      date: flexibleTimestampToDate(messagePacket.rxTime ?? 0),
+      date: messagePacket.rxTime ?? new Date(),
       state: "ack",
       rxSnr: messagePacket.rxSnr ?? 0,
       rxRssi: messagePacket.rxRssi ?? 0,

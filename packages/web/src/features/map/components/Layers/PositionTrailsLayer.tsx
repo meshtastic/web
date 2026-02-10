@@ -73,7 +73,6 @@ export const PositionTrailsLayer = ({
     return Math.floor(cutoff / 1000); // Convert to seconds
   }, [trailDurationHours]);
 
-  // Get node numbers for filtered nodes
   const nodeNums = useMemo(
     () => filteredNodes.map((node) => node.nodeNum),
     [filteredNodes],

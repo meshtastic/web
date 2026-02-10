@@ -28,7 +28,6 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
   const { pendingChanges, saveChange, clearChange } =
     usePendingChanges(myNodeNum);
 
-  // Convert flat DB channel to nested form structure
   const dbToFormValues = useCallback(
     (ch: DbChannel): ChannelValidation => ({
       index: ch.channelIndex,
@@ -48,7 +47,6 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
     [],
   );
 
-  // Convert form data back to flat DB structure
   const formToDbChannel = useCallback(
     (data: ChannelValidation): DbChannel => ({
       ownerNodeNum: channel.ownerNodeNum,
@@ -70,7 +68,6 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
     [channel, dbToFormValues],
   );
 
-  // Get working channel from pending changes if there are any
   const workingChannelChange = useMemo(() => {
     return pendingChanges.find(
       (c) =>
@@ -135,7 +132,6 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
         return;
       }
 
-      // Save the whole channel as a change
       saveChange({
         changeType: "channel",
         channelIndex: channel.channelIndex,
@@ -219,7 +215,6 @@ export function useChannelForm({ channel }: UseChannelFormOptions) {
     }
   }, [byteCount, setValue, trigger, handleSubmit, submitChanges]);
 
-  // Handle byte count select change
   const handleByteCountChange = useCallback(
     (value: string) => {
       const count = Number.parseInt(value, 10);

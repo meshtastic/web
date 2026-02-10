@@ -55,7 +55,6 @@ export function useActivityChanges() {
     // Determine category from change type and variant
     let category = "Settings";
     if (change.variant) {
-      // Convert camelCase to Title Case
       const formatted =
         change.variant.charAt(0).toUpperCase() +
         change.variant
@@ -63,7 +62,6 @@ export function useActivityChanges() {
           .replace(/([A-Z])/g, " $1")
           .trim();
 
-      // Handle common acronyms
       const acronymMap: Record<string, string> = {
         Mqtt: "MQTT",
         Lora: "Lora",
@@ -111,7 +109,6 @@ export function useActivityChanges() {
       key = { type: "user" };
     }
 
-    // Get human-readable label from i18n, with fallback to formatted field path
     const labelKey = getFieldLabelKey(
       change.changeType,
       change.variant,

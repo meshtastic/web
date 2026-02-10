@@ -21,7 +21,6 @@ export const RemoveNodeDialog = ({
   const { nodes: allNodes } = useNodes(myNodeNum);
   const { nodeNumToBeRemoved } = useUIStore();
 
-  // Create getNode function from database nodes
   const getNode = (nodeNum: number) => {
     return allNodes.find((n) => n.nodeNum === nodeNum);
   };

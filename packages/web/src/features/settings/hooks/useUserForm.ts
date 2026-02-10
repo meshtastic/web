@@ -19,7 +19,6 @@ export function useUserForm() {
   const { pendingChanges, saveChange, clearChange } =
     usePendingChanges(myNodeNum);
 
-  // Get user data from node in database
   const myNode = useMemo(() => {
     if (!myNodeNum) {
       return undefined;
@@ -107,7 +106,6 @@ export function useUserForm() {
       const originalValue = original[key];
 
       if (newValue !== originalValue) {
-        // Save change to database
         saveChange({
           changeType: "user",
           fieldPath: key,
@@ -115,7 +113,6 @@ export function useUserForm() {
           originalValue: originalValue,
         });
       } else {
-        // Clear change from database if reverted to original
         clearChange({
           changeType: "user",
           fieldPath: key,
@@ -145,7 +142,6 @@ export function useUserForm() {
     }
   }, [pendingReset, form]);
 
-  // Send user data directly to device via adminCommands
   const sendToDevice = useCallback(async () => {
     const data = getValues();
     const userData = create(Protobuf.Mesh.UserSchema, {

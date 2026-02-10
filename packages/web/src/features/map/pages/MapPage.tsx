@@ -51,7 +51,6 @@ export const MapPage = () => {
     return allNodes.filter((node) => hasNodePosition(node));
   }, [allNodes]);
 
-  // Create getNode helper
   const getNode = useCallback(
     (nodeNum: number) => {
       return validNodes.find((n) => n.nodeNum === nodeNum);

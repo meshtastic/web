@@ -53,7 +53,6 @@ export function DashboardPage() {
     nodeSignalData,
   } = useDashboardCharts(myNodeNum, myNodeNum);
 
-  // Get latest environment telemetry (most recent entry with env data)
   const latestEnv = telemetry.find(
     (t) => t.temperature != null || t.relativeHumidity != null,
   );

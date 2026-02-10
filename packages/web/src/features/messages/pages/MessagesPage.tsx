@@ -88,18 +88,15 @@ export default function MessagesPage() {
       openMessageTab(channelParam, "channel");
     }
 
-    // Handle node param (direct messages)
     if (nodeParam !== undefined) {
       logger.info(`[MessagesPage] Opening node tab: ${nodeParam}`);
       openMessageTab(nodeParam, "direct");
     }
   }, [searchParams.channel, searchParams.node, openMessageTab]);
 
-  // Get active tab info
   const activeTab = openTabs.find((t) => t.id === activeTabId);
   const secondaryTab = openTabs.find((t) => t.id === secondaryTabId);
 
-  // Get contacts from database nodes and channels
   const contacts = useMemo<Contact[]>(() => {
     const contactsList: Contact[] = [];
 
@@ -171,7 +168,6 @@ export default function MessagesPage() {
     });
   }, [contacts, conversations]);
 
-  // Update tabs with unread counts
   const tabsWithUnread = useMemo(() => {
     return openTabs.map((tab) => {
       const contact = contactsWithUnread.find((c) => c.id === tab.contactId);
@@ -286,7 +282,6 @@ export default function MessagesPage() {
               const tabContact = contacts.find(
                 (c) => c.id === tab.contactId && c.type === tab.type,
               );
-              // Create placeholder if contact not loaded yet
               const displayContact: Contact = tabContact ?? {
                 id: tab.contactId,
                 name:

@@ -32,7 +32,6 @@ export function ensureDefaultUser(
       return node;
     }
 
-    // Assign the created user directly
     node.user = createDefaultUser(node.num);
   }
 

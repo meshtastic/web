@@ -34,7 +34,6 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
   const { myNodeNum } = useMyNode();
   const { nodes: allNodes } = useNodes(myNodeNum);
 
-  // Create getNode function from database nodes
   const getNode = (nodeNum: number) => {
     return allNodes.find((n) => n.nodeNum === nodeNum);
   };

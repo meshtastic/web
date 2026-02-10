@@ -68,7 +68,6 @@ class ReactionServiceClass {
       createdAt: new Date(),
     });
 
-    // Send over mesh
     try {
       await deviceCommands.sendReaction(
         targetMessageId,
@@ -113,7 +112,6 @@ class ReactionServiceClass {
         `[ReactionService] Toggle result: ${wasAdded ? "added" : "removed"}`,
       );
 
-      // Send over mesh (same message acts as toggle on receiving end)
       try {
         const messageId = await deviceCommands.sendReaction(
           targetMessageId,

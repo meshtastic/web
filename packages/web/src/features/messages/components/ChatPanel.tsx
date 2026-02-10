@@ -82,7 +82,6 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
     messageIds,
   );
 
-  // Handler for when user reacts to a message
   const handleReact = useCallback(
     (message: Message, emoji: string) => {
       if (!myNodeNum || !contact) return;
@@ -107,7 +106,6 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
     [myNodeNum, contact],
   );
 
-  // Handler for deleting a message
   const handleDelete = useCallback(
     (message: Message) => {
       if (!myNodeNum) return;
@@ -160,22 +158,30 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
 
   // Mark conversation as read when viewing it
   // Only runs when contact changes OR a new message arrives (newestMessageId changes)
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- using specific contact properties to avoid re-running on unrelated contact changes
+  const contactId = contact?.id;
+  const contactType = contact?.type;
+  const contactNodeNum = contact?.nodeNum;
+
   useEffect(() => {
-    if (!contact || !myNodeNum || newestMessageId === undefined) {
+    if (
+      contactId === undefined ||
+      !contactType ||
+      !myNodeNum ||
+      newestMessageId === undefined
+    ) {
       return;
     }
 
-    if (contact.type === "channel") {
+    if (contactType === "channel") {
       markConversationAsRead(
         myNodeNum,
         "channel",
-        contact.id.toString(),
+        contactId.toString(),
         newestMessageId,
       );
     } else {
       // Conversation ID format: myNodeNum:otherNodeNum (from user's perspective)
-      const otherNode = contact.nodeNum ?? contact.id;
+      const otherNode = contactNodeNum ?? contactId;
       markConversationAsRead(
         myNodeNum,
         "direct",
@@ -183,13 +189,7 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
         newestMessageId,
       );
     }
-  }, [
-    contact?.id,
-    contact?.type,
-    contact?.nodeNum,
-    myNodeNum,
-    newestMessageId,
-  ]);
+  }, [contactId, contactType, contactNodeNum, myNodeNum, newestMessageId]);
 
   if (!contact) {
     return (
@@ -245,7 +245,6 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
                     ? messageByMessageId.get(message.replyId)
                     : undefined;
 
-                  // Get the sender name of the replied-to message
                   const replyToSenderNode = replyToMessage
                     ? nodeMap.get(replyToMessage.fromNode)
                     : undefined;

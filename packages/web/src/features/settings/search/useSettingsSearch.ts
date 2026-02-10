@@ -27,16 +27,13 @@ function searchFields(index: SearchableField[], query: string): SearchResult[] {
     const descMatch = descLower.includes(normalizedQuery);
 
     if (labelMatch || descMatch) {
-      // Calculate score - prefer label matches and exact matches
       let score = 0;
 
       if (labelMatch) {
         score += 10;
-        // Bonus for starts with
         if (labelLower.startsWith(normalizedQuery)) {
           score += 5;
         }
-        // Bonus for exact match
         if (labelLower === normalizedQuery) {
           score += 10;
         }
@@ -59,10 +56,8 @@ function searchFields(index: SearchableField[], query: string): SearchResult[] {
     }
   }
 
-  // Sort by score descending
   results.sort((a, b) => b.score - a.score);
 
-  // Limit results to prevent overwhelming the UI
   return results.slice(0, 20);
 }
 
@@ -81,10 +76,8 @@ function groupResults(results: SearchResult[]): GroupedSearchResults[] {
     }
   }
 
-  // Convert to array with section labels
   const groupedResults: GroupedSearchResults[] = [];
 
-  // Order sections in a logical way
   const sectionOrder: SettingsSection[] = [
     "device",
     "radio",
@@ -115,18 +108,14 @@ function groupResults(results: SearchResult[]): GroupedSearchResults[] {
 export function useSettingsSearch(query: string) {
   const { t } = useTranslation(["config", "moduleConfig", "channels", "ui"]);
 
-  // Build translated index when language changes
-  // The t function changes reference when language changes
   const searchIndex = useMemo(() => {
     return buildSearchIndex(t);
   }, [t]);
 
-  // Perform search
   const results = useMemo(() => {
     return searchFields(searchIndex, query);
   }, [searchIndex, query]);
 
-  // Group results for display
   const groupedResults = useMemo(() => {
     return groupResults(results);
   }, [results]);

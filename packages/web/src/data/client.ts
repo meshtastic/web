@@ -48,14 +48,12 @@ class DatabaseClient {
   private async _init(): Promise<void> {
     logger.debug("[DB] Initializing database...");
 
-    // Create SQLocalDrizzle instance and get the driver
     this.sqlocalDrizzle = new SQLocalDrizzle({
       databasePath: "meshtastic.db",
       reactive: true,
     });
     const { driver } = this.sqlocalDrizzle;
 
-    // Create Drizzle instance with the SQLocalDrizzle driver
     this.drizzleDb = drizzle(driver, { schema });
 
     // Run migrations
@@ -77,7 +75,6 @@ class DatabaseClient {
 
     const { sql } = this.sqlocalDrizzle;
 
-    // Create migrations tracking table if it doesn't exist
     await sql(`
       CREATE TABLE IF NOT EXISTS __drizzle_migrations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,8 +83,6 @@ class DatabaseClient {
       )
     `);
 
-    // Check if we have an existing database without migration tracking
-    // (database was created before we added migration tracking)
     const existingTables = await sql<{ name: string }>(
       `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != '__drizzle_migrations'`,
     );

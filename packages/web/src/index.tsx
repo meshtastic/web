@@ -128,8 +128,8 @@ const initTimeout = new Promise<never>((_, reject) =>
 );
 
 Promise.race([initializeApp(), initTimeout])
-  .then(() => {
-    root.render(<AppWithSplash isReturningUser={true} />);
+  .then(({ isReturningUser }) => {
+    root.render(<AppWithSplash isReturningUser={isReturningUser} />);
   })
   .catch((error) => {
     logger.error("[App] Failed to initialize:", error);

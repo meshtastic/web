@@ -82,7 +82,6 @@ export async function runScheduledMaintenance(
       settings.unknownOnly,
     );
 
-    // Update last run time
     await updateNodeCleanupSettings(deviceId, { lastRun: now });
 
     logger.debug(`[Maintenance] Deleted ${deleted} stale nodes`);
@@ -107,7 +106,6 @@ export async function runNodeCleanup(
 
   const deleted = await nodeRepo.deleteStaleNodes(deviceId, days, unknown);
 
-  // Update last run time
   await updateNodeCleanupSettings(deviceId, { lastRun: Date.now() });
 
   return deleted;

@@ -784,7 +784,6 @@ function deviceFactory(
           if (device) {
             device.remoteAdminTargetNode = nodeNum;
 
-            // Check authorization only when entering remote admin
             if (nodeNum !== null && targetPublicKey) {
               const adminKeys = device.config.security?.adminKey ?? [];
               const isAuthorized = adminKeys.some((adminKey) => {

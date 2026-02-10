@@ -166,7 +166,6 @@ export const NodeDetailsDrawer = ({
     startTraceroute,
   } = useTraceroute({ nodeNum: nodeNumDetails ?? 0 });
 
-  // Check if this node is the connected device (can't traceroute to self)
   const isOwnNode = node?.nodeNum === myNodeNum;
 
   const [noteText, setNoteText] = React.useState(node?.privateNote ?? "");
@@ -277,14 +276,12 @@ export const NodeDetailsDrawer = ({
       });
   };
 
-  // Check if there are unsaved changes to the note
   const hasNoteChanges = noteText !== (node.privateNote ?? "");
 
   // Environment metrics are no longer stored on the node directly
   // They would be in telemetry logs if needed
   const hasEnvironmentMetrics = false;
 
-  // Get device image based on hardware model
   const getDeviceImage = (): string => {
     if (!node.hwModel) {
       return "/devices/diy.svg";

@@ -96,7 +96,6 @@ class ConnectionServiceClass {
         state.subscriptions.push(unsub);
       }
 
-      // Set up the MeshDevice with callbacks
       const setupCtx = await deviceSetup.setupMeshDevice(
         conn.id,
         result.transport,
@@ -279,12 +278,10 @@ class ConnectionServiceClass {
    * Check if fast recovery (skip config sync) can be used
    */
   private async canUseFastRecovery(conn: Connection): Promise<boolean> {
-    // Check if we have a last connection timestamp
     if (!conn.lastConnectedAt) {
       return false;
     }
 
-    // Check if within 30-minute window
     const timeSinceLastConnect = Date.now() - conn.lastConnectedAt.getTime();
     const THIRTY_MINUTES = 30 * 60 * 1000;
 
@@ -297,7 +294,6 @@ class ConnectionServiceClass {
       return false;
     }
 
-    // Check if we have cached config for this device
     if (!conn.nodeNum) {
       return false;
     }

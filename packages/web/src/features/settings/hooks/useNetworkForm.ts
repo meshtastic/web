@@ -26,7 +26,6 @@ export function useNetworkForm() {
   const effectiveConfig = dbEffectiveConfig ?? baseConfig;
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
-  // Convert integer IPs to string for form display
   const toFormValues = useCallback(
     (
       cfg: Protobuf.Config.Config_NetworkConfig | null,
@@ -50,7 +49,6 @@ export function useNetworkForm() {
     [],
   );
 
-  // Convert string IPs back to integers for store
   const fromFormValues = useCallback((data: NetworkValidation) => {
     return {
       ...data,
@@ -117,7 +115,6 @@ export function useNetworkForm() {
 
       prevValuesRef.current = currentValues;
 
-      // Convert form values to store format (with integer IPs)
       const parsed = fromFormValues(currentValues);
       const originalParsed = fromFormValues(defaultValues);
 
@@ -127,7 +124,6 @@ export function useNetworkForm() {
         const originalValue = originalParsed[key];
 
         if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-          // Save change to database
           saveChange({
             changeType: "config",
             variant: "network",
@@ -136,7 +132,6 @@ export function useNetworkForm() {
             originalValue: originalValue,
           });
         } else {
-          // Clear change from database if reverted to original
           clearChange({
             changeType: "config",
             variant: "network",

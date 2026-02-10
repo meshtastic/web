@@ -70,7 +70,6 @@ export function useConfig(ownerNodeNum: number | undefined): UseConfigResult {
   // Build query for device config
   const query = useMemo(() => {
     if (!ownerNodeNum) {
-      // Return a query that returns empty results
       return configCacheRepo.buildConfigQuery(0);
     }
     return configCacheRepo.buildConfigQuery(ownerNodeNum);

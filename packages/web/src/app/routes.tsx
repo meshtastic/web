@@ -193,7 +193,6 @@ const connectedLayoutRoute = createRoute({
       throw redirect({ to: "/connect", replace: true });
     }
 
-    // Check if device exists in database
     const deviceExists =
       await context.repositories.device.deviceExists(nodeNum);
 

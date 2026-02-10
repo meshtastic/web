@@ -143,13 +143,11 @@ function ConnectedSidebarContent() {
   const isAuthorized = device.remoteAdminAuthorized;
   const remoteNode = remoteAdminTarget ? nodeMap.get(remoteAdminTarget) : null;
 
-  // Get effective connection status using consolidated utilities
   const effectiveStatus = getEffectiveStatus(
     activeConnection?.status,
     autoReconnectStatus,
   );
 
-  // Handle special case for unauthorized remote admin
   const statusColor =
     isRemoteAdmin && !isAuthorized
       ? "bg-red-500"
@@ -448,7 +446,6 @@ export function AppSidebar() {
   const location = useLocation();
   const { t } = useTranslation();
 
-  // Check if we're on a connected route (/:nodeNum/*)
   const isConnectedRoute = /^\/\d+\//.test(location.pathname);
 
   return (

@@ -20,7 +20,6 @@ const LOG_LEVEL_MAP: Record<LogLevel, number> = {
 };
 
 function getLogLevel(): number {
-  // Check localStorage for log level override
   const storedLevel = localStorage.getItem(
     "meshtastic-log-level",
   ) as LogLevel | null;

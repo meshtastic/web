@@ -169,7 +169,6 @@ export const MessageInput = ({
 
       const replyMessageId = replyingTo?.messageId;
 
-      // Clear reply state after sending
       onCancelReply?.();
 
       commands
@@ -182,7 +181,6 @@ export const MessageInput = ({
         )
         .then(async (realMessageId) => {
           if (realMessageId !== undefined) {
-            // Update message state to sent
             await messageRepo.updateMessageStateByMessageId(
               tempMessageId,
               myNodeNum,

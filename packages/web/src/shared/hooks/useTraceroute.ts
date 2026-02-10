@@ -2,7 +2,7 @@ import { tracerouteRepo } from "@data/index";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { useDevice } from "@state/index.ts";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import logger from "../../core/services/logger.ts";
 
 const TRACEROUTE_TIMEOUT_MS = 30000; // 30 seconds max
@@ -35,8 +35,10 @@ export function useTraceroute({
   const animationRef = useRef<number | null>(null);
   const tracerouteCountAtStartRef = useRef<number>(0);
 
-  // Get current traceroute count for this node
-  const currentTraceroutes = traceroutes.get(nodeNum) ?? [];
+  const currentTraceroutes = useMemo(
+    () => traceroutes.get(nodeNum) ?? [],
+    [traceroutes, nodeNum],
+  );
 
   // Watch for new traceroute responses
   useEffect(() => {
@@ -44,7 +46,6 @@ export function useTraceroute({
       return;
     }
 
-    // Check if we have a new traceroute response
     if (currentTraceroutes.length > tracerouteCountAtStartRef.current) {
       // Got a response - complete the progress
       const latestTraceroute =

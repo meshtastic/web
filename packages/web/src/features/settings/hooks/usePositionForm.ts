@@ -33,7 +33,6 @@ export function usePositionForm() {
     effectiveConfig?.positionFlags ?? 0,
   );
 
-  // Get current node for position coordinates
   const myNode = useMemo(() => {
     if (!myNodeNum) {
       return undefined;
@@ -116,7 +115,6 @@ export function usePositionForm() {
         ...configData
       } = currentValues;
 
-      // Include computed flags value
       const payload = { ...configData, positionFlags: flagsValue };
 
       // Process each field and save/clear changes to database
@@ -125,7 +123,6 @@ export function usePositionForm() {
         const originalValue = baseConfig[key as keyof typeof baseConfig];
 
         if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-          // Save change to database
           saveChange({
             changeType: "config",
             variant: "position",
@@ -134,7 +131,6 @@ export function usePositionForm() {
             originalValue: originalValue,
           });
         } else {
-          // Clear change from database if reverted to original
           clearChange({
             changeType: "config",
             variant: "position",

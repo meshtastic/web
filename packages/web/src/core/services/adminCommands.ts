@@ -49,7 +49,6 @@ class AdminCommandService {
       `[AdminCommands] Setting node ${nodeNum} favorite=${isFavorite}`,
     );
 
-    // Send admin message to device
     this.sendAdminMessage(
       create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
@@ -59,7 +58,6 @@ class AdminCommandService {
       }),
     );
 
-    // Update local database
     await nodeRepo.updateFavorite(myNodeNum, nodeNum, isFavorite);
   }
 
@@ -74,7 +72,6 @@ class AdminCommandService {
       `[AdminCommands] Setting node ${nodeNum} ignored=${isIgnored}`,
     );
 
-    // Send admin message to device
     this.sendAdminMessage(
       create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
@@ -84,7 +81,6 @@ class AdminCommandService {
       }),
     );
 
-    // Update local database
     await nodeRepo.updateIgnored(myNodeNum, nodeNum, isIgnored);
   }
 
@@ -385,18 +381,15 @@ class AdminCommandService {
   }> {
     const connection = this.getConnection();
 
-    // Load pending changes from database
     const pendingChanges =
       await configCacheRepo.getPendingChanges(ownerNodeNum);
 
-    // Load base config from database
     const cachedConfig = await configCacheRepo.getCachedConfig(ownerNodeNum);
 
     if (!cachedConfig) {
       throw new Error("No cached config found for device");
     }
 
-    // Convert to protobuf format
     const configProtobufs = buildConfigProtobuf(
       pendingChanges,
       cachedConfig.config as Protobuf.LocalOnly.LocalConfig,
@@ -411,27 +404,22 @@ class AdminCommandService {
       `[AdminCommands] Saving ${configProtobufs.length} configs, ${moduleConfigProtobufs.length} module configs, ${channelProtobufs.length} channels`,
     );
 
-    // Save channels first (they don't need commit)
     for (const channel of channelProtobufs) {
       await connection.setChannel(channel);
     }
 
-    // Save configs
     for (const config of configProtobufs) {
       await connection.setConfig(config);
     }
 
-    // Save module configs
     for (const moduleConfig of moduleConfigProtobufs) {
       await connection.setModuleConfig(moduleConfig);
     }
 
-    // Commit if there were config changes
     if (configProtobufs.length > 0 || moduleConfigProtobufs.length > 0) {
       await connection.commitEditSettings();
     }
 
-    // Clear pending changes from database after successful save
     await configCacheRepo.clearAllLocalChanges(ownerNodeNum);
 
     return {
@@ -463,7 +451,6 @@ class AdminCommandService {
       (c) => c.changeType === "channel",
     );
 
-    // Count unique variants (not individual field changes)
     const configVariants = new Set(configChanges.map((c) => c.variant));
     const moduleConfigVariants = new Set(
       moduleConfigChanges.map((c) => c.variant),

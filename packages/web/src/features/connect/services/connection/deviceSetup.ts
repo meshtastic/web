@@ -133,7 +133,6 @@ function subscribeToNodeInfo(
     );
     subscriptions.push(dbUnsub);
 
-    // Check cache for fast reconnection
     await tryUseCachedConfig(ctx, callbacks, nodeInfo.myNodeNum);
   });
 

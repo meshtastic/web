@@ -68,11 +68,8 @@ export function SettingsNavigationProvider({
   }, []);
 
   const navigateToField = useCallback((field: SearchableField) => {
-    // Update section if different
     setActiveSectionState(field.section);
-    // Update tab
     setActiveTabState(field.tab);
-    // Set the field to highlight
     setHighlightedField(field.fieldName);
   }, []);
 

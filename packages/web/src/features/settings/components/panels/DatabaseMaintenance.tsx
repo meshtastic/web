@@ -30,7 +30,6 @@ export function DatabaseMaintenance() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load settings from database
   useEffect(() => {
     if (!myNodeNum) {
       return;

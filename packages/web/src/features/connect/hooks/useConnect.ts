@@ -45,13 +45,12 @@ export function useConnect(options?: UseConnectOptions) {
   const query = useMemo(() => connectionRepo.buildConnectionsQuery(), []);
   const { data } = useReactiveSQL(connectionRepo.getClient(), query);
 
-  const connList = data ?? [];
+  const connList = useMemo(() => data ?? [], [data]);
 
   // Auto-reconnect state
   const [autoReconnectStatus, setAutoReconnectStatus] =
     useState<AutoReconnectStatus>("idle");
 
-  // Handle auto-reconnect on mount
   useEffect(() => {
     if (!options?.autoReconnect) return;
 

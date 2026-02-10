@@ -39,10 +39,8 @@ export function useConfigForm<T extends FieldValues>({
   configType,
   schema,
 }: UseConfigFormOptions<T>): UseConfigFormReturn<T> {
-  // Get myNodeNum for database lookups
   const { myNodeNum } = useMyNode();
 
-  // Load config from database (base + pending changes merged)
   const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
     useEffectiveConfig(myNodeNum, configType);
 
@@ -53,7 +51,6 @@ export function useConfigForm<T extends FieldValues>({
   const baseConfig = dbBaseConfig ?? device.config[configType] ?? null;
   const effectiveConfig = dbEffectiveConfig ?? baseConfig;
 
-  // Get pending changes methods
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
   const isReady = baseConfig !== undefined && baseConfig !== null;
@@ -103,7 +100,6 @@ export function useConfigForm<T extends FieldValues>({
       const originalValue = (baseConfig as unknown as T)[key];
 
       if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        // Save change to database
         saveChange({
           changeType: "config",
           variant: configType,
@@ -112,7 +108,6 @@ export function useConfigForm<T extends FieldValues>({
           originalValue: originalValue,
         });
       } else {
-        // Clear change from database if reverted to original
         clearChange({
           changeType: "config",
           variant: configType,

@@ -45,10 +45,8 @@ export function useModuleConfigForm<T extends FieldValues>({
   schema,
   transformDefaults,
 }: UseModuleConfigFormOptions<T>): UseModuleConfigFormReturn<T> {
-  // Get myNodeNum for database lookups
   const { myNodeNum } = useMyNode();
 
-  // Load module config from database (base + pending changes merged)
   const { config: dbRawEffectiveConfig, baseConfig: dbRawBaseConfig } =
     useEffectiveModuleConfig(myNodeNum, moduleConfigType);
 
@@ -58,7 +56,6 @@ export function useModuleConfigForm<T extends FieldValues>({
     dbRawBaseConfig ?? device.moduleConfig[moduleConfigType] ?? null;
   const rawEffectiveConfig = dbRawEffectiveConfig ?? rawBaseConfig;
 
-  // Get pending changes methods
   const { saveChange, clearChange } = usePendingChanges(myNodeNum);
 
   // Apply transforms if provided
@@ -119,7 +116,6 @@ export function useModuleConfigForm<T extends FieldValues>({
       const originalValue = (baseConfig as unknown as T)[key];
 
       if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        // Save change to database
         saveChange({
           changeType: "moduleConfig",
           variant: moduleConfigType,
@@ -128,7 +124,6 @@ export function useModuleConfigForm<T extends FieldValues>({
           originalValue: originalValue,
         });
       } else {
-        // Clear change from database if reverted to original
         clearChange({
           changeType: "moduleConfig",
           variant: moduleConfigType,

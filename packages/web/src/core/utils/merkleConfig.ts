@@ -61,7 +61,6 @@ export type ModuleConfigLeafKey = (typeof MODULE_CONFIG_LEAF_KEYS)[number];
 export type ChannelLeafKey = (typeof CHANNEL_LEAF_KEYS)[number];
 export type LeafKey = (typeof ALL_LEAF_KEYS)[number];
 
-// Extract variant name from leaf key
 export type ConfigVariant = ConfigLeafKey extends `config:${infer V}`
   ? V
   : never;
@@ -128,7 +127,6 @@ export function stableStringify(obj: unknown): string {
     return `[${items.join(",")}]`;
   }
 
-  // Handle Map
   if (obj instanceof Map) {
     const entries = Array.from(obj.entries())
       .sort(([a], [b]) => String(a).localeCompare(String(b)))
@@ -136,7 +134,6 @@ export function stableStringify(obj: unknown): string {
     return `{${entries.join(",")}}`;
   }
 
-  // Handle Set
   if (obj instanceof Set) {
     const items = Array.from(obj)
       .map((item) => stableStringify(item))
@@ -144,12 +141,10 @@ export function stableStringify(obj: unknown): string {
     return `[${items.join(",")}]`;
   }
 
-  // Handle Date
   if (obj instanceof Date) {
     return JSON.stringify(obj.toISOString());
   }
 
-  // Handle Uint8Array and other typed arrays
   if (ArrayBuffer.isView(obj)) {
     const arr = Array.from(obj as Uint8Array);
     return `[${arr.join(",")}]`;
@@ -214,7 +209,6 @@ export interface ComputeHashesInput {
   user?: {
     shortName?: string | null;
     longName?: string | null;
-    // Include other user fields that should be tracked
   };
 }
 
@@ -300,7 +294,6 @@ export function computeLeafHashes(
  * @returns Root hash string
  */
 export function computeRootHash(leafHashes: Map<string, string>): string {
-  // Combine leaves in deterministic order
   const combined = ALL_LEAF_KEYS.map((key) => leafHashes.get(key) ?? "").join(
     ":",
   );

@@ -100,7 +100,7 @@ export function usePendingChanges(
     configCacheRepo.getClient(),
     query,
   );
-  const pendingChanges = data ?? [];
+  const pendingChanges = useMemo(() => data ?? [], [data]);
 
   // Track if we've ever received data to avoid showing loading on subsequent renders
   const hasHydratedRef = useRef(false);
@@ -180,7 +180,6 @@ export function usePendingChanges(
     [ownerNodeNum],
   );
 
-  // Get changes for a specific variant
   const getVariantChanges = useMemo(
     () =>
       (changeType: ChangeType, variant: string | null): ConfigChange[] => {
@@ -193,7 +192,6 @@ export function usePendingChanges(
     [pendingChanges],
   );
 
-  // Check if a specific variant has changes
   const hasVariantChanges = useMemo(
     () =>
       (changeType: ChangeType, variant: string | null): boolean => {
@@ -385,7 +383,6 @@ export function buildConfigProtobuf(
   const configs: Protobuf.Config.Config[] = [];
 
   for (const [variant, changes] of changesByVariant) {
-    // Get base config for this variant
     const variantBase = baseConfig[variant as ValidConfigType];
     if (!variantBase) continue;
 
@@ -397,7 +394,6 @@ export function buildConfigProtobuf(
       }
     }
 
-    // Create protobuf object
     configs.push(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -438,7 +434,6 @@ export function buildModuleConfigProtobuf(
   const configs: Protobuf.ModuleConfig.ModuleConfig[] = [];
 
   for (const [variant, changes] of changesByVariant) {
-    // Get base config for this variant
     const variantBase = baseModuleConfig[variant as ValidModuleConfigType];
     if (!variantBase) continue;
 
@@ -450,7 +445,6 @@ export function buildModuleConfigProtobuf(
       }
     }
 
-    // Create protobuf object
     configs.push(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {

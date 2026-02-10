@@ -31,7 +31,6 @@ const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
   const { nodes: allNodes } = useNodes(myNodeNum);
   const { t } = useTranslation();
 
-  // Create getNode function from database nodes
   const getNode = (nodeNum: number) => {
     return allNodes.find((n) => n.nodeNum === nodeNum);
   };

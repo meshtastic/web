@@ -17,7 +17,6 @@ export function useIgnoreNode() {
 
   const updateIgnoredCB = useCallback(
     async ({ nodeNum, isIgnored }: IgnoreNodeOptions) => {
-      // Get node from database for toast message
       const node = await nodeRepo.getNode(myNodeNum, nodeNum);
       if (!node) {
         return;

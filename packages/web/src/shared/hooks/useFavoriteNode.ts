@@ -17,7 +17,6 @@ export function useFavoriteNode() {
 
   const updateFavoriteCB = useCallback(
     async ({ nodeNum, isFavorite }: FavoriteNodeOptions) => {
-      // Get node from database for toast message
       const node = await nodeRepo.getNode(myNodeNum, nodeNum);
       if (!node) {
         return;

@@ -39,7 +39,6 @@ export function validateMaxByteLength(
   value: string | null | undefined,
   maxByteLength: number,
 ): LengthValidationResult {
-  // Ensure maxByteLength is valid
   if (
     typeof maxByteLength !== "number" ||
     !Number.isInteger(maxByteLength) ||
@@ -51,12 +50,10 @@ export function validateMaxByteLength(
     return { isValid: false, currentLength: null }; // Cannot validate with invalid limit
   }
 
-  // Handle null or undefined input values
   if (value === null || value === undefined) {
     return { isValid: false, currentLength: null };
   }
 
-  // Check for TextEncoder availability
   if (typeof TextEncoder === "undefined") {
     console.error(
       "validateMaxByteLength: TextEncoder API is not available in this environment.",
@@ -71,10 +68,8 @@ export function validateMaxByteLength(
     // Perform the byte length check
     const isValid = currentLength <= maxByteLength;
 
-    // Return the result object
     return { isValid, currentLength };
   } catch (error) {
-    // Handle potential errors during encoding
     console.error("validateMaxByteLength: Error encoding string:", error);
     return { isValid: false, currentLength: null }; // Encoding failed
   }

@@ -72,7 +72,6 @@ export function useDeviceForm() {
       const originalValue = (baseConfig as DeviceValidation)[key];
 
       if (JSON.stringify(newValue) !== JSON.stringify(originalValue)) {
-        // Save change to database
         saveChange({
           changeType: "config",
           variant: "device",
@@ -81,7 +80,6 @@ export function useDeviceForm() {
           originalValue: originalValue,
         });
       } else {
-        // Clear change from database if reverted to original
         clearChange({
           changeType: "config",
           variant: "device",
@@ -116,7 +114,6 @@ export function useDeviceForm() {
     }
   }, [pendingReset, form]);
 
-  // Handle role change with validation dialog
   const handleRoleChange = useCallback(
     async (newRole: string) => {
       const isAllowed = await validateRoleSelection(newRole);

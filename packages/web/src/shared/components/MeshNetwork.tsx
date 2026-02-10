@@ -82,7 +82,6 @@ export function MeshNetwork() {
       return;
     }
 
-    // Initialize all nodes as idle
     nodes.forEach((node) => {
       nodeStatusRef.current.set(node.id, {
         state: "idle",
@@ -231,7 +230,6 @@ export function MeshNetwork() {
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // Check which nodes this wave reaches
         const seenNodes = floodSeenNodesRef.current.get(wave.floodId);
         if (seenNodes && wave.generation < 6) {
           // Max 6 hops (TTL)

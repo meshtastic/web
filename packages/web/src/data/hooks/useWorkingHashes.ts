@@ -79,14 +79,12 @@ function mergeChangesIntoConfig(
     if (change.changeType !== changeType) continue;
     if (!change.variant) continue;
 
-    // Get or create the variant object
     const variantKey = change.variant;
     const existingVariant =
       (merged[variantKey] as Record<string, unknown>) ?? {};
     const mergedVariant = { ...existingVariant };
 
     if (change.fieldPath) {
-      // Set the specific field
       mergedVariant[change.fieldPath] = change.value;
     } else {
       // Replace the entire variant (rare case)
@@ -200,7 +198,6 @@ export function useWorkingHashes(
     setIsComputing(true);
 
     try {
-      // Get base config
       const baseConfig =
         (baseConfigRow.config as Record<string, unknown>) ?? {};
       const baseModuleConfig =
@@ -332,10 +329,6 @@ export function useWorkingHashes(
     };
   }, [baseHashes, workingHashes]);
 
-  // ==========================================================================
-  // Return
-  // ==========================================================================
-
   return {
     ...changeSummary,
     isBaseLoaded,
@@ -363,7 +356,6 @@ export function useInitializeBaseHashes(ownerNodeNum: number | undefined) {
   return useCallback(async () => {
     if (!ownerNodeNum) return;
 
-    // Get cached config from DB
     const cachedConfig = await configCacheRepo.getCachedConfig(ownerNodeNum);
     if (!cachedConfig) return;
 

@@ -14,7 +14,6 @@ import {
 import { Mono } from "@shared/components/Mono.tsx";
 import { NodeAvatar } from "@shared/components/NodeAvatar.tsx";
 import { TimeAgo } from "@shared/components/TimeAgo.tsx";
-import { Badge } from "@shared/components/ui/badge";
 import { Button } from "@shared/components/ui/button";
 import {
   Card,
@@ -109,7 +108,6 @@ const NodesPage = (): JSX.Element => {
   const { nodes: allNodes } = useNodes(myNodeNum);
   const { nodes: onlineNodes } = useOnlineNodes(myNodeNum);
 
-  // Create a Set of online node numbers for O(1) lookup
   const onlineNodeNums = useMemo(
     () => new Set(onlineNodes.map((n) => n.nodeNum)),
     [onlineNodes],
@@ -131,7 +129,7 @@ const NodesPage = (): JSX.Element => {
   );
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
-  const [selectedTraceroute, setSelectedTraceroute] = useState<
+  const [_selectedTraceroute, setSelectedTraceroute] = useState<
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
   const [selectedLocation, setSelectedLocation] = useState<
@@ -697,6 +695,7 @@ const NodesPage = (): JSX.Element => {
                             handleDragStart(columnKey);
                           }}
                           onClick={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => e.stopPropagation()}
                           className="cursor-grab active:cursor-grabbing p-1 -m-1 hover:bg-muted rounded"
                         >
                           <GripVertical className="h-5 w-5 text-muted-foreground" />
