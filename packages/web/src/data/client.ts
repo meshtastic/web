@@ -5,6 +5,7 @@ import initialMigration from "./migrations/0000_initial_migration.sql?raw";
 import configHashesMigration from "./migrations/0001_config_hashes.sql?raw";
 import workingHashesMigration from "./migrations/0002_working_hashes.sql?raw";
 import notificationSoundsMigration from "./migrations/0003_notification_sounds.sql?raw";
+import autoReconnectMigration from "./migrations/0004_auto_reconnect.sql?raw";
 import * as schema from "./schema.ts";
 
 const migrations = [
@@ -12,6 +13,7 @@ const migrations = [
   { id: "0001_config_hashes", sql: configHashesMigration },
   { id: "0002_working_hashes", sql: workingHashesMigration },
   { id: "0003_notification_sounds", sql: notificationSoundsMigration },
+  { id: "0004_auto_reconnect", sql: autoReconnectMigration },
 ];
 
 class DatabaseClient {

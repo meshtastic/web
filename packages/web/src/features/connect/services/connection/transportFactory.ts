@@ -170,6 +170,10 @@ async function createSerialTransport(
     throw new Error("Serial port not available. Re-select the port.");
   }
 
+  // Ensure the port is in a clean state before creating a transport.
+  // Calling .cancel() on a locked ReadableStream is a spec violation (must go
+  // through the reader), so the only reliable way to release stale locks is to
+  // close the port entirely and re-open it.
   if (browserSerial.isSerialPortOpen(port)) {
     logger.debug(`[transportFactory] Closing already-open serial port`);
     await browserSerial.closeSerialPort(port);
@@ -181,8 +185,21 @@ async function createSerialTransport(
   };
 
   if (portWithStreams.readable?.locked || portWithStreams.writable?.locked) {
-    logger.debug(`[transportFactory] Detected locked streams, forcing cleanup`);
-    await browserSerial.forceReleaseStreams(port);
+    logger.warn(
+      `[transportFactory] Streams still locked after close, forcing port reopen`,
+    );
+    try {
+      await port.close();
+    } catch {
+      // port.close() may reject if locks aren't released; ignore
+    }
+    // Give the browser time to tear down the underlying connection
+    await new Promise((r) => setTimeout(r, 200));
+    try {
+      await port.open({ baudRate: 115200 });
+    } catch {
+      // open may fail if close didn't complete; will be caught below
+    }
   }
 
   try {

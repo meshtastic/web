@@ -99,10 +99,7 @@ export function useConnect(options?: UseConnectOptions) {
   }, []);
 
   const connect = useCallback(
-    async (
-      id: number,
-      opts?: { allowPrompt?: boolean; skipConfig?: boolean },
-    ) => {
+    async (id: number, opts?: { allowPrompt?: boolean }) => {
       const conn = connList.find((c) => c.id === id);
       if (!conn) {
         return false;
@@ -167,6 +164,18 @@ export function useConnect(options?: UseConnectOptions) {
     [connList],
   );
 
+  const toggleAutoReconnect = useCallback(
+    async (id: number) => {
+      const conn = connList.find((c) => c.id === id);
+      if (conn) {
+        await connectionRepo.updateConnection(id, {
+          autoReconnect: !conn.autoReconnect,
+        });
+      }
+    },
+    [connList],
+  );
+
   const syncConnectionStatuses = useCallback(async () => {
     await ConnectionService.refreshStatuses(connList);
   }, [connList]);
@@ -178,6 +187,7 @@ export function useConnect(options?: UseConnectOptions) {
     disconnect,
     removeConnection,
     setDefaultConnection,
+    toggleAutoReconnect,
     refreshStatuses,
     syncConnectionStatuses,
     autoReconnectStatus,

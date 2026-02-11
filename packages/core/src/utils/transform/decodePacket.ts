@@ -21,6 +21,7 @@ export const decodePacket = (device: MeshDevice) =>
           break;
         }
         case "debug": {
+          device.events.onDeviceDebugLog.dispatch(chunk.data);
           break;
         }
         case "packet": {

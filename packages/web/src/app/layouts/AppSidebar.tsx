@@ -45,7 +45,7 @@ import {
 } from "@shared/components/ui/tooltip";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
-import { useLocation, useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate, useParams } from "@tanstack/react-router";
 import {
   CableIcon,
   CheckIcon,
@@ -443,10 +443,9 @@ function DisconnectedSidebarContent() {
 }
 
 export function AppSidebar() {
-  const location = useLocation();
   const { t } = useTranslation();
-
-  const isConnectedRoute = /^\/\d+\//.test(location.pathname);
+  const params = useParams({ strict: false });
+  const isConnectedRoute = "nodeNum" in params;
 
   return (
     <Sidebar>

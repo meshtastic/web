@@ -34,6 +34,7 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   LinkIcon,
   MoreHorizontal,
+  RefreshCw,
   RotateCw,
   RouterIcon,
   Star,
@@ -61,7 +62,6 @@ export const ConnectPage = () => {
       navigate({
         to: "/$nodeNum/messages",
         params: { nodeNum: String(intent.nodeNum) },
-        search: { channel: 0 },
       });
     },
     [navigate],
@@ -74,6 +74,7 @@ export const ConnectPage = () => {
     disconnect,
     removeConnection,
     setDefaultConnection,
+    toggleAutoReconnect,
     refreshStatuses,
     syncConnectionStatuses,
   } = useConnect({
@@ -145,10 +146,7 @@ export const ConnectPage = () => {
               key={c.id}
               connection={c}
               onConnect={async () => {
-                const ok = await connect(c.id, {
-                  allowPrompt: true,
-                  skipConfig: false, // Debug: set to true to skip config sync
-                });
+                const ok = await connect(c.id, { allowPrompt: true });
                 toast({
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
@@ -158,7 +156,6 @@ export const ConnectPage = () => {
                       })
                     : t("toasts.checkConnection"),
                 });
-                // Navigation handled by ConnectionService after config complete
               }}
               onDisconnect={async () => {
                 await disconnect(c.id);
@@ -180,6 +177,7 @@ export const ConnectPage = () => {
                   }),
                 });
               }}
+              onToggleAutoReconnect={() => toggleAutoReconnect(c.id)}
               onDelete={async () => {
                 await disconnect(c.id);
                 removeConnection(c.id);
@@ -192,10 +190,7 @@ export const ConnectPage = () => {
                 });
               }}
               onRetry={async () => {
-                const ok = await connect(c.id, {
-                  allowPrompt: true,
-                  skipConfig: false, // Debug: set to true to skip config sync
-                });
+                const ok = await connect(c.id, { allowPrompt: true });
                 toast({
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
@@ -251,6 +246,7 @@ function ConnectionCard({
   onConnect,
   onDisconnect,
   onSetDefault,
+  onToggleAutoReconnect,
   onDelete,
   onRetry,
 }: {
@@ -258,6 +254,7 @@ function ConnectionCard({
   onConnect: () => Promise<boolean> | Promise<void>;
   onDisconnect: () => Promise<void> | Promise<void>;
   onSetDefault: () => void;
+  onToggleAutoReconnect: () => void;
   onDelete: () => void;
   onRetry: () => Promise<boolean> | Promise<void>;
 }) {
@@ -319,6 +316,17 @@ function ConnectionCard({
                   >
                     <Star className="size-4" />
                     {t("button.setDefault")}
+                  </DropdownMenuItem>
+                )}
+                {connection.type === "http" && (
+                  <DropdownMenuItem
+                    className="gap-2"
+                    onClick={() => onToggleAutoReconnect()}
+                  >
+                    <RefreshCw className="size-4" />
+                    {connection.autoReconnect
+                      ? t("button.disableAutoReconnect")
+                      : t("button.enableAutoReconnect")}
                   </DropdownMenuItem>
                 )}
                 <AlertDialog>

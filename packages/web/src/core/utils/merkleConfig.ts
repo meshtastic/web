@@ -118,6 +118,10 @@ export function stableStringify(obj: unknown): string {
     return "null";
   }
 
+  if (typeof obj === "bigint") {
+    return obj.toString();
+  }
+
   if (typeof obj !== "object") {
     return JSON.stringify(obj);
   }

@@ -44,6 +44,17 @@ export const advancedFieldRegistry: FieldRegistryEntry[] = [
   },
   {
     section: "advanced",
+    tab: "serialMonitor",
+    groupLabelKey: "settings.advanced.serialMonitor.title",
+    fields: [
+      {
+        name: "serialMonitor",
+        labelKey: "settings.advanced.serialMonitor.button.open",
+      },
+    ],
+  },
+  {
+    section: "advanced",
     tab: "performance",
     groupLabelKey: "preferences.performance.title",
     groupNamespace: "ui",

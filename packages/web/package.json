@@ -17,7 +17,6 @@
     "setup:certs": "mkcert localhost 127.0.0.1 ::1",
     "build": "vite build",
     "build:analyze": "BUNDLE_ANALYZE=true pnpm run build",
-
     "dev": "vite",
     "dev:https": "USE_HTTPS=true vite",
     "test": "vitest",
@@ -65,6 +64,8 @@
     "@tanstack/router-cli": "^1.159.4",
     "@tanstack/router-devtools": "^1.159.5",
     "@turf/turf": "^7.3.4",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
     "base64-js": "^1.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

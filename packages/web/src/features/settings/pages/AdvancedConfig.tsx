@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { Administration } from "../components/panels/Administration";
 import { DatabaseMaintenance } from "../components/panels/DatabaseMaintenance";
 import { DebugLog } from "../components/panels/DebugLog";
+import { SerialMonitor } from "../components/panels/SerialMonitor";
 
 const PACKET_BATCH_SIZE_MIN = 10;
 const PACKET_BATCH_SIZE_MAX = 100;
@@ -78,6 +79,23 @@ export const AdvancedConfig = () => {
         </CardHeader>
         <CardContent>
           <DebugLog />
+        </CardContent>
+      </Card>
+
+      <Card data-section="serialMonitor">
+        <CardHeader>
+          <CardTitle>
+            {t("settings.advanced.serialMonitor.title", "Serial Monitor")}
+          </CardTitle>
+          <CardDescription>
+            {t(
+              "settings.advanced.serialMonitor.description",
+              "Connect to a device's serial port to view raw debug output",
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SerialMonitor />
         </CardContent>
       </Card>
 

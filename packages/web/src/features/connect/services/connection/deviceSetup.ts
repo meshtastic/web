@@ -59,7 +59,6 @@ export async function setupMeshDevice(
   connectionId: number,
   transport: PacketTransport,
   callbacks: SetupCallbacks,
-  skipConfig?: boolean,
 ): Promise<SetupContext> {
   // Use a simple random ID for the MeshDevice instance (not persisted)
   const meshDeviceId = randId();
@@ -95,14 +94,7 @@ export async function setupMeshDevice(
 
   device.resetConfigProgress();
   await callbacks.onStatusChange("configuring");
-
-  if (skipConfig) {
-    logger.info("[deviceSetup] Skipping config (debug mode)");
-    await callbacks.onStatusChange("connected");
-    startHeartbeat(ctx, callbacks);
-  } else {
-    runConfigSync(ctx, callbacks);
-  }
+  runConfigSync(ctx, callbacks);
 
   return ctx;
 }
@@ -299,22 +291,25 @@ async function handleConfigStage1Complete(
   ctx: SetupContext,
   callbacks: SetupCallbacks,
 ): Promise<void> {
-  const { device, myNodeNum } = ctx;
-  const wasCached = device.isCachedConfig;
+  const { myNodeNum } = ctx;
 
-  device.setIsCachedConfig(false);
+  // get the latest device from the store
+  const latestDevice = useDeviceStore.getState().device;
+  if (!latestDevice) return;
+
+  const wasCached = latestDevice.isCachedConfig;
+  latestDevice.setIsCachedConfig(false);
 
   if (!wasCached) {
     await callbacks.onStatusChange("connected");
   }
 
-  // Save fresh config to cache and compute base hashes
   if (myNodeNum) {
     await configSync.saveFreshConfig(myNodeNum, {
-      config: device.config,
-      moduleConfig: device.moduleConfig,
-      metadata: device.metadata,
-      setCachedConfig: device.setCachedConfig,
+      config: latestDevice.config,
+      moduleConfig: latestDevice.moduleConfig,
+      metadata: latestDevice.metadata,
+      setCachedConfig: latestDevice.setCachedConfig,
     });
   }
 

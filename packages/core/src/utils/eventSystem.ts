@@ -369,8 +369,8 @@ export class EventSystem {
    *
    * @event onDeviceDebugLog
    */
-  public readonly onDeviceDebugLog: SimpleEventDispatcher<Uint8Array> =
-    new SimpleEventDispatcher<Uint8Array>();
+  public readonly onDeviceDebugLog: SimpleEventDispatcher<string> =
+    new SimpleEventDispatcher<string>();
 
   /**
    * Outputs status of pending settings changes

@@ -1,5 +1,4 @@
 import { useMyNode } from "@app/shared/index.ts";
-import logger from "@core/services/logger";
 import {
   useChannels,
   useConversations,
@@ -22,7 +21,6 @@ import {
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { cn } from "@shared/utils/cn";
 import { type SplitMode, useUIStore } from "@state/index.ts";
-import { Link, useSearch } from "@tanstack/react-router";
 import { Columns, Hash, ListX, Rows, Search, Users, X } from "lucide-react";
 import type React from "react";
 import { Activity, useEffect, useMemo, useState } from "react";
@@ -48,8 +46,6 @@ export default function MessagesPage() {
   const { nodes: allNodes } = useNodes(myNodeNum);
   const { onlineNodeIds } = useOnlineNodes(myNodeNum);
 
-  const searchParams = useSearch({ strict: false });
-
   // Fetch channels from database (myNodeNum is used as ownerNodeNum for all queries)
   const { channels: dbChannels } = useChannels(myNodeNum);
   const { conversations } = useConversations(myNodeNum);
@@ -71,28 +67,6 @@ export default function MessagesPage() {
   const [contactFilter, setContactFilter] = useState<
     "all" | "direct" | "channels"
   >("all");
-
-  // Open channel or node from URL on mount
-  useEffect(() => {
-    const channelParam = searchParams.channel as number | undefined;
-    const nodeParam = searchParams.node as number | undefined;
-
-    logger.debug(
-      `[MessagesPage] URL params effect: channel=${channelParam}, node=${nodeParam}`,
-    );
-
-    // Open tab immediately - channel 0-7 are always valid indices
-    // The ChatPanel will handle showing loading/empty state if needed
-    if (channelParam !== undefined) {
-      logger.info(`[MessagesPage] Opening channel tab: ${channelParam}`);
-      openMessageTab(channelParam, "channel");
-    }
-
-    if (nodeParam !== undefined) {
-      logger.info(`[MessagesPage] Opening node tab: ${nodeParam}`);
-      openMessageTab(nodeParam, "direct");
-    }
-  }, [searchParams.channel, searchParams.node, openMessageTab]);
 
   const activeTab = openTabs.find((t) => t.id === activeTabId);
   const secondaryTab = openTabs.find((t) => t.id === secondaryTabId);
@@ -255,7 +229,6 @@ export default function MessagesPage() {
     closeMessageTab(tabId);
   };
 
-  // Only used for secondary panel tabs (primary panel uses <Link>)
   const handleTabClick = (tabId: number, isSecondaryPanel = false) => {
     if (isSecondaryPanel) {
       setSecondaryMessageTab(tabId);
@@ -351,7 +324,7 @@ export default function MessagesPage() {
                   : "hover:bg-muted/50",
               );
 
-              // For secondary panel, use button; for primary panel, use Link
+              // Secondary panel tabs update local state only
               if (isSecondaryPanel) {
                 return (
                   <div
@@ -373,21 +346,23 @@ export default function MessagesPage() {
                 );
               }
 
-              // Primary panel uses Link to update URL
               return (
-                <Link
+                <div
                   key={tab.id}
-                  to="/$nodeNum/messages"
-                  params={{ nodeNum: String(myNodeNum) }}
-                  search={
-                    tab.type === "channel"
-                      ? { channel: tab.contactId }
-                      : { node: tab.contactId }
-                  }
+                  role="tab"
+                  aria-selected={isActive}
+                  tabIndex={0}
+                  onClick={() => openMessageTab(tab.contactId, tab.type)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openMessageTab(tab.contactId, tab.type);
+                    }
+                  }}
                   className={tabClassName}
                 >
                   {tabContent}
-                </Link>
+                </div>
               );
             })}
           </div>
@@ -519,15 +494,10 @@ export default function MessagesPage() {
                 selectedContact?.type === contact.type;
 
               return (
-                <Link
+                <button
                   key={`${contact.type}-${contact.id}`}
-                  to="/$nodeNum/messages"
-                  params={{ nodeNum: String(myNodeNum) }}
-                  search={
-                    contact.type === "channel"
-                      ? { channel: contact.id }
-                      : { node: contact.id }
-                  }
+                  type="button"
+                  onClick={() => openMessageTab(contact.id, contact.type)}
                   className={cn(
                     "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
                     isSelected
@@ -575,7 +545,7 @@ export default function MessagesPage() {
                       </div>
                     )}
                   </div>
-                </Link>
+                </button>
               );
             })}
           </div>

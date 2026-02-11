@@ -6,7 +6,6 @@
  */
 import logger from "@core/services/logger";
 import { connectionRepo } from "@data/repositories";
-import { configCacheRepo } from "@data/repositories";
 import type { ConnectionStatus } from "@data/repositories/ConnectionRepository";
 import type { Connection } from "@data/schema";
 import { toast } from "@shared/hooks/useToast";
@@ -54,7 +53,7 @@ class ConnectionServiceClass {
 
   async connect(
     conn: Connection,
-    opts?: { allowPrompt?: boolean; skipConfig?: boolean },
+    opts?: { allowPrompt?: boolean },
   ): Promise<boolean> {
     logger.info(
       `[ConnectionService] Connecting id=${conn.id} type=${conn.type}`,
@@ -108,7 +107,6 @@ class ConnectionServiceClass {
             state.heartbeat = heartbeat;
           },
         },
-        opts?.skipConfig,
       );
 
       state.setupContext = setupCtx;
@@ -192,6 +190,10 @@ class ConnectionServiceClass {
     this.notify();
   }
 
+  /**
+   * Attempt auto-reconnect. Only HTTP connections with autoReconnect enabled
+   * are eligible — BLE and Serial require an explicit browser permission grant.
+   */
   async tryAutoReconnect(): Promise<boolean> {
     const lastConnection = await connectionRepo.getLastConnectedConnection();
     if (!lastConnection) {
@@ -201,65 +203,29 @@ class ConnectionServiceClass {
       return false;
     }
 
-    logger.info(
-      `[ConnectionService] Auto-reconnecting to ${lastConnection.name}`,
-    );
-
-    const available =
-      await hardwareStatus.checkHardwareAvailable(lastConnection);
-    if (!available) {
+    if (lastConnection.type !== "http" || !lastConnection.autoReconnect) {
       logger.debug(
-        `[ConnectionService] Hardware unavailable for ${lastConnection.type}`,
+        `[ConnectionService] Auto-reconnect not enabled for ${lastConnection.type} connection`,
       );
       return false;
     }
 
-    // Determine if we can use fast recovery (skip config sync)
-    const canUseFastRecovery = await this.canUseFastRecovery(lastConnection);
+    logger.info(
+      `[ConnectionService] Auto-reconnecting to ${lastConnection.name}`,
+    );
 
-    if (canUseFastRecovery) {
-      // Try fast recovery first (skip config sync)
-      logger.info(
-        "[ConnectionService] Attempting fast recovery (using cached config)",
-      );
-      toast({
-        title: "Reconnecting...",
-        description: "Restoring connection using cached configuration",
-        duration: 3000,
-      });
+    toast({
+      title: "Reconnecting...",
+      description: `Connecting to ${lastConnection.name}`,
+      duration: 3000,
+    });
 
-      const fastRecoverySuccess = await this.connect(lastConnection, {
-        allowPrompt: false,
-        skipConfig: true,
-      });
-
-      if (fastRecoverySuccess) {
-        toast({
-          title: "Reconnected",
-          description: "Connection restored successfully",
-          duration: 3000,
-        });
-        return true;
-      }
-
-      // Fast recovery failed, try full recovery
-      logger.warn(
-        "[ConnectionService] Fast recovery failed, attempting full recovery",
-      );
-      toast({
-        title: "Reconnecting...",
-        description: "Performing full device sync",
-        duration: 5000,
-      });
-    }
-
-    // Full recovery (or fallback from fast recovery)
     const success = await this.connect(lastConnection, { allowPrompt: false });
 
     if (success) {
       toast({
         title: "Reconnected",
-        description: "Connection restored with full sync",
+        description: "Connection restored successfully",
         duration: 3000,
       });
     } else {
@@ -272,46 +238,6 @@ class ConnectionServiceClass {
     }
 
     return success;
-  }
-
-  /**
-   * Check if fast recovery (skip config sync) can be used
-   */
-  private async canUseFastRecovery(conn: Connection): Promise<boolean> {
-    if (!conn.lastConnectedAt) {
-      return false;
-    }
-
-    const timeSinceLastConnect = Date.now() - conn.lastConnectedAt.getTime();
-    const THIRTY_MINUTES = 30 * 60 * 1000;
-
-    if (timeSinceLastConnect >= THIRTY_MINUTES) {
-      logger.debug(
-        `[ConnectionService] Last connection was ${Math.round(
-          timeSinceLastConnect / 60000,
-        )} minutes ago, using full recovery`,
-      );
-      return false;
-    }
-
-    if (!conn.nodeNum) {
-      return false;
-    }
-
-    const cachedConfig = await configCacheRepo.getCachedConfig(conn.nodeNum);
-    if (!cachedConfig) {
-      logger.debug(
-        `[ConnectionService] No cached config available for node ${conn.nodeNum}, using full recovery`,
-      );
-      return false;
-    }
-
-    logger.debug(
-      `[ConnectionService] Can use fast recovery: last connected ${Math.round(
-        timeSinceLastConnect / 60000,
-      )} minutes ago`,
-    );
-    return true;
   }
 
   private notify(): void {

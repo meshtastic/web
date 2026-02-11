@@ -78,7 +78,6 @@ function ConnectedLayout() {
       navigate({
         to: "/$nodeNum/messages",
         params: { nodeNum: String(intent.nodeNum) },
-        search: { channel: 0 },
       });
     },
     [navigate, location.pathname],
@@ -147,7 +146,6 @@ const indexRoute = createRoute({
         throw redirect({
           to: "/$nodeNum/messages",
           params: { nodeNum: String(lastConnection.nodeNum) },
-          search: { channel: 0 },
           replace: true,
         });
       }
@@ -224,12 +222,6 @@ const messagesRoute = createRoute({
     </Suspense>
   ),
   errorComponent: ErrorPage,
-  validateSearch: z.object({
-    // For broadcast messages: ?channel=0 (channel index 0-7)
-    channel: z.coerce.number().int().min(0).max(7).optional(),
-    // For direct messages: ?node=123456789 (node number)
-    node: z.coerce.number().int().min(0).max(4294967294).optional(), // max is 0xffffffff - 1
-  }),
 });
 
 const mapRoute = createRoute({

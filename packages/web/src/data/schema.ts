@@ -472,6 +472,9 @@ export const connections = sqliteTable(
     isDefault: integer("is_default", { mode: "boolean" })
       .notNull()
       .default(false),
+    autoReconnect: integer("auto_reconnect", { mode: "boolean" })
+      .notNull()
+      .default(false),
 
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
