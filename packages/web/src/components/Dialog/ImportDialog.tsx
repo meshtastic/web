@@ -105,7 +105,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
           )
         ) {
           setChange(
-            { type: "channels", index: importIndex[index] ?? 0 },
+            { type: "channel", index: importIndex[index] ?? 0 },
             payload,
             channels.get(importIndex[index] ?? 0),
           );

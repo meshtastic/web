@@ -47,7 +47,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
   };
 
   const workingChannel = getChange({
-    type: "channels",
+    type: "channel",
     index: channel.index,
   }) as Protobuf.Channel.Channel | undefined;
   const effectiveConfig = workingChannel ?? channel;
