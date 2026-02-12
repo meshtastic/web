@@ -106,8 +106,6 @@ export function useNetworkForm() {
 
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<NetworkValidation | undefined>(undefined);
-  // Track whether we've completed initial sync (skip first watch fire)
-  const hasInitialSyncRef = useRef(false);
 
   // Sync form changes to database
   const onFormChange = useEffectEvent(
@@ -117,15 +115,6 @@ export function useNetworkForm() {
       }
 
       const currentValues = formData as NetworkValidation;
-
-      // Skip the first watch fire - just capture initial values without tracking
-      // This prevents spurious change detection during form initialization
-      if (!hasInitialSyncRef.current) {
-        prevValuesRef.current = currentValues;
-        hasInitialSyncRef.current = true;
-        return;
-      }
-
       const prevValues = prevValuesRef.current;
 
       if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
@@ -162,9 +151,7 @@ export function useNetworkForm() {
   );
 
   useEffect(() => {
-    // Reset initial sync flag when effect re-runs
-    hasInitialSyncRef.current = false;
-
+    prevValuesRef.current = form.getValues() as NetworkValidation;
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch, onFormChange]);

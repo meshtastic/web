@@ -65,6 +65,14 @@ class ConnectionServiceClass {
 
     await this.updateStatus(conn.id, "connecting");
 
+    // Clean up stale state from a previous connection (e.g. after device reboot)
+    // to prevent old event handlers from interfering with the new connection
+    const existingState = this.state.get(conn.id);
+    if (existingState) {
+      this.cleanupState(conn.id, existingState);
+      this.state.delete(conn.id);
+    }
+
     let nativeHandle: unknown | undefined;
 
     try {

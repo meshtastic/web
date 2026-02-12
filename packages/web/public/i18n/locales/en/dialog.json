@@ -218,5 +218,15 @@
     "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
     "confirm": "Factory Reset Config",
     "failedTitle": "There was an error performing the factory reset. Please try again."
+  },
+  "deviceReboot": {
+    "title": "Device Rebooting",
+    "rebooting": "The device is rebooting to apply configuration changes. This may take a few seconds.",
+    "disconnected": "The device has disconnected. Click Reconnect when the device has finished rebooting.",
+    "reconnecting": "Reconnecting to device...",
+    "reconnected": "Successfully reconnected to the device.",
+    "reconnectFailed": "Unable to reconnect. The device may still be rebooting. Try again in a few seconds.",
+    "reconnect": "Reconnect",
+    "close": "Close"
   }
 }

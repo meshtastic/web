@@ -2,6 +2,7 @@ import { adminCommands } from "@core/services/adminCommands";
 import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
 import { useMyNode } from "@shared/hooks";
 import { useToast } from "@shared/hooks/useToast";
+import { useUIStore } from "@state/ui/store";
 import { useCallback, useState } from "react";
 
 export function useSettingsSave() {
@@ -30,10 +31,15 @@ export function useSettingsSave() {
         result.configCount + result.moduleConfigCount + result.channelCount;
 
       if (totalSaved > 0) {
-        toast({
-          title: "All changes saved",
-          description: `Saved ${result.configCount} config(s), ${result.moduleConfigCount} module config(s), ${result.channelCount} channel(s)`,
-        });
+        // Config or module config changes trigger a device reboot via commitEditSettings
+        if (result.configCount > 0 || result.moduleConfigCount > 0) {
+          useUIStore.getState().setDialogOpen("deviceReboot", true);
+        } else {
+          toast({
+            title: "All changes saved",
+            description: `Saved ${result.configCount} config(s), ${result.moduleConfigCount} module config(s), ${result.channelCount} channel(s)`,
+          });
+        }
       } else {
         toast({
           title: "No changes to save",

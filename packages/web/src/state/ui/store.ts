@@ -29,6 +29,7 @@ export interface Dialogs {
   factoryResetDevice: boolean;
   factoryResetConfig: boolean;
   tracerouteResponse: boolean;
+  deviceReboot: boolean;
 }
 
 export type DialogVariant = keyof Dialogs;
@@ -200,6 +201,7 @@ const defaultDialogs: Dialogs = {
   factoryResetDevice: false,
   factoryResetConfig: false,
   tracerouteResponse: false,
+  deviceReboot: false,
 };
 
 const defaultState = {

@@ -64,8 +64,6 @@ export function useUserForm() {
   // Track previous values to detect actual changes
   const prevValuesRef = useRef<UserValidation | undefined>(undefined);
   const originalValuesRef = useRef<UserValidation>(baseValues);
-  // Track whether we've completed initial sync (skip first watch fire)
-  const hasInitialSyncRef = useRef(false);
 
   // Store original values on mount
   useEffect(() => {
@@ -79,15 +77,6 @@ export function useUserForm() {
     }
 
     const currentValues = formData as UserValidation;
-
-    // Skip the first watch fire - just capture initial values without tracking
-    // This prevents spurious change detection during form initialization
-    if (!hasInitialSyncRef.current) {
-      prevValuesRef.current = currentValues;
-      hasInitialSyncRef.current = true;
-      return;
-    }
-
     const prevValues = prevValuesRef.current;
 
     if (JSON.stringify(currentValues) === JSON.stringify(prevValues)) {
@@ -122,9 +111,7 @@ export function useUserForm() {
   });
 
   useEffect(() => {
-    // Reset initial sync flag when effect re-runs
-    hasInitialSyncRef.current = false;
-
+    prevValuesRef.current = form.getValues() as UserValidation;
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
   }, [watch]);

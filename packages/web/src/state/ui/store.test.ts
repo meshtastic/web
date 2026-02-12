@@ -24,6 +24,7 @@ describe("useUIStore", () => {
         factoryResetDevice: false,
         factoryResetConfig: false,
         tracerouteResponse: false,
+        deviceReboot: false,
       },
       messageTabs: [],
       activeMessageTabId: null,

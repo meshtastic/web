@@ -29,6 +29,7 @@ export interface QueueItem {
   sent: boolean;
   added: Date;
   promise: Promise<number>;
+  resolveSend?: (id: number) => void;
 }
 
 export interface HttpRetryConfig {
