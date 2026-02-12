@@ -1,3 +1,4 @@
+import { usePreference } from "@data/hooks";
 import { Button } from "@shared/components/ui/button";
 import {
   Card,
@@ -19,7 +20,14 @@ import { Separator } from "@shared/components/ui/separator";
 import { Slider } from "@shared/components/ui/slider";
 import { Switch } from "@shared/components/ui/switch";
 import { useTheme } from "@shared/hooks/useTheme";
-import { useUIStore } from "@state/index.ts";
+import {
+  type CoordinateFormat,
+  DEFAULT_PREFERENCES,
+  type DistanceUnits,
+  type Language,
+  type MapStyle,
+  type TimeFormat,
+} from "@state/ui/store.ts";
 import {
   Globe,
   MapPin,
@@ -29,41 +37,114 @@ import {
   Sun,
   Volume2,
 } from "lucide-react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { preferencesRepo } from "@data/repositories/index.ts";
 
 export function PreferencesPage() {
   const { t } = useTranslation("ui");
-  const { theme: themeFromProvider, setTheme: setThemeInProvider } = useTheme();
+  const { preference: themePreference, setPreference: setThemePreference } =
+    useTheme();
 
-  const {
-    compactMode,
-    showNodeAvatars,
-    language,
-    timeFormat,
-    distanceUnits,
-    coordinateFormat,
-    mapStyle,
-    showNodeLabels,
-    showConnectionLines,
-    autoCenterOnPosition,
-    masterVolume,
-    messageSoundEnabled,
-    alertSoundEnabled,
-    setCompactMode,
-    setShowNodeAvatars,
-    setLanguage,
-    setTimeFormat,
-    setDistanceUnits,
-    setCoordinateFormat,
-    setMapStyle,
-    setShowNodeLabels,
-    setShowConnectionLines,
-    setAutoCenterOnPosition,
-    setMasterVolume,
-    setMessageSoundEnabled,
-    setAlertSoundEnabled,
-    resetToDefaults,
-  } = useUIStore();
+  // Appearance preferences
+  const [compactMode, setCompactMode] = usePreference(
+    "compactMode",
+    DEFAULT_PREFERENCES.compactMode,
+  );
+  const [showNodeAvatars, setShowNodeAvatars] = usePreference(
+    "showNodeAvatars",
+    DEFAULT_PREFERENCES.showNodeAvatars,
+  );
+
+  // Localization preferences
+  const [language, setLanguage] = usePreference<Language>(
+    "language",
+    DEFAULT_PREFERENCES.language,
+  );
+  const [timeFormat, setTimeFormat] = usePreference<TimeFormat>(
+    "timeFormat",
+    DEFAULT_PREFERENCES.timeFormat,
+  );
+  const [distanceUnits, setDistanceUnits] = usePreference<DistanceUnits>(
+    "distanceUnits",
+    DEFAULT_PREFERENCES.distanceUnits,
+  );
+  const [coordinateFormat, setCoordinateFormat] =
+    usePreference<CoordinateFormat>(
+      "coordinateFormat",
+      DEFAULT_PREFERENCES.coordinateFormat,
+    );
+
+  // Map preferences
+  const [mapStyle, setMapStyle] = usePreference<MapStyle>(
+    "mapStyle",
+    DEFAULT_PREFERENCES.mapStyle,
+  );
+  const [showNodeLabels, setShowNodeLabels] = usePreference(
+    "showNodeLabels",
+    DEFAULT_PREFERENCES.showNodeLabels,
+  );
+  const [showConnectionLines, setShowConnectionLines] = usePreference(
+    "showConnectionLines",
+    DEFAULT_PREFERENCES.showConnectionLines,
+  );
+  const [autoCenterOnPosition, setAutoCenterOnPosition] = usePreference(
+    "autoCenterOnPosition",
+    DEFAULT_PREFERENCES.autoCenterOnPosition,
+  );
+
+  // Audio preferences
+  const [masterVolume, setMasterVolume] = usePreference(
+    "masterVolume",
+    DEFAULT_PREFERENCES.masterVolume,
+  );
+  const [messageSoundEnabled, setMessageSoundEnabled] = usePreference(
+    "messageSoundEnabled",
+    DEFAULT_PREFERENCES.messageSoundEnabled,
+  );
+  const [alertSoundEnabled, setAlertSoundEnabled] = usePreference(
+    "alertSoundEnabled",
+    DEFAULT_PREFERENCES.alertSoundEnabled,
+  );
+
+  const resetToDefaults = useCallback(async () => {
+    // Reset all preferences to defaults
+    await Promise.all([
+      preferencesRepo.set("compactMode", DEFAULT_PREFERENCES.compactMode),
+      preferencesRepo.set(
+        "showNodeAvatars",
+        DEFAULT_PREFERENCES.showNodeAvatars,
+      ),
+      preferencesRepo.set("language", DEFAULT_PREFERENCES.language),
+      preferencesRepo.set("timeFormat", DEFAULT_PREFERENCES.timeFormat),
+      preferencesRepo.set("distanceUnits", DEFAULT_PREFERENCES.distanceUnits),
+      preferencesRepo.set(
+        "coordinateFormat",
+        DEFAULT_PREFERENCES.coordinateFormat,
+      ),
+      preferencesRepo.set("mapStyle", DEFAULT_PREFERENCES.mapStyle),
+      preferencesRepo.set("showNodeLabels", DEFAULT_PREFERENCES.showNodeLabels),
+      preferencesRepo.set(
+        "showConnectionLines",
+        DEFAULT_PREFERENCES.showConnectionLines,
+      ),
+      preferencesRepo.set(
+        "autoCenterOnPosition",
+        DEFAULT_PREFERENCES.autoCenterOnPosition,
+      ),
+      preferencesRepo.set("masterVolume", DEFAULT_PREFERENCES.masterVolume),
+      preferencesRepo.set(
+        "messageSoundEnabled",
+        DEFAULT_PREFERENCES.messageSoundEnabled,
+      ),
+      preferencesRepo.set(
+        "alertSoundEnabled",
+        DEFAULT_PREFERENCES.alertSoundEnabled,
+      ),
+    ]);
+    // Also reset theme
+    setThemePreference("system");
+  }, [setThemePreference]);
 
   const themeMap = new Map([
     [
@@ -124,9 +205,9 @@ export function PreferencesPage() {
           <div className="space-y-3">
             <Label>{t("preferences.appearance.theme")}</Label>
             <RadioGroup
-              value={themeFromProvider}
+              value={themePreference}
               onValueChange={(value) =>
-                setThemeInProvider(value as "light" | "dark" | "system")
+                setThemePreference(value as "light" | "dark" | "system")
               }
               className="grid grid-cols-3 gap-4"
             >
@@ -174,18 +255,18 @@ export function PreferencesPage() {
               <Label>{t("preferences.localization.language")}</Label>
               <Select
                 value={language}
-                onValueChange={(value) => setLanguage(value)}
+                onValueChange={(value) => setLanguage(value as Language)}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="es">Espanol</SelectItem>
                   <SelectItem value="de">Deutsch</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="pt">Português</SelectItem>
-                  <SelectItem value="zh">中文</SelectItem>
+                  <SelectItem value="fr">Francais</SelectItem>
+                  <SelectItem value="pt">Portugues</SelectItem>
+                  <SelectItem value="zh">Chinese</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -193,7 +274,7 @@ export function PreferencesPage() {
               <Label>{t("preferences.localization.timeFormat")}</Label>
               <Select
                 value={timeFormat}
-                onValueChange={(value) => setTimeFormat(value as any)}
+                onValueChange={(value) => setTimeFormat(value as TimeFormat)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -214,7 +295,9 @@ export function PreferencesPage() {
               <Label>{t("preferences.localization.distanceUnits")}</Label>
               <Select
                 value={distanceUnits}
-                onValueChange={(value) => setDistanceUnits(value as any)}
+                onValueChange={(value) =>
+                  setDistanceUnits(value as DistanceUnits)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -233,7 +316,9 @@ export function PreferencesPage() {
               <Label>{t("preferences.localization.coordinateFormat")}</Label>
               <Select
                 value={coordinateFormat}
-                onValueChange={(value) => setCoordinateFormat(value as any)}
+                onValueChange={(value) =>
+                  setCoordinateFormat(value as CoordinateFormat)
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -268,7 +353,7 @@ export function PreferencesPage() {
             <Label>{t("preferences.map.mapStyle")}</Label>
             <Select
               value={mapStyle}
-              onValueChange={(value) => setMapStyle(value as any)}
+              onValueChange={(value) => setMapStyle(value as MapStyle)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -351,7 +436,10 @@ export function PreferencesPage() {
             </div>
             <Slider
               value={[masterVolume]}
-              onValueChange={(value) => setMasterVolume(value[0])}
+              onValueChange={(value) => {
+                const v = value[0];
+                if (v !== undefined) setMasterVolume(v);
+              }}
               max={100}
               step={1}
             />

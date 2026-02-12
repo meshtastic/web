@@ -203,6 +203,14 @@ class ConnectionServiceClass {
       return false;
     }
 
+    // Already connected — nothing to do
+    if (this.isActiveStatus(lastConnection.status)) {
+      logger.debug(
+        "[ConnectionService] Connection already active, skipping auto-reconnect",
+      );
+      return true;
+    }
+
     if (lastConnection.type !== "http" || !lastConnection.autoReconnect) {
       logger.debug(
         `[ConnectionService] Auto-reconnect not enabled for ${lastConnection.type} connection`,
@@ -255,6 +263,9 @@ class ConnectionServiceClass {
       return;
     }
 
+    logger.debug(
+      `[ConnectionService] Dispatching nav intent to ${this.navigationCallbacks.size} listener(s)`,
+    );
     for (const cb of this.navigationCallbacks) {
       cb(intent);
     }

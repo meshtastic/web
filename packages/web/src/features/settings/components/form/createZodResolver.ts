@@ -59,6 +59,6 @@ export function createZodResolver<T extends FieldValues>(
     return {
       values: {} as T,
       errors,
-    };
+    } as ResolverResult<T>;
   };
 }

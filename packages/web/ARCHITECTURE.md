@@ -172,27 +172,25 @@ src/
 │   ├── migrationService.ts      # Database migration service
 │   ├── repositories/            # Data access layer
 │   │   ├── ChannelRepository.ts
-│   │   ├── ConfigCacheRepository.ts  # Cached config + pending changes
-│   │   ├── ConfigHashRepository.ts   # Base config hashes
 │   │   ├── ConnectionRepository.ts
+│   │   ├── DeviceRepository.ts
 │   │   ├── MessageRepository.ts
 │   │   ├── NodeRepository.ts
 │   │   ├── PacketLogRepository.ts
+│   │   ├── PendingChangesRepository.ts  # Pending config changes only
 │   │   ├── PreferencesRepository.ts
-│   │   ├── TracerouteRepository.ts
-│   │   └── WorkingHashRepository.ts  # Working config hashes
+│   │   └── TracerouteRepository.ts
 │   ├── hooks/                   # Database hooks
 │   │   ├── useChannels.ts
-│   │   ├── useConfig.ts          # Base config from DB
+│   │   ├── useConfig.ts          # Config from Zustand store
 │   │   ├── useDevicePreference.ts
 │   │   ├── useDisplayUnits.ts    # Display unit preferences
 │   │   ├── useLoraConfig.ts      # LoRa config hook
 │   │   ├── useNodes.ts
 │   │   ├── usePacketLogs.ts
-│   │   ├── usePendingChanges.ts  # Pending config changes CRUD + effective config
+│   │   ├── usePendingChanges.ts  # Pending config changes CRUD
 │   │   ├── usePreferences.ts
-│   │   ├── useSignalLogs.ts
-│   │   └── useWorkingHashes.ts   # Hash-based change detection
+│   │   └── useSignalLogs.ts
 │   └── migrations/              # SQL migration files
 │
 ├── core/                        # Core services
@@ -240,32 +238,33 @@ The project uses TypeScript path aliases for clean imports:
   - `remoteAdminTargetNode` - Node being remotely administered
   - `queuedAdminMessages` - Admin messages waiting to be sent
   - `configConflicts` - Detected conflicts between local and remote config
-- **Note:** Device config and pending changes are stored in SQLite, not Zustand. Use `useConfig()` for base config and `usePendingChanges()` for change tracking.
+- **Note:** Device config is stored in Zustand (`device.config`, `device.moduleConfig`). Pending changes are tracked in SQLite via `usePendingChanges()`.
 
 ### Accessing the Current Device
 
-Use the `useDevice()` hook from `@state/index.ts` to access the device connection:
+Use the `useDevice()` hook from `@state/index.ts` to access the device connection and config:
 
 ```typescript
 import { useDevice } from "@state/index.ts";
 
 function MyComponent() {
-  const { connection, hardware, remoteAdminTargetNode } = useDevice();
-  // connection - MeshDevice for sending packets
-  // hardware - MyNodeInfo from device
+  const device = useDevice();
+  // device.connection - MeshDevice for sending packets
+  // device.hardware - MyNodeInfo from device
+  // device.config - LocalConfig (device, lora, network, etc.)
+  // device.moduleConfig - LocalModuleConfig (mqtt, telemetry, etc.)
 }
 ```
 
-**For config data**, use the DB hooks instead:
+**For config data**, use the config hooks:
 
 ```typescript
-import { useConfig, useEffectiveConfig } from "@data/hooks";
-import { useMyNode } from "@shared/hooks";
+import { useConfig, useConfigVariant, useModuleConfigVariant } from "@data/hooks";
 
 function MyComponent() {
-  const { myNodeNum } = useMyNode();
-  const { config } = useConfig(myNodeNum); // Base config from DB
-  const { config: effectiveConfig } = useEffectiveConfig(myNodeNum, "lora"); // With pending changes
+  const { config, moduleConfig, isLoading } = useConfig();
+  const loraConfig = useConfigVariant("lora");
+  const mqttConfig = useModuleConfigVariant("mqtt");
 }
 ```
 
@@ -422,10 +421,9 @@ Uses Drizzle ORM with SQLite (sqlocal) for client-side persistence:
 | `packetLogs` | Raw packet metadata for debugging |
 | `tracerouteLogs` | Route discovery results |
 | `preferences` | Key-value user preferences |
-| `deviceConfigs` | Cached device and module configuration (enables instant UI on reconnect) |
 | `configChanges` | Pending local config changes not yet saved to device |
-| `configHashes` | Base config hashes for change detection (Merkle tree leaves) |
-| `workingHashes` | Working config hashes including pending changes |
+
+**Note:** Device config is stored in Zustand (not SQLite) and received fresh from the device on each connection.
 
 ### Repository Pattern
 
@@ -434,12 +432,11 @@ Data access is abstracted through repositories in `src/data/repositories/`:
 - `NodeRepository` - Node upsert with position/telemetry updates
 - `ChannelRepository` - Channel configuration management
 - `ConnectionRepository` - Saved connection management
+- `DeviceRepository` - Device metadata management
 - `PacketLogRepository` - Raw packet logging for debugging
+- `PendingChangesRepository` - Pending config changes (not yet saved to device)
 - `PreferencesRepository` - Key-value user preferences
 - `TracerouteRepository` - Route discovery results
-- `ConfigCacheRepository` - Cached device config and pending changes
-- `ConfigHashRepository` - Base config hashes (from device)
-- `WorkingHashRepository` - Working config hashes (base + pending changes)
 
 #### Query Builder Pattern with Reactive Updates
 
@@ -482,9 +479,7 @@ export function useNodes(deviceId: number) {
 | `ChannelRepository` | `buildChannelsQuery()`, `buildChannelQuery()`, `buildPrimaryChannelQuery()` |
 | `PacketLogRepository` | `buildPacketLogsQuery()`, `buildSignalLogsQuery()` |
 | `PreferencesRepository` | `buildPreferenceQuery()`, `buildAllPreferencesQuery()` |
-| `ConfigCacheRepository` | `buildConfigQuery()`, `buildChangesQuery()` |
-| `ConfigHashRepository` | `buildHashesQuery()` |
-| `WorkingHashRepository` | `buildHashesQuery()` |
+| `PendingChangesRepository` | `buildChangesQuery()` |
 
 **Dependency injection:** Each repository exposes `getClient(client?: SQLocalDrizzle)` for testing:
 ```typescript
@@ -497,21 +492,10 @@ const { data } = useReactiveQuery(nodeRepo.getClient(mockClient), query);
 
 ## Config Management Architecture
 
-The application uses a **database-centric architecture** for device configuration, enabling:
-- Instant UI on reconnect (cached config displayed immediately)
-- Offline config viewing
-- Pending change tracking across page refreshes (no in-memory state)
-- Conflict detection when device config changes remotely
-- Single source of truth for all config state (SQLite database)
-
-### Design Decision: Database-Only Change Tracking
-
-All config changes are tracked in SQLite, not in-memory Zustand state. This eliminates:
-- Duplicate state (no in-memory `changes` Map in DeviceStore)
-- State synchronization bugs between memory and database
-- Lost changes on page refresh
-
-The DeviceStore now only holds ephemeral connection state (MeshDevice, hardware info, admin message queue). All config data flows through the database.
+The application uses a **Zustand-centric architecture** for device configuration:
+- Config is stored in the Zustand device store, received fresh from the device on each connection
+- Pending changes (edits not yet saved to device) are tracked in SQLite
+- Single source of truth: Zustand for current config, SQLite for pending changes
 
 ### Data Flow
 
@@ -520,70 +504,44 @@ The DeviceStore now only holds ephemeral connection state (MeshDevice, hardware 
 │                         Config Data Flow                                 │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│  Device ──(packets)──▶ device_configs table ──▶ useConfig() ──▶ UI     │
-│                              (base config)                               │
+│  Device ──(packets)──▶ Zustand device store ──▶ useConfig() ──▶ UI     │
+│                     (device.config, device.moduleConfig)                 │
 │                                                                          │
 │  Form edits ──▶ config_changes table ──▶ usePendingChanges() ──▶ UI    │
 │                    (pending changes)                                     │
 │                                                                          │
-│  base + changes ──▶ useWorkingHashes() ──▶ working_hashes table        │
-│                     (hash-based change detection)                        │
-│                                                                          │
 │  Save button ──▶ adminCommands.saveAllPendingChanges() ──▶ Device      │
+│                 (builds protobuf from Zustand base + pending changes)    │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Config Tables
+### Config Storage
 
-| Table | Purpose |
-|-------|---------|
-| `device_configs` | Base config from device (LocalConfig + LocalModuleConfig) |
-| `config_changes` | Field-level pending changes (not yet saved to device) |
-| `config_hashes` | Merkle tree leaf hashes of base config |
-| `working_hashes` | Merkle tree leaf hashes of base + pending changes |
+| Location | What's Stored |
+|----------|---------------|
+| Zustand `device.config` | Current LocalConfig from device (8 variants) |
+| Zustand `device.moduleConfig` | Current LocalModuleConfig from device (13 variants) |
+| SQLite `config_changes` | Field-level pending changes (not yet saved to device) |
 
 ### Config Hooks
 
 | Hook | File | Purpose |
 |------|------|---------|
-| `useConfig` | `useConfig.ts` | Read base config from DB |
-| `useConfigVariant` | `useConfig.ts` | Read specific base config variant (e.g., "lora") |
-| `useModuleConfigVariant` | `useConfig.ts` | Read specific base module config variant |
-| `usePendingChanges` | `usePendingChanges.ts` | CRUD for pending config changes |
-| `useEffectiveConfig` | `usePendingChanges.ts` | Read base + pending changes merged |
-| `useEffectiveModuleConfig` | `usePendingChanges.ts` | Read base + pending module config merged |
-| `useWorkingHashes` | `useWorkingHashes.ts` | Hash-based change detection with debounce |
-| `useInitializeBaseHashes` | `useWorkingHashes.ts` | Initialize hashes when config first received |
-
-### Change Detection with Merkle Hashes
-
-The application uses Merkle tree-style hashing for efficient change detection:
-
-```typescript
-// Leaf keys for config hashing
-const ALL_LEAF_KEYS = [
-  "config:device", "config:position", "config:power", "config:network",
-  "config:display", "config:lora", "config:bluetooth", "config:security",
-  "moduleConfig:mqtt", "moduleConfig:serial", "moduleConfig:telemetry", ...
-  "channel:0", "channel:1", ... "channel:7",
-  "user"
-];
-
-// Change detection
-const { hasChanges, configChanges, moduleConfigChanges } = useWorkingHashes(myNodeNum);
-if (hasChanges) {
-  console.log("Changed configs:", configChanges); // e.g., ["lora", "device"]
-}
-```
+| `useConfig` | `useConfig.ts` | Read config from Zustand store |
+| `useConfigVariant` | `useConfig.ts` | Read specific config variant (e.g., "lora") |
+| `useModuleConfigVariant` | `useConfig.ts` | Read specific module config variant |
+| `usePendingChanges` | `usePendingChanges.ts` | CRUD for pending config changes in SQLite |
 
 ### Form Integration
 
-Settings forms use the DB-backed hooks instead of Zustand:
+Settings forms read from Zustand and track changes in SQLite:
 
 ```typescript
 // Reading config for forms
-const { config, baseConfig, hasChanges } = useEffectiveConfig(myNodeNum, "lora");
+const device = useDevice();
+const baseConfig = device?.config?.lora ?? null;
+const hasReceivedConfig = device?.configProgress?.receivedConfigs?.has("config:lora");
 
 // Saving field changes
 const { saveChange, clearChange } = usePendingChanges(myNodeNum);
@@ -592,7 +550,7 @@ await saveChange({
   variant: "lora",
   fieldPath: "region",
   value: newRegion,
-  originalValue: baseConfig.region,
+  originalValue: baseConfig?.region,
 });
 ```
 

@@ -1,4 +1,4 @@
-import type { FilterState } from "@shared/components/generic/Filter/useFilterNode.ts";
+import type { FilterState } from "@shared/components/Filter/useFilterNode.ts";
 import {
   AccordionContent,
   AccordionHeader,
@@ -21,7 +21,7 @@ interface FilterAccordionItemProps {
   children?: ReactNode;
 }
 
-type RangeKeys<T> = {
+export type RangeKeys<T> = {
   [K in keyof T]: T[K] extends [number, number] ? K : never;
 }[keyof T];
 interface FilterSliderProps<K extends RangeKeys<FilterState>> {
@@ -139,14 +139,14 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
     options.length > 0 && options.every((opt) => selected.includes(opt));
 
   const toggleAll = () => {
-    setFilterState((prev) => ({
+    setFilterState((prev: FilterState) => ({
       ...prev,
       [filterKey]: allSelected ? [] : [...options],
     }));
   };
 
   const toggleValue = (val: number, checked: boolean) => {
-    setFilterState((prev) => {
+    setFilterState((prev: FilterState) => {
       const current = getNumberArray(prev, filterKey);
       return {
         ...prev,

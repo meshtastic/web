@@ -22,6 +22,3 @@ export type { SetupContext, SetupCallbacks } from "./connection/deviceSetup";
 
 // Hardware status
 export * as hardwareStatus from "./connection/hardwareStatus";
-
-// Config synchronization
-export * as configSync from "./connection/ConfigSyncService";

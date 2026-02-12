@@ -238,7 +238,7 @@ export const AppPreferencesConfig = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <Card data-section="appearance">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

@@ -13,12 +13,24 @@ import {
 import { MeshDevice, Types } from "@meshtastic/core";
 import { randId } from "@shared/utils/randId";
 import { useDeviceStore } from "@state/index";
-import * as configSync from "./ConfigSyncService";
 import type { PacketTransport } from "./transportFactory";
 
-const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
+const HEARTBEAT_INTERVAL_MS = 30 * 1000;
 const CONFIG_COMPLETE_STAGE1 = 69420;
 const CONFIG_COMPLETE_STAGE2 = 69421;
+const CONFIG_NAV_TIMEOUT_MS = 10_000;
+
+// Device config variants that must be received before navigating
+const DEVICE_CONFIG_VARIANTS = [
+  "config:device",
+  "config:position",
+  "config:power",
+  "config:network",
+  "config:display",
+  "config:lora",
+  "config:bluetooth",
+  "config:security",
+] as const;
 
 /** Navigation intent emitted when device is ready */
 export interface NavigationIntent {
@@ -93,10 +105,74 @@ export async function setupMeshDevice(
   subscribeToDeviceStatus(ctx, callbacks);
 
   device.resetConfigProgress();
+  device.setConnectionPhase("waitingForDevice");
   await callbacks.onStatusChange("configuring");
   runConfigSync(ctx, callbacks);
 
   return ctx;
+}
+
+/**
+ * Check if all device config variants have been received
+ */
+function hasAllDeviceConfigs(receivedConfigs: Set<string>): boolean {
+  return DEVICE_CONFIG_VARIANTS.every((variant) =>
+    receivedConfigs.has(variant),
+  );
+}
+
+/**
+ * Set up navigation once device config is complete
+ */
+function setupNavigationOnConfigComplete(
+  ctx: SetupContext,
+  callbacks: SetupCallbacks,
+  nodeNum: number,
+): void {
+  let hasNavigated = false;
+
+  const navigate = () => {
+    if (hasNavigated || ctx.cancelled) {
+      return;
+    }
+    hasNavigated = true;
+    emitNavigationIntent(ctx, callbacks, nodeNum, ctx.usedCache);
+  };
+
+  // Check if device config is already complete (shouldn't happen now without cache)
+  const currentDevice = useDeviceStore.getState().device;
+  if (
+    currentDevice &&
+    hasAllDeviceConfigs(currentDevice.configProgress.receivedConfigs)
+  ) {
+    navigate();
+    return;
+  }
+
+  // Set up timeout fallback
+  const timeout = setTimeout(() => {
+    logger.warn(
+      "[deviceSetup] Config timeout - navigating with incomplete config",
+    );
+    navigate();
+  }, CONFIG_NAV_TIMEOUT_MS);
+
+  // Subscribe to config progress changes
+  const unsub = useDeviceStore.subscribe(
+    (state) => state.device?.configProgress.receivedConfigs,
+    (receivedConfigs) => {
+      if (receivedConfigs && hasAllDeviceConfigs(receivedConfigs)) {
+        clearTimeout(timeout);
+        navigate();
+        unsub();
+      }
+    },
+  );
+
+  ctx.subscriptions.push(() => {
+    clearTimeout(timeout);
+    unsub();
+  });
 }
 
 /**
@@ -117,6 +193,10 @@ function subscribeToNodeInfo(
     await upsertDeviceRecord(ctx, nodeInfo.myNodeNum);
     ctx.resolveDeviceUpserted();
 
+    // Navigate when device config is complete
+    await callbacks.onStatusChange("connected");
+    setupNavigationOnConfigComplete(ctx, callbacks, nodeInfo.myNodeNum);
+
     // Subscribe to DB events now that we have nodeNum
     const dbUnsub = subscribeToDevice(
       nodeInfo.myNodeNum,
@@ -124,8 +204,6 @@ function subscribeToNodeInfo(
       meshDevice,
     );
     subscriptions.push(dbUnsub);
-
-    await tryUseCachedConfig(ctx, callbacks, nodeInfo.myNodeNum);
   });
 
   subscriptions.push(unsub);
@@ -160,13 +238,17 @@ function subscribeToConfig(ctx: SetupContext): void {
   const { meshDevice, device, subscriptions } = ctx;
 
   const configUnsub = meshDevice.events.onConfigPacket.subscribe((config) => {
-    logger.debug(`[deviceSetup] Config: ${config.payloadVariant.case}`);
+    logger.info(
+      `[deviceSetup] Config packet received: ${config.payloadVariant.case}`,
+    );
     device.setConfig(config);
   });
 
   const moduleUnsub = meshDevice.events.onModuleConfigPacket.subscribe(
     (config) => {
-      logger.debug(`[deviceSetup] ModuleConfig: ${config.payloadVariant.case}`);
+      logger.info(
+        `[deviceSetup] ModuleConfig packet received: ${config.payloadVariant.case}`,
+      );
       device.setModuleConfig(config);
     },
   );
@@ -212,9 +294,10 @@ function subscribeToConfigComplete(
     logger.info(`[deviceSetup] Config complete (nonce: ${nonce})`);
 
     if (nonce === CONFIG_COMPLETE_STAGE1) {
-      await handleConfigStage1Complete(ctx, callbacks);
+      await handleConfigStage1Complete(ctx);
     } else if (nonce === CONFIG_COMPLETE_STAGE2) {
       unsub();
+      ctx.device.setConnectionPhase("connected");
       await callbacks.onStatusChange("configured");
       logger.debug("[deviceSetup] NodeDB sync complete");
     }
@@ -262,61 +345,18 @@ async function upsertDeviceRecord(
 }
 
 /**
- * Try to use cached config for fast reconnection
- */
-async function tryUseCachedConfig(
-  ctx: SetupContext,
-  callbacks: SetupCallbacks,
-  nodeNum: number,
-): Promise<void> {
-  const result = await configSync.tryLoadCachedConfig(nodeNum, {
-    config: ctx.device.config,
-    moduleConfig: ctx.device.moduleConfig,
-    metadata: ctx.device.metadata,
-    setCachedConfig: ctx.device.setCachedConfig,
-  });
-
-  if (result.usedCache) {
-    ctx.usedCache = true;
-    await callbacks.onStatusChange("connected");
-    emitNavigationIntent(ctx, callbacks, nodeNum, true);
-    startHeartbeat(ctx, callbacks);
-  }
-}
-
-/**
  * Handle stage 1 config complete
  */
-async function handleConfigStage1Complete(
-  ctx: SetupContext,
-  callbacks: SetupCallbacks,
-): Promise<void> {
-  const { myNodeNum } = ctx;
+async function handleConfigStage1Complete(ctx: SetupContext): Promise<void> {
+  const { device } = ctx;
 
-  // get the latest device from the store
-  const latestDevice = useDeviceStore.getState().device;
-  if (!latestDevice) return;
+  // Set phase to syncing network data
+  device.setConnectionPhase("syncingNetwork");
 
-  const wasCached = latestDevice.isCachedConfig;
-  latestDevice.setIsCachedConfig(false);
-
-  if (!wasCached) {
-    await callbacks.onStatusChange("connected");
-  }
-
-  if (myNodeNum) {
-    await configSync.saveFreshConfig(myNodeNum, {
-      config: latestDevice.config,
-      moduleConfig: latestDevice.moduleConfig,
-      metadata: latestDevice.metadata,
-      setCachedConfig: latestDevice.setCachedConfig,
-    });
-  }
-
-  if (!wasCached && myNodeNum) {
-    await ctx.deviceUpserted;
-    emitNavigationIntent(ctx, callbacks, myNodeNum, false);
-  }
+  // Config is now received fresh from device - no database caching needed
+  logger.debug(
+    "[deviceSetup] Stage 1 config complete - config received from device",
+  );
 }
 
 /**
@@ -329,19 +369,11 @@ function runConfigSync(ctx: SetupContext, callbacks: SetupCallbacks): void {
     .configureTwoStage()
     .then(() => {
       logger.debug("[deviceSetup] configureTwoStage completed");
-      if (!ctx.usedCache) {
-        startHeartbeat(ctx, callbacks);
-      }
+      startHeartbeat(ctx, callbacks);
     })
     .catch(async (err) => {
-      if (ctx.usedCache) {
-        logger.warn(
-          `[deviceSetup] Config sync failed (using cache): ${err.message}`,
-        );
-      } else {
-        logger.error(`[deviceSetup] configureTwoStage failed: ${err.message}`);
-        await callbacks.onStatusChange("error", err.message);
-      }
+      logger.error(`[deviceSetup] configureTwoStage failed: ${err.message}`);
+      await callbacks.onStatusChange("error", err.message);
     });
 }
 
@@ -388,6 +420,7 @@ function emitNavigationIntent(
   }
 
   const intent: NavigationIntent = { nodeNum, cached, timestamp: Date.now() };
+  logger.debug(`[deviceSetup] Emitting nav intent for nodeNum=${nodeNum}`);
   callbacks.onNavigationIntent(intent);
 }
 

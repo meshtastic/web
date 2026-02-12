@@ -9,5 +9,3 @@ export * as deviceSetup from "./deviceSetup";
 export type { SetupContext, SetupCallbacks } from "./deviceSetup";
 
 export * as hardwareStatus from "./hardwareStatus";
-
-export * as configSync from "./ConfigSyncService";

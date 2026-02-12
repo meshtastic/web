@@ -227,7 +227,7 @@ async function createSerialTransport(
       msg.includes("NetworkError")
     ) {
       throw new Error(
-        "Port is locked or in use by another application. Close other apps using this device and try again.",
+        "Unable to connect to your Meshtastic device. The serial port appears to be in use by another application (web flasher, mobile app, or another browser tab). Please close any other applications using this device and try again.",
       );
     }
     throw serialErr;

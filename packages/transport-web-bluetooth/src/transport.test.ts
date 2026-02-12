@@ -54,7 +54,8 @@ function stubWebBluetooth() {
   } as unknown as BluetoothRemoteGATTCharacteristic;
 
   const toRadioCharacteristic: BluetoothRemoteGATTCharacteristic = {
-    async writeValue(bufferSource: BufferSource) {
+    properties: { writeWithoutResponse: false },
+    async writeValueWithResponse(bufferSource: BufferSource) {
       const u8 =
         bufferSource instanceof ArrayBuffer
           ? new Uint8Array(bufferSource)
@@ -181,6 +182,9 @@ describe("TransportWebBluetooth (contract)", () => {
       return await TransportWebBluetooth.create();
     },
     pushIncoming: async (bytes) => {
+      // Yield to let the ReadableStream start() callback complete
+      // (registers the characteristicvaluechanged listener)
+      await new Promise((r) => setTimeout(r, 10));
       (
         globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }
       ).__ble.pushIncoming(bytes);

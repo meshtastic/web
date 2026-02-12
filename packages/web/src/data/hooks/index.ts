@@ -3,16 +3,7 @@ export {
   useConfigVariant,
   useModuleConfigVariant,
 } from "./useConfig.ts";
-export {
-  useWorkingHashes,
-  useInitializeBaseHashes,
-} from "./useWorkingHashes.ts";
-export {
-  usePendingChanges,
-  useEffectiveConfig,
-  useEffectiveModuleConfig,
-  mergeConfigChanges,
-} from "./usePendingChanges.ts";
+export { usePendingChanges, mergeConfigChanges } from "./usePendingChanges.ts";
 export {
   useFavoriteNodes,
   useNode,

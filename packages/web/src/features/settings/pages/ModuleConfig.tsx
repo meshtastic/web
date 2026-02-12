@@ -138,7 +138,7 @@ export const ModuleConfig = () => {
     : (tabs[0]?.case ?? "mqtt");
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <Tabs value={currentTab} onValueChange={setActiveTab}>
         <TabsList className="flex w-full">
           {tabs.map((tab) => (

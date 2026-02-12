@@ -3,6 +3,7 @@ import { useMyNode } from "@shared/hooks";
 import { useUIStore } from "@state/index.ts";
 import { toByteArray } from "base64-js";
 import { Activity, useMemo } from "react";
+import { useShallow } from "zustand/shallow";
 import { ClientNotificationDialog } from "./ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "./DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 import { DeviceShareDialog } from "./DeviceShareDialog.tsx";
@@ -20,7 +21,7 @@ import { UnsafeRolesDialog } from "./UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 
 export const DialogManager = () => {
   const { myNodeNum } = useMyNode();
-  const dialogs = useUIStore((s) => s.dialogs);
+  const dialogs = useUIStore(useShallow((s) => s.dialogs));
   const setDialogOpen = useUIStore((s) => s.setDialogOpen);
   const { channels: dbChannels } = useChannels(myNodeNum);
   const loraConfig = useLoraConfig(myNodeNum);

@@ -17,9 +17,9 @@ export interface FilterOption<T = string> {
 }
 
 interface FilterProps<T extends string> {
-  options: FilterOption[];
-  activeFilter: T;
-  onFilterChange: (filter: T) => void;
+  options: FilterOption<T>[];
+  activeFilter: T | undefined;
+  onFilterChange: (filter: T | undefined) => void;
   variant?: "radio" | "multiselect" | "dropdown";
   className?: string;
 }

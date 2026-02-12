@@ -1,12 +1,12 @@
 import type { dbClient } from "@data/client";
 import type {
   ChannelRepository,
-  ConfigCacheRepository,
   ConnectionRepository,
   DeviceRepository,
   MessageRepository,
   NodeRepository,
   PacketLogRepository,
+  PendingChangesRepository,
   PreferencesRepository,
   TracerouteRepository,
 } from "@data/repositories";
@@ -21,7 +21,7 @@ export interface RouterContext {
   };
   repositories: {
     channel: ChannelRepository;
-    configCache: ConfigCacheRepository;
+    pendingChanges: PendingChangesRepository;
     connection: ConnectionRepository;
     device: DeviceRepository;
     message: MessageRepository;

@@ -179,7 +179,6 @@
     "label": "Language",
     "changeLanguage": "Change Language"
   },
-  "configProgres": "Loading conifg {{received}}/{{total}}",
   "errorPage": {
     "title": "This is a little embarrassing...",
     "description1": "We are really sorry but an error occurred in the web client that caused it to crash.  This is not supposed to happen, and we are working hard to fix it.",
@@ -201,6 +200,14 @@
   "footer": {
     "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
     "commitSha": "Commit SHA: {{sha}}"
+  },
+  "messages": {
+    "actionsMenu": {
+      "more": "More actions",
+      "copy": "Copy text",
+      "delete": "Delete"
+    },
+    "MQTT": "MQTT"
   },
   "preferences": {
     "title": "Preferences",

@@ -1,12 +1,12 @@
 import {
-  useEffectiveModuleConfig,
+  mergeConfigChanges,
   usePendingChanges,
 } from "@data/hooks/usePendingChanges.ts";
 import type { ValidModuleConfigType } from "@features/settings/components/types.ts";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
 import { useUIStore } from "@state/ui/store.ts";
-import { useCallback, useEffect, useEffectEvent, useRef } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import {
   type DefaultValues,
   type FieldValues,
@@ -46,30 +46,48 @@ export function useModuleConfigForm<T extends FieldValues>({
   transformDefaults,
 }: UseModuleConfigFormOptions<T>): UseModuleConfigFormReturn<T> {
   const { myNodeNum } = useMyNode();
-
-  const { config: dbRawEffectiveConfig, baseConfig: dbRawBaseConfig } =
-    useEffectiveModuleConfig(myNodeNum, moduleConfigType);
-
-  // Fall back to device store module config when DB has no cached row yet
   const device = useDevice();
-  const rawBaseConfig =
-    dbRawBaseConfig ?? device.moduleConfig[moduleConfigType] ?? null;
-  const rawEffectiveConfig = dbRawEffectiveConfig ?? rawBaseConfig;
 
-  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
+  // Use device store module config directly (most up-to-date from device)
+  const rawBaseConfig = (device?.moduleConfig?.[moduleConfigType] ??
+    null) as T | null;
+
+  // Merge pending changes into base config
+  const { pendingChanges, saveChange, clearChange } =
+    usePendingChanges(myNodeNum);
+  const moduleChanges = useMemo(
+    () =>
+      pendingChanges.filter(
+        (c) =>
+          c.changeType === "moduleConfig" && c.variant === moduleConfigType,
+      ),
+    [pendingChanges, moduleConfigType],
+  );
+  const rawEffectiveConfig = useMemo(() => {
+    if (!rawBaseConfig) return null;
+    return mergeConfigChanges(
+      rawBaseConfig as Record<string, unknown>,
+      moduleChanges,
+    ) as T;
+  }, [rawBaseConfig, moduleChanges]);
 
   // Apply transforms if provided
   const baseConfig = (
     transformDefaults
-      ? transformDefaults(rawBaseConfig as unknown as T | undefined)
+      ? transformDefaults(rawBaseConfig as T | undefined)
       : rawBaseConfig
   ) as DefaultValues<T> | undefined;
 
   const effectiveConfig = transformDefaults
-    ? transformDefaults(rawEffectiveConfig as unknown as T | undefined)
-    : (rawEffectiveConfig as unknown as T | undefined);
+    ? transformDefaults(rawEffectiveConfig as T | undefined)
+    : (rawEffectiveConfig as T | undefined);
 
-  const isReady = baseConfig !== undefined && baseConfig !== null;
+  // Check if the specific module config has been received from the device
+  const hasReceivedConfig =
+    device?.configProgress?.receivedConfigs?.has(
+      `moduleConfig:${moduleConfigType}`,
+    ) ?? false;
+  const isReady = hasReceivedConfig;
 
   const form = useForm<T>({
     mode: "onChange",
@@ -139,7 +157,7 @@ export function useModuleConfigForm<T extends FieldValues>({
 
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [watch, onFormChange]);
 
   // Subscribe to pending field resets from activity undo
   const pendingReset = useUIStore((s) => s.pendingFieldReset);

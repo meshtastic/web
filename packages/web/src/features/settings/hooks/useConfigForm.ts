@@ -1,12 +1,12 @@
 import {
-  useEffectiveConfig,
+  mergeConfigChanges,
   usePendingChanges,
 } from "@data/hooks/usePendingChanges.ts";
 import type { ValidConfigType } from "@features/settings/components/types.ts";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
 import { useUIStore } from "@state/ui/store.ts";
-import { useCallback, useEffect, useEffectEvent, useRef } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import {
   type DefaultValues,
   type FieldValues,
@@ -40,20 +40,34 @@ export function useConfigForm<T extends FieldValues>({
   schema,
 }: UseConfigFormOptions<T>): UseConfigFormReturn<T> {
   const { myNodeNum } = useMyNode();
-
-  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
-    useEffectiveConfig(myNodeNum, configType);
-
-  // Fall back to device store config when DB has no cached row yet.
-  // The device store always has config with protobuf defaults, populated
-  // with real values as config packets arrive from the device.
   const device = useDevice();
-  const baseConfig = dbBaseConfig ?? device.config[configType] ?? null;
-  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
 
-  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
+  // Use device store config directly (most up-to-date from device)
+  const baseConfig = (device?.config?.[configType] ?? null) as T | null;
 
-  const isReady = baseConfig !== undefined && baseConfig !== null;
+  // Merge pending changes into base config
+  const { pendingChanges, saveChange, clearChange } =
+    usePendingChanges(myNodeNum);
+  const configChanges = useMemo(
+    () =>
+      pendingChanges.filter(
+        (c) => c.changeType === "config" && c.variant === configType,
+      ),
+    [pendingChanges, configType],
+  );
+  const effectiveConfig = useMemo(() => {
+    if (!baseConfig) return null;
+    return mergeConfigChanges(
+      baseConfig as Record<string, unknown>,
+      configChanges,
+    ) as T;
+  }, [baseConfig, configChanges]);
+
+  // Check if the specific config has been received from the device
+  const hasReceivedConfig =
+    device?.configProgress?.receivedConfigs?.has(`config:${configType}`) ??
+    false;
+  const isReady = hasReceivedConfig;
 
   const form = useForm<T>({
     mode: "onChange",
@@ -123,7 +137,7 @@ export function useConfigForm<T extends FieldValues>({
 
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [watch, onFormChange]);
 
   // Subscribe to pending field resets from activity undo
   const pendingReset = useUIStore((s) => s.pendingFieldReset);

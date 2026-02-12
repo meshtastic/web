@@ -1,12 +1,12 @@
 import {
-  useEffectiveConfig,
+  mergeConfigChanges,
   usePendingChanges,
 } from "@data/hooks/usePendingChanges.ts";
 import { useUnsafeRolesDialog } from "@shared/components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
 import { useMyNode } from "@shared/hooks";
 import { useDevice } from "@state/index.ts";
 import { useUIStore } from "@state/ui/store.ts";
-import { useCallback, useEffect, useEffectEvent, useRef } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { type Path, useForm } from "react-hook-form";
 import { createZodResolver } from "../components/form/createZodResolver.ts";
 import {
@@ -16,15 +16,35 @@ import {
 
 export function useDeviceForm() {
   const { myNodeNum } = useMyNode();
-  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
-    useEffectiveConfig(myNodeNum, "device");
   const device = useDevice();
-  const baseConfig = dbBaseConfig ?? device.config.device ?? null;
-  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
-  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
+
+  // Use device store config directly (most up-to-date from device)
+  const baseConfig = device?.config?.device ?? null;
+
+  // Merge pending changes into base config
+  const { pendingChanges, saveChange, clearChange } =
+    usePendingChanges(myNodeNum);
+  const deviceChanges = useMemo(
+    () =>
+      pendingChanges.filter(
+        (c) => c.changeType === "config" && c.variant === "device",
+      ),
+    [pendingChanges],
+  );
+  const effectiveConfig = useMemo(() => {
+    if (!baseConfig) return null;
+    return mergeConfigChanges(
+      baseConfig as Record<string, unknown>,
+      deviceChanges,
+    ) as typeof baseConfig;
+  }, [baseConfig, deviceChanges]);
+
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
-  const isReady = baseConfig !== undefined && baseConfig !== null;
+  // Check if device config has been received from the device
+  const hasReceivedConfig =
+    device?.configProgress?.receivedConfigs?.has("config:device") ?? false;
+  const isReady = hasReceivedConfig;
 
   const form = useForm<DeviceValidation>({
     mode: "onChange",
@@ -95,7 +115,7 @@ export function useDeviceForm() {
 
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [watch, onFormChange]);
 
   // Subscribe to pending field resets from activity undo
   const pendingReset = useUIStore((s) => s.pendingFieldReset);

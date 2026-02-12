@@ -1,13 +1,13 @@
-import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
 import { Badge } from "@shared/components/ui/badge";
 import { Button } from "@shared/components/ui/button";
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@shared/components/ui/sheet";
-import { useMyNode, useRemoteAdminAuth } from "@shared/hooks";
+import { useRemoteAdminAuth } from "@shared/hooks";
 import { cn } from "@shared/utils/cn";
 import { t } from "i18next";
 import {
   AlertCircleIcon,
+  AlertTriangle,
   Database,
   FileEdit,
   LayersIcon,
@@ -20,7 +20,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { SettingsSearchBar } from "../components/SettingsSearchBar.tsx";
-import { ActivityPanel } from "../components/activity/index.ts";
+import {
+  ActivityPanel,
+  useActivityChanges,
+} from "../components/activity/index.ts";
 import { useSettingsSave } from "../hooks/useSaveSettings.ts";
 import {
   SettingsNavigationProvider,
@@ -71,8 +74,8 @@ interface SettingsHeaderActionsProps {
 function SettingsHeaderActions({ onActivityOpen }: SettingsHeaderActionsProps) {
   const { handleSave, handleReset, isSaving, hasPending, saveDisabled } =
     useSettingsSave();
-  const { myNodeNum } = useMyNode();
-  const { changeCount: totalChangeCount } = usePendingChanges(myNodeNum);
+  const { activityItems, totalCount } = useActivityChanges();
+  const conflictCount = activityItems.filter((item) => item.hasConflict).length;
 
   return (
     <>
@@ -84,12 +87,19 @@ function SettingsHeaderActions({ onActivityOpen }: SettingsHeaderActionsProps) {
       >
         <FileEdit className="h-4 w-4 mr-2" />
         Activity
-        {totalChangeCount > 0 && (
+        {totalCount > 0 && (
           <Badge
-            variant="destructive"
-            className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+            variant={conflictCount > 0 ? "default" : "destructive"}
+            className={cn(
+              "absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs",
+              conflictCount > 0 && "bg-amber-500 hover:bg-amber-500",
+            )}
           >
-            {totalChangeCount}
+            {conflictCount > 0 ? (
+              <AlertTriangle className="h-3 w-3" />
+            ) : (
+              totalCount
+            )}
           </Badge>
         )}
       </Button>

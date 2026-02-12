@@ -11,6 +11,8 @@ export interface ActivityItem {
   fieldPath: string | null; // The specific field path for this change
   hasChanges: boolean;
   originalValue: unknown; // Value to restore when undoing
+  hasConflict: boolean; // True if device config changed since this edit was made
+  currentDeviceValue?: unknown; // Current value on device (if different from originalValue)
 }
 
 export interface GroupedActivities {

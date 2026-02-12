@@ -3,8 +3,9 @@ import {
   buildChannelProtobuf,
   buildConfigProtobuf,
   buildModuleConfigProtobuf,
-} from "@data/hooks/usePendingChanges.ts";
-import { configCacheRepo, nodeRepo } from "@data/repositories";
+} from "@core/utils/configProtobuf.ts";
+import { nodeRepo, pendingChangesRepo } from "@data/repositories";
+import type { ConfigChange } from "@data/schema.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useDeviceStore } from "@state/index.ts";
 import logger from "./logger.ts";
@@ -142,7 +143,7 @@ class AdminCommandService {
       create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
           case: "nodedbReset",
-          value: 1,
+          value: true,
         },
       }),
     );
@@ -382,21 +383,17 @@ class AdminCommandService {
     const connection = this.getConnection();
 
     const pendingChanges =
-      await configCacheRepo.getPendingChanges(ownerNodeNum);
+      await pendingChangesRepo.getPendingChanges(ownerNodeNum);
 
-    const cachedConfig = await configCacheRepo.getCachedConfig(ownerNodeNum);
+    // Get current config from Zustand store (not database cache)
+    const device = this.getDevice();
+    const baseConfig = device.config;
+    const baseModuleConfig = device.moduleConfig;
 
-    if (!cachedConfig) {
-      throw new Error("No cached config found for device");
-    }
-
-    const configProtobufs = buildConfigProtobuf(
-      pendingChanges,
-      cachedConfig.config as Protobuf.LocalOnly.LocalConfig,
-    );
+    const configProtobufs = buildConfigProtobuf(pendingChanges, baseConfig);
     const moduleConfigProtobufs = buildModuleConfigProtobuf(
       pendingChanges,
-      cachedConfig.moduleConfig as Protobuf.LocalOnly.LocalModuleConfig,
+      baseModuleConfig,
     );
     const channelProtobufs = buildChannelProtobuf(pendingChanges);
 
@@ -420,7 +417,7 @@ class AdminCommandService {
       await connection.commitEditSettings();
     }
 
-    await configCacheRepo.clearAllLocalChanges(ownerNodeNum);
+    await pendingChangesRepo.clearAllLocalChanges(ownerNodeNum);
 
     return {
       configCount: configProtobufs.length,
@@ -439,16 +436,16 @@ class AdminCommandService {
     total: number;
   }> {
     const pendingChanges =
-      await configCacheRepo.getPendingChanges(ownerNodeNum);
+      await pendingChangesRepo.getPendingChanges(ownerNodeNum);
 
     const configChanges = pendingChanges.filter(
-      (c) => c.changeType === "config",
+      (c: ConfigChange) => c.changeType === "config",
     );
     const moduleConfigChanges = pendingChanges.filter(
-      (c) => c.changeType === "moduleConfig",
+      (c: ConfigChange) => c.changeType === "moduleConfig",
     );
     const channelChanges = pendingChanges.filter(
-      (c) => c.changeType === "channel",
+      (c: ConfigChange) => c.changeType === "channel",
     );
 
     const configVariants = new Set(configChanges.map((c) => c.variant));
@@ -469,7 +466,7 @@ class AdminCommandService {
    * Clear all pending changes from database
    */
   async clearPendingChanges(ownerNodeNum: number): Promise<void> {
-    await configCacheRepo.clearAllLocalChanges(ownerNodeNum);
+    await pendingChangesRepo.clearAllLocalChanges(ownerNodeNum);
   }
 }
 

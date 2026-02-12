@@ -52,9 +52,9 @@ export class PacketLogRepository {
   async logPacketsBatch(packets: NewPacketLog[]): Promise<void> {
     if (packets.length === 0) return;
 
-    await this.db.transaction(async (tx) => {
-      await tx.insert(packetLogs).values(packets);
-    });
+    // Use individual inserts to avoid Drizzle transaction isolation warning
+    // See: https://sqlocal.dev/api/transaction#drizzle
+    await Promise.all(packets.map((packet) => this.logPacket(packet)));
   }
 
   async getPackets(
@@ -105,11 +105,16 @@ export class PacketLogRepository {
   async deleteOldPackets(maxAgeDays = DEFAULT_MAX_AGE_DAYS): Promise<number> {
     const cutoffDate = new Date(Date.now() - maxAgeDays * 24 * 60 * 60 * 1000);
 
-    const result = await this.db
-      .delete(packetLogs)
+    // Count before deleting since sqlocal doesn't return affected rows
+    const countResult = await this.db
+      .select({ count: count() })
+      .from(packetLogs)
       .where(lt(packetLogs.rxTime, cutoffDate));
+    const deletedCount = countResult[0]?.count ?? 0;
 
-    return result.rowsAffected ?? 0;
+    await this.db.delete(packetLogs).where(lt(packetLogs.rxTime, cutoffDate));
+
+    return deletedCount;
   }
 
   async trimPackets(
@@ -133,16 +138,21 @@ export class PacketLogRepository {
       return 0;
     }
 
-    const result = await this.db
-      .delete(packetLogs)
-      .where(
-        and(
-          eq(packetLogs.ownerNodeNum, ownerNodeNum),
-          lt(packetLogs.id, cutoffId),
-        ),
-      );
+    const deleteCondition = and(
+      eq(packetLogs.ownerNodeNum, ownerNodeNum),
+      lt(packetLogs.id, cutoffId),
+    );
 
-    return result.rowsAffected ?? 0;
+    // Count before deleting since sqlocal doesn't return affected rows
+    const countResult = await this.db
+      .select({ count: count() })
+      .from(packetLogs)
+      .where(deleteCondition);
+    const deletedCount = countResult[0]?.count ?? 0;
+
+    await this.db.delete(packetLogs).where(deleteCondition);
+
+    return deletedCount;
   }
 
   async deleteAllPackets(ownerNodeNum: number): Promise<void> {

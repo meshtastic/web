@@ -26,6 +26,7 @@ export class TransportWebBluetooth implements Types.Transport {
   private toRadioCharacteristic: BluetoothRemoteGATTCharacteristic;
   private fromRadioCharacteristic: BluetoothRemoteGATTCharacteristic;
   private fromNumCharacteristic: BluetoothRemoteGATTCharacteristic;
+  private logRadioCharacteristic: BluetoothRemoteGATTCharacteristic | null;
   private gattServer: BluetoothRemoteGATTServer;
 
   private lastStatus: Types.DeviceStatusEnum =
@@ -39,6 +40,8 @@ export class TransportWebBluetooth implements Types.Transport {
   static FromRadioUuid = "2c55e69e-4993-11ed-b878-0242ac120002";
   /** UUID for the "fromNum" notification characteristic. */
   static FromNumUuid = "ed9da18c-a800-4f66-a670-aa7547e34453";
+  /** UUID for the "logRadio" notification characteristic (optional). */
+  static LogRadioUuid = "5a3d6e49-06e6-4423-9944-e9de8cdf9547";
   /** UUID for the Meshtastic GATT service. */
   static ServiceUuid = "6ba1b218-15a8-461f-9fa8-5dcae273eafd";
 
@@ -53,6 +56,16 @@ export class TransportWebBluetooth implements Types.Transport {
   };
   private onFromNumChanged = () => {
     void this.readFromRadio();
+  };
+  private onLogRadioChanged = (event: Event) => {
+    const target = event.target as BluetoothRemoteGATTCharacteristic;
+    const value = target.value;
+    if (value && value.byteLength > 0) {
+      this.enqueue({
+        type: "packet",
+        data: new Uint8Array(value.buffer),
+      });
+    }
   };
 
   /**
@@ -109,11 +122,21 @@ export class TransportWebBluetooth implements Types.Transport {
       throw new Error("Failed to find required characteristics");
     }
 
+    let logRadioCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
+    try {
+      logRadioCharacteristic = await service.getCharacteristic(
+        TransportWebBluetooth.LogRadioUuid,
+      );
+    } catch {
+      // Optional — older firmware may not expose this characteristic
+    }
+
     return new TransportWebBluetooth(
       toRadioCharacteristic,
       fromRadioCharacteristic,
       fromNumCharacteristic,
       gattServer,
+      logRadioCharacteristic,
     );
   }
 
@@ -126,10 +149,12 @@ export class TransportWebBluetooth implements Types.Transport {
     fromRadioCharacteristic: BluetoothRemoteGATTCharacteristic,
     fromNumCharacteristic: BluetoothRemoteGATTCharacteristic,
     gattServer: BluetoothRemoteGATTServer,
+    logRadioCharacteristic: BluetoothRemoteGATTCharacteristic | null = null,
   ) {
     this.toRadioCharacteristic = toRadioCharacteristic;
     this.fromRadioCharacteristic = fromRadioCharacteristic;
     this.fromNumCharacteristic = fromNumCharacteristic;
+    this.logRadioCharacteristic = logRadioCharacteristic;
     this.gattServer = gattServer;
 
     this._fromDevice = new ReadableStream<Types.DeviceOutput>({
@@ -143,11 +168,29 @@ export class TransportWebBluetooth implements Types.Transport {
         );
 
         try {
-          await this.fromNumCharacteristic.startNotifications();
+          await this.retryCall(() =>
+            this.fromNumCharacteristic.startNotifications(),
+          );
           this.fromNumCharacteristic.addEventListener(
             "characteristicvaluechanged",
             this.onFromNumChanged,
           );
+
+          if (this.logRadioCharacteristic) {
+            try {
+              await this.retryCall(() =>
+                this.logRadioCharacteristic!.startNotifications(),
+              );
+              this.logRadioCharacteristic.addEventListener(
+                "characteristicvaluechanged",
+                this.onLogRadioChanged,
+              );
+            } catch {
+              // Non-fatal — logRadio is optional
+              this.logRadioCharacteristic = null;
+            }
+          }
+
           this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
           // prime once in case data already queued
           void this.readFromRadio();
@@ -168,7 +211,12 @@ export class TransportWebBluetooth implements Types.Transport {
       write: async (chunk) => {
         try {
           const ab = toArrayBuffer(chunk);
-          await this.toRadioCharacteristic.writeValue(ab);
+          await this.retryCall(() => {
+            if (this.toRadioCharacteristic.properties.writeWithoutResponse) {
+              return this.toRadioCharacteristic.writeValueWithoutResponse(ab);
+            }
+            return this.toRadioCharacteristic.writeValueWithResponse(ab);
+          });
           void this.readFromRadio(); // ensure we read any response
         } catch (error) {
           this.emitStatus(
@@ -205,6 +253,17 @@ export class TransportWebBluetooth implements Types.Transport {
         "characteristicvaluechanged",
         this.onFromNumChanged,
       );
+
+      if (this.logRadioCharacteristic) {
+        try {
+          this.logRadioCharacteristic.stopNotifications?.();
+        } catch {}
+        this.logRadioCharacteristic.removeEventListener(
+          "characteristicvaluechanged",
+          this.onLogRadioChanged,
+        );
+      }
+
       this.gattServer.device.removeEventListener(
         "gattserverdisconnected",
         this.onGattDisconnected,
@@ -226,7 +285,9 @@ export class TransportWebBluetooth implements Types.Transport {
     try {
       let hasMoreData = true;
       while (hasMoreData && this.fromRadioCharacteristic) {
-        const value = await this.fromRadioCharacteristic.readValue();
+        const value = await this.retryCall(() =>
+          this.fromRadioCharacteristic.readValue(),
+        );
         if (value.byteLength === 0) {
           hasMoreData = false;
           continue;
@@ -247,6 +308,22 @@ export class TransportWebBluetooth implements Types.Transport {
     } finally {
       this.reading = false;
     }
+  }
+
+  private async retryCall<T>(
+    fn: () => Promise<T>,
+    attempts = 3,
+    delayMs = 500,
+  ): Promise<T> {
+    for (let i = 0; i < attempts; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (i === attempts - 1) throw error;
+        await new Promise((r) => setTimeout(r, delayMs));
+      }
+    }
+    throw new Error("retryCall exhausted");
   }
 
   private emitStatus(next: Types.DeviceStatusEnum, reason?: string): void {

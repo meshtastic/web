@@ -10,6 +10,7 @@ import {
 } from "@shared/components/ui/form";
 import { Heading } from "@shared/components/ui/typography/heading";
 import { Subtle } from "@shared/components/ui/typography/subtle";
+import type { FLAGS_CONFIG } from "@shared/hooks/usePositionFlags";
 import type { ChangeEventHandler, ComponentType, ReactNode } from "react";
 import type {
   Control,
@@ -60,7 +61,7 @@ export interface FieldConfig<T extends FieldValues> {
   disabled?: boolean;
   disabledBy?: DisabledByConfig<T>[];
   properties?: {
-    enumValue?: Record<string, string | number>;
+    enumValue?: Record<string, string | number> | typeof FLAGS_CONFIG;
     formatEnumName?: boolean;
     suffix?: string;
     step?: number;

@@ -99,7 +99,7 @@ export const DeviceConfig = () => {
     : (sections[0]?.case ?? "user");
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <Tabs value={currentTab} onValueChange={setActiveTab}>
         <TabsList className="flex flex-wrap">
           {sections.map((section) => (

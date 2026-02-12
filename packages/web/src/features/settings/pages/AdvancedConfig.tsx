@@ -30,7 +30,7 @@ export const AdvancedConfig = () => {
   );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <Card data-section="administration">
         <CardHeader>
           <CardTitle>

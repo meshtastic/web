@@ -5,18 +5,12 @@
  * This hook provides:
  * - Reactive access to pending changes
  * - Methods to save/clear changes
- * - Effective config by merging base + changes
+ * - Merging utilities for combining base config with pending changes
  */
 
-import { create } from "@bufbuild/protobuf";
-import { configCacheRepo } from "@data/repositories/index.ts";
-import type {
-  ValidConfigType,
-  ValidModuleConfigType,
-} from "@features/settings/components/types.ts";
-import { Protobuf } from "@meshtastic/core";
+import { pendingChangesRepo } from "@data/repositories/index.ts";
 import { useCallback, useMemo, useRef } from "react";
-import type { ConfigChange, DeviceConfig } from "../schema.ts";
+import type { ConfigChange } from "../schema.ts";
 import { useReactiveSQL } from "./useReactiveSQL.ts";
 
 // =============================================================================
@@ -91,13 +85,13 @@ export function usePendingChanges(
   // Load pending changes from database (reactive)
   const query = useMemo(() => {
     if (!ownerNodeNum) {
-      return configCacheRepo.buildChangesQuery(0);
+      return pendingChangesRepo.buildChangesQuery(0);
     }
-    return configCacheRepo.buildChangesQuery(ownerNodeNum);
+    return pendingChangesRepo.buildChangesQuery(ownerNodeNum);
   }, [ownerNodeNum]);
 
   const { data, status } = useReactiveSQL<ConfigChange>(
-    configCacheRepo.getClient(),
+    pendingChangesRepo.getClient(),
     query,
   );
   const pendingChanges = useMemo(() => data ?? [], [data]);
@@ -128,7 +122,7 @@ export function usePendingChanges(
     }) => {
       if (!ownerNodeNum) return;
 
-      await configCacheRepo.saveLocalChange(ownerNodeNum, {
+      await pendingChangesRepo.saveLocalChange(ownerNodeNum, {
         changeType: params.changeType,
         variant: params.variant,
         channelIndex: params.channelIndex,
@@ -150,7 +144,7 @@ export function usePendingChanges(
     }) => {
       if (!ownerNodeNum) return;
 
-      await configCacheRepo.clearLocalChange(
+      await pendingChangesRepo.clearLocalChange(
         ownerNodeNum,
         params.changeType,
         params.variant ?? null,
@@ -164,14 +158,16 @@ export function usePendingChanges(
   // Clear all changes for this device
   const clearAllChanges = useCallback(async () => {
     if (!ownerNodeNum) return;
-    await configCacheRepo.clearAllLocalChanges(ownerNodeNum);
+
+    await pendingChangesRepo.clearAllLocalChanges(ownerNodeNum);
   }, [ownerNodeNum]);
 
   // Clear all changes for a specific variant
   const clearVariantChanges = useCallback(
     async (changeType: ChangeType, variant: string | null) => {
       if (!ownerNodeNum) return;
-      await configCacheRepo.clearLocalChangesForVariant(
+
+      await pendingChangesRepo.clearLocalChangesForVariant(
         ownerNodeNum,
         changeType,
         variant,
@@ -245,340 +241,4 @@ export function mergeConfigChanges<T extends Record<string, unknown>>(
   }
 
   return merged as T;
-}
-
-// =============================================================================
-// Hook: Effective config with changes merged
-// =============================================================================
-
-/**
- * Hook for getting effective config with pending changes merged.
- *
- * @param ownerNodeNum - Device node number
- * @param configType - Config variant (e.g., "device", "lora")
- * @returns Effective config with pending changes applied
- */
-export function useEffectiveConfig<
-  K extends keyof Protobuf.LocalOnly.LocalConfig,
->(
-  ownerNodeNum: number | undefined,
-  configType: K,
-): {
-  config: Protobuf.LocalOnly.LocalConfig[K] | null;
-  baseConfig: Protobuf.LocalOnly.LocalConfig[K] | null;
-  isLoading: boolean;
-  hasChanges: boolean;
-  error: Error | null;
-} {
-  // Load base config
-  const configQuery = useMemo(() => {
-    if (!ownerNodeNum) {
-      return configCacheRepo.buildConfigQuery(0);
-    }
-    return configCacheRepo.buildConfigQuery(ownerNodeNum);
-  }, [ownerNodeNum]);
-
-  const {
-    data: configData,
-    status: configStatus,
-    error: configError,
-  } = useReactiveSQL<DeviceConfig>(configCacheRepo.getClient(), configQuery);
-
-  // Track if we've ever received data to avoid showing loading on subsequent renders
-  const configHydratedRef = useRef(false);
-  const configDataArray = configData ?? [];
-  if (configDataArray.length > 0 || configStatus === "ok") {
-    configHydratedRef.current = true;
-  }
-
-  // Load pending changes
-  const { pendingChanges, isLoading: changesLoading } =
-    usePendingChanges(ownerNodeNum);
-
-  // Compute effective config
-  const result = useMemo(() => {
-    // Only show loading if we haven't hydrated yet AND query is pending with no data
-    const isLoading =
-      (!configHydratedRef.current &&
-        configStatus === "pending" &&
-        configDataArray.length === 0) ||
-      changesLoading;
-    const baseConfigRow = configDataArray[0];
-
-    if (!baseConfigRow) {
-      return {
-        config: null,
-        baseConfig: null,
-        isLoading,
-        hasChanges: false,
-        error: configError ?? null,
-      };
-    }
-
-    const fullConfig =
-      baseConfigRow.config as Protobuf.LocalOnly.LocalConfig | null;
-    const baseConfig = fullConfig?.[configType] ?? null;
-
-    // Filter changes for this config type
-    const variantChanges = pendingChanges.filter(
-      (c) => c.changeType === "config" && c.variant === configType,
-    );
-
-    const hasChanges = variantChanges.length > 0;
-
-    // Merge changes into base config
-    const effectiveConfig = mergeConfigChanges(
-      baseConfig as Record<string, unknown> | null,
-      variantChanges,
-    );
-
-    return {
-      config: (effectiveConfig as Protobuf.LocalOnly.LocalConfig[K]) ?? null,
-      baseConfig,
-      isLoading,
-      hasChanges,
-      error: configError ?? null,
-    };
-  }, [
-    configDataArray,
-    configStatus,
-    configError,
-    pendingChanges,
-    changesLoading,
-    configType,
-  ]);
-
-  return result;
-}
-
-// =============================================================================
-// Protobuf Conversion Utilities
-// =============================================================================
-
-/**
- * Convert database config changes to protobuf Config objects for device.setConfig()
- *
- * Groups field-level changes by variant and creates protobuf objects with merged values.
- *
- * @param pendingChanges - All pending changes from database
- * @param baseConfig - Base config from database to merge changes into
- * @returns Array of Protobuf.Config.Config objects ready for device.setConfig()
- */
-export function buildConfigProtobuf(
-  pendingChanges: ConfigChange[],
-  baseConfig: Protobuf.LocalOnly.LocalConfig | null,
-): Protobuf.Config.Config[] {
-  if (!baseConfig) return [];
-
-  // Group changes by variant
-  const changesByVariant = new Map<string, ConfigChange[]>();
-  for (const change of pendingChanges) {
-    if (change.changeType === "config" && change.variant) {
-      const existing = changesByVariant.get(change.variant) ?? [];
-      existing.push(change);
-      changesByVariant.set(change.variant, existing);
-    }
-  }
-
-  const configs: Protobuf.Config.Config[] = [];
-
-  for (const [variant, changes] of changesByVariant) {
-    const variantBase = baseConfig[variant as ValidConfigType];
-    if (!variantBase) continue;
-
-    // Merge changes into base
-    const merged = { ...variantBase } as Record<string, unknown>;
-    for (const change of changes) {
-      if (change.fieldPath) {
-        merged[change.fieldPath] = change.value;
-      }
-    }
-
-    configs.push(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: variant as ValidConfigType,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic config value from change tracking
-          value: merged as never,
-        },
-      }),
-    );
-  }
-
-  return configs;
-}
-
-/**
- * Convert database module config changes to protobuf ModuleConfig objects
- *
- * @param pendingChanges - All pending changes from database
- * @param baseModuleConfig - Base module config from database
- * @returns Array of Protobuf.ModuleConfig.ModuleConfig objects
- */
-export function buildModuleConfigProtobuf(
-  pendingChanges: ConfigChange[],
-  baseModuleConfig: Protobuf.LocalOnly.LocalModuleConfig | null,
-): Protobuf.ModuleConfig.ModuleConfig[] {
-  if (!baseModuleConfig) return [];
-
-  // Group changes by variant
-  const changesByVariant = new Map<string, ConfigChange[]>();
-  for (const change of pendingChanges) {
-    if (change.changeType === "moduleConfig" && change.variant) {
-      const existing = changesByVariant.get(change.variant) ?? [];
-      existing.push(change);
-      changesByVariant.set(change.variant, existing);
-    }
-  }
-
-  const configs: Protobuf.ModuleConfig.ModuleConfig[] = [];
-
-  for (const [variant, changes] of changesByVariant) {
-    const variantBase = baseModuleConfig[variant as ValidModuleConfigType];
-    if (!variantBase) continue;
-
-    // Merge changes into base
-    const merged = { ...variantBase } as Record<string, unknown>;
-    for (const change of changes) {
-      if (change.fieldPath) {
-        merged[change.fieldPath] = change.value;
-      }
-    }
-
-    configs.push(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: variant as ValidModuleConfigType,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic config value from change tracking
-          value: merged as never,
-        },
-      }),
-    );
-  }
-
-  return configs;
-}
-
-/**
- * Convert database channel changes to protobuf Channel objects
- *
- * @param pendingChanges - All pending changes from database
- * @returns Array of Protobuf.Channel.Channel objects
- */
-export function buildChannelProtobuf(
-  pendingChanges: ConfigChange[],
-): Protobuf.Channel.Channel[] {
-  const channels: Protobuf.Channel.Channel[] = [];
-
-  for (const change of pendingChanges) {
-    if (change.changeType === "channel" && change.value) {
-      channels.push(change.value as Protobuf.Channel.Channel);
-    }
-  }
-
-  return channels;
-}
-
-/**
- * Hook for getting effective module config with pending changes merged.
- *
- * @param ownerNodeNum - Device node number
- * @param moduleConfigType - Module config variant (e.g., "mqtt", "telemetry")
- * @returns Effective module config with pending changes applied
- */
-export function useEffectiveModuleConfig<
-  K extends keyof Protobuf.LocalOnly.LocalModuleConfig,
->(
-  ownerNodeNum: number | undefined,
-  moduleConfigType: K,
-): {
-  config: Protobuf.LocalOnly.LocalModuleConfig[K] | null;
-  baseConfig: Protobuf.LocalOnly.LocalModuleConfig[K] | null;
-  isLoading: boolean;
-  hasChanges: boolean;
-  error: Error | null;
-} {
-  // Load base config
-  const moduleConfigQuery = useMemo(() => {
-    if (!ownerNodeNum) {
-      return configCacheRepo.buildConfigQuery(0);
-    }
-    return configCacheRepo.buildConfigQuery(ownerNodeNum);
-  }, [ownerNodeNum]);
-
-  const {
-    data: configData,
-    status: configStatus,
-    error: configError,
-  } = useReactiveSQL<DeviceConfig>(
-    configCacheRepo.getClient(),
-    moduleConfigQuery,
-  );
-
-  // Track if we've ever received data to avoid showing loading on subsequent renders
-  const moduleConfigHydratedRef = useRef(false);
-  const moduleConfigDataArray = configData ?? [];
-  if (moduleConfigDataArray.length > 0 || configStatus === "ok") {
-    moduleConfigHydratedRef.current = true;
-  }
-
-  // Load pending changes
-  const { pendingChanges, isLoading: changesLoading } =
-    usePendingChanges(ownerNodeNum);
-
-  // Compute effective config
-  const result = useMemo(() => {
-    // Only show loading if we haven't hydrated yet AND query is pending with no data
-    const isLoading =
-      (!moduleConfigHydratedRef.current &&
-        configStatus === "pending" &&
-        moduleConfigDataArray.length === 0) ||
-      changesLoading;
-    const baseConfigRow = moduleConfigDataArray[0];
-
-    if (!baseConfigRow) {
-      return {
-        config: null,
-        baseConfig: null,
-        isLoading,
-        hasChanges: false,
-        error: configError ?? null,
-      };
-    }
-
-    const fullModuleConfig =
-      baseConfigRow.moduleConfig as Protobuf.LocalOnly.LocalModuleConfig | null;
-    const baseConfig = fullModuleConfig?.[moduleConfigType] ?? null;
-
-    // Filter changes for this module config type
-    const variantChanges = pendingChanges.filter(
-      (c) => c.changeType === "moduleConfig" && c.variant === moduleConfigType,
-    );
-
-    const hasChanges = variantChanges.length > 0;
-
-    // Merge changes into base config
-    const effectiveConfig = mergeConfigChanges(
-      baseConfig as Record<string, unknown> | null,
-      variantChanges,
-    );
-
-    return {
-      config:
-        (effectiveConfig as Protobuf.LocalOnly.LocalModuleConfig[K]) ?? null,
-      baseConfig,
-      isLoading,
-      hasChanges,
-      error: configError ?? null,
-    };
-  }, [
-    moduleConfigDataArray,
-    configStatus,
-    configError,
-    pendingChanges,
-    changesLoading,
-    moduleConfigType,
-  ]);
-
-  return result;
 }

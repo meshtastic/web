@@ -1,6 +1,11 @@
 import { Badge } from "@shared/components/ui/badge";
 import { Button } from "@shared/components/ui/button";
-import { Hash, Layers, RadioTower, X } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@shared/components/ui/tooltip";
+import { AlertTriangle, Hash, Layers, RadioTower, X } from "lucide-react";
 import type { ActivityItem as ActivityItemType } from "./types.ts";
 import { formatRelativeTime } from "./utils.ts";
 
@@ -31,6 +36,16 @@ export function ActivityItem({ item, onRemove }: ActivityItemProps) {
           <Badge variant="secondary" className="text-xs shrink-0">
             {item.category}
           </Badge>
+          {item.hasConflict && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Device config changed since this edit was made</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
         <p className="text-xs md:text-sm text-muted-foreground">
           {formatRelativeTime(item.timestamp)}

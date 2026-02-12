@@ -1,7 +1,8 @@
 import { usePendingChanges } from "@data/hooks/usePendingChanges.ts";
 import { useMyNode } from "@shared/hooks";
+import { useDevice } from "@state/index.ts";
 import { useUIStore } from "@state/ui/store.ts";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { ActivityItem } from "./types.ts";
 
@@ -43,103 +44,158 @@ function formatFieldPath(fieldPath: string): string {
     .trim();
 }
 
+/**
+ * Get the current device config value for a specific change.
+ * Returns undefined if the config doesn't exist or the path can't be resolved.
+ */
+function getDeviceConfigValue(
+  device: ReturnType<typeof useDevice>,
+  changeType: string,
+  variant: string | null,
+  fieldPath: string | null,
+): unknown {
+  if (!device || !fieldPath) return undefined;
+
+  try {
+    if (changeType === "config" && variant) {
+      const configVariant =
+        device.config?.[variant as keyof typeof device.config];
+      if (configVariant && typeof configVariant === "object") {
+        return (configVariant as Record<string, unknown>)[fieldPath];
+      }
+    } else if (changeType === "moduleConfig" && variant) {
+      const moduleVariant =
+        device.moduleConfig?.[variant as keyof typeof device.moduleConfig];
+      if (moduleVariant && typeof moduleVariant === "object") {
+        return (moduleVariant as Record<string, unknown>)[fieldPath];
+      }
+    }
+  } catch {
+    // Path resolution failed
+  }
+  return undefined;
+}
+
 export function useActivityChanges() {
   const { myNodeNum } = useMyNode();
   const { pendingChanges, clearChange } = usePendingChanges(myNodeNum);
   const { t } = useTranslation(["config", "moduleConfig", "channels"]);
+  const device = useDevice();
 
   // Transform database changes to activity items
-  const activityItems: ActivityItem[] = pendingChanges.map((change) => {
-    const sectionKey = `${change.changeType}:${change.variant ?? ""}`;
+  const activityItems: ActivityItem[] = useMemo(
+    () =>
+      pendingChanges.map((change) => {
+        const sectionKey = `${change.changeType}:${change.variant ?? ""}`;
 
-    // Determine category from change type and variant
-    let category = "Settings";
-    if (change.variant) {
-      const formatted =
-        change.variant.charAt(0).toUpperCase() +
-        change.variant
-          .slice(1)
-          .replace(/([A-Z])/g, " $1")
-          .trim();
+        // Determine category from change type and variant
+        let category = "Settings";
+        if (change.variant) {
+          const formatted =
+            change.variant.charAt(0).toUpperCase() +
+            change.variant
+              .slice(1)
+              .replace(/([A-Z])/g, " $1")
+              .trim();
 
-      const acronymMap: Record<string, string> = {
-        Mqtt: "MQTT",
-        Lora: "Lora",
-      };
-      category = acronymMap[formatted] || formatted;
-    }
-
-    if (change.changeType === "channel") {
-      category = "Channels";
-    }
-
-    if (change.changeType === "user") {
-      category = "User";
-    }
-
-    // Build the config change key based on change type
-    let key: ActivityItem["key"];
-    if (change.changeType === "channel" && change.channelIndex !== null) {
-      key = {
-        type: "channel",
-        index: change.channelIndex as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7,
-      };
-    } else if (change.changeType === "user") {
-      key = { type: "user" };
-    } else if (change.changeType === "moduleConfig" && change.variant) {
-      key = {
-        type: "moduleConfig",
-        variant: change.variant as ActivityItem["key"] extends {
-          type: "moduleConfig";
+          const acronymMap: Record<string, string> = {
+            Mqtt: "MQTT",
+            Lora: "Lora",
+          };
+          category = acronymMap[formatted] || formatted;
         }
-          ? ActivityItem["key"]["variant"]
-          : never,
-      };
-    } else if (change.changeType === "config" && change.variant) {
-      key = {
-        type: "config",
-        variant: change.variant as ActivityItem["key"] extends {
-          type: "config";
+
+        if (change.changeType === "channel") {
+          category = "Channels";
         }
-          ? ActivityItem["key"]["variant"]
-          : never,
-      };
-    } else {
-      // Fallback - shouldn't happen in practice
-      key = { type: "user" };
-    }
 
-    const labelKey = getFieldLabelKey(
-      change.changeType,
-      change.variant,
-      change.fieldPath,
-    );
-    let label = change.fieldPath ?? change.variant ?? change.changeType;
-    if (labelKey) {
-      const translated = t(labelKey, { defaultValue: "" });
-      if (translated) {
-        label = translated;
-      } else if (change.fieldPath) {
-        // Fallback to formatted field path
-        label = formatFieldPath(change.fieldPath);
-      }
-    } else if (change.fieldPath) {
-      label = formatFieldPath(change.fieldPath);
-    }
+        if (change.changeType === "user") {
+          category = "User";
+        }
 
-    return {
-      id: `${sectionKey}:${change.fieldPath ?? ""}`,
-      type: change.changeType as "config" | "moduleConfig" | "channel" | "user",
-      category,
-      variant: change.variant ?? "",
-      label,
-      timestamp: change.createdAt?.getTime() ?? Date.now(),
-      key,
-      fieldPath: change.fieldPath,
-      hasChanges: true,
-      originalValue: change.originalValue,
-    };
-  });
+        // Build the config change key based on change type
+        let key: ActivityItem["key"];
+        if (change.changeType === "channel" && change.channelIndex !== null) {
+          key = {
+            type: "channel",
+            index: change.channelIndex as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7,
+          };
+        } else if (change.changeType === "user") {
+          key = { type: "user" };
+        } else if (change.changeType === "moduleConfig" && change.variant) {
+          key = {
+            type: "moduleConfig",
+            variant: change.variant as ActivityItem["key"] extends {
+              type: "moduleConfig";
+            }
+              ? ActivityItem["key"]["variant"]
+              : never,
+          };
+        } else if (change.changeType === "config" && change.variant) {
+          key = {
+            type: "config",
+            variant: change.variant as ActivityItem["key"] extends {
+              type: "config";
+            }
+              ? ActivityItem["key"]["variant"]
+              : never,
+          };
+        } else {
+          // Fallback - shouldn't happen in practice
+          key = { type: "user" };
+        }
+
+        const labelKey = getFieldLabelKey(
+          change.changeType,
+          change.variant,
+          change.fieldPath,
+        );
+        let label = change.fieldPath ?? change.variant ?? change.changeType;
+        if (labelKey) {
+          const translated = t(labelKey, { defaultValue: "" });
+          if (translated) {
+            label = translated;
+          } else if (change.fieldPath) {
+            // Fallback to formatted field path
+            label = formatFieldPath(change.fieldPath);
+          }
+        } else if (change.fieldPath) {
+          label = formatFieldPath(change.fieldPath);
+        }
+
+        // Detect conflicts - device config changed since edit was made
+        const currentDeviceValue = getDeviceConfigValue(
+          device,
+          change.changeType,
+          change.variant,
+          change.fieldPath,
+        );
+        const hasConflict =
+          currentDeviceValue !== undefined &&
+          JSON.stringify(change.originalValue) !==
+            JSON.stringify(currentDeviceValue);
+
+        return {
+          id: `${sectionKey}:${change.fieldPath ?? ""}`,
+          type: change.changeType as
+            | "config"
+            | "moduleConfig"
+            | "channel"
+            | "user",
+          category,
+          variant: change.variant ?? "",
+          label,
+          timestamp: change.createdAt?.getTime() ?? Date.now(),
+          key,
+          fieldPath: change.fieldPath,
+          hasChanges: true,
+          originalValue: change.originalValue,
+          hasConflict,
+          currentDeviceValue: hasConflict ? currentDeviceValue : undefined,
+        };
+      }),
+    [pendingChanges, device, t],
+  );
 
   // Remove a single change, resetting the form field first
   const removeChange = useCallback(

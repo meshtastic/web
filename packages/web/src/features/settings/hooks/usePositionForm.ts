@@ -1,7 +1,7 @@
 import { adminCommands } from "@core/services/adminCommands";
 import { useNodes } from "@data/hooks";
 import {
-  useEffectiveConfig,
+  mergeConfigChanges,
   usePendingChanges,
 } from "@data/hooks/usePendingChanges.ts";
 import { useMyNode } from "@shared/hooks";
@@ -18,16 +18,32 @@ import {
 
 export function usePositionForm() {
   const { myNodeNum } = useMyNode();
-  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
-    useEffectiveConfig(myNodeNum, "position");
-  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
   const { nodes: allNodes } = useNodes(myNodeNum);
 
   // Keep queueAdminMessage from device store for admin message queueing
   const device = useDevice();
   const { queueAdminMessage } = device;
-  const baseConfig = dbBaseConfig ?? device.config.position ?? null;
-  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
+
+  // Use device store config directly (most up-to-date from device)
+  const baseConfig = device?.config?.position ?? null;
+
+  // Merge pending changes into base config
+  const { pendingChanges, saveChange, clearChange } =
+    usePendingChanges(myNodeNum);
+  const positionChanges = useMemo(
+    () =>
+      pendingChanges.filter(
+        (c) => c.changeType === "config" && c.variant === "position",
+      ),
+    [pendingChanges],
+  );
+  const effectiveConfig = useMemo(() => {
+    if (!baseConfig) return null;
+    return mergeConfigChanges(
+      baseConfig as Record<string, unknown>,
+      positionChanges,
+    ) as typeof baseConfig;
+  }, [baseConfig, positionChanges]);
 
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     effectiveConfig?.positionFlags ?? 0,
@@ -66,7 +82,10 @@ export function usePositionForm() {
     };
   }, [baseConfig, myNode]);
 
-  const isReady = baseConfig !== undefined && baseConfig !== null;
+  // Check if position config has been received from the device
+  const hasReceivedConfig =
+    device?.configProgress?.receivedConfigs?.has("config:position") ?? false;
+  const isReady = hasReceivedConfig;
 
   const form = useForm<PositionValidation>({
     mode: "onChange",
@@ -147,7 +166,7 @@ export function usePositionForm() {
 
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [watch, onFormChange]);
 
   // Subscribe to pending field resets from activity undo
   const pendingReset = useUIStore((s) => s.pendingFieldReset);

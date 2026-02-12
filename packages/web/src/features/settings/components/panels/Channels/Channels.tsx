@@ -156,10 +156,7 @@ export const Channels = () => {
         const isOpen = openChannels.has(channel.channelIndex);
 
         return (
-          <Card
-            key={channel.channelIndex}
-            className={isOpen ? "md:col-span-2" : ""}
-          >
+          <Card key={channel.channelIndex} className="">
             <CardHeader
               className="p-3 cursor-pointer"
               onClick={() => handleToggle(channel.channelIndex, !isOpen)}
@@ -206,7 +203,7 @@ export const Channels = () => {
       {placeholderChannels.map((ch) => (
         <Card
           key={`add-${ch.channelIndex}`}
-          className="md:col-span-2 border-dashed cursor-pointer hover:bg-accent/50 transition-colors"
+          className="border-dashed cursor-pointer hover:bg-accent/50 transition-colors"
           onClick={() => handleAddChannel(ch.channelIndex)}
         >
           <CardHeader className="p-3">

@@ -31,7 +31,7 @@ import { useTraceroute } from "@shared/hooks/useTraceroute.ts";
 import { isDefined } from "@shared/utils/typeGuards";
 import { useDevice, useUIStore } from "@state/index.ts";
 import { useNavigate } from "@tanstack/react-router";
-import { fromByteArray } from "base64-js";
+
 import {
   BatteryIcon,
   CableIcon,
@@ -639,9 +639,7 @@ export const NodeDetailsDrawer = ({
                           onClick={() => {
                             setRemoteAdminTarget(
                               node.nodeNum,
-                              node.publicKey
-                                ? fromByteArray(node.publicKey)
-                                : undefined,
+                              node.publicKey ?? undefined,
                             );
                             onOpenChange(false);
                           }}

@@ -1,18 +1,13 @@
 import type { Protobuf } from "@meshtastic/core";
-import { useEffectiveConfig } from "./usePendingChanges.ts";
+import { useDevice } from "@state/index.ts";
 
 /**
- * Hook to get the LoRa config for a device from the database.
- * Returns the merged config (base + pending changes).
+ * Hook to get the LoRa config for a device from the device store.
+ * Returns the config directly from the most up-to-date source.
  */
 export function useLoraConfig(
-  deviceId: number | undefined,
+  _deviceId: number | undefined,
 ): Protobuf.Config.Config_LoRaConfig | undefined {
-  const { config, isLoading } = useEffectiveConfig(deviceId, "lora");
-
-  if (isLoading || !config) {
-    return undefined;
-  }
-
-  return config as Protobuf.Config.Config_LoRaConfig;
+  const device = useDevice();
+  return device?.config?.lora ?? undefined;
 }

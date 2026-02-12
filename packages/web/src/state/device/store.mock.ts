@@ -28,7 +28,9 @@ export const mockDeviceStore: Device = {
   neighborInfo: new Map(),
   configProgress: {
     receivedConfigs: new Set(),
-    total: 21,
+    total: 24,
+    phase: "initializing",
+    lastReceivedConfig: null,
   },
 
   // Config caching state
@@ -59,6 +61,7 @@ export const mockDeviceStore: Device = {
   addNeighborInfo: vi.fn(),
   getMyNodeNum: vi.fn().mockReturnValue(123456),
   resetConfigProgress: vi.fn(),
+  setConnectionPhase: vi.fn(),
 
   // Admin message queue methods
   queueAdminMessage: vi.fn(),

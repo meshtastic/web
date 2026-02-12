@@ -4,6 +4,7 @@ import {
   FilterMulti,
   FilterSlider,
   FilterToggle,
+  type RangeKeys,
 } from "@shared/components/Filter/FilterComponents.tsx";
 import type { FilterState } from "@shared/components/Filter/useFilterNode.ts";
 import { TimeAgo } from "@shared/components/TimeAgo";
@@ -147,9 +148,9 @@ export function FilterControl({
   );
 
   const handleRangeChange = useCallback(
-    <K extends keyof FilterState>(key: K) =>
+    <K extends RangeKeys<FilterState>>(key: K) =>
       (value: number[]) => {
-        setLocalFilterState((prev) => ({
+        setLocalFilterState((prev: FilterState) => ({
           ...prev,
           [key]: value,
         }));

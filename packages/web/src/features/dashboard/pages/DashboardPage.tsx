@@ -1,10 +1,4 @@
-import {
-  useChannels,
-  useConfig,
-  useConnection,
-  useModuleConfigVariant,
-  useTelemetryHistory,
-} from "@data/hooks";
+import { useChannels, useConnection, useTelemetryHistory } from "@data/hooks";
 import { Protobuf } from "@meshtastic/core";
 import {
   Tabs,
@@ -13,6 +7,7 @@ import {
   TabsTrigger,
 } from "@shared/components/ui/tabs";
 import { useMyNode } from "@shared/hooks";
+import { useDevice } from "@state/index.ts";
 import { Activity, useState } from "react";
 import { BatteryCard } from "../components/BatteryCard";
 import { ChannelsCard } from "../components/ChannelsCard";
@@ -37,10 +32,18 @@ export function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const { myNodeNum, myNode } = useMyNode();
   const { channels } = useChannels(myNodeNum);
-  const { firmwareVersion } = useConfig(myNodeNum);
   const { connection } = useConnection(myNodeNum);
-  const mqttConfig = useModuleConfigVariant(myNodeNum, "mqtt");
   const { telemetry } = useTelemetryHistory(myNodeNum, myNodeNum);
+
+  // Get firmware version from device metadata
+  const device = useDevice();
+  const firmwareVersion =
+    myNodeNum && device?.metadata.get(myNodeNum)?.firmwareVersion
+      ? (device.metadata.get(myNodeNum)?.firmwareVersion ?? null)
+      : null;
+
+  // Get MQTT config from module config
+  const mqttConfig = device?.moduleConfig?.mqtt;
 
   // Chart data from telemetry + signal logs (memoized transformations)
   const {

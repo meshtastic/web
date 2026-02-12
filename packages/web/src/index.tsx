@@ -4,12 +4,12 @@ import { dbClient } from "@data/client";
 import { initDatabase, resetConnectionStatuses } from "@data/index";
 import {
   channelRepo,
-  configCacheRepo,
   connectionRepo,
   deviceRepo,
   messageRepo,
   nodeRepo,
   packetLogRepo,
+  pendingChangesRepo,
   preferencesRepo,
   tracerouteRepo,
 } from "@data/repositories";
@@ -54,12 +54,12 @@ const routerContext: RouterContext = {
   },
   repositories: {
     channel: channelRepo,
-    configCache: configCacheRepo,
     connection: connectionRepo,
     device: deviceRepo,
     message: messageRepo,
     node: nodeRepo,
     packetLog: packetLogRepo,
+    pendingChanges: pendingChangesRepo,
     preferences: preferencesRepo,
     traceroute: tracerouteRepo,
   },

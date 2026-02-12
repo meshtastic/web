@@ -48,24 +48,22 @@ export class DeviceRepository {
   }
 
   async upsertDevice(device: NewDevice): Promise<void> {
-    await this.db.transaction(async (tx) => {
-      await tx
-        .insert(devices)
-        .values({
-          ...device,
-          lastSeen: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: devices.nodeNum,
-          set: {
-            shortName: device.shortName,
-            longName: device.longName,
-            hwModel: device.hwModel,
-            lastSeen: sql`(unixepoch() * 1000)`,
-            updatedAt: new Date(),
-          },
-        });
-    });
+    await this.db
+      .insert(devices)
+      .values({
+        ...device,
+        lastSeen: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: devices.nodeNum,
+        set: {
+          shortName: device.shortName,
+          longName: device.longName,
+          hwModel: device.hwModel,
+          lastSeen: sql`(unixepoch() * 1000)`,
+          updatedAt: new Date(),
+        },
+      });
   }
 
   async updateDevice(

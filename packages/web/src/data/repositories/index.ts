@@ -4,13 +4,9 @@
 
 export { ChannelRepository } from "./ChannelRepository.ts";
 export {
-  ConfigCacheRepository,
-  type CachedConfig,
+  PendingChangesRepository,
   type ChangeType,
-  type ConflictInfo,
-} from "./ConfigCacheRepository.ts";
-export { ConfigHashRepository } from "./ConfigHashRepository.ts";
-export { WorkingHashRepository } from "./WorkingHashRepository.ts";
+} from "./PendingChangesRepository.ts";
 export { ConnectionRepository } from "./ConnectionRepository.ts";
 export { DeviceRepository } from "./DeviceRepository.ts";
 export { MessageRepository } from "./MessageRepository.ts";
@@ -23,8 +19,7 @@ export { NotificationSoundRepository } from "./NotificationSoundRepository.ts";
 
 // Singleton instances for convenience
 import { ChannelRepository } from "./ChannelRepository.ts";
-import { ConfigCacheRepository } from "./ConfigCacheRepository.ts";
-import { ConfigHashRepository } from "./ConfigHashRepository.ts";
+import { PendingChangesRepository } from "./PendingChangesRepository.ts";
 import { ConnectionRepository } from "./ConnectionRepository.ts";
 import { DeviceRepository } from "./DeviceRepository.ts";
 import { MessageRepository } from "./MessageRepository.ts";
@@ -34,12 +29,9 @@ import { PacketLogRepository } from "./PacketLogRepository.ts";
 import { PreferencesRepository } from "./PreferencesRepository.ts";
 import { ReactionRepository } from "./ReactionRepository.ts";
 import { TracerouteRepository } from "./TracerouteRepository.ts";
-import { WorkingHashRepository } from "./WorkingHashRepository.ts";
 
 export const channelRepo = new ChannelRepository();
-export const configCacheRepo = new ConfigCacheRepository();
-export const configHashRepo = new ConfigHashRepository();
-export const workingHashRepo = new WorkingHashRepository();
+export const pendingChangesRepo = new PendingChangesRepository();
 export const connectionRepo = new ConnectionRepository();
 export const deviceRepo = new DeviceRepository();
 export const messageRepo = new MessageRepository();

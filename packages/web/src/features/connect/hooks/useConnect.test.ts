@@ -1,7 +1,7 @@
 import { connectionRepo } from "@data/repositories";
 import { useDeviceStore } from "@state/index.ts";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   useConnect,
   useConnection,
@@ -92,33 +92,29 @@ describe("useConnect", () => {
     vi.clearAllMocks();
 
     // Setup default store mocks
-    (useDeviceStore as unknown as vi.Mock).mockImplementation(
-      (selector: any) => {
-        if (selector) {
-          return selector({
-            setActiveConnectionId: mockSetActiveConnectionId,
-            setActiveDeviceId: mockSetActiveDeviceId,
-            activeDeviceId: 0,
-            addDevice: mockAddDevice,
-          });
-        }
-        return {
+    (useDeviceStore as unknown as Mock).mockImplementation((selector: any) => {
+      if (selector) {
+        return selector({
           setActiveConnectionId: mockSetActiveConnectionId,
           setActiveDeviceId: mockSetActiveDeviceId,
           activeDeviceId: 0,
           addDevice: mockAddDevice,
-        };
-      },
-    );
+        });
+      }
+      return {
+        setActiveConnectionId: mockSetActiveConnectionId,
+        setActiveDeviceId: mockSetActiveDeviceId,
+        activeDeviceId: 0,
+        addDevice: mockAddDevice,
+      };
+    });
     (useDeviceStore as any).getState.mockReturnValue({
       getDevice: vi.fn(),
       removeDevice: vi.fn(),
     });
 
     // Default repo mock
-    (connectionRepo.getConnections as vi.Mock).mockResolvedValue(
-      mockConnections,
-    );
+    (connectionRepo.getConnections as Mock).mockResolvedValue(mockConnections);
   });
 
   it("should initialize and fetch connections", async () => {
@@ -138,8 +134,8 @@ describe("useConnect", () => {
     };
     const createdConn = { id: 3, ...newConnInput, status: "disconnected" };
 
-    (connectionRepo.createConnection as vi.Mock).mockResolvedValue(createdConn);
-    (connectionRepo.getConnections as vi.Mock)
+    (connectionRepo.createConnection as Mock).mockResolvedValue(createdConn);
+    (connectionRepo.getConnections as Mock)
       .mockResolvedValueOnce(mockConnections) // Initial load
       .mockResolvedValueOnce([...mockConnections, createdConn]); // After add
 
@@ -164,8 +160,8 @@ describe("useConnect", () => {
   });
 
   it("should remove a connection", async () => {
-    (connectionRepo.deleteConnection as vi.Mock).mockResolvedValue(undefined);
-    (connectionRepo.getConnections as vi.Mock)
+    (connectionRepo.deleteConnection as Mock).mockResolvedValue(undefined);
+    (connectionRepo.getConnections as Mock)
       .mockResolvedValueOnce(mockConnections)
       .mockResolvedValueOnce([mockConnections[1]]); // After delete
 
@@ -183,7 +179,7 @@ describe("useConnect", () => {
   });
 
   it("should set default connection", async () => {
-    (connectionRepo.setDefault as vi.Mock).mockResolvedValue(undefined);
+    (connectionRepo.setDefault as Mock).mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useConnect());
     await waitFor(() => expect(result.current.connections).toHaveLength(2));
@@ -208,7 +204,7 @@ describe("useConnection", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (connectionRepo.getConnection as vi.Mock).mockResolvedValue(mockConnection);
+    (connectionRepo.getConnection as Mock).mockResolvedValue(mockConnection);
   });
 
   it("should fetch a specific connection", async () => {
@@ -233,7 +229,7 @@ describe("useDefaultConnection", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (connectionRepo.getDefaultConnection as vi.Mock).mockResolvedValue(
+    (connectionRepo.getDefaultConnection as Mock).mockResolvedValue(
       mockConnection,
     );
   });

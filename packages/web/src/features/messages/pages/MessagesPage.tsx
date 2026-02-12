@@ -21,6 +21,7 @@ import {
 import { ScrollArea } from "@shared/components/ui/scroll-area";
 import { cn } from "@shared/utils/cn";
 import { type SplitMode, useUIStore } from "@state/index.ts";
+import { useShallow } from "zustand/shallow";
 import { Columns, Hash, ListX, Rows, Search, Users, X } from "lucide-react";
 import type React from "react";
 import { Activity, useEffect, useMemo, useState } from "react";
@@ -50,7 +51,7 @@ export default function MessagesPage() {
   const { channels: dbChannels } = useChannels(myNodeNum);
   const { conversations } = useConversations(myNodeNum);
 
-  const openTabs = useUIStore((state) => state.messageTabs);
+  const openTabs = useUIStore(useShallow((state) => state.messageTabs));
   const activeTabId = useUIStore((state) => state.activeMessageTabId);
   const secondaryTabId = useUIStore((state) => state.secondaryMessageTabId);
   const splitMode = useUIStore((state) => state.messageSplitMode);

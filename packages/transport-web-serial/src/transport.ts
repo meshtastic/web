@@ -26,6 +26,7 @@ export class TransportWebSerial implements Types.Transport {
   public static async create(baudRate?: number): Promise<TransportWebSerial> {
     const port = await navigator.serial.requestPort();
     await port.open({ baudRate: baudRate || 115200 });
+    await TransportWebSerial.sendWakeBytes(port);
     return new TransportWebSerial(port);
   }
 
@@ -37,10 +38,37 @@ export class TransportWebSerial implements Types.Transport {
     port: SerialPort,
     baudRate?: number,
   ): Promise<TransportWebSerial> {
+    const streamsLocked = port.readable?.locked || port.writable?.locked;
+
+    if (streamsLocked) {
+      // Streams locked from a previous connection — close and reopen
+      try {
+        await port.close();
+      } catch {
+        /* port.close() releases locks internally */
+      }
+    }
+
     if (!port.readable || !port.writable) {
       await port.open({ baudRate: baudRate || 115200 });
     }
+
+    await TransportWebSerial.sendWakeBytes(port);
     return new TransportWebSerial(port);
+  }
+
+  /**
+   * Sends wake bytes to rouse a sleeping device before establishing streams.
+   * Must be called before the constructor, which locks the writable stream via pipeTo().
+   */
+  private static async sendWakeBytes(port: SerialPort): Promise<void> {
+    if (!port.writable || port.writable.locked) return;
+    const writer = port.writable.getWriter();
+    try {
+      await writer.write(new Uint8Array([0x94, 0x94, 0x94, 0x94]));
+    } finally {
+      writer.releaseLock();
+    }
   }
 
   /**
@@ -177,48 +205,6 @@ export class TransportWebSerial implements Types.Transport {
     } finally {
       this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
       this.closingByUser = false;
-    }
-  }
-
-  /**
-   * Reconnects the transport by creating a new AbortController and re-establishing
-   * the pipe connection. Only call this after disconnect() or if the connection failed.
-   */
-  public async reconnect() {
-    this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting, "reconnect");
-
-    try {
-      if (!this.connection.readable || !this.connection.writable) {
-        throw new Error("Stream not accessible");
-      }
-      this.portReadable = this.connection.readable;
-
-      this.abortController = new AbortController();
-      const abortController = this.abortController;
-
-      const toDeviceTransform = Utils.toDeviceStream();
-      this.pipePromise = toDeviceTransform.readable
-        .pipeTo(this.connection.writable, {
-          signal: this.abortController.signal,
-        })
-        .catch((error) => {
-          if (abortController.signal.aborted) {
-            return;
-          }
-          console.error("Error piping data to serial port (reconnect):", error);
-          this.emitStatus(
-            Types.DeviceStatusEnum.DeviceDisconnected,
-            "write-error",
-          );
-        });
-
-      this.emitStatus(Types.DeviceStatusEnum.DeviceConnected, "reconnected");
-    } catch (error) {
-      this.emitStatus(
-        Types.DeviceStatusEnum.DeviceDisconnected,
-        "reconnect-failed",
-      );
-      throw error;
     }
   }
 }

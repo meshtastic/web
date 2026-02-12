@@ -44,9 +44,18 @@ const MODULE_CONFIG_SET = new Set<string>(MODULE_CONFIG_TYPES);
 export const TOTAL_CONFIG_COUNT =
   DEVICE_CONFIG_TYPES.length + MODULE_CONFIG_TYPES.length;
 
+export type ConnectionPhase =
+  | "initializing"
+  | "waitingForDevice"
+  | "receivingConfig"
+  | "syncingNetwork"
+  | "connected";
+
 export interface ConfigProgress {
   receivedConfigs: Set<string>;
   total: number;
+  phase: ConnectionPhase;
+  lastReceivedConfig: string | null;
 }
 
 export function getConfigProgressPercent(progress: ConfigProgress): number {
@@ -95,6 +104,7 @@ export interface Device extends DeviceData {
 
   setConnectionId: (id: ConnectionId | null) => void;
   resetConfigProgress: () => void;
+  setConnectionPhase: (phase: ConnectionPhase) => void;
   setConfig: (config: Protobuf.Config.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
@@ -209,6 +219,8 @@ function deviceFactory(
     configProgress: {
       receivedConfigs: new Set<string>(),
       total: TOTAL_CONFIG_COUNT,
+      phase: "initializing",
+      lastReceivedConfig: null,
     },
     config: data?.config ?? create(Protobuf.LocalOnly.LocalConfigSchema),
     moduleConfig:
@@ -246,7 +258,19 @@ function deviceFactory(
             device.configProgress = {
               receivedConfigs: new Set<string>(),
               total: TOTAL_CONFIG_COUNT,
+              phase: "initializing",
+              lastReceivedConfig: null,
             };
+          }
+        }),
+      );
+    },
+    setConnectionPhase: (phase: ConnectionPhase) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.device;
+          if (device) {
+            device.configProgress.phase = phase;
           }
         }),
       );
@@ -273,6 +297,9 @@ function deviceFactory(
             device.configProgress.receivedConfigs.add(
               `config:${config.payloadVariant.case}`,
             );
+            device.configProgress.phase = "receivingConfig";
+            device.configProgress.lastReceivedConfig =
+              config.payloadVariant.case;
           }
 
           switch (config.payloadVariant.case) {
@@ -327,6 +354,9 @@ function deviceFactory(
               device.configProgress.receivedConfigs.add(
                 `moduleConfig:${config.payloadVariant.case}`,
               );
+              device.configProgress.phase = "receivingConfig";
+              device.configProgress.lastReceivedConfig =
+                config.payloadVariant.case;
             }
 
             switch (config.payloadVariant.case) {

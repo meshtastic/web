@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import {
-  useEffectiveConfig,
+  mergeConfigChanges,
   usePendingChanges,
 } from "@data/hooks/usePendingChanges.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -19,12 +19,28 @@ import {
 
 export function useNetworkForm() {
   const { myNodeNum } = useMyNode();
-  const { config: dbEffectiveConfig, baseConfig: dbBaseConfig } =
-    useEffectiveConfig(myNodeNum, "network");
   const device = useDevice();
-  const baseConfig = dbBaseConfig ?? device.config.network ?? null;
-  const effectiveConfig = dbEffectiveConfig ?? baseConfig;
-  const { saveChange, clearChange } = usePendingChanges(myNodeNum);
+
+  // Use device store config directly (most up-to-date from device)
+  const baseConfig = device?.config?.network ?? null;
+
+  // Merge pending changes into base config
+  const { pendingChanges, saveChange, clearChange } =
+    usePendingChanges(myNodeNum);
+  const networkChanges = useMemo(
+    () =>
+      pendingChanges.filter(
+        (c) => c.changeType === "config" && c.variant === "network",
+      ),
+    [pendingChanges],
+  );
+  const effectiveConfig = useMemo(() => {
+    if (!baseConfig) return null;
+    return mergeConfigChanges(
+      baseConfig as Record<string, unknown>,
+      networkChanges,
+    ) as typeof baseConfig;
+  }, [baseConfig, networkChanges]);
 
   const toFormValues = useCallback(
     (
@@ -74,7 +90,10 @@ export function useNetworkForm() {
     [effectiveConfig, toFormValues],
   );
 
-  const isReady = baseConfig !== undefined && baseConfig !== null;
+  // Check if network config has been received from the device
+  const hasReceivedConfig =
+    device?.configProgress?.receivedConfigs?.has("config:network") ?? false;
+  const isReady = hasReceivedConfig;
 
   const form = useForm<NetworkValidation>({
     mode: "onChange",
@@ -148,7 +167,7 @@ export function useNetworkForm() {
 
     const subscription = watch(onFormChange);
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [watch, onFormChange]);
 
   // Subscribe to pending field resets from activity undo
   const pendingReset = useUIStore((s) => s.pendingFieldReset);

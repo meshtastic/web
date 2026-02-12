@@ -628,49 +628,9 @@ export type TracerouteLog = typeof tracerouteLogs.$inferSelect;
 export type NewTracerouteLog = typeof tracerouteLogs.$inferInsert;
 
 /**
- * Device configs - cached device and module configuration
- * Enables instant UI on reconnect and change detection
- */
-export const deviceConfigs = sqliteTable(
-  "device_configs",
-  {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-
-    // Device identity - the node number of the device that owns this config
-    ownerNodeNum: integer("owner_node_num")
-      .notNull()
-      .references(() => devices.nodeNum, { onDelete: "cascade" }),
-
-    // Config data (stored as JSON)
-    config: text("config", { mode: "json" }).notNull(), // LocalConfig
-    moduleConfig: text("module_config", { mode: "json" }).notNull(), // LocalModuleConfig
-
-    // Sync metadata
-    configHash: text("config_hash"), // SHA-256 for quick comparison
-    configVersion: integer("config_version"), // From firmware (when available)
-
-    // Firmware info
-    firmwareVersion: text("firmware_version"),
-
-    // Timestamps
-    lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }).notNull(),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
-  },
-  (table) => [
-    // One config cache per device
-    unique("device_configs_owner_unique").on(table.ownerNodeNum),
-    index("device_configs_owner_idx").on(table.ownerNodeNum),
-  ],
-);
-
-/**
- * Config changes - track pending local changes separately from synced config
- * Enables preserving unsaved edits across reconnects and detecting conflicts
+ * Config changes - track pending local changes
+ * Enables preserving unsaved edits across reconnects
+ * Note: Config itself is stored in Zustand, not the database
  */
 export const configChanges = sqliteTable(
   "config_changes",
@@ -692,11 +652,6 @@ export const configChanges = sqliteTable(
     value: text("value", { mode: "json" }).notNull(),
     originalValue: text("original_value", { mode: "json" }),
 
-    hasConflict: integer("has_conflict", { mode: "boolean" })
-      .notNull()
-      .default(false),
-    remoteValue: text("remote_value", { mode: "json" }), // Value from device when conflict detected
-
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
@@ -714,15 +669,8 @@ export const configChanges = sqliteTable(
       table.fieldPath,
     ),
     index("config_changes_owner_idx").on(table.ownerNodeNum),
-    index("config_changes_conflict_idx").on(
-      table.ownerNodeNum,
-      table.hasConflict,
-    ),
   ],
 );
-
-export type DeviceConfig = typeof deviceConfigs.$inferSelect;
-export type NewDeviceConfig = typeof deviceConfigs.$inferInsert;
 
 export type ConfigChange = typeof configChanges.$inferSelect;
 export type NewConfigChange = typeof configChanges.$inferInsert;
@@ -776,92 +724,6 @@ export const messageReactions = sqliteTable(
 
 export type Reaction = typeof messageReactions.$inferSelect;
 export type NewReaction = typeof messageReactions.$inferInsert;
-
-/**
- * Config hashes - Merkle tree leaf hashes for efficient config change detection
- * Stores per-leaf hashes to enable quick diff detection without deep object comparison
- */
-export const configHashes = sqliteTable(
-  "config_hashes",
-  {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-
-    // Device identity - the node number of the device that owns this config
-    ownerNodeNum: integer("owner_node_num")
-      .notNull()
-      .references(() => devices.nodeNum, { onDelete: "cascade" }),
-
-    // Leaf key - identifies which config this hash is for
-    // e.g., "config:device", "moduleConfig:mqtt", "channel:0", "user"
-    leafKey: text("leaf_key").notNull(),
-
-    // Hash value - cyrb53 hash of the config content
-    hash: text("hash").notNull(),
-
-    // Timestamps
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
-  },
-  (table) => [
-    // One hash per leaf per device
-    unique("config_hashes_owner_leaf_unique").on(
-      table.ownerNodeNum,
-      table.leafKey,
-    ),
-    // Query all hashes for a device
-    index("config_hashes_owner_idx").on(table.ownerNodeNum),
-  ],
-);
-
-export type ConfigHash = typeof configHashes.$inferSelect;
-export type NewConfigHash = typeof configHashes.$inferInsert;
-
-/**
- * Working hashes - Merkle tree leaf hashes for pending config changes
- * Separate from config_hashes (base) to enable efficient change detection
- */
-export const workingHashes = sqliteTable(
-  "working_hashes",
-  {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-
-    // Device identity - the node number of the device that owns this config
-    ownerNodeNum: integer("owner_node_num")
-      .notNull()
-      .references(() => devices.nodeNum, { onDelete: "cascade" }),
-
-    // Leaf key - identifies which config this hash is for
-    // e.g., "config:device", "moduleConfig:mqtt", "channel:0", "user"
-    leafKey: text("leaf_key").notNull(),
-
-    // Hash value - cyrb53 hash of the config content (including pending changes)
-    hash: text("hash").notNull(),
-
-    // Timestamps
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
-  },
-  (table) => [
-    // One hash per leaf per device
-    unique("working_hashes_owner_leaf_unique").on(
-      table.ownerNodeNum,
-      table.leafKey,
-    ),
-    // Query all hashes for a device
-    index("working_hashes_owner_idx").on(table.ownerNodeNum),
-  ],
-);
-
-export type WorkingHash = typeof workingHashes.$inferSelect;
-export type NewWorkingHash = typeof workingHashes.$inferInsert;
 
 /**
  * Notification sounds - user-uploaded audio files for notification slots
