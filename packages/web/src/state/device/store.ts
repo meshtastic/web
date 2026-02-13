@@ -178,10 +178,6 @@ export interface DeviceState {
 
   // Connection management
   setConnection: (connection: MeshDevice) => void;
-
-  // Active connection tracking (connections now stored in SQLite)
-  activeConnectionId: ConnectionId | null;
-  setActiveConnectionId: (id: ConnectionId | null) => void;
 }
 
 // Internal state includes backward-compat fields during migration
@@ -195,7 +191,6 @@ interface PrivateDeviceState extends DeviceState {
   getDevice: (id: number) => Device | undefined;
   setActiveDeviceId: (id: number) => void;
   getActiveDeviceId: () => number;
-  getActiveConnectionId: () => ConnectionId | null;
 }
 
 function deviceFactory(
@@ -916,7 +911,6 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   // Legacy fields - kept during migration
   devices: new Map(),
   activeDeviceId: 0,
-  activeConnectionId: null,
 
   addDevice: (id) => {
     const existing = get().device;
@@ -966,15 +960,6 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
     );
   },
   getActiveDeviceId: () => get().activeDeviceId,
-
-  setActiveConnectionId: (id) => {
-    set(
-      produce<PrivateDeviceState>((draft) => {
-        draft.activeConnectionId = id;
-      }),
-    );
-  },
-  getActiveConnectionId: () => get().activeConnectionId,
 });
 
 // LEAVE THIS HERE FOR NOW
@@ -1039,11 +1024,4 @@ export const deviceActions = {
   /** Set the MeshDevice connection on the current device. */
   setConnection: (connection: MeshDevice) =>
     useDeviceStore.getState().setConnection(connection),
-
-  /** Set the active connection ID. */
-  setActiveConnectionId: (id: ConnectionId | null) =>
-    useDeviceStore.getState().setActiveConnectionId(id),
-
-  /** Get the active connection ID. */
-  getActiveConnectionId: () => useDeviceStore.getState().activeConnectionId,
 };

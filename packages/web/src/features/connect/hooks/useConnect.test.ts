@@ -24,7 +24,6 @@ vi.mock("@data/repositories", () => ({
 }));
 
 // Mock Stores
-const mockSetActiveConnectionId = vi.fn();
 const mockSetActiveDeviceId = vi.fn();
 const mockAddDevice = vi.fn();
 
@@ -33,14 +32,12 @@ vi.mock("@state/index.ts", () => ({
     vi.fn((selector) => {
       if (selector) {
         return selector({
-          setActiveConnectionId: mockSetActiveConnectionId,
           setActiveDeviceId: mockSetActiveDeviceId,
           activeDeviceId: 123,
           addDevice: mockAddDevice,
         });
       }
       return {
-        setActiveConnectionId: mockSetActiveConnectionId,
         setActiveDeviceId: mockSetActiveDeviceId,
         activeDeviceId: 123,
         addDevice: mockAddDevice,
@@ -92,23 +89,23 @@ describe("useConnect", () => {
     vi.clearAllMocks();
 
     // Setup default store mocks
-    (useDeviceStore as unknown as Mock).mockImplementation((selector: any) => {
-      if (selector) {
-        return selector({
-          setActiveConnectionId: mockSetActiveConnectionId,
+    (useDeviceStore as unknown as Mock).mockImplementation(
+      (selector: (state: Record<string, unknown>) => unknown) => {
+        if (selector) {
+          return selector({
+            setActiveDeviceId: mockSetActiveDeviceId,
+            activeDeviceId: 0,
+            addDevice: mockAddDevice,
+          });
+        }
+        return {
           setActiveDeviceId: mockSetActiveDeviceId,
           activeDeviceId: 0,
           addDevice: mockAddDevice,
-        });
-      }
-      return {
-        setActiveConnectionId: mockSetActiveConnectionId,
-        setActiveDeviceId: mockSetActiveDeviceId,
-        activeDeviceId: 0,
-        addDevice: mockAddDevice,
-      };
-    });
-    (useDeviceStore as any).getState.mockReturnValue({
+        };
+      },
+    );
+    (useDeviceStore as unknown as { getState: Mock }).getState.mockReturnValue({
       getDevice: vi.fn(),
       removeDevice: vi.fn(),
     });

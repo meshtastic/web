@@ -1,10 +1,14 @@
-import { useConnection } from "@features/connect/hooks/useConnect";
+import {
+  useConnectionByNodeNum,
+  useDeviceDisconnectDetection,
+  useDeviceReconnectionDetection,
+} from "@features/connect/hooks";
 import { ConnectionService } from "@features/connect/services";
 import { Button } from "@shared/components/ui/button";
-import { useDeviceStore } from "@state/device/store";
-import { LoaderCircleIcon, RefreshCwIcon, WifiOffIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { LoaderCircleIcon, RotateCw, WifiOffIcon } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useParams } from "@tanstack/react-router";
 import { DialogWrapper } from "./DialogWrapper";
 
 export interface DeviceRebootDialogProps {
@@ -14,43 +18,69 @@ export interface DeviceRebootDialogProps {
 
 type RebootPhase = "rebooting" | "disconnected" | "reconnecting";
 
+// How long to wait for a disconnect before assuming the device rebooted
+// without losing the transport (e.g. serial over USB stays connected).
+const REBOOT_TIMEOUT_MS = 10_000;
+
 export const DeviceRebootDialog = ({
   open,
   onOpenChange,
 }: DeviceRebootDialogProps) => {
   const { t } = useTranslation("dialog");
-  const connectionId = useDeviceStore((s) => s.activeConnectionId);
-  const { connection } = useConnection(connectionId ?? 0);
+  const params = useParams({ strict: false });
+  const nodeNum = params.nodeNum ? Number(params.nodeNum) : null;
+  const { connection } = useConnectionByNodeNum(nodeNum);
   const [phase, setPhase] = useState<RebootPhase>("rebooting");
   const [reconnectError, setReconnectError] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
-  // Reset phase when dialog opens
+  // Reset phase when dialog opens, start reboot timeout
   useEffect(() => {
     if (open) {
       setPhase("rebooting");
       setReconnectError(false);
-    }
-  }, [open]);
 
-  // Watch connection status and transition phases
-  useEffect(() => {
+      timeoutRef.current = setTimeout(() => {
+        // If still in "rebooting" after timeout, the transport stayed alive
+        // (serial USB). Close the dialog — the device has rebooted in place.
+        setPhase((current) => {
+          if (current === "rebooting") {
+            onOpenChange(false);
+          }
+          return current;
+        });
+      }, REBOOT_TIMEOUT_MS);
+    }
+
+    return () => clearTimeout(timeoutRef.current);
+  }, [open, onOpenChange]);
+
+  // Listen for disconnect events to transition from rebooting to disconnected
+  useDeviceDisconnectDetection(() => {
     if (!open) return;
 
-    const status = connection?.status;
-    if (
-      phase === "rebooting" &&
-      (status === "disconnected" || status === "error")
-    ) {
-      setPhase("disconnected");
-    }
+    setPhase((current) => {
+      if (current === "rebooting") {
+        clearTimeout(timeoutRef.current);
+        return "disconnected";
+      }
+      return current;
+    });
+  });
 
-    if (
-      phase === "reconnecting" &&
-      (status === "connected" || status === "configured")
-    ) {
-      onOpenChange(false);
-    }
-  }, [open, connection?.status, phase, onOpenChange]);
+  // Listen for reconnection events to auto-close the dialog
+  useDeviceReconnectionDetection(() => {
+    if (!open) return;
+
+    setPhase((current) => {
+      if (current === "reconnecting") {
+        onOpenChange(false);
+      }
+      return current;
+    });
+  });
 
   const handleReconnect = useCallback(async () => {
     if (!connection) return;
@@ -66,6 +96,12 @@ export const DeviceRebootDialog = ({
       setPhase("disconnected");
       setReconnectError(true);
     }
+  }, [connection]);
+
+  const handleCancel = useCallback(async () => {
+    if (!connection) return;
+    setPhase("disconnected");
+    await ConnectionService.disconnect(connection);
   }, [connection]);
 
   const description = (() => {
@@ -102,14 +138,30 @@ export const DeviceRebootDialog = ({
                 {t("deviceReboot.close")}
               </Button>
               <Button onClick={handleReconnect}>
-                <RefreshCwIcon className="mr-2" size={16} />
+                <RotateCw className="mr-2 size-4" />
                 {t("deviceReboot.reconnect")}
               </Button>
             </div>
           </>
         )}
         {phase === "reconnecting" && (
-          <LoaderCircleIcon className="size-8 animate-spin text-muted-foreground" />
+          <>
+            <WifiOffIcon className="size-8 text-muted-foreground" />
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2 justify-center">
+                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                  {t("deviceReboot.close")}
+                </Button>
+                <Button disabled>
+                  <RotateCw className="mr-2 size-4 animate-spin" />
+                  {t("deviceReboot.reconnectingButton")}
+                </Button>
+              </div>
+              <Button variant="ghost" className="w-full" onClick={handleCancel}>
+                {t("deviceReboot.cancel")}
+              </Button>
+            </div>
+          </>
         )}
       </div>
     </DialogWrapper>

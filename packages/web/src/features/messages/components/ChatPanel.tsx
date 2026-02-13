@@ -153,8 +153,15 @@ export function ChatPanel({ contact, showHeader = true }: ChatPanelProps) {
     [sortedMessages, t, dayLabelFmt],
   );
 
-  // Get the newest message ID (stable value for effect dependency)
-  const newestMessageId = sortedMessages[0]?.id;
+  // Get the highest message ID (for marking conversation as read)
+  // We use max(id) instead of the first sorted message's id because:
+  // - Messages are sorted by date, but unread count uses id > lastReadId
+  // - If messages arrive out of order, date order != id order
+  // - Using max(id) ensures all visible messages are marked as read
+  const newestMessageId = useMemo(() => {
+    if (currentMessages.length === 0) return undefined;
+    return Math.max(...currentMessages.map((m) => m.id));
+  }, [currentMessages]);
 
   // Mark conversation as read when viewing it
   // Only runs when contact changes OR a new message arrives (newestMessageId changes)

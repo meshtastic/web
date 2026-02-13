@@ -47,6 +47,13 @@ export class ConnectionRepository {
       .where(eq(connections.isDefault, true));
   }
 
+  buildConnectionByNodeNumQuery(nodeNum: number) {
+    return this.db
+      .select()
+      .from(connections)
+      .where(eq(connections.nodeNum, nodeNum));
+  }
+
   async getConnections(): Promise<Connection[]> {
     return this.db
       .select()
@@ -91,6 +98,18 @@ export class ConnectionRepository {
       .from(connections)
       .where(isNotNull(connections.lastConnectedAt))
       .orderBy(desc(connections.lastConnectedAt))
+      .limit(1);
+
+    return result[0];
+  }
+
+  async getConnectionByNodeNum(
+    nodeNum: number,
+  ): Promise<Connection | undefined> {
+    const result = await this.db
+      .select()
+      .from(connections)
+      .where(eq(connections.nodeNum, nodeNum))
       .limit(1);
 
     return result[0];

@@ -215,6 +215,24 @@ export function useDefaultConnection() {
 }
 
 /**
+ * Hook to fetch a connection by nodeNum (reactive)
+ * Returns undefined connection when nodeNum is null
+ */
+export function useConnectionByNodeNum(nodeNum: number | null) {
+  // Use nodeNum 0 as a fallback (no connection will have nodeNum 0)
+  // This ensures we always have a valid query for useReactiveSQL
+  const effectiveNodeNum = nodeNum ?? 0;
+  const query = useMemo(
+    () => connectionRepo.buildConnectionByNodeNumQuery(effectiveNodeNum),
+    [effectiveNodeNum],
+  );
+  const { data } = useReactiveSQL(connectionRepo.getClient(), query);
+
+  // Return undefined if nodeNum was null (disabled state)
+  return { connection: nodeNum !== null ? data?.[0] : undefined };
+}
+
+/**
  * Reset all connection statuses on app startup
  */
 export async function resetConnectionStatuses(): Promise<void> {

@@ -1,5 +1,9 @@
 import { SidebarInset } from "@app/shared/components/ui/sidebar.tsx";
-import { ConnectPage, useConnect } from "@features/connect";
+import {
+  ConnectPage,
+  useConnect,
+  useDeviceStatusEvents,
+} from "@features/connect";
 import { MessagesPage } from "@features/messages";
 import { ErrorPage } from "@shared/components/ui/error-page";
 import { Spinner } from "@shared/components/ui/spinner";
@@ -48,11 +52,14 @@ function RouteLoader() {
 }
 
 /**
- * Handles auto-reconnect and navigation intent subscriptions
+ * Handles auto-reconnect, navigation intent subscriptions, and device status events
  */
 function ConnectedLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Subscribe to device status events (disconnect detection)
+  useDeviceStatusEvents();
 
   const handleNavigationIntent = useCallback(
     (intent: { nodeNum: number }) => {

@@ -280,7 +280,10 @@ const TAB_META: Array<{ key: TabKey; label: string; Icon: LucideIcon }> = [
   { key: "http", label: "HTTP", Icon: Globe },
   { key: "bluetooth", label: "Bluetooth", Icon: Bluetooth },
   { key: "serial", label: "Serial", Icon: Cable },
-  { key: "demo", label: "Demo", Icon: Play },
+  // Demo transport is only available in development mode
+  ...(import.meta.env.DEV
+    ? [{ key: "demo" as const, label: "Demo", Icon: Play }]
+    : []),
 ];
 
 export function AddConnectionDialog({

@@ -227,6 +227,19 @@
     "reconnected": "Successfully reconnected to the device.",
     "reconnectFailed": "Unable to reconnect. The device may still be rebooting. Try again in a few seconds.",
     "reconnect": "Reconnect",
+    "reconnectingButton": "Reconnecting...",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "deviceDisconnect": {
+    "title": "Device Disconnected",
+    "description": "The connection to your device has been lost.",
+    "reconnecting": "Reconnecting to device...",
+    "reconnectFailed": "Unable to reconnect. Please check your device and try again.",
+    "reconnect": "Reconnect",
+    "reconnectingButton": "Reconnecting...",
+    "cancel": "Cancel",
+    "goToConnections": "Go to Connections",
     "close": "Close"
   }
 }

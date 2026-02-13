@@ -17,6 +17,7 @@ import { RemoveNodeDialog } from "./RemoveNodeDialog.tsx";
 import { ResetNodeDbDialog } from "./ResetNodeDbDialog/ResetNodeDbDialog.tsx";
 import { ShutdownDialog } from "./ShutdownDialog.tsx";
 import { TracerouteResponseDialog } from "./TracerouteResponseDialog.tsx";
+import { DeviceDisconnectDialog } from "./DeviceDisconnectDialog.tsx";
 import { DeviceRebootDialog } from "./DeviceRebootDialog.tsx";
 import { UnsafeRolesDialog } from "./UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 
@@ -134,6 +135,12 @@ export const DialogManager = () => {
         open={dialogs.deviceReboot}
         onOpenChange={(open) => {
           setDialogOpen("deviceReboot", open);
+        }}
+      />
+      <DeviceDisconnectDialog
+        open={dialogs.deviceDisconnect}
+        onOpenChange={(open) => {
+          setDialogOpen("deviceDisconnect", open);
         }}
       />
     </>
