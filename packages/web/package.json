@@ -108,7 +108,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.14",
     "tailwindcss-animate": "^1.0.7",
-    "tar": "^7.5.7",
+    "tar": "^7.5.8",
     "testing-library": "^0.0.2",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
