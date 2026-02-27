@@ -40,24 +40,77 @@ export function createConnectionFromInput(input: NewConnection): Connection {
   };
 }
 
+export type ReachabilityFailureReason =
+  | "timeout"
+  | "cors"
+  | "http-error"
+  | "network";
+
+export type ReachabilityResult =
+  | { reachable: true }
+  | { reachable: false; reason: ReachabilityFailureReason };
+
 export async function testHttpReachable(
   url: string,
-  timeoutMs = 2500,
-): Promise<boolean> {
+  timeoutMs = 3000,
+  signal?: AbortSignal,
+): Promise<ReachabilityResult> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  // Forward external abort into our controller
+  if (signal) {
+    if (signal.aborted) {
+      controller.abort();
+    } else {
+      signal.addEventListener("abort", () => controller.abort(), {
+        once: true,
+      });
+    }
+  }
+
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    // Use no-cors to avoid CORS failure; opaque responses resolve but status is 0
-    await fetch(url, {
+    const response = await fetch(`${url}/api/v1/fromradio`, {
       method: "GET",
-      mode: "no-cors",
       cache: "no-store",
       signal: controller.signal,
     });
     clearTimeout(timer);
-    return true;
-  } catch {
-    return false;
+    if (!response.ok) {
+      return { reachable: false, reason: "http-error" };
+    }
+    return { reachable: true };
+  } catch (err) {
+    clearTimeout(timer);
+    if (
+      err instanceof DOMException &&
+      (err.name === "AbortError" || err.name === "TimeoutError")
+    ) {
+      return { reachable: false, reason: "timeout" };
+    }
+    if (err instanceof TypeError) {
+      return { reachable: false, reason: "cors" };
+    }
+    return { reachable: false, reason: "network" };
+  }
+}
+
+export function httpReachabilityMessage(
+  url: string,
+  reason: ReachabilityFailureReason,
+): string {
+  const isHTTPS = url.startsWith("https:");
+  switch (reason) {
+    case "timeout":
+      return "Device did not respond. Make sure it is powered on and connected to the same network.";
+    case "cors":
+      return isHTTPS
+        ? `Cannot reach device over HTTPS. If using a self-signed certificate, open ${url} in a new tab, accept the certificate warning, then try again.`
+        : "Cannot reach device. Check that the address is correct and the device is on the same network.";
+    case "http-error":
+      return "Device responded with an error. It may be busy or running incompatible firmware.";
+    case "network":
+      return "Network error. Check your connection and the device address.";
   }
 }
 

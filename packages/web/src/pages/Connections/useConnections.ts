@@ -6,6 +6,7 @@ import type {
 } from "@app/core/stores/deviceStore/types";
 import {
   createConnectionFromInput,
+  httpReachabilityMessage,
   testHttpReachable,
 } from "@app/pages/Connections/utils";
 import {
@@ -269,14 +270,9 @@ export function useConnections() {
       updateStatus(id, "connecting");
       try {
         if (conn.type === "http") {
-          const ok = await testHttpReachable(conn.url);
-          if (!ok) {
-            const url = new URL(conn.url);
-            const isHTTPS = url.protocol === "https:";
-            const message = isHTTPS
-              ? `Cannot reach HTTPS endpoint. If using a self-signed certificate, open ${conn.url} in a new tab, accept the certificate warning, then try connecting again.`
-              : "HTTP endpoint not reachable (may be blocked by CORS)";
-            throw new Error(message);
+          const result = await testHttpReachable(conn.url);
+          if (!result.reachable) {
+            throw new Error(httpReachabilityMessage(conn.url, result.reason));
           }
 
           const url = new URL(conn.url);
@@ -535,9 +531,12 @@ export function useConnections() {
           c.status !== "configuring",
       )
       .map(async (c) => {
-        const ok = await testHttpReachable(c.url);
+        const result = await testHttpReachable(c.url);
         updateSavedConnection(c.id, {
-          status: ok ? "online" : "error",
+          status: result.reachable ? "online" : "error",
+          error: result.reachable
+            ? undefined
+            : httpReachabilityMessage(c.url, result.reason),
         });
       });
 

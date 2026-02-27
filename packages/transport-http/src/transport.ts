@@ -43,15 +43,47 @@ export class TransportHTTP implements Types.Transport {
    *
    * @param address Hostname or IP address (with optional port).
    * @param tls Use HTTPS if true, HTTP otherwise.
+   * @param timeoutMs Probe timeout in milliseconds (default 5000).
    */
   public static async create(
     address: string,
     tls?: boolean,
+    timeoutMs = 5000,
   ): Promise<TransportHTTP> {
     const connectionUrl = `${tls ? "https" : "http"}://${address}`;
-    await fetch(`${connectionUrl}/api/v1/toradio`, {
-      method: "OPTIONS",
-    });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(`${connectionUrl}/api/v1/fromradio`, {
+        method: "GET",
+        headers: { Accept: "application/x-protobuf" },
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (!response.ok) {
+        throw new Error(
+          `Device returned HTTP ${response.status}. It may be busy or running incompatible firmware.`,
+        );
+      }
+    } catch (err) {
+      clearTimeout(timer);
+      if (
+        err instanceof DOMException &&
+        (err.name === "AbortError" || err.name === "TimeoutError")
+      ) {
+        throw new Error(
+          "Device did not respond within the timeout. Make sure it is powered on and reachable.",
+        );
+      }
+      if (err instanceof TypeError) {
+        const isHTTPS = tls === true;
+        const hint = isHTTPS
+          ? ` If using a self-signed certificate, open ${connectionUrl} in a new tab and accept the warning first.`
+          : "";
+        throw new Error(`Cannot reach device at ${connectionUrl}.${hint}`);
+      }
+      throw err;
+    }
     return new TransportHTTP(connectionUrl);
   }
 
