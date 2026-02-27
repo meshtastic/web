@@ -54,10 +54,6 @@ function stubFetch() {
   const mockFetch = vi.fn(async (url: string, init?: RequestInit) => {
     const method = (init?.method ?? "GET").toUpperCase();
 
-    if (url.includes("/api/v1/toradio") && method === "OPTIONS") {
-      return { ok: true, status: 204 } as Response;
-    }
-
     if (url.includes("/api/v1/toradio") && method === "PUT") {
       lastWritten = init?.body as ArrayBuffer;
       return { ok: true, status: 200 } as Response;
@@ -243,5 +239,69 @@ describe("TransportHTTP (extras)", () => {
 
     reader.releaseLock();
     await transport.disconnect();
+  });
+});
+
+describe("TransportHTTP.create() error handling", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it("rejects with timeout error when probe hangs", async () => {
+    vi.useFakeTimers();
+    const mockFetch = vi.fn(
+      (_url: string, init?: RequestInit) =>
+        new Promise<Response>((_, reject) => {
+          const abort = () => reject(new DOMException("Aborted", "AbortError"));
+          if (init?.signal?.aborted) {
+            abort();
+            return;
+          }
+          init?.signal?.addEventListener("abort", abort, { once: true });
+        }),
+    );
+    vi.stubGlobal("fetch", mockFetch);
+
+    const promise = TransportHTTP.create("192.168.1.1", false, 1000);
+    // Set up the assertion before advancing timers so the rejection is caught
+    const assertion = expect(promise).rejects.toThrow(/did not respond/);
+    await vi.advanceTimersByTimeAsync(1000);
+    await assertion;
+    vi.useRealTimers();
+  });
+
+  it("rejects with descriptive error on TypeError (CORS/network)", async () => {
+    const mockFetch = vi
+      .fn()
+      .mockRejectedValue(new TypeError("Failed to fetch"));
+    vi.stubGlobal("fetch", mockFetch);
+
+    await expect(TransportHTTP.create("192.168.1.1", false)).rejects.toThrow(
+      /Cannot reach device/,
+    );
+  });
+
+  it("rejects with HTTPS cert guidance on TypeError when TLS is true", async () => {
+    const mockFetch = vi
+      .fn()
+      .mockRejectedValue(new TypeError("Failed to fetch"));
+    vi.stubGlobal("fetch", mockFetch);
+
+    await expect(TransportHTTP.create("192.168.1.1", true)).rejects.toThrow(
+      /self-signed certificate/,
+    );
+  });
+
+  it("rejects when probe returns non-OK status", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+    } as Response);
+    vi.stubGlobal("fetch", mockFetch);
+
+    await expect(TransportHTTP.create("192.168.1.1", false)).rejects.toThrow(
+      /HTTP 503/,
+    );
   });
 });

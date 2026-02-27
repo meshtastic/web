@@ -4,7 +4,10 @@ import type {
   ConnectionType,
   NewConnection,
 } from "@app/core/stores/deviceStore/types.ts";
-import { testHttpReachable } from "@app/pages/Connections/utils";
+import {
+  httpReachabilityMessage,
+  testHttpReachable,
+} from "@app/pages/Connections/utils";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -45,6 +48,7 @@ type DialogState = {
   protocol: "http" | "https";
   url: string;
   testStatus: TestingStatus;
+  testAttempt: number;
   btSelected:
     | { id: string; name?: string; device?: BluetoothDevice }
     | undefined;
@@ -58,6 +62,7 @@ type DialogAction =
   | { type: "SET_PROTOCOL"; payload: "http" | "https" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
+  | { type: "SET_TEST_ATTEMPT"; payload: number }
   | {
       type: "SET_BT_SELECTED";
       payload:
@@ -164,6 +169,7 @@ const initialState: DialogState = {
   protocol: "http",
   url: "",
   testStatus: "idle",
+  testAttempt: 0,
   btSelected: undefined,
   serialSelected: undefined,
 };
@@ -193,6 +199,8 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
       return { ...state, url: action.payload };
     case "SET_TEST_STATUS":
       return { ...state, testStatus: action.payload };
+    case "SET_TEST_ATTEMPT":
+      return { ...state, testAttempt: action.payload };
     case "SET_BT_SELECTED":
       return { ...state, btSelected: action.payload };
     case "SET_SERIAL_SELECTED":
@@ -380,6 +388,7 @@ export default function AddConnectionDialog({
   }, [serialSupported, state.name, toast, makeToastErrorHandler, t]);
 
   const handleTestHttp = useCallback(async () => {
+    const MAX_ATTEMPTS = 3;
     const fullUrl = `${state.protocol}://${state.url}`;
     const validatedURL = urlOrIpv4Schema.safeParse(fullUrl);
     if (validatedURL.success === false) {
@@ -390,15 +399,26 @@ export default function AddConnectionDialog({
       return;
     }
     dispatch({ type: "SET_TEST_STATUS", payload: "testing" });
-    const reachable = await testHttpReachable(validatedURL.data);
-    if (reachable) {
-      dispatch({ type: "SET_TEST_STATUS", payload: "success" });
-    } else {
-      dispatch({ type: "SET_TEST_STATUS", payload: "failure" });
+
+    let lastResult: Awaited<ReturnType<typeof testHttpReachable>> | undefined;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      dispatch({ type: "SET_TEST_ATTEMPT", payload: attempt });
+      lastResult = await testHttpReachable(validatedURL.data);
+      if (lastResult.reachable) {
+        dispatch({ type: "SET_TEST_STATUS", payload: "success" });
+        dispatch({ type: "SET_TEST_ATTEMPT", payload: 0 });
+        return;
+      }
+    }
+
+    dispatch({ type: "SET_TEST_STATUS", payload: "failure" });
+    dispatch({ type: "SET_TEST_ATTEMPT", payload: 0 });
+    if (lastResult && !lastResult.reachable) {
       toast({
         title: t("addConnection.httpConnection.connectionTest.failure.title"),
-        description: t(
-          "addConnection.httpConnection.connectionTest.failure.description",
+        description: httpReachabilityMessage(
+          validatedURL.data,
+          lastResult.reason,
         ),
       });
     }
@@ -455,9 +475,11 @@ export default function AddConnectionDialog({
                 {state.testStatus === "testing" ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {t(
-                      "addConnection.httpConnection.connectionTest.button.loading",
-                    )}
+                    {state.testAttempt > 1
+                      ? `Attempt ${state.testAttempt} of 3…`
+                      : t(
+                          "addConnection.httpConnection.connectionTest.button.loading",
+                        )}
                   </>
                 ) : (
                   <>
