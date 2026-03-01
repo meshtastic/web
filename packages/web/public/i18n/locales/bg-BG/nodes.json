@@ -37,7 +37,7 @@
   "nodesTable": {
     "headings": {
       "longName": "Дълго име",
-      "connection": "Connection",
+      "connection": "Свързване",
       "lastHeard": "Последно чут",
       "encryption": "Криптиране",
       "model": "Модел",

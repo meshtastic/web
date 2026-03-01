@@ -1,238 +1,238 @@
 {
   "deleteMessages": {
-    "description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-    "title": "Clear All Messages"
+    "description": "此操作将清除所有消息历史记录。此操作无法撤销。您确定要继续吗？",
+    "title": "清除所有消息"
   },
   "import": {
-    "description": "The current LoRa configuration will be overridden.",
+    "description": "从Meshtastic URL导入频道集。<br />有效的Meshtasic URL以\"<italic>https://meshtastic.org/e/...</italic>\"开头",
     "error": {
-      "invalidUrl": "Invalid Meshtastic URL"
+      "invalidUrl": "无效的Meshtastic URL"
     },
     "channelPrefix": "Channel: ",
-    "primary": "Primary ",
-    "doNotImport": "No not import",
+    "primary": "主要 ",
+    "doNotImport": "没有导入",
     "channelName": "名称",
     "channelSlot": "槽位",
-    "channelSetUrl": "Channel Set/QR Code URL",
-    "useLoraConfig": "Import LoRa Config",
-    "presetDescription": "The current LoRa Config will be replaced.",
+    "channelSetUrl": "频道设置/QR 代码 URL",
+    "useLoraConfig": "导入 LoRa 配置",
+    "presetDescription": "当前的 LoRa 配置将被替换。",
     "title": "Import Channel Set"
   },
   "locationResponse": {
-    "title": "Location: {{identifier}}",
-    "altitude": "Altitude: ",
-    "coordinates": "Coordinates: ",
-    "noCoordinates": "No Coordinates"
+    "title": "位置:{{identifier}}",
+    "altitude": "海拔: ",
+    "coordinates": "坐标：",
+    "noCoordinates": "无坐标"
   },
   "pkiRegenerateDialog": {
-    "title": "Regenerate Pre-Shared Key?",
-    "description": "Are you sure you want to regenerate the pre-shared key?",
-    "regenerate": "Regenerate"
+    "title": "重新生成私钥?",
+    "description": "您确定要重新生成您的私钥吗？",
+    "regenerate": "重新生成"
   },
   "addConnection": {
-    "title": "Add connection",
-    "description": "Choose a connection type and fill in the details",
+    "title": "添加连接",
+    "description": "选择连接类型并填写详细信息",
     "validation": {
-      "requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
-      "requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
-      "requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
-      "additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
+      "requiresWebBluetooth": "此连接类型需要 <0>Web 蓝牙</0>。请使用支持的浏览器，例如Chrome或Edge。",
+      "requiresWebSerial": "此连接类型需要 <0>Web Serial</0>。请使用支持的浏览器，比如Chrome 或 Edge。",
+      "requiresSecureContext": "此应用程序需要 <0>安全上下文</0>。请使用 HTTPS 或 localhost 连接。",
+      "additionallyRequiresSecureContext": "此应用程序需要 <0>安全环境</0>。请使用 HTTPS 或 localhost 连接。"
     },
     "bluetoothConnection": {
-      "namePlaceholder": "My Bluetooth Node",
+      "namePlaceholder": "我的蓝牙节点",
       "supported": {
-        "title": "Web Bluetooth supported"
+        "title": "支持 Web 蓝牙"
       },
       "notSupported": {
-        "title": "Web Bluetooth not supported",
-        "description": "Your browser or device does not support Web Bluetooth"
+        "title": "不支持 Web 蓝牙",
+        "description": "您的浏览器或设备不支持 Web 蓝牙"
       },
-      "short": "BT: {{deviceName}}",
-      "long": "Bluetooth Device",
+      "short": "BT:{{deviceName}}",
+      "long": "蓝牙设备",
       "device": "设备",
-      "selectDevice": "Select device",
-      "selected": "Bluetooth device selected",
-      "notSelected": "No device selected",
-      "helperText": "Uses the Meshtastic Bluetooth service for discovery."
+      "selectDevice": "选择设备",
+      "selected": "已选择蓝牙设备",
+      "notSelected": "未选择设备",
+      "helperText": "使用Meshtastic 蓝牙服务进行发现。"
     },
     "serialConnection": {
-      "namePlaceholder": "My Serial Node",
-      "helperText": "Selecting a port grants permission so the app can open it to connect.",
+      "namePlaceholder": "我的串口节点",
+      "helperText": "选择一个端口授予权限，以便应用程序可以打开它进行连接。",
       "supported": {
-        "title": "Web Serial supported"
+        "title": "支持Web 串口"
       },
       "notSupported": {
-        "title": "Web Serial not supported",
-        "description": "Your browser or device does not support Web Serial"
+        "title": "不支持 Web 串口",
+        "description": "您的浏览器或设备不支持 Web 串口"
       },
       "portSelected": {
-        "title": "Serial port selected",
-        "description": "Port permissions granted."
+        "title": "选择串口端口",
+        "description": "已授予端口使用权限。"
       },
-      "port": "Port",
-      "selectPort": "Select port",
+      "port": "端口",
+      "selectPort": "选择端口",
       "deviceName": "USB {{vendorId}}:{{productId}}",
-      "notSelected": "No port selected"
+      "notSelected": "未选定端口"
     },
     "httpConnection": {
-      "namePlaceholder": "My HTTP Node",
-      "inputPlaceholder": "192.168.1.10 or meshtastic.local",
-      "heading": "URL or IP",
-      "useHttps": "Use HTTTPS",
+      "namePlaceholder": "我的 HTTP 节点",
+      "inputPlaceholder": "192.168.1.10 或 meshtastic.local",
+      "heading": "URL 或 IP",
+      "useHttps": "使用HTTPS",
       "invalidUrl": {
-        "title": "Invalid URL",
-        "description": "Please enter a valid HTTP or HTTPS URL."
+        "title": "无效的 URL",
+        "description": "请输入有效的HTTP或HTTPS URL。"
       },
       "connectionTest": {
-        "description": "Test the connetion before saving to verify the device is reachable.",
+        "description": "保存前测试接口，以验证设备是否可用。",
         "button": {
-          "loading": "Testing...",
-          "label": "Test connection"
+          "loading": "测试中……",
+          "label": "连接测试"
         },
-        "reachable": "Reachable",
-        "notReachable": "Not reachable",
+        "reachable": "可访问",
+        "notReachable": "无法访问",
         "success": {
-          "title": "Connection test successful",
-          "description": "The device appears to be reachable."
+          "title": "连接测试成功",
+          "description": "设备似乎是可访问的。"
         },
         "failure": {
-          "title": "Connection test failed",
-          "description": "Could not reach the device. Check the URL and try again."
+          "title": "连接测试失败",
+          "description": "无法连接设备。请检查URL地址，然后重试。"
         }
       }
     }
   },
   "nodeDetails": {
     "message": "信息",
-    "requestPosition": "Request Position",
-    "traceRoute": "Trace Route",
-    "airTxUtilization": "Air TX utilization",
-    "allRawMetrics": "All Raw Metrics:",
-    "batteryLevel": "Battery level",
-    "channelUtilization": "Channel utilization",
-    "details": "Details:",
-    "deviceMetrics": "Device Metrics:",
-    "hardware": "Hardware: ",
-    "lastHeard": "Last Heard: ",
-    "nodeHexPrefix": "Node Hex: ",
-    "nodeNumber": "Node Number: ",
-    "position": "Position:",
-    "role": "Role: ",
-    "uptime": "Uptime: ",
+    "requestPosition": "请求位置",
+    "traceRoute": "追踪路径",
+    "airTxUtilization": "无线信道利用率",
+    "allRawMetrics": "所有原始数据：",
+    "batteryLevel": "电池电量",
+    "channelUtilization": "频道使用",
+    "details": "详细信息：",
+    "deviceMetrics": "设备指标：",
+    "hardware": "硬件: ",
+    "lastHeard": "最后收到: ",
+    "nodeHexPrefix": "节点十六进制：",
+    "nodeNumber": "节点编号: ",
+    "position": "位置：",
+    "role": "角色: ",
+    "uptime": "运行时间： ",
     "voltage": "电压",
-    "title": "Node Details for {{identifier}}",
-    "ignoreNode": "Ignore node",
-    "removeNode": "Remove node",
-    "unignoreNode": "Unignore node",
-    "security": "Security:",
-    "publicKey": "Public Key: ",
-    "messageable": "Messageable: ",
-    "KeyManuallyVerifiedTrue": "Public Key has been manually verified",
-    "KeyManuallyVerifiedFalse": "Public Key is not manually verified"
+    "title": "节点详情{{identifier}}",
+    "ignoreNode": "忽略节点",
+    "removeNode": "删除节点",
+    "unignoreNode": "取消忽略节点",
+    "security": "安全:",
+    "publicKey": "公钥: ",
+    "messageable": "可以发送消息： ",
+    "KeyManuallyVerifiedTrue": "已手动验证公钥",
+    "KeyManuallyVerifiedFalse": "已手动验证公钥"
   },
   "pkiBackup": {
-    "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
-    "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
+    "loseKeysWarning": "如果丢失您的密钥，您需要重置您的设备。",
+    "secureBackup": "它对备份您的公钥和私钥并安全地存储您的备份非常重要！",
     "footer": "=== END OF KEYS ===",
-    "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-    "privateKey": "Private Key:",
-    "publicKey": "Public Key:",
+    "header": "{{longName}}（{{shortName}}）的Mesh通讯密钥",
+    "privateKey": "私钥:",
+    "publicKey": "公钥:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-    "title": "Backup Keys"
+    "title": "备份密钥"
   },
   "pkiBackupReminder": {
-    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
-    "title": "Backup Reminder",
-    "remindLaterPrefix": "Remind me in",
-    "remindNever": "Never remind me",
-    "backupNow": "Back up now"
+    "description": "我们建议定期备份您的密钥数据。您是否想要现在备份？",
+    "title": "备份提醒",
+    "remindLaterPrefix": "提醒我：",
+    "remindNever": "从不提醒我",
+    "backupNow": "立即备份"
   },
   "pkiRegenerate": {
-    "description": "Are you sure you want to regenerate key pair?",
-    "title": "Regenerate Key Pair"
+    "description": "您确定要重新生成您的私钥吗？",
+    "title": "重新生成密钥"
   },
   "qr": {
-    "addChannels": "Add Channels",
-    "replaceChannels": "Replace Channels",
-    "description": "The current LoRa configuration will also be shared.",
-    "sharableUrl": "Sharable URL",
+    "addChannels": "增加频道",
+    "replaceChannels": "替换频道",
+    "description": "当前的 LoRa 配置也会被共享。",
+    "sharableUrl": "可共享的网址",
     "title": "生成二维码"
   },
   "reboot": {
-    "title": "Reboot device",
-    "description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
-    "ota": "Reboot into OTA mode",
-    "enterDelay": "Enter delay",
-    "scheduled": "Reboot has been scheduled",
-    "schedule": "Schedule reboot",
-    "now": "Reboot now",
-    "cancel": "Cancel scheduled reboot"
+    "title": "重启设备",
+    "description": "立即重启或安排已连接节点的重启。你也可以选择重启进入OTA（空中下载）模式。",
+    "ota": "重启到 OTA 模式",
+    "enterDelay": "输入延时",
+    "scheduled": "重启计划已设置",
+    "schedule": "计划重新启动",
+    "now": "立即重启",
+    "cancel": "取消预定的重启"
   },
   "refreshKeys": {
     "description": {
-      "acceptNewKeys": "This will remove the node from device and request new keys.",
-      "keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
-      "unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
+      "acceptNewKeys": "这将从设备中删除节点，并请求新的密钥。",
+      "keyMismatchReasonSuffix": "。这是由于远程节点当前的公钥与此节点以前存储的密钥不匹配。",
+      "unableToSendDmPrefix": "您的节点无法向其他节点发送消息： "
     },
-    "acceptNewKeys": "Accept New Keys",
-    "title": "Keys Mismatch - {{identifier}}"
+    "acceptNewKeys": "接受新的密钥",
+    "title": "密钥不匹配 - {{identifier}}"
   },
   "removeNode": {
-    "description": "Are you sure you want to remove this Node?",
-    "title": "Remove Node?"
+    "description": "您确定要删除此节点吗？",
+    "title": "删除节点?"
   },
   "shutdown": {
-    "title": "Schedule Shutdown",
-    "description": "Turn off the connected node after x minutes."
+    "title": "计划关机",
+    "description": "x 分钟后关闭已连接的节点。"
   },
   "traceRoute": {
-    "routeToDestination": "Route to destination:",
-    "routeBack": "Route back:"
+    "routeToDestination": "到达路由：",
+    "routeBack": "返回路由："
   },
   "tracerouteResponse": {
-    "title": "Traceroute: {{identifier}}"
+    "title": "路由追踪: {{identifier}}"
   },
   "unsafeRoles": {
-    "confirmUnderstanding": "Yes, I know what I'm doing",
-    "conjunction": " and the blog post about ",
-    "postamble": " and understand the implications of changing the role.",
-    "preamble": "I have read the ",
-    "choosingRightDeviceRole": "Choosing The Right Device Role",
-    "deviceRoleDocumentation": "Device Role Documentation",
+    "confirmUnderstanding": "是的，我知道我在做什么",
+    "conjunction": " 以及博客文章 ",
+    "postamble": " 并理解改变这一作用的意义。",
+    "preamble": "已阅 ",
+    "choosingRightDeviceRole": "选择合适的设备角色",
+    "deviceRoleDocumentation": "设备角色文档",
     "title": "是否确认？"
   },
   "managedMode": {
-    "confirmUnderstanding": "Yes, I know what I'm doing",
+    "confirmUnderstanding": "我知道自己在做什么",
     "title": "是否确认？",
-    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+    "description": "启用远程管理模式会阻止客户端应用程序（包括网页客户端）向无线电设备写入配置。启用后，无线电配置仅能通过远程管理消息进行更改。此设置并非远程节点管理所必需。"
   },
   "clientNotification": {
     "title": "客户端通知",
-    "TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
-    "Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
+    "TraceRoute can only be sent once every 30 seconds": "追踪路由只能每30秒发送一次",
+    "Compromised keys were detected and regenerated.": "检测到并重新生成了未兑现的密钥。"
   },
   "resetNodeDb": {
-    "title": "Reset Node Database",
-    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
-    "confirm": "Reset Node Database",
-    "failedTitle": "There was an error resetting the Node DB. Please try again."
+    "title": "清理节点数据库",
+    "description": "这将清除所有节点从连接设备的节点数据库中的所有节点并清除客户端中的所有消息历史记录。 此操作无法撤销。您确定要继续吗？",
+    "confirm": "清理节点数据库",
+    "failedTitle": "重置节点数据库时出错。请重试。"
   },
   "clearAllStores": {
-    "title": "Clear All Local Storage",
-    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
-    "confirm": "Clear all local storage",
-    "failedTitle": "There was an error clearing local storage. Please try again."
+    "title": "清除所有本地存储",
+    "description": "这将清除所有本地存储的数据，包括所有先前连接设备的消息历史记录和节点数据库。操作完成后，您需要重新连接到您的节点，且此操作无法撤销。您确定要继续吗？",
+    "confirm": "清除所有本地存储",
+    "failedTitle": "清除本地存储时出错。请重试。"
   },
   "factoryResetDevice": {
-    "title": "Factory Reset Device",
-    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
-    "confirm": "Factory Reset Device",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "title": "恢复出厂设置配置",
+    "description": "这将出厂重置连接的设备， 删除设备上的所有配置和数据以及保存到客户端的所有节点和消息。 此操作无法撤销。您确定要继续吗？",
+    "confirm": "恢复出厂设置配置",
+    "failedTitle": "执行出厂重置时出错。请重试。"
   },
   "factoryResetConfig": {
-    "title": "Factory Reset Config",
-    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
-    "confirm": "Factory Reset Config",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "title": "恢复出厂设置配置",
+    "description": "这将对连接的设备进行出厂设置重置，删除设备上的所有配置。此操作无法撤销。您确定要继续吗？",
+    "confirm": "恢复出厂设置配置",
+    "failedTitle": "执行出厂重置时出错。请重试。"
   }
 }
