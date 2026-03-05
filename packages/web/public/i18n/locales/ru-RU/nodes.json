@@ -1,59 +1,59 @@
 {
   "nodeDetail": {
     "publicKeyEnabled": {
-      "label": "Public Key Enabled"
+      "label": "Открытый ключ доступен"
     },
     "noPublicKey": {
-      "label": "No Public Key"
+      "label": "Нет открытого ключа"
     },
     "directMessage": {
-      "label": "Direct Message {{shortName}}"
+      "label": "Личное сообщение {{shortName}}"
     },
     "favorite": {
       "label": "Избранное",
-      "tooltip": "Add or remove this node from your favorites"
+      "tooltip": "Добавить или удалить этот узел из списка избранных"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "Не в списке избранных"
     },
     "error": {
       "label": "Ошибки",
-      "text": "An error occurred while fetching node details. Please try again later."
+      "text": "Произошла ошибка при получении информации об узле. Пожалуйста, повторите попытку позже."
     },
     "status": {
-      "heard": "Heard",
+      "heard": "Слышали",
       "mqtt": "MQTT"
     },
     "elevation": {
-      "label": "Elevation"
+      "label": "Высота"
     },
     "channelUtil": {
-      "label": "Channel Util"
+      "label": "Использование канала"
     },
     "airtimeUtil": {
-      "label": "Airtime Util"
+      "label": "Использование эфира"
     }
   },
   "nodesTable": {
     "headings": {
       "longName": "Полное имя",
       "connection": "Соединения",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
-      "model": "Model",
-      "macAddress": "MAC Address"
+      "lastHeard": "Последний раз слышали",
+      "encryption": "Шифрование",
+      "model": "Модель",
+      "macAddress": "MAC-адрес"
     },
     "connectionStatus": {
       "direct": "Прямой",
-      "away": "away",
-      "viaMqtt": ", via MQTT"
+      "away": "отключен",
+      "viaMqtt": ", через MQTT"
     }
   },
   "actions": {
-    "added": "Added",
-    "removed": "Removed",
-    "ignoreNode": "Ignore Node",
-    "unignoreNode": "Unignore Node",
-    "requestPosition": "Request Position"
+    "added": "Добавлено",
+    "removed": "Удалено",
+    "ignoreNode": "Игнорировать узел",
+    "unignoreNode": "Не игнорировать узел",
+    "requestPosition": "Запросить позицию"
   }
 }
