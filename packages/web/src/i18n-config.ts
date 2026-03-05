@@ -17,6 +17,7 @@ export const supportedLanguages: Lang[] = [
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
   { code: "en", name: "English", flag: "🇺🇸" },
   { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
   { code: "sv", name: "Svenska", flag: "🇸🇪" },
 ];
 
@@ -45,6 +46,7 @@ i18next
       fr: ["fr-FR", FALLBACK_LANGUAGE_CODE],
       sv: ["sv-SE", FALLBACK_LANGUAGE_CODE],
       de: ["de-DE", FALLBACK_LANGUAGE_CODE],
+      ru: ["ru-RU", FALLBACK_LANGUAGE_CODE],
     },
     fallbackNS: ["common", "ui", "dialog"],
     debug: import.meta.env.MODE === "development",

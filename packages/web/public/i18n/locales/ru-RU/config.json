@@ -13,446 +13,458 @@
     "tabSecurity": "Безопасность"
   },
   "sidebar": {
-    "label": "Configuration"
+    "label": "Конфигурация"
   },
   "device": {
-    "title": "Device Settings",
-    "description": "Settings for the device",
+    "title": "Настройки устройства",
+    "description": "Настройки для устройства",
     "buttonPin": {
-      "description": "Button pin override",
-      "label": "Button Pin"
+      "description": "Переопределение пина кнопки",
+      "label": "Пин кнопки"
     },
     "buzzerPin": {
-      "description": "Buzzer pin override",
-      "label": "Buzzer Pin"
+      "description": "Переопределение пина зуммера",
+      "label": "Пин зуммера"
     },
     "disableTripleClick": {
-      "description": "Disable triple click",
-      "label": "Disable Triple Click"
+      "description": "Отключить тройное нажатие",
+      "label": "Отключить тройное нажатие"
     },
     "doubleTapAsButtonPress": {
-      "description": "Treat double tap as button press",
-      "label": "Double Tap as Button Press"
+      "description": "Обрабатывать двойное касание как нажатие кнопки",
+      "label": "Двойное касание как нажатие кнопки"
     },
     "ledHeartbeatDisabled": {
-      "description": "Disable default blinking LED",
-      "label": "LED Heartbeat Disabled"
+      "description": "Отключить мигание светодиода по умолчанию",
+      "label": "Отключен пульс светодиода"
     },
     "nodeInfoBroadcastInterval": {
-      "description": "How often to broadcast node info",
-      "label": "Интервал вещания передачи информации об узле"
+      "description": "Как часто транслировать информацию об узле",
+      "label": "Интервал вещания информации об узле"
     },
     "posixTimezone": {
-      "description": "The POSIX timezone string for the device",
+      "description": "Строка часового пояса POSIX для устройства",
       "label": "Часовой пояс POSIX"
     },
     "rebroadcastMode": {
-      "description": "How to handle rebroadcasting",
-      "label": "Режим ретрансляции"
+      "description": "Как обрабатывать повторную трансляцию",
+      "label": "Режим повторной трансляции"
     },
     "role": {
-      "description": "What role the device performs on the mesh",
+      "description": "Какую роль выполняет устройство в сети",
       "label": "Роль"
     }
   },
   "bluetooth": {
-    "title": "Bluetooth Settings",
-    "description": "Settings for the Bluetooth module",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "Настройки Bluetooth",
+    "description": "Настройки для модуля Bluetooth",
+    "note": "Примечание: Некоторые устройства (ESP32) не могут использовать Bluetooth и WiFi одновременно.",
     "enabled": {
-      "description": "Enable or disable Bluetooth",
+      "description": "Включить или отключить Bluetooth",
       "label": "Включено"
     },
     "pairingMode": {
-      "description": "Pin selection behaviour.",
+      "description": "Поведение выбора пина.",
       "label": "Режим сопряжения"
     },
     "pin": {
-      "description": "Pin to use when pairing",
-      "label": "Pin"
+      "description": "Пин для использования при сопряжении",
+      "label": "Пин"
     }
   },
   "display": {
-    "description": "Settings for the device display",
-    "title": "Display Settings",
+    "description": "Настройки для дисплея устройства",
+    "title": "Настройки дисплея",
     "headingBold": {
-      "description": "Bolden the heading text",
-      "label": "Выделять жирным заголовок"
+      "description": "Сделать заголовок жирным",
+      "label": "Жирный заголовок"
     },
     "carouselDelay": {
-      "description": "How fast to cycle through windows",
-      "label": "Carousel Delay"
+      "description": "Как быстро переключаться между окнами",
+      "label": "Задержка карусели"
     },
     "compassNorthTop": {
-      "description": "Fix north to the top of compass",
-      "label": "Compass North Top"
+      "description": "Закрепить север вверху компаса",
+      "label": "Север компаса сверху"
     },
     "displayMode": {
-      "description": "Screen layout variant",
-      "label": "Display Mode"
+      "description": "Вариант компоновки экрана",
+      "label": "Режим отображения"
     },
     "displayUnits": {
-      "description": "Display metric or imperial units",
-      "label": "Display Units"
+      "description": "Отображать метрические или имперские единицы",
+      "label": "Единицы отображения"
     },
     "flipScreen": {
-      "description": "Flip display 180 degrees",
-      "label": "Flip Screen"
+      "description": "Перевернуть дисплей на 180 градусов",
+      "label": "Перевернуть экран"
     },
     "gpsDisplayUnits": {
-      "description": "Coordinate display format",
-      "label": "GPS Display Units"
+      "description": "Формат отображения координат",
+      "label": "Единицы отображения GPS"
     },
     "oledType": {
-      "description": "Type of OLED screen attached to the device",
-      "label": "OLED Type"
+      "description": "Тип OLED экрана, подключенного к устройству",
+      "label": "Тип OLED"
     },
     "screenTimeout": {
-      "description": "Turn off the display after this long",
-      "label": "Screen Timeout"
+      "description": "Выключить дисплей через это время",
+      "label": "Таймаут экрана"
     },
     "twelveHourClock": {
-      "description": "Use 12-hour clock format",
-      "label": "12-Hour Clock"
+      "description": "Использовать 12-часовой формат времени",
+      "label": "12-часовой формат"
     },
     "wakeOnTapOrMotion": {
-      "description": "Wake the device on tap or motion",
-      "label": "Wake on Tap or Motion"
+      "description": "Пробуждать устройство при касании или движении",
+      "label": "Пробуждение при касании или движении"
     }
   },
   "lora": {
-    "title": "Mesh Settings",
-    "description": "Settings for the LoRa mesh",
+    "title": "Настройки сети",
+    "description": "Настройки для сети LoRa",
     "bandwidth": {
-      "description": "Channel bandwidth in kHz",
-      "label": "Ширина канала"
+      "description": "Пропускная способность канала в кГц",
+      "label": "Пропускная способность"
     },
     "boostedRxGain": {
-      "description": "Boosted RX gain",
-      "label": "Boosted RX Gain"
+      "description": "Усиленный прием RX",
+      "label": "Усиленный прием RX"
     },
     "codingRate": {
-      "description": "The denominator of the coding rate",
-      "label": "Частота кодирования"
+      "description": "Знаменатель коэффициента кодирования",
+      "label": "Коэффициент кодирования"
     },
     "frequencyOffset": {
-      "description": "Frequency offset to correct for crystal calibration errors",
-      "label": "Frequency Offset"
+      "description": "Смещение частоты для коррекции ошибок калибровки кристалла",
+      "label": "Смещение частоты"
     },
     "frequencySlot": {
-      "description": "LoRa frequency channel number",
-      "label": "Частота слота"
+      "description": "Номер частотного канала LoRa",
+      "label": "Частотный слот"
     },
     "hopLimit": {
-      "description": "Maximum number of hops",
-      "label": "Hop Limit"
+      "description": "Максимальное количество прыжков",
+      "label": "Лимит прыжков"
     },
     "ignoreMqtt": {
-      "description": "Don't forward MQTT messages over the mesh",
+      "description": "Не пересылать MQTT сообщения по сети",
       "label": "Игнорировать MQTT"
     },
     "modemPreset": {
-      "description": "Modem preset to use",
-      "label": "Режим работы модема"
+      "description": "Предустановка модема для использования",
+      "label": "Предустановка модема"
     },
     "okToMqtt": {
-      "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
-      "label": "ОК в MQTT"
+      "description": "Когда установлено в true, эта конфигурация указывает, что пользователь одобряет загрузку пакета в MQTT. Если установлено в false, удаленные узлы запрашиваются не пересылать пакеты в MQTT",
+      "label": "Разрешено в MQTT"
     },
     "overrideDutyCycle": {
       "description": "Переопределить рабочий цикл",
       "label": "Переопределить рабочий цикл"
     },
     "overrideFrequency": {
-      "description": "Override frequency",
-      "label": "Override Frequency"
+      "description": "Переопределить частоту",
+      "label": "Переопределить частоту"
     },
     "region": {
-      "description": "Sets the region for your node",
-      "label": "Регион / Страна"
+      "description": "Устанавливает регион для вашего узла",
+      "label": "Регион"
     },
     "spreadingFactor": {
-      "description": "Indicates the number of chirps per symbol",
-      "label": "Spreading Factor"
+      "description": "Указывает количество чирпов на символ",
+      "label": "Коэффициент расширения"
     },
     "transmitEnabled": {
-      "description": "Enable/Disable transmit (TX) from the LoRa radio",
+      "description": "Включить/Отключить передачу (TX) с радио LoRa",
       "label": "Передача включена"
     },
     "transmitPower": {
-      "description": "Max transmit power",
-      "label": "Мощность передатчика"
+      "description": "Максимальная мощность передачи",
+      "label": "Мощность передачи"
     },
     "usePreset": {
-      "description": "Use one of the predefined modem presets",
-      "label": "Использовать шаблон"
+      "description": "Использовать одну из предопределенных предустановок модема",
+      "label": "Использовать предустановку"
     },
     "meshSettings": {
-      "description": "Settings for the LoRa mesh",
-      "label": "Mesh Settings"
+      "description": "Настройки для сети LoRa",
+      "label": "Настройки сети"
     },
     "waveformSettings": {
-      "description": "Settings for the LoRa waveform",
-      "label": "Waveform Settings"
+      "description": "Настройки для формы сигнала LoRa",
+      "label": "Настройки формы сигнала"
     },
     "radioSettings": {
-      "label": "Radio Settings",
-      "description": "Settings for the LoRa radio"
+      "label": "Настройки радио",
+      "description": "Настройки для радио LoRa"
     }
   },
   "network": {
-    "title": "WiFi Config",
-    "description": "WiFi radio configuration",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "Конфигурация WiFi",
+    "description": "Конфигурация радио WiFi",
+    "note": "Примечание: Некоторые устройства (ESP32) не могут использовать Bluetooth и WiFi одновременно.",
     "addressMode": {
-      "description": "Address assignment selection",
-      "label": "Address Mode"
+      "description": "Выбор назначения адреса",
+      "label": "Режим адреса"
     },
     "dns": {
-      "description": "DNS Server",
+      "description": "DNS сервер",
       "label": "DNS"
     },
     "ethernetEnabled": {
-      "description": "Enable or disable the Ethernet port",
+      "description": "Включить или отключить порт Ethernet",
       "label": "Включено"
     },
     "gateway": {
-      "description": "Default Gateway",
+      "description": "Шлюз по умолчанию",
       "label": "Шлюз"
     },
     "ip": {
-      "description": "IP Address",
-      "label": "IP-адрес"
+      "description": "IP адрес",
+      "label": "IP"
     },
     "psk": {
-      "description": "Network password",
-      "label": "Пароль"
+      "description": "Пароль сети",
+      "label": "PSK"
     },
     "ssid": {
-      "description": "Network name",
-      "label": "Название сети"
+      "description": "Имя сети",
+      "label": "SSID"
     },
     "subnet": {
-      "description": "Subnet Mask",
+      "description": "Маска подсети",
       "label": "Подсеть"
     },
     "wifiEnabled": {
-      "description": "Enable or disable the WiFi radio",
+      "description": "Включить или отключить радио WiFi",
       "label": "Включено"
     },
     "meshViaUdp": {
-      "label": "Mesh via UDP"
+      "label": "Сеть через UDP"
     },
     "ntpServer": {
-      "label": "NTP Server"
+      "label": "NTP сервер"
     },
     "rsyslogServer": {
-      "label": "Rsyslog Server"
+      "label": "Rsyslog сервер"
     },
     "ethernetConfigSettings": {
-      "description": "Ethernet port configuration",
-      "label": "Ethernet Config"
+      "description": "Конфигурация порта Ethernet",
+      "label": "Конфигурация Ethernet"
     },
     "ipConfigSettings": {
-      "description": "IP configuration",
-      "label": "IP Config"
+      "description": "IP конфигурация",
+      "label": "Конфигурация IP"
     },
     "ntpConfigSettings": {
-      "description": "NTP configuration",
-      "label": "NTP Config"
+      "description": "NTP конфигурация",
+      "label": "Конфигурация NTP"
     },
     "rsyslogConfigSettings": {
-      "description": "Rsyslog configuration",
-      "label": "Rsyslog Config"
+      "description": "Rsyslog конфигурация",
+      "label": "Конфигурация Rsyslog"
     },
     "udpConfigSettings": {
-      "description": "UDP over Mesh configuration",
-      "label": "UDP Config"
+      "description": "Конфигурация UDP через сеть",
+      "label": "Конфигурация UDP"
     }
   },
   "position": {
-    "title": "Position Settings",
-    "description": "Settings for the position module",
+    "title": "Настройки местоположения",
+    "description": "Настройки для модуля местоположения",
     "broadcastInterval": {
-      "description": "How often your position is sent out over the mesh",
-      "label": "Период трансляции"
+      "description": "Как часто ваша позиция отправляется по сети",
+      "label": "Интервал вещания"
     },
     "enablePin": {
-      "description": "GPS module enable pin override",
-      "label": "Enable Pin"
+      "description": "Переопределение пина включения модуля GPS",
+      "label": "Пин включения"
     },
     "fixedPosition": {
-      "description": "Don't report GPS position, but a manually-specified one",
-      "label": "Фиксированное положение"
+      "description": "Не сообщать GPS позицию, а использовать вручную указанную",
+      "label": "Фиксированная позиция",
+      "latitude": {
+        "label": "Широта",
+        "description": "Десятичные градусы от -90 до 90 (например, 37.7749)"
+      },
+      "longitude": {
+        "label": "Долгота",
+        "description": "Десятичные градусы от -180 до 180 (например, -122.4194)"
+      },
+      "altitude": {
+        "label": "Высота",
+        "description": "Необязательно — введите высоту в {{unit}} над уровнем моря (например, 100). Оставьте пустым, если неизвестно, или добавьте дополнительную высоту для антенн/мачт."
+      }
     },
     "gpsMode": {
-      "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-      "label": "GPS Mode"
+      "description": "Настроить, включен ли GPS устройства, отключен или отсутствует",
+      "label": "Режим GPS"
     },
     "gpsUpdateInterval": {
-      "description": "How often a GPS fix should be acquired",
-      "label": "GPS Update Interval"
+      "description": "Как часто должен получаться GPS фикс",
+      "label": "Интервал обновления GPS"
     },
     "positionFlags": {
-      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
+      "description": "Необязательные поля для включения при сборке сообщений о позиции. Чем больше полей выбрано, тем больше будет сообщение, что приведет к более длительному использованию эфирного времени и более высокому риску потери пакетов.",
       "label": "Флаги позиции"
     },
     "receivePin": {
-      "description": "GPS module RX pin override",
-      "label": "Receive Pin"
+      "description": "Переопределение пина RX модуля GPS",
+      "label": "Пин приема"
     },
     "smartPositionEnabled": {
-      "description": "Only send position when there has been a meaningful change in location",
-      "label": "Enable Smart Position"
+      "description": "Отправлять позицию только при значительном изменении местоположения",
+      "label": "Включить умную позицию"
     },
     "smartPositionMinDistance": {
-      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
-      "label": "Smart Position Minimum Distance"
+      "description": "Минимальное расстояние (в метрах), которое должно быть пройдено перед отправкой обновления позиции",
+      "label": "Минимальное расстояние умной позиции"
     },
     "smartPositionMinInterval": {
-      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
-      "label": "Smart Position Minimum Interval"
+      "description": "Минимальный интервал (в секундах), который должен пройти перед отправкой обновления позиции",
+      "label": "Минимальный интервал умной позиции"
     },
     "transmitPin": {
-      "description": "GPS module TX pin override",
-      "label": "Transmit Pin"
+      "description": "Переопределение пина TX модуля GPS",
+      "label": "Пин передачи"
     },
     "intervalsSettings": {
-      "description": "How often to send position updates",
-      "label": "Intervals"
+      "description": "Как часто отправлять обновления позиции",
+      "label": "Интервалы"
     },
     "flags": {
-      "placeholder": "Select position flags...",
+      "placeholder": "Выберите флаги позиции...",
       "altitude": "Высота",
-      "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
-      "altitudeMsl": "Altitude is Mean Sea Level",
-      "dop": "Dilution of precision (DOP) PDOP used by default",
-      "hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
-      "numSatellites": "Number of satellites",
-      "sequenceNumber": "Sequence number",
-      "timestamp": "Отметка времени",
-      "unset": "Не установлена",
-      "vehicleHeading": "Vehicle heading",
-      "vehicleSpeed": "Vehicle speed"
+      "altitudeGeoidalSeparation": "Разделение высоты геоида",
+      "altitudeMsl": "Высота над средним уровнем моря",
+      "dop": "Разбавление точности (DOP), по умолчанию используется PDOP",
+      "hdopVdop": "Если установлен DOP, использовать значения HDOP / VDOP вместо PDOP",
+      "numSatellites": "Количество спутников",
+      "sequenceNumber": "Номер последовательности",
+      "timestamp": "Временная метка",
+      "unset": "Не установлено",
+      "vehicleHeading": "Направление транспортного средства",
+      "vehicleSpeed": "Скорость транспортного средства"
     }
   },
   "power": {
     "adcMultiplierOverride": {
-      "description": "Used for tweaking battery voltage reading",
-      "label": "ADC Multiplier Override ratio"
+      "description": "Используется для настройки показаний напряжения батареи",
+      "label": "Коэффициент переопределения ADC"
     },
     "ina219Address": {
-      "description": "Address of the INA219 battery monitor",
-      "label": "INA219 Address"
+      "description": "Адрес монитора батареи INA219",
+      "label": "Адрес INA219"
     },
     "lightSleepDuration": {
-      "description": "How long the device will be in light sleep for",
-      "label": "Light Sleep Duration"
+      "description": "Как долго устройство будет в легком сне",
+      "label": "Длительность легкого сна"
     },
     "minimumWakeTime": {
-      "description": "Minimum amount of time the device will stay awake for after receiving a packet",
-      "label": "Minimum Wake Time"
+      "description": "Минимальное количество времени, которое устройство будет оставаться активным после получения пакета",
+      "label": "Минимальное время пробуждения"
     },
     "noConnectionBluetoothDisabled": {
-      "description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
-      "label": "No Connection Bluetooth Disabled"
+      "description": "Если устройство не получает подключение Bluetooth, радио BLE будет отключено через это время",
+      "label": "Bluetooth отключен без подключения"
     },
     "powerSavingEnabled": {
-      "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
+      "description": "Выберите, если питание от источника с низким током (например, солнечная батарея), чтобы минимизировать потребление энергии как можно больше.",
       "label": "Включить режим энергосбережения"
     },
     "shutdownOnBatteryDelay": {
-      "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
-      "label": "Shutdown on battery delay"
+      "description": "Автоматически выключить узел через это время при работе от батареи, 0 для неограниченного времени",
+      "label": "Задержка выключения при работе от батареи"
     },
     "superDeepSleepDuration": {
-      "description": "How long the device will be in super deep sleep for",
-      "label": "Super Deep Sleep Duration"
+      "description": "Как долго устройство будет в глубоком сне",
+      "label": "Длительность глубокого сна"
     },
     "powerConfigSettings": {
-      "description": "Settings for the power module",
-      "label": "Настройка питания"
+      "description": "Настройки для модуля питания",
+      "label": "Конфигурация питания"
     },
     "sleepSettings": {
-      "description": "Sleep settings for the power module",
-      "label": "Sleep Settings"
+      "description": "Настройки сна для модуля питания",
+      "label": "Настройки сна"
     }
   },
   "security": {
-    "description": "Settings for the Security configuration",
-    "title": "Security Settings",
-    "button_backupKey": "Backup Key",
+    "description": "Настройки для конфигурации безопасности",
+    "title": "Настройки безопасности",
+    "button_backupKey": "Резервная копия ключа",
     "adminChannelEnabled": {
-      "description": "Allow incoming device control over the insecure legacy admin channel",
-      "label": "Allow Legacy Admin"
+      "description": "Разрешить входящее управление устройством через небезопасный устаревший административный канал",
+      "label": "Разрешить устаревший административный доступ"
     },
     "enableDebugLogApi": {
-      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
-      "label": "Enable Debug Log API"
+      "description": "Выводить отладочные логи в реальном времени через последовательный порт, просматривать и экспортировать логи устройства с удаленными позициями через Bluetooth",
+      "label": "Включить API отладочных логов"
     },
     "managed": {
-      "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
-      "label": "Managed"
+      "description": "Если включено, параметры конфигурации устройства могут быть изменены только удаленно узлом удаленного администратора через административные сообщения. Не включайте этот параметр, если не настроен хотя бы один подходящий узел удаленного администратора и публичный ключ не сохранен в одном из полей выше.",
+      "label": "Управляемый"
     },
     "privateKey": {
-      "description": "Used to create a shared key with a remote device",
+      "description": "Используется для создания общего ключа с удаленным устройством",
       "label": "Приватный ключ"
     },
     "publicKey": {
-      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+      "description": "Отправляется другим узлам в сети, чтобы позволить им вычислить общий секретный ключ",
       "label": "Публичный ключ"
     },
     "primaryAdminKey": {
-      "description": "The primary public key authorized to send admin messages to this node",
-      "label": "Primary Admin Key"
+      "description": "Основной публичный ключ, авторизованный для отправки административных сообщений на этот узел",
+      "label": "Основной ключ администратора"
     },
     "secondaryAdminKey": {
-      "description": "The secondary public key authorized to send admin messages to this node",
-      "label": "Secondary Admin Key"
+      "description": "Вторичный публичный ключ, авторизованный для отправки административных сообщений на этот узел",
+      "label": "Вторичный ключ администратора"
     },
     "serialOutputEnabled": {
-      "description": "Serial Console over the Stream API",
-      "label": "Serial Output Enabled"
+      "description": "Последовательная консоль через Stream API",
+      "label": "Последовательный вывод включен"
     },
     "tertiaryAdminKey": {
-      "description": "The tertiary public key authorized to send admin messages to this node",
-      "label": "Tertiary Admin Key"
+      "description": "Третичный публичный ключ, авторизованный для отправки административных сообщений на этот узел",
+      "label": "Третичный ключ администратора"
     },
     "adminSettings": {
-      "description": "Settings for Admin",
-      "label": "Admin Settings"
+      "description": "Настройки для администратора",
+      "label": "Настройки администратора"
     },
     "loggingSettings": {
-      "description": "Settings for Logging",
-      "label": "Logging Settings"
+      "description": "Настройки для логирования",
+      "label": "Настройки логирования"
     }
   },
   "user": {
-    "title": "User Settings",
-    "description": "Configure your device name and identity settings",
+    "title": "Настройки пользователя",
+    "description": "Настройте имя устройства и параметры идентификации",
     "longName": {
       "label": "Полное имя",
-      "description": "Your full display name (1-40 characters)",
+      "description": "Ваше полное отображаемое имя (1-40 символов)",
       "validation": {
-        "min": "Long name must be at least 1 character",
-        "max": "Long name must be at most 40 characters"
+        "min": "Полное имя должно содержать не менее 1 символа",
+        "max": "Полное имя должно содержать не более 40 символов"
       }
     },
     "shortName": {
       "label": "Короткое имя",
-      "description": "Your abbreviated name (2-4 characters)",
+      "description": "Ваше сокращенное имя (2-4 символа)",
       "validation": {
-        "min": "Short name must be at least 2 characters",
-        "max": "Short name must be at most 4 characters"
+        "min": "Короткое имя должно содержать не менее 2 символов",
+        "max": "Короткое имя должно содержать не более 4 символов"
       }
     },
     "isUnmessageable": {
-      "label": "Не отправляемо",
-      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+      "label": "Недоступен для сообщений",
+      "description": "Используется для идентификации неконтролируемых или инфраструктурных узлов, чтобы обмен сообщениями был недоступен для узлов, которые никогда не ответят."
     },
     "isLicensed": {
       "label": "Лицензированный радиолюбитель (HAM)",
-      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+      "description": "Включите, если вы лицензированный радиолюбитель, включение этого параметра отключает шифрование и несовместимо с сетью Meshtastic по умолчанию."
     }
   }
 }
