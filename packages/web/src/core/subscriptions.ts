@@ -116,6 +116,11 @@ export const subscribeAll = (
       from: meshPacket.from,
       snr: meshPacket.rxSnr,
       time: meshPacket.rxTime,
+      hopStart: meshPacket.hopStart,
+      hopLimit: meshPacket.hopLimit,
+      hasBitfield:
+        meshPacket.payloadVariant.case === "decoded" &&
+        meshPacket.payloadVariant.value.bitfield !== undefined,
     });
   });
 
