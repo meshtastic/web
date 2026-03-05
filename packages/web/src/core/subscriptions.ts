@@ -41,8 +41,14 @@ export const subscribeAll = (
     }
   });
 
-  connection.events.onTelemetryPacket.subscribe(() => {
-    // device.setMetrics(telemetryPacket);
+  connection.events.onTelemetryPacket.subscribe((packet) => {
+    const metrics = packet.data.variant.value;
+    const existing = nodeDB.getNode(packet.from);
+    nodeDB.addNode({
+      ...(existing ?? {}),
+      num: packet.from,
+      deviceMetrics: { ...metrics },
+    });
   });
 
   connection.events.onDeviceStatus.subscribe((status) => {

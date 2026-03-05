@@ -21,6 +21,7 @@ import type { DeviceMetrics } from "./types.ts";
 import { Avatar } from "./UI/Avatar.tsx";
 import { Button } from "./UI/Button.tsx";
 import { Subtle } from "./UI/Typography/Subtle.tsx";
+import { Uptime } from "./generic/Uptime.tsx";
 
 interface DeviceInfoPanelProps {
   isCollapsed: boolean;
@@ -62,7 +63,7 @@ export const DeviceInfoPanel = ({
 }: DeviceInfoPanelProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate({ from: "/" });
-  const { batteryLevel, voltage } = deviceMetrics;
+  const { batteryLevel, voltage, channelUtilization, airUtilTx, uptimeSeconds} = deviceMetrics;
 
   const getStatusColor = (status?: ConnectionStatus): string => {
     if (!status) {
@@ -117,6 +118,32 @@ export const DeviceInfoPanel = ({
       icon: CpuIcon,
       value: firmwareVersion ?? t("unknown.notAvailable", "N/A"),
     },
+    {
+      id: "channelUtil",
+      label: t("sidebar.deviceInfo.channelUtil.title"),
+      value:
+        channelUtilization !== undefined
+          ? `${(channelUtilization).toFixed(1)}%`
+          : "N/A",
+    },
+    {
+      id: "airUtilTx",
+      label: t("sidebar.deviceInfo.airUtilTx.title"),
+      value:
+        airUtilTx !== undefined
+          ? `${(airUtilTx).toFixed(1)}%`
+          : "N/A",
+    },
+    {
+      id: "uptimeSeconds",
+      label: t("sidebar.deviceInfo.uptime.title"),
+      value:
+        uptimeSeconds !== undefined ? (
+          <Uptime seconds={uptimeSeconds} />
+        ) : (
+          "N/A"
+        )
+    }
   ];
 
   const actionButtons: ActionButtonConfig[] = [

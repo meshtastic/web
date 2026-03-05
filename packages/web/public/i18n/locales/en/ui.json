@@ -28,6 +28,15 @@
         "title": "Firmware",
         "version": "v{{version}}",
         "buildDate": "Build date: {{date}}"
+      },
+      "channelUtil": {
+        "title": "Ch Util"
+      },
+      "airUtilTx": {
+        "title": "TX Airtime"
+      },
+      "uptime": {
+        "title": "Uptime"
       }
     }
   },
