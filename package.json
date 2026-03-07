@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.9.0",
-    "@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs@^2.7.12-1",
+    "@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs@^2.7.18",
     "ste-simple-events": "^3.0.11",
     "tslog": "^4.9.3"
   },
