@@ -50,9 +50,7 @@ export type UseLRUListReturn<T> = {
  *
  * MRU is index 0. Adding an existing item "touches" it (moves to front).
  */
-export function useLRUList<T, J = unknown>(
-  opts: UseLRUListOptions<T, J>,
-): UseLRUListReturn<T> {
+export function useLRUList<T, J = unknown>(opts: UseLRUListOptions<T, J>): UseLRUListReturn<T> {
   const {
     key,
     capacity,
@@ -154,10 +152,7 @@ export function useLRUList<T, J = unknown>(
   }, [syncTabs, canPersist, storage, key, readPersisted]);
 
   // Helpers
-  const indexOf = useCallback(
-    (arr: T[], needle: T) => arr.findIndex((x) => eq(x, needle)),
-    [eq],
-  );
+  const indexOf = useCallback((arr: T[], needle: T) => arr.findIndex((x) => eq(x, needle)), [eq]);
 
   const add = useCallback(
     (item: T) => {
@@ -197,10 +192,7 @@ export function useLRUList<T, J = unknown>(
 
   const clear = useCallback(() => setItems([]), []);
 
-  const has = useCallback(
-    (item: T) => indexOf(items, item) !== -1,
-    [items, indexOf],
-  );
+  const has = useCallback((item: T) => indexOf(items, item) !== -1, [items, indexOf]);
 
   const replaceAll = useCallback(
     (next: T[]) => setItems(trimToCapacity([...next], effectiveCapacity)),

@@ -3,10 +3,7 @@ import {
   type PaxcounterValidation,
   PaxcounterValidationSchema,
 } from "@app/validation/moduleConfig/paxcounter.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
@@ -18,8 +15,7 @@ interface PaxcounterModuleConfigProps {
 export const Paxcounter = ({ onFormInit }: PaxcounterModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "paxcounter" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: PaxcounterValidation) => {
@@ -28,11 +24,7 @@ export const Paxcounter = ({ onFormInit }: PaxcounterModuleConfigProps) => {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "paxcounter" },
-      data,
-      moduleConfig.paxcounter,
-    );
+    setChange({ type: "moduleConfig", variant: "paxcounter" }, data, moduleConfig.paxcounter);
   };
 
   return (

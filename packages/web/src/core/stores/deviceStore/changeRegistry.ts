@@ -115,10 +115,7 @@ export function createChangeRegistry(): ChangeRegistry {
 /**
  * Check if a config variant has changes
  */
-export function hasConfigChange(
-  registry: ChangeRegistry,
-  variant: ValidConfigType,
-): boolean {
+export function hasConfigChange(registry: ChangeRegistry, variant: ValidConfigType): boolean {
   return registry.changes.has(serializeKey({ type: "config", variant }));
 }
 
@@ -135,10 +132,7 @@ export function hasModuleConfigChange(
 /**
  * Check if a channel has changes
  */
-export function hasChannelChange(
-  registry: ChangeRegistry,
-  index: Types.ChannelNumber,
-): boolean {
+export function hasChannelChange(registry: ChangeRegistry, index: Types.ChannelNumber): boolean {
   return registry.changes.has(serializeKey({ type: "channel", index }));
 }
 
@@ -207,9 +201,7 @@ export function getAllConfigChanges(registry: ChangeRegistry): ChangeEntry[] {
 /**
  * Get all module config changes as an array
  */
-export function getAllModuleConfigChanges(
-  registry: ChangeRegistry,
-): ChangeEntry[] {
+export function getAllModuleConfigChanges(registry: ChangeRegistry): ChangeEntry[] {
   const changes: ChangeEntry[] = [];
   for (const entry of registry.changes.values()) {
     if (entry.key.type === "moduleConfig") {

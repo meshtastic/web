@@ -50,8 +50,7 @@ export const NodesLayer = ({
     () =>
       popupState?.type !== "node"
         ? undefined
-        : (filteredNodes.find((node) => node.num === popupState.num) ??
-          undefined),
+        : (filteredNodes.find((node) => node.num === popupState.num) ?? undefined),
     [popupState, filteredNodes],
   );
 
@@ -78,9 +77,7 @@ export const NodesLayer = ({
     const isExpanded = expandedCluster === key;
 
     // Precompute pixel offsets for expanded state
-    const expandedOffsets = isExpanded
-      ? fanOutOffsetsPx(nodes.length, key)
-      : undefined;
+    const expandedOffsets = isExpanded ? fanOutOffsetsPx(nodes.length, key) : undefined;
 
     // Always render all node markers in the cluster
     for (const [i, node] of nodes.entries()) {

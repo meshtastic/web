@@ -1,16 +1,9 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
-import {
-  type FilterState,
-  useFilterNode,
-} from "@components/generic/Filter/useFilterNode.ts";
+import { type FilterState, useFilterNode } from "@components/generic/Filter/useFilterNode.ts";
 import { Mono } from "@components/generic/Mono.tsx";
-import {
-  type DataRow,
-  type Heading,
-  Table,
-} from "@components/generic/Table/index.tsx";
+import { type DataRow, type Heading, Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -21,13 +14,7 @@ import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import {
-  type JSX,
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useState,
-} from "react";
+import { type JSX, useCallback, useDeferredValue, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { base16 } from "rfc4648";
 
@@ -53,9 +40,7 @@ const NodesPage = (): JSX.Element => {
     Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
   >();
 
-  const [filterState, setFilterState] = useState<FilterState>(
-    () => defaultFilterValues,
-  );
+  const [filterState, setFilterState] = useState<FilterState>(() => defaultFilterValues);
   const deferredFilterState = useDeferredValue(filterState);
 
   // stable predicate so the selector identity doesn’t thrash
@@ -136,9 +121,7 @@ const NodesPage = (): JSX.Element => {
         .match(/.{1,2}/g)
         ?.join(":") ?? t("unknown.shortName");
 
-    const shortName =
-      node.user?.shortName ??
-      numberToHexUnpadded(node.num).slice(-4).toUpperCase();
+    const shortName = node.user?.shortName ?? numberToHexUnpadded(node.num).slice(-4).toUpperCase();
     const longName =
       node.user?.longName ??
       t("fallbackName", {
@@ -164,7 +147,9 @@ const NodesPage = (): JSX.Element => {
             <h1
               onMouseDown={() => handleNodeInfoDialog(node.num)}
               onKeyUp={(evt) => {
-                evt.key === "Enter" && handleNodeInfoDialog(node.num);
+                if (evt.key === "Enter") {
+                  handleNodeInfoDialog(node.num);
+                }
               }}
               className="cursor-pointer underline ml-2 whitespace-break-spaces"
             >
@@ -180,14 +165,10 @@ const NodesPage = (): JSX.Element => {
                 ? node?.viaMqtt === false && node.hopsAway === 0
                   ? t("nodesTable.connectionStatus.direct")
                   : `${node.hopsAway?.toString()} ${
-                      (node.hopsAway ?? 0 > 1)
-                        ? t("unit.hop.plural")
-                        : t("unit.hops_one")
+                      (node.hopsAway ?? 0 > 1) ? t("unit.hop.plural") : t("unit.hops_one")
                     } ${t("nodesTable.connectionStatus.away")}`
                 : t("unknown.longName")}
-              {node?.viaMqtt === true
-                ? t("nodesTable.connectionStatus.viaMqtt")
-                : ""}
+              {node?.viaMqtt === true ? t("nodesTable.connectionStatus.viaMqtt") : ""}
             </Mono>
           ),
           sortValue: node.hopsAway ?? Number.MAX_SAFE_INTEGER,
@@ -198,10 +179,7 @@ const NodesPage = (): JSX.Element => {
               {node.lastHeard === 0 ? (
                 t("unknown.longName")
               ) : (
-                <TimeAgo
-                  timestamp={node.lastHeard * 1000}
-                  locale={current?.code}
-                />
+                <TimeAgo timestamp={node.lastHeard * 1000} locale={current?.code} />
               )}
             </Mono>
           ),
@@ -232,11 +210,8 @@ const NodesPage = (): JSX.Element => {
           sortValue: node.snr,
         },
         {
-          content: (
-            <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>
-          ),
-          sortValue:
-            Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ?? "UNSET",
+          content: <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>,
+          sortValue: Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ?? "UNSET",
         },
         {
           content: <Mono>{macAddress}</Mono>,

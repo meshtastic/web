@@ -19,6 +19,4 @@ export const CannedMessageValidationSchema = z.object({
   sendBell: z.boolean(),
 });
 
-export type CannedMessageValidation = z.infer<
-  typeof CannedMessageValidationSchema
->;
+export type CannedMessageValidation = z.infer<typeof CannedMessageValidationSchema>;

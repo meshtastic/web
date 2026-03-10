@@ -14,10 +14,7 @@ export interface ClientNotificationDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const ClientNotificationDialog = ({
-  open,
-  onOpenChange,
-}: ClientNotificationDialogProps) => {
+export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificationDialogProps) => {
   const { t } = useTranslation("dialog");
   const { getClientNotification, removeClientNotification } = useDevice();
 

@@ -13,10 +13,7 @@ const sizeClasses = {
 export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
   return (
     <div
-      className={cn(
-        "flex items-center justify-center fade-in-50 fade-out-50",
-        className,
-      )}
+      className={cn("flex items-center justify-center fade-in-50 fade-out-50", className)}
       {...props}
     >
       <svg

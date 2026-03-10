@@ -1,10 +1,5 @@
 import { toast } from "@core/hooks/useToast.ts";
-import {
-  useDevice,
-  useDeviceStore,
-  useMessageStore,
-  useNodeDBStore,
-} from "@core/stores";
+import { useDevice, useDeviceStore, useMessageStore, useNodeDBStore } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 
@@ -13,10 +8,7 @@ export interface FactoryResetDeviceDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const FactoryResetDeviceDialog = ({
-  open,
-  onOpenChange,
-}: FactoryResetDeviceDialogProps) => {
+export const FactoryResetDeviceDialog = ({ open, onOpenChange }: FactoryResetDeviceDialogProps) => {
   const { t } = useTranslation("dialog");
   const { connection, id } = useDevice();
 

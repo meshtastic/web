@@ -4,16 +4,10 @@ import { z } from "zod/v4";
 const GpsCoordinateEnum = z.enum(
   Protobuf.Config.Config_DisplayConfig_DeprecatedGpsCoordinateFormat,
 );
-const DisplayUnitsEnum = z.enum(
-  Protobuf.Config.Config_DisplayConfig_DisplayUnits,
-);
+const DisplayUnitsEnum = z.enum(Protobuf.Config.Config_DisplayConfig_DisplayUnits);
 const OledTypeEnum = z.enum(Protobuf.Config.Config_DisplayConfig_OledType);
-const DisplayModeEnum = z.enum(
-  Protobuf.Config.Config_DisplayConfig_DisplayMode,
-);
-const CompassOrientationEnum = z.enum(
-  Protobuf.Config.Config_DisplayConfig_CompassOrientation,
-);
+const DisplayModeEnum = z.enum(Protobuf.Config.Config_DisplayConfig_DisplayMode);
+const CompassOrientationEnum = z.enum(Protobuf.Config.Config_DisplayConfig_CompassOrientation);
 
 export const DisplayValidationSchema = z.object({
   screenOnSecs: z.coerce.number().int().min(0),

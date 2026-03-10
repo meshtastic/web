@@ -27,11 +27,7 @@ function stubCoreTransforms() {
   const restoreFrom = vi
     .spyOn(Utils, "fromDeviceStream")
     .mockImplementation(
-      () =>
-        fromDeviceFactory() as unknown as TransformStream<
-          Uint8Array,
-          Types.DeviceOutput
-        >,
+      () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, Types.DeviceOutput>,
     );
 
   return {
@@ -47,18 +43,12 @@ function stubNavigatorSerial() {
   const handlers = new Set<SerialDisconnectHandler>();
 
   const serialStub = {
-    addEventListener: (
-      type: string,
-      handler: EventListenerOrEventListenerObject,
-    ) => {
+    addEventListener: (type: string, handler: EventListenerOrEventListenerObject) => {
       if (type === "disconnect") {
         handlers.add(handler as any as SerialDisconnectHandler);
       }
     },
-    removeEventListener: (
-      type: string,
-      handler: EventListenerOrEventListenerObject,
-    ) => {
+    removeEventListener: (type: string, handler: EventListenerOrEventListenerObject) => {
       if (type === "disconnect") {
         handlers.delete(handler as any as SerialDisconnectHandler);
       }
@@ -182,9 +172,7 @@ describe("TransportWebSerial (contract)", () => {
       expect((globalThis as any).__ws.fake.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (globalThis as any).__ws.serial.dispatchDisconnect(
-        (globalThis as any).__ws.fake,
-      );
+      (globalThis as any).__ws.serial.dispatchDisconnect((globalThis as any).__ws.fake);
       await Promise.resolve();
     },
   });
@@ -230,10 +218,7 @@ describe("TransportWebSerial (extras)", () => {
     let saw = false;
     for (let i = 0; i < 6; i++) {
       const { value } = await reader.read();
-      if (
-        value?.type === "status" &&
-        value.data.reason === "serial-disconnected"
-      ) {
+      if (value?.type === "status" && value.data.reason === "serial-disconnected") {
         saw = true;
         break;
       }

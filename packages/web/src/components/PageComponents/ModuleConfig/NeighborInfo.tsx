@@ -3,10 +3,7 @@ import {
   type NeighborInfoValidation,
   NeighborInfoValidationSchema,
 } from "@app/validation/moduleConfig/neighborInfo.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
@@ -18,8 +15,7 @@ interface NeighborInfoModuleConfigProps {
 export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "neighborInfo" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: NeighborInfoValidation) => {
@@ -28,11 +24,7 @@ export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "neighborInfo" },
-      data,
-      moduleConfig.neighborInfo,
-    );
+    setChange({ type: "moduleConfig", variant: "neighborInfo" }, data, moduleConfig.neighborInfo);
   };
 
   return (

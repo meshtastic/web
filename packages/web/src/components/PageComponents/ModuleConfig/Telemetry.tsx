@@ -3,10 +3,7 @@ import {
   type TelemetryValidation,
   TelemetryValidationSchema,
 } from "@app/validation/moduleConfig/telemetry.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
@@ -18,8 +15,7 @@ interface TelemetryModuleConfigProps {
 export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "telemetry" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: TelemetryValidation) => {
@@ -28,11 +24,7 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "telemetry" },
-      data,
-      moduleConfig.telemetry,
-    );
+    setChange({ type: "moduleConfig", variant: "telemetry" }, data, moduleConfig.telemetry);
   };
 
   return (
@@ -69,9 +61,7 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
               type: "toggle",
               name: "environmentMeasurementEnabled",
               label: t("telemetry.environmentMeasurementEnabled.label"),
-              description: t(
-                "telemetry.environmentMeasurementEnabled.description",
-              ),
+              description: t("telemetry.environmentMeasurementEnabled.description"),
             },
             {
               type: "toggle",
@@ -83,9 +73,7 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
               type: "toggle",
               name: "environmentDisplayFahrenheit",
               label: t("telemetry.environmentDisplayFahrenheit.label"),
-              description: t(
-                "telemetry.environmentDisplayFahrenheit.description",
-              ),
+              description: t("telemetry.environmentDisplayFahrenheit.description"),
             },
             {
               type: "toggle",

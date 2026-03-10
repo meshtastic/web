@@ -20,16 +20,8 @@ class FakeSocket extends Duplex {
 
   _read() {}
 
-  _write(
-    chunk: Buffer,
-    _encoding: BufferEncoding,
-    callback: (error?: Error | null) => void,
-  ) {
-    this.lastWritten = new Uint8Array(
-      chunk.buffer,
-      chunk.byteOffset,
-      chunk.byteLength,
-    );
+  _write(chunk: Buffer, _encoding: BufferEncoding, callback: (error?: Error | null) => void) {
+    this.lastWritten = new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength);
     callback();
   }
 
@@ -69,16 +61,10 @@ function stubCoreTransforms() {
     });
 
   const transform = Utils.toDeviceStream;
-  vi.spyOn(Utils, "toDeviceStream", "get").mockReturnValue(
-    toDevice as unknown as typeof transform,
-  );
+  vi.spyOn(Utils, "toDeviceStream", "get").mockReturnValue(toDevice as unknown as typeof transform);
 
   vi.spyOn(Utils, "fromDeviceStream").mockImplementation(
-    () =>
-      fromDeviceFactory() as unknown as TransformStream<
-        Uint8Array,
-        Types.DeviceOutput
-      >,
+    () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, Types.DeviceOutput>,
   );
 
   return {
@@ -107,26 +93,22 @@ describe("TransportNode (contract)", () => {
       const fakeSocket = new FakeSocket();
       const transport = new TransportNode(fakeSocket as unknown as Socket);
       await Promise.resolve();
-      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock =
-        fakeSocket;
+      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock = fakeSocket;
       return transport;
     },
     pushIncoming: async (bytes) => {
-      (
-        globalThis as unknown as { __nodeSock: FakeSocket }
-      ).__nodeSock.pushIncoming(bytes);
+      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock.pushIncoming(bytes);
       await Promise.resolve();
     },
     assertLastWritten: (bytes) => {
-      const sock = (globalThis as unknown as { __nodeSock: FakeSocket })
-        .__nodeSock;
+      const sock = (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock;
       expect(sock.lastWritten).toBeDefined();
       expect(sock.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (
-        globalThis as unknown as { __nodeSock: FakeSocket }
-      ).__nodeSock.emitErrorOnce("test-disconnect");
+      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock.emitErrorOnce(
+        "test-disconnect",
+      );
       await Promise.resolve();
     },
   });
@@ -153,17 +135,13 @@ describe("TransportNode (extras)", () => {
     const first = await reader.read();
     expect(isStatusEvent(first.value)).toBe(true);
     if (isStatusEvent(first.value)) {
-      expect(first.value.data.status).toBe(
-        Types.DeviceStatusEnum.DeviceConnecting,
-      );
+      expect(first.value.data.status).toBe(Types.DeviceStatusEnum.DeviceConnecting);
     }
 
     const second = await reader.read();
     expect(isStatusEvent(second.value)).toBe(true);
     if (isStatusEvent(second.value)) {
-      expect(second.value.data.status).toBe(
-        Types.DeviceStatusEnum.DeviceConnected,
-      );
+      expect(second.value.data.status).toBe(Types.DeviceStatusEnum.DeviceConnected);
     }
 
     fakeSocket.emitClose();

@@ -3,10 +3,7 @@ import {
   type StoreForwardValidation,
   StoreForwardValidationSchema,
 } from "@app/validation/moduleConfig/storeForward.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
@@ -18,8 +15,7 @@ interface StoreForwardModuleConfigProps {
 export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "storeForward" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: StoreForwardValidation) => {
@@ -28,11 +24,7 @@ export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "storeForward" },
-      data,
-      moduleConfig.storeForward,
-    );
+    setChange({ type: "moduleConfig", variant: "storeForward" }, data, moduleConfig.storeForward);
   };
 
   return (

@@ -68,9 +68,7 @@ const DateDelimiter = ({ label }: { label: string }) => (
   <li aria-label={label}>
     <div className="my-2 flex h-3 items-center justify-center">
       <Separator className="bg-slate-100 dark:bg-slate-800" />
-      <div className="mx-5 whitespace-nowrap text-center text-xs text-slate-400">
-        {label}
-      </div>
+      <div className="mx-5 whitespace-nowrap text-center text-xs text-slate-400">{label}</div>
       <Separator className="bg-slate-100 dark:bg-slate-800" />
     </div>
   </li>
@@ -108,9 +106,7 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
   const { i18n, t } = useTranslation();
 
   const locale = useMemo(
-    () =>
-      i18n.language ||
-      (typeof navigator !== "undefined" ? navigator.language : "en-US"),
+    () => i18n.language || (typeof navigator !== "undefined" ? navigator.language : "en-US"),
     [i18n.language],
   );
 

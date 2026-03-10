@@ -35,13 +35,9 @@ export function makePskHelpers(allowedByteLengths: readonly number[]) {
   const stringSchema = (optional = false) =>
     z
       .string()
-      .refine(
-        (s) =>
-          optional || s !== "" || (s === "" && allowedByteLengths.includes(0)),
-        {
-          message: msgs.required,
-        },
-      )
+      .refine((s) => optional || s !== "" || (s === "" && allowedByteLengths.includes(0)), {
+        message: msgs.required,
+      })
       .refine((s) => s === "" || tryParse(s) !== null, { message: msgs.format })
       .refine((s) => s === "" || isValidString(s), {
         message: msgs.length,
@@ -51,15 +47,13 @@ export function makePskHelpers(allowedByteLengths: readonly number[]) {
   const bytesSchema = (optional = false): ZodType<Uint8Array> =>
     z
       .instanceof(Uint8Array)
-      .refine(
-        (arr) =>
-          optional || arr.byteLength !== 0 || allowedByteLengths.includes(0),
-        { message: msgs.required },
-      )
-      .refine(
-        (arr) => optional || allowedByteLengths.includes(arr.byteLength),
-        { message: msgs.length, params: { bits: bitsLabel } },
-      );
+      .refine((arr) => optional || arr.byteLength !== 0 || allowedByteLengths.includes(0), {
+        message: msgs.required,
+      })
+      .refine((arr) => optional || allowedByteLengths.includes(arr.byteLength), {
+        message: msgs.length,
+        params: { bits: bitsLabel },
+      });
 
   return {
     allowedByteLengths,

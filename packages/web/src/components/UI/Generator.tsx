@@ -15,7 +15,6 @@ export interface ActionButton {
   variant: ButtonVariant;
   className?: string;
 }
-[];
 
 export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   type: "text" | "password";

@@ -8,13 +8,7 @@ type StackBadgeProps = {
   onClick: (e: { originalEvent: MouseEvent }) => void;
 };
 
-export const StackBadge = ({
-  lng,
-  lat,
-  count,
-  isVisible = true,
-  onClick,
-}: StackBadgeProps) => {
+export const StackBadge = ({ lng, lat, count, isVisible = true, onClick }: StackBadgeProps) => {
   return (
     <Marker
       longitude={lng}

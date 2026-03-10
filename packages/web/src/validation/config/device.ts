@@ -2,9 +2,7 @@ import { Protobuf } from "@meshtastic/core";
 import { z } from "zod/v4";
 
 const RoleEnum = z.enum(Protobuf.Config.Config_DeviceConfig_Role);
-const RebroadcastModeEnum = z.enum(
-  Protobuf.Config.Config_DeviceConfig_RebroadcastMode,
-);
+const RebroadcastModeEnum = z.enum(Protobuf.Config.Config_DeviceConfig_RebroadcastMode);
 
 export const DeviceValidationSchema = z.object({
   role: RoleEnum,

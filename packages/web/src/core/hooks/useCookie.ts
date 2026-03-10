@@ -7,10 +7,7 @@ interface CookieHookResult<T> {
   removeCookie: () => void;
 }
 
-function useCookie<T extends object>(
-  cookieName: string,
-  initialValue?: T,
-): CookieHookResult<T> {
+function useCookie<T extends object>(cookieName: string, initialValue?: T): CookieHookResult<T> {
   const [cookieValue, setCookieValue] = useState<T | undefined>(() => {
     try {
       const cookie = Cookies.get(cookieName);

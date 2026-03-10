@@ -36,10 +36,7 @@ export function generatePrecisionCircles(
   >();
 
   for (const node of filteredNodes) {
-    if (
-      node.position?.precisionBits === undefined ||
-      node.position.precisionBits === 0
-    ) {
+    if (node.position?.precisionBits === undefined || node.position.precisionBits === 0) {
       continue;
     }
     const [lng, lat] = toLngLat(node.position);
@@ -63,9 +60,7 @@ export function generatePrecisionCircles(
     }
   }
 
-  const items = Array.from(unique.values()).sort(
-    (a, b) => a.radiusM - b.radiusM,
-  );
+  const items = Array.from(unique.values()).sort((a, b) => a.radiusM - b.radiusM);
 
   const features: Feature<Polygon, CircleProps>[] = items.map(
     ({ lng, lat, radiusM, r, g, b, a }) => {
@@ -96,13 +91,7 @@ export const SourcePrecisionCircles = ({
         type="fill"
         layout={{ visibility: isVisible ? "visible" : "none" }}
         paint={{
-          "fill-color": [
-            "rgba",
-            ["get", "r"],
-            ["get", "g"],
-            ["get", "b"],
-            ["get", "a"],
-          ],
+          "fill-color": ["rgba", ["get", "r"], ["get", "g"], ["get", "b"], ["get", "a"]],
         }}
       />
       <Layer

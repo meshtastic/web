@@ -34,12 +34,8 @@ export function ToggleInput<T extends FieldValues>({
           {...field.properties}
           className={cn([
             field.properties?.className,
-            isDirty
-              ? "focus:ring-sky-500 ring-sky-500 ring-2 ring-offset-2"
-              : "",
-            invalid
-              ? "focus:ring-red-500 ring-red-500 ring-2 ring-offset-2"
-              : "",
+            isDirty ? "focus:ring-sky-500 ring-sky-500 ring-2 ring-offset-2" : "",
+            invalid ? "focus:ring-red-500 ring-red-500 ring-2 ring-offset-2" : "",
           ])}
           {...rest}
         />

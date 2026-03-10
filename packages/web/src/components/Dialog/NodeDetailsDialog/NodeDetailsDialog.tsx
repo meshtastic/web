@@ -50,10 +50,7 @@ export interface NodeDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const NodeDetailsDialog = ({
-  open,
-  onOpenChange,
-}: NodeDetailsDialogProps) => {
+export const NodeDetailsDialog = ({ open, onOpenChange }: NodeDetailsDialogProps) => {
   const { t } = useTranslation("dialog");
   const { setDialogOpen, connection } = useDevice();
   const { getNode } = useNodeDB();
@@ -64,12 +61,8 @@ export const NodeDetailsDialog = ({
 
   const node = getNode(nodeNumDetails);
 
-  const [isFavoriteState, setIsFavoriteState] = useState<boolean>(
-    node?.isFavorite ?? false,
-  );
-  const [isIgnoredState, setIsIgnoredState] = useState<boolean>(
-    node?.isIgnored ?? false,
-  );
+  const [isFavoriteState, setIsFavoriteState] = useState<boolean>(node?.isFavorite ?? false);
+  const [isIgnoredState, setIsIgnoredState] = useState<boolean>(node?.isIgnored ?? false);
 
   useEffect(() => {
     if (!node) {
@@ -168,8 +161,7 @@ export const NodeDetailsDialog = ({
       key: "batteryLevel",
       label: t("nodeDetails.batteryLevel"),
       value: node.deviceMetrics?.batteryLevel,
-      format: (val: number) =>
-        val === 101 ? t("batteryStatus.pluggedIn") : `${val.toFixed(2)}%`,
+      format: (val: number) => (val === 101 ? t("batteryStatus.pluggedIn") : `${val.toFixed(2)}%`),
     },
     {
       key: "voltage",
@@ -202,27 +194,17 @@ export const NodeDetailsDialog = ({
         <DialogFooter>
           <div className="w-full ">
             <div className="flex flex-row flex-wrap space-y-1">
-              <Button
-                className="mr-1"
-                name="message"
-                onClick={handleDirectMessage}
-              >
+              <Button className="mr-1" name="message" onClick={handleDirectMessage}>
                 <MessageSquareIcon className="mr-2" />
                 {t("nodeDetails.message")}
               </Button>
-              <Button
-                className="mr-1"
-                name="traceRoute"
-                onClick={handleTraceroute}
-              >
+              <Button className="mr-1" name="traceRoute" onClick={handleTraceroute}>
                 <WaypointsIcon className="mr-2" />
                 {t("nodeDetails.traceRoute")}
               </Button>
               <Button className="mr-1" onClick={handleToggleFavorite}>
                 <StarIcon
-                  className={cn(
-                    isFavoriteState ? " fill-yellow-400 stroke-yellow-400" : "",
-                  )}
+                  className={cn(isFavoriteState ? " fill-yellow-400 stroke-yellow-400" : "")}
                 />
               </Button>
               <div className="flex flex-1 justify-start" />
@@ -243,9 +225,7 @@ export const NodeDetailsDialog = ({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                    {isIgnoredState
-                      ? t("nodeDetails.unignoreNode")
-                      : t("nodeDetails.ignoreNode")}
+                    {isIgnoredState ? t("nodeDetails.unignoreNode") : t("nodeDetails.ignoreNode")}
                     <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
                   </TooltipContent>
                 </Tooltip>
@@ -275,9 +255,7 @@ export const NodeDetailsDialog = ({
             <div className="flex flex-col flex-wrap space-x-1 space-y-1">
               <div className="flex flex-row space-x-2">
                 <div className="w-full bg-slate-100 text-slate-900 dark:text-slate-100 dark:bg-slate-800 p-3  rounded-lg">
-                  <p className="text-lg font-semibold">
-                    {t("nodeDetails.details")}
-                  </p>
+                  <p className="text-lg font-semibold">{t("nodeDetails.details")}</p>
                   <table className="table-fixed w-full">
                     <tbody>
                       <tr>
@@ -291,9 +269,10 @@ export const NodeDetailsDialog = ({
                       <tr>
                         <td>{t("nodeDetails.role")}</td>
                         <td>
-                          {Protobuf.Config.Config_DeviceConfig_Role[
-                            node.user?.role ?? 0
-                          ]?.replace(/_/g, " ")}
+                          {Protobuf.Config.Config_DeviceConfig_Role[node.user?.role ?? 0]?.replace(
+                            /_/g,
+                            " ",
+                          )}
                         </td>
                       </tr>
                       <tr>
@@ -312,44 +291,35 @@ export const NodeDetailsDialog = ({
                         <td>{t("nodeDetails.hardware")}</td>
                         <td>
                           {(
-                            Protobuf.Mesh.HardwareModel[
-                              node.user?.hwModel ?? 0
-                            ] ?? t("unknown.shortName")
+                            Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
+                            t("unknown.shortName")
                           ).replace(/_/g, " ")}
                         </td>
                       </tr>
                       <tr>
                         <td>{t("nodeDetails.messageable")}</td>
-                        <td>
-                          {node.user?.isUnmessagable ? t("no") : t("yes")}
-                        </td>
+                        <td>{node.user?.isUnmessagable ? t("no") : t("yes")}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
                 <DeviceImage
                   className="w-40 p-2 rounded-lg border-4 border-slate-200 dark:border-slate-800"
-                  deviceType={
-                    Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
-                    "UNKNOWN"
-                  }
+                  deviceType={Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ?? "UNKNOWN"}
                 />
               </div>
             </div>
 
             <div>
               <div className={sectionClassName}>
-                <p className="text-lg font-semibold">
-                  {t("nodeDetails.security")}
-                </p>
+                <p className="text-lg font-semibold">{t("nodeDetails.security")}</p>
                 <table className="table-auto w-full">
                   <tbody>
                     <tr>
                       <td className="pr-2">{t("nodeDetails.publicKey")}</td>
                       <td>
                         <pre className="text-xs pt-0.5">
-                          {node.user?.publicKey &&
-                          node.user?.publicKey.length > 0
+                          {node.user?.publicKey && node.user?.publicKey.length > 0
                             ? fromByteArray(node.user.publicKey)
                             : t("unknown.longName")}
                         </pre>
@@ -368,9 +338,7 @@ export const NodeDetailsDialog = ({
               </div>
 
               <div className={sectionClassName}>
-                <p className="text-lg font-semibold">
-                  {t("nodeDetails.position")}
-                </p>
+                <p className="text-lg font-semibold">{t("nodeDetails.position")}</p>
 
                 {node.position ? (
                   <table className="table-auto w-full">
@@ -387,8 +355,7 @@ export const NodeDetailsDialog = ({
                               target="_blank"
                               rel="noreferrer"
                             >
-                              {node.position.latitudeI / 1e7},{" "}
-                              {node.position.longitudeI / 1e7}
+                              {node.position.latitudeI / 1e7}, {node.position.longitudeI / 1e7}
                             </a>
                           </td>
                         </tr>
@@ -407,11 +374,7 @@ export const NodeDetailsDialog = ({
                 ) : (
                   <p>{t("unknown.longName")}</p>
                 )}
-                <Button
-                  onClick={handleRequestPosition}
-                  name="requestPosition"
-                  className="mt-2"
-                >
+                <Button onClick={handleRequestPosition} name="requestPosition" className="mt-2">
                   <MapPinnedIcon className="mr-2" />
                   {t("nodeDetails.requestPosition")}
                 </Button>
@@ -436,9 +399,7 @@ export const NodeDetailsDialog = ({
                         <tr>
                           <td>{t("nodeDetails.uptime")}</td>
                           <td>
-                            <Uptime
-                              seconds={node.deviceMetrics.uptimeSeconds}
-                            />
+                            <Uptime seconds={node.deviceMetrics.uptimeSeconds} />
                           </td>
                         </tr>
                       )}
@@ -457,9 +418,7 @@ export const NodeDetailsDialog = ({
                     </p>
                   </AccordionTrigger>
                   <AccordionContent className="overflow-x-scroll">
-                    <pre className="text-xs w-full">
-                      {JSON.stringify(node, null, 2)}
-                    </pre>
+                    <pre className="text-xs w-full">{JSON.stringify(node, null, 2)}</pre>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

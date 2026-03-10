@@ -26,9 +26,7 @@ export default function useLocalStorage<T>(
   const deserializerRef = useRef(options.deserializer ?? JSON.parse);
 
   const initialValueRef = useRef<T>(
-    typeof initialValue === "function"
-      ? (initialValue as () => T)()
-      : initialValue,
+    typeof initialValue === "function" ? (initialValue as () => T)() : initialValue,
   );
 
   const getInitialValue = useCallback(() => initialValueRef.current, []);
@@ -50,22 +48,15 @@ export default function useLocalStorage<T>(
   const setValue: Dispatch<SetStateAction<T>> = useCallback(
     (value) => {
       if (IS_SERVER) {
-        console.warn(
-          `Tried setting localStorage key “${key}” in a non-client environment.`,
-        );
+        console.warn(`Tried setting localStorage key “${key}” in a non-client environment.`);
         return;
       }
 
       try {
         setStoredValue((prev) => {
-          const newValue =
-            typeof value === "function"
-              ? (value as (prev: T) => T)(prev)
-              : value;
+          const newValue = typeof value === "function" ? (value as (prev: T) => T)(prev) : value;
           window.localStorage.setItem(key, serializerRef.current(newValue));
-          window.dispatchEvent(
-            new CustomEvent("local-storage", { detail: { key } }),
-          );
+          window.dispatchEvent(new CustomEvent("local-storage", { detail: { key } }));
           return newValue;
         });
       } catch (err) {
@@ -77,17 +68,13 @@ export default function useLocalStorage<T>(
 
   const removeValue = useCallback(() => {
     if (IS_SERVER) {
-      console.warn(
-        `Tried removing localStorage key “${key}” in a non-client environment.`,
-      );
+      console.warn(`Tried removing localStorage key “${key}” in a non-client environment.`);
       return;
     }
     try {
       window.localStorage.removeItem(key);
       setStoredValue(getInitialValue());
-      window.dispatchEvent(
-        new CustomEvent("local-storage", { detail: { key } }),
-      );
+      window.dispatchEvent(new CustomEvent("local-storage", { detail: { key } }));
     } catch (err) {
       console.warn(`Error removing localStorage key “${key}”:`, err);
     }
@@ -98,17 +85,13 @@ export default function useLocalStorage<T>(
       return;
     }
 
-    const handleStorageChange = (
-      event: StorageEvent | CustomEvent<{ key: string }>,
-    ) => {
+    const handleStorageChange = (event: StorageEvent | CustomEvent<{ key: string }>) => {
       const eventKey = "key" in event ? event.key : event.detail?.key;
 
       if (eventKey === key) {
         try {
           const item = window.localStorage.getItem(key);
-          setStoredValue(
-            item ? deserializerRef.current(item) : getInitialValue(),
-          );
+          setStoredValue(item ? deserializerRef.current(item) : getInitialValue());
         } catch (err) {
           console.warn(`Error syncing localStorage key “${key}”:`, err);
           setStoredValue(getInitialValue());
@@ -117,17 +100,11 @@ export default function useLocalStorage<T>(
     };
 
     window.addEventListener("storage", handleStorageChange);
-    window.addEventListener(
-      "local-storage",
-      handleStorageChange as EventListener,
-    );
+    window.addEventListener("local-storage", handleStorageChange as EventListener);
 
     return () => {
       window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener(
-        "local-storage",
-        handleStorageChange as EventListener,
-      );
+      window.removeEventListener("local-storage", handleStorageChange as EventListener);
     };
   }, [key, getInitialValue]);
 

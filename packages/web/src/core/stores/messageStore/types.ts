@@ -21,9 +21,7 @@ interface GenericMessage<T extends MessageType> extends MessageBase {
   type: T;
 }
 
-type Message =
-  | GenericMessage<MessageType.Direct>
-  | GenericMessage<MessageType.Broadcast>;
+type Message = GenericMessage<MessageType.Direct> | GenericMessage<MessageType.Broadcast>;
 
 type GetMessagesParams =
   | { type: MessageType.Direct; nodeA: NodeNum; nodeB: NodeNum }

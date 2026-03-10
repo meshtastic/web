@@ -207,12 +207,8 @@ describe("NodeDB store", () => {
   it("will prune nodes after 14 days of inactivitiy", async () => {
     const { useNodeDBStore } = await freshStore();
     const st = useNodeDBStore.getState();
-    st.addNodeDB(1).addNode(
-      makeNode(1, { lastHeard: Date.now() / 1000 - 15 * 24 * 3600 }),
-    ); // 15 days ago
-    st.addNodeDB(1).addNode(
-      makeNode(2, { lastHeard: Date.now() / 1000 - 7 * 24 * 3600 }),
-    ); // 7 days ago
+    st.addNodeDB(1).addNode(makeNode(1, { lastHeard: Date.now() / 1000 - 15 * 24 * 3600 })); // 15 days ago
+    st.addNodeDB(1).addNode(makeNode(2, { lastHeard: Date.now() / 1000 - 7 * 24 * 3600 })); // 7 days ago
 
     st.getNodeDB(1)!.pruneStaleNodes();
     expect(st.getNodeDB(1)?.getNode(2)).toBeDefined();
@@ -331,14 +327,10 @@ describe("NodeDB – merge semantics, PKI checks & extras", () => {
 
     const oldDB = st.addNodeDB(30);
     oldDB.setNodeNum(77);
-    oldDB.addNode(
-      makeNode(5, { user: { publicKey: keyOld, longName: "old-5" } }),
-    );
+    oldDB.addNode(makeNode(5, { user: { publicKey: keyOld, longName: "old-5" } }));
 
     const newDB = st.addNodeDB(31);
-    newDB.addNode(
-      makeNode(5, { user: { publicKey: new Uint8Array(), longName: "new-5" } }),
-    );
+    newDB.addNode(makeNode(5, { user: { publicKey: new Uint8Array(), longName: "new-5" } }));
 
     newDB.setNodeNum(77);
 

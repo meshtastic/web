@@ -49,13 +49,7 @@ describe("IP Address Conversion Functions", () => {
 
   describe("bidirectional conversion", () => {
     it("can convert back and forth", () => {
-      const testIps = [
-        "0.0.0.0",
-        "127.0.0.1",
-        "192.168.1.1",
-        "10.0.0.1",
-        "255.255.255.255",
-      ];
+      const testIps = ["0.0.0.0", "127.0.0.1", "192.168.1.1", "10.0.0.1", "255.255.255.255"];
 
       for (const ip of testIps) {
         const int = convertIpAddressToInt(ip);

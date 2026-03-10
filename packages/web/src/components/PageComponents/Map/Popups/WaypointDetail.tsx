@@ -2,12 +2,7 @@ import { TimeAgo } from "@components/generic/TimeAgo";
 import { Separator } from "@components/UI/Separator.tsx";
 import type { WaypointWithMetadata } from "@core/stores";
 import { useNodeDB } from "@core/stores";
-import {
-  bearingDegrees,
-  distanceMeters,
-  hasPos,
-  toLngLat,
-} from "@core/utils/geo";
+import { bearingDegrees, distanceMeters, hasPos, toLngLat } from "@core/utils/geo";
 import type { Protobuf } from "@meshtastic/core";
 import {
   ClockFadingIcon,
@@ -88,14 +83,10 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
           <div className="flex flex-wrap items-start gap-x-3">
             <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
               <ClockPlusIcon size={14} aria-hidden />
-              <span className="truncate">
-                {t("waypointDetail.createdDate")}
-              </span>
+              <span className="truncate">{t("waypointDetail.createdDate")}</span>
             </dt>
             <dd className="ms-auto text-right">
-              <time
-                dateTime={new Date(waypoint.metadata.created).toISOString()}
-              >
+              <time dateTime={new Date(waypoint.metadata.created).toISOString()}>
                 <TimeAgo timestamp={waypoint.metadata.created} />
               </time>
             </dd>
@@ -109,9 +100,7 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
                 <span className="truncate">{t("waypointDetail.updated")}</span>
               </dt>
               <dd className="ms-auto text-right">
-                <time
-                  dateTime={new Date(waypoint.metadata.updated).toISOString()}
-                >
+                <time dateTime={new Date(waypoint.metadata.updated).toISOString()}>
                   <TimeAgo timestamp={waypoint.metadata.updated} />
                 </time>
               </dd>
@@ -143,9 +132,7 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
               <dd className="ms-auto text-right">
                 <data value={Math.round(distance)}>
                   {Math.round(distance)}{" "}
-                  {distance === 1
-                    ? t("unit.meter.one")
-                    : t("unit.meter.plural")}
+                  {distance === 1 ? t("unit.meter.one") : t("unit.meter.plural")}
                 </data>
               </dd>
             </div>
@@ -179,8 +166,7 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
                 <span className="truncate">{t("waypointDetail.lockedTo")}</span>
               </dt>
               <dd className="ms-auto text-right">
-                {getNode(waypoint.lockedTo)?.user?.longName ??
-                  t("unknown.longName")}
+                {getNode(waypoint.lockedTo)?.user?.longName ?? t("unknown.longName")}
               </dd>
             </div>
           )}

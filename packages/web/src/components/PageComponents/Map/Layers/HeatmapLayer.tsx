@@ -13,11 +13,7 @@ export interface HeatmapLayerProps {
   mode: HeatmapMode;
 }
 
-export const HeatmapLayer = ({
-  id,
-  filteredNodes,
-  mode,
-}: HeatmapLayerProps) => {
+export const HeatmapLayer = ({ id, filteredNodes, mode }: HeatmapLayerProps) => {
   const data: FeatureCollection = useMemo(() => {
     const features: Feature[] = filteredNodes
       .filter((node) => hasPos(node.position))
@@ -45,9 +41,7 @@ export const HeatmapLayer = ({
   const paintProps: HeatmapLayerSpecification["paint"] = useMemo(
     () => ({
       "heatmap-weight":
-        mode === "density"
-          ? 1
-          : ["interpolate", ["linear"], ["get", "snr"], -20, 0, 10, 1],
+        mode === "density" ? 1 : ["interpolate", ["linear"], ["get", "snr"], -20, 0, 10, 1],
       "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 0, 1, 15, 3],
       // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
       // Begin color ramp at 0-stop with a 0-transparancy color
@@ -69,17 +63,7 @@ export const HeatmapLayer = ({
         1,
         "rgb(178,24,43)",
       ],
-      "heatmap-radius": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        0,
-        2,
-        9,
-        20,
-        15,
-        30,
-      ],
+      "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0, 2, 9, 20, 15, 30],
       // Opacity 0.7 to be visible but not blocking
       "heatmap-opacity": 0.7,
     }),

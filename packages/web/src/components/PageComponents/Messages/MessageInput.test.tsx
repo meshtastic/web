@@ -1,23 +1,11 @@
 import type { Types } from "@meshtastic/core";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MessageInput, type MessageInputProps } from "./MessageInput.tsx";
 
 vi.mock("@components/UI/Button.tsx", () => ({
   Button: vi.fn(({ type, className, children, onClick, onSubmit, ...rest }) => (
-    <button
-      type={type}
-      className={className}
-      onClick={onClick}
-      onSubmit={onSubmit}
-      {...rest}
-    >
+    <button type={type} className={className} onClick={onClick} onSubmit={onSubmit} {...rest}>
       {children}
     </button>
   )),
@@ -155,9 +143,7 @@ describe("MessageInput", () => {
       expect(mockOnSend).toHaveBeenCalledTimes(1);
       expect(mockOnSend).toHaveBeenCalledWith(testMessage);
       expect((inputElement as HTMLInputElement).value).toBe("");
-      expect(screen.getByTestId("byte-counter")).toHaveTextContent(
-        `0/${defaultProps.maxBytes}`,
-      );
+      expect(screen.getByTestId("byte-counter")).toHaveTextContent(`0/${defaultProps.maxBytes}`);
       expect(mockClearDraft).toHaveBeenCalledTimes(1);
       expect(mockClearDraft).toHaveBeenCalledWith(defaultProps.to);
     });
@@ -222,20 +208,16 @@ describe("MessageInput", () => {
 
   it("should work with broadcast destination for drafts", () => {
     const broadcastDest: Types.Destination = "broadcast";
-    mockGetDraft.mockImplementation((key) =>
-      key === broadcastDest ? "Broadcast draft" : "",
-    );
+    mockGetDraft.mockImplementation((key) => (key === broadcastDest ? "Broadcast draft" : ""));
 
     renderComponent({ to: broadcastDest });
 
     expect(mockGetDraft).toHaveBeenCalledWith(broadcastDest);
-    expect(
-      (screen.getByTestId("message-input-field") as HTMLInputElement).value,
-    ).toBe("Broadcast draft");
+    expect((screen.getByTestId("message-input-field") as HTMLInputElement).value).toBe(
+      "Broadcast draft",
+    );
 
-    const inputElement = screen.getByTestId(
-      "message-input-field",
-    ) as HTMLInputElement;
+    const inputElement = screen.getByTestId("message-input-field") as HTMLInputElement;
     const formElement = screen.getByRole("form");
     const newMessage = "New broadcast msg";
 

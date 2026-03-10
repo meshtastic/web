@@ -1,11 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  getColorFromNodeNum,
-  hexToRgb,
-  isLightColor,
-  type RGBColor,
-  rgbToHex,
-} from "./color.ts";
+import { getColorFromNodeNum, hexToRgb, isLightColor, type RGBColor, rgbToHex } from "./color.ts";
 
 describe("hexToRgb", () => {
   it.each([
@@ -29,9 +23,7 @@ describe("rgbToHex", () => {
   });
 
   it("rounds component values before packing", () => {
-    expect(rgbToHex({ r: 12.2, g: 12.8, b: 99.5 })).toBe(
-      (12 << 16) | (13 << 8) | 100,
-    );
+    expect(rgbToHex({ r: 12.2, g: 12.8, b: 99.5 })).toBe((12 << 16) | (13 << 8) | 100);
   });
 });
 

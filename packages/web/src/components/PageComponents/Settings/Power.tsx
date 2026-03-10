@@ -1,12 +1,6 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import {
-  type PowerValidation,
-  PowerValidationSchema,
-} from "@app/validation/config/power.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { type PowerValidation, PowerValidationSchema } from "@app/validation/config/power.ts";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";

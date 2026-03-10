@@ -42,8 +42,7 @@ export default function ThemeSwitcher({
   const toggleTheme = () => {
     const preferences: ThemePreference[] = ["light", "dark", "system"];
     const currentIndex = preferences.indexOf(preference);
-    const nextPreference =
-      preferences[(currentIndex + 1) % preferences.length] ?? "system";
+    const nextPreference = preferences[(currentIndex + 1) % preferences.length] ?? "system";
     setPreference(nextPreference);
     toggleShowTooltip();
   };
@@ -90,8 +89,7 @@ export default function ThemeSwitcher({
           "text-sm",
           "text-gray-600 dark:text-gray-300",
           "transition-colors duration-150",
-          !disableHover &&
-            "group-hover:text-gray-800 dark:group-hover:text-gray-100",
+          !disableHover && "group-hover:text-gray-800 dark:group-hover:text-gray-100",
         )}
       >
         {t("theme.changeTheme")}

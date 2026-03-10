@@ -2,11 +2,7 @@ import { featureFlags } from "@core/services/featureFlags.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
-import {
-  type PersistOptions,
-  persist,
-  subscribeWithSelector,
-} from "zustand/middleware";
+import { type PersistOptions, persist, subscribeWithSelector } from "zustand/middleware";
 import type { RasterSource } from "./types.ts";
 
 const IDB_KEY_NAME = "meshtastic-app-store";
@@ -109,12 +105,8 @@ const persistOptions: PersistOptions<AppState, AppData> = {
 
 // Add persist middleware on the store if the feature flag is enabled
 const persistApps = featureFlags.get("persistApp");
-console.debug(
-  `AppStore: Persisting app is ${persistApps ? "enabled" : "disabled"}`,
-);
+console.debug(`AppStore: Persisting app is ${persistApps ? "enabled" : "disabled"}`);
 
 export const useAppStore = persistApps
-  ? createStore(
-      subscribeWithSelector(persist(deviceStoreInitializer, persistOptions)),
-    )
+  ? createStore(subscribeWithSelector(persist(deviceStoreInitializer, persistOptions)))
   : createStore(subscribeWithSelector(deviceStoreInitializer));

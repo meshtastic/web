@@ -1,12 +1,6 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import {
-  type DisplayValidation,
-  DisplayValidationSchema,
-} from "@app/validation/config/display.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { type DisplayValidation, DisplayValidationSchema } from "@app/validation/config/display.ts";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -60,9 +54,7 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
               label: t("display.gpsDisplayUnits.label"),
               description: t("display.gpsDisplayUnits.description"),
               properties: {
-                enumValue:
-                  Protobuf.Config
-                    .Config_DisplayConfig_DeprecatedGpsCoordinateFormat,
+                enumValue: Protobuf.Config.Config_DisplayConfig_DeprecatedGpsCoordinateFormat,
               },
             },
             {

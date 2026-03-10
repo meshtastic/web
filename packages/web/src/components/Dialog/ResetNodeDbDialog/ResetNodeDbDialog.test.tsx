@@ -48,9 +48,7 @@ describe("ResetNodeDbDialog", () => {
     );
 
     render(<ResetNodeDbDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(
-      screen.getByRole("button", { name: "Reset Node Database" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Reset Node Database" }));
 
     // Called immediately
     expect(mockResetNodes).toHaveBeenCalledTimes(1);

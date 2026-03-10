@@ -19,10 +19,7 @@ const ToggleGroup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToggleGroupPrimitive.Root
     ref={ref}
-    className={cn(
-      "flex rounded shadow-md space-x-[1px] bg-slate-300 dark:bg-slate-800",
-      className,
-    )}
+    className={cn("flex rounded shadow-md space-x-[1px] bg-slate-300 dark:bg-slate-800", className)}
     {...props}
   />
 ));

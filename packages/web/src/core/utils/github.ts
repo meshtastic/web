@@ -37,9 +37,7 @@ const VALID_PARAMS = [
  * @throws {Error} If repository information is missing or invalid
  * @throws {TypeError} If labels or projects are not arrays when provided
  */
-export default function newGithubIssueUrl(
-  options: GithubIssueUrlOptions = {},
-): string {
+export default function newGithubIssueUrl(options: GithubIssueUrlOptions = {}): string {
   const validatedOptions = validateOptions(options);
   const url = new URL(`${validatedOptions.repoUrl}/issues/new`);
 

@@ -76,9 +76,8 @@ export class EventSystem {
    *
    * @event onAtakPacket
    */
-  public readonly onAtakPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onAtakPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Text packet has been
@@ -86,9 +85,8 @@ export class EventSystem {
    *
    * @event onMessagePacket
    */
-  public readonly onMessagePacket: SimpleEventDispatcher<
-    PacketMetadata<string>
-  > = new SimpleEventDispatcher<PacketMetadata<string>>();
+  public readonly onMessagePacket: SimpleEventDispatcher<PacketMetadata<string>> =
+    new SimpleEventDispatcher<PacketMetadata<string>>();
 
   /**
    * Fires when a new MeshPacket message containing a Remote Hardware packet has
@@ -98,9 +96,7 @@ export class EventSystem {
    */
   public readonly onRemoteHardwarePacket: SimpleEventDispatcher<
     PacketMetadata<Protobuf.RemoteHardware.HardwareMessage>
-  > = new SimpleEventDispatcher<
-    PacketMetadata<Protobuf.RemoteHardware.HardwareMessage>
-  >();
+  > = new SimpleEventDispatcher<PacketMetadata<Protobuf.RemoteHardware.HardwareMessage>>();
 
   /**
    * Fires when a new MeshPacket message containing a Position packet has been
@@ -108,9 +104,8 @@ export class EventSystem {
    *
    * @event onPositionPacket
    */
-  public readonly onPositionPacket: SimpleEventDispatcher<
-    PacketMetadata<Protobuf.Mesh.Position>
-  > = new SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Position>>();
+  public readonly onPositionPacket: SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Position>> =
+    new SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Position>>();
 
   /**
    * Fires when a new MeshPacket message containing a User packet has been
@@ -118,9 +113,8 @@ export class EventSystem {
    *
    * @event onUserPacket
    */
-  public readonly onUserPacket: SimpleEventDispatcher<
-    PacketMetadata<Protobuf.Mesh.User>
-  > = new SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.User>>();
+  public readonly onUserPacket: SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.User>> =
+    new SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.User>>();
 
   /**
    * Fires when a new MeshPacket message containing a Routing packet has been
@@ -128,9 +122,8 @@ export class EventSystem {
    *
    * @event onRoutingPacket
    */
-  public readonly onRoutingPacket: SimpleEventDispatcher<
-    PacketMetadata<Protobuf.Mesh.Routing>
-  > = new SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Routing>>();
+  public readonly onRoutingPacket: SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Routing>> =
+    new SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Routing>>();
 
   /**
    * Fires when the device receives a Metadata packet
@@ -146,9 +139,8 @@ export class EventSystem {
    *
    * @event onCannedMessageModulePacket
    */
-  public readonly onCannedMessageModulePacket: SimpleEventDispatcher<
-    PacketMetadata<string>
-  > = new SimpleEventDispatcher<PacketMetadata<string>>();
+  public readonly onCannedMessageModulePacket: SimpleEventDispatcher<PacketMetadata<string>> =
+    new SimpleEventDispatcher<PacketMetadata<string>>();
 
   /**
    * Fires when a new MeshPacket message containing a Waypoint packet has been
@@ -156,9 +148,8 @@ export class EventSystem {
    *
    * @event onWaypointPacket
    */
-  public readonly onWaypointPacket: SimpleEventDispatcher<
-    PacketMetadata<Protobuf.Mesh.Waypoint>
-  > = new SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Waypoint>>();
+  public readonly onWaypointPacket: SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Waypoint>> =
+    new SimpleEventDispatcher<PacketMetadata<Protobuf.Mesh.Waypoint>>();
 
   /**
    * Fires when a new MeshPacket message containing an Audio packet has been
@@ -166,9 +157,8 @@ export class EventSystem {
    *
    * @event onAudioPacket
    */
-  public readonly onAudioPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onAudioPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Detection Sensor packet has been
@@ -176,9 +166,8 @@ export class EventSystem {
    *
    * @event onDetectionSensorPacket
    */
-  public readonly onDetectionSensorPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onDetectionSensorPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Ping packet has been
@@ -186,9 +175,8 @@ export class EventSystem {
    *
    * @event onPingPacket
    */
-  public readonly onPingPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onPingPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a IP Tunnel packet has been
@@ -196,9 +184,8 @@ export class EventSystem {
    *
    * @event onIpTunnelPacket
    */
-  public readonly onIpTunnelPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onIpTunnelPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Paxcounter packet has been
@@ -216,9 +203,8 @@ export class EventSystem {
    *
    * @event onSerialPacket
    */
-  public readonly onSerialPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onSerialPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Store and Forward packet
@@ -226,9 +212,8 @@ export class EventSystem {
    *
    * @event onStoreForwardPacket
    */
-  public readonly onStoreForwardPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onStoreForwardPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Store and Forward packet
@@ -236,9 +221,8 @@ export class EventSystem {
    *
    * @event onRangeTestPacket
    */
-  public readonly onRangeTestPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onRangeTestPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Telemetry packet has been
@@ -256,9 +240,8 @@ export class EventSystem {
    *
    * @event onZPSPacket
    */
-  public readonly onZpsPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onZpsPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Simulator packet has been
@@ -266,9 +249,8 @@ export class EventSystem {
    *
    * @event onSimulatorPacket
    */
-  public readonly onSimulatorPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onSimulatorPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Trace Route packet has been
@@ -296,9 +278,8 @@ export class EventSystem {
    *
    * @event onAtakPluginPacket
    */
-  public readonly onAtakPluginPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onAtakPluginPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Map Report packet has been
@@ -306,9 +287,8 @@ export class EventSystem {
    *
    * @event onMapReportPacket
    */
-  public readonly onMapReportPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onMapReportPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a Private packet has been
@@ -316,9 +296,8 @@ export class EventSystem {
    *
    * @event onPrivatePacket
    */
-  public readonly onPrivatePacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onPrivatePacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing an ATAK Forwarder packet has been
@@ -326,9 +305,8 @@ export class EventSystem {
    *
    * @event onAtakForwarderPacket
    */
-  public readonly onAtakForwarderPacket: SimpleEventDispatcher<
-    PacketMetadata<Uint8Array>
-  > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
+  public readonly onAtakForwarderPacket: SimpleEventDispatcher<PacketMetadata<Uint8Array>> =
+    new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
    * Fires when a new MeshPacket message containing a ClientNotification packet has been
@@ -361,8 +339,7 @@ export class EventSystem {
    *
    * @event onMeshHeartbeat
    */
-  public readonly onMeshHeartbeat: SimpleEventDispatcher<Date> =
-    new SimpleEventDispatcher<Date>();
+  public readonly onMeshHeartbeat: SimpleEventDispatcher<Date> = new SimpleEventDispatcher<Date>();
 
   /**
    * Outputs any debug log data (currently serial connections only)

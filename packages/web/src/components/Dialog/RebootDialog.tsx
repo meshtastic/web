@@ -96,11 +96,7 @@ export const RebootDialog = ({ open, onOpenChange }: RebootDialogProps) => {
         <Separator />
         {!isScheduled ? (
           <>
-            <Checkbox
-              checked={isOTA}
-              onChange={(checked) => setIsOTA(checked)}
-              className="px-2"
-            >
+            <Checkbox checked={isOTA} onChange={(checked) => setIsOTA(checked)} className="px-2">
               {t("reboot.ota")}
             </Checkbox>
             <div className="flex gap-2 px-2 items-center relative">
@@ -137,9 +133,7 @@ export const RebootDialog = ({ open, onOpenChange }: RebootDialogProps) => {
         ) : (
           <div className="px-2">
             <div className="pb-6 pt-2  text-center">
-              <Label className=" text-gray-700 dark:text-gray-300 ">
-                {t("reboot.scheduled")}
-              </Label>
+              <Label className=" text-gray-700 dark:text-gray-300 ">{t("reboot.scheduled")}</Label>
             </div>
             <Button
               variant="destructive"

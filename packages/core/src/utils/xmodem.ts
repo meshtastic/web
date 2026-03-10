@@ -74,11 +74,7 @@ export class Xmodem {
           this.rxBuffer[this.counter] = packet.buffer;
           return this.sendCommand(Protobuf.Xmodem.XModem_Control.ACK);
         }
-        return await this.sendCommand(
-          Protobuf.Xmodem.XModem_Control.NAK,
-          undefined,
-          packet.seq,
-        );
+        return await this.sendCommand(Protobuf.Xmodem.XModem_Control.NAK, undefined, packet.seq);
       }
       case Protobuf.Xmodem.XModem_Control.STX: {
         break;

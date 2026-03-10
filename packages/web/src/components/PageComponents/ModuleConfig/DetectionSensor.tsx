@@ -3,10 +3,7 @@ import {
   type DetectionSensorValidation,
   DetectionSensorValidationSchema,
 } from "@app/validation/moduleConfig/detectionSensor.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -16,13 +13,10 @@ interface DetectionSensorModuleConfigProps {
   onFormInit: DynamicFormFormInit<DetectionSensorValidation>;
 }
 
-export const DetectionSensor = ({
-  onFormInit,
-}: DetectionSensorModuleConfigProps) => {
+export const DetectionSensor = ({ onFormInit }: DetectionSensorModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "detectionSensor" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: DetectionSensorValidation) => {
@@ -60,9 +54,7 @@ export const DetectionSensor = ({
               type: "number",
               name: "minimumBroadcastSecs",
               label: t("detectionSensor.minimumBroadcastSecs.label"),
-              description: t(
-                "detectionSensor.minimumBroadcastSecs.description",
-              ),
+              description: t("detectionSensor.minimumBroadcastSecs.description"),
               properties: {
                 suffix: t("unit.second.plural"),
               },
@@ -120,18 +112,14 @@ export const DetectionSensor = ({
               type: "select",
               name: "detectionTriggerType",
               label: t("detectionSensor.detectionTriggerType.label"),
-              description: t(
-                "detectionSensor.detectionTriggerType.description",
-              ),
+              description: t("detectionSensor.detectionTriggerType.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
                 },
               ],
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_DetectionSensorConfig_TriggerType,
+                enumValue: Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig_TriggerType,
               },
             },
             {

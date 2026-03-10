@@ -29,9 +29,7 @@ async function freshStore(persist = false) {
   // Mock feature flag for persistence
   vi.doMock("@core/services/featureFlags", () => ({
     featureFlags: {
-      get: vi.fn((key: string) =>
-        key === "persistMessages" ? persist : false,
-      ),
+      get: vi.fn((key: string) => (key === "persistMessages" ? persist : false)),
     },
   }));
 
@@ -127,9 +125,7 @@ describe("MessageStore persistence & rehydrate", () => {
     const db = state.addMessageStore(123);
 
     db.setNodeNum(myNodeNum);
-    expect(useMessageStore.getState().getMessageStore(123)?.myNodeNum).toBe(
-      myNodeNum,
-    );
+    expect(useMessageStore.getState().getMessageStore(123)?.myNodeNum).toBe(myNodeNum);
   });
 
   describe("saveMessage", async () => {
@@ -154,9 +150,7 @@ describe("MessageStore persistence & rehydrate", () => {
       // Check if the message exists within the inner Map
       expect(conversationLog?.has(directMessageToOther1.messageId)).toBe(true);
       // Check the message content
-      expect(conversationLog?.get(directMessageToOther1.messageId)).toEqual(
-        directMessageToOther1,
-      );
+      expect(conversationLog?.get(directMessageToOther1.messageId)).toEqual(directMessageToOther1);
     });
 
     it("should save a broadcast message with correct Map structure", () => {
@@ -168,9 +162,7 @@ describe("MessageStore persistence & rehydrate", () => {
       const channelLog = store.messages.broadcast.get(channelId);
       expect(channelLog).toBeInstanceOf(Map);
       expect(channelLog?.has(broadcastMessage1.messageId)).toBe(true);
-      expect(channelLog?.get(broadcastMessage1.messageId)).toEqual(
-        broadcastMessage1,
-      );
+      expect(channelLog?.get(broadcastMessage1.messageId)).toEqual(broadcastMessage1);
     });
 
     it("should save multiple messages correctly", () => {
@@ -181,24 +173,18 @@ describe("MessageStore persistence & rehydrate", () => {
       const store = state.getMessageStore(123)!;
 
       const convId1 = getConversationId(myNodeNum, otherNodeNum1);
-      expect(
-        store.messages.direct
-          .get(convId1)
-          ?.get(directMessageToOther1.messageId),
-      ).toEqual(directMessageToOther1);
+      expect(store.messages.direct.get(convId1)?.get(directMessageToOther1.messageId)).toEqual(
+        directMessageToOther1,
+      );
 
-      expect(
-        store.messages.direct
-          .get(convId1)
-          ?.get(directMessageFromOther1.messageId),
-      ).toEqual(directMessageFromOther1);
+      expect(store.messages.direct.get(convId1)?.get(directMessageFromOther1.messageId)).toEqual(
+        directMessageFromOther1,
+      );
 
       const channelId = broadcastMessage1.channel;
-      expect(
-        store.messages.broadcast
-          .get(channelId)
-          ?.get(broadcastMessage1.messageId),
-      ).toEqual(broadcastMessage1);
+      expect(store.messages.broadcast.get(channelId)?.get(broadcastMessage1.messageId)).toEqual(
+        broadcastMessage1,
+      );
     });
   });
 
@@ -342,9 +328,7 @@ describe("MessageStore persistence & rehydrate", () => {
         newState: MessageState.Ack,
       });
       expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "Message or conversation/channel not found for state update",
-        ),
+        expect.stringContaining("Message or conversation/channel not found for state update"),
       );
       warnSpy.mockRestore();
     });
@@ -358,9 +342,7 @@ describe("MessageStore persistence & rehydrate", () => {
         newState: MessageState.Ack,
       });
       expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "Message or conversation/channel not found for state update",
-        ),
+        expect.stringContaining("Message or conversation/channel not found for state update"),
       );
       warnSpy.mockRestore();
     });
@@ -375,9 +357,7 @@ describe("MessageStore persistence & rehydrate", () => {
         newState: MessageState.Ack,
       });
       expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "Message or conversation/channel not found for state update",
-        ),
+        expect.stringContaining("Message or conversation/channel not found for state update"),
       );
       warnSpy.mockRestore();
     });
@@ -418,9 +398,7 @@ describe("MessageStore persistence & rehydrate", () => {
       const conversationLog = store.messages.direct.get(conversationId);
       expect(conversationLog?.has(messageIdToDelete)).toBe(false);
       expect(conversationLog?.has(extraDirectMessageId)).toBe(true);
-      expect(conversationLog?.has(directMessageFromOther1.messageId)).toBe(
-        true,
-      );
+      expect(conversationLog?.has(directMessageFromOther1.messageId)).toBe(true);
       expect(store.messages.direct.has(conversationId)).toBe(true);
     });
 
@@ -455,9 +433,7 @@ describe("MessageStore persistence & rehydrate", () => {
       });
 
       const store = useMessageStore.getState().getMessageStore(123)!;
-      expect(
-        store.messages.broadcast.get(channelId)?.get(messageIdToDelete),
-      ).toBeUndefined();
+      expect(store.messages.broadcast.get(channelId)?.get(messageIdToDelete)).toBeUndefined();
     });
 
     it("should clean up empty conversation/channel Maps", () => {
@@ -486,9 +462,7 @@ describe("MessageStore persistence & rehydrate", () => {
         messageId: extraDirectMessageId,
       });
 
-      expect(
-        state.getMessageStore(123)?.messages.direct.has(directConvId),
-      ).toBe(false);
+      expect(state.getMessageStore(123)?.messages.direct.has(directConvId)).toBe(false);
 
       state.getMessageStore(123)?.clearMessageByMessageId({
         type: MessageType.Broadcast,
@@ -496,9 +470,7 @@ describe("MessageStore persistence & rehydrate", () => {
         messageId: broadcastMessage1.messageId,
       });
 
-      expect(
-        state.getMessageStore(123)?.messages.broadcast.has(broadcastChanId),
-      ).toBe(false);
+      expect(state.getMessageStore(123)?.messages.broadcast.has(broadcastChanId)).toBe(false);
     });
 
     it("should not error when trying to delete non-existent message", () => {
@@ -517,9 +489,7 @@ describe("MessageStore persistence & rehydrate", () => {
       const store = useMessageStore.getState().getMessageStore(123)!;
       const conversationLog = store.messages.direct.get(conversationId);
       expect(conversationLog?.size).toBe(3); // 101, 102, 1011
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("not found in direct chat"),
-      );
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("not found in direct chat"));
 
       warnSpy.mockRestore();
     });
@@ -535,9 +505,7 @@ describe("MessageStore persistence & rehydrate", () => {
         });
       }).not.toThrow();
 
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Message entry"),
-      );
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Message entry"));
 
       expect(warnSpy).toHaveBeenCalledTimes(1);
 
@@ -556,22 +524,14 @@ describe("MessageStore persistence & rehydrate", () => {
 
     it("should set and get a draft for direct chat", () => {
       state.getMessageStore(123)?.setDraft(draftKeyDirect, draftMessage);
-      expect(state.getMessageStore(123)?.drafts.get(draftKeyDirect)).toBe(
-        draftMessage,
-      );
-      expect(state.getMessageStore(123)?.getDraft(draftKeyDirect)).toBe(
-        draftMessage,
-      );
+      expect(state.getMessageStore(123)?.drafts.get(draftKeyDirect)).toBe(draftMessage);
+      expect(state.getMessageStore(123)?.getDraft(draftKeyDirect)).toBe(draftMessage);
     });
 
     it("should set and get a draft for broadcast chat", () => {
       state.getMessageStore(123)?.setDraft(draftKeyBroadcast, draftMessage);
-      expect(state.getMessageStore(123)?.drafts.get(draftKeyBroadcast)).toBe(
-        draftMessage,
-      );
-      expect(state.getMessageStore(123)?.getDraft(draftKeyBroadcast)).toBe(
-        draftMessage,
-      );
+      expect(state.getMessageStore(123)?.drafts.get(draftKeyBroadcast)).toBe(draftMessage);
+      expect(state.getMessageStore(123)?.getDraft(draftKeyBroadcast)).toBe(draftMessage);
     });
 
     it("should return empty string for non-existent draft", () => {
@@ -582,9 +542,7 @@ describe("MessageStore persistence & rehydrate", () => {
       state.getMessageStore(123)?.setDraft(draftKeyDirect, draftMessage);
       expect(state.getMessageStore(123)?.drafts.has(draftKeyDirect)).toBe(true);
       state.getMessageStore(123)?.clearDraft(draftKeyDirect);
-      expect(state.getMessageStore(123)?.drafts.has(draftKeyDirect)).toBe(
-        false,
-      );
+      expect(state.getMessageStore(123)?.drafts.has(draftKeyDirect)).toBe(false);
       expect(state.getMessageStore(123)?.getDraft(draftKeyDirect)).toBe("");
     });
   });
@@ -598,12 +556,8 @@ describe("MessageStore persistence & rehydrate", () => {
       state.getMessageStore(123)?.saveMessage(directMessageToOther1);
       state.getMessageStore(123)?.saveMessage(broadcastMessage1);
 
-      expect(state.getMessageStore(123)?.messages.direct.size).toBeGreaterThan(
-        0,
-      );
-      expect(
-        state.getMessageStore(123)?.messages.broadcast.size,
-      ).toBeGreaterThan(0);
+      expect(state.getMessageStore(123)?.messages.direct.size).toBeGreaterThan(0);
+      expect(state.getMessageStore(123)?.messages.broadcast.size).toBeGreaterThan(0);
 
       state.getMessageStore(123)?.deleteAllMessages();
 
@@ -627,21 +581,14 @@ describe("MessageStore persistence & rehydrate", () => {
         const convId = getConversationId(myNodeNum, otherNodeNum1);
         store.saveMessage(directMessageToOther1);
         store.saveMessage(broadcastMessage1);
-        store.setDraft(
-          otherNodeNum1 as unknown as Types.Destination,
-          "draft-text",
-        );
+        store.setDraft(otherNodeNum1 as unknown as Types.Destination, "draft-text");
 
         const store2 = state.addMessageStore(123);
 
         expect(store2.messages.direct.has(convId)).toBe(true);
         expect(store2.messages.direct.get(convId)?.has(101)).toBe(true);
-        expect(store2.messages.broadcast.get(broadcastChannel)?.has(201)).toBe(
-          true,
-        );
-        expect(
-          store2.getDraft(otherNodeNum1 as unknown as Types.Destination),
-        ).toBe("draft-text");
+        expect(store2.messages.broadcast.get(broadcastChannel)?.has(201)).toBe(true);
+        expect(store2.getDraft(otherNodeNum1 as unknown as Types.Destination)).toBe("draft-text");
       }
       {
         const { useMessageStore } = await freshStore(true);
@@ -664,9 +611,7 @@ describe("MessageStore persistence & rehydrate", () => {
         });
         expect(bMsgs.map((m) => m.messageId)).toEqual([201]);
 
-        expect(
-          store.getDraft(otherNodeNum1 as unknown as Types.Destination),
-        ).toBe("draft-text");
+        expect(store.getDraft(otherNodeNum1 as unknown as Types.Destination)).toBe("draft-text");
 
         store.saveMessage(directMessageFromOther1);
 
@@ -721,9 +666,7 @@ describe("MessageStore persistence & rehydrate", () => {
         const kept = state.getMessageStore(501);
         expect(kept).toBeDefined();
 
-        expect(kept?.messages.broadcast.get(broadcastChannel)?.has(202)).toBe(
-          true,
-        );
+        expect(kept?.messages.broadcast.get(broadcastChannel)?.has(202)).toBe(true);
       }
     });
 
@@ -745,8 +688,7 @@ describe("MessageStore persistence & rehydrate", () => {
     it("keeps only the latest 1000 messages in a broadcast channel (oldest trimmed)", async () => {
       setAutoFreeze(false); // Disable immer auto-freeze for performance in this test
       try {
-        const { useMessageStore, MessageType, MessageState } =
-          await freshStore();
+        const { useMessageStore, MessageType, MessageState } = await freshStore();
         const state = useMessageStore.getState();
 
         const store = state.addMessageStore(123);

@@ -10,11 +10,7 @@ interface FormatOptions {
   numberFormat?: Intl.NumberFormatOptions;
 }
 
-export function formatQuantity(
-  value: number,
-  forms: PluralForms,
-  options: FormatOptions = {},
-) {
+export function formatQuantity(value: number, forms: PluralForms, options: FormatOptions = {}) {
   const {
     locale = "en-US",
     pluralRules: pluralOptions = { type: "cardinal" },
@@ -40,14 +36,8 @@ export function validateMaxByteLength(
   maxByteLength: number,
 ): LengthValidationResult {
   // Ensure maxByteLength is valid
-  if (
-    typeof maxByteLength !== "number" ||
-    !Number.isInteger(maxByteLength) ||
-    maxByteLength < 0
-  ) {
-    console.warn(
-      "validateMaxByteLength: maxByteLength must be a non-negative integer.",
-    );
+  if (typeof maxByteLength !== "number" || !Number.isInteger(maxByteLength) || maxByteLength < 0) {
+    console.warn("validateMaxByteLength: maxByteLength must be a non-negative integer.");
     return { isValid: false, currentLength: null }; // Cannot validate with invalid limit
   }
 
@@ -58,9 +48,7 @@ export function validateMaxByteLength(
 
   // Check for TextEncoder availability
   if (typeof TextEncoder === "undefined") {
-    console.error(
-      "validateMaxByteLength: TextEncoder API is not available in this environment.",
-    );
+    console.error("validateMaxByteLength: TextEncoder API is not available in this environment.");
     return { isValid: false, currentLength: null }; // Cannot determine byte length
   }
 

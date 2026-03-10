@@ -45,8 +45,10 @@ export function useBackupReminder({
 
   const { toast } = useToast();
   const toastShownRef = useRef(false);
-  const [reminderState, setReminderState] =
-    useLocalStorage<ReminderState | null>(STORAGE_KEY, null);
+  const [reminderState, setReminderState] = useLocalStorage<ReminderState | null>(
+    STORAGE_KEY,
+    null,
+  );
 
   const setReminderExpiry = useCallback(
     (days: number) => {

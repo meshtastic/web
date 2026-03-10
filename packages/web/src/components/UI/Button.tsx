@@ -9,10 +9,8 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-slate-900 text-white dark:bg-slate-50 hover:dark:bg-slate-200 dark:text-slate-900 hover:bg-slate-500",
-        destructive:
-          "bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-600",
-        success:
-          "bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600",
+        destructive: "bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-600",
+        success: "bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600",
         outline:
           "bg-transparent border border-slate-400 hover:text-slate-400 dark:hover:text-slate-300 dark:border-slate-400 dark:text-slate-100 ",
         subtle:
@@ -38,8 +36,7 @@ const buttonVariants = cva(
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   icon?: React.ReactNode;
   iconAlignment?: "left" | "right";
 }

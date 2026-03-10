@@ -33,9 +33,7 @@ describe("FactoryResetConfigDialog", () => {
   it("calls factoryResetConfig and then closes the dialog on confirm", async () => {
     render(<FactoryResetConfigDialog open onOpenChange={mockOnOpenChange} />);
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Factory Reset Config" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Factory Reset Config" }));
 
     expect(mockFactoryReset).toHaveBeenCalledTimes(1);
 

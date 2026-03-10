@@ -1,8 +1,4 @@
-import {
-  type FlagKey,
-  type Flags,
-  featureFlags,
-} from "@core/services/featureFlags.ts";
+import { type FlagKey, type Flags, featureFlags } from "@core/services/featureFlags.ts";
 import * as React from "react";
 
 export function useFeatureFlags(): Flags {

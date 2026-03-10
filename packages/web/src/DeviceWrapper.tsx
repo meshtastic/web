@@ -8,8 +8,6 @@ export interface DeviceWrapperProps {
 
 export const DeviceWrapper = ({ children, deviceId }: DeviceWrapperProps) => {
   return (
-    <CurrentDeviceContext.Provider value={{ deviceId }}>
-      {children}
-    </CurrentDeviceContext.Provider>
+    <CurrentDeviceContext.Provider value={{ deviceId }}>{children}</CurrentDeviceContext.Provider>
   );
 };

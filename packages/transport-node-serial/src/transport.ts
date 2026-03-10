@@ -16,8 +16,7 @@ export class TransportNodeSerial implements Types.Transport {
   private port: SerialPort | undefined;
   private pipePromise?: Promise<void>;
   private abortController: AbortController;
-  private lastStatus: Types.DeviceStatusEnum =
-    Types.DeviceStatusEnum.DeviceDisconnected;
+  private lastStatus: Types.DeviceStatusEnum = Types.DeviceStatusEnum.DeviceDisconnected;
   private closingByUser = false;
 
   /**
@@ -26,10 +25,7 @@ export class TransportNodeSerial implements Types.Transport {
    * @param baudRate - Baud rate for the serial connection (default is 115200).
    * @returns A promise that resolves with a connected TransportNode instance.
    */
-  public static create(
-    path: string,
-    baudRate = 115200,
-  ): Promise<TransportNodeSerial> {
+  public static create(path: string, baudRate = 115200): Promise<TransportNodeSerial> {
     return new Promise((resolve, reject) => {
       const port = new SerialPort({
         path,
@@ -94,13 +90,8 @@ export class TransportNodeSerial implements Types.Transport {
           if (this.closingByUser) {
             ctrl.close(); // graceful EOF on user
           } else {
-            this.emitStatus(
-              Types.DeviceStatusEnum.DeviceDisconnected,
-              "read-error",
-            );
-            ctrl.error(
-              error instanceof Error ? error : new Error(String(error)),
-            );
+            this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "read-error");
+            ctrl.error(error instanceof Error ? error : new Error(String(error)));
           }
           try {
             await transformed.cancel();
@@ -124,10 +115,7 @@ export class TransportNodeSerial implements Types.Transport {
           return;
         }
         console.error("Error piping data to serial port:", error);
-        this.emitStatus(
-          Types.DeviceStatusEnum.DeviceDisconnected,
-          "write-error",
-        );
+        this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "write-error");
         try {
           this.port?.close();
         } catch {}

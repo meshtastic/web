@@ -15,16 +15,10 @@ export const LINE_COLOR = {
 };
 
 export const getSignalColor = (snr: number, rssi?: number): string => {
-  if (
-    snr > SNR_THRESHOLD.GOOD &&
-    (rssi == null || rssi > RSSI_THRESHOLD.GOOD)
-  ) {
+  if (snr > SNR_THRESHOLD.GOOD && (rssi == null || rssi > RSSI_THRESHOLD.GOOD)) {
     return LINE_COLOR.GOOD;
   }
-  if (
-    snr > SNR_THRESHOLD.FAIR &&
-    (rssi == null || rssi > RSSI_THRESHOLD.FAIR)
-  ) {
+  if (snr > SNR_THRESHOLD.FAIR && (rssi == null || rssi > RSSI_THRESHOLD.FAIR)) {
     return LINE_COLOR.FAIR;
   }
   return LINE_COLOR.BAD;

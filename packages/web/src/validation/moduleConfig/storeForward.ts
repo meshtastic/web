@@ -8,6 +8,4 @@ export const StoreForwardValidationSchema = z.object({
   historyReturnWindow: z.coerce.number().int().min(0),
 });
 
-export type StoreForwardValidation = z.infer<
-  typeof StoreForwardValidationSchema
->;
+export type StoreForwardValidation = z.infer<typeof StoreForwardValidationSchema>;

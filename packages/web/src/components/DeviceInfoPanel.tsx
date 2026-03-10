@@ -107,9 +107,7 @@ export const DeviceInfoPanel = ({
       label: t("batteryVoltage.title"),
       icon: ZapIcon,
       value:
-        voltage !== undefined
-          ? `${voltage?.toPrecision(3)} V`
-          : t("unknown.notAvailable", "N/A"),
+        voltage !== undefined ? `${voltage?.toPrecision(3)} V` : t("unknown.notAvailable", "N/A"),
     },
     {
       id: "firmware",
@@ -207,9 +205,7 @@ export const DeviceInfoPanel = ({
         </button>
       )}
 
-      {!isCollapsed && (
-        <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
-      )}
+      {!isCollapsed && <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />}
 
       <div
         className={cn(
@@ -241,9 +237,7 @@ export const DeviceInfoPanel = ({
         })}
       </div>
 
-      {!isCollapsed && (
-        <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
-      )}
+      {!isCollapsed && <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />}
 
       <div
         className={cn(
@@ -257,9 +251,7 @@ export const DeviceInfoPanel = ({
         {actionButtons.map((buttonItem) => {
           const Icon = buttonItem.icon;
           if (buttonItem.render) {
-            return (
-              <Fragment key={buttonItem.id}>{buttonItem.render()}</Fragment>
-            );
+            return <Fragment key={buttonItem.id}>{buttonItem.render()}</Fragment>;
           }
           return (
             <Button
@@ -281,8 +273,7 @@ export const DeviceInfoPanel = ({
                   "flex-shrink-0 w-4",
                   "text-gray-500 dark:text-gray-400",
                   "transition-colors duration-150",
-                  !disableHover &&
-                    "group-hover:text-gray-700 dark:group-hover:text-gray-200",
+                  !disableHover && "group-hover:text-gray-700 dark:group-hover:text-gray-200",
                 )}
               />
               <Subtle
@@ -290,8 +281,7 @@ export const DeviceInfoPanel = ({
                   "text-sm",
                   "text-gray-600 dark:text-gray-300",
                   "transition-colors duration-150",
-                  !disableHover &&
-                    "group-hover:text-gray-800 dark:group-hover:text-gray-100",
+                  !disableHover && "group-hover:text-gray-800 dark:group-hover:text-gray-100",
                 )}
               >
                 {buttonItem.label}

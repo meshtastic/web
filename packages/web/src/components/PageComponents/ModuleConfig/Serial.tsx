@@ -3,10 +3,7 @@ import {
   type SerialValidation,
   SerialValidationSchema,
 } from "@app/validation/moduleConfig/serial.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -19,8 +16,7 @@ interface SerialModuleConfigProps {
 export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "serial" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: SerialValidation) => {
@@ -29,11 +25,7 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "serial" },
-      data,
-      moduleConfig.serial,
-    );
+    setChange({ type: "moduleConfig", variant: "serial" }, data, moduleConfig.serial);
   };
 
   return (
@@ -99,8 +91,7 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
                 },
               ],
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud,
+                enumValue: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud,
               },
             },
             {
@@ -129,8 +120,7 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
                 },
               ],
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode,
+                enumValue: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode,
                 formatEnumName: true,
               },
             },

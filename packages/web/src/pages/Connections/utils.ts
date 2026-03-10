@@ -40,10 +40,7 @@ export function createConnectionFromInput(input: NewConnection): Connection {
   };
 }
 
-export async function testHttpReachable(
-  url: string,
-  timeoutMs = 2500,
-): Promise<boolean> {
+export async function testHttpReachable(url: string, timeoutMs = 2500): Promise<boolean> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);

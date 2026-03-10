@@ -28,11 +28,7 @@ function stubWebBluetooth() {
   const fromRadioCharacteristic: BluetoothRemoteGATTCharacteristic = {
     async readValue() {
       const next = incomingQueue.shift() ?? new Uint8Array();
-      return new DataView(
-        next.buffer,
-        next.byteOffset,
-        next.byteLength,
-      ) as unknown as DataView;
+      return new DataView(next.buffer, next.byteOffset, next.byteLength) as unknown as DataView;
     },
     addEventListener() {},
     removeEventListener() {},
@@ -58,11 +54,7 @@ function stubWebBluetooth() {
       const u8 =
         bufferSource instanceof ArrayBuffer
           ? new Uint8Array(bufferSource)
-          : new Uint8Array(
-              bufferSource.buffer,
-              bufferSource.byteOffset,
-              bufferSource.byteLength,
-            );
+          : new Uint8Array(bufferSource.buffer, bufferSource.byteOffset, bufferSource.byteLength);
       lastWritten = new Uint8Array(u8);
     },
   } as unknown as BluetoothRemoteGATTCharacteristic;
@@ -104,20 +96,10 @@ function stubWebBluetooth() {
       return primaryService;
     },
     device: {
-      addEventListener: (
-        ...args: Parameters<EventTarget["addEventListener"]>
-      ) =>
-        deviceEmitter.addEventListener(
-          args[0] as string,
-          args[1] as (e: Event) => void,
-        ),
-      removeEventListener: (
-        ...args: Parameters<EventTarget["removeEventListener"]>
-      ) =>
-        deviceEmitter.removeEventListener(
-          args[0] as string,
-          args[1] as (e: Event) => void,
-        ),
+      addEventListener: (...args: Parameters<EventTarget["addEventListener"]>) =>
+        deviceEmitter.addEventListener(args[0] as string, args[1] as (e: Event) => void),
+      removeEventListener: (...args: Parameters<EventTarget["removeEventListener"]>) =>
+        deviceEmitter.removeEventListener(args[0] as string, args[1] as (e: Event) => void),
     } as unknown as BluetoothDevice,
   } as unknown as BluetoothRemoteGATTServer;
 
@@ -134,10 +116,7 @@ function stubWebBluetooth() {
     },
   };
 
-  vi.stubGlobal(
-    "navigator",
-    Object.assign({}, globalThis.navigator, fakeNavigator),
-  );
+  vi.stubGlobal("navigator", Object.assign({}, globalThis.navigator, fakeNavigator));
 
   // helper actions for tests/contract
   return {
@@ -165,25 +144,20 @@ describe("TransportWebBluetooth (contract)", () => {
     name: "TransportWebBluetooth",
     setup: () => {},
     teardown: () => {
-      (
-        globalThis as unknown as { __ble?: ReturnType<typeof stubWebBluetooth> }
-      ).__ble?.cleanup();
-      (
-        globalThis as unknown as { __ble?: ReturnType<typeof stubWebBluetooth> }
-      ).__ble = undefined;
+      (globalThis as unknown as { __ble?: ReturnType<typeof stubWebBluetooth> }).__ble?.cleanup();
+      (globalThis as unknown as { __ble?: ReturnType<typeof stubWebBluetooth> }).__ble = undefined;
       vi.restoreAllMocks();
       vi.unstubAllGlobals();
     },
     create: async () => {
-      (
-        globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }
-      ).__ble = stubWebBluetooth();
+      (globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }).__ble =
+        stubWebBluetooth();
       return await TransportWebBluetooth.create();
     },
     pushIncoming: async (bytes) => {
-      (
-        globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }
-      ).__ble.pushIncoming(bytes);
+      (globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }).__ble.pushIncoming(
+        bytes,
+      );
       await Promise.resolve();
     },
     assertLastWritten: (bytes) => {

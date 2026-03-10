@@ -37,15 +37,11 @@ export const SidebarButton = ({
       size="sm"
       className={cn(
         "flex w-full items-center text-wrap",
-        isButtonCollapsed
-          ? "justify-center gap-0 px-2 h-9"
-          : "justify-start gap-2 min-h-9",
+        isButtonCollapsed ? "justify-center gap-0 px-2 h-9" : "justify-start gap-2 min-h-9",
       )}
       disabled={disabled}
     >
-      {Icon && (
-        <Icon size={isButtonCollapsed ? 20 : 18} className="flex-shrink-0" />
-      )}
+      {Icon && <Icon size={isButtonCollapsed ? 20 : 18} className="flex-shrink-0" />}
 
       {children}
 

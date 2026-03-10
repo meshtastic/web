@@ -21,13 +21,7 @@ import { randId } from "@core/utils/randId.ts";
 import { Protobuf, Types } from "@meshtastic/core";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getChannelName } from "../components/PageComponents/Channels/Channels.tsx";
 
@@ -65,8 +59,7 @@ export const MessagesPage = () => {
     [navigate],
   );
 
-  const chatType =
-    type === "direct" ? MessageType.Direct : MessageType.Broadcast;
+  const chatType = type === "direct" ? MessageType.Direct : MessageType.Broadcast;
   const numericChatId = Number(chatId);
 
   const allChannels = Array.from(channels.values());
@@ -77,10 +70,7 @@ export const MessagesPage = () => {
   useEffect(() => {
     if (!type && !chatId && filteredChannels.length > 0) {
       const defaultChannel = filteredChannels[0];
-      navigateToChat(
-        MessageType.Broadcast,
-        defaultChannel?.index.toString() ?? "0",
-      );
+      navigateToChat(MessageType.Broadcast, defaultChannel?.index.toString() ?? "0");
     }
   }, [type, chatId, filteredChannels, navigateToChat]);
 
@@ -96,10 +86,7 @@ export const MessagesPage = () => {
     return getNodes((node: Protobuf.Mesh.NodeInfo) => {
       const longName = node.user?.longName?.toLowerCase() ?? "";
       const shortName = node.user?.shortName?.toLowerCase() ?? "";
-      return (
-        longName.includes(lowerCaseSearchTerm) ||
-        shortName.includes(lowerCaseSearchTerm)
-      );
+      return longName.includes(lowerCaseSearchTerm) || shortName.includes(lowerCaseSearchTerm);
     }, true)
       .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
@@ -117,19 +104,12 @@ export const MessagesPage = () => {
   const sendText = useCallback(
     async (message: string) => {
       const toValue = isDirect ? numericChatId : MessageType.Broadcast;
-      const channelValue = isDirect
-        ? Types.ChannelNumber.Primary
-        : numericChatId;
+      const channelValue = isDirect ? Types.ChannelNumber.Primary : numericChatId;
 
       let messageId: number | undefined;
 
       try {
-        messageId = await connection?.sendText(
-          message,
-          toValue,
-          true,
-          channelValue,
-        );
+        messageId = await connection?.sendText(message, toValue, true, channelValue);
         if (messageId !== undefined) {
           if (chatType === MessageType.Broadcast) {
             setMessageState({
@@ -217,19 +197,13 @@ export const MessagesPage = () => {
                       ns: "channels",
                     }))
               }
-              active={
-                numericChatId === channel.index &&
-                chatType === MessageType.Broadcast
-              }
+              active={numericChatId === channel.index && chatType === MessageType.Broadcast}
               onClick={() => {
                 navigateToChat(MessageType.Broadcast, channel.index.toString());
                 resetUnread(channel.index);
               }}
             >
-              <HashIcon
-                size={16}
-                className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")}
-              />
+              <HashIcon size={16} className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")} />
             </SidebarButton>
           ))}
         </SidebarSection>
@@ -248,10 +222,7 @@ export const MessagesPage = () => {
   );
 
   const rightSidebar = (
-    <SidebarSection
-      label=""
-      className="px-0 flex flex-col h-full overflow-y-auto"
-    >
+    <SidebarSection label="" className="px-0 flex flex-col h-full overflow-y-auto">
       <label className="p-2 block" htmlFor="nodeSearch">
         <Input
           type="text"
@@ -263,9 +234,7 @@ export const MessagesPage = () => {
         />
       </label>
       <div
-        className={cn(
-          "flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1 ",
-        )}
+        className={cn("flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1 ")}
         style={{ contentVisibility: "auto", containIntrinsicSize: "100px" }}
       >
         {filteredNodes()?.map((node) => (
@@ -274,9 +243,7 @@ export const MessagesPage = () => {
             preventCollapse
             label={node.user?.longName ?? t("unknown.shortName")}
             count={node.unreadCount > 0 ? node.unreadCount : undefined}
-            active={
-              numericChatId === node.num && chatType === MessageType.Direct
-            }
+            active={numericChatId === node.num && chatType === MessageType.Direct}
             onClick={() => {
               navigateToChat(MessageType.Direct, node.num.toString());
               resetUnread(node.num);
@@ -314,9 +281,7 @@ export const MessagesPage = () => {
           ? [
               {
                 key: "encryption",
-                icon: otherNode.user?.publicKey?.length
-                  ? LockIcon
-                  : LockOpenIcon,
+                icon: otherNode.user?.publicKey?.length ? LockIcon : LockOpenIcon,
                 iconClasses: otherNode.user?.publicKey?.length
                   ? "text-green-600"
                   : "text-yellow-300",

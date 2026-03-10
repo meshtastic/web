@@ -17,8 +17,12 @@
     "setup:certs": "mkcert localhost 127.0.0.1 ::1",
     "build": "vite build",
     "build:analyze": "BUNDLE_ANALYZE=true pnpm run build",
-    "check": "biome check src/",
-    "check:fix": "biome check --write src/",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --check .",
+    "format:fix": "oxfmt .",
+    "check": "pnpm lint && pnpm format",
+    "check:fix": "pnpm lint:fix && pnpm format:fix",
     "dev": "vite",
     "dev:https": "USE_HTTPS=true vite",
     "test": "vitest",
@@ -111,6 +115,8 @@
     "tar": "^7.5.7",
     "testing-library": "^0.0.2",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "oxfmt": "^0.16.0",
+    "oxlint": "^1.41.0"
   }
 }

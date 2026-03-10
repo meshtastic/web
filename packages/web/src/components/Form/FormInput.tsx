@@ -48,10 +48,7 @@ export function GenericInput<T extends FieldValues>({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
 
-    if (
-      field.properties?.fieldLength?.max &&
-      newValue.length > field.properties.fieldLength.max
-    ) {
+    if (field.properties?.fieldLength?.max && newValue.length > field.properties.fieldLength.max) {
       return;
     }
 
@@ -60,32 +57,22 @@ export function GenericInput<T extends FieldValues>({
     }
 
     controllerField.onChange(
-      field.type === "number"
-        ? Number.parseFloat(newValue).toString()
-        : newValue,
+      field.type === "number" ? Number.parseFloat(newValue).toString() : newValue,
     );
   };
 
-  const currentLength = controllerField.value
-    ? String(controllerField.value).length
-    : 0;
+  const currentLength = controllerField.value ? String(controllerField.value).length : 0;
 
   return (
     <div className="relative w-full">
       <Input
         type={field.type}
         step={field.properties?.step}
-        value={
-          field.type === "number"
-            ? String(controllerField.value)
-            : controllerField.value
-        }
+        value={field.type === "number" ? String(controllerField.value) : controllerField.value}
         id={field.name}
         onChange={handleInputChange}
         showCopyButton={field.properties?.showCopyButton}
-        showPasswordToggle={
-          field.properties?.showPasswordToggle || field.type === "password"
-        }
+        showPasswordToggle={field.properties?.showPasswordToggle || field.type === "password"}
         className={field.properties?.className}
         {...restProperties}
         disabled={disabled}

@@ -28,8 +28,7 @@ export class TransportWebBluetooth implements Types.Transport {
   private fromNumCharacteristic: BluetoothRemoteGATTCharacteristic;
   private gattServer: BluetoothRemoteGATTServer;
 
-  private lastStatus: Types.DeviceStatusEnum =
-    Types.DeviceStatusEnum.DeviceDisconnected;
+  private lastStatus: Types.DeviceStatusEnum = Types.DeviceStatusEnum.DeviceDisconnected;
 
   private closingByUser = false;
   private reading = false;
@@ -46,10 +45,7 @@ export class TransportWebBluetooth implements Types.Transport {
     if (this.closingByUser) {
       return;
     }
-    this.emitStatus(
-      Types.DeviceStatusEnum.DeviceDisconnected,
-      "gatt-disconnected",
-    );
+    this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "gatt-disconnected");
   };
   private onFromNumChanged = () => {
     void this.readFromRadio();
@@ -68,9 +64,7 @@ export class TransportWebBluetooth implements Types.Transport {
   /**
    * Creates a transport from an existing, user-provided {@link BluetoothDevice}.
    */
-  public static async createFromDevice(
-    device: BluetoothDevice,
-  ): Promise<TransportWebBluetooth> {
+  public static async createFromDevice(device: BluetoothDevice): Promise<TransportWebBluetooth> {
     return await TransportWebBluetooth.prepareConnection(device);
   }
 
@@ -80,17 +74,13 @@ export class TransportWebBluetooth implements Types.Transport {
    *
    * @throws if required services or characteristics are missing.
    */
-  public static async prepareConnection(
-    device: BluetoothDevice,
-  ): Promise<TransportWebBluetooth> {
+  public static async prepareConnection(device: BluetoothDevice): Promise<TransportWebBluetooth> {
     const gattServer = await device.gatt?.connect();
     if (!gattServer) {
       throw new Error("Failed to connect to GATT server");
     }
 
-    const service = await gattServer.getPrimaryService(
-      TransportWebBluetooth.ServiceUuid,
-    );
+    const service = await gattServer.getPrimaryService(TransportWebBluetooth.ServiceUuid);
     const toRadioCharacteristic = await service.getCharacteristic(
       TransportWebBluetooth.ToRadioUuid,
     );
@@ -101,11 +91,7 @@ export class TransportWebBluetooth implements Types.Transport {
       TransportWebBluetooth.FromNumUuid,
     );
 
-    if (
-      !toRadioCharacteristic ||
-      !fromRadioCharacteristic ||
-      !fromNumCharacteristic
-    ) {
+    if (!toRadioCharacteristic || !fromRadioCharacteristic || !fromNumCharacteristic) {
       throw new Error("Failed to find required characteristics");
     }
 
@@ -137,10 +123,7 @@ export class TransportWebBluetooth implements Types.Transport {
         this.fromDeviceController = ctrl;
         this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
 
-        this.gattServer.device.addEventListener(
-          "gattserverdisconnected",
-          this.onGattDisconnected,
-        );
+        this.gattServer.device.addEventListener("gattserverdisconnected", this.onGattDisconnected);
 
         try {
           await this.fromNumCharacteristic.startNotifications();
@@ -152,10 +135,7 @@ export class TransportWebBluetooth implements Types.Transport {
           // prime once in case data already queued
           void this.readFromRadio();
         } catch {
-          this.emitStatus(
-            Types.DeviceStatusEnum.DeviceDisconnected,
-            "notify-failed",
-          );
+          this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "notify-failed");
           this.gattServer.device.removeEventListener(
             "gattserverdisconnected",
             this.onGattDisconnected,
@@ -171,10 +151,7 @@ export class TransportWebBluetooth implements Types.Transport {
           await this.toRadioCharacteristic.writeValue(ab);
           void this.readFromRadio(); // ensure we read any response
         } catch (error) {
-          this.emitStatus(
-            Types.DeviceStatusEnum.DeviceDisconnected,
-            "write-error",
-          );
+          this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "write-error");
           throw error;
         }
       },
@@ -205,10 +182,7 @@ export class TransportWebBluetooth implements Types.Transport {
         "characteristicvaluechanged",
         this.onFromNumChanged,
       );
-      this.gattServer.device.removeEventListener(
-        "gattserverdisconnected",
-        this.onGattDisconnected,
-      );
+      this.gattServer.device.removeEventListener("gattserverdisconnected", this.onGattDisconnected);
 
       this.gattServer.disconnect();
     } finally {
@@ -238,10 +212,7 @@ export class TransportWebBluetooth implements Types.Transport {
       }
     } catch (error) {
       if (!this.closingByUser) {
-        this.emitStatus(
-          Types.DeviceStatusEnum.DeviceDisconnected,
-          "read-error",
-        );
+        this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "read-error");
       }
       throw error;
     } finally {

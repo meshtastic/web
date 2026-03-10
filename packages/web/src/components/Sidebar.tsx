@@ -60,10 +60,7 @@ const CollapseToggleButton = () => {
     >
       <CircleChevronLeft
         size={24}
-        className={cn(
-          "transition-transform duration-300 ease-in-out",
-          isCollapsed && "rotate-180",
-        )}
+        className={cn("transition-transform duration-300 ease-in-out", isCollapsed && "rotate-180")}
       />
     </button>
   );
@@ -147,18 +144,12 @@ export const Sidebar = ({ children }: SidebarProps) => {
           isCollapsed && "justify-center px-0",
         )}
       >
-        <img
-          src="/logo.svg"
-          alt={t("app.logo")}
-          className="size-10 flex-shrink-0 rounded-xl"
-        />
+        <img src="/logo.svg" alt={t("app.logo")} className="size-10 flex-shrink-0 rounded-xl" />
         <h2
           className={cn(
             "text-xl font-semibold text-gray-800 dark:text-gray-100 whitespace-nowrap",
             "transition-all duration-300 ease-in-out",
-            isCollapsed
-              ? "opacity-0 max-w-0 invisible ml-0"
-              : "opacity-100 max-w-xs visible ml-2",
+            isCollapsed ? "opacity-0 max-w-0 invisible ml-0" : "opacity-100 max-w-xs visible ml-2",
           )}
         >
           {t("app.title")}
@@ -185,9 +176,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         })}
       </SidebarSection>
 
-      <div className={cn("flex-1 min-h-0", isCollapsed && "overflow-hidden")}>
-        {children}
-      </div>
+      <div className={cn("flex-1 min-h-0", isCollapsed && "overflow-hidden")}>{children}</div>
 
       <div className=" pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 h-full flex-1">
         {myNode === undefined ? (
@@ -208,9 +197,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
             setCommandPaletteOpen={() => setCommandPaletteOpen(true)}
             setDialogOpen={() => setDialogOpen("deviceName", true)}
             user={myNode.user}
-            firmwareVersion={
-              myMetadata?.firmwareVersion ?? t("unknown.notAvailable")
-            }
+            firmwareVersion={myMetadata?.firmwareVersion ?? t("unknown.notAvailable")}
             deviceMetrics={{
               batteryLevel: myNode.deviceMetrics?.batteryLevel,
               voltage:

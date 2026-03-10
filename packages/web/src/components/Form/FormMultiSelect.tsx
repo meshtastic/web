@@ -33,20 +33,17 @@ export function MultiSelectInput<T extends FieldValues>({
     Object.values(enumValue)[0] !== null &&
     "i18nKey" in Object.values(enumValue)[0];
 
-  const optionsToRender = Object.entries(enumValue).map(
-    ([key, configOrValue]) => {
-      if (isNewConfigStructure) {
-        const config =
-          configOrValue as (typeof FLAGS_CONFIG)[keyof typeof FLAGS_CONFIG];
-        return {
-          key,
-          display: t(config.i18nKey),
-          value: config.value,
-        };
-      }
-      return { key, display: key, value: configOrValue as number };
-    },
-  );
+  const optionsToRender = Object.entries(enumValue).map(([key, configOrValue]) => {
+    if (isNewConfigStructure) {
+      const config = configOrValue as (typeof FLAGS_CONFIG)[keyof typeof FLAGS_CONFIG];
+      return {
+        key,
+        display: t(config.i18nKey),
+        value: config.value,
+      };
+    }
+    return { key, display: key, value: configOrValue as number };
+  });
 
   return (
     <MultiSelect
