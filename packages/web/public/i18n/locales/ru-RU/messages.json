@@ -1,39 +1,39 @@
 {
   "page": {
-    "title": "Messages: {{chatName}}",
-    "placeholder": "Enter Message"
+    "title": "Сообщения: {{chatName}}",
+    "placeholder": "Введите сообщение"
   },
   "emptyState": {
-    "title": "Select a Chat",
-    "text": "No messages yet."
+    "title": "Выберите чат",
+    "text": "Сообщений пока нет."
   },
   "selectChatPrompt": {
-    "text": "Select a channel or node to start messaging."
+    "text": "Выберите канал или ноду, чтобы начать переписку."
   },
   "sendMessage": {
-    "placeholder": "Enter your message here...",
+    "placeholder": "Введите сообщение...",
     "sendButton": "Отправить"
   },
   "actionsMenu": {
-    "addReactionLabel": "Add Reaction",
+    "addReactionLabel": "Добавить реакцию",
     "replyLabel": "Ответить"
   },
   "deliveryStatus": {
     "delivered": {
-      "label": "Message delivered",
-      "displayText": "Message delivered"
+      "label": "Сообщение доставлено",
+      "displayText": "Сообщение доставлено"
     },
     "failed": {
-      "label": "Message delivery failed",
-      "displayText": "Delivery failed"
+      "label": "Не удалось доставить сообщение",
+      "displayText": "Доставка не удалась"
     },
     "unknown": {
-      "label": "Message status unknown",
-      "displayText": "Unknown state"
+      "label": "Статус сообщения неизвестен",
+      "displayText": "Неизвестный статус"
     },
     "waiting": {
-      "label": "Sending message",
-      "displayText": "Waiting for delivery"
+      "label": "Отправка сообщения",
+      "displayText": "Ожидание доставки"
     }
   }
 }
