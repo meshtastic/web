@@ -6,18 +6,18 @@ on:
       packages:
         description: 'Packages to release (comma-separated, or "all")'
         required: false
-        default: 'all'
+        default: "all"
       bump:
-        description: 'Semver bump (patch | minor | major)'
+        description: "Semver bump (patch | minor | major)"
         required: false
-        default: 'patch'
+        default: "patch"
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # we commit the bumped versions back
-      id-token: write        # required for JSR OIDC
+      contents: write # we commit the bumped versions back
+      id-token: write # required for JSR OIDC
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -32,10 +32,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
-          cache-dependency-path: '**/pnpm-lock.yaml'
-          registry-url: 'https://registry.npmjs.org'
+          cache-dependency-path: "**/pnpm-lock.yaml"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -81,7 +81,6 @@ jobs:
               # jq -C . "$dir/jsr.json" || cat "$dir/jsr.json"
             fi
           done
-
 
       - name: Commit version bumps
         env:

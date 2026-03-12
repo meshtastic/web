@@ -7,18 +7,12 @@ export type Bounds = [[number, number], [number, number]];
 const INT_DEG = 1e7;
 const EARTH_RADIUS = 6378137;
 
-export const toLngLat = (position?: {
-  latitudeI?: number;
-  longitudeI?: number;
-}): LngLat => [
+export const toLngLat = (position?: { latitudeI?: number; longitudeI?: number }): LngLat => [
   (position?.longitudeI ?? 0) / INT_DEG,
   (position?.latitudeI ?? 0) / INT_DEG,
 ];
 
-export const hasPos = (position?: {
-  latitudeI?: number;
-  longitudeI?: number;
-}) =>
+export const hasPos = (position?: { latitudeI?: number; longitudeI?: number }) =>
   Number.isFinite(position?.latitudeI) &&
   Number.isFinite(position?.longitudeI) &&
   !(position?.latitudeI === 0 && position?.longitudeI === 0);
@@ -80,8 +74,7 @@ export function bearingDegrees(from: LngLat, to: LngLat): number {
 
   const y = Math.sin(deltaLambda) * Math.cos(phi2);
   const x =
-    Math.cos(phi1) * Math.sin(phi2) -
-    Math.sin(phi1) * Math.cos(phi2) * Math.cos(deltaLambda);
+    Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(deltaLambda);
 
   return (rad2deg(Math.atan2(y, x)) + 360) % 360;
 }

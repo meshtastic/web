@@ -54,10 +54,7 @@ export function Slider({
 
   return (
     <SliderPrimitive.Root
-      className={cn(
-        "relative flex items-center select-none touch-none",
-        className,
-      )}
+      className={cn("relative flex items-center select-none touch-none", className)}
       id={internalId}
       value={currentValue}
       step={step}
@@ -69,16 +66,10 @@ export function Slider({
       {...props}
     >
       <SliderPrimitive.Track
-        className={cn(
-          "relative h-2 flex-1 rounded-full bg-slate-200",
-          trackClassName,
-        )}
+        className={cn("relative h-2 flex-1 rounded-full bg-slate-200", trackClassName)}
       >
         <SliderPrimitive.Range
-          className={cn(
-            "absolute h-full rounded-full bg-blue-500",
-            rangeClassName,
-          )}
+          className={cn("absolute h-full rounded-full bg-blue-500", rangeClassName)}
         />
       </SliderPrimitive.Track>
       {currentValue.map((_, idx) => (

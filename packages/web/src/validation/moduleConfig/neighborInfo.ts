@@ -5,6 +5,4 @@ export const NeighborInfoValidationSchema = z.object({
   updateInterval: z.coerce.number().int().min(0),
 });
 
-export type NeighborInfoValidation = z.infer<
-  typeof NeighborInfoValidationSchema
->;
+export type NeighborInfoValidation = z.infer<typeof NeighborInfoValidationSchema>;

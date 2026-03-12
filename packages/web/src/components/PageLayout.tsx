@@ -68,9 +68,7 @@ export const PageLayout = ({
           >
             {/* Header Content */}
             <div className="flex flex-1 items-center justify-between min-w-0">
-              <span className="text-lg font-medium text-foreground truncate px-2">
-                {label}
-              </span>
+              <span className="text-lg font-medium text-foreground truncate px-2">{label}</span>
               <div className="flex items-center space-x-1 md:space-x-2 shrink-0 pr-6">
                 {actions?.map((action) => {
                   return (
@@ -93,15 +91,9 @@ export const PageLayout = ({
                         (action.isLoading ? (
                           <Spinner size="md" />
                         ) : (
-                          <action.icon
-                            className={cn("h-5 w-5", action.iconClasses)}
-                          />
+                          <action.icon className={cn("h-5 w-5", action.iconClasses)} />
                         ))}
-                      {action.label && (
-                        <span className="text-sm px-1 pt-0.5">
-                          {action.label}
-                        </span>
-                      )}
+                      {action.label && <span className="text-sm px-1 pt-0.5">{action.label}</span>}
                     </button>
                   );
                 })}

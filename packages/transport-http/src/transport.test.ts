@@ -1,26 +1,14 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  type MockInstance,
-  vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract.ts";
 import { TransportHTTP } from "./transport.ts";
 
 let abortTimeoutSpy: MockInstance | undefined;
 beforeEach(() => {
   abortTimeoutSpy = vi
-    .spyOn(
-      globalThis.AbortSignal as unknown as { timeout(ms: number): AbortSignal },
-      "timeout",
-    )
+    .spyOn(globalThis.AbortSignal as unknown as { timeout(ms: number): AbortSignal }, "timeout")
     .mockImplementation((ms: number) => {
       const ctrl = new AbortController();
-      const abort = () =>
-        ctrl.abort(new DOMException("Timeout reached", "TimeoutError"));
+      const abort = () => ctrl.abort(new DOMException("Timeout reached", "TimeoutError"));
       // Uses setTimeout so vi.useFakeTimers() can fast-forward it
       setTimeout(abort, ms);
       return ctrl.signal;
@@ -128,23 +116,21 @@ describe("TransportHTTP (contract)", () => {
       vi.unstubAllGlobals();
     },
     create: async () => {
-      (
-        globalThis as unknown as { __http: ReturnType<typeof stubFetch> }
-      ).__http = stubFetch();
+      (globalThis as unknown as { __http: ReturnType<typeof stubFetch> }).__http = stubFetch();
       const transport = await TransportHTTP.create("127.0.0.1:80", false);
       await tickNextTimer();
       return transport;
     },
     pushIncoming: async (bytes) => {
-      (
-        globalThis as unknown as { __http: ReturnType<typeof stubFetch> }
-      ).__http.pushIncoming(bytes);
+      (globalThis as unknown as { __http: ReturnType<typeof stubFetch> }).__http.pushIncoming(
+        bytes,
+      );
       await tickNextTimer();
     },
     assertLastWritten: (bytes) => {
-      (
-        globalThis as unknown as { __http: ReturnType<typeof stubFetch> }
-      ).__http.assertLastWritten(bytes);
+      (globalThis as unknown as { __http: ReturnType<typeof stubFetch> }).__http.assertLastWritten(
+        bytes,
+      );
     },
     triggerDisconnect: async () => {
       (

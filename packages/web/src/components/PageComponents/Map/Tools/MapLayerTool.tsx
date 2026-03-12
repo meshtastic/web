@@ -1,10 +1,6 @@
 import type { HeatmapMode } from "@components/PageComponents/Map/Layers/HeatmapLayer.tsx";
 import { Checkbox } from "@components/UI/Checkbox/index.tsx";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@components/UI/Popover.tsx";
+import { Popover, PopoverContent, PopoverTrigger } from "@components/UI/Popover.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { LayersIcon } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
@@ -44,12 +40,7 @@ interface CheckboxProps {
   className?: string;
 }
 
-const CheckboxItem = ({
-  label,
-  checked,
-  onChange,
-  className,
-}: CheckboxProps) => {
+const CheckboxItem = ({ label, checked, onChange, className }: CheckboxProps) => {
   return (
     <Checkbox
       checked={checked}
@@ -149,9 +140,7 @@ export function MapLayerTool({
             <CheckboxItem
               label={label}
               checked={visibilityState[key as keyof VisibilityState]}
-              onChange={() =>
-                handleCheckboxChange(key as keyof VisibilityState)
-              }
+              onChange={() => handleCheckboxChange(key as keyof VisibilityState)}
             />
             {key === "heatmap" && visibilityState.heatmap && (
               <div className="pl-6 pt-2 flex flex-col gap-1">
@@ -162,9 +151,7 @@ export function MapLayerTool({
                     checked={heatmapMode === "density"}
                     onChange={() => setHeatmapMode("density")}
                   />
-                  <span className="text-sm dark:text-slate-300">
-                    {t("layerTool.density")}
-                  </span>
+                  <span className="text-sm dark:text-slate-300">{t("layerTool.density")}</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input

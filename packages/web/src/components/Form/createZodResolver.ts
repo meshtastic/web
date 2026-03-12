@@ -10,11 +10,7 @@ import type { ZodType } from "zod/v4";
 export function createZodResolver<T extends FieldValues>(
   schema: ZodType<T, unknown>,
 ): Resolver<T, unknown> {
-  return (
-    values: T,
-    _context: unknown,
-    _options?: ResolverOptions<T>,
-  ): ResolverResult<T> => {
+  return (values: T, _context: unknown, _options?: ResolverOptions<T>): ResolverResult<T> => {
     const result = schema.safeParse(values);
     if (result.success) {
       return {
@@ -23,10 +19,7 @@ export function createZodResolver<T extends FieldValues>(
       };
     }
 
-    const errors: Record<
-      string,
-      FieldError & { params?: Record<string, unknown> }
-    > = {};
+    const errors: Record<string, FieldError & { params?: Record<string, unknown> }> = {};
 
     for (const issue of result.error.issues) {
       const { path, code, message, ...params } = issue;
@@ -42,8 +35,7 @@ export function createZodResolver<T extends FieldValues>(
               : "";
 
       const newCode =
-        code.replace(/_([a-z])/g, (_, char) => char.toUpperCase()) +
-        (suffix ? `.${suffix}` : "");
+        code.replace(/_([a-z])/g, (_, char) => char.toUpperCase()) + (suffix ? `.${suffix}` : "");
 
       const fieldError: FieldError & { params?: Record<string, unknown> } = {
         type: newCode,

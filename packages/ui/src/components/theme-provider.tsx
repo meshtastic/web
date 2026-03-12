@@ -36,8 +36,7 @@ export function ThemeProvider({
     root.classList.remove("light", "dark");
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
 
@@ -68,9 +67,7 @@ export const useTheme = () => {
 
   // If the provider is missing, context will be initialState (setTheme is a no-op)
   if (context.setTheme === initialState.setTheme) {
-    throw new Error(
-      "useTheme must be used within a ThemeProvider: provider is missing",
-    );
+    throw new Error("useTheme must be used within a ThemeProvider: provider is missing");
   }
 
   return context;

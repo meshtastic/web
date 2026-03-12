@@ -4,9 +4,7 @@ type Theme = "light" | "dark" | "system";
 
 export function useTheme() {
   const getSystemTheme = () =>
-    globalThis.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+    globalThis.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
   const getStoredPreference = useCallback(
     (): Theme => (localStorage.getItem("theme") as Theme) || "system",

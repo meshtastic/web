@@ -35,10 +35,8 @@ type InputActionType = {
 };
 
 export interface InputProps
-  extends Omit<
-      React.InputHTMLAttributes<HTMLInputElement>,
-      "prefix" | "suffix"
-    >,
+  extends
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix" | "suffix">,
     VariantProps<typeof inputVariants> {
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
@@ -128,11 +126,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     const actions = potentialActions.filter((action) => action.condition);
 
-    const inputType = showPasswordToggle
-      ? isVisible
-        ? "text"
-        : "password"
-      : type;
+    const inputType = showPasswordToggle ? (isVisible ? "text" : "password") : type;
 
     const hasPrefix = !!prefix;
     const hasSuffix = !!suffix;
@@ -151,9 +145,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ]);
 
     return (
-      <div
-        className={cn("relative flex w-full items-stretch", containerClassName)}
-      >
+      <div className={cn("relative flex w-full items-stretch", containerClassName)}>
         {prefix && (
           <span className="inline-flex items-center rounded-l-md border border-r-0 border-slate-300 bg-slate-100/80 px-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-200 dark:text-slate-700">
             {prefix}
@@ -188,8 +180,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               className={cn(
                 "flex items-center divide-x divide-slate-300 border border-l-0 border-slate-300 dark:divide-slate-700 dark:border-slate-500",
                 extrasClassName,
-                disabled &&
-                  "border-slate-200 dark:border-slate-700 divide-slate-200",
+                disabled && "border-slate-200 dark:border-slate-700 divide-slate-200",
                 !hasSuffix && "rounded-r-md",
                 "bg-white dark:bg-slate-800",
               )}
@@ -201,9 +192,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   className={cn(
                     "inline-flex h-full items-center justify-center px-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:ring-offset-0 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 dark:focus:ring-slate-500 last:hover:rounded-r-md last:dark:hover:rounded-r-md",
                     disabled && "text-slate-300 dark:text-slate-600",
-                    action.id === "copy-value" &&
-                      isCopied &&
-                      "text-green-600 dark:text-green-500",
+                    action.id === "copy-value" && isCopied && "text-green-600 dark:text-green-500",
                   )}
                   onClick={action.onClick}
                   aria-label={action.ariaLabel}

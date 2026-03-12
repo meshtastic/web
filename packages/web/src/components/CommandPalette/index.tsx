@@ -8,12 +8,7 @@ import {
   CommandList,
 } from "@components/UI/Command.tsx";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
-import {
-  useAppStore,
-  useDevice,
-  useDeviceStore,
-  useNodeDB,
-} from "@core/stores";
+import { useAppStore, useDevice, useDeviceStore, useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useNavigate } from "@tanstack/react-router";
 import { useCommandState } from "cmdk";
@@ -62,12 +57,8 @@ export interface SubItem {
 }
 
 export const CommandPalette = () => {
-  const {
-    commandPaletteOpen,
-    setCommandPaletteOpen,
-    setConnectDialogOpen,
-    setSelectedDevice,
-  } = useAppStore();
+  const { commandPaletteOpen, setCommandPaletteOpen, setConnectDialogOpen, setSelectedDevice } =
+    useAppStore();
   const { getDevices } = useDeviceStore();
   const { setDialogOpen, connection } = useDevice();
   const { getNode } = useNodeDB();
@@ -123,9 +114,7 @@ export const CommandPalette = () => {
           label: t("manage.command.switchNode"),
           icon: ArrowLeftRightIcon,
           subItems: getDevices().map((device) => ({
-            label:
-              getNode(device.hardware.myNodeNum)?.user?.longName ??
-              t("unknown.shortName"),
+            label: getNode(device.hardware.myNodeNum)?.user?.longName ?? t("unknown.shortName"),
             icon: <Avatar nodeNum={device.hardware.myNodeNum} />,
             action() {
               setSelectedDevice(device.id);
@@ -268,10 +257,7 @@ export const CommandPalette = () => {
   }, [setCommandPaletteOpen]);
 
   return (
-    <CommandDialog
-      open={commandPaletteOpen}
-      onOpenChange={setCommandPaletteOpen}
-    >
+    <CommandDialog open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen}>
       <CommandInput placeholder={t("search.commandPalette")} />
       <CommandList>
         <CommandEmpty>{t("emptyState")}</CommandEmpty>

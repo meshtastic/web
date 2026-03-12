@@ -90,30 +90,27 @@ const ConfigPage = () => {
       routerState.location.pathname.includes(`/settings/${section.key}`),
     ) ?? sections[0];
 
-  const onFormInit = useCallback(
-    <T extends FieldValues>(methods: UseFormReturn<T>) => {
-      setFormMethods(methods as UseFormReturn);
+  const onFormInit = useCallback(<T extends FieldValues>(methods: UseFormReturn<T>) => {
+    setFormMethods(methods as UseFormReturn);
 
-      setRhfState({
-        // Assume defailt on init, changes will be caught by subscription
-        isDirty: false,
-        isValid: true,
-      });
+    setRhfState({
+      // Assume defailt on init, changes will be caught by subscription
+      isDirty: false,
+      isValid: true,
+    });
 
-      // Unsubscribe from previous subscriptions & subscribe to form changes
-      unsubRef.current?.();
-      unsubRef.current = methods.subscribe({
-        formState: { isDirty: true, isValid: true },
-        callback: ({ isValid, isDirty }) => {
-          setRhfState({
-            isDirty: isDirty ?? false,
-            isValid: isValid ?? true,
-          });
-        },
-      });
-    },
-    [],
-  );
+    // Unsubscribe from previous subscriptions & subscribe to form changes
+    unsubRef.current?.();
+    unsubRef.current = methods.subscribe({
+      formState: { isDirty: true, isValid: true },
+      callback: ({ isValid, isDirty }) => {
+        setRhfState({
+          isDirty: isDirty ?? false,
+          isValid: isValid ?? true,
+        });
+      },
+    });
+  }, []);
 
   useEffect(() => {
     return () => unsubRef.current?.();
@@ -206,7 +203,7 @@ const ConfigPage = () => {
 
         formMethods.trigger();
       }
-    } catch (_error) {
+    } catch {
       toast({
         title: t("toast.configSaveError.title"),
         description: t("toast.configSaveError.description"),
@@ -300,9 +297,7 @@ const ConfigPage = () => {
         isLoading: isSaving,
         disabled: saveDisabled,
         iconClasses:
-          !rhfState.isValid && hasPending
-            ? "text-red-400 cursor-not-allowed"
-            : "cursor-pointer",
+          !rhfState.isValid && hasPending ? "text-red-400 cursor-not-allowed" : "cursor-pointer",
         className: cn([
           "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
           "hover:dark:bg-slate-300 hover:dark:text-black",

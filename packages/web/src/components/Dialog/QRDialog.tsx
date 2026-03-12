@@ -24,12 +24,7 @@ export interface QRDialogProps {
   channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
 }
 
-export const QRDialog = ({
-  open,
-  onOpenChange,
-  loraConfig,
-  channels,
-}: QRDialogProps) => {
+export const QRDialog = ({ open, onOpenChange, loraConfig, channels }: QRDialogProps) => {
   const { t } = useTranslation("dialog");
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
@@ -49,16 +44,12 @@ export const QRDialog = ({
         settings: channelsToEncode,
       }),
     );
-    const base64 = fromByteArray(
-      toBinary(Protobuf.AppOnly.ChannelSetSchema, encoded),
-    )
+    const base64 = fromByteArray(toBinary(Protobuf.AppOnly.ChannelSetSchema, encoded))
       .replace(/=/g, "")
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
-    setQrCodeUrl(
-      `https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`,
-    );
+    setQrCodeUrl(`https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`);
   }, [allChannels, selectedChannels, qrCodeAdd, loraConfig]);
 
   return (
@@ -89,14 +80,9 @@ export const QRDialog = ({
                     checked={selectedChannels.includes(channel.index)}
                     onChange={() => {
                       if (selectedChannels.includes(channel.index)) {
-                        setSelectedChannels(
-                          selectedChannels.filter((c) => c !== channel.index),
-                        );
+                        setSelectedChannels(selectedChannels.filter((c) => c !== channel.index));
                       } else {
-                        setSelectedChannels([
-                          ...selectedChannels,
-                          channel.index,
-                        ]);
+                        setSelectedChannels([...selectedChannels, channel.index]);
                       }
                     }}
                   />

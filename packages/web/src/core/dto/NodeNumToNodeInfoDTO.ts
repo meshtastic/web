@@ -15,9 +15,7 @@ function createDefaultUser(num: number): Protobuf.Mesh.User {
   });
 }
 
-export function ensureDefaultUser(
-  node: Protobuf.Mesh.NodeInfo,
-): Protobuf.Mesh.NodeInfo {
+export function ensureDefaultUser(node: Protobuf.Mesh.NodeInfo): Protobuf.Mesh.NodeInfo {
   if (!node) {
     return node;
   }

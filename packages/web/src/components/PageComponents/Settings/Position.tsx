@@ -4,14 +4,8 @@ import {
   PositionValidationSchema,
 } from "@app/validation/config/position.ts";
 import { create } from "@bufbuild/protobuf";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
-import {
-  type FlagName,
-  usePositionFlags,
-} from "@core/hooks/usePositionFlags.ts";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import { type FlagName, usePositionFlags } from "@core/hooks/usePositionFlags.ts";
 import { useDevice, useNodeDB } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -24,13 +18,7 @@ interface PositionConfigProps {
 export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
-  const {
-    setChange,
-    config,
-    getEffectiveConfig,
-    removeChange,
-    queueAdminMessage,
-  } = useDevice();
+  const { setChange, config, getEffectiveConfig, removeChange, queueAdminMessage } = useDevice();
   const { getMyNode } = useNodeDB();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     getEffectiveConfig("position")?.positionFlags ?? 0,
@@ -48,24 +36,15 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       ...config.position,
       ...effectiveConfig,
       // Include current position coordinates if available
-      latitude: currentPosition?.latitudeI
-        ? currentPosition.latitudeI / 1e7
-        : undefined,
-      longitude: currentPosition?.longitudeI
-        ? currentPosition.longitudeI / 1e7
-        : undefined,
+      latitude: currentPosition?.latitudeI ? currentPosition.latitudeI / 1e7 : undefined,
+      longitude: currentPosition?.longitudeI ? currentPosition.longitudeI / 1e7 : undefined,
       altitude: currentPosition?.altitude ?? 0,
     } as PositionValidation;
   }, [config.position, effectiveConfig, currentPosition]);
 
   const onSubmit = (data: PositionValidation) => {
     // Exclude position coordinates from config payload (they're handled via admin message)
-    const {
-      latitude: _latitude,
-      longitude: _longitude,
-      altitude: _altitude,
-      ...configData
-    } = data;
+    const { latitude: _latitude, longitude: _longitude, altitude: _altitude, ...configData } = data;
     const payload = { ...configData, positionFlags: flagsValue };
 
     // Save config first
@@ -74,19 +53,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       removeChange({ type: "config", variant: "position" });
       configResult = undefined;
     } else {
-      configResult = setChange(
-        { type: "config", variant: "position" },
-        payload,
-        config.position,
-      );
+      configResult = setChange({ type: "config", variant: "position" }, payload, config.position);
     }
 
     // Then handle position coordinates via admin message if fixedPosition is enabled
-    if (
-      data.fixedPosition &&
-      data.latitude !== undefined &&
-      data.longitude !== undefined
-    ) {
+    if (data.fixedPosition && data.latitude !== undefined && data.longitude !== undefined) {
       const message = create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
           case: "setFixedPosition",
@@ -150,8 +121,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               disabledBy: [
                 {
                   fieldName: "gpsMode",
-                  selector:
-                    Protobuf.Config.Config_PositionConfig_GpsMode.ENABLED,
+                  selector: Protobuf.Config.Config_PositionConfig_GpsMode.ENABLED,
                 },
               ],
             },
@@ -198,16 +168,14 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               label: t("position.fixedPosition.altitude.label"),
               description: t("position.fixedPosition.altitude.description", {
                 unit:
-                  displayUnits ===
-                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+                  displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
                     ? "Feet"
                     : "Meters",
               }),
               properties: {
                 step: 0.0000001,
                 suffix:
-                  displayUnits ===
-                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+                  displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
                     ? "Feet"
                     : "Meters",
               },
@@ -221,8 +189,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               type: "multiSelect",
               name: "positionFlags",
               value: activeFlags,
-              isChecked: (name: string) =>
-                activeFlags?.includes(name as FlagName) ?? false,
+              isChecked: (name: string) => activeFlags?.includes(name as FlagName) ?? false,
               onValueChange: onPositonFlagChange,
               label: t("position.positionFlags.label"),
               placeholder: t("position.flags.placeholder"),

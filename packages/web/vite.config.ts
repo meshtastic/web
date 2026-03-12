@@ -83,8 +83,7 @@ export default defineConfig(({ mode }) => {
         "Cross-Origin-Opener-Policy": "same-origin",
         "Cross-Origin-Embedder-Policy": "credentialless",
         "X-Content-Type-Options": "nosniff",
-        "Strict-Transport-Security":
-          "max-age=63072000; includeSubDomains; preload",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
         "Referrer-Policy": "strict-origin-when-cross-origin",
       },
     },

@@ -7,10 +7,7 @@ export interface ClearAllStoresDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const ClearAllStoresDialog = ({
-  open,
-  onOpenChange,
-}: ClearAllStoresDialogProps) => {
+export const ClearAllStoresDialog = ({ open, onOpenChange }: ClearAllStoresDialogProps) => {
   const { t } = useTranslation("dialog");
 
   const handleClearAllStores = () => {

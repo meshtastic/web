@@ -29,10 +29,7 @@ export function bindStoreToDevice<S, DB>(
   function useBound<T>(selector: (db: DB) => T, opts?: DebounceOpts<T>): T;
 
   // Implementation:
-  function useBound<T>(
-    selector?: (db: DB) => T,
-    opts?: DebounceOpts<T>,
-  ): DB | T {
+  function useBound<T>(selector?: (db: DB) => T, opts?: DebounceOpts<T>): DB | T {
     const { deviceId } = useDeviceContext();
 
     // Build the store-level selector
@@ -41,7 +38,8 @@ export function bindStoreToDevice<S, DB>(
         const db = resolveDB(state, deviceId);
         return selector ? selector(db) : db;
       },
-      [deviceId, resolveDB, selector],
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [deviceId, selector],
     );
 
     type Selected = ReturnType<typeof storeSelector>;
@@ -55,9 +53,7 @@ export function bindStoreToDevice<S, DB>(
     const snapRef = useRef<Selected>(storeSelector(store.getState()));
     snapRef.current = storeSelector(store.getState()); // this ensures rerenders with a new selector (new deviceId) see the right initial value
 
-    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-      undefined,
-    );
+    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     const subscribe = useMemo(() => {
       return (onChange: () => void) => {
@@ -91,7 +87,8 @@ export function bindStoreToDevice<S, DB>(
           unsubscribe();
         };
       };
-    }, [store, storeSelector, equality, wait, fireImmediately]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [storeSelector, equality, wait, fireImmediately]);
 
     const getSnapshot = () => snapRef.current;
     return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);

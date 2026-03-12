@@ -78,22 +78,12 @@ const coordParamsSchema = z.object({
   // Accept "strings" from the URL, coerce to number, then validate
   long: z.coerce
     .number()
-    .refine(
-      (n) => Number.isFinite(n) && n >= -180 && n <= 180,
-      "Invalid longitude (-180..180).",
-    ),
+    .refine((n) => Number.isFinite(n) && n >= -180 && n <= 180, "Invalid longitude (-180..180)."),
   lat: z.coerce
     .number()
-    .refine(
-      (n) => Number.isFinite(n) && n >= -90 && n <= 90,
-      "Invalid latitude (-90..90).",
-    ),
+    .refine((n) => Number.isFinite(n) && n >= -90 && n <= 90, "Invalid latitude (-90..90)."),
   // Typical web map zoom levels ~0..22 (adjust if your map lib differs)
-  zoom: z.coerce
-    .number()
-    .int()
-    .min(0, "Zoom too small.")
-    .max(22, "Zoom too large."),
+  zoom: z.coerce.number().int().min(0, "Zoom too small.").max(22, "Zoom too large."),
 });
 
 export const mapWithParamsRoute = createRoute({

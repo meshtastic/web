@@ -16,8 +16,7 @@ export class TransportWebSerial implements Types.Transport {
   private abortController: AbortController;
   private portReadable: ReadableStream<Uint8Array>;
 
-  private lastStatus: Types.DeviceStatusEnum =
-    Types.DeviceStatusEnum.DeviceDisconnected;
+  private lastStatus: Types.DeviceStatusEnum = Types.DeviceStatusEnum.DeviceDisconnected;
   private closingByUser = false;
 
   /**
@@ -68,10 +67,7 @@ export class TransportWebSerial implements Types.Transport {
         }
         console.error("Error piping data to serial port:", err);
         this.connection.close().catch(() => {});
-        this.emitStatus(
-          Types.DeviceStatusEnum.DeviceDisconnected,
-          "write-error",
-        );
+        this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "write-error");
       });
 
     this._toDevice = toDeviceTransform.writable;
@@ -83,18 +79,13 @@ export class TransportWebSerial implements Types.Transport {
 
         this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
 
-        const transformed = this.portReadable.pipeThrough(
-          Utils.fromDeviceStream(),
-        );
+        const transformed = this.portReadable.pipeThrough(Utils.fromDeviceStream());
         const reader = transformed.getReader();
 
         const onOsDisconnect = (ev: Event) => {
           const { port } = ev as unknown as { port?: SerialPort };
           if (port && port === this.connection) {
-            this.emitStatus(
-              Types.DeviceStatusEnum.DeviceDisconnected,
-              "serial-disconnected",
-            );
+            this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "serial-disconnected");
           }
         };
         navigator.serial.addEventListener("disconnect", onOsDisconnect);
@@ -112,10 +103,7 @@ export class TransportWebSerial implements Types.Transport {
           ctrl.close();
         } catch (error) {
           if (!this.closingByUser) {
-            this.emitStatus(
-              Types.DeviceStatusEnum.DeviceDisconnected,
-              "read-error",
-            );
+            this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "read-error");
           }
           ctrl.error(error instanceof Error ? error : new Error(String(error)));
           try {
@@ -210,19 +198,13 @@ export class TransportWebSerial implements Types.Transport {
             return;
           }
           console.error("Error piping data to serial port (reconnect):", error);
-          this.emitStatus(
-            Types.DeviceStatusEnum.DeviceDisconnected,
-            "write-error",
-          );
+          this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "write-error");
         });
 
       this.emitStatus(Types.DeviceStatusEnum.DeviceConnected, "reconnected");
     } catch (error) {
       // Couldn’t re-pipe
-      this.emitStatus(
-        Types.DeviceStatusEnum.DeviceDisconnected,
-        "reconnect-failed",
-      );
+      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "reconnect-failed");
       throw error;
     }
   }

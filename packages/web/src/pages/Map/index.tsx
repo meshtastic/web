@@ -4,10 +4,7 @@ import {
   type VisibilityState,
 } from "@app/components/PageComponents/Map/Tools/MapLayerTool.tsx";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
-import {
-  type FilterState,
-  useFilterNode,
-} from "@components/generic/Filter/useFilterNode.ts";
+import { type FilterState, useFilterNode } from "@components/generic/Filter/useFilterNode.ts";
 import { BaseMap } from "@components/Map.tsx";
 import {
   HeatmapLayer,
@@ -31,14 +28,7 @@ import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
-import {
-  useCallback,
-  useDeferredValue,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useDeferredValue, useId, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type MapLayerMouseEvent, useMap } from "react-map-gl/maplibre";
 
@@ -50,9 +40,7 @@ const MapPage = () => {
   const { nodes: validNodes, myNode } = useNodeDB(
     (db) => ({
       // only nodes with a position
-      nodes: db.getNodes((n): n is Protobuf.Mesh.NodeInfo =>
-        Boolean(n.position?.latitudeI),
-      ),
+      nodes: db.getNodes((n): n is Protobuf.Mesh.NodeInfo => Boolean(n.position?.latitudeI)),
       myNode: db.getMyNode(),
 
       // References to cause re-render on change
@@ -76,9 +64,7 @@ const MapPage = () => {
   const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>("density");
 
   // Filters
-  const [filterState, setFilterState] = useState<FilterState>(
-    () => defaultFilterValues,
-  );
+  const [filterState, setFilterState] = useState<FilterState>(() => defaultFilterValues);
   const deferredFilterState = useDeferredValue(filterState);
 
   const filteredNodes = useMemo(
@@ -119,12 +105,7 @@ const MapPage = () => {
         mode={heatmapMode}
       />
     ),
-    [
-      filteredNodes,
-      visibilityState.heatmap,
-      heatmapMode,
-      heatmapLayerElementId,
-    ],
+    [filteredNodes, visibilityState.heatmap, heatmapMode, heatmapLayerElementId],
   );
 
   const onMouseMove = useCallback(
@@ -136,8 +117,7 @@ const MapPage = () => {
       const hoveredFeature = features?.[0];
 
       if (hoveredFeature) {
-        const { from, to, snr, name, shortName, num } =
-          hoveredFeature.properties;
+        const { from, to, snr, name, shortName, num } = hoveredFeature.properties;
 
         // Handle Heatmap Hover
         if (
@@ -197,14 +177,7 @@ const MapPage = () => {
         isVisible={visibilityState.nodeMarkers}
       />
     ),
-    [
-      filteredNodes,
-      expandedCluster,
-      mapRef,
-      myNode,
-      popupState,
-      visibilityState.nodeMarkers,
-    ],
+    [filteredNodes, expandedCluster, mapRef, myNode, popupState, visibilityState.nodeMarkers],
   );
 
   // Precision circles
@@ -217,11 +190,7 @@ const MapPage = () => {
         isVisible={visibilityState.positionPrecision}
       />
     ),
-    [
-      filteredNodes,
-      visibilityState.positionPrecision,
-      precisionCirclesElementId,
-    ],
+    [filteredNodes, visibilityState.positionPrecision, precisionCirclesElementId],
   );
 
   // Waypoints
@@ -244,10 +213,7 @@ const MapPage = () => {
         onLoad={getMapBounds}
         onMouseMove={onMouseMove}
         onClick={onMapBackgroundClick}
-        interactiveLayerIds={[
-          snrLayerElementId,
-          `${heatmapLayerElementId}-interaction`,
-        ]}
+        interactiveLayerIds={[snrLayerElementId, `${heatmapLayerElementId}-interaction`]}
       >
         {heatmapLayerElement}
         {markerElements}
@@ -256,12 +222,7 @@ const MapPage = () => {
         {waypointLayerElement}
 
         {snrHover && (
-          <SNRTooltip
-            pos={snrHover.pos}
-            snr={snrHover.snr}
-            from={snrHover.from}
-            to={snrHover.to}
-          />
+          <SNRTooltip pos={snrHover.pos} snr={snrHover.snr} from={snrHover.from} to={snrHover.to} />
         )}
       </BaseMap>
       <div className="flex flex-col space-y-1 fixed top-35 right-2.5">

@@ -1,8 +1,5 @@
 import type { Protobuf } from "@meshtastic/core";
-import type {
-  ValidConfigType,
-  ValidModuleConfigType,
-} from "./changeRegistry.ts";
+import type { ValidConfigType, ValidModuleConfigType } from "./changeRegistry.ts";
 
 interface Dialogs {
   import: boolean;

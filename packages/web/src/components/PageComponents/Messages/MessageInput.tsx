@@ -20,9 +20,7 @@ export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
 
   const initialDraft = getDraft(to);
   const [localDraft, setLocalDraft] = useState(initialDraft);
-  const [messageBytes, setMessageBytes] = useState(() =>
-    calculateBytes(initialDraft),
-  );
+  const [messageBytes, setMessageBytes] = useState(() => calculateBytes(initialDraft));
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;

@@ -20,16 +20,8 @@ class FakeSerialPort extends Duplex {
 
   _read() {}
 
-  _write(
-    chunk: Buffer,
-    _encoding: BufferEncoding,
-    callback: (error?: Error | null) => void,
-  ) {
-    this.lastWritten = new Uint8Array(
-      chunk.buffer,
-      chunk.byteOffset,
-      chunk.byteLength,
-    );
+  _write(chunk: Buffer, _encoding: BufferEncoding, callback: (error?: Error | null) => void) {
+    this.lastWritten = new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength);
     callback();
   }
 
@@ -69,16 +61,10 @@ function stubCoreTransforms() {
 
   // Utils.toDeviceStream is a getter
   const transform = Utils.toDeviceStream;
-  vi.spyOn(Utils, "toDeviceStream", "get").mockReturnValue(
-    toDevice as unknown as typeof transform,
-  );
+  vi.spyOn(Utils, "toDeviceStream", "get").mockReturnValue(toDevice as unknown as typeof transform);
 
   vi.spyOn(Utils, "fromDeviceStream").mockImplementation(
-    () =>
-      fromDeviceFactory() as unknown as TransformStream<
-        Uint8Array,
-        Types.DeviceOutput
-      >,
+    () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, Types.DeviceOutput>,
   );
 
   return {
@@ -105,30 +91,24 @@ describe("TransportNodeSerial (contract)", () => {
     },
     create: async () => {
       const fakePort = new FakeSerialPort();
-      const transport = new TransportNodeSerial(
-        fakePort as unknown as SerialPort,
-      );
+      const transport = new TransportNodeSerial(fakePort as unknown as SerialPort);
       await Promise.resolve();
-      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort =
-        fakePort;
+      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort = fakePort;
       return transport;
     },
     pushIncoming: async (bytes) => {
-      (
-        globalThis as unknown as { __fakePort: FakeSerialPort }
-      ).__fakePort.pushIncoming(bytes);
+      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort.pushIncoming(bytes);
       await Promise.resolve();
     },
     assertLastWritten: (bytes) => {
-      const port = (globalThis as unknown as { __fakePort: FakeSerialPort })
-        .__fakePort;
+      const port = (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort;
       expect(port.lastWritten).toBeDefined();
       expect(port.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (
-        globalThis as unknown as { __fakePort: FakeSerialPort }
-      ).__fakePort.emitErrorOnce("test-disconnect");
+      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort.emitErrorOnce(
+        "test-disconnect",
+      );
       await Promise.resolve();
     },
   });
@@ -147,9 +127,7 @@ describe("TransportNodeSerial (extras)", () => {
 
   it("emits DeviceDisconnected with reason 'port-closed' on close event", async () => {
     const fakePort = new FakeSerialPort();
-    const transport = new TransportNodeSerial(
-      fakePort as unknown as SerialPort,
-    );
+    const transport = new TransportNodeSerial(fakePort as unknown as SerialPort);
     const reader = transport.fromDevice.getReader();
 
     await Promise.resolve();
@@ -157,17 +135,13 @@ describe("TransportNodeSerial (extras)", () => {
     const first = await reader.read();
     expect(isStatusEvent(first.value)).toBe(true);
     if (isStatusEvent(first.value)) {
-      expect(first.value.data.status).toBe(
-        Types.DeviceStatusEnum.DeviceConnecting,
-      );
+      expect(first.value.data.status).toBe(Types.DeviceStatusEnum.DeviceConnecting);
     }
 
     const second = await reader.read();
     expect(isStatusEvent(second.value)).toBe(true);
     if (isStatusEvent(second.value)) {
-      expect(second.value.data.status).toBe(
-        Types.DeviceStatusEnum.DeviceConnected,
-      );
+      expect(second.value.data.status).toBe(Types.DeviceStatusEnum.DeviceConnected);
     }
 
     fakePort.emitClose();

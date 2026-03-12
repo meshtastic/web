@@ -34,9 +34,7 @@ describe("RawSecuritySchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(
-        result.error.issues.some((i) => i.path.includes("privateKey")),
-      ).toBe(true);
+      expect(result.error.issues.some((i) => i.path.includes("privateKey"))).toBe(true);
     }
   });
 
@@ -52,11 +50,9 @@ describe("RawSecuritySchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(
-        result.error.issues.some(
-          (i) => i.message === "formValidation.required.managed",
-        ),
-      ).toBe(true);
+      expect(result.error.issues.some((i) => i.message === "formValidation.required.managed")).toBe(
+        true,
+      );
     }
   });
 
@@ -102,11 +98,9 @@ describe("ParsedSecuritySchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(
-        result.error.issues.some(
-          (i) => i.message === "formValidation.required.managed",
-        ),
-      ).toBe(true);
+      expect(result.error.issues.some((i) => i.message === "formValidation.required.managed")).toBe(
+        true,
+      );
     }
   });
 });

@@ -11,12 +11,7 @@ import { Serial } from "@components/PageComponents/ModuleConfig/Serial.tsx";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
 import { useDevice, type ValidModuleConfigType } from "@core/stores";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
@@ -36,68 +31,70 @@ type TabItem = {
 export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   const { hasModuleConfigChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
-  const tabs: TabItem[] = [
-    {
-      case: "mqtt",
-      label: t("page.tabMqtt"),
-      element: MQTT,
-    },
-    {
-      case: "serial",
-      label: t("page.tabSerial"),
-      element: Serial,
-    },
-    {
-      case: "externalNotification",
-      label: t("page.tabExternalNotification"),
-      element: ExternalNotification,
-    },
-    {
-      case: "storeForward",
-      label: t("page.tabStoreAndForward"),
-      element: StoreForward,
-    },
-    {
-      case: "rangeTest",
-      label: t("page.tabRangeTest"),
-      element: RangeTest,
-    },
-    {
-      case: "telemetry",
-      label: t("page.tabTelemetry"),
-      element: Telemetry,
-    },
-    {
-      case: "cannedMessage",
-      label: t("page.tabCannedMessage"),
-      element: CannedMessage,
-    },
-    {
-      case: "audio",
-      label: t("page.tabAudio"),
-      element: Audio,
-    },
-    {
-      case: "neighborInfo",
-      label: t("page.tabNeighborInfo"),
-      element: NeighborInfo,
-    },
-    {
-      case: "ambientLighting",
-      label: t("page.tabAmbientLighting"),
-      element: AmbientLighting,
-    },
-    {
-      case: "detectionSensor",
-      label: t("page.tabDetectionSensor"),
-      element: DetectionSensor,
-    },
-    { case: "paxcounter", label: t("page.tabPaxcounter"), element: Paxcounter },
-  ] as const;
+  const tabs: TabItem[] = useMemo(
+    () => [
+      {
+        case: "mqtt",
+        label: t("page.tabMqtt"),
+        element: MQTT,
+      },
+      {
+        case: "serial",
+        label: t("page.tabSerial"),
+        element: Serial,
+      },
+      {
+        case: "externalNotification",
+        label: t("page.tabExternalNotification"),
+        element: ExternalNotification,
+      },
+      {
+        case: "storeForward",
+        label: t("page.tabStoreAndForward"),
+        element: StoreForward,
+      },
+      {
+        case: "rangeTest",
+        label: t("page.tabRangeTest"),
+        element: RangeTest,
+      },
+      {
+        case: "telemetry",
+        label: t("page.tabTelemetry"),
+        element: Telemetry,
+      },
+      {
+        case: "cannedMessage",
+        label: t("page.tabCannedMessage"),
+        element: CannedMessage,
+      },
+      {
+        case: "audio",
+        label: t("page.tabAudio"),
+        element: Audio,
+      },
+      {
+        case: "neighborInfo",
+        label: t("page.tabNeighborInfo"),
+        element: NeighborInfo,
+      },
+      {
+        case: "ambientLighting",
+        label: t("page.tabAmbientLighting"),
+        element: AmbientLighting,
+      },
+      {
+        case: "detectionSensor",
+        label: t("page.tabDetectionSensor"),
+        element: DetectionSensor,
+      },
+      { case: "paxcounter", label: t("page.tabPaxcounter"), element: Paxcounter },
+    ],
+    [t],
+  );
 
   const flags = useMemo(
-    () =>
-      new Map(tabs.map((tab) => [tab.case, hasModuleConfigChange(tab.case)])),
+    () => new Map(tabs.map((tab) => [tab.case, hasModuleConfigChange(tab.case)])),
     [tabs, hasModuleConfigChange],
   );
 
@@ -105,11 +102,7 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
     <Tabs defaultValue={t("page.tabMqtt")}>
       <TabsList className="w-full dark:bg-slate-800">
         {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.label}
-            value={tab.label}
-            className="dark:text-white relative"
-          >
+          <TabsTrigger key={tab.label} value={tab.label} className="dark:text-white relative">
             {tab.label}
             {flags.get(tab.case) && (
               <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">

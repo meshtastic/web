@@ -67,10 +67,7 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
       for (const key in FLAGS_CONFIG) {
         const flagName = key as FlagName;
         const flagConfig = FLAGS_CONFIG[flagName];
-        if (
-          flagConfig.value !== 0 &&
-          (value & flagConfig.value) === flagConfig.value
-        ) {
+        if (flagConfig.value !== 0 && (value & flagConfig.value) === flagConfig.value) {
           activeFlags.push(flagName);
         }
       }
@@ -90,9 +87,7 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
     };
 
     const hasFlag = (value: number, flagName: FlagName): boolean => {
-      return (
-        (value & FLAGS_CONFIG[flagName].value) === FLAGS_CONFIG[flagName].value
-      );
+      return (value & FLAGS_CONFIG[flagName].value) === FLAGS_CONFIG[flagName].value;
     };
 
     const getAllFlags = (): typeof FLAGS_CONFIG => {
@@ -121,9 +116,7 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
 
   const setFlag = useCallback((flagName: FlagName, enabled: boolean) => {
     const currentFlagValue = FLAGS_CONFIG[flagName].value;
-    setFlagsValue((prev) =>
-      enabled ? prev | currentFlagValue : prev & ~currentFlagValue,
-    );
+    setFlagsValue((prev) => (enabled ? prev | currentFlagValue : prev & ~currentFlagValue));
   }, []);
 
   const setFlags = useCallback(

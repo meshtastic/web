@@ -5,11 +5,7 @@ import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
-import {
-  type PersistOptions,
-  persist,
-  subscribeWithSelector,
-} from "zustand/middleware";
+import { type PersistOptions, persist, subscribeWithSelector } from "zustand/middleware";
 import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types.ts";
 
 const IDB_KEY_NAME = "meshtastic-nodedb-store";
@@ -101,8 +97,7 @@ function nodeDBFactory(
             (nodeNum: number, err: NodeErrorType) => {
               nodeDB.setNodeError(nodeNum, err);
             },
-            (filter?: (node: Protobuf.Mesh.NodeInfo) => boolean) =>
-              nodeDB.getNodes(filter, true),
+            (filter?: (node: Protobuf.Mesh.NodeInfo) => boolean) => nodeDB.getNodes(filter, true),
           );
 
           if (!next) {
@@ -165,8 +160,7 @@ function nodeDBFactory(
           ) {
             newNodeMap.set(
               nodeDB.myNodeNum,
-              nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
-                create(Protobuf.Mesh.NodeInfoSchema),
+              nodeDB.nodeMap.get(nodeDB.myNodeNum) ?? create(Protobuf.Mesh.NodeInfoSchema),
             );
           }
           nodeDB.nodeMap = newNodeMap;
@@ -196,11 +190,7 @@ function nodeDBFactory(
             // Keep myNode regardless of lastHeard
             // Keep nodes that have been heard recently
             // Keep nodes without lastHeard (just in case)
-            if (
-              nodeNum === nodeDB.myNodeNum ||
-              !node.lastHeard ||
-              node.lastHeard >= cutoffSec
-            ) {
+            if (nodeNum === nodeDB.myNodeNum || !node.lastHeard || node.lastHeard >= cutoffSec) {
               newNodeMap.set(nodeNum, node);
             } else {
               prunedCount++;
@@ -332,9 +322,7 @@ function nodeDBFactory(
           nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(position.from, updated);
 
           if (isNew) {
-            console.log(
-              `[NodeDB] Adding new node from position packet: ${position.from}`,
-            );
+            console.log(`[NodeDB] Adding new node from position packet: ${position.from}`);
           }
         }),
       ),
@@ -375,11 +363,7 @@ function nodeDBFactory(
               };
 
               for (const [num, newNode] of newDB.nodeMap) {
-                const next = validateIncomingNode(
-                  newNode,
-                  setErrorProxy,
-                  getNodesProxy,
-                );
+                const next = validateIncomingNode(newNode, setErrorProxy, getNodesProxy);
                 if (next) {
                   mergedNodes.set(num, next);
                 }
@@ -469,10 +453,7 @@ function nodeDBFactory(
         throw new Error(`No nodeDB found (id: ${id})`);
       }
       if (nodeDB.myNodeNum) {
-        return (
-          nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
-          create(Protobuf.Mesh.NodeInfoSchema)
-        );
+        return nodeDB.nodeMap.get(nodeDB.myNodeNum) ?? create(Protobuf.Mesh.NodeInfoSchema);
       }
     },
 
@@ -494,10 +475,7 @@ function nodeDBFactory(
   };
 }
 
-export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
-  set,
-  get,
-) => ({
+export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (set, get) => ({
   nodeDBs: new Map(),
 
   addNodeDB: (id) => {
@@ -564,19 +542,12 @@ const persistOptions: PersistOptions<PrivateNodeDBState, NodeDBPersisted> = {
     useNodeDBStore.setState(
       produce<PrivateNodeDBState>((draft) => {
         const rebuilt = new Map<number, NodeDB>();
-        for (const [id, data] of (
-          draft.nodeDBs as unknown as Map<number, NodeDBData>
-        ).entries()) {
+        for (const [id, data] of (draft.nodeDBs as unknown as Map<number, NodeDBData>).entries()) {
           if (data.myNodeNum !== undefined) {
             // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
             rebuilt.set(
               id,
-              nodeDBFactory(
-                id,
-                useNodeDBStore.getState,
-                useNodeDBStore.setState,
-                data,
-              ),
+              nodeDBFactory(id, useNodeDBStore.getState, useNodeDBStore.setState, data),
             );
           }
         }
@@ -588,12 +559,8 @@ const persistOptions: PersistOptions<PrivateNodeDBState, NodeDBPersisted> = {
 
 // Add persist middleware on the store if the feature flag is enabled
 const persistNodes = featureFlags.get("persistNodeDB");
-console.debug(
-  `NodeDBStore: Persisting nodes is ${persistNodes ? "enabled" : "disabled"}`,
-);
+console.debug(`NodeDBStore: Persisting nodes is ${persistNodes ? "enabled" : "disabled"}`);
 
 export const useNodeDBStore = persistNodes
-  ? createStore(
-      subscribeWithSelector(persist(nodeDBInitializer, persistOptions)),
-    )
+  ? createStore(subscribeWithSelector(persist(nodeDBInitializer, persistOptions)))
   : createStore(subscribeWithSelector(nodeDBInitializer));

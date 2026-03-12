@@ -59,6 +59,5 @@ export function App() {
         </div>
       </DeviceWrapper>
     </ErrorBoundary>
-    // </ThemeProvider>
-  );
+  ); // </ThemeProvider>
 }

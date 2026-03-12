@@ -47,9 +47,7 @@ describe("ClearAllStoresDialog", () => {
 
   it("calls clearAllStores and navigates to '/' when confirm is clicked", () => {
     render(<ClearAllStoresDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(
-      screen.getByRole("button", { name: "Clear all local storage" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Clear all local storage" }));
 
     expect(mockClearAllStores).toHaveBeenCalledTimes(1);
     expect(assignedHref).toBe("/"); // forced reload target

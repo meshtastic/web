@@ -3,10 +3,7 @@ import {
   type CannedMessageValidation,
   CannedMessageValidationSchema,
 } from "@app/validation/moduleConfig/cannedMessage.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -16,13 +13,10 @@ interface CannedMessageModuleConfigProps {
   onFormInit: DynamicFormFormInit<CannedMessageValidation>;
 }
 
-export const CannedMessage = ({
-  onFormInit,
-}: CannedMessageModuleConfigProps) => {
+export const CannedMessage = ({ onFormInit }: CannedMessageModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "cannedMessage" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: CannedMessageValidation) => {
@@ -31,11 +25,7 @@ export const CannedMessage = ({
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "cannedMessage" },
-      data,
-      moduleConfig.cannedMessage,
-    );
+    setChange({ type: "moduleConfig", variant: "cannedMessage" }, data, moduleConfig.cannedMessage);
   };
 
   return (
@@ -86,9 +76,7 @@ export const CannedMessage = ({
               label: t("cannedMessage.inputbrokerEventCw.label"),
               description: t("cannedMessage.inputbrokerEventCw.description"),
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -97,9 +85,7 @@ export const CannedMessage = ({
               label: t("cannedMessage.inputbrokerEventCcw.label"),
               description: t("cannedMessage.inputbrokerEventCcw.description"),
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -108,9 +94,7 @@ export const CannedMessage = ({
               label: t("cannedMessage.inputbrokerEventPress.label"),
               description: t("cannedMessage.inputbrokerEventPress.description"),
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {

@@ -3,10 +3,7 @@ import {
   type AmbientLightingValidation,
   AmbientLightingValidationSchema,
 } from "@app/validation/moduleConfig/ambientLighting.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
@@ -15,12 +12,9 @@ interface AmbientLightingModuleConfigProps {
   onFormInit: DynamicFormFormInit<AmbientLightingValidation>;
 }
 
-export const AmbientLighting = ({
-  onFormInit,
-}: AmbientLightingModuleConfigProps) => {
+export const AmbientLighting = ({ onFormInit }: AmbientLightingModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "ambientLighting" });
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AmbientLightingValidation) => {

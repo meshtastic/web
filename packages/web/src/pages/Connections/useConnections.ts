@@ -4,16 +4,8 @@ import type {
   ConnectionStatus,
   NewConnection,
 } from "@app/core/stores/deviceStore/types";
-import {
-  createConnectionFromInput,
-  testHttpReachable,
-} from "@app/pages/Connections/utils";
-import {
-  useAppStore,
-  useDeviceStore,
-  useMessageStore,
-  useNodeDBStore,
-} from "@core/stores";
+import { createConnectionFromInput, testHttpReachable } from "@app/pages/Connections/utils";
+import { useAppStore, useDeviceStore, useMessageStore, useNodeDBStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
@@ -35,9 +27,7 @@ export function useConnections() {
 
   const addSavedConnection = useDeviceStore((s) => s.addSavedConnection);
   const updateSavedConnection = useDeviceStore((s) => s.updateSavedConnection);
-  const removeSavedConnectionFromStore = useDeviceStore(
-    (s) => s.removeSavedConnection,
-  );
+  const removeSavedConnectionFromStore = useDeviceStore((s) => s.removeSavedConnection);
 
   // DeviceStore methods
   const setActiveConnectionId = useDeviceStore((s) => s.setActiveConnectionId);
@@ -77,9 +67,7 @@ export function useConnections() {
       if (unsubConfigComplete) {
         unsubConfigComplete();
         configSubscriptions.delete(id);
-        console.log(
-          `[useConnections] Config subscription cleaned up for connection ${id}`,
-        );
+        console.log(`[useConnections] Config subscription cleaned up for connection ${id}`);
       }
 
       // Get device and MeshDevice from Device.connection
@@ -178,9 +166,7 @@ export function useConnections() {
       // Listen for config complete event (with nonce/ID)
       const unsubConfigComplete = meshDevice.events.onConfigComplete.subscribe(
         (configCompleteId) => {
-          console.log(
-            `[useConnections] Configuration complete with ID: ${configCompleteId}`,
-          );
+          console.log(`[useConnections] Configuration complete with ID: ${configCompleteId}`);
           device.setConnectionPhase("configured");
           updateStatus(id, "configured");
 
@@ -188,9 +174,7 @@ export function useConnections() {
           const oldHeartbeat = heartbeats.get(id);
           if (oldHeartbeat) {
             clearInterval(oldHeartbeat);
-            console.log(
-              `[useConnections] Switching to maintenance heartbeat (5 min interval)`,
-            );
+            console.log(`[useConnections] Switching to maintenance heartbeat (5 min interval)`);
           }
 
           const maintenanceHeartbeat = setInterval(() => {
@@ -211,9 +195,7 @@ export function useConnections() {
       meshDevice
         .configure()
         .then(() => {
-          console.log(
-            "[useConnections] Configuration complete, starting heartbeat",
-          );
+          console.log("[useConnections] Configuration complete, starting heartbeat");
           // Send initial heartbeat after configure completes
           meshDevice
             .heartbeat()
@@ -221,10 +203,7 @@ export function useConnections() {
               // Start fast heartbeat after first successful heartbeat
               const configHeartbeatId = setInterval(() => {
                 meshDevice.heartbeat().catch((error) => {
-                  console.warn(
-                    "[useConnections] Config heartbeat failed:",
-                    error,
-                  );
+                  console.warn("[useConnections] Config heartbeat failed:", error);
                 });
               }, CONFIG_HEARTBEAT_INTERVAL_MS);
               heartbeats.set(id, configHeartbeatId);
@@ -303,9 +282,7 @@ export function useConnections() {
             if (getDevices) {
               const known = await getDevices();
               if (known && known.length > 0 && conn.deviceId) {
-                bleDevice = known.find(
-                  (d: BluetoothDevice) => d.id === conn.deviceId,
-                );
+                bleDevice = known.find((d: BluetoothDevice) => d.id === conn.deviceId);
               }
             }
           }
@@ -313,22 +290,15 @@ export function useConnections() {
             // Prompt user to reselect (filter by optional service if provided)
             bleDevice = await navigator.bluetooth.requestDevice({
               acceptAllDevices: !conn.gattServiceUUID,
-              optionalServices: conn.gattServiceUUID
-                ? [conn.gattServiceUUID]
-                : undefined,
-              filters: conn.gattServiceUUID
-                ? [{ services: [conn.gattServiceUUID] }]
-                : undefined,
+              optionalServices: conn.gattServiceUUID ? [conn.gattServiceUUID] : undefined,
+              filters: conn.gattServiceUUID ? [{ services: [conn.gattServiceUUID] }] : undefined,
             });
           }
           if (!bleDevice) {
-            throw new Error(
-              "Bluetooth device not available. Re-select the device.",
-            );
+            throw new Error("Bluetooth device not available. Re-select the device.");
           }
 
-          const transport =
-            await TransportWebBluetooth.createFromDevice(bleDevice);
+          const transport = await TransportWebBluetooth.createFromDevice(bleDevice);
           setupMeshDevice(id, transport, bleDevice);
 
           bleDevice.addEventListener("gattserverdisconnected", () => {
@@ -363,8 +333,7 @@ export function useConnections() {
                     }
                   ).getInfo?.() ?? {};
                 return (
-                  info.usbVendorId === conn.usbVendorId &&
-                  info.usbProductId === conn.usbProductId
+                  info.usbVendorId === conn.usbVendorId && info.usbProductId === conn.usbProductId
                 );
               });
             }
@@ -373,9 +342,7 @@ export function useConnections() {
             port = await (
               navigator as Navigator & {
                 serial: {
-                  requestPort: (
-                    options: Record<string, unknown>,
-                  ) => Promise<SerialPort>;
+                  requestPort: (options: Record<string, unknown>) => Promise<SerialPort>;
                 };
               }
             ).serial.requestPort({});
@@ -426,9 +393,7 @@ export function useConnections() {
         if (heartbeatId) {
           clearInterval(heartbeatId);
           heartbeats.delete(id);
-          console.log(
-            `[useConnections] Heartbeat stopped for connection ${id}`,
-          );
+          console.log(`[useConnections] Heartbeat stopped for connection ${id}`);
         }
 
         // Unsubscribe from config complete event
@@ -436,9 +401,7 @@ export function useConnections() {
         if (unsubConfigComplete) {
           unsubConfigComplete();
           configSubscriptions.delete(id);
-          console.log(
-            `[useConnections] Config subscription cleaned up for connection ${id}`,
-          );
+          console.log(`[useConnections] Config subscription cleaned up for connection ${id}`);
         }
 
         // Get device and meshDevice from Device.connection
@@ -560,9 +523,7 @@ export function useConnections() {
               getDevices?: () => Promise<BluetoothDevice[]>;
             }
           ).getDevices?.();
-          const hasPermission = known?.some(
-            (d: BluetoothDevice) => d.id === c.deviceId,
-          );
+          const hasPermission = known?.some((d: BluetoothDevice) => d.id === c.deviceId);
           updateSavedConnection(c.id, {
             status: hasPermission ? "configured" : "disconnected",
           });
@@ -607,10 +568,7 @@ export function useConnections() {
                   };
                 }
               ).getInfo?.() ?? {};
-            return (
-              info.usbVendorId === c.usbVendorId &&
-              info.usbProductId === c.usbProductId
-            );
+            return info.usbVendorId === c.usbVendorId && info.usbProductId === c.usbProductId;
           });
           updateSavedConnection(c.id, {
             status: hasPermission ? "configured" : "disconnected",
@@ -626,9 +584,7 @@ export function useConnections() {
 
   const syncConnectionStatuses = useCallback(() => {
     // Find which connection corresponds to the currently selected device
-    const activeConnection = connections.find(
-      (c) => c.meshDeviceId === selectedDeviceId,
-    );
+    const activeConnection = connections.find((c) => c.meshDeviceId === selectedDeviceId);
 
     // Update all connection statuses
     connections.forEach((conn) => {

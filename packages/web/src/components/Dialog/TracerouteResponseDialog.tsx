@@ -32,13 +32,10 @@ export const TracerouteResponseDialog = ({
   const snrBack = (traceroute?.data.snrBack ?? []).map((snr) => snr / 4);
   const from = getNode(traceroute?.to ?? 0); // The origin of the traceroute = the "to" node of the mesh packet
   const fromLongName =
-    from?.user?.longName ??
-    (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
+    from?.user?.longName ?? (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
   const fromShortName =
     from?.user?.shortName ??
-    (from
-      ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
-      : t("unknown.shortName"));
+    (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : t("unknown.shortName"));
 
   const toUser = getNode(traceroute?.from ?? 0); // The destination of the traceroute = the "from" node of the mesh packet
 

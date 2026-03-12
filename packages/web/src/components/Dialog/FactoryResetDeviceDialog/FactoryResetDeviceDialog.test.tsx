@@ -61,9 +61,7 @@ describe("FactoryResetDeviceDialog", () => {
     );
 
     render(<FactoryResetDeviceDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(
-      screen.getByRole("button", { name: "Factory Reset Device" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Factory Reset Device" }));
 
     // Called immediately
     expect(mockFactoryResetDevice).toHaveBeenCalledTimes(1);

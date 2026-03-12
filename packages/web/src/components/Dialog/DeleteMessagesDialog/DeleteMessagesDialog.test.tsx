@@ -46,19 +46,13 @@ describe("DeleteMessagesDialog", () => {
   it("renders the dialog when open is true", () => {
     render(<DeleteMessagesDialog open onOpenChange={mockOnOpenChange} />);
     expect(screen.getByText("Clear All Messages")).toBeInTheDocument();
-    expect(
-      screen.getByText(/This action will clear all message history./),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/This action will clear all message history./)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Clear Messages" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Clear Messages" })).toBeInTheDocument();
   });
 
   it("does not render the dialog when open is false", () => {
-    render(
-      <DeleteMessagesDialog open={false} onOpenChange={mockOnOpenChange} />,
-    );
+    render(<DeleteMessagesDialog open={false} onOpenChange={mockOnOpenChange} />);
     expect(screen.queryByText("Clear All Messages")).toBeNull();
   });
 

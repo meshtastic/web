@@ -8,9 +8,7 @@ interface MultiSelectProps {
 }
 
 const MultiSelect = ({ children, className = "" }: MultiSelectProps) => {
-  return (
-    <div className={cn("flex flex-wrap gap-2", className)}>{children}</div>
-  );
+  return <div className={cn("flex flex-wrap gap-2", className)}>{children}</div>;
 };
 
 interface MultiSelectItemProps {

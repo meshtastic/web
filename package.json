@@ -12,31 +12,38 @@
     "url": "https://github.com/meshtastic/web/issues"
   },
   "homepage": "https://meshtastic.org",
-  "simple-git-hooks": {
-    "pre-commit": "pnpm run check:fix"
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "oxlint",
+      "oxfmt"
+    ]
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "lint": "biome lint",
-    "lint:fix": "biome lint --write",
-    "format": "biome format",
-    "format:fix": "biome format . --write",
-    "check": "biome check",
-    "check:fix": "biome check --write",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --check .",
+    "format:fix": "oxfmt .",
+    "check": "pnpm lint && pnpm format",
+    "check:fix": "pnpm lint:fix && pnpm format:fix",
     "build:all": "pnpm run --filter '*' build",
     "clean:all": "pnpm run --filter '*' clean",
     "publish:packages": "pnpm run build --filter 'packages/transport-*'",
-    "test": "vitest"
+    "test": "vitest",
+    "prepare": "husky"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.9.0",
-    "@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs@^2.7.18",
+    "@meshtastic/protobufs": "jsr:^2.7.18",
     "ste-simple-events": "^3.0.11",
     "tslog": "^4.9.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.4",
     "@types/node": "^24.3.1",
+    "husky": "^9.1.0",
+    "lint-staged": "^16.0.0",
+    "oxfmt": "^0.16.0",
+    "oxlint": "^1.41.0",
     "tsdown": "^0.15.0",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
@@ -46,8 +53,7 @@
       "@serialport/bindings-cpp",
       "@tailwindcss/oxide",
       "core-js",
-      "esbuild",
-      "simple-git-hooks"
+      "esbuild"
     ]
   }
 }

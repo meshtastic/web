@@ -1,12 +1,6 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import {
-  type AudioValidation,
-  AudioValidationSchema,
-} from "@app/validation/moduleConfig/audio.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { type AudioValidation, AudioValidationSchema } from "@app/validation/moduleConfig/audio.ts";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -18,8 +12,7 @@ interface AudioModuleConfigProps {
 
 export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "audio" });
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AudioValidation) => {
@@ -28,11 +21,7 @@ export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "audio" },
-      data,
-      moduleConfig.audio,
-    );
+    setChange({ type: "moduleConfig", variant: "audio" }, data, moduleConfig.audio);
   };
 
   return (
@@ -65,8 +54,7 @@ export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
               label: t("audio.bitrate.label"),
               description: t("audio.bitrate.description"),
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud,
+                enumValue: Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud,
               },
             },
             {

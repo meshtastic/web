@@ -28,18 +28,13 @@ export const urlOrIpv4Schema = z
     }
 
     // IPv4 pattern
-    const ipv4Regex =
-      /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
+    const ipv4Regex = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
     // Domain pattern (e.g. example.com, meshtastic.local)
     const domainRegex = /^(?!-)(?:[a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,}$/;
     // Local domain (e.g. meshtastic.local)
     const localDomainRegex = /^(?!-)[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.local$/;
 
-    return (
-      ipv4Regex.test(host) ||
-      domainRegex.test(host) ||
-      localDomainRegex.test(host)
-    );
+    return ipv4Regex.test(host) || domainRegex.test(host) || localDomainRegex.test(host);
   }, "Must be a valid IPv4 address or domain name with optional port (10-65535)")
   .transform((val) => {
     return /^https?:\/\//i.test(val) ? val : `http://${val}`;

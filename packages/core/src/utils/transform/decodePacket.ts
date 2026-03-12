@@ -26,10 +26,7 @@ export const decodePacket = (device: MeshDevice) =>
         case "packet": {
           let decodedMessage: Protobuf.Mesh.FromRadio;
           try {
-            decodedMessage = fromBinary(
-              Protobuf.Mesh.FromRadioSchema,
-              chunk.data,
-            );
+            decodedMessage = fromBinary(Protobuf.Mesh.FromRadioSchema, chunk.data);
           } catch (e) {
             device.log.error(
               Types.Emitter[Types.Emitter.HandleFromRadio],
@@ -56,9 +53,7 @@ export const decodePacket = (device: MeshDevice) =>
             }
 
             case "myInfo": {
-              device.events.onMyNodeInfo.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
+              device.events.onMyNodeInfo.dispatch(decodedMessage.payloadVariant.value);
               device.log.info(
                 Types.Emitter[Types.Emitter.HandleFromRadio],
                 "📱 Received Node info for this device",
@@ -72,9 +67,7 @@ export const decodePacket = (device: MeshDevice) =>
                 `📱 Received Node Info packet for node: ${decodedMessage.payloadVariant.value.num}`,
               );
 
-              device.events.onNodeInfoPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
+              device.events.onNodeInfoPacket.dispatch(decodedMessage.payloadVariant.value);
 
               //TODO: HERE
               if (decodedMessage.payloadVariant.value.position) {
@@ -117,9 +110,7 @@ export const decodePacket = (device: MeshDevice) =>
                 );
               }
 
-              device.events.onConfigPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
+              device.events.onConfigPacket.dispatch(decodedMessage.payloadVariant.value);
               break;
             }
 
@@ -128,9 +119,7 @@ export const decodePacket = (device: MeshDevice) =>
                 Types.Emitter[Types.Emitter.HandleFromRadio],
                 "Received onLogRecord",
               );
-              device.events.onLogRecord.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
+              device.events.onLogRecord.dispatch(decodedMessage.payloadVariant.value);
               break;
             }
 
@@ -141,9 +130,7 @@ export const decodePacket = (device: MeshDevice) =>
               );
 
               // Emit the configCompleteId event for MeshService to handle two-stage flow
-              device.events.onConfigComplete.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
+              device.events.onConfigComplete.dispatch(decodedMessage.payloadVariant.value);
 
               // For backward compatibility: if configId matches, update device status
               // MeshService will override this behavior for two-stage flow
@@ -152,9 +139,7 @@ export const decodePacket = (device: MeshDevice) =>
                   Types.Emitter[Types.Emitter.HandleFromRadio],
                   `⚙️ Config id matches device.configId: ${device.configId}`,
                 );
-                device.updateDeviceStatus(
-                  Types.DeviceStatusEnum.DeviceConfigured,
-                );
+                device.updateDeviceStatus(Types.DeviceStatusEnum.DeviceConfigured);
               }
               break;
             }
@@ -179,9 +164,7 @@ export const decodePacket = (device: MeshDevice) =>
                 );
               }
 
-              device.events.onModuleConfigPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
+              device.events.onModuleConfigPacket.dispatch(decodedMessage.payloadVariant.value);
               break;
             }
 
@@ -191,9 +174,7 @@ export const decodePacket = (device: MeshDevice) =>
                 `🔐 Received Channel: ${decodedMessage.payloadVariant.value.index}`,
               );
 
-              device.events.onChannelPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
+              device.events.onChannelPacket.dispatch(decodedMessage.payloadVariant.value);
               break;
             }
 
@@ -203,9 +184,7 @@ export const decodePacket = (device: MeshDevice) =>
                 `🚧 Received Queue Status: ${decodedMessage.payloadVariant.value}`,
               );
 
-              device.events.onQueueStatus.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
+              device.events.onQueueStatus.dispatch(decodedMessage.payloadVariant.value);
               break;
             }
 
@@ -216,9 +195,8 @@ export const decodePacket = (device: MeshDevice) =>
 
             case "metadata": {
               if (
-                Number.parseFloat(
-                  decodedMessage.payloadVariant.value.firmwareVersion,
-                ) < Constants.minFwVer
+                Number.parseFloat(decodedMessage.payloadVariant.value.firmwareVersion) <
+                Constants.minFwVer
               ) {
                 device.log.fatal(
                   Types.Emitter[Types.Emitter.HandleFromRadio],

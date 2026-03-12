@@ -1,9 +1,5 @@
 import { Mono } from "@components/generic/Mono.tsx";
-import {
-  type DataRow,
-  type Heading,
-  Table,
-} from "@components/generic/Table/index.tsx";
+import { type DataRow, type Heading, Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -106,8 +102,8 @@ describe("Generic Table", () => {
     expect(columnHeaders).toHaveLength(3);
 
     const getRenderedOrder = () =>
-      [...renderedTable.querySelectorAll("[data-testid='short-name']")].map(
-        (el) => el.textContent?.trim(),
+      [...renderedTable.querySelectorAll("[data-testid='short-name']")].map((el) =>
+        el.textContent?.trim(),
       );
 
     // Default sort: "Last Heard" desc. TST2 is favorite, so it's first.

@@ -27,13 +27,10 @@ export const LocationResponseDialog = ({
 
   const from = getNode(location?.from ?? 0);
   const longName =
-    from?.user?.longName ??
-    (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
+    from?.user?.longName ?? (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
   const shortName =
     from?.user?.shortName ??
-    (from
-      ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
-      : t("unknown.shortName"));
+    (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : t("unknown.shortName"));
 
   const position = location?.data;
 
@@ -70,23 +67,18 @@ export const LocationResponseDialog = ({
                     rel="noreferrer"
                   >
                     {" "}
-                    {position.latitudeI ?? 0 / 1e7},{" "}
-                    {position.longitudeI ?? 0 / 1e7}
+                    {position.latitudeI ?? 0 / 1e7}, {position.longitudeI ?? 0 / 1e7}
                   </a>
                 </p>
                 <p>
                   {t("locationResponse.altitude")} {position.altitude}
-                  {(position.altitude ?? 0) < 1
-                    ? t("unit.meter.one")
-                    : t("unit.meter.plural")}
+                  {(position.altitude ?? 0) < 1 ? t("unit.meter.one") : t("unit.meter.plural")}
                 </p>
               </span>
             </div>
           ) : (
             // Optional: Show a message if coordinates are not available
-            <p className="text-textPrimary">
-              {t("locationResponse.noCoordinates")}
-            </p>
+            <p className="text-textPrimary">{t("locationResponse.noCoordinates")}</p>
           )}
         </DialogDescription>
       </DialogContent>

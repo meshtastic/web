@@ -1,13 +1,7 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import {
-  type MqttValidation,
-  MqttValidationSchema,
-} from "@app/validation/moduleConfig/mqtt.ts";
+import { type MqttValidation, MqttValidationSchema } from "@app/validation/moduleConfig/mqtt.ts";
 import { create } from "@bufbuild/protobuf";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -20,13 +14,7 @@ interface MqttModuleConfigProps {
 export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "mqtt" });
 
-  const {
-    config,
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { config, moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: MqttValidation) => {
@@ -43,11 +31,7 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "mqtt" },
-      payload,
-      moduleConfig.mqtt,
-    );
+    setChange({ type: "moduleConfig", variant: "mqtt" }, payload, moduleConfig.mqtt);
   };
 
   const populateDefaultValues = (
@@ -185,9 +169,7 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
               type: "number",
               name: "mapReportSettings.publishIntervalSecs",
               label: t("mqtt.mapReportSettings.publishIntervalSecs.label"),
-              description: t(
-                "mqtt.mapReportSettings.publishIntervalSecs.description",
-              ),
+              description: t("mqtt.mapReportSettings.publishIntervalSecs.description"),
               properties: {
                 suffix: t("unit.second.plural"),
               },
@@ -204,75 +186,33 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
               type: "select",
               name: "mapReportSettings.positionPrecision",
               label: t("mqtt.mapReportSettings.positionPrecision.label"),
-              description: t(
-                "mqtt.mapReportSettings.positionPrecision.description",
-              ),
+              description: t("mqtt.mapReportSettings.positionPrecision.description"),
               properties: {
                 enumValue:
                   config.display?.units === 0
                     ? {
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_km23",
-                        )]: 10,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_km12",
-                        )]: 11,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_km5_8",
-                        )]: 12,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_km2_9",
-                        )]: 13,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_km1_5",
-                        )]: 14,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_m700",
-                        )]: 15,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_m350",
-                        )]: 16,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_m200",
-                        )]: 17,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_m90",
-                        )]: 18,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.metric_m50",
-                        )]: 19,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km23")]: 10,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km12")]: 11,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km5_8")]: 12,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km2_9")]: 13,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_km1_5")]: 14,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m700")]: 15,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m350")]: 16,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m200")]: 17,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m90")]: 18,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.metric_m50")]: 19,
                       }
                     : {
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi15",
-                        )]: 10,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3",
-                        )]: 11,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6",
-                        )]: 12,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8",
-                        )]: 13,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9",
-                        )]: 14,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5",
-                        )]: 15,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_2",
-                        )]: 16,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_ft600",
-                        )]: 17,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_ft300",
-                        )]: 18,
-                        [t(
-                          "mqtt.mapReportSettings.positionPrecision.options.imperial_ft150",
-                        )]: 19,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi15")]: 10,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3")]: 11,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6")]: 12,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8")]: 13,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9")]: 14,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5")]: 15,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_2")]: 16,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft600")]: 17,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft300")]: 18,
+                        [t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft150")]: 19,
                       },
               },
               disabledBy: [

@@ -1,11 +1,6 @@
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
-import {
-  type Device,
-  type MessageStore,
-  MessageType,
-  type NodeDB,
-} from "@core/stores";
+import { type Device, type MessageStore, MessageType, type NodeDB } from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/core";
 export const subscribeAll = (
   device: Device,
@@ -22,9 +17,7 @@ export const subscribeAll = (
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     switch (routingPacket.data.variant.case) {
       case "errorReason": {
-        if (
-          routingPacket.data.variant.value === Protobuf.Mesh.Routing_Error.NONE
-        ) {
+        if (routingPacket.data.variant.value === Protobuf.Mesh.Routing_Error.NONE) {
           return;
         }
         console.info(`Routing Error: ${routingPacket.data.variant.value}`);
@@ -119,12 +112,10 @@ export const subscribeAll = (
     });
   });
 
-  connection.events.onClientNotificationPacket.subscribe(
-    (clientNotificationPacket) => {
-      device.addClientNotification(clientNotificationPacket);
-      device.setDialogOpen("clientNotification", true);
-    },
-  );
+  connection.events.onClientNotificationPacket.subscribe((clientNotificationPacket) => {
+    device.addClientNotification(clientNotificationPacket);
+    device.setDialogOpen("clientNotification", true);
+  });
 
   connection.events.onNeighborInfoPacket.subscribe((neighborInfo) => {
     device.addNeighborInfo(neighborInfo.from, neighborInfo.data);
@@ -138,18 +129,12 @@ export const subscribeAll = (
           break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          nodeDB.setNodeError(
-            routingPacket.from,
-            routingPacket?.data?.variant?.value,
-          );
+          nodeDB.setNodeError(routingPacket.from, routingPacket?.data?.variant?.value);
           device.setDialogOpen("refreshKeys", true);
           break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          nodeDB.setNodeError(
-            routingPacket.from,
-            routingPacket?.data?.variant?.value,
-          );
+          nodeDB.setNodeError(routingPacket.from, routingPacket?.data?.variant?.value);
           device.setDialogOpen("refreshKeys", true);
           break;
         default: {

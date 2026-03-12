@@ -7,10 +7,7 @@ import {
 import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
@@ -25,8 +22,7 @@ interface SecurityConfigProps {
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
 
-  const { config, setChange, setDialogOpen, getEffectiveConfig, removeChange } =
-    useDevice();
+  const { config, setChange, setDialogOpen, getEffectiveConfig, removeChange } = useDevice();
 
   const { t } = useTranslation("config");
 
@@ -48,9 +44,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   const formValues = {
     ...effectiveConfig,
     ...{
-      privateKey: fromByteArray(
-        effectiveConfig?.privateKey ?? new Uint8Array(0),
-      ),
+      privateKey: fromByteArray(effectiveConfig?.privateKey ?? new Uint8Array(0)),
       publicKey: fromByteArray(effectiveConfig?.publicKey ?? new Uint8Array(0)),
       adminKey: [
         fromByteArray(effectiveConfig?.adminKey?.at(0) ?? new Uint8Array(0)),
@@ -74,10 +68,8 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     onFormInit?.(formMethods);
   }, [onFormInit, formMethods]);
 
-  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] =
-    useState<boolean>(false);
-  const [managedModeDialogOpen, setManagedModeDialogOpen] =
-    useState<boolean>(false);
+  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] = useState<boolean>(false);
+  const [managedModeDialogOpen, setManagedModeDialogOpen] = useState<boolean>(false);
 
   const onSubmit = (data: RawSecurity) => {
     if (!formState.isReady) {
@@ -100,11 +92,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
       return;
     }
 
-    setChange(
-      { type: "config", variant: "security" },
-      payload,
-      config.security,
-    );
+    setChange({ type: "config", variant: "security" }, payload, config.security);
   };
 
   const pkiRegenerate = () => {
@@ -114,14 +102,12 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
 
   const updatePublicKey = async (privateKey: string) => {
     try {
-      const publicKey = fromByteArray(
-        getX25519PublicKey(toByteArray(privateKey)),
-      );
+      const publicKey = fromByteArray(getX25519PublicKey(toByteArray(privateKey)));
       setValue("privateKey", privateKey, { shouldDirty: true });
       setValue("publicKey", publicKey, { shouldDirty: true });
 
       setPrivateKeyDialogOpen(false);
-    } catch (_e) {
+    } catch {
       setValue("privateKey", privateKey, { shouldDirty: true });
     }
     const valid = await trigger(["privateKey", "publicKey"]);
@@ -202,9 +188,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
+                disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
                 properties: {
                   showCopyButton: true,
                 },
@@ -218,9 +202,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
+                disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
                 properties: {
                   showCopyButton: true,
                 },
@@ -234,9 +216,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
+                disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
                 properties: {
                   showCopyButton: true,
                 },

@@ -8,12 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,
@@ -63,9 +58,7 @@ const ErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
     return null;
   }
 
-  const browserFeatures = missingFeatures.filter(
-    (feature) => feature !== "Secure Context",
-  );
+  const browserFeatures = missingFeatures.filter((feature) => feature !== "Secure Context");
   const needsSecureContext = missingFeatures.includes("Secure Context");
 
   const needsFeature =
@@ -133,17 +126,13 @@ export const NewDeviceDialog = ({ open, onOpenChange }: NewDeviceProps) => {
       id: "BLE",
       label: t("newDeviceDialog.tabBluetooth"),
       element: BLE,
-      isDisabled:
-        unsupported.includes("Web Bluetooth") ||
-        unsupported.includes("Secure Context"),
+      isDisabled: unsupported.includes("Web Bluetooth") || unsupported.includes("Secure Context"),
     },
     {
       id: "Serial",
       label: t("newDeviceDialog.tabSerial"),
       element: Serial,
-      isDisabled:
-        unsupported.includes("Web Serial") ||
-        unsupported.includes("Secure Context"),
+      isDisabled: unsupported.includes("Web Serial") || unsupported.includes("Secure Context"),
     },
   ];
 

@@ -33,10 +33,7 @@ export enum MessageType {
   Broadcast = "broadcast",
 }
 
-export function getConversationId(
-  node1: NodeNum,
-  node2: NodeNum,
-): ConversationId {
+export function getConversationId(node1: NodeNum, node2: NodeNum): ConversationId {
   return [node1, node2].sort((a, b) => a - b).join(":");
 }
 
@@ -158,10 +155,7 @@ function messageStoreFactory(
           if (message.type === MessageType.Direct) {
             const conversationId = getConversationId(message.from, message.to);
             if (!state.messages.direct.has(conversationId)) {
-              state.messages.direct.set(
-                conversationId,
-                new Map<MessageId, Message>(),
-              );
+              state.messages.direct.set(conversationId, new Map<MessageId, Message>());
             }
 
             log = state.messages.direct.get(conversationId);
@@ -169,10 +163,7 @@ function messageStoreFactory(
           } else if (message.type === MessageType.Broadcast) {
             const channelId = message.channel as ChannelId;
             if (!state.messages.broadcast.has(channelId)) {
-              state.messages.broadcast.set(
-                channelId,
-                new Map<MessageId, Message>(),
-              );
+              state.messages.broadcast.set(channelId, new Map<MessageId, Message>());
             }
 
             log = state.messages.broadcast.get(channelId);
@@ -199,10 +190,7 @@ function messageStoreFactory(
           let targetMessage: Message | undefined;
 
           if (params.type === MessageType.Direct) {
-            const conversationId = getConversationId(
-              params.nodeA,
-              params.nodeB,
-            );
+            const conversationId = getConversationId(params.nodeA, params.nodeB);
             messageLog = state.messages.direct.get(conversationId);
             if (messageLog) {
               targetMessage = messageLog.get(params.messageId);
@@ -340,9 +328,7 @@ function messageStoreFactory(
               );
             }
           } else {
-            console.warn(
-              `Message entry ${parentKey} not found for message deletion.`,
-            );
+            console.warn(`Message entry ${parentKey} not found for message deletion.`);
           }
         }),
       );
@@ -350,10 +336,7 @@ function messageStoreFactory(
   };
 }
 
-export const messageStoreInitializer: StateCreator<PrivateMessageStoreState> = (
-  set,
-  get,
-) => ({
+export const messageStoreInitializer: StateCreator<PrivateMessageStoreState> = (set, get) => ({
   messageStores: new Map(),
 
   addMessageStore: (id) => {
@@ -385,10 +368,7 @@ export const messageStoreInitializer: StateCreator<PrivateMessageStoreState> = (
   getMessageStore: (id) => get().messageStores.get(id),
 });
 
-const persistOptions: PersistOptions<
-  PrivateMessageStoreState,
-  MessageStorePersisted
-> = {
+const persistOptions: PersistOptions<PrivateMessageStoreState, MessageStorePersisted> = {
   name: IDB_KEY_NAME,
   storage: createStorage<MessageStorePersisted>(),
   version: CURRENT_STORE_VERSION,
@@ -426,12 +406,7 @@ const persistOptions: PersistOptions<
             // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
             rebuilt.set(
               id,
-              messageStoreFactory(
-                id,
-                useMessageStore.getState,
-                useMessageStore.setState,
-                data,
-              ),
+              messageStoreFactory(id, useMessageStore.getState, useMessageStore.setState, data),
             );
           }
         }
@@ -443,13 +418,10 @@ const persistOptions: PersistOptions<
 
 // Add persist middleware on the store if the feature flag is enabled
 const persistMessages = featureFlags.get("persistMessages");
-console.debug(
-  `MessageStore: Persisting messages is ${persistMessages ? "enabled" : "disabled"}`,
-);
+console.debug(`MessageStore: Persisting messages is ${persistMessages ? "enabled" : "disabled"}`);
 
 export const useMessageStore = persistMessages
-  ? createStore<
-      PrivateMessageStoreState,
-      [["zustand/persist", MessageStorePersisted]]
-    >(persist(messageStoreInitializer, persistOptions))
+  ? createStore<PrivateMessageStoreState, [["zustand/persist", MessageStorePersisted]]>(
+      persist(messageStoreInitializer, persistOptions),
+    )
   : createStore<PrivateMessageStoreState>()(messageStoreInitializer);

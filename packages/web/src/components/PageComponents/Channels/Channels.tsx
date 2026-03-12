@@ -1,12 +1,7 @@
 import { Channel } from "@app/components/PageComponents/Channels/Channel";
 import { Button } from "@components/UI/Button.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
 import { useDevice } from "@core/stores";
 import type { Protobuf } from "@meshtastic/core";
 import i18next from "i18next";
@@ -36,13 +31,7 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
 
   const allChannels = Array.from(channels.values());
   const flags = useMemo(
-    () =>
-      new Map(
-        allChannels.map((channel) => [
-          channel.index,
-          hasChannelChange(channel.index),
-        ]),
-      ),
+    () => new Map(allChannels.map((channel) => [channel.index, hasChannelChange(channel.index)])),
     [allChannels, hasChannelChange],
   );
 
@@ -64,10 +53,7 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
             )}
           </TabsTrigger>
         ))}
-        <Button
-          className="ml-auto mr-1 h-8"
-          onClick={() => setDialogOpen("import", true)}
-        >
+        <Button className="ml-auto mr-1 h-8" onClick={() => setDialogOpen("import", true)}>
           <UploadIcon className="mr-2" size={14} />
           {t("page.import")}
         </Button>
@@ -77,16 +63,9 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
         </Button>
       </TabsList>
       {allChannels.map((channel) => (
-        <TabsContent
-          key={`channel_${channel.index}`}
-          value={`channel_${channel.index}`}
-        >
+        <TabsContent key={`channel_${channel.index}`} value={`channel_${channel.index}`}>
           <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <Channel
-              key={channel.index}
-              onFormInit={onFormInit}
-              channel={channel}
-            />
+            <Channel key={channel.index} onFormInit={onFormInit} channel={channel} />
           </Suspense>
         </TabsContent>
       ))}

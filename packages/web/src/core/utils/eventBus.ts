@@ -10,10 +10,7 @@ export type EventCallback<T extends EventName> = (data: EventMap[T]) => void;
 class EventBus {
   private listeners: { [K in EventName]?: Array<EventCallback<K>> } = {};
 
-  public on<T extends EventName>(
-    event: T,
-    callback: EventCallback<T>,
-  ): () => void {
+  public on<T extends EventName>(event: T, callback: EventCallback<T>): () => void {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }

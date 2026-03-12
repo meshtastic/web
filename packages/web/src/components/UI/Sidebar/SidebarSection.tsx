@@ -9,11 +9,7 @@ interface SidebarSectionProps {
   className?: string;
 }
 
-export const SidebarSection = ({
-  label,
-  children,
-  className,
-}: SidebarSectionProps) => {
+export const SidebarSection = ({ label, children, className }: SidebarSectionProps) => {
   const { isCollapsed } = useSidebar();
   return (
     <div className={cn("py-2", isCollapsed ? "px-0" : "px-4", className)}>

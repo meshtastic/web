@@ -3,7 +3,7 @@ name: Nightly Release
 on:
   schedule:
     - cron: "0 5 * * *" # 05:00 UTC daily
-  workflow_dispatch: {}   # allow manual runs too
+  workflow_dispatch: {} # allow manual runs too
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -28,9 +28,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
-          cache-dependency-path: '**/pnpm-lock.yaml'
+          cache-dependency-path: "**/pnpm-lock.yaml"
 
       - name: Install dependencies (root)
         run: pnpm install --frozen-lockfile

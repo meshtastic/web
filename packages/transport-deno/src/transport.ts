@@ -20,9 +20,7 @@ export class TransportDeno implements Types.Transport {
     toDeviceStream.readable.pipeTo(this.connection.writable);
 
     this._toDevice = toDeviceStream.writable;
-    this._fromDevice = this.connection.readable.pipeThrough(
-      Utils.fromDeviceStream(),
-    );
+    this._fromDevice = this.connection.readable.pipeThrough(Utils.fromDeviceStream());
   }
 
   get toDevice(): WritableStream<Uint8Array> {

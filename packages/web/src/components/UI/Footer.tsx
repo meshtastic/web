@@ -21,19 +21,12 @@ const Footer = ({ className, ...props }: FooterProps) => {
 
   return (
     <footer
-      className={cn(
-        "flex mt-auto justify-center py-2 px-4 text-sm lg:text-md",
-        className,
-      )}
+      className={cn("flex mt-auto justify-center py-2 px-4 text-sm lg:text-md", className)}
       {...props}
     >
       <div className="px-2">
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
-          {version}
-        </span>
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40 mx-2">
-          -
-        </span>
+        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">{version}</span>
+        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40 mx-2">-</span>
         <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
           {`#${commitHash}`}
         </span>
@@ -42,19 +35,21 @@ const Footer = ({ className, ...props }: FooterProps) => {
         <Trans
           i18nKey="footer.text"
           components={[
-            // biome-ignore lint/a11y/useAnchorContent: because I want to use the link component
             <a
               key="vercel"
               rel="noopener noreferrer"
               href="https://vercel.com/?utm_source=meshtastic&utm_campaign=oss"
               className="hover:underline text-link"
+              aria-label="Link to Vercel homepage"
+              title="Vercel"
             />,
-            // biome-ignore lint/a11y/useAnchorContent: because I want to use the link component
             <a
               key="legal"
               rel="noopener noreferrer"
               href="https://meshtastic.org/docs/legal"
               className="hover:underline text-link"
+              aria-label="Link to Legal page"
+              title="Legal"
             />,
           ]}
         />

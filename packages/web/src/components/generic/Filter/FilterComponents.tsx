@@ -50,10 +50,7 @@ interface FilterToggleProps<K extends keyof FilterState> {
   onChange: (key: K, value: string) => void;
 }
 
-export const FilterAccordionItem = ({
-  label,
-  children,
-}: FilterAccordionItemProps) => {
+export const FilterAccordionItem = ({ label, children }: FilterAccordionItemProps) => {
   return (
     <AccordionItem value={label}>
       <AccordionHeader>
@@ -65,9 +62,7 @@ export const FilterAccordionItem = ({
           {label}
         </AccordionTrigger>
       </AccordionHeader>
-      <AccordionContent
-        className={cn("px-1 pb-4 pt-2 space-y-3 dark:border-slate-700")}
-      >
+      <AccordionContent className={cn("px-1 pb-4 pt-2 space-y-3 dark:border-slate-700")}>
         {children}
       </AccordionContent>
     </AccordionItem>
@@ -132,8 +127,7 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
 }: FilterMultiProps<K>) => {
   const selected = getNumberArray(filterState, filterKey);
 
-  const allSelected =
-    options.length > 0 && options.every((opt) => selected.includes(opt));
+  const allSelected = options.length > 0 && options.every((opt) => selected.includes(opt));
 
   const toggleAll = () => {
     setFilterState((prev) => ({
@@ -147,9 +141,7 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
       const current = getNumberArray(prev, filterKey);
       return {
         ...prev,
-        [filterKey]: checked
-          ? [...current, val]
-          : current.filter((v) => v !== val),
+        [filterKey]: checked ? [...current, val] : current.filter((v) => v !== val),
       };
     });
   };
@@ -197,11 +189,7 @@ export const FilterToggle = <K extends keyof FilterState>({
       aria-label={label}
       id={label}
       onValueChange={(value) => onChange(filterKey, value)}
-      value={
-        typeof filterState[filterKey] === "undefined"
-          ? ""
-          : String(filterState[filterKey])
-      }
+      value={typeof filterState[filterKey] === "undefined" ? "" : String(filterState[filterKey])}
     >
       <ToggleGroupItem
         value="false"

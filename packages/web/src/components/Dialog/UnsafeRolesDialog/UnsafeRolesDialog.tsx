@@ -20,16 +20,12 @@ export interface RouterRoleDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const UnsafeRolesDialog = ({
-  open,
-  onOpenChange,
-}: RouterRoleDialogProps) => {
+export const UnsafeRolesDialog = ({ open, onOpenChange }: RouterRoleDialogProps) => {
   const { t } = useTranslation("dialog");
   const [confirmState, setConfirmState] = useState(false);
   const { setDialogOpen } = useDevice();
 
-  const deviceRoleLink =
-    "https://meshtastic.org/docs/configuration/radio/device/";
+  const deviceRoleLink = "https://meshtastic.org/docs/configuration/radio/device/";
   const choosingTheRightDeviceRoleLink =
     "https://meshtastic.org/blog/choosing-the-right-device-role/";
 
@@ -63,17 +59,11 @@ export const UnsafeRolesDialog = ({
             onChange={() => setConfirmState(!confirmState)}
             name="confirmUnderstanding"
           >
-            <span className="dark:text-white">
-              {t("unsafeRoles.confirmUnderstanding")}
-            </span>
+            <span className="dark:text-white">{t("unsafeRoles.confirmUnderstanding")}</span>
           </Checkbox>
         </div>
         <DialogFooter className="mt-6">
-          <Button
-            variant="default"
-            name="dismiss"
-            onClick={() => handleCloseDialog("dismiss")}
-          >
+          <Button variant="default" name="dismiss" onClick={() => handleCloseDialog("dismiss")}>
             {t("button.dismiss")}
           </Button>
           <Button

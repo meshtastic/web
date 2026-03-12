@@ -1,9 +1,4 @@
-import {
-  BatteryFullIcon,
-  BatteryLowIcon,
-  BatteryMediumIcon,
-  PlugZapIcon,
-} from "lucide-react";
+import { BatteryFullIcon, BatteryLowIcon, BatteryMediumIcon, PlugZapIcon } from "lucide-react";
 import type React from "react";
 import { useTranslation } from "react-i18next";
 import type { DeviceMetrics } from "./types.ts";
@@ -43,10 +38,7 @@ export const getBatteryStatus = (level: number): BatteryStatusKey => {
 const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
   const { t } = useTranslation();
 
-  if (
-    deviceMetrics?.batteryLevel === undefined ||
-    deviceMetrics?.batteryLevel === null
-  ) {
+  if (deviceMetrics?.batteryLevel === undefined || deviceMetrics?.batteryLevel === null) {
     return null;
   }
 

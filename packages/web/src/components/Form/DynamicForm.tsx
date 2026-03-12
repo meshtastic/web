@@ -1,8 +1,5 @@
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
-import {
-  DynamicFormField,
-  type FieldProps,
-} from "@components/Form/DynamicFormField.tsx";
+import { DynamicFormField, type FieldProps } from "@components/Form/DynamicFormField.tsx";
 import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
@@ -66,9 +63,7 @@ export interface DynamicFormProps<T extends FieldValues> {
   validationSchema?: ZodType<T>;
 }
 
-export type DynamicFormFormInit<T extends FieldValues> = (
-  methods: UseFormReturn<T, T, T>,
-) => void;
+export type DynamicFormFormInit<T extends FieldValues> = (methods: UseFormReturn<T, T, T>) => void;
 
 export function DynamicForm<T extends FieldValues>({
   propMethods,
@@ -86,9 +81,7 @@ export function DynamicForm<T extends FieldValues>({
   const internalMethods = useForm<T>({
     mode: "onChange",
     defaultValues: defaultValues,
-    resolver: validationSchema
-      ? createZodResolver(validationSchema)
-      : undefined,
+    resolver: validationSchema ? createZodResolver(validationSchema) : undefined,
     shouldFocusError: false,
     resetOptions: { keepDefaultValues: true },
     values,
@@ -96,8 +89,7 @@ export function DynamicForm<T extends FieldValues>({
 
   const methods = propMethods ?? internalMethods;
 
-  const { handleSubmit, control, getValues, formState, getFieldState } =
-    methods;
+  const { handleSubmit, control, getValues, formState, getFieldState } = methods;
 
   useEffect(() => {
     if (!propMethods) {
@@ -105,10 +97,7 @@ export function DynamicForm<T extends FieldValues>({
     }
   }, [onFormInit, propMethods, internalMethods]);
 
-  const isDisabled = (
-    disabledBy?: DisabledBy<T>[],
-    disabled?: boolean,
-  ): boolean => {
+  const isDisabled = (disabledBy?: DisabledBy<T>[], disabled?: boolean): boolean => {
     if (disabled) {
       return true;
     }
@@ -125,9 +114,7 @@ export function DynamicForm<T extends FieldValues>({
         return field.invert ? value : !value;
       }
       if (typeof value === "number") {
-        return field.invert
-          ? field.selector !== value
-          : field.selector === value;
+        return field.invert ? field.selector !== value : field.selector === value;
       }
       return false;
     });

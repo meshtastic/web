@@ -3,10 +3,7 @@ import {
   type ExternalNotificationValidation,
   ExternalNotificationValidationSchema,
 } from "@app/validation/moduleConfig/externalNotification.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
@@ -15,13 +12,10 @@ interface ExternalNotificationModuleConfigProps {
   onFormInit: DynamicFormFormInit<ExternalNotificationValidation>;
 }
 
-export const ExternalNotification = ({
-  onFormInit,
-}: ExternalNotificationModuleConfigProps) => {
+export const ExternalNotification = ({ onFormInit }: ExternalNotificationModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "externalNotification" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: ExternalNotificationValidation) => {
@@ -129,9 +123,7 @@ export const ExternalNotification = ({
               type: "toggle",
               name: "alertMessageVibra",
               label: t("externalNotification.alertMessageVibra.label"),
-              description: t(
-                "externalNotification.alertMessageVibra.description",
-              ),
+              description: t("externalNotification.alertMessageVibra.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -142,9 +134,7 @@ export const ExternalNotification = ({
               type: "toggle",
               name: "alertMessageBuzzer",
               label: t("externalNotification.alertMessageBuzzer.label"),
-              description: t(
-                "externalNotification.alertMessageBuzzer.description",
-              ),
+              description: t("externalNotification.alertMessageBuzzer.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -177,9 +167,7 @@ export const ExternalNotification = ({
               type: "toggle",
               name: "alertBellBuzzer",
               label: t("externalNotification.alertBellBuzzer.label"),
-              description: t(
-                "externalNotification.alertBellBuzzer.description",
-              ),
+              description: t("externalNotification.alertBellBuzzer.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",

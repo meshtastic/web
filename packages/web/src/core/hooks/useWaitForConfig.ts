@@ -1,17 +1,10 @@
-import {
-  useDevice,
-  type ValidConfigType,
-  type ValidModuleConfigType,
-} from "@core/stores";
+import { useDevice, type ValidConfigType, type ValidModuleConfigType } from "@core/stores";
 
 type UseWaitForConfigProps =
   | { configCase: ValidConfigType; moduleConfigCase?: never }
   | { configCase?: never; moduleConfigCase: ValidModuleConfigType };
 
-export function useWaitForConfig({
-  configCase,
-  moduleConfigCase,
-}: UseWaitForConfigProps): void {
+export function useWaitForConfig({ configCase, moduleConfigCase }: UseWaitForConfigProps): void {
   const { config, moduleConfig } = useDevice();
 
   const isDataDefined = configCase

@@ -8,11 +8,7 @@ import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Accordion } from "@components/UI/Accordion.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@components/UI/Popover.tsx";
+import { Popover, PopoverContent, PopoverTrigger } from "@components/UI/Popover.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { debounce } from "@core/utils/debounce.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -134,6 +130,7 @@ export function FilterControl({
     [setFilterState],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetFilterState = useCallback(
     debounce(<K extends keyof FilterState>(key: K, value: number[]) => {
       skipNextFilterStateSync.current = true;
@@ -158,10 +155,7 @@ export function FilterControl({
   );
 
   const handleBoolChange = useCallback(
-    <K extends keyof FilterState>(
-      key: K,
-      value: string | boolean | undefined,
-    ) => {
+    <K extends keyof FilterState>(key: K, value: string | boolean | undefined) => {
       let typedValue: boolean | undefined;
       if (value === true || value === "true") {
         typedValue = true;
@@ -185,10 +179,7 @@ export function FilterControl({
     [],
   );
 
-  const formatEnumLabel = useCallback(
-    (label: string): string => label.replace(/_/g, " "),
-    [],
-  );
+  const formatEnumLabel = useCallback((label: string): string => label.replace(/_/g, " "), []);
 
   const roleOptions = useMemo(
     () =>
@@ -199,9 +190,7 @@ export function FilterControl({
   );
   const hwModelOptions = useMemo(
     () =>
-      Object.values(Protobuf.Mesh.HardwareModel).filter(
-        (v): v is number => typeof v === "number",
-      ),
+      Object.values(Protobuf.Mesh.HardwareModel).filter((v): v is number => typeof v === "number"),
     [],
   );
 
@@ -225,17 +214,10 @@ export function FilterControl({
       </PopoverTrigger>
       <PopoverContent
         {...parameters?.popoverContentProps}
-        className={cn(
-          "dark:text-slate-300",
-          parameters?.popoverContentProps?.className,
-        )}
+        className={cn("dark:text-slate-300", parameters?.popoverContentProps?.className)}
       >
         <form className="space-y-4">
-          <Accordion
-            type="single"
-            defaultValue={t("general.label")}
-            collapsible
-          >
+          <Accordion type="single" defaultValue={t("general.label")} collapsible>
             <FilterAccordionItem label={t("general.label")}>
               {(parameters?.showTextSearch ?? true) && (
                 <div className="flex flex-col space-y-1 pb-2">
@@ -365,9 +347,7 @@ export function FilterControl({
                 setFilterState={setFilterState}
                 options={roleOptions}
                 getLabel={(val) =>
-                  formatEnumLabel(
-                    Protobuf.Config.Config_DeviceConfig_Role[val] ?? "UNSET",
-                  )
+                  formatEnumLabel(Protobuf.Config.Config_DeviceConfig_Role[val] ?? "UNSET")
                 }
               />
             </FilterAccordionItem>
@@ -378,9 +358,7 @@ export function FilterControl({
                 filterState={filterState}
                 setFilterState={setFilterState}
                 options={hwModelOptions}
-                getLabel={(val) =>
-                  formatEnumLabel(Protobuf.Mesh.HardwareModel[val] ?? "UNKNOWN")
-                }
+                getLabel={(val) => formatEnumLabel(Protobuf.Mesh.HardwareModel[val] ?? "UNKNOWN")}
               />
             </FilterAccordionItem>
             <FilterAccordionItem label={t("advanced.label")}>

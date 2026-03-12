@@ -1,12 +1,6 @@
-import {
-  type UserValidation,
-  UserValidationSchema,
-} from "@app/validation/config/user.ts";
+import { type UserValidation, UserValidationSchema } from "@app/validation/config/user.ts";
 import { create } from "@bufbuild/protobuf";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
+import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice, useNodeDB } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
@@ -29,9 +23,7 @@ export const User = ({ onFormInit }: UserConfigProps) => {
   };
 
   // Get working copy from change registry
-  const workingUser = getChange({ type: "user" }) as
-    | Protobuf.Mesh.User
-    | undefined;
+  const workingUser = getChange({ type: "user" }) as Protobuf.Mesh.User | undefined;
 
   const effectiveUser = workingUser ?? defaultUser;
 

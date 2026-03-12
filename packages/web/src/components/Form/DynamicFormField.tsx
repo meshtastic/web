@@ -1,24 +1,12 @@
-import {
-  GenericInput,
-  type InputFieldProps,
-} from "@components/Form/FormInput.tsx";
+import { GenericInput, type InputFieldProps } from "@components/Form/FormInput.tsx";
 import {
   PasswordGenerator,
   type PasswordGeneratorProps,
 } from "@components/Form/FormPasswordGenerator.tsx";
-import {
-  type SelectFieldProps,
-  SelectInput,
-} from "@components/Form/FormSelect.tsx";
-import {
-  type ToggleFieldProps,
-  ToggleInput,
-} from "@components/Form/FormToggle.tsx";
+import { type SelectFieldProps, SelectInput } from "@components/Form/FormSelect.tsx";
+import { type ToggleFieldProps, ToggleInput } from "@components/Form/FormToggle.tsx";
 import type { Control, FieldValues } from "react-hook-form";
-import {
-  type MultiSelectFieldProps,
-  MultiSelectInput,
-} from "./FormMultiSelect.tsx";
+import { type MultiSelectFieldProps, MultiSelectInput } from "./FormMultiSelect.tsx";
 
 export type FieldProps<T> =
   | InputFieldProps<T>
@@ -46,14 +34,7 @@ export function DynamicFormField<T extends FieldValues>({
     case "text":
     case "password":
     case "number":
-      return (
-        <GenericInput
-          field={field}
-          control={control}
-          disabled={disabled}
-          isDirty={isDirty}
-        />
-      );
+      return <GenericInput field={field} control={control} disabled={disabled} isDirty={isDirty} />;
 
     case "toggle":
       return (

@@ -1,10 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import type {
-  ButtonHTMLAttributes,
-  ClassAttributes,
-  InputHTMLAttributes,
-  ReactNode,
-} from "react";
+import type { ButtonHTMLAttributes, ClassAttributes, InputHTMLAttributes, ReactNode } from "react";
 import type { JSX } from "react/jsx-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RebootDialog } from "./RebootDialog.tsx";
@@ -54,16 +49,10 @@ vi.mock("@components/UI/Input.tsx", async () => {
 vi.mock("@components/UI/Dialog.tsx", () => {
   return {
     Dialog: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    DialogContent: ({ children }: { children: ReactNode }) => (
-      <div>{children}</div>
-    ),
-    DialogHeader: ({ children }: { children: ReactNode }) => (
-      <div>{children}</div>
-    ),
+    DialogContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    DialogHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     DialogTitle: ({ children }: { children: ReactNode }) => <h1>{children}</h1>,
-    DialogDescription: ({ children }: { children: ReactNode }) => (
-      <p>{children}</p>
-    ),
+    DialogDescription: ({ children }: { children: ReactNode }) => <p>{children}</p>,
     DialogClose: () => null,
   };
 });
@@ -81,12 +70,8 @@ describe("RebootDialog", () => {
   it("renders dialog with default input value", () => {
     render(<RebootDialog open onOpenChange={() => {}} />);
     expect(screen.getByPlaceholderText(/enter delay/i)).toHaveValue(5);
-    expect(
-      screen.getByRole("heading", { name: /reboot device/i, level: 1 }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /reboot now/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /reboot device/i, level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /reboot now/i })).toBeInTheDocument();
   });
 
   it("calls correct reboot function based on OTA checkbox state", () => {
@@ -199,8 +184,6 @@ describe("RebootDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
     });
     expect(rebootMock).toHaveBeenCalledWith(-1);
-    expect(
-      screen.queryByText(/reboot has been scheduled/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/reboot has been scheduled/i)).not.toBeInTheDocument();
   });
 });

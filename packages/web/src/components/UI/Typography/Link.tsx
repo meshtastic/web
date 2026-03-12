@@ -1,17 +1,11 @@
 import { cn } from "@core/utils/cn.ts";
-import {
-  Link as RouterLink,
-  type LinkProps as RouterLinkProps,
-} from "@tanstack/react-router";
+import { Link as RouterLink, type LinkProps as RouterLinkProps } from "@tanstack/react-router";
 
 export interface LinkProps extends RouterLinkProps {
   href: string;
   children?:
     | React.ReactNode
-    | ((state: {
-        isActive: boolean;
-        isTransitioning: boolean;
-      }) => React.ReactNode);
+    | ((state: { isActive: boolean; isTransitioning: boolean }) => React.ReactNode);
   className?: string;
 }
 

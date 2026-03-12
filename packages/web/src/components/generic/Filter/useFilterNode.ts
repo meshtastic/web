@@ -45,8 +45,7 @@ export function useFilterNode() {
       batteryLevel: [0, 101],
       voltage: [0, 5],
       role: Object.values(Protobuf.Config.Config_DeviceConfig_Role).filter(
-        (v): v is Protobuf.Config.Config_DeviceConfig_Role =>
-          typeof v === "number",
+        (v): v is Protobuf.Config.Config_DeviceConfig_Role => typeof v === "number",
       ),
       hwModel: Object.values(Protobuf.Mesh.HardwareModel).filter(
         (v): v is Protobuf.Mesh.HardwareModel => typeof v === "number",
@@ -58,10 +57,7 @@ export function useFilterNode() {
   );
 
   const nodeFilter = useCallback(
-    (
-      node: Protobuf.Mesh.NodeInfo,
-      filterOverrides?: Partial<FilterState>,
-    ): boolean => {
+    (node: Protobuf.Mesh.NodeInfo, filterOverrides?: Partial<FilterState>): boolean => {
       const filterState: FilterState = {
         ...defaultFilterValues,
         ...filterOverrides,
@@ -87,10 +83,7 @@ export function useFilterNode() {
       const hops = node.hopsAway ?? 7;
       if (
         (node.hopsAway === undefined &&
-          !shallowEqualArray(
-            filterState.hopsAway,
-            defaultFilterValues.hopsAway,
-          )) || // If hops are unknown, hide node if state is not default
+          !shallowEqualArray(filterState.hopsAway, defaultFilterValues.hopsAway)) || // If hops are unknown, hide node if state is not default
         hops < filterState.hopsAway[0] ||
         hops > filterState.hopsAway[1]
       ) {
@@ -107,10 +100,7 @@ export function useFilterNode() {
       const secondsAgo = Math.max(0, Date.now() / 1000 - (node.lastHeard ?? 0));
       if (
         (node.lastHeard === 0 &&
-          !shallowEqualArray(
-            filterState.lastHeard,
-            defaultFilterValues.lastHeard,
-          )) || // If lastHeard is unknown (0), hide node if state is not default
+          !shallowEqualArray(filterState.lastHeard, defaultFilterValues.lastHeard)) || // If lastHeard is unknown (0), hide node if state is not default
         secondsAgo < filterState.lastHeard[0] ||
         (secondsAgo > filterState.lastHeard[1] &&
           filterState.lastHeard[1] !== defaultFilterValues.lastHeard[1])
@@ -132,21 +122,15 @@ export function useFilterNode() {
         return false;
       }
 
-      if (
-        typeof filterState.viaMqtt !== "undefined" &&
-        node.viaMqtt !== filterState.viaMqtt
-      ) {
+      if (typeof filterState.viaMqtt !== "undefined" && node.viaMqtt !== filterState.viaMqtt) {
         return false;
       }
 
       const snr = node.snr ?? -20;
       if (
-        (node.snr === undefined &&
-          !shallowEqualArray(filterState.snr, defaultFilterValues.snr)) ||
-        (snr < filterState.snr[0] &&
-          filterState.snr[0] !== defaultFilterValues.snr[0]) ||
-        (snr > filterState.snr[1] &&
-          filterState.snr[1] !== defaultFilterValues.snr[1])
+        (node.snr === undefined && !shallowEqualArray(filterState.snr, defaultFilterValues.snr)) ||
+        (snr < filterState.snr[0] && filterState.snr[0] !== defaultFilterValues.snr[0]) ||
+        (snr > filterState.snr[1] && filterState.snr[1] !== defaultFilterValues.snr[1])
       ) {
         return false;
       }
@@ -167,10 +151,7 @@ export function useFilterNode() {
       const airUtilTx = node.deviceMetrics?.airUtilTx ?? 0;
       if (
         (node.deviceMetrics?.airUtilTx === undefined &&
-          !shallowEqualArray(
-            filterState.airUtilTx,
-            defaultFilterValues.airUtilTx,
-          )) ||
+          !shallowEqualArray(filterState.airUtilTx, defaultFilterValues.airUtilTx)) ||
         airUtilTx < filterState.airUtilTx[0] ||
         airUtilTx > filterState.airUtilTx[1]
       ) {
@@ -180,10 +161,7 @@ export function useFilterNode() {
       const batt = node.deviceMetrics?.batteryLevel ?? 101;
       if (
         (node.deviceMetrics?.batteryLevel === undefined &&
-          !shallowEqualArray(
-            filterState.batteryLevel,
-            defaultFilterValues.batteryLevel,
-          )) ||
+          !shallowEqualArray(filterState.batteryLevel, defaultFilterValues.batteryLevel)) ||
         batt < filterState.batteryLevel[0] ||
         batt > filterState.batteryLevel[1]
       ) {
@@ -193,10 +171,7 @@ export function useFilterNode() {
       const voltage = Math.abs(node.deviceMetrics?.voltage ?? 0);
       if (
         (node.deviceMetrics?.voltage === undefined &&
-          !shallowEqualArray(
-            filterState.voltage,
-            defaultFilterValues.voltage,
-          )) ||
+          !shallowEqualArray(filterState.voltage, defaultFilterValues.voltage)) ||
         voltage < filterState.voltage[0] ||
         (voltage > filterState.voltage[1] &&
           filterState.voltage[1] !== defaultFilterValues.voltage[1])
@@ -218,10 +193,7 @@ export function useFilterNode() {
         node.user?.hwModel ?? Protobuf.Mesh.HardwareModel.UNSET;
       if (
         (node.user?.hwModel === undefined &&
-          !shallowEqualArray(
-            filterState.hwModel,
-            defaultFilterValues.hwModel,
-          )) ||
+          !shallowEqualArray(filterState.hwModel, defaultFilterValues.hwModel)) ||
         !filterState.hwModel.includes(hwModel)
       ) {
         return false;

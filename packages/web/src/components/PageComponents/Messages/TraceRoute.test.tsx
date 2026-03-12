@@ -74,14 +74,7 @@ describe("TraceRoute", () => {
   });
 
   it("renders the route to destination with SNR values", () => {
-    render(
-      <TraceRoute
-        from={fromUser}
-        to={toUser}
-        route={[1, 2]}
-        snrTowards={[10, 20, 30]}
-      />,
-    );
+    render(<TraceRoute from={fromUser} to={toUser} route={[1, 2]} snrTowards={[10, 20, 30]} />);
 
     expect(screen.getByText("Source Node")).toBeInTheDocument();
     expect(screen.getByText("Destination Node")).toBeInTheDocument();
