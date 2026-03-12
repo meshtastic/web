@@ -43,9 +43,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
-          cache-dependency-path: '**/pnpm-lock.yaml'
+          cache-dependency-path: "**/pnpm-lock.yaml"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -139,7 +139,7 @@ jobs:
           push: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag_name != '') }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          provenance: false 
+          provenance: false
 
       - name: Output image refs
         if: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag_name != '') }}
