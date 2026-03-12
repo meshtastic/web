@@ -108,7 +108,6 @@
     "autoprefixer": "^10.4.21",
     "gzipper": "^8.2.1",
     "happy-dom": "^20.0.2",
-    "simple-git-hooks": "^2.13.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.14",
     "tailwindcss-animate": "^1.0.7",
