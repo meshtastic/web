@@ -1,4 +1,5 @@
 import { useFirstSavedConnection } from "@app/core/stores/deviceStore/selectors.ts";
+import { ScrollArea } from "@components/UI/ScrollArea.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
@@ -130,7 +131,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
   return (
     <div
       className={cn(
-        "relative border-slate-300 dark:border-slate-700",
+        "relative h-svh flex flex-col border-slate-300 dark:border-slate-700",
         "transition-all duration-300 ease-in-out flex-shrink-0",
         isCollapsed ? "w-24" : "w-52 lg:w-64",
       )}
@@ -156,60 +157,62 @@ export const Sidebar = ({ children }: SidebarProps) => {
         </h2>
       </div>
 
-      <SidebarSection label={t("navigation.title")} className="mt-4 px-0">
-        {pages.map((link) => {
-          return (
-            <SidebarButton
-              key={link.name}
-              count={link.count}
-              label={link.name}
-              Icon={link.icon}
-              onClick={() => {
-                if (myNode !== undefined) {
-                  navigate({ to: `/${link.page}` });
-                }
+      <ScrollArea>
+        <SidebarSection label={t("navigation.title")} className="mt-4 px-0">
+          {pages.map((link) => {
+            return (
+              <SidebarButton
+                key={link.name}
+                count={link.count}
+                label={link.name}
+                Icon={link.icon}
+                onClick={() => {
+                  if (myNode !== undefined) {
+                    navigate({ to: `/${link.page}` });
+                  }
+                }}
+                active={link.page === pathname}
+                disabled={myNode === undefined}
+              />
+            );
+          })}
+        </SidebarSection>
+
+        <div>{children}</div>
+
+        <div className=" pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 h-full flex-1">
+          {myNode === undefined ? (
+            <div className="flex flex-col items-center justify-center py-6">
+              <Spinner />
+              <Subtle
+                className={cn(
+                  "mt-4 transition-opacity duration-300",
+                  isCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
+                )}
+              >
+                {t("loading")}
+              </Subtle>
+            </div>
+          ) : (
+            <DeviceInfoPanel
+              isCollapsed={isCollapsed}
+              setCommandPaletteOpen={() => setCommandPaletteOpen(true)}
+              setDialogOpen={() => setDialogOpen("deviceName", true)}
+              user={myNode.user}
+              firmwareVersion={myMetadata?.firmwareVersion ?? t("unknown.notAvailable")}
+              deviceMetrics={{
+                batteryLevel: myNode.deviceMetrics?.batteryLevel,
+                voltage:
+                  typeof myNode.deviceMetrics?.voltage === "number"
+                    ? Math.abs(myNode.deviceMetrics?.voltage)
+                    : undefined,
               }}
-              active={link.page === pathname}
-              disabled={myNode === undefined}
+              connectionStatus={activeConnection?.status}
+              connectionName={activeConnection?.name}
             />
-          );
-        })}
-      </SidebarSection>
-
-      <div className={cn("flex-1 min-h-0", isCollapsed && "overflow-hidden")}>{children}</div>
-
-      <div className=" pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 h-full flex-1">
-        {myNode === undefined ? (
-          <div className="flex flex-col items-center justify-center py-6">
-            <Spinner />
-            <Subtle
-              className={cn(
-                "mt-4 transition-opacity duration-300",
-                isCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
-              )}
-            >
-              {t("loading")}
-            </Subtle>
-          </div>
-        ) : (
-          <DeviceInfoPanel
-            isCollapsed={isCollapsed}
-            setCommandPaletteOpen={() => setCommandPaletteOpen(true)}
-            setDialogOpen={() => setDialogOpen("deviceName", true)}
-            user={myNode.user}
-            firmwareVersion={myMetadata?.firmwareVersion ?? t("unknown.notAvailable")}
-            deviceMetrics={{
-              batteryLevel: myNode.deviceMetrics?.batteryLevel,
-              voltage:
-                typeof myNode.deviceMetrics?.voltage === "number"
-                  ? Math.abs(myNode.deviceMetrics?.voltage)
-                  : undefined,
-            }}
-            connectionStatus={activeConnection?.status}
-            connectionName={activeConnection?.name}
-          />
-        )}
-      </div>
+          )}
+        </div>
+      </ScrollArea>
     </div>
   );
 };
