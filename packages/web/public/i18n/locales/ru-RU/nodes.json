@@ -1,59 +1,62 @@
 {
   "nodeDetail": {
     "publicKeyEnabled": {
-      "label": "Public Key Enabled"
+      "label": "Публичный ключ включён"
     },
     "noPublicKey": {
-      "label": "No Public Key"
+      "label": "Нет публичного ключа"
     },
     "directMessage": {
-      "label": "Direct Message {{shortName}}"
+      "label": "Личное сообщение {{shortName}}"
     },
     "favorite": {
       "label": "Избранное",
-      "tooltip": "Add or remove this node from your favorites"
+      "tooltip": "Добавить или удалить эту ноду из избранного"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "Не в избранном"
     },
     "error": {
-      "label": "Ошибки",
-      "text": "An error occurred while fetching node details. Please try again later."
+      "label": "Ошибка",
+      "text": "Произошла ошибка при получении сведений о ноде. Повторите попытку позже."
     },
     "status": {
-      "heard": "Heard",
+      "heard": "Слышен",
       "mqtt": "MQTT"
     },
     "elevation": {
-      "label": "Elevation"
+      "label": "Высота"
     },
     "channelUtil": {
-      "label": "Channel Util"
+      "label": "Загрузка канала"
     },
     "airtimeUtil": {
-      "label": "Airtime Util"
+      "label": "Загрузка эфира"
     }
   },
   "nodesTable": {
     "headings": {
       "longName": "Полное имя",
-      "connection": "Соединения",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
-      "model": "Model",
-      "macAddress": "MAC Address"
+      "connection": "Подключение",
+      "lastHeard": "Последний раз слышен",
+      "encryption": "Шифрование",
+      "model": "Модель",
+      "macAddress": "MAC-адрес"
     },
     "connectionStatus": {
-      "direct": "Прямой",
-      "away": "away",
-      "viaMqtt": ", via MQTT"
+      "direct": "Прямое",
+      "away": "от вас",
+      "viaMqtt": ", через MQTT"
+    },
+    "lastHeardStatus": {
+      "never": "Никогда"
     }
   },
   "actions": {
-    "added": "Added",
-    "removed": "Removed",
-    "ignoreNode": "Ignore Node",
-    "unignoreNode": "Unignore Node",
-    "requestPosition": "Request Position"
+    "added": "Добавлено",
+    "removed": "Удалено",
+    "ignoreNode": "Игнорировать ноду",
+    "unignoreNode": "Перестать игнорировать ноду",
+    "requestPosition": "Запросить позицию"
   }
 }
