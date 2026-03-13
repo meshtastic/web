@@ -50,7 +50,7 @@
       "short": "BT: {{deviceName}}",
       "long": "Bluetooth Device",
       "device": "Пристрій",
-      "selectDevice": "Select device",
+      "selectDevice": "Оберіть пристрій",
       "selected": "Bluetooth device selected",
       "notSelected": "No device selected",
       "helperText": "Uses the Meshtastic Bluetooth service for discovery."
@@ -69,30 +69,30 @@
         "title": "Serial port selected",
         "description": "Port permissions granted."
       },
-      "port": "Port",
-      "selectPort": "Select port",
+      "port": "Порт",
+      "selectPort": "Виберіть порт",
       "deviceName": "USB {{vendorId}}:{{productId}}",
       "notSelected": "No port selected"
     },
     "httpConnection": {
       "namePlaceholder": "My HTTP Node",
-      "inputPlaceholder": "192.168.1.10 or meshtastic.local",
-      "heading": "URL or IP",
-      "useHttps": "Use HTTTPS",
+      "inputPlaceholder": "192.168.1.10 або meshtastic.local",
+      "heading": "URL або IP",
+      "useHttps": "Використовувати HTTPS",
       "invalidUrl": {
-        "title": "Invalid URL",
+        "title": "Некоректна адреса URL",
         "description": "Please enter a valid HTTP or HTTPS URL."
       },
       "connectionTest": {
         "description": "Test the connetion before saving to verify the device is reachable.",
         "button": {
-          "loading": "Testing...",
-          "label": "Test connection"
+          "loading": "Тестування...",
+          "label": "Перевірка зʼєднання"
         },
         "reachable": "Reachable",
         "notReachable": "Not reachable",
         "success": {
-          "title": "Connection test successful",
+          "title": "Тест з'єднання успішний",
           "description": "The device appears to be reachable."
         },
         "failure": {
@@ -108,24 +108,24 @@
     "traceRoute": "Trace Route",
     "airTxUtilization": "Air TX utilization",
     "allRawMetrics": "All Raw Metrics:",
-    "batteryLevel": "Battery level",
+    "batteryLevel": "Рівень заряду батареї",
     "channelUtilization": "Channel utilization",
-    "details": "Details:",
+    "details": "Подробиці:",
     "deviceMetrics": "Device Metrics:",
     "hardware": "Hardware: ",
     "lastHeard": "Last Heard: ",
     "nodeHexPrefix": "Node Hex: ",
     "nodeNumber": "Node Number: ",
-    "position": "Position:",
-    "role": "Role: ",
-    "uptime": "Uptime: ",
+    "position": "Розташування:",
+    "role": "Роль: ",
+    "uptime": "Час роботи: ",
     "voltage": "Напруга",
     "title": "Node Details for {{identifier}}",
     "ignoreNode": "Ignore node",
     "removeNode": "Remove node",
     "unignoreNode": "Unignore node",
     "security": "Security:",
-    "publicKey": "Public Key: ",
+    "publicKey": "Відкритий ключ: ",
     "messageable": "Messageable: ",
     "KeyManuallyVerifiedTrue": "Public Key has been manually verified",
     "KeyManuallyVerifiedFalse": "Public Key is not manually verified"
@@ -135,37 +135,37 @@
     "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
     "footer": "=== END OF KEYS ===",
     "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-    "privateKey": "Private Key:",
-    "publicKey": "Public Key:",
+    "privateKey": "Приватний Ключ:",
+    "publicKey": "Відкритий ключ:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-    "title": "Backup Keys"
+    "title": "Резервні ключі"
   },
   "pkiBackupReminder": {
     "description": "We recommend backing up your key data regularly. Would you like to back up now?",
     "title": "Backup Reminder",
     "remindLaterPrefix": "Remind me in",
     "remindNever": "Never remind me",
-    "backupNow": "Back up now"
+    "backupNow": "Зробити резервну копію"
   },
   "pkiRegenerate": {
     "description": "Are you sure you want to regenerate key pair?",
     "title": "Regenerate Key Pair"
   },
   "qr": {
-    "addChannels": "Add Channels",
+    "addChannels": "Додайте канали",
     "replaceChannels": "Replace Channels",
     "description": "The current LoRa configuration will also be shared.",
     "sharableUrl": "Sharable URL",
     "title": "Згенерувати QR-код"
   },
   "reboot": {
-    "title": "Reboot device",
+    "title": "Перезавантажити пристрій",
     "description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
     "ota": "Reboot into OTA mode",
     "enterDelay": "Enter delay",
     "scheduled": "Reboot has been scheduled",
     "schedule": "Schedule reboot",
-    "now": "Reboot now",
+    "now": "Перезавантажити зараз",
     "cancel": "Cancel scheduled reboot"
   },
   "refreshKeys": {
@@ -179,7 +179,7 @@
   },
   "removeNode": {
     "description": "Are you sure you want to remove this Node?",
-    "title": "Remove Node?"
+    "title": "Видалити вузол?"
   },
   "shutdown": {
     "title": "Розклад вимкнення",
@@ -196,7 +196,7 @@
     "confirmUnderstanding": "Я знаю, що роблю",
     "conjunction": " and the blog post about ",
     "postamble": " and understand the implications of changing the role.",
-    "preamble": "I have read the ",
+    "preamble": "Я прочитав(-ла) ",
     "choosingRightDeviceRole": "Choosing The Right Device Role",
     "deviceRoleDocumentation": "Device Role Documentation",
     "title": "Ви впевнені?"

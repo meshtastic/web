@@ -124,7 +124,7 @@
     "title": "Настройки на Mesh",
     "description": "Настройки за LoRa mesh",
     "bandwidth": {
-      "description": "Широчина на канала в kHz",
+      "description": "Широчина на канала в MHz",
       "label": "Широчина на честотната лента"
     },
     "boostedRxGain": {
@@ -428,31 +428,31 @@
     }
   },
   "user": {
-    "title": "User Settings",
-    "description": "Configure your device name and identity settings",
+    "title": "Потребителски настройки",
+    "description": "Конфигурирайте името на Вашето устройство и настройките за самоличност",
     "longName": {
       "label": "Дълго име",
-      "description": "Your full display name (1-40 characters)",
+      "description": "Вашето пълно показвано име (1-40 знака)",
       "validation": {
-        "min": "Long name must be at least 1 character",
-        "max": "Long name must be at most 40 characters"
+        "min": "Дългото име трябва да е поне 1 знак",
+        "max": "Дългото име трябва да е най-много 40 знака"
       }
     },
     "shortName": {
       "label": "Кратко име",
-      "description": "Your abbreviated name (2-4 characters)",
+      "description": "Вашето кратко име (2-4 знака)",
       "validation": {
-        "min": "Short name must be at least 2 characters",
-        "max": "Short name must be at most 4 characters"
+        "min": "Краткото име трябва да е поне 2 знака",
+        "max": "Краткото име трябва да е най-много 4 знака"
       }
     },
     "isUnmessageable": {
       "label": "Без съобщения",
-      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+      "description": "Използва се за идентифициране на ненаблюдавани или инфраструктурни възли, така че съобщенията да не са достъпни за възли, които никога няма да отговорят."
     },
     "isLicensed": {
       "label": "Лицензиран радиолюбител (HAM)",
-      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+      "description": "Активирайте, ако сте лицензиран радиолюбител. Активирането на тази опция деактивира криптирането и не е съвместимо с мрежата Meshtastic по подразбиране."
     }
   }
 }

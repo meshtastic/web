@@ -1,7 +1,7 @@
 {
-  "emptyState": "Результаты не найдены..",
+  "emptyState": "Ничего не найдено",
   "page": {
-    "title": "Меню"
+    "title": "Меню команд"
   },
   "pinGroup": {
     "label": "Закрепить меню"
@@ -10,7 +10,7 @@
     "label": "Открепить меню"
   },
   "goto": {
-    "label": "Перейти",
+    "label": "Перейти в меню",
     "command": {
       "messages": "Сообщения",
       "map": "Карта",
@@ -19,31 +19,31 @@
     }
   },
   "manage": {
-    "label": "Управление",
+    "label": "Управление узлами",
     "command": {
-      "switchNode": "Выбрать узел",
+      "switchNode": "Сменить узел",
       "connectNewNode": "Подключить новый узел"
     }
   },
   "contextual": {
-    "label": "Контекст",
+    "label": "Контекстное меню",
     "command": {
-      "qrCode": "QR Код",
+      "qrCode": "QR-код",
       "qrGenerator": "Генератор",
       "qrImport": "Импортировать",
-      "scheduleShutdown": "Расписание выключения",
+      "scheduleShutdown": "Запланировать выключение",
       "scheduleReboot": "Перезагрузить устройство",
       "resetNodeDb": "Стереть базу данных узлов",
       "dfuMode": "Войти в режим DFU",
       "factoryResetDevice": "Сброс устройства к заводским установкам",
-      "factoryResetConfig": "Factory Reset Config",
+      "factoryResetConfig": "Сброс настроек к заводским установкам",
       "disconnect": "Отключиться"
     }
   },
   "debug": {
     "label": "Debug",
     "command": {
-      "reconfigure": "Перенастроить",
+      "reconfigure": "Настроить заново",
       "clearAllStoredMessages": "Удалить все сохранённые сообщения",
       "clearAllStores": "Очистить всё локальное хранилище"
     }
