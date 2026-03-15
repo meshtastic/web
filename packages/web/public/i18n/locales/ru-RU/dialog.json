@@ -1,238 +1,238 @@
 {
   "deleteMessages": {
-    "description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-    "title": "Clear All Messages"
+    "description": "Это действие очистит всю историю сообщений. Это действие нельзя будет отменить. Вы уверены, что хотите продолжить?",
+    "title": "Очистить все сообщения"
   },
   "import": {
-    "description": "Import a Channel Set from a Meshtastic URL. <br />Valid Meshtasic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
+    "description": "Импортировать набор каналов по ссылке Meshtastic.<br />Допустимые ссылки Meshtastic начинаются с \"<italic>https://meshtastic.org/e/...</italic>\"",
     "error": {
-      "invalidUrl": "Invalid Meshtastic URL"
+      "invalidUrl": "Недопустимый URL-адрес Meshtastic"
     },
-    "channelPrefix": "Channel ",
-    "primary": "Primary ",
-    "doNotImport": "No not import",
+    "channelPrefix": "Канал",
+    "primary": "Первичный",
+    "doNotImport": "Не импортировать",
     "channelName": "Имя",
     "channelSlot": "Слот",
-    "channelSetUrl": "Channel Set/QR Code URL",
-    "useLoraConfig": "Import LoRa Config",
-    "presetDescription": "The current LoRa Config will be replaced.",
-    "title": "Import Channels"
+    "channelSetUrl": "Установки канала/QR-код ссылка",
+    "useLoraConfig": "Импорт конфигурации LoRa",
+    "presetDescription": "Текущая конфигурация LoRa будет заменена",
+    "title": "Импорт каналов"
   },
   "locationResponse": {
-    "title": "Location: {{identifier}}",
-    "altitude": "Altitude: ",
-    "coordinates": "Coordinates: ",
-    "noCoordinates": "No Coordinates"
+    "title": "Расположение: {{identifier}}",
+    "altitude": "Высота:",
+    "coordinates": "Координаты:",
+    "noCoordinates": "Нет координат"
   },
   "pkiRegenerateDialog": {
-    "title": "Regenerate Pre-Shared Key?",
-    "description": "Are you sure you want to regenerate the pre-shared key?",
-    "regenerate": "Regenerate"
+    "title": "Пересоздать открытый ключ (PSK)?",
+    "description": "Вы уверены, что вы хотите сгенерировать повторно общий ключ?",
+    "regenerate": "Сгенерировать новый"
   },
   "addConnection": {
-    "title": "Add connection",
-    "description": "Choose a connection type and fill in the details",
+    "title": "Добавить соединение",
+    "description": "Выберите тип подключения и заполните детали",
     "validation": {
-      "requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
-      "requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
-      "requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
-      "additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
+      "requiresWebBluetooth": "Этот тип подключения требует <0>Web Bluetooth</0>. Пожалуйста, используйте поддерживаемый браузер, например Chrome или Edge.",
+      "requiresWebSerial": "Этот тип подключения требует <0>Web Serial</0>. Пожалуйста, используйте поддерживаемый браузер, например Chrome или Edge.",
+      "requiresSecureContext": "Это приложение требует <0>безопасное соединение</0>. Пожалуйста, подключитесь через HTTPS или localhost.",
+      "additionallyRequiresSecureContext": "Кроме того, для этого требуется <0>безопасное соединение</0>. Пожалуйста, подключитесь через HTTPS или localhost."
     },
     "bluetoothConnection": {
-      "namePlaceholder": "My Bluetooth Node",
+      "namePlaceholder": "Мой Bluetooth-узел",
       "supported": {
-        "title": "Web Bluetooth supported"
+        "title": "Поддерживается Web Bluetooth"
       },
       "notSupported": {
-        "title": "Web Bluetooth not supported",
-        "description": "Your browser or device does not support Web Bluetooth"
+        "title": "Web Bluetooth не поддерживается",
+        "description": "Ваш браузер или устройство не поддерживает Web Bluetooth"
       },
       "short": "BT: {{deviceName}}",
-      "long": "Bluetooth Device",
+      "long": "Bluetooth-устройство",
       "device": "Устройство",
-      "selectDevice": "Select device",
-      "selected": "Bluetooth device selected",
-      "notSelected": "No device selected",
-      "helperText": "Uses the Meshtastic Bluetooth service for discovery."
+      "selectDevice": "Выберите устройство",
+      "selected": "Устройство Bluetooth выбрано",
+      "notSelected": "Устройство не выбрано",
+      "helperText": "Использует Meshtastic Bluetooth для обнаружения"
     },
     "serialConnection": {
-      "namePlaceholder": "My Serial Node",
-      "helperText": "Selecting a port grants permission so the app can open it to connect.",
+      "namePlaceholder": "Мой узел COM-порта",
+      "helperText": "Выбор порта дает разрешение, чтобы приложение могло открыть его для подключения.",
       "supported": {
-        "title": "Web Serial supported"
+        "title": "Поддерживается Web Serial"
       },
       "notSupported": {
-        "title": "Web Serial not supported",
-        "description": "Your browser or device does not support Web Serial"
+        "title": "Web Serial не поддерживается",
+        "description": "Ваш браузер или устройство не поддерживает Web Serial"
       },
       "portSelected": {
-        "title": "Serial port selected",
-        "description": "Port permissions granted."
+        "title": "Выбран COM-порт",
+        "description": "Разрешения порта предоставлены"
       },
-      "port": "Port",
-      "selectPort": "Select port",
+      "port": "Порт",
+      "selectPort": "Выберите порт",
       "deviceName": "USB {{vendorId}}:{{productId}}",
-      "notSelected": "No port selected"
+      "notSelected": "Порт не выбран"
     },
     "httpConnection": {
-      "namePlaceholder": "My HTTP Node",
-      "inputPlaceholder": "192.168.1.10 or meshtastic.local",
-      "heading": "URL or IP",
-      "useHttps": "Use HTTTPS",
+      "namePlaceholder": "Мой HTTP-узел",
+      "inputPlaceholder": "192.168.1.10 или meshtastic.local",
+      "heading": "URL или IP-адрес",
+      "useHttps": "Использовать HTTPS",
       "invalidUrl": {
-        "title": "Invalid URL",
-        "description": "Please enter a valid HTTP or HTTPS URL."
+        "title": "Неверный URL-адрес",
+        "description": "Пожалуйста, введите правильный HTTP или HTTPS URL-адрес"
       },
       "connectionTest": {
-        "description": "Test the connetion before saving to verify the device is reachable.",
+        "description": "Проверьте соединение перед сохранением, чтобы убедиться, что устройство доступно",
         "button": {
-          "loading": "Testing...",
-          "label": "Test connection"
+          "loading": "Тестирование...",
+          "label": "Проверить соединение"
         },
-        "reachable": "Reachable",
-        "notReachable": "Not reachable",
+        "reachable": "Доступно",
+        "notReachable": "Недоступно",
         "success": {
-          "title": "Connection test successful",
-          "description": "The device appears to be reachable."
+          "title": "Проверка соединения прошла успешно",
+          "description": "Похоже, что устройство доступно"
         },
         "failure": {
-          "title": "Connection test failed",
-          "description": "Could not reach the device. Check the URL and try again."
+          "title": "Проверка соединения не удалась",
+          "description": "Не удалось подключиться к устройству. Проверьте URL-адрес и повторите попытку."
         }
       }
     }
   },
   "nodeDetails": {
     "message": "Сообщение",
-    "requestPosition": "Request Position",
-    "traceRoute": "Trace Route",
-    "airTxUtilization": "Air TX utilization",
-    "allRawMetrics": "All Raw Metrics:",
-    "batteryLevel": "Battery level",
-    "channelUtilization": "Channel utilization",
-    "details": "Details:",
-    "deviceMetrics": "Device Metrics:",
-    "hardware": "Hardware: ",
-    "lastHeard": "Last Heard: ",
-    "nodeHexPrefix": "Node Hex: ",
-    "nodeNumber": "Node Number: ",
-    "position": "Position:",
-    "role": "Role: ",
-    "uptime": "Uptime: ",
+    "requestPosition": "Запросить позицию",
+    "traceRoute": "Трассировка маршрута",
+    "airTxUtilization": "Использование эфира",
+    "allRawMetrics": "Все показатели:",
+    "batteryLevel": "Уровень заряда батареи",
+    "channelUtilization": "Использование канала",
+    "details": "Подробности:",
+    "deviceMetrics": "Показатели устройства:",
+    "hardware": "Модель:",
+    "lastHeard": "Последний раз слышали: ",
+    "nodeHexPrefix": "ID узла (HEX):",
+    "nodeNumber": "ID узла:",
+    "position": "Местоположение:",
+    "role": "Роль:",
+    "uptime": "Время непр. работы:",
     "voltage": "Напряжение",
-    "title": "Node Details for {{identifier}}",
-    "ignoreNode": "Ignore node",
-    "removeNode": "Remove node",
-    "unignoreNode": "Unignore node",
-    "security": "Security:",
-    "publicKey": "Public Key: ",
-    "messageable": "Messageable: ",
-    "KeyManuallyVerifiedTrue": "Public Key has been manually verified",
-    "KeyManuallyVerifiedFalse": "Public Key is not manually verified"
+    "title": "Детали {{identifier}} узла",
+    "ignoreNode": "Игнорировать узел",
+    "removeNode": "Удалить узел",
+    "unignoreNode": "Не игнорировать узел",
+    "security": "Безопасность:",
+    "publicKey": "Открытый ключ:",
+    "messageable": "Доступен для общения: ",
+    "KeyManuallyVerifiedTrue": "Открытый ключ был проверен вручную",
+    "KeyManuallyVerifiedFalse": "Открытый ключ не проверен вручную"
   },
   "pkiBackup": {
-    "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
-    "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
+    "loseKeysWarning": "Если вы потеряете свои ключи, вам нужно будет сбросить устройство",
+    "secureBackup": "Это важно для резервного копирования ваших открытых и закрытых ключей и для безопасного хранения резервной копии!",
     "footer": "=== END OF KEYS ===",
     "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
     "privateKey": "Private Key:",
     "publicKey": "Public Key:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-    "title": "Backup Keys"
+    "title": "Резервное копирование"
   },
   "pkiBackupReminder": {
-    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
-    "title": "Backup Reminder",
-    "remindLaterPrefix": "Remind me in",
-    "remindNever": "Never remind me",
-    "backupNow": "Back up now"
+    "description": "Мы рекомендуем регулярно делать резервное копирование ключей. Хотите сделать резервную копию сейчас?",
+    "title": "Напоминание о резервном копировании",
+    "remindLaterPrefix": "Напомнить через",
+    "remindNever": "Не напоминать",
+    "backupNow": "Сделать резервную копию сейчас"
   },
   "pkiRegenerate": {
-    "description": "Are you sure you want to regenerate key pair?",
-    "title": "Regenerate Key Pair"
+    "description": "Вы уверены, что хотите пересоздать пару ключей?",
+    "title": "Пересоздать ключевую пару"
   },
   "qr": {
-    "addChannels": "Add Channels",
-    "replaceChannels": "Replace Channels",
-    "description": "The current LoRa configuration will also be shared.",
-    "sharableUrl": "Sharable URL",
-    "title": "Generate QR Code"
+    "addChannels": "Добавить каналы",
+    "replaceChannels": "Заменить каналы",
+    "description": "Текущая конфигурация LoRa также будет общей",
+    "sharableUrl": "URL-адрес для общего доступа",
+    "title": "Сгенерировать QR-код"
   },
   "reboot": {
-    "title": "Reboot device",
-    "description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
-    "ota": "Reboot into OTA mode",
-    "enterDelay": "Enter delay",
-    "scheduled": "Reboot has been scheduled",
-    "schedule": "Schedule reboot",
-    "now": "Reboot now",
-    "cancel": "Cancel scheduled reboot"
+    "title": "Перезагрузить устройство",
+    "description": "Выполните немедленную или запланированную перезагрузку подключённого узла. При необходимости можно перезагрузить его в режиме OTA (беспроводного обновления).",
+    "ota": "Перезагрузиться в режиме OTA ",
+    "enterDelay": "Введите задержку",
+    "scheduled": "Перезагрузка запланирована",
+    "schedule": "Запланировать",
+    "now": "Перезагрузить сейчас",
+    "cancel": "Отменить плановую перезагрузку"
   },
   "refreshKeys": {
     "description": {
-      "acceptNewKeys": "This will remove the node from device and request new keys.",
-      "keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
-      "unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
+      "acceptNewKeys": "Это удалит узел с устройства и запросит новые ключи.",
+      "keyMismatchReasonSuffix": "Текущий открытый ключ удаленного узла не соответствует ранее сохранённому ключу для этого узла.",
+      "unableToSendDmPrefix": "Ваш узел не может отправить личное сообщение узлу: "
     },
-    "acceptNewKeys": "Accept New Keys",
-    "title": "Keys Mismatch - {{identifier}}"
+    "acceptNewKeys": "Принять новые ключи",
+    "title": "Несоответствие ключей - {{identifier}}"
   },
   "removeNode": {
-    "description": "Are you sure you want to remove this Node?",
-    "title": "Remove Node?"
+    "description": "Вы уверены, что хотите узел страницу?",
+    "title": "Удалить узел?"
   },
   "shutdown": {
-    "title": "Schedule Shutdown",
-    "description": "Turn off the connected node after x minutes."
+    "title": "Запланировать выключение",
+    "description": "Выключить подключенный узел через x минут"
   },
   "traceRoute": {
-    "routeToDestination": "Route to destination:",
-    "routeBack": "Route back:"
+    "routeToDestination": "Путь до адресата:",
+    "routeBack": "Путь от адресата:"
   },
   "tracerouteResponse": {
-    "title": "Traceroute: {{identifier}}"
+    "title": "Трассировка: {{identifier}}"
   },
   "unsafeRoles": {
-    "confirmUnderstanding": "Yes, I know what I'm doing",
-    "conjunction": " and the blog post about ",
-    "postamble": " and understand the implications of changing the role.",
-    "preamble": "I have read the ",
-    "choosingRightDeviceRole": "Choosing The Right Device Role",
-    "deviceRoleDocumentation": "Device Role Documentation",
+    "confirmUnderstanding": "Да, я понимаю что я делаю",
+    "conjunction": " и пост про",
+    "postamble": " и понимаю последствия изменения роли.",
+    "preamble": "Я прочитал ",
+    "choosingRightDeviceRole": "Правильный Выбор Роли Устройства",
+    "deviceRoleDocumentation": "Документацию Ролей Устройств",
     "title": "Вы уверены?"
   },
   "managedMode": {
-    "confirmUnderstanding": "Yes, I know what I'm doing",
+    "confirmUnderstanding": "Да, я понимаю что я делаю",
     "title": "Вы уверены?",
-    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+    "description": "Включение управляемого режима блокирует возможность клиентских приложений (включая веб-клиент) записывать конфигурации в радиоустройство. После включения конфигурации радиоустройства можно изменять только с помощью сообщений удаленного администрирования. Этот параметр не требуется для удаленных администририрующих узлов."
   },
   "clientNotification": {
     "title": "Уведомления клиента",
-    "TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
-    "Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
+    "TraceRoute can only be sent once every 30 seconds": "Трассировка соединения может отправляться только раз в 30 секунд",
+    "Compromised keys were detected and regenerated.": "Скомпрометированные ключи были обнаружены и пересозданы"
   },
   "resetNodeDb": {
-    "title": "Reset Node Database",
-    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
-    "confirm": "Reset Node Database",
-    "failedTitle": "There was an error resetting the Node DB. Please try again."
+    "title": "Очистить базу данных узлов",
+    "description": "Это очистит все узлы из базы данных узлов подключенных устройств и удалит всю историю сообщений в клиенте. Это действие нельзя отменить. Вы уверены, что хотите продолжить?",
+    "confirm": "Очистить базу данных узлов",
+    "failedTitle": "Произошла ошибка при сбросе БД узлов. Пожалуйста, попробуйте еще раз."
   },
   "clearAllStores": {
-    "title": "Clear All Local Storage",
-    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
-    "confirm": "Clear all local storage",
-    "failedTitle": "There was an error clearing local storage. Please try again."
+    "title": "Очистить всё локальное хранилище",
+    "description": "Это очистит все локально сохраненные данные, включая историю сообщений и базы данных узлов для всех ранее подключенных устройств. Это потребует повторного подключения к узлу после завершения и не может быть отменено. Вы уверены, что хотите продолжить?",
+    "confirm": "Очистить всё локальное хранилище",
+    "failedTitle": "Произошла ошибка при очистке локального хранилища. Пожалуйста, попробуйте еще раз."
   },
   "factoryResetDevice": {
-    "title": "Factory Reset Device",
-    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
-    "confirm": "Factory Reset Device",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "title": "Сброс устройства к заводским установкам",
+    "description": "Это приведет к сбросу настроек подключенного устройства до заводских настроек, удалению всех конфигураций и данных на устройстве, а также всех узлов и сообщений, сохраненных в клиенте. Это действие нельзя отменить. Вы уверены, что хотите продолжить?",
+    "confirm": "Сброс устройства к заводским установкам",
+    "failedTitle": "Произошла ошибка при выполнении сброса до заводских настроек. Пожалуйста, попробуйте еще раз."
   },
   "factoryResetConfig": {
-    "title": "Factory Reset Config",
-    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
-    "confirm": "Factory Reset Config",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "title": "Сброс настроек к заводским установкам",
+    "description": "Это приведет к сбросу настроек подключенного устройства до заводских установок. Это действие нельзя отменить. Вы уверены, что хотите продолжить?",
+    "confirm": "Сброс настроек к заводским установкам",
+    "failedTitle": "Произошла ошибка при выполнении сброса до заводских настроек. Пожалуйста, попробуйте еще раз."
   }
 }
