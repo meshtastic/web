@@ -12,7 +12,7 @@ importers:
         specifier: ^2.9.0
         version: 2.11.0
       '@meshtastic/protobufs':
-        specifier: jsr:@meshtastic/protobufs@^2.7.20
+        specifier: jsr:^2.7.20
         version: '@jsr/meshtastic__protobufs@2.7.20'
       ste-simple-events:
         specifier: ^3.0.11
