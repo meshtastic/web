@@ -212,7 +212,7 @@ export const DeviceInfoPanel = ({
           "flex flex-col gap-2 mt-1",
           "transition-all duration-300 ease-in-out",
           isCollapsed
-            ? "opacity-0 max-w-0 h-0 invisible pointer-events-none"
+            ? "opacity-0 max-w-0 hidden pointer-events-none"
             : "opacity-100 max-w-xs h-auto visible",
         )}
       >
@@ -244,7 +244,7 @@ export const DeviceInfoPanel = ({
           "flex flex-col gap-1 mt-1",
           "transition-all duration-300 ease-in-out",
           isCollapsed
-            ? "opacity-0 max-w-0 h-0 invisible pointer-events-none"
+            ? "opacity-0 max-w-0 hidden pointer-events-none"
             : "opacity-100 max-w-xs visible",
         )}
       >
