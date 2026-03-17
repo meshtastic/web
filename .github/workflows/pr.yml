@@ -26,20 +26,28 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 10.32.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: pnpm
-          cache-dependency-path: "**/pnpm-lock.yaml"
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Prefetch dependencies
-        run: pnpm fetch
+      - name: Debug dependency state
+        run: |
+          set -euo pipefail
+          echo "GITHUB_SHA=${GITHUB_SHA}"
+          git log --oneline -1
+          pnpm --version
+          node --version
+          grep -n "meshtastic__protobufs" pnpm-lock.yaml || true
+          grep -n "2.7.18" pnpm-lock.yaml || true
+          grep -n "2.7.20" pnpm-lock.yaml || true
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile
 
       - name: Run linter
         run: pnpm run lint
