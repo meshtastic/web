@@ -1223,7 +1223,7 @@ packages:
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
   '@jsr/meshtastic__protobufs@2.7.20':
-    resolution: {integrity: sha512-GrHWfOzi9i7xk2Br3MkKWLxbzreZuwgjZKNooednYpa1V/abnSj9e4twNTtKyqXYaAOzthY3Cdk4IXouBN9dbA==}
+    resolution: {integrity: sha512-GrHWfOzi9i7xk2Br3MkKWLxbzreZuwgjZKNooednYpa1V/abnSj9e4twNTtKyqXYaAOzthY3Cdk4IXouBN9dbA==, tarball: https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.7.20.tgz}
 
   '@mapbox/geojson-rewind@0.5.2':
     resolution: {integrity: sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==}
