@@ -4,10 +4,10 @@
     "title": "命令選單"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "置頂命令群組"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "取消置頂命令群組"
   },
   "goto": {
     "label": "前往",
@@ -26,10 +26,10 @@
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "相關功能",
     "command": {
       "qrCode": "QR 代碼",
-      "qrGenerator": "Generator",
+      "qrGenerator": "建立工具",
       "qrImport": "匯入",
       "scheduleShutdown": "排程關機",
       "scheduleReboot": "重新啟動設備",
