@@ -8,7 +8,7 @@
     "error": {
       "invalidUrl": "Невалиден Meshtastic URL"
     },
-    "channelPrefix": "Канал: ",
+    "channelPrefix": "Канал ",
     "primary": "Първичен ",
     "doNotImport": "No not import",
     "channelName": "Име",
@@ -59,14 +59,14 @@
       "namePlaceholder": "Моят сериен възел",
       "helperText": "Selecting a port grants permission so the app can open it to connect.",
       "supported": {
-        "title": "Web Serial supported"
+        "title": "Поддържа се Web Serial"
       },
       "notSupported": {
-        "title": "Web Serial not supported",
-        "description": "Your browser or device does not support Web Serial"
+        "title": "Не се поддържа Web Serial",
+        "description": "Вашият браузър или устройство не поддържа Web Serial"
       },
       "portSelected": {
-        "title": "Serial port selected",
+        "title": "Избран сериен порт",
         "description": "Port permissions granted."
       },
       "port": "Порт",
@@ -161,7 +161,7 @@
   "reboot": {
     "title": "Рестартиране на устройството",
     "description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
-    "ota": "Reboot into OTA mode",
+    "ota": "Рестартиране в режим OTA",
     "enterDelay": "Въведете забавяне",
     "scheduled": "Насрочено е рестартиране",
     "schedule": "Планиране на рестартиране",
@@ -170,7 +170,7 @@
   },
   "refreshKeys": {
     "description": {
-      "acceptNewKeys": "This will remove the node from device and request new keys.",
+      "acceptNewKeys": "Това ще премахне възела от устройството и ще поиска нови ключове.",
       "keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
       "unableToSendDmPrefix": "Вашият възел не може да изпрати директно съобщение до възел:"
     },
@@ -186,8 +186,8 @@
     "description": "Изключване на свързания възел след x минути."
   },
   "traceRoute": {
-    "routeToDestination": "Route to destination:",
-    "routeBack": "Route back:"
+    "routeToDestination": "Маршрут до дестинацията:",
+    "routeBack": "Маршрут обратно:"
   },
   "tracerouteResponse": {
     "title": "Traceroute: {{identifier}}"
@@ -221,18 +221,18 @@
     "title": "Clear All Local Storage",
     "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
     "confirm": "Clear all local storage",
-    "failedTitle": "There was an error clearing local storage. Please try again."
+    "failedTitle": "Възникна грешка при изчистването на локалното хранилище. Моля, опитайте отново."
   },
   "factoryResetDevice": {
     "title": "Фабрично нулиране на устройството",
     "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
     "confirm": "Фабрично нулиране на устройството",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "failedTitle": "Възникна грешка при възстановяването на фабричните настройки. Моля, опитайте отново."
   },
   "factoryResetConfig": {
     "title": "Фабрично нулиране на конфигурацията",
     "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
     "confirm": "Фабрично нулиране на конфигурацията",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "failedTitle": "Възникна грешка при извършване на възстановяването на фабричните настройки. Моля, опитайте отново."
   }
 }

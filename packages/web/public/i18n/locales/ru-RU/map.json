@@ -1,36 +1,34 @@
 {
   "maplibre": {
-    "GeolocateControl.FindMyLocation": "Найти моё местоположение",
+    "GeolocateControl.FindMyLocation": "Найти мое местоположение",
     "NavigationControl.ZoomIn": "Увеличить",
     "NavigationControl.ZoomOut": "Уменьшить",
-    "CooperativeGesturesHandler.WindowsHelpText": "Используйте Ctrl + прокрутку, чтобы приблизить карту",
-    "CooperativeGesturesHandler.MacHelpText": "Используйте ⌘ + прокрутку, чтобы приблизить карту",
-    "CooperativeGesturesHandler.MobileHelpText": "Используйте два пальца, чтобы перемещать карту"
+    "CooperativeGesturesHandler.WindowsHelpText": "Используйте Ctrl + прокрутку, для изменения масштаба карты",
+    "CooperativeGesturesHandler.MacHelpText": "Используйте ⌘ + прокрутку, для изменения масштаба карты",
+    "CooperativeGesturesHandler.MobileHelpText": "Используйте два пальца для перемещения карты"
   },
   "layerTool": {
-    "nodeMarkers": "Показать ноды",
-    "directNeighbors": "Показать прямые соединения",
-    "remoteNeighbors": "Показать удалённые соединения",
-    "positionPrecision": "Показать точность позиции",
-    "traceroutes": "Показать трассировки",
-    "waypoints": "Показать путевые точки",
-    "heatmap": "Показать тепловую карту",
-    "density": "Плотность"
+    "nodeMarkers": "Показать узлы",
+    "directNeighbors": "Показать прямые подключения",
+    "remoteNeighbors": "Показать удаленные подключения",
+    "positionPrecision": "Показать точность положения",
+    "traceroutes": "Показать трассировку",
+    "waypoints": "Показать путевые точки"
   },
   "mapMenu": {
-    "locateAria": "Найти мою ноду",
-    "layersAria": "Изменить стиль карты"
+    "locateAria": "Найти мой узел",
+    "layersAria": "Сменить стиль карты"
   },
   "waypointDetail": {
     "edit": "Редактировать",
     "description": "Описание:",
-    "createdBy": "Кем изменено:",
+    "createdBy": "Отредактировано:",
     "createdDate": "Создано:",
     "updated": "Обновлено:",
     "expires": "Истекает:",
     "distance": "Расстояние:",
-    "bearing": "Абсолютный азимут:",
-    "lockedTo": "Закреплено за:",
+    "bearing": "Азимут:",
+    "lockedTo": "Заблокировано:",
     "latitude": "Широта:",
     "longitude": "Долгота:"
   },

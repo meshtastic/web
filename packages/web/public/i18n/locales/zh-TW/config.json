@@ -16,147 +16,147 @@
     "label": "裝置設定"
   },
   "device": {
-    "title": "Device Settings",
-    "description": "Settings for the device",
+    "title": "裝置設定",
+    "description": "裝置設定項目",
     "buttonPin": {
-      "description": "Button pin override",
-      "label": "Button Pin"
+      "description": "自訂按鈕腳位",
+      "label": "按鈕腳位"
     },
     "buzzerPin": {
-      "description": "Buzzer pin override",
-      "label": "Buzzer Pin"
+      "description": "自訂蜂鳴器腳位",
+      "label": "蜂鳴器腳位"
     },
     "disableTripleClick": {
-      "description": "Disable triple click",
-      "label": "Disable Triple Click"
+      "description": "停用三次點擊",
+      "label": "停用三次點擊"
     },
     "doubleTapAsButtonPress": {
-      "description": "Treat double tap as button press",
-      "label": "Double Tap as Button Press"
+      "description": "將雙擊視為按鈕觸發",
+      "label": "雙擊觸發按鈕"
     },
     "ledHeartbeatDisabled": {
-      "description": "Disable default blinking LED",
-      "label": "LED Heartbeat Disabled"
+      "description": "停用預設閃爍 LED",
+      "label": " LED心跳已停用"
     },
     "nodeInfoBroadcastInterval": {
-      "description": "How often to broadcast node info",
-      "label": "Node Info Broadcast Interval"
+      "description": "節點資訊廣播頻率",
+      "label": "節點資訊廣播間隔"
     },
     "posixTimezone": {
-      "description": "The POSIX timezone string for the device",
+      "description": "裝置的 POSIX 時區字串",
       "label": "POSIX時區"
     },
     "rebroadcastMode": {
-      "description": "How to handle rebroadcasting",
-      "label": "Rebroadcast Mode"
+      "description": "如何處理重新廣播",
+      "label": "轉發模式"
     },
     "role": {
-      "description": "What role the device performs on the mesh",
+      "description": "裝置在 Mesh 網路中的角色",
       "label": "角色"
     }
   },
   "bluetooth": {
-    "title": "Bluetooth Settings",
-    "description": "Settings for the Bluetooth module",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "藍牙設定",
+    "description": "藍牙模組設定",
+    "note": "注意：部分裝置（如 ESP32）無法同時使用藍牙和 WiFi。",
     "enabled": {
-      "description": "Enable or disable Bluetooth",
-      "label": "Enabled"
+      "description": "啟用或停用藍牙",
+      "label": "已啟用"
     },
     "pairingMode": {
-      "description": "Pin selection behaviour.",
+      "description": "PIN 碼配對模式。",
       "label": "配對模式"
     },
     "pin": {
-      "description": "Pin to use when pairing",
+      "description": "配對時使用的 PIN 碼",
       "label": "Pin"
     }
   },
   "display": {
-    "description": "Settings for the device display",
-    "title": "Display Settings",
+    "description": "裝置顯示設定",
+    "title": "顯示設定",
     "headingBold": {
-      "description": "Bolden the heading text",
-      "label": "Bold Heading"
+      "description": "將標題文字加粗",
+      "label": "粗體標題"
     },
     "carouselDelay": {
-      "description": "How fast to cycle through windows",
-      "label": "Carousel Delay"
+      "description": "切換視窗的速度",
+      "label": "輪播延遲"
     },
     "compassNorthTop": {
-      "description": "Fix north to the top of compass",
-      "label": "Compass North Top"
+      "description": "將北方固定於指南針頂部",
+      "label": "指南針北方朝上"
     },
     "displayMode": {
-      "description": "Screen layout variant",
-      "label": "Display Mode"
+      "description": "畫面版面配置",
+      "label": "顯示模式"
     },
     "displayUnits": {
-      "description": "Display metric or imperial units",
-      "label": "Display Units"
+      "description": "顯示公制或英制單位",
+      "label": "顯示單位"
     },
     "flipScreen": {
-      "description": "Flip display 180 degrees",
-      "label": "Flip Screen"
+      "description": "將螢幕翻轉 180 度",
+      "label": "翻轉螢幕"
     },
     "gpsDisplayUnits": {
-      "description": "Coordinate display format",
-      "label": "GPS Display Units"
+      "description": "座標顯示格式",
+      "label": "GPS 顯示單位"
     },
     "oledType": {
-      "description": "Type of OLED screen attached to the device",
+      "description": "連接至裝置的 OLED 螢幕類型",
       "label": "OLED類型"
     },
     "screenTimeout": {
-      "description": "Turn off the display after this long",
-      "label": "Screen Timeout"
+      "description": "經過多久後關閉螢幕",
+      "label": "螢幕逾時"
     },
     "twelveHourClock": {
-      "description": "Use 12-hour clock format",
-      "label": "12-Hour Clock"
+      "description": "使用 12 小時制格式",
+      "label": "12 小時制"
     },
     "wakeOnTapOrMotion": {
-      "description": "Wake the device on tap or motion",
-      "label": "Wake on Tap or Motion"
+      "description": "點擊或移動時喚醒裝置",
+      "label": "點擊或移動喚醒"
     }
   },
   "lora": {
-    "title": "Mesh Settings",
-    "description": "Settings for the LoRa mesh",
+    "title": "Mesh網路設定",
+    "description": "LoRa 網狀網路設定",
     "bandwidth": {
-      "description": "Channel bandwidth in kHz",
+      "description": "頻道頻寬（MHz）",
       "label": "帶寬"
     },
     "boostedRxGain": {
-      "description": "Boosted RX gain",
-      "label": "Boosted RX Gain"
+      "description": "啟用後可提升接收增益",
+      "label": "提升接收增益"
     },
     "codingRate": {
-      "description": "The denominator of the coding rate",
-      "label": "Coding Rate"
+      "description": "編碼率的分母",
+      "label": "編碼率"
     },
     "frequencyOffset": {
-      "description": "Frequency offset to correct for crystal calibration errors",
-      "label": "Frequency Offset"
+      "description": "用於校正晶振誤差的頻率偏移量",
+      "label": "頻率偏移量"
     },
     "frequencySlot": {
-      "description": "LoRa frequency channel number",
-      "label": "Frequency Slot"
+      "description": "LoRa 頻率頻道編號",
+      "label": "頻率槽"
     },
     "hopLimit": {
-      "description": "Maximum number of hops",
-      "label": "Hop Limit"
+      "description": "最大躍點數",
+      "label": "躍點限制"
     },
     "ignoreMqtt": {
-      "description": "Don't forward MQTT messages over the mesh",
+      "description": "不透過Mesh網路轉發 MQTT 訊息",
       "label": "無視MQTT"
     },
     "modemPreset": {
-      "description": "Modem preset to use",
+      "description": "無線電預設模式",
       "label": "Modem 預設集"
     },
     "okToMqtt": {
-      "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+      "description": "設為啟用時，表示使用者同意將封包上傳至 MQTT。設為停用時，將要求遠端節點不轉發封包至 MQTT",
       "label": "將消息轉發至MQTT"
     },
     "overrideDutyCycle": {
@@ -164,76 +164,76 @@
       "label": "覆蓋工作週期/佔空比"
     },
     "overrideFrequency": {
-      "description": "Override frequency",
-      "label": "Override Frequency"
+      "description": "覆蓋預設頻率",
+      "label": "覆蓋頻率"
     },
     "region": {
-      "description": "Sets the region for your node",
+      "description": "設定節點的地區",
       "label": "地區"
     },
     "spreadingFactor": {
-      "description": "Indicates the number of chirps per symbol",
-      "label": "Spreading Factor"
+      "description": "表示每個符號的啁啾數",
+      "label": "擴頻因子"
     },
     "transmitEnabled": {
-      "description": "Enable/Disable transmit (TX) from the LoRa radio",
-      "label": "Transmit Enabled"
+      "description": "啟用/停用 LoRa 無線電的傳輸（TX）",
+      "label": "傳輸已啟用"
     },
     "transmitPower": {
-      "description": "Max transmit power",
-      "label": "Transmit Power"
+      "description": "最大傳輸功率",
+      "label": "傳輸功率"
     },
     "usePreset": {
-      "description": "Use one of the predefined modem presets",
-      "label": "Use Preset"
+      "description": "使用其中一個預定義的無線電預設模式",
+      "label": "使用預設模式"
     },
     "meshSettings": {
-      "description": "Settings for the LoRa mesh",
-      "label": "Mesh Settings"
+      "description": "LoRa Mesh網路設定",
+      "label": "Mesh網路設定"
     },
     "waveformSettings": {
-      "description": "Settings for the LoRa waveform",
-      "label": "Waveform Settings"
+      "description": "LoRa 波形設定",
+      "label": "波形設定"
     },
     "radioSettings": {
-      "label": "Radio Settings",
-      "description": "Settings for the LoRa radio"
+      "label": "無線電設定",
+      "description": "LoRa 無線電設定"
     }
   },
   "network": {
-    "title": "WiFi Config",
-    "description": "WiFi radio configuration",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "WiFi 設定",
+    "description": "WiFi 無線設定",
+    "note": "注意：部分裝置（ESP32）無法同時使用藍牙與 WiFi。",
     "addressMode": {
-      "description": "Address assignment selection",
-      "label": "Address Mode"
+      "description": "位址指派方式選擇",
+      "label": "位址模式"
     },
     "dns": {
-      "description": "DNS Server",
+      "description": "DNS 伺服器",
       "label": "DNS"
     },
     "ethernetEnabled": {
-      "description": "Enable or disable the Ethernet port",
-      "label": "Enabled"
+      "description": "啟用或停用乙太網路埠",
+      "label": "已啟用"
     },
     "gateway": {
-      "description": "Default Gateway",
+      "description": "預設閘道",
       "label": "網閘"
     },
     "ip": {
-      "description": "IP Address",
+      "description": "IP 位址",
       "label": "IP"
     },
     "psk": {
-      "description": "Network password",
+      "description": "網路密碼",
       "label": "PSK"
     },
     "ssid": {
-      "description": "Network name",
+      "description": "網路名稱",
       "label": "SSID"
     },
     "subnet": {
-      "description": "Subnet Mask",
+      "description": "子網路遮罩",
       "label": "子網"
     },
     "wifiEnabled": {
