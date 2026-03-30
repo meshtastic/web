@@ -96,7 +96,7 @@ describe("Generic Table", () => {
   ];
 
   it("Can sort rows, keeping favorites at the top", async () => {
-    render(<Table headings={headings} rows={mockRows} />);
+    render(<Table headings={headings} rows={mockRows} defaultSortIndex={1} />);
     const renderedTable = await screen.findByRole("table");
     const columnHeaders = screen.getAllByRole("columnheader");
     expect(columnHeaders).toHaveLength(3);

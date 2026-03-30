@@ -1,10 +1,11 @@
 import { cn } from "@core/utils/cn.ts";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 export interface Heading {
   title: string;
   sortable: boolean;
+  sortFn?: (value: string | number) => string | number;
 }
 
 interface Cell {
@@ -21,39 +22,35 @@ export interface DataRow {
 export interface TableProps {
   headings: Heading[];
   rows: DataRow[];
+  defaultSortIndex?: number;
+  defaultSortOrder?: "asc" | "desc";
 }
 
-function numericHops(hopsAway: string | number): number {
-  if (typeof hopsAway === "number") {
-    return hopsAway;
-  }
-  if (hopsAway.match(/direct/i)) {
-    return 0;
-  }
-  const match = hopsAway.match(/(\d+)\s+hop/i);
-  return Number(match?.[1] ?? Number.MAX_SAFE_INTEGER);
-}
+export const Table = ({
+  headings,
+  rows,
+  defaultSortIndex,
+  defaultSortOrder = "desc",
+}: TableProps) => {
+  const [sortIndex, setSortIndex] = useState<number | null>(defaultSortIndex ?? null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(defaultSortOrder);
 
-export const Table = ({ headings, rows }: TableProps) => {
-  const [sortColumn, setSortColumn] = useState<string | null>("Last Heard");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-
-  const handleSort = (title: string) => {
-    if (sortColumn === title) {
+  const handleSort = (index: number) => {
+    if (sortIndex === index) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      setSortColumn(title);
+      setSortIndex(index);
       setSortOrder("asc");
     }
   };
 
   const sortedRows = useMemo(() => {
-    if (!sortColumn) {
+    if (sortIndex === null) {
       return rows;
     }
 
-    const columnIndex = headings.findIndex((h) => h.title === sortColumn);
-    if (columnIndex === -1) {
+    const heading = headings[sortIndex];
+    if (!heading) {
       return rows;
     }
 
@@ -62,51 +59,43 @@ export const Table = ({ headings, rows }: TableProps) => {
         return a.isFavorite ? -1 : 1;
       }
 
-      const aCell = a.cells[columnIndex];
-      const bCell = b.cells[columnIndex];
+      const aRaw = a.cells[sortIndex]?.sortValue ?? 0;
+      const bRaw = b.cells[sortIndex]?.sortValue ?? 0;
+      const aValue = heading.sortFn ? heading.sortFn(aRaw) : aRaw;
+      const bValue = heading.sortFn ? heading.sortFn(bRaw) : bRaw;
 
-      let aValue: string | number;
-      let bValue: string | number;
-
-      if (sortColumn === "Connection") {
-        aValue = numericHops(aCell.sortValue);
-        bValue = numericHops(bCell.sortValue);
-      } else {
-        aValue = aCell.sortValue;
-        bValue = bCell.sortValue;
-      }
-
-      if (aValue < bValue) {
-        return sortOrder === "asc" ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return sortOrder === "asc" ? 1 : -1;
-      }
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
-  }, [rows, sortColumn, sortOrder, headings]);
+  }, [rows, sortIndex, sortOrder, headings]);
+
+  const lastFavoriteIndex = useMemo(
+    () => sortedRows.reduce((last, row, i) => (row.isFavorite ? i : last), -1),
+    [sortedRows],
+  );
 
   return (
     <table className="min-w-full" style={{ contentVisibility: "auto" }}>
       <thead className="text-xs font-semibold">
         <tr>
-          {headings.map((heading) => (
+          {headings.map((heading, headingIndex) => (
             <th
-              key={heading.title}
+              key={heading.title || headingIndex}
               scope="col"
               className={cn(
                 "py-2 pr-3 text-left",
                 heading.sortable && "cursor-pointer hover:brightness-hover active:brightness-press",
               )}
-              onClick={() => heading.sortable && handleSort(heading.title)}
+              onClick={() => heading.sortable && handleSort(headingIndex)}
               onKeyUp={(e) => {
                 if (heading.sortable && (e.key === "Enter" || e.key === " ")) {
-                  handleSort(heading.title);
+                  handleSort(headingIndex);
                 }
               }}
               tabIndex={heading.sortable ? 0 : -1}
               aria-sort={
-                sortColumn === heading.title
+                sortIndex === headingIndex
                   ? sortOrder === "asc"
                     ? "ascending"
                     : "descending"
@@ -116,7 +105,7 @@ export const Table = ({ headings, rows }: TableProps) => {
               <div className="flex items-center gap-2">
                 {heading.title}
                 {heading.sortable &&
-                  sortColumn === heading.title &&
+                  sortIndex === headingIndex &&
                   (sortOrder === "asc" ? (
                     <ChevronUpIcon size={16} aria-hidden="true" />
                   ) : (
@@ -128,36 +117,53 @@ export const Table = ({ headings, rows }: TableProps) => {
         </tr>
       </thead>
       <tbody className="max-w-fit">
-        {sortedRows.map((row) => (
-          <tr
-            key={row.id}
-            className={cn(
-              row.isFavorite
-                ? "bg-yellow-100/30 dark:bg-slate-800 odd:bg-yellow-200/30 dark:odd:bg-slate-600/40"
-                : "bg-white dark:bg-slate-900 odd:bg-slate-200/40 dark:odd:bg-slate-800/40",
-            )}
-          >
-            {row.cells.map((cell, cellIndex) => {
-              const key = `${row.id}_${cellIndex}`;
-              const isFirstCell = cellIndex === 0;
+        {sortedRows.map((row, rowIndex) => {
+          const isSeparator = rowIndex === lastFavoriteIndex && lastFavoriteIndex >= 0;
+          return (
+            <tr
+              key={row.id}
+              className={cn(
+                row.isFavorite
+                  ? "bg-yellow-100/30 dark:bg-slate-800 odd:bg-yellow-200/30 dark:odd:bg-slate-600/40"
+                  : "bg-white dark:bg-slate-900 odd:bg-slate-200/40 dark:odd:bg-slate-800/40",
+              )}
+            >
+              {row.cells.map((cell, cellIndex) => {
+                const key = `${row.id}_${cellIndex}`;
+                const isFirstCell = cellIndex === 0;
+                const separatorClass = isSeparator
+                  ? "border-b-2 border-black dark:border-slate-300"
+                  : "";
 
-              const cellElement = isFirstCell ? (
-                <th
-                  className="whitespace-nowrap px-3 py-2 text-sm text-left text-text-secondary"
-                  scope="row"
-                >
-                  {cell.content}
-                </th>
-              ) : (
-                <td className="whitespace-nowrap px-3 py-2 text-sm text-text-secondary">
-                  {cell.content}
-                </td>
-              );
-
-              return React.cloneElement(cellElement, { key });
-            })}
-          </tr>
-        ))}
+                if (isFirstCell) {
+                  return (
+                    <th
+                      key={key}
+                      className={cn(
+                        "whitespace-nowrap px-3 py-2 text-sm text-left text-text-secondary",
+                        separatorClass,
+                      )}
+                      scope="row"
+                    >
+                      {cell.content}
+                    </th>
+                  );
+                }
+                return (
+                  <td
+                    key={key}
+                    className={cn(
+                      "whitespace-nowrap px-3 py-2 text-sm text-text-secondary",
+                      separatorClass,
+                    )}
+                  >
+                    {cell.content}
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

@@ -18,3 +18,4 @@ packages/protobufs/packages/ts/dist
 *.pem
 *.crt
 *.key
+/.claude
