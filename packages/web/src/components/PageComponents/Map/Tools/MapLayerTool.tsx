@@ -91,8 +91,8 @@ export function MapLayerTool({
       { key: "directNeighbors", label: t("layerTool.directNeighbors") },
       { key: "remoteNeighbors", label: t("layerTool.remoteNeighbors") },
       { key: "positionPrecision", label: t("layerTool.positionPrecision") },
+      { key: "traceroutes", label: t("layerTool.traceroutes") },
       { key: "heatmap", label: t("layerTool.heatmap") },
-      // { key: "traceroutes", label: t("layerTool.traceroutes") },
     ],
     [t],
   );
@@ -166,14 +166,6 @@ export function MapLayerTool({
             )}
           </div>
         ))}
-        {/*<CheckboxItem
-          key="traceroutes"
-          label={t("layerTool.traceroutes")}
-          checked={visibilityState.traceroutes}
-          onChange={(checked) => {
-            setVisibilityState({ ...visibilityState, traceroutes: checked });
-          }}
-        />*/}
       </PopoverContent>
     </Popover>
   );

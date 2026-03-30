@@ -17,6 +17,7 @@ import {
   SNRTooltip,
   type SNRTooltipProps,
 } from "@components/PageComponents/Map/Layers/SNRLayer.tsx";
+import { TracerouteLayer } from "@components/PageComponents/Map/Layers/TracerouteLayer.tsx";
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
@@ -79,6 +80,13 @@ const MapPage = () => {
       hasFitBoundsOnce.current = true;
     }
   }, [fitToNodes, validNodes]);
+
+  // Traceroute hop lines
+  const tracerouteLayerElementId = useId();
+  const tracerouteLayerElement = useMemo(
+    () => <TracerouteLayer id={tracerouteLayerElementId} visibilityState={visibilityState} />,
+    [visibilityState, tracerouteLayerElementId],
+  );
 
   // SNR lines
   const snrLayerElementId = useId();
@@ -213,11 +221,19 @@ const MapPage = () => {
         onLoad={getMapBounds}
         onMouseMove={onMouseMove}
         onClick={onMapBackgroundClick}
-        interactiveLayerIds={[snrLayerElementId, `${heatmapLayerElementId}-interaction`]}
+        interactiveLayerIds={[
+          snrLayerElementId,
+          `${heatmapLayerElementId}-interaction`,
+          tracerouteLayerElementId,
+          `${tracerouteLayerElementId}-back`,
+          `${tracerouteLayerElementId}-fallback`,
+          `${tracerouteLayerElementId}-pending`,
+        ]}
       >
         {heatmapLayerElement}
         {markerElements}
         {snrLayerElement}
+        {tracerouteLayerElement}
         {precisionCirclesElement}
         {waypointLayerElement}
 

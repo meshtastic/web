@@ -21,6 +21,7 @@ import {
   MessageSquareIcon,
   SettingsIcon,
   UsersIcon,
+  WaypointsIcon,
 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState, useTransition } from "react";
@@ -124,6 +125,11 @@ export const Sidebar = ({ children }: SidebarProps) => {
       name: `${t("navigation.nodes")} (${displayedNodeCount})`,
       icon: UsersIcon,
       page: "nodes",
+    },
+    {
+      name: t("navigation.traceroutes"),
+      icon: WaypointsIcon,
+      page: "traceroutes",
     },
   ];
 

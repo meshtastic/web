@@ -52,7 +52,7 @@ export interface NodeDetailsDialogProps {
 
 export const NodeDetailsDialog = ({ open, onOpenChange }: NodeDetailsDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { setDialogOpen, connection } = useDevice();
+  const { setDialogOpen, connection, addPendingTraceroute } = useDevice();
   const { getNode } = useNodeDB();
   const navigate = useNavigate();
   const { setNodeNumToBeRemoved, nodeNumDetails } = useAppStore();
@@ -108,6 +108,7 @@ export const NodeDetailsDialog = ({ open, onOpenChange }: NodeDetailsDialogProps
     toast({
       title: t("toast.sendingTraceroute.title", { ns: "ui" }),
     });
+    addPendingTraceroute(node.num);
     connection?.traceRoute(node.num).then(() =>
       toast({
         title: t("toast.tracerouteSent.title", { ns: "ui" }),

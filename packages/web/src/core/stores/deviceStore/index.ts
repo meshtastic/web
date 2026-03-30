@@ -46,6 +46,8 @@ type DeviceData = {
   traceroutes: Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>;
   waypoints: WaypointWithMetadata[];
   neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
+  // Pending traceroutes: key = destination node num, value = sent timestamp (ms)
+  pendingTraceroutes: Map<number, number>;
 };
 export type ConnectionPhase = "disconnected" | "connecting" | "configuring" | "configured";
 
@@ -92,6 +94,7 @@ export interface Device extends DeviceData {
   removeWaypoint: (waypointId: number, toMesh: boolean) => Promise<void>;
   getWaypoint: (waypointId: number) => WaypointWithMetadata | undefined;
   addConnection: (connection: MeshDevice) => void;
+  addPendingTraceroute: (destNum: number) => void;
   addTraceRoute: (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
@@ -173,12 +176,22 @@ function deviceFactory(
     data?.traceroutes ?? new Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>();
   const waypoints = data?.waypoints ?? [];
   const neighborInfo = data?.neighborInfo ?? new Map<number, Protobuf.Mesh.NeighborInfo>();
+
+  // Drop pending entries that are older than 2 hours — they're stale from a previous session
+  const PENDING_TTL_MS = 2 * 60 * 60 * 1000;
+  const rawPending = data?.pendingTraceroutes ?? new Map<number, number>();
+  const now = Date.now();
+  const pendingTraceroutes = new Map(
+    [...rawPending.entries()].filter(([, sentAt]) => now - sentAt < PENDING_TTL_MS),
+  );
+
   return {
     id,
     myNodeNum,
     traceroutes,
     waypoints,
     neighborInfo,
+    pendingTraceroutes,
 
     status: Types.DeviceStatusEnum.DeviceDisconnected,
     connectionPhase: "disconnected",
@@ -558,6 +571,16 @@ function deviceFactory(
         }),
       );
     },
+    addPendingTraceroute: (destNum) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (device) {
+            device.pendingTraceroutes.set(destNum, Date.now());
+          }
+        }),
+      );
+    },
     addTraceRoute: (traceroute) => {
       set(
         produce<PrivateDeviceState>((draft) => {
@@ -572,6 +595,9 @@ function deviceFactory(
           // Enforce retention limit, both in terms of targets (device.traceroutes) and routes per target (routes)
           evictOldestEntries(routes, TRACEROUTE_ROUTE_RETENTION_NUM);
           evictOldestEntries(device.traceroutes, TRACEROUTE_TARGET_RETENTION_NUM);
+
+          // Clear the pending entry now that the response has arrived
+          device.pendingTraceroutes.delete(traceroute.from);
         }),
       );
     },
@@ -1057,6 +1083,7 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
           traceroutes: db.traceroutes,
           waypoints: db.waypoints,
           neighborInfo: db.neighborInfo,
+          pendingTraceroutes: db.pendingTraceroutes,
         },
       ]),
     ),
