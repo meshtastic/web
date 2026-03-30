@@ -20,6 +20,17 @@ import { base16 } from "rfc4648";
 
 const NODEDB_DEBOUNCE_MS = 250;
 
+function numericHops(hopsAway: string | number): number {
+  if (typeof hopsAway === "number") {
+    return hopsAway;
+  }
+  if (hopsAway.match(/direct/i)) {
+    return 0;
+  }
+  const match = hopsAway.match(/(\d+)\s+hop/i);
+  return Number(match?.[1] ?? Number.MAX_SAFE_INTEGER);
+}
+
 export interface DeleteNoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -106,7 +117,7 @@ const NodesPage = (): JSX.Element => {
   const tableHeadings: Heading[] = [
     { title: "", sortable: false },
     { title: t("nodesTable.headings.longName"), sortable: true },
-    { title: t("nodesTable.headings.connection"), sortable: true },
+    { title: t("nodesTable.headings.connection"), sortable: true, sortFn: numericHops },
     { title: t("nodesTable.headings.lastHeard"), sortable: true },
     { title: t("nodesTable.headings.encryption"), sortable: false },
     { title: t("unit.snr"), sortable: true },
@@ -183,7 +194,7 @@ const NodesPage = (): JSX.Element => {
               )}
             </Mono>
           ),
-          sortValue: node.lastHeard,
+          sortValue: node.lastHeard ?? 0,
         },
         {
           content: (
@@ -257,7 +268,12 @@ const NodesPage = (): JSX.Element => {
         </div>
       </div>
       <div className="overflow-y-auto">
-        <Table headings={tableHeadings} rows={tableRows} />
+        <Table
+          headings={tableHeadings}
+          rows={tableRows}
+          defaultSortIndex={3}
+          defaultSortOrder="desc"
+        />
         <TracerouteResponseDialog
           traceroute={selectedTraceroute}
           open={!!selectedTraceroute}
