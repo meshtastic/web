@@ -9,7 +9,8 @@
     "deviceConfig": "Device Config",
     "moduleConfig": "Module Config",
     "manageConnections": "Manage Connections",
-    "nodes": "Nodes"
+    "nodes": "Nodes",
+    "traceroutes": "Traceroutes"
   },
   "app": {
     "title": "Meshtastic",

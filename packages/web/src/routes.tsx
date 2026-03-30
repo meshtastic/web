@@ -4,6 +4,7 @@ import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
+import TraceroutesPage from "@pages/Traceroutes/index.tsx";
 import ConfigPage from "@pages/Settings/index.tsx";
 import {
   createRootRouteWithContext,
@@ -135,6 +136,12 @@ const nodesRoute = createRoute({
   component: NodesPage,
 });
 
+const traceroutesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/traceroutes",
+  component: TraceroutesPage,
+});
+
 const dialogWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/dialog/$dialogId",
@@ -155,6 +162,7 @@ const routeTree = rootRoute.addChildren([
   mapWithParamsRoute,
   settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
   nodesRoute,
+  traceroutesRoute,
   dialogWithParamsRoute,
   connectionsRoute,
 ]);
