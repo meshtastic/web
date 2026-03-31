@@ -37,8 +37,9 @@ import {
   Star,
   StarOff,
   Trash2,
+  X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export const Connections = () => {
@@ -64,6 +65,51 @@ export const Connections = () => {
     refreshStatuses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-connect to the best HTTP connection on first load (after store rehydrates).
+  // Bluetooth and Serial require a user gesture to re-select the device, so they are skipped.
+  const autoConnectAttempted = useRef(false);
+  useEffect(() => {
+    if (autoConnectAttempted.current || connections.length === 0) return;
+
+    const httpConnections = connections.filter((c) => c.type === "http");
+    if (httpConnections.length === 0) return;
+
+    // Prefer the connection marked as default, otherwise the most recently connected one.
+    const candidate =
+      httpConnections.find((c) => c.isDefault) ??
+      [...httpConnections].sort((a, b) => (b.lastConnectedAt ?? 0) - (a.lastConnectedAt ?? 0))[0];
+
+    autoConnectAttempted.current = true;
+    connect(candidate.id).then((ok) => {
+      if (ok) navigate({ to: "/" });
+    });
+  }, [connections, connect, navigate]);
+
+  // Show a quick-reconnect banner for the most recently used BT/Serial connection.
+  // These connection types require a user gesture so they can't be auto-connected silently.
+  const [quickReconnectTarget, setQuickReconnectTarget] = useState<
+    (typeof connections)[number] | null
+  >(null);
+  const quickReconnectChecked = useRef(false);
+  useEffect(() => {
+    if (quickReconnectChecked.current || connections.length === 0) return;
+
+    const activeStatuses = new Set(["connected", "configured", "configuring", "connecting"]);
+    const candidate = connections
+      .filter(
+        (c) =>
+          (c.type === "bluetooth" || c.type === "serial") &&
+          c.lastConnectedAt != null &&
+          !activeStatuses.has(c.status),
+      )
+      .sort((a, b) => (b.lastConnectedAt ?? 0) - (a.lastConnectedAt ?? 0))[0];
+
+    if (!candidate) return;
+
+    quickReconnectChecked.current = true;
+    setQuickReconnectTarget(candidate);
+  }, [connections]);
 
   const sorted = useMemo(() => {
     const copy = [...connections];
@@ -112,6 +158,27 @@ export const Connections = () => {
       </header>
 
       <Separator />
+
+      {quickReconnectTarget && (
+        <QuickReconnectBanner
+          target={quickReconnectTarget}
+          onReconnect={async () => {
+            setQuickReconnectTarget(null);
+            const ok = await connect(quickReconnectTarget.id, { allowPrompt: true });
+            toast({
+              title: ok ? t("toasts.connected") : t("toasts.failed"),
+              description: ok
+                ? t("toasts.nowConnected", {
+                    name: quickReconnectTarget.name,
+                    interpolation: { escapeValue: false },
+                  })
+                : t("toasts.checkConnection"),
+            });
+            if (ok) navigate({ to: "/" });
+          }}
+          onDismiss={() => setQuickReconnectTarget(null)}
+        />
+      )}
 
       {sorted.length === 0 ? (
         <Card className="border-dashed">
@@ -229,6 +296,45 @@ export const Connections = () => {
     </div>
   );
 };
+
+function QuickReconnectBanner({
+  target,
+  onReconnect,
+  onDismiss,
+}: {
+  target: Connection;
+  onReconnect: () => Promise<void>;
+  onDismiss: () => void;
+}) {
+  const { t } = useTranslation("connections");
+  const Icon = connectionTypeIcon(target.type);
+  return (
+    <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+      <Icon className="size-5 text-blue-600 dark:text-blue-400 shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-blue-900 dark:text-blue-100 truncate">
+          {t("quickReconnect.title", { name: target.name })}
+        </p>
+        <p className="text-sm text-blue-700 dark:text-blue-300">
+          {t("quickReconnect.description")}
+        </p>
+      </div>
+      <Button className="gap-2 shrink-0" onClick={onReconnect}>
+        <LinkIcon className="size-4" />
+        {t("button.reconnect")}
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 shrink-0 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900"
+        onClick={onDismiss}
+      >
+        <X className="size-4" />
+        <span className="sr-only">{t("button.dismiss")}</span>
+      </Button>
+    </div>
+  );
+}
 
 function TypeBadge({ type }: { type: Connection["type"] }) {
   const Icon = connectionTypeIcon(type);

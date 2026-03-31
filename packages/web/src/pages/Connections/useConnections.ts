@@ -43,7 +43,7 @@ export function useConnections() {
       const updates: Partial<Connection> = {
         status,
         error: error || undefined,
-        ...(status === "disconnected" ? { lastConnectedAt: Date.now() } : {}),
+        ...(status === "configured" ? { lastConnectedAt: Date.now() } : {}),
       };
       updateSavedConnection(id, updates);
     },
@@ -525,7 +525,7 @@ export function useConnections() {
           ).getDevices?.();
           const hasPermission = known?.some((d: BluetoothDevice) => d.id === c.deviceId);
           updateSavedConnection(c.id, {
-            status: hasPermission ? "configured" : "disconnected",
+            status: hasPermission ? "online" : "disconnected",
           });
         } catch {
           // getDevices not supported or failed
@@ -571,7 +571,7 @@ export function useConnections() {
             return info.usbVendorId === c.usbVendorId && info.usbProductId === c.usbProductId;
           });
           updateSavedConnection(c.id, {
-            status: hasPermission ? "configured" : "disconnected",
+            status: hasPermission ? "online" : "disconnected",
           });
         } catch {
           // getPorts failed

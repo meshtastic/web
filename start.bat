@@ -1,0 +1,1 @@
+pnpm --filter meshtastic-web dev

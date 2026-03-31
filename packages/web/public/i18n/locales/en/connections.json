@@ -15,6 +15,10 @@
   },
   "lastConnectedAt": "Last connected: {{date}}",
   "neverConnected": "Never connected",
+  "quickReconnect": {
+    "title": "Reconnect to {{name}}?",
+    "description": "Bluetooth and Serial connections require you to re-select the device after a page refresh."
+  },
   "toasts": {
     "connected": "Connected",
     "nowConnected": "{{name}} is now connected",
