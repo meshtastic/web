@@ -19,6 +19,7 @@ import {
   type LucideIcon,
   MapIcon,
   MessageSquareIcon,
+  ScrollTextIcon,
   SettingsIcon,
   UsersIcon,
   WaypointsIcon,
@@ -130,6 +131,11 @@ export const Sidebar = ({ children }: SidebarProps) => {
       name: t("navigation.traceroutes"),
       icon: WaypointsIcon,
       page: "traceroutes",
+    },
+    {
+      name: "Packet Log",
+      icon: ScrollTextIcon,
+      page: "logs",
     },
   ];
 

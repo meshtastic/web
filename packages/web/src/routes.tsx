@@ -4,6 +4,7 @@ import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
+import PacketLogPage from "@pages/PacketLog/index.tsx";
 import TraceroutesPage from "@pages/Traceroutes/index.tsx";
 import ConfigPage from "@pages/Settings/index.tsx";
 import {
@@ -154,6 +155,12 @@ const connectionsRoute = createRoute({
   component: Connections,
 });
 
+const logsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/logs",
+  component: PacketLogPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
@@ -165,6 +172,7 @@ const routeTree = rootRoute.addChildren([
   traceroutesRoute,
   dialogWithParamsRoute,
   connectionsRoute,
+  logsRoute,
 ]);
 
 const router = createRouter({

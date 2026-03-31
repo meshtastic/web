@@ -23,7 +23,7 @@ interface Dialogs {
 
 type DialogVariant = keyof Dialogs;
 
-type Page = "messages" | "map" | "settings" | "channels" | "nodes" | "traceroutes";
+type Page = "messages" | "map" | "settings" | "channels" | "nodes" | "traceroutes" | "logs";
 
 export type ConnectionId = number;
 export type ConnectionType = "http" | "bluetooth" | "serial";
