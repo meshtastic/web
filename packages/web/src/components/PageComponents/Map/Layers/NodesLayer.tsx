@@ -16,6 +16,7 @@ import { useMapFitting } from "@core/hooks/useMapFitting";
 import { useNodeDB } from "@core/stores";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { MapRef } from "react-map-gl/maplibre";
@@ -83,6 +84,14 @@ export const NodesLayer = ({
     for (const [i, node] of nodes.entries()) {
       const isHead = i === 0;
 
+      const shortName =
+        node.user?.shortName ?? numberToHexUnpadded(node.num).slice(-4).toUpperCase();
+      const longName =
+        node.user?.longName ??
+        t("fallbackName", {
+          last4: shortName,
+        });
+
       rendered.push(
         <NodeMarker
           key={`node-${key}-${node.num}`}
@@ -90,8 +99,8 @@ export const NodesLayer = ({
           lng={lng}
           lat={lat}
           offset={expandedOffsets?.[i]}
-          label={node.user?.shortName ?? t("unknown.shortName")}
-          tooltipLabel={node.user?.longName ?? t("unknown.longName")}
+          label={shortName}
+          tooltipLabel={longName}
           hasError={hasNodeError(node.num)}
           isFavorite={node.isFavorite ?? false}
           isVisible={isVisible}

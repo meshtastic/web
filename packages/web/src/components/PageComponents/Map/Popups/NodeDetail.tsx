@@ -8,6 +8,7 @@ import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { formatQuantity } from "@core/utils/string.ts";
 import type { Protobuf as ProtobufType } from "@meshtastic/core";
 import { Protobuf } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -26,8 +27,12 @@ export interface NodeDetailProps {
 export const NodeDetail = ({ node }: NodeDetailProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation("nodes");
-  const name = node.user?.longName ?? t("unknown.shortName");
-  const shortName = node.user?.shortName ?? t("unknown.shortName");
+  const shortName = node.user?.shortName ?? numberToHexUnpadded(node.num).slice(-4).toUpperCase();
+  const name =
+    node.user?.longName ??
+    t("fallbackName", {
+      last4: shortName,
+    });
   const hwModel = node.user?.hwModel ?? 0;
   const rawHardwareType = Protobuf.Mesh.HardwareModel[hwModel] as
     | keyof typeof Protobuf.Mesh.HardwareModel
