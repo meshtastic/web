@@ -1,34 +1,34 @@
 {
   "page": {
-    "title": "Подключение к устройству Meshtastic",
-    "description": "Добавьте подключение по HTTP, Bluetooth или COM-порту. Сохранённые подключения будут храниться в вашем браузере."
+    "title": "Подключиться к Meshtastic устройству",
+    "description": "Добавьте подключение к устройству через HTTP, Bluetooth, или COM-порт. Подключения будут сохранены в браузере"
   },
   "connectionType_ble": "BLE",
   "connectionType_serial": "COM-порт",
   "connectionType_network": "Сеть",
   "deleteConnection": "Удалить подключение",
-  "areYouSure": "Это удалит {{name}}. Это действие нельзя отменить.",
-  "moreActions": "Другие действия",
+  "areYouSure": "Это приведет к удалению {{name}}. Это действие нельзя отменить",
+  "moreActions": "Ещё действия",
   "noConnections": {
-    "title": "Подключений пока нет.",
-    "description": "Создайте первое подключение. Оно подключится сразу и сохранится на будущее."
+    "title": "Пока нет подключений",
+    "description": "Создайте ваше первое соединение. Оно будет сохранено."
   },
   "lastConnectedAt": "Последнее подключение: {{date}}",
-  "neverConnected": "Никогда не подключалось",
+  "neverConnected": "Никогда не подключался",
   "toasts": {
     "connected": "Подключено",
-    "nowConnected": "Подключено: {{name}}",
-    "nowDisconnected": "Отключено: {{name}}",
+    "nowConnected": "{{name}} подключен",
+    "nowDisconnected": "{{name}} отключен",
     "disconnected": "Отключено",
     "failed": "Не удалось подключиться",
-    "checkConnection": "Проверьте устройство или настройки и попробуйте снова",
-    "defaultSet": "По умолчанию",
-    "defaultConnection": "Теперь подключение по умолчанию: {{nameisconnected}}",
+    "checkConnetion": "Проверьте ваше устройство или настройки и повторите попытку",
+    "defaultSet": "Настройки по умолчанию установлены",
+    "defaultConnection": "Соединение по умолчанию теперь {{nameisconnected}}",
     "deleted": "Удалено",
-    "deletedByName": "Удалено: {{name}}",
-    "pickConnectionAgain": "Не удалось подключиться. Возможно, нужно заново выбрать устройство/порт.",
+    "deletedByName": "{{name}} был удален",
+    "pickConnectionAgain": "Не удалось подключиться. Возможно, потребуется выбрать другой порт/устройство",
     "added": "Подключение добавлено",
-    "savedByName": "{{name}} сохранено.",
-    "savedCantConnect": "Подключение сохранено, но подключиться не удалось."
+    "savedByName": "{{name}} сохранено",
+    "savedCantConnect": "Соединение было сохранено, но не удалось подключиться"
   }
 }

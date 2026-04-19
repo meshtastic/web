@@ -11,14 +11,14 @@
     },
     "favorite": {
       "label": "Preferito",
-      "tooltip": "Add or remove this node from your favorites"
+      "tooltip": "Aggiungi o rimuovi questo nodo dai tuoi preferiti"
     },
     "notFavorite": {
       "label": "Non è un preferito"
     },
     "error": {
       "label": "Errori",
-      "text": "An error occurred while fetching node details. Please try again later."
+      "text": "Si è verificato un errore durante il recupero dei dettagli del nodo. Riprova più tardi."
     },
     "status": {
       "heard": "Sentito",
@@ -50,10 +50,10 @@
     }
   },
   "actions": {
-    "added": "Added",
-    "removed": "Removed",
-    "ignoreNode": "Ignore Node",
-    "unignoreNode": "Unignore Node",
+    "added": "Aggiunto",
+    "removed": "Rimosso",
+    "ignoreNode": "Ignora nodo",
+    "unignoreNode": "Non ignorare più",
     "requestPosition": "Richiedi posizione"
   }
 }

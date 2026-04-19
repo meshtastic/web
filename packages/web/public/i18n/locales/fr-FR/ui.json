@@ -8,7 +8,7 @@
     "radioConfig": "Configuration radio",
     "deviceConfig": "Configuration de l'appareil",
     "moduleConfig": "Configuration du module",
-    "manageConnections": "Manage Connections",
+    "manageConnections": "Gérer les connexions",
     "nodes": "Noeuds"
   },
   "app": {
@@ -78,8 +78,8 @@
       "description": "Le changement de configuration {{case}} a été enregistré."
     },
     "saveAllSuccess": {
-      "title": "Saved",
-      "description": "All configuration changes have been saved."
+      "title": "Sauvegardé",
+      "description": "Toutes les modifications de la configuration ont été sauvegardées."
     },
     "favoriteNode": {
       "title": "{{action}} {{nodeName}} {{direction}} des favoris.",
@@ -150,7 +150,7 @@
   },
   "airtimeUtilization": {
     "label": "Utilisation du temps d’antenne (%)",
-    "short": "Airtime Util. (%)"
+    "short": "Util. tps. antenne (%)"
   },
   "batteryLevel": {
     "label": "Niveau de batterie (%)",
@@ -162,7 +162,7 @@
   },
   "channelUtilization": {
     "label": "Utilisation du canal (%)",
-    "short": "Channel Util. (%)"
+    "short": "Util. canal (%)"
   },
   "hops": {
     "direct": "Direk",
@@ -217,7 +217,7 @@
       "step4": "Toute autre information pertinente"
     },
     "reportLink": "Vous pouvez signaler le problème à notre <0>GitHub</0>",
-    "connectionsLink": "Return to the <0>connections</0>",
+    "connectionsLink": "Retour aux <0>connexions</0>",
     "detailsSummary": "Détails de l'erreur",
     "errorMessageLabel": "Message d'erreur :",
     "stackTraceLabel": "État de la pile :",
