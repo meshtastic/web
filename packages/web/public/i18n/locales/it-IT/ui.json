@@ -8,7 +8,7 @@
     "radioConfig": "Configurazione Radio",
     "deviceConfig": "Configurazione Dispositivo",
     "moduleConfig": "Configurazione Modulo",
-    "manageConnections": "Manage Connections",
+    "manageConnections": "Gestisci Connessioni",
     "nodes": "Nodi"
   },
   "app": {
@@ -78,7 +78,7 @@
       "description": "La modifica di configurazione {{case}} è stata salvata."
     },
     "saveAllSuccess": {
-      "title": "Saved",
+      "title": "Salvato",
       "description": "All configuration changes have been saved."
     },
     "favoriteNode": {
@@ -190,7 +190,7 @@
     "label": "Connesso tramite MQTT"
   },
   "hopsUnknown": {
-    "label": "Unknown number of hops"
+    "label": "Numero sconosciuto di salti"
   },
   "showUnheard": {
     "label": "Never heard"
