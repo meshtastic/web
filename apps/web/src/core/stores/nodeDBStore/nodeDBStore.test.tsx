@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { act, render, screen } from "@testing-library/react";
 import { toByteArray } from "base64-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";

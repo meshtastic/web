@@ -3,7 +3,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
 import { useDevice } from "@core/stores";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import i18next from "i18next";
 import { QrCodeIcon, UploadIcon } from "lucide-react";
 import { Suspense, useMemo } from "react";

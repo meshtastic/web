@@ -7,7 +7,7 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { DeviceConfig } from "@pages/Settings/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig.tsx";
 import { useNavigate, useRouterState } from "@tanstack/react-router";

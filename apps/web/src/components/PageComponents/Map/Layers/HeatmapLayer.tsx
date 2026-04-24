@@ -1,5 +1,5 @@
 import { hasPos, toLngLat } from "@core/utils/geo";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import type { Feature, FeatureCollection } from "geojson";
 import type { HeatmapLayerSpecification } from "maplibre-gl";
 import { useMemo } from "react";

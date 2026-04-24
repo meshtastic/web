@@ -12,7 +12,7 @@ import type {
 } from "@core/stores/messageStore/types.ts";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
-import type { Types } from "@meshtastic/core";
+import type { Types } from "@meshtastic/sdk";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist } from "zustand/middleware";

@@ -25,7 +25,7 @@ import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import { useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useId, useMemo, useRef, useState } from "react";

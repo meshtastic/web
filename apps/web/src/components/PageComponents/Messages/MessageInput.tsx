@@ -1,7 +1,7 @@
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useMessages } from "@core/stores";
-import type { Types } from "@meshtastic/core";
+import type { Types } from "@meshtastic/sdk";
 import { SendIcon } from "lucide-react";
 import { startTransition, useState } from "react";
 import { useTranslation } from "react-i18next";

@@ -1,6 +1,6 @@
 import type { ConnectionStatus } from "@app/core/stores/deviceStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ChevronRight,

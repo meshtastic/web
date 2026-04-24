@@ -3,7 +3,7 @@ import { Separator } from "@components/UI/Separator.tsx";
 import type { WaypointWithMetadata } from "@core/stores";
 import { useNodeDB } from "@core/stores";
 import { bearingDegrees, distanceMeters, hasPos, toLngLat } from "@core/utils/geo";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import {
   ClockFadingIcon,
   ClockPlusIcon,

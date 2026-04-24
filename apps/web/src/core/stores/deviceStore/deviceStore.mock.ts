@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import { vi } from "vitest";
 import type { Device } from "./index.ts";
 

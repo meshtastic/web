@@ -11,7 +11,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { Popover, PopoverContent, PopoverTrigger } from "@components/UI/Popover.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { debounce } from "@core/utils/debounce.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { FunnelIcon } from "lucide-react";
 import {
   type ComponentProps,

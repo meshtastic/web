@@ -1,7 +1,7 @@
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
 import { useNodeDB } from "@core/stores";
 import { mockNodeDBStore } from "@core/stores/nodeDBStore/nodeDBStore.mock.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

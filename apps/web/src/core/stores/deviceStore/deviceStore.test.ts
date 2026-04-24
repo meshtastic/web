@@ -1,5 +1,5 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { Protobuf, type Types } from "@meshtastic/core";
+import { Protobuf, type Types } from "@meshtastic/sdk";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const idbMem = new Map<string, string>();

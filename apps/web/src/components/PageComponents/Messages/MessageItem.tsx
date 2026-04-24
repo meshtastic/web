@@ -9,7 +9,7 @@ import {
 import { MessageState, useAppStore, useDevice, useNodeDB } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
-import { type Protobuf, Types } from "@meshtastic/core";
+import { type Protobuf, Types } from "@meshtastic/sdk";
 import type { LucideIcon } from "lucide-react";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import { type ReactNode, useMemo } from "react";

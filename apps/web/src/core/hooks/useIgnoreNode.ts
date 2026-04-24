@@ -1,7 +1,7 @@
 import { create } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice, useNodeDB } from "@core/stores";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 

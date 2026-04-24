@@ -1,4 +1,4 @@
-import type { Types } from "@meshtastic/core";
+import type { Types } from "@meshtastic/sdk";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MessageInput, type MessageInputProps } from "./MessageInput.tsx";

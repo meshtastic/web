@@ -29,7 +29,7 @@ import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
 import { toast } from "@core/hooks/useToast.ts";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { fromByteArray } from "base64-js";

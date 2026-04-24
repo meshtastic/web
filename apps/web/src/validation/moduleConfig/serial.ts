@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { z } from "zod/v4";
 
 const Serial_BaudEnum = z.enum(Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud);

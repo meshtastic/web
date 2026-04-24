@@ -4,7 +4,7 @@ import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUn
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { useTranslation } from "react-i18next";
 
 interface DeviceConfigProps {

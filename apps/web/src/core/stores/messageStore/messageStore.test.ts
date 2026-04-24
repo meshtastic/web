@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: <tests> */
-import { Types } from "@meshtastic/core";
+import { Types } from "@meshtastic/sdk";
 import { setAutoFreeze } from "immer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getConversationId, MessageState, MessageType } from "./index.ts";

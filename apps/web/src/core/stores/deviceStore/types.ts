@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import type { ValidConfigType, ValidModuleConfigType } from "./changeRegistry.ts";
 
 interface Dialogs {

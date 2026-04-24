@@ -1,5 +1,5 @@
 import type { NodeErrorType } from "@core/stores";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import { fromByteArray } from "base64-js";
 
 export function equalKey(a?: Uint8Array | null, b?: Uint8Array | null): boolean {

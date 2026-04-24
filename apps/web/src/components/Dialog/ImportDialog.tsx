@@ -21,7 +21,7 @@ import {
 import { Switch } from "@components/UI/Switch.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";

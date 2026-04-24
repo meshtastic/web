@@ -8,7 +8,7 @@ import { createConnectionFromInput, testHttpReachable } from "@app/pages/Connect
 import { useAppStore, useDeviceStore, useMessageStore, useNodeDBStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
-import { MeshDevice } from "@meshtastic/core";
+import { MeshDevice } from "@meshtastic/sdk";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";

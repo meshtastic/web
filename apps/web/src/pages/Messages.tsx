@@ -18,7 +18,7 @@ import {
 } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { randId } from "@core/utils/randId.ts";
-import { Protobuf, Types } from "@meshtastic/core";
+import { Protobuf, Types } from "@meshtastic/sdk";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";

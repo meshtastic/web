@@ -2,7 +2,7 @@ import { type UserValidation, UserValidationSchema } from "@app/validation/confi
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice, useNodeDB } from "@core/stores";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { useTranslation } from "react-i18next";
 
 interface UserConfigProps {

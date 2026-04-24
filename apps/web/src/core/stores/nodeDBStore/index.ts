@@ -2,7 +2,7 @@ import { create } from "@bufbuild/protobuf";
 import { featureFlags } from "@core/services/featureFlags";
 import { validateIncomingNode } from "@core/stores/nodeDBStore/nodeValidation";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
-import { Protobuf, type Types } from "@meshtastic/core";
+import { Protobuf, type Types } from "@meshtastic/sdk";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist, subscribeWithSelector } from "zustand/middleware";

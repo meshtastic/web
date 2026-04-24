@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { describe, expect, it } from "vitest";
 
 describe("LoRa modem presets", () => {

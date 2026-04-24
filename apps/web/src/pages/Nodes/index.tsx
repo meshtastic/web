@@ -11,7 +11,7 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
-import { Protobuf, type Types } from "@meshtastic/core";
+import { Protobuf, type Types } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
 import { type JSX, useCallback, useDeferredValue, useEffect, useState } from "react";

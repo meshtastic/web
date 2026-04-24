@@ -1,4 +1,4 @@
-import type { Types } from "@meshtastic/core";
+import type { Types } from "@meshtastic/sdk";
 
 // Config type discriminators
 export type ValidConfigType =
