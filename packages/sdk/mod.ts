@@ -1,6 +1,8 @@
 // Main entry
 export { MeshClient } from "./src/core/client/MeshClient.ts";
 export type { MeshClientOptions } from "./src/core/client/MeshClient.ts";
+export { MeshRegistry } from "./src/core/registry/MeshRegistry.ts";
+export type { ConnectionId, RegistryEntry } from "./src/core/registry/MeshRegistry.ts";
 
 // Constants & errors
 export { Constants } from "./src/core/constants/index.ts";

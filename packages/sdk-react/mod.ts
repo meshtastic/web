@@ -1,8 +1,14 @@
 export { MeshProvider } from "./src/provider/MeshProvider.tsx";
 export type { MeshProviderProps } from "./src/provider/MeshProvider.tsx";
 export { MeshContext } from "./src/provider/MeshContext.ts";
+export { MeshRegistryProvider } from "./src/provider/MeshRegistryProvider.tsx";
+export type { MeshRegistryProviderProps } from "./src/provider/MeshRegistryProvider.tsx";
+export { MeshRegistryContext } from "./src/provider/MeshRegistryContext.ts";
 
 export { useClient } from "./src/adapters/useClient.ts";
+export { useClientById } from "./src/adapters/useClientById.ts";
+export { useActiveClient } from "./src/adapters/useActiveClient.ts";
+export { useMeshRegistry, useOptionalMeshRegistry } from "./src/adapters/useMeshRegistry.ts";
 export { useSignal } from "./src/adapters/useSignal.ts";
 export { useSignalValue } from "./src/adapters/useSignalValue.ts";
 
