@@ -9,7 +9,9 @@ import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
+import { meshRegistry } from "@core/meshRegistry.ts";
 import { useAppStore, useMessageStore } from "@core/stores";
+import { MeshRegistryProvider } from "@meshtastic/sdk-react";
 import { type createRouter, RouterProvider } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
@@ -41,7 +43,9 @@ function IndexPage() {
   return (
     <React.StrictMode>
       <Suspense fallback={null}>
-        <RouterProvider router={router} context={context} />
+        <MeshRegistryProvider registry={meshRegistry}>
+          <RouterProvider router={router} context={context} />
+        </MeshRegistryProvider>
       </Suspense>
     </React.StrictMode>
   );
