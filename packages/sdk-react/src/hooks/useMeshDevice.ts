@@ -3,7 +3,7 @@ import type { DeviceStatusEnum } from "@meshtastic/sdk";
 import { useClient } from "../adapters/useClient.ts";
 import { useSignal } from "../adapters/useSignal.ts";
 
-export interface UseDeviceResult {
+export interface UseMeshDeviceResult {
   status: DeviceStatusEnum;
   isConfigured: boolean;
   myNodeNum: number | undefined;
@@ -12,7 +12,13 @@ export interface UseDeviceResult {
   shutdown(seconds?: number): Promise<number>;
 }
 
-export function useDevice(): UseDeviceResult {
+/**
+ * Exposes the device slice of the current MeshClient: status, metadata, and
+ * reboot/shutdown commands. Named `useMeshDevice` (not `useDevice`) so it does
+ * not collide with consumer hooks of the same name (e.g. the legacy one in
+ * `packages/web`).
+ */
+export function useMeshDevice(): UseMeshDeviceResult {
   const client = useClient();
   const status = useSignal(client.device.status);
   const isConfigured = useSignal(client.device.isConfigured);

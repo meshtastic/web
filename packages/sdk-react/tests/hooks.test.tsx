@@ -3,7 +3,7 @@ import { MeshClient } from "@meshtastic/sdk";
 import { createFakeTransport } from "@meshtastic/sdk/testing";
 import { ChannelNumber } from "@meshtastic/sdk";
 import { describe, expect, it } from "vitest";
-import { MeshProvider, useChat, useDevice } from "../mod.ts";
+import { MeshProvider, useChat, useMeshDevice } from "../mod.ts";
 
 function setup() {
   const handle = createFakeTransport();
@@ -15,9 +15,9 @@ function setup() {
 }
 
 describe("sdk-react hooks", () => {
-  it("useDevice re-renders on myNodeInfo", async () => {
+  it("useMeshDevice re-renders on myNodeInfo", async () => {
     const { handle, wrapper } = setup();
-    const { result } = renderHook(() => useDevice(), { wrapper });
+    const { result } = renderHook(() => useMeshDevice(), { wrapper });
     expect(result.current.myNodeNum).toBeUndefined();
 
     await act(async () => {

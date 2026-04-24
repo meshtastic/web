@@ -12,8 +12,8 @@ export { useMeshRegistry, useOptionalMeshRegistry } from "./src/adapters/useMesh
 export { useSignal } from "./src/adapters/useSignal.ts";
 export { useSignalValue } from "./src/adapters/useSignalValue.ts";
 
-export { useDevice } from "./src/hooks/useDevice.ts";
-export type { UseDeviceResult } from "./src/hooks/useDevice.ts";
+export { useMeshDevice } from "./src/hooks/useMeshDevice.ts";
+export type { UseMeshDeviceResult } from "./src/hooks/useMeshDevice.ts";
 export { useConnection } from "./src/hooks/useConnection.ts";
 export type { UseConnectionResult } from "./src/hooks/useConnection.ts";
 export { useChat } from "./src/hooks/useChat.ts";
