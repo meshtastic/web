@@ -1,0 +1,56 @@
+{
+  "name": "@meshtastic/sdk",
+  "version": "0.1.0",
+  "description": "Domain-driven SDK for Meshtastic devices. Feature slices (device/chat/nodes/channels/config/telemetry/position/traceroute/files) with signals-backed reactive state. Replaces @meshtastic/core.",
+  "exports": {
+    ".": "./mod.ts",
+    "./transport": "./src/core/transport/index.ts",
+    "./protobuf": "./src/core/protobuf/index.ts",
+    "./testing": "./src/core/testing/index.ts"
+  },
+  "type": "module",
+  "main": "./dist/mod.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/mod.d.ts",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meshtastic/web.git",
+    "directory": "packages/sdk"
+  },
+  "tsdown": {
+    "entry": {
+      "mod": "mod.ts",
+      "transport": "src/core/transport/index.ts",
+      "protobuf": "src/core/protobuf/index.ts",
+      "testing": "src/core/testing/index.ts"
+    },
+    "platform": "browser",
+    "dts": true,
+    "format": ["esm"],
+    "splitting": false,
+    "clean": true
+  },
+  "jsrInclude": ["mod.ts", "src", "README.md", "LICENSE"],
+  "jsrExclude": ["src/**/*.test.ts", "tests"],
+  "files": ["package.json", "README.md", "LICENSE", "dist"],
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "clean": "rm -rf dist LICENSE",
+    "build:npm": "tsdown",
+    "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public --no-git-checks",
+    "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
+    "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.9.0",
+    "@meshtastic/protobufs": "jsr:^2.7.18",
+    "@preact/signals-core": "^1.8.0",
+    "better-result": "^1.0.0",
+    "crc": "npm:crc@^4.3.2",
+    "ste-simple-events": "^3.0.11",
+    "tslog": "^4.9.3"
+  }
+}
