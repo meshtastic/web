@@ -53,8 +53,22 @@ export { DeviceClient } from "./src/features/device/index.ts";
 export type { Device } from "./src/features/device/index.ts";
 
 export { ChatClient } from "./src/features/chat/index.ts";
-export type { Message, SendTextError, SendTextInput } from "./src/features/chat/index.ts";
-export { EmptyMessageError, MessageState, MessageTooLongError } from "./src/features/chat/index.ts";
+export type {
+  ChatClientOptions,
+  ConversationKey,
+  Message,
+  MessageRepository,
+  RetentionPolicy,
+  SendTextError,
+  SendTextInput,
+} from "./src/features/chat/index.ts";
+export {
+  conversationKeyString,
+  EmptyMessageError,
+  InMemoryMessageRepository,
+  MessageState,
+  MessageTooLongError,
+} from "./src/features/chat/index.ts";
 
 export { NodesClient } from "./src/features/nodes/index.ts";
 export type { Node } from "./src/features/nodes/index.ts";

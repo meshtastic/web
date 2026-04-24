@@ -34,6 +34,15 @@ export class ChatStore {
     bucket.value = [...bucket.value, message];
   }
 
+  /**
+   * Inserts an older message at the front of the bucket. Used when paginating
+   * backwards; preserves chronological order because callers feed older-first.
+   */
+  prepend(key: string, message: Message): void {
+    const bucket = this.writeBucket(key);
+    bucket.value = [message, ...bucket.value];
+  }
+
   updateState(id: number, state: MessageState): void {
     for (const [, bucket] of this.buckets) {
       const idx = bucket.value.findIndex((m) => m.id === id);

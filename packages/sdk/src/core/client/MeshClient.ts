@@ -22,10 +22,13 @@ import { PositionClient } from "../../features/position/index.ts";
 import { TelemetryClient } from "../../features/telemetry/index.ts";
 import { TraceRouteClient } from "../../features/traceroute/index.ts";
 
+import type { ChatClientOptions } from "../../features/chat/ChatClient.ts";
+
 export interface MeshClientOptions {
   transport: Transport;
   configId?: number;
   logger?: Logger<unknown>;
+  chat?: ChatClientOptions;
 }
 
 /**
@@ -64,7 +67,7 @@ export class MeshClient {
     this.configId = options.configId ?? generatePacketId();
 
     this.device = new DeviceClient(this);
-    this.chat = new ChatClient(this);
+    this.chat = new ChatClient(this, options.chat);
     this.nodes = new NodesClient(this);
     this.channels = new ChannelsClient(this);
     this.config = new ConfigClient(this);
