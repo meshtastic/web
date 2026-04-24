@@ -40,6 +40,22 @@ export class MeshRegistry {
       throw new Error(`MeshRegistry already has a client for id ${id}`);
     }
     const client = new MeshClient(options);
+    return this.adopt(id, client);
+  }
+
+  /**
+   * Registers an externally-constructed MeshClient under the given id. Useful
+   * when the client was produced by a legacy shim (e.g. the Phase-A MeshDevice
+   * wrapper) and must coexist with the registry during migration.
+   */
+  public register(id: ConnectionId, client: MeshClient): MeshClient {
+    if (this.clients.has(id)) {
+      throw new Error(`MeshRegistry already has a client for id ${id}`);
+    }
+    return this.adopt(id, client);
+  }
+
+  private adopt(id: ConnectionId, client: MeshClient): MeshClient {
     this.clients.set(id, client);
     this.snapshot();
     if (this.activeIdSignal.value === null) {
@@ -74,10 +90,20 @@ export class MeshRegistry {
     const client = this.clients.get(id);
     if (!client) return;
     await client.disconnect().catch(() => {});
+    this.unregister(id);
+  }
+
+  /**
+   * Removes the mapping without disconnecting the client. Use when the caller
+   * has already torn down the transport itself (e.g. the legacy useConnections
+   * flow in packages/web).
+   */
+  public unregister(id: ConnectionId): void {
+    if (!this.clients.has(id)) return;
     this.clients.delete(id);
     if (this.activeIdSignal.value === id) {
       const next = this.clients.keys().next();
-      this.setActive(next.done ? null : next.value);
+      this.setActive(next.done ? null : (next.value as ConnectionId));
     }
     this.snapshot();
   }

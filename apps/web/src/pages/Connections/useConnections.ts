@@ -5,6 +5,7 @@ import type {
   NewConnection,
 } from "@app/core/stores/deviceStore/types";
 import { createConnectionFromInput, testHttpReachable } from "@app/pages/Connections/utils";
+import { meshRegistry } from "@core/meshRegistry.ts";
 import { useAppStore, useDeviceStore, useMessageStore, useNodeDBStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
@@ -108,6 +109,7 @@ export function useConnections() {
         } catch {}
       }
 
+      meshRegistry.unregister(id);
       removeSavedConnectionFromStore(id);
     },
     [connections, removeSavedConnectionFromStore],
@@ -149,6 +151,13 @@ export function useConnections() {
       const nodeDB = addNodeDB(deviceId);
       const messageStore = addMessageStore(deviceId);
       const meshDevice = new MeshDevice(transport, deviceId);
+
+      // Register the underlying MeshClient so sdk-react hooks
+      // (useMeshDevice, useChat, etc.) observe this connection.
+      if (!meshRegistry.has(id)) {
+        meshRegistry.register(id, meshDevice.meshClient);
+      }
+      meshRegistry.setActive(id);
 
       setSelectedDevice(deviceId);
       device.addConnection(meshDevice); // This stores meshDevice in Device.connection

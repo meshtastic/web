@@ -22,6 +22,7 @@ import type { Xmodem } from "../core/xmodem/Xmodem.ts";
 import { sendAdminMessage } from "../features/device/infrastructure/AdminMessageSender.ts";
 
 export class MeshDevice {
+  public readonly meshClient: MeshClient;
   private readonly client: MeshClient;
 
   public transport: Transport;
@@ -38,6 +39,7 @@ export class MeshDevice {
 
   constructor(transport: Transport, configId?: number) {
     this.client = new MeshClient({ transport, configId });
+    this.meshClient = this.client;
     this.transport = this.client.transport;
     this.log = this.client.log;
     this.events = this.client.events;
