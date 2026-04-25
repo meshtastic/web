@@ -11,7 +11,10 @@ import { useAppStore, useDeviceStore, useMessageStore, useNodeDBStore } from "@c
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/sdk";
-import { SqlocalMessageRepository } from "@meshtastic/sdk-storage-sqlocal/chat";
+import {
+  SqlocalDraftRepository,
+  SqlocalMessageRepository,
+} from "@meshtastic/sdk-storage-sqlocal/chat";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
@@ -154,23 +157,27 @@ export function useConnections() {
       const messageStore = addMessageStore(deviceId);
 
       // Wire the SDK chat slice to the OPFS-backed SQLite repository so the
-      // user keeps message history across reloads. The DB is opened lazily on
-      // first connect; subsequent connections share the same DB instance.
+      // user keeps message + draft history across reloads. The DB is opened
+      // lazily on first connect; subsequent connections share the same DB.
       let chatRepository: SqlocalMessageRepository | undefined;
+      let draftRepository: SqlocalDraftRepository | undefined;
       try {
         const db = await getStorageDb();
         chatRepository = new SqlocalMessageRepository(db, { deviceId: id, coordinator });
+        draftRepository = new SqlocalDraftRepository(db, { deviceId: id });
       } catch (err) {
         console.warn("[useConnections] sqlocal unavailable, falling back to in-memory chat:", err);
       }
       const meshDevice = new MeshDevice(transport, {
         configId: deviceId,
-        chat: chatRepository
-          ? {
-              repository: chatRepository,
-              retention: { maxPerBucket: 1000, olderThanMs: 1000 * 60 * 60 * 24 * 90 },
-            }
-          : undefined,
+        chat:
+          chatRepository || draftRepository
+            ? {
+                repository: chatRepository,
+                draftRepository,
+                retention: { maxPerBucket: 1000, olderThanMs: 1000 * 60 * 60 * 24 * 90 },
+              }
+            : undefined,
       });
 
       // Register the underlying MeshClient so sdk-react hooks

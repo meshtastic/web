@@ -53,4 +53,16 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
       `CREATE TABLE IF NOT EXISTS _schema (version INTEGER PRIMARY KEY)`,
     ],
   },
+  {
+    version: 2,
+    sql: [
+      `CREATE TABLE IF NOT EXISTS drafts (
+        device_id INTEGER NOT NULL,
+        conversation_key TEXT NOT NULL,
+        text TEXT NOT NULL,
+        updated_at INTEGER NOT NULL,
+        PRIMARY KEY (device_id, conversation_key)
+      )`,
+    ],
+  },
 ];

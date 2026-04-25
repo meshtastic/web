@@ -55,7 +55,9 @@ export type { Device } from "./src/features/device/index.ts";
 export { ChatClient } from "./src/features/chat/index.ts";
 export type {
   ChatClientOptions,
+  ChatDrafts,
   ConversationKey,
+  DraftRepository,
   Message,
   MessageRepository,
   RetentionPolicy,
@@ -65,6 +67,7 @@ export type {
 export {
   conversationKeyString,
   EmptyMessageError,
+  InMemoryDraftRepository,
   InMemoryMessageRepository,
   MessageState,
   MessageTooLongError,

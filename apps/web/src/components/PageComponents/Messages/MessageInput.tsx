@@ -1,26 +1,25 @@
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import { useMessages } from "@core/stores";
-import type { Types } from "@meshtastic/sdk";
+import type { ConversationKey } from "@meshtastic/sdk";
+import { useDraft } from "@meshtastic/sdk-react";
 import { SendIcon } from "lucide-react";
 import { startTransition, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface MessageInputProps {
   onSend: (message: string) => void;
-  to: Types.Destination;
+  conversation: ConversationKey;
   maxBytes: number;
 }
 
-export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
-  const { setDraft, getDraft, clearDraft } = useMessages();
+export const MessageInput = ({ onSend, conversation, maxBytes }: MessageInputProps) => {
+  const { text: persistedDraft, setText, clear } = useDraft(conversation);
   const { t } = useTranslation("messages");
 
-  const calculateBytes = (text: string) => new Blob([text]).size;
+  const calculateBytes = (value: string) => new Blob([value]).size;
 
-  const initialDraft = getDraft(to);
-  const [localDraft, setLocalDraft] = useState(initialDraft);
-  const [messageBytes, setMessageBytes] = useState(() => calculateBytes(initialDraft));
+  const [localDraft, setLocalDraft] = useState(persistedDraft);
+  const [messageBytes, setMessageBytes] = useState(() => calculateBytes(persistedDraft));
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -29,7 +28,7 @@ export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
     if (byteLength <= maxBytes) {
       setLocalDraft(newValue);
       setMessageBytes(byteLength);
-      setDraft(to, newValue);
+      setText(newValue);
     }
   };
 
@@ -38,13 +37,12 @@ export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
     if (!localDraft.trim()) {
       return;
     }
-    // Reset bytes *before* sending (consider if onSend failure needs different handling)
     setMessageBytes(0);
 
     startTransition(() => {
       onSend(localDraft.trim());
       setLocalDraft("");
-      clearDraft(to);
+      clear();
     });
   };
 

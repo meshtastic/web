@@ -255,7 +255,11 @@ export const MessagesPage = () => {
         <div className="flex-none dark:bg-slate-900 p-2">
           {isBroadcast || isDirect ? (
             <MessageInput
-              to={isDirect ? numericChatId : MessageType.Broadcast}
+              conversation={
+                isDirect
+                  ? { kind: "direct", peer: numericChatId }
+                  : { kind: "channel", channel: numericChatId }
+              }
               onSend={sendText}
               maxBytes={200}
             />

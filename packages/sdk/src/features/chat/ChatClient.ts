@@ -3,6 +3,7 @@ import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
 import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../core/types.ts";
+import type { DraftRepository } from "./domain/DraftRepository.ts";
 import type { Message } from "./domain/Message.ts";
 import type {
   ConversationKey,
@@ -11,35 +12,62 @@ import type {
 } from "./domain/MessageRepository.ts";
 import { MessageState } from "./domain/MessageState.ts";
 import { MessageMapper } from "./infrastructure/MessageMapper.ts";
+import { InMemoryDraftRepository } from "./infrastructure/repositories/InMemoryDraftRepository.ts";
 import { InMemoryMessageRepository } from "./infrastructure/repositories/InMemoryMessageRepository.ts";
 import { type SendTextError, type SendTextInput, sendText } from "./application/SendTextUseCase.ts";
 import { ChatStore } from "./state/chatStore.ts";
+import { DraftStore } from "./state/draftStore.ts";
 
 export interface ChatClientOptions {
   repository?: MessageRepository;
+  draftRepository?: DraftRepository;
   retention?: RetentionPolicy;
   /** Messages to load into the store on first subscription of a conversation. */
   initialLoadLimit?: number;
 }
 
 /**
- * Chat slice facade. Exposes message buckets keyed by channel or peer, and the
- * `send` command for outbound text. Optional persistence via MessageRepository.
+ * Drafts namespace: per-conversation working text. Lazy-hydrates from the
+ * configured DraftRepository on first read; auto-clears on successful send.
+ */
+export interface ChatDrafts {
+  get(key: ConversationKey): ReadonlySignal<string>;
+  set(key: ConversationKey, text: string): void;
+  clear(key: ConversationKey): void;
+}
+
+/**
+ * Chat slice facade. Exposes message buckets keyed by channel or peer, drafts
+ * keyed the same way, and the `send` command for outbound text. Optional
+ * persistence via MessageRepository / DraftRepository.
  */
 export class ChatClient {
   private readonly client: MeshClient;
   private readonly store: ChatStore;
+  private readonly draftStore: DraftStore;
   private readonly repository: MessageRepository;
+  private readonly draftRepository: DraftRepository;
   private readonly retention: RetentionPolicy | undefined;
   private readonly initialLoadLimit: number;
   private readonly hydrated = new Set<string>();
+  private readonly draftsHydrated = new Set<string>();
+
+  public readonly drafts: ChatDrafts;
 
   constructor(client: MeshClient, options: ChatClientOptions = {}) {
     this.client = client;
     this.store = new ChatStore();
+    this.draftStore = new DraftStore();
     this.repository = options.repository ?? new InMemoryMessageRepository();
+    this.draftRepository = options.draftRepository ?? new InMemoryDraftRepository();
     this.retention = options.retention;
     this.initialLoadLimit = options.initialLoadLimit ?? 50;
+
+    this.drafts = {
+      get: (key) => this.draftFor(key),
+      set: (key, text) => this.setDraft(key, text),
+      clear: (key) => this.setDraft(key, ""),
+    };
 
     client.events.onMessagePacket.subscribe((packet) => {
       const message = MessageMapper.fromPacket(packet);
@@ -74,14 +102,21 @@ export class ChatClient {
   public async loadOlder(conv: ConversationKey, before: Date, limit = 50): Promise<Message[]> {
     const older = await this.repository.loadBefore(conv, before, limit);
     const key = this.keyFor(conv);
-    // older is sorted oldest → newest. Iterate in reverse so each prepend
-    // lands ahead of the previous, preserving chronological order.
     for (let i = older.length - 1; i >= 0; i--) this.store.prepend(key, older[i]!);
     return older;
   }
 
-  public send(input: SendTextInput): Promise<ResultType<number, SendTextError>> {
-    return sendText(this.client, input);
+  public async send(input: SendTextInput): Promise<ResultType<number, SendTextError>> {
+    const result = await sendText(this.client, input);
+    if (result.status === "ok") {
+      const conv: ConversationKey =
+        typeof input.destination === "number"
+          ? { kind: "direct", peer: input.destination }
+          : { kind: "channel", channel: input.channel ?? 0 };
+      this.draftStore.clear(conv);
+      void this.draftRepository.clear(conv).catch(() => {});
+    }
+    return result;
   }
 
   private ensureHydrated(conv: ConversationKey): void {
@@ -96,6 +131,30 @@ export class ChatClient {
         // adapter may not have history yet; safe to ignore
       }
     })();
+  }
+
+  private draftFor(conv: ConversationKey): ReadonlySignal<string> {
+    const key = this.keyFor(conv);
+    if (!this.draftsHydrated.has(key)) {
+      this.draftsHydrated.add(key);
+      void (async () => {
+        try {
+          const stored = await this.draftRepository.load(conv);
+          if (stored) this.draftStore.set(conv, stored);
+        } catch {
+          // ok
+        }
+      })();
+    }
+    return this.draftStore.get(conv);
+  }
+
+  private setDraft(conv: ConversationKey, text: string): void {
+    this.draftsHydrated.add(this.keyFor(conv));
+    this.draftStore.set(conv, text);
+    void this.draftRepository.save(conv, text).catch(() => {
+      // persistence failure must not break reactive flow
+    });
   }
 
   private async persistAppend(message: Message): Promise<void> {
