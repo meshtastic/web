@@ -1,11 +1,21 @@
-import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
-import { type Device, type MessageStore, MessageType, type NodeDB } from "@core/stores";
+import { type Device, type MessageStore, type NodeDB } from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
+
+/**
+ * Wires up the legacy MeshDevice event stream into the web's Zustand stores.
+ *
+ * Note: the SDK chat slice already persists messages via the configured
+ * SqlocalMessageRepository, so this function no longer copies messages into
+ * the legacy messageStore. Unread-count increments stay here because that
+ * logic still lives on the device store; it migrates to the SDK in a
+ * follow-up "unread" cross-cutting commit.
+ */
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
-  messageStore: MessageStore,
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for callsite stability while messageStore is being retired
+  _messageStore: MessageStore,
   nodeDB: NodeDB,
 ) => {
   let myNodeNum = 0;
@@ -85,19 +95,16 @@ export const subscribeAll = (
   });
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
-    // incoming and outgoing messages are handled by this event listener
-    const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
-    const message = dto.toMessage();
-    messageStore.saveMessage(message);
-
-    if (message.type === MessageType.Direct) {
-      if (message.to === myNodeNum) {
+    // Message persistence is handled by the SDK chat slice via the
+    // SqlocalMessageRepository wired in useConnections. This handler exists
+    // only to drive the legacy unread-count tracking on the device store.
+    const isDirect = messagePacket.type === "direct";
+    if (isDirect) {
+      if (messagePacket.to === myNodeNum) {
         device.incrementUnread(messagePacket.from);
       }
-    } else if (message.type === MessageType.Broadcast) {
-      if (message.from !== myNodeNum) {
-        device.incrementUnread(message.channel);
-      }
+    } else if (messagePacket.from !== myNodeNum) {
+      device.incrementUnread(messagePacket.channel);
     }
   });
 
