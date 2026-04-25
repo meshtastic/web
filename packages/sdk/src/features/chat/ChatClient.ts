@@ -74,7 +74,9 @@ export class ChatClient {
   public async loadOlder(conv: ConversationKey, before: Date, limit = 50): Promise<Message[]> {
     const older = await this.repository.loadBefore(conv, before, limit);
     const key = this.keyFor(conv);
-    for (const m of older) this.store.prepend(key, m);
+    // older is sorted oldest → newest. Iterate in reverse so each prepend
+    // lands ahead of the previous, preserving chronological order.
+    for (let i = older.length - 1; i >= 0; i--) this.store.prepend(key, older[i]!);
     return older;
   }
 

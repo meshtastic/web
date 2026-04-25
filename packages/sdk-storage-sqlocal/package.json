@@ -38,7 +38,8 @@
     "clean": "rm -rf dist LICENSE",
     "build:npm": "tsdown",
     "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public --no-git-checks",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:browser": "vitest run --config vitest.browser.config.ts"
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
