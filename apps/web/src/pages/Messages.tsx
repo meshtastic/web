@@ -7,6 +7,7 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
+import { useChatLegacy } from "@core/hooks/useChatLegacy.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
   MessageState,
@@ -40,7 +41,7 @@ export const MessagesPage = () => {
   const { channels, getUnreadCount, resetUnread, connection } = useDevice();
   const { getNodes, getNode, getMyNode, hasNodeError } = useNodeDB();
 
-  const { getMessages, setMessageState } = useMessages();
+  const { setMessageState } = useMessages();
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
 
@@ -154,27 +155,21 @@ export const MessagesPage = () => {
     [numericChatId, chatType, connection, getMyNode, setMessageState, isDirect],
   );
 
+  const broadcastMessages = useChatLegacy({
+    type: MessageType.Broadcast,
+    channelId: numericChatId,
+  });
+  const directMessages = useChatLegacy({
+    type: MessageType.Direct,
+    peer: numericChatId,
+  });
+
   const renderChatContent = () => {
     switch (chatType) {
       case MessageType.Broadcast:
-        return (
-          <ChannelChat
-            messages={getMessages({
-              type: MessageType.Broadcast,
-              channelId: numericChatId,
-            }).reverse()}
-          />
-        );
+        return <ChannelChat messages={[...broadcastMessages].reverse()} />;
       case MessageType.Direct:
-        return (
-          <ChannelChat
-            messages={getMessages({
-              type: MessageType.Direct,
-              nodeA: getMyNode().num,
-              nodeB: numericChatId,
-            }).reverse()}
-          />
-        );
+        return <ChannelChat messages={[...directMessages].reverse()} />;
       default:
         return <SelectMessageChat />;
     }

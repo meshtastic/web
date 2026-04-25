@@ -18,6 +18,8 @@ export { useConnection } from "./src/hooks/useConnection.ts";
 export type { UseConnectionResult } from "./src/hooks/useConnection.ts";
 export { useChat } from "./src/hooks/useChat.ts";
 export type { UseChatResult } from "./src/hooks/useChat.ts";
+export { useDirectChat } from "./src/hooks/useDirectChat.ts";
+export type { UseDirectChatResult } from "./src/hooks/useDirectChat.ts";
 export { useNodes } from "./src/hooks/useNodes.ts";
 export { useNode } from "./src/hooks/useNode.ts";
 export { useChannels, useChannel } from "./src/hooks/useChannels.ts";
