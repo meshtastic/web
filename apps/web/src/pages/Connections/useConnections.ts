@@ -6,10 +6,12 @@ import type {
 } from "@app/core/stores/deviceStore/types";
 import { createConnectionFromInput, testHttpReachable } from "@app/pages/Connections/utils";
 import { meshRegistry } from "@core/meshRegistry.ts";
+import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
 import { useAppStore, useDeviceStore, useMessageStore, useNodeDBStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/sdk";
+import { SqlocalMessageRepository } from "@meshtastic/sdk-storage-sqlocal/chat";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
@@ -129,7 +131,7 @@ export function useConnections() {
   );
 
   const setupMeshDevice = useCallback(
-    (
+    async (
       id: ConnectionId,
       transport:
         | Awaited<ReturnType<typeof TransportHTTP.create>>
@@ -137,7 +139,7 @@ export function useConnections() {
         | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>,
       btDevice?: BluetoothDevice,
       serialPort?: SerialPort,
-    ): number => {
+    ): Promise<number> => {
       // Reuse existing meshDeviceId if available to prevent duplicate nodeDBs,
       // but only if the corresponding nodeDB still exists. Otherwise, generate a new ID.
       const conn = connections.find((c) => c.id === id);
@@ -150,7 +152,26 @@ export function useConnections() {
       const device = addDevice(deviceId);
       const nodeDB = addNodeDB(deviceId);
       const messageStore = addMessageStore(deviceId);
-      const meshDevice = new MeshDevice(transport, deviceId);
+
+      // Wire the SDK chat slice to the OPFS-backed SQLite repository so the
+      // user keeps message history across reloads. The DB is opened lazily on
+      // first connect; subsequent connections share the same DB instance.
+      let chatRepository: SqlocalMessageRepository | undefined;
+      try {
+        const db = await getStorageDb();
+        chatRepository = new SqlocalMessageRepository(db, { deviceId: id, coordinator });
+      } catch (err) {
+        console.warn("[useConnections] sqlocal unavailable, falling back to in-memory chat:", err);
+      }
+      const meshDevice = new MeshDevice(transport, {
+        configId: deviceId,
+        chat: chatRepository
+          ? {
+              repository: chatRepository,
+              retention: { maxPerBucket: 1000, olderThanMs: 1000 * 60 * 60 * 24 * 90 },
+            }
+          : undefined,
+      });
 
       // Register the underlying MeshClient so sdk-react hooks
       // (useMeshDevice, useChat, etc.) observe this connection.
@@ -270,7 +291,7 @@ export function useConnections() {
           const url = new URL(conn.url);
           const isTLS = url.protocol === "https:";
           const transport = await TransportHTTP.create(url.host, isTLS);
-          setupMeshDevice(id, transport);
+          await setupMeshDevice(id, transport);
           // Status will be set to "configured" by onConfigComplete event
           return true;
         }
@@ -308,7 +329,7 @@ export function useConnections() {
           }
 
           const transport = await TransportWebBluetooth.createFromDevice(bleDevice);
-          setupMeshDevice(id, transport, bleDevice);
+          await setupMeshDevice(id, transport, bleDevice);
 
           bleDevice.addEventListener("gattserverdisconnected", () => {
             updateStatus(id, "disconnected");
@@ -376,7 +397,7 @@ export function useConnections() {
           }
 
           const transport = await TransportWebSerial.createFromPort(port);
-          setupMeshDevice(id, transport, undefined, port);
+          await setupMeshDevice(id, transport, undefined, port);
           // Status will be set to "configured" by onConfigComplete event
           return true;
         }

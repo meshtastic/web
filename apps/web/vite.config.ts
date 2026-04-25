@@ -67,6 +67,11 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       assetsDir: "./",
     },
+    // sqlocal ships an OPFS-backed Web Worker; rolldown only allows ES-format
+    // workers when code-splitting is on (which Vite enables by default).
+    worker: {
+      format: "es",
+    },
     resolve: {
       alias: {
         "@app": path.resolve(process.cwd(), "./src"),

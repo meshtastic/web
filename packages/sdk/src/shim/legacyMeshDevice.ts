@@ -12,7 +12,7 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import type { Logger } from "tslog";
-import { MeshClient } from "../core/client/MeshClient.ts";
+import { MeshClient, type MeshClientOptions } from "../core/client/MeshClient.ts";
 import type { EventBus } from "../core/event-bus/EventBus.ts";
 import type { Queue } from "../core/queue/Queue.ts";
 import type { Transport } from "../core/transport/Transport.ts";
@@ -20,6 +20,8 @@ import { DeviceStatusEnum } from "../core/transport/Transport.ts";
 import { ChannelNumber, type Destination, Emitter, type PacketMetadata } from "../core/types.ts";
 import type { Xmodem } from "../core/xmodem/Xmodem.ts";
 import { sendAdminMessage } from "../features/device/infrastructure/AdminMessageSender.ts";
+
+export type MeshDeviceOptions = Omit<MeshClientOptions, "transport">;
 
 export class MeshDevice {
   public readonly meshClient: MeshClient;
@@ -37,8 +39,12 @@ export class MeshDevice {
   protected pendingSettingsChanges: boolean;
   private myNodeInfo: Protobuf.Mesh.MyNodeInfo;
 
-  constructor(transport: Transport, configId?: number) {
-    this.client = new MeshClient({ transport, configId });
+  constructor(transport: Transport, configIdOrOptions?: number | MeshDeviceOptions) {
+    const options: MeshClientOptions =
+      typeof configIdOrOptions === "number"
+        ? { transport, configId: configIdOrOptions }
+        : { transport, ...(configIdOrOptions ?? {}) };
+    this.client = new MeshClient(options);
     this.meshClient = this.client;
     this.transport = this.client.transport;
     this.log = this.client.log;

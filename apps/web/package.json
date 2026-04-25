@@ -36,6 +36,7 @@
     "@meshtastic/core": "workspace:*",
     "@meshtastic/sdk": "workspace:*",
     "@meshtastic/sdk-react": "workspace:*",
+    "@meshtastic/sdk-storage-sqlocal": "workspace:*",
     "@meshtastic/transport-http": "workspace:*",
     "@meshtastic/transport-web-bluetooth": "workspace:*",
     "@meshtastic/transport-web-serial": "workspace:*",
