@@ -1,4 +1,4 @@
-import { useMessages } from "@app/core/stores/index.ts";
+import { useActiveClient } from "@meshtastic/sdk-react";
 import { AlertTriangleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
@@ -10,10 +10,10 @@ export interface DeleteMessagesDialogProps {
 
 export const DeleteMessagesDialog = ({ open, onOpenChange }: DeleteMessagesDialogProps) => {
   const { t } = useTranslation("dialog");
-  const messageStore = useMessages();
+  const meshClient = useActiveClient();
 
   const handleConfirm = () => {
-    messageStore.deleteAllMessages();
+    void meshClient?.chat.clearAll();
     onOpenChange(false);
   };
 

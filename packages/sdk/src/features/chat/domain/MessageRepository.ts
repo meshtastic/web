@@ -31,6 +31,9 @@ export interface MessageRepository {
   appendBatch(messages: ReadonlyArray<Message>): Promise<void>;
   updateState(id: number, state: MessageState): Promise<void>;
   prune(policy: RetentionPolicy): Promise<void>;
+  /** Deletes every message in a single conversation. */
+  clearConversation(key: ConversationKey): Promise<void>;
+  /** Deletes every message for the scoped device / consumer. */
   clear(): Promise<void>;
 }
 

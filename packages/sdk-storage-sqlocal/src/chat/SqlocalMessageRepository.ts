@@ -90,6 +90,10 @@ export class SqlocalMessageRepository implements MessageRepository {
     }
   }
 
+  async clearConversation(key: ConversationKey): Promise<void> {
+    await this.db.delete(messages).where(this.scoped(key));
+  }
+
   async clear(): Promise<void> {
     await this.db.delete(messages).where(eq(messages.deviceId, this.deviceId));
   }

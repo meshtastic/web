@@ -43,6 +43,25 @@ export class ChatStore {
     bucket.value = [message, ...bucket.value];
   }
 
+  /**
+   * Empties a single conversation bucket. Signal subscribers re-render with
+   * an empty array.
+   */
+  clearBucket(key: string): void {
+    const bucket = this.buckets.get(key);
+    if (bucket && bucket.value.length > 0) bucket.value = [];
+  }
+
+  /**
+   * Empties every existing bucket. Buckets that have never been subscribed
+   * to don't exist yet, so nothing needs doing for them.
+   */
+  clearAll(): void {
+    for (const bucket of this.buckets.values()) {
+      if (bucket.value.length > 0) bucket.value = [];
+    }
+  }
+
   updateState(id: number, state: MessageState): void {
     for (const [, bucket] of this.buckets) {
       const idx = bucket.value.findIndex((m) => m.id === id);

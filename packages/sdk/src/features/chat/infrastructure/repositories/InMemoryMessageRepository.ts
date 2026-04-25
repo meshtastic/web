@@ -67,6 +67,10 @@ export class InMemoryMessageRepository implements MessageRepository {
     }
   }
 
+  async clearConversation(key: ConversationKey): Promise<void> {
+    this.buckets.delete(conversationKeyString(key));
+  }
+
   async clear(): Promise<void> {
     this.buckets.clear();
   }

@@ -106,6 +106,35 @@ export class ChatClient {
     return older;
   }
 
+  /**
+   * Empties a single conversation from memory + persistence. Draft for the
+   * same conversation is untouched; callers invoke `drafts.clear(conv)` too
+   * if they want the compose box wiped.
+   */
+  public async clearConversation(conv: ConversationKey): Promise<void> {
+    const key = this.keyFor(conv);
+    this.store.clearBucket(key);
+    this.hydrated.delete(key);
+    try {
+      await this.repository.clearConversation(conv);
+    } catch {
+      // ok
+    }
+  }
+
+  /**
+   * Wipes every message across every conversation for this client.
+   */
+  public async clearAll(): Promise<void> {
+    this.store.clearAll();
+    this.hydrated.clear();
+    try {
+      await this.repository.clear();
+    } catch {
+      // ok
+    }
+  }
+
   public async send(input: SendTextInput): Promise<ResultType<number, SendTextError>> {
     const result = await sendText(this.client, input);
     if (result.status === "ok") {
