@@ -9,17 +9,10 @@ import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useChatLegacy } from "@core/hooks/useChatLegacy.ts";
 import { useToast } from "@core/hooks/useToast.ts";
-import {
-  MessageState,
-  MessageType,
-  useDevice,
-  useMessages,
-  useNodeDB,
-  useSidebar,
-} from "@core/stores";
+import { MessageType, useDevice, useNodeDB, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import { randId } from "@core/utils/randId.ts";
 import { Protobuf, Types } from "@meshtastic/sdk";
+import { useActiveClient } from "@meshtastic/sdk-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -38,10 +31,9 @@ function SelectMessageChat() {
 }
 
 export const MessagesPage = () => {
-  const { channels, getUnreadCount, resetUnread, connection } = useDevice();
-  const { getNodes, getNode, getMyNode, hasNodeError } = useNodeDB();
-
-  const { setMessageState } = useMessages();
+  const { channels, getUnreadCount, resetUnread } = useDevice();
+  const { getNodes, getNode, hasNodeError } = useNodeDB();
+  const meshClient = useActiveClient();
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
 
@@ -104,55 +96,20 @@ export const MessagesPage = () => {
 
   const sendText = useCallback(
     async (message: string) => {
-      const toValue = isDirect ? numericChatId : MessageType.Broadcast;
-      const channelValue = isDirect ? Types.ChannelNumber.Primary : numericChatId;
-
-      let messageId: number | undefined;
-
-      try {
-        messageId = await connection?.sendText(message, toValue, true, channelValue);
-        if (messageId !== undefined) {
-          if (chatType === MessageType.Broadcast) {
-            setMessageState({
-              type: MessageType.Broadcast,
-              channelId: channelValue,
-              messageId,
-              newState: MessageState.Ack,
-            });
-          } else {
-            setMessageState({
-              type: MessageType.Direct,
-              nodeA: getMyNode().num,
-              nodeB: numericChatId,
-              messageId,
-              newState: MessageState.Ack,
-            });
-          }
-        } else {
-          console.warn("sendText completed but messageId is undefined");
-        }
-      } catch (e: unknown) {
-        console.error("Failed to send message:", e);
-        const failedId = messageId ?? randId();
-        if (chatType === MessageType.Broadcast) {
-          setMessageState({
-            type: MessageType.Broadcast,
-            channelId: channelValue,
-            messageId: failedId,
-            newState: MessageState.Failed,
-          });
-        } else {
-          setMessageState({
-            type: MessageType.Direct,
-            nodeA: getMyNode().num,
-            nodeB: numericChatId,
-            messageId: failedId,
-            newState: MessageState.Failed,
-          });
-        }
+      if (!meshClient) {
+        console.warn("[MessagesPage] no active mesh client; send dropped");
+        return;
       }
+      const destination: Types.Destination = isDirect ? numericChatId : "broadcast";
+      const channel = isDirect ? Types.ChannelNumber.Primary : numericChatId;
+      const result = await meshClient.chat.send({ text: message, destination, channel });
+      if (result.status === "error") {
+        console.error("Failed to send message:", result.error);
+      }
+      // Outbound state (Ack / Failed) is updated by the SDK chat slice when the
+      // routing packet for this message id arrives.
     },
-    [numericChatId, chatType, connection, getMyNode, setMessageState, isDirect],
+    [meshClient, numericChatId, isDirect],
   );
 
   const broadcastMessages = useChatLegacy({
