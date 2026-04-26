@@ -2,7 +2,6 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useIgnoreNode } from "./useIgnoreNode.ts";
 
-const mockUpdateIgnore = vi.fn();
 const mockToast = vi.fn();
 const mockSdkIgnore = vi.fn();
 const mockSdkUnignore = vi.fn();
@@ -13,15 +12,6 @@ const { mockUseActiveClient } = vi.hoisted(() => ({
 
 vi.mock("@meshtastic/sdk-react", () => ({
   useActiveClient: mockUseActiveClient,
-}));
-
-vi.mock("@core/stores", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
-  useNodeDB: () => ({
-    updateIgnore: mockUpdateIgnore,
-  }),
 }));
 
 vi.mock("@core/hooks/useToast.ts", () => ({
@@ -47,7 +37,7 @@ describe("useIgnoreNode hook", () => {
     });
   });
 
-  it("calls updateIgnored and shows correct toast", () => {
+  it("calls SDK ignore and shows correct toast", () => {
     const { result } = renderHook(() => useIgnoreNode());
 
     act(() => {
@@ -55,7 +45,6 @@ describe("useIgnoreNode hook", () => {
     });
 
     expect(mockSdkIgnore).toHaveBeenCalledWith(1234);
-    expect(mockUpdateIgnore).toHaveBeenCalledWith(1234, true);
     expect(mockToast).toHaveBeenCalledWith({
       title: "Added Test Node to ignore list",
     });
@@ -69,7 +58,6 @@ describe("useIgnoreNode hook", () => {
     });
 
     expect(mockSdkUnignore).toHaveBeenCalledWith(1234);
-    expect(mockUpdateIgnore).toHaveBeenCalledWith(1234, false);
     expect(mockToast).toHaveBeenCalledWith({
       title: "Removed Test Node from ignore list",
     });
@@ -98,7 +86,8 @@ describe("useIgnoreNode hook", () => {
       result.current.updateIgnored({ nodeNum: 9999, isIgnored: false });
     });
 
-    expect(mockUpdateIgnore).not.toHaveBeenCalled();
+    expect(mockSdkIgnore).not.toHaveBeenCalled();
+    expect(mockSdkUnignore).not.toHaveBeenCalled();
     expect(mockToast).not.toHaveBeenCalled();
   });
 });

@@ -1,5 +1,4 @@
 import { toast } from "@core/hooks/useToast.ts";
-import { useNodeDB } from "@core/stores";
 import { useActiveClient } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
@@ -12,21 +11,14 @@ export interface ResetNodeDbDialogProps {
 export const ResetNodeDbDialog = ({ open, onOpenChange }: ResetNodeDbDialogProps) => {
   const { t } = useTranslation("dialog");
   const meshClient = useActiveClient();
-  // The legacy nodeDB still holds an in-memory snapshot for unmigrated
-  // consumers; sweep it alongside the SDK clear.
-  const { removeAllNodes } = useNodeDB();
 
   const handleResetNodeDb = () => {
     if (!meshClient) return;
     meshClient.nodes
-      .reset()
+      .reset({ keepMyNode: true })
       .then((result) => {
         if (result.status === "error") throw result.error;
-        meshClient.nodes.clearAllErrors();
         return meshClient.chat.clearAll();
-      })
-      .then(() => {
-        removeAllNodes(true);
       })
       .catch((error) => {
         toast({ title: t("resetNodeDb.failedTitle") });

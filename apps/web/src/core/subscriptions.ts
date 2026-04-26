@@ -5,18 +5,20 @@ import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
 /**
  * Wires up the legacy MeshDevice event stream into the web's Zustand stores.
  *
- * Note: the SDK chat slice already persists messages via the configured
- * SqlocalMessageRepository, so this function no longer copies messages into
- * the legacy messageStore. Unread-count increments stay here because that
- * logic still lives on the device store; it migrates to the SDK in a
- * follow-up "unread" cross-cutting commit.
+ * Note: the SDK now owns chat persistence (via SqlocalMessageRepository) and
+ * the entire NodesClient surface — node info, user, position, lastHeard /
+ * snr, favourite / ignored flags, and PKI-error tracking. This handler no
+ * longer mirrors any of that into the legacy stores; what remains is
+ * device-store-only state (waypoints, traceroutes, neighbour info, dialog
+ * open triggers, unread counts).
  */
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
   // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for callsite stability while messageStore is being retired
   _messageStore: MessageStore,
-  nodeDB: NodeDB,
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for callsite stability while nodeDB is being retired
+  _nodeDB: NodeDB,
 ) => {
   let myNodeNum = 0;
 
@@ -69,20 +71,8 @@ export const subscribeAll = (
     myNodeNum = nodeInfo.myNodeNum;
   });
 
-  connection.events.onUserPacket.subscribe((user) => {
-    nodeDB.addUser(user);
-  });
-
-  connection.events.onPositionPacket.subscribe((position) => {
-    nodeDB.addPosition(position);
-  });
-
-  // NOTE: Node handling is managed by the nodeDB
-  // Nodes are added via subscriptions.ts and stored in nodeDB
-  // Configuration is handled directly by meshDevice.configure() in useConnections
-  connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    nodeDB.addNode(nodeInfo);
-  });
+  // onUserPacket / onPositionPacket / onNodeInfoPacket are handled by the
+  // SDK NodesClient (see packages/sdk/src/features/nodes/NodesClient.ts).
 
   connection.events.onChannelPacket.subscribe((channel) => {
     device.addChannel(channel);
@@ -118,13 +108,8 @@ export const subscribeAll = (
     device.setPendingSettingsChanges(state);
   });
 
-  connection.events.onMeshPacket.subscribe((meshPacket) => {
-    nodeDB.processPacket({
-      from: meshPacket.from,
-      snr: meshPacket.rxSnr,
-      time: meshPacket.rxTime,
-    });
-  });
+  // onMeshPacket → lastHeard / snr per-node updates are handled by the SDK
+  // NodesClient.
 
   connection.events.onClientNotificationPacket.subscribe((clientNotificationPacket) => {
     device.addClientNotification(clientNotificationPacket);

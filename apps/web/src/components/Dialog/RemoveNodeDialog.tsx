@@ -1,6 +1,7 @@
 import { Label } from "@components/UI/Label.tsx";
 import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { useAppStore, useDevice, useNodeDB } from "@core/stores";
+import { useAppStore } from "@core/stores";
+import { useActiveClient } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
 
@@ -11,14 +12,12 @@ export interface RemoveNodeDialogProps {
 
 export const RemoveNodeDialog = ({ open, onOpenChange }: RemoveNodeDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection } = useDevice();
-  const { removeNode } = useNodeDB();
+  const meshClient = useActiveClient();
   const { nodeNumToBeRemoved } = useAppStore();
   const node = useNodeAsProto(nodeNumToBeRemoved);
 
   const handleConfirm = () => {
-    connection?.removeNodeByNum(nodeNumToBeRemoved);
-    removeNode(nodeNumToBeRemoved);
+    void meshClient?.nodes.remove(nodeNumToBeRemoved);
   };
 
   return (

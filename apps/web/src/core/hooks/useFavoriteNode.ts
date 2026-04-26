@@ -1,5 +1,4 @@
 import { useToast } from "@core/hooks/useToast.ts";
-import { useNodeDB } from "@core/stores";
 import { useActiveClient } from "@meshtastic/sdk-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,11 +8,12 @@ interface FavoriteNodeOptions {
   isFavorite: boolean;
 }
 
+/**
+ * Toggles the favorite flag on a node. Drives the SDK NodesClient which
+ * sends the matching admin message and flips the local flag on success.
+ */
 export function useFavoriteNode() {
   const meshClient = useActiveClient();
-  // Mirror to the legacy nodeDB until the favorite/ignore-flag projection on
-  // the SDK Node entity drives the UI directly.
-  const { updateFavorite } = useNodeDB();
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -24,9 +24,6 @@ export function useFavoriteNode() {
       if (!node) return;
 
       void (isFavorite ? meshClient.nodes.favorite(nodeNum) : meshClient.nodes.unfavorite(nodeNum));
-
-      // TODO: drive store mutation off the admin-message ack instead of optimistic.
-      updateFavorite(nodeNum, isFavorite);
 
       toast({
         title: t("toast.favoriteNode.title", {
@@ -40,7 +37,7 @@ export function useFavoriteNode() {
         }),
       });
     },
-    [meshClient, updateFavorite, t, toast],
+    [meshClient, t, toast],
   );
 
   return { updateFavorite: updateFavoriteCB };

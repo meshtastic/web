@@ -1,5 +1,4 @@
 import { useToast } from "@core/hooks/useToast.ts";
-import { useNodeDB } from "@core/stores";
 import { useActiveClient } from "@meshtastic/sdk-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,9 +8,12 @@ interface IgnoreNodeOptions {
   isIgnored: boolean;
 }
 
+/**
+ * Toggles the ignored flag on a node. Drives the SDK NodesClient which
+ * sends the matching admin message and flips the local flag on success.
+ */
 export function useIgnoreNode() {
   const meshClient = useActiveClient();
-  const { updateIgnore } = useNodeDB();
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -22,8 +24,6 @@ export function useIgnoreNode() {
       if (!node) return;
 
       void (isIgnored ? meshClient.nodes.ignore(nodeNum) : meshClient.nodes.unignore(nodeNum));
-
-      updateIgnore(nodeNum, isIgnored);
 
       toast({
         title: t("toast.ignoreNode.title", {
@@ -37,7 +37,7 @@ export function useIgnoreNode() {
         }),
       });
     },
-    [meshClient, updateIgnore, t, toast],
+    [meshClient, t, toast],
   );
 
   return { updateIgnored: updateIgnoredCB };
