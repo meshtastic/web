@@ -4,7 +4,7 @@ import { ResetNodeDbDialog } from "./ResetNodeDbDialog.tsx";
 
 const mockResetNodes = vi.fn();
 const mockClearAll = vi.fn();
-const mockRemoveAllNodeErrors = vi.fn();
+const mockClearAllErrors = vi.fn();
 const mockRemoveAllNodes = vi.fn();
 
 const { mockUseActiveClient } = vi.hoisted(() => ({
@@ -20,7 +20,6 @@ vi.mock("@core/stores", () => ({
     _currentValue: { deviceId: 1234 },
   },
   useNodeDB: () => ({
-    removeAllNodeErrors: mockRemoveAllNodeErrors,
     removeAllNodes: mockRemoveAllNodes,
   }),
 }));
@@ -31,12 +30,12 @@ describe("ResetNodeDbDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseActiveClient.mockReturnValue({
-      nodes: { reset: mockResetNodes },
+      nodes: { reset: mockResetNodes, clearAllErrors: mockClearAllErrors },
       chat: { clearAll: mockClearAll },
     });
   });
 
-  it("calls reset(), clears chat + legacy errors/nodes after resolve", async () => {
+  it("calls reset(), clears SDK errors + chat + legacy nodes after resolve", async () => {
     let resolveReset: ((value: { status: "ok"; value: number }) => void) | undefined;
     mockResetNodes.mockImplementation(
       () =>
@@ -56,14 +55,14 @@ describe("ResetNodeDbDialog", () => {
     });
 
     expect(mockClearAll).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodeErrors).not.toHaveBeenCalled();
+    expect(mockClearAllErrors).not.toHaveBeenCalled();
     expect(mockRemoveAllNodes).not.toHaveBeenCalled();
 
     resolveReset?.({ status: "ok", value: 1 });
 
     await waitFor(() => {
+      expect(mockClearAllErrors).toHaveBeenCalledTimes(1);
       expect(mockClearAll).toHaveBeenCalledTimes(1);
-      expect(mockRemoveAllNodeErrors).toHaveBeenCalledTimes(1);
       expect(mockRemoveAllNodes).toHaveBeenCalledWith(true);
     });
   });
@@ -78,7 +77,7 @@ describe("ResetNodeDbDialog", () => {
 
     expect(mockResetNodes).not.toHaveBeenCalled();
     expect(mockClearAll).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodeErrors).not.toHaveBeenCalled();
+    expect(mockClearAllErrors).not.toHaveBeenCalled();
     expect(mockRemoveAllNodes).not.toHaveBeenCalled();
   });
 });

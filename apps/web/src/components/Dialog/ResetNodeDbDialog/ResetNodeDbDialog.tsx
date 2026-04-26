@@ -12,9 +12,9 @@ export interface ResetNodeDbDialogProps {
 export const ResetNodeDbDialog = ({ open, onOpenChange }: ResetNodeDbDialogProps) => {
   const { t } = useTranslation("dialog");
   const meshClient = useActiveClient();
-  // PKI-error tracking still lives on the legacy nodeDB store; clear it
-  // here until that subsystem is migrated to the SDK.
-  const { removeAllNodeErrors, removeAllNodes } = useNodeDB();
+  // The legacy nodeDB still holds an in-memory snapshot for unmigrated
+  // consumers; sweep it alongside the SDK clear.
+  const { removeAllNodes } = useNodeDB();
 
   const handleResetNodeDb = () => {
     if (!meshClient) return;
@@ -22,10 +22,10 @@ export const ResetNodeDbDialog = ({ open, onOpenChange }: ResetNodeDbDialogProps
       .reset()
       .then((result) => {
         if (result.status === "error") throw result.error;
+        meshClient.nodes.clearAllErrors();
         return meshClient.chat.clearAll();
       })
       .then(() => {
-        removeAllNodeErrors();
         removeAllNodes(true);
       })
       .catch((error) => {

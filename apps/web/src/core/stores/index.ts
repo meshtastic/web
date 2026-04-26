@@ -40,7 +40,6 @@ export {
   useMessageStore,
 } from "@core/stores/messageStore";
 export { type NodeDB, useNodeDBStore } from "@core/stores/nodeDBStore/index.ts";
-export type { NodeErrorType } from "@core/stores/nodeDBStore/types.ts";
 export {
   SidebarProvider,
   useSidebar, // TODO: Bring hook into this file
