@@ -1,5 +1,5 @@
-import type { Types } from "@meshtastic/core";
-import { Utils } from "@meshtastic/core";
+import type { Types } from "@meshtastic/sdk";
+import { Utils } from "@meshtastic/sdk";
 
 export class TransportDeno implements Types.Transport {
   private _toDevice: WritableStream<Uint8Array>;

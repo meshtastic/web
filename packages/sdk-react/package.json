@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/sdk-react",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "React hooks + provider for @meshtastic/sdk. Signal-backed reactive state exposed as idiomatic hooks.",
   "exports": {
     ".": "./mod.ts"

@@ -16,7 +16,7 @@ devices. Installation instructions are available at
 ## Usage
 
 ```ts
-import { MeshDevice } from "@meshtastic/core";
+import { MeshDevice } from "@meshtastic/sdk";
 import { TransportNodeSerial } from "@meshtastic/transport-node-serial";
 
 const transport = await TransportNodeSerial.create("/dev/cu.usbserial-0001");

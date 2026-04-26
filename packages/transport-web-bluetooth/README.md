@@ -16,7 +16,7 @@ Meshtastic devices. Installation instructions are available at
 ## Usage
 
 ```ts
-import { MeshDevice } from "@meshtastic/core";
+import { MeshDevice } from "@meshtastic/sdk";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 
 const transport = await TransportWebBluetooth.create();

@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@meshtastic/core": "workspace:*",
     "@meshtastic/sdk": "workspace:*",
     "@meshtastic/sdk-react": "workspace:*",
     "@meshtastic/sdk-storage-sqlocal": "workspace:*",

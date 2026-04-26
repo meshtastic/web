@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/transport-web-bluetooth",
-  "version": "0.1.5",
+  "version": "1.0.0",
   "description": "A transport layer for Meshtastic applications using Web Bluetooth.",
   "exports": {
     ".": "./mod.ts"
@@ -45,6 +45,6 @@
   },
   "dependencies": {
     "@types/web-bluetooth": "npm:@types/web-bluetooth@^0.0.20",
-    "@meshtastic/core": "workspace:*"
+    "@meshtastic/sdk": "workspace:*"
   }
 }

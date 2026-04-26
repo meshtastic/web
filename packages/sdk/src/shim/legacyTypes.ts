@@ -1,7 +1,9 @@
 /**
- * Phase-A compatibility shim: forwards the legacy `Types` namespace from
- * `@meshtastic/core` so `import { Types } from "@meshtastic/sdk"` sees the
- * same shape. Removed in Phase C.
+ * Backwards-compatible re-export of the cross-cutting types under the
+ * `Types` namespace. mod.ts already exports `Types` directly from
+ * `core/types.ts`; this file is no longer wired anywhere but is kept as a
+ * stable import path for any third-party that grabbed it via the published
+ * dist.
  */
 export type {
   Destination,

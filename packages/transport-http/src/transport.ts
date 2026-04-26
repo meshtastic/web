@@ -1,4 +1,4 @@
-import { Types } from "@meshtastic/core";
+import { Types } from "@meshtastic/sdk";
 
 const FETCH_INTERVAL_MS = 3000;
 const READ_TIMEOUT_MS = 7000;

@@ -34,7 +34,6 @@ All projects live under `packages/`.
 | `packages/transport-node-serial` | Serial transport for Node.js. |
 | `packages/transport-deno` | TCP transport for Deno. |
 | `packages/transport-mock` | In-memory transport for tests. |
-| `packages/core` | Legacy SDK — superseded by `@meshtastic/sdk` and slated for removal after the slice-by-slice migration completes. |
 
 All publishable packages ship to both [JSR](https://jsr.io/@meshtastic) and [NPM](https://www.npmjs.com/org/meshtastic).
 

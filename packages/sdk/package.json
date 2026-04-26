@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/sdk",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Domain-driven SDK for Meshtastic devices. Feature slices (device/chat/nodes/channels/config/telemetry/position/traceroute/files) with signals-backed reactive state. Replaces @meshtastic/core.",
   "exports": {
     ".": {
@@ -50,7 +50,7 @@
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rm -rf dist LICENSE",
-    "build:npm": "tsdown",
+    "build:npm": "tsdown && node ./scripts/rename-dts.mjs",
     "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public --no-git-checks",
     "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check",

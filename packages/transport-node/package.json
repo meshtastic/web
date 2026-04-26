@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/transport-node",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "NodeJS-specific transport layer for Meshtastic web applications.",
   "exports": {
     ".": "./mod.ts"
@@ -45,6 +45,6 @@
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
   },
   "dependencies": {
-    "@meshtastic/core": "workspace:*"
+    "@meshtastic/sdk": "workspace:*"
   }
 }

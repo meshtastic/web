@@ -1,4 +1,4 @@
-import { Types, Utils } from "@meshtastic/core";
+import { Types, Utils } from "@meshtastic/sdk";
 
 /**
  * Provides Web Serial transport for Meshtastic devices.

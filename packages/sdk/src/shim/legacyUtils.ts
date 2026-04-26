@@ -1,6 +1,6 @@
 /**
- * Phase-A compatibility shim: forwards the legacy `Utils` namespace from
- * `@meshtastic/core`. Removed in Phase C.
+ * Re-exports for the public `Utils` namespace (mod.ts: `export * as Utils`).
+ * Transport packages import `toDeviceStream` / `fromDeviceStream` here.
  */
 export { EventBus as EventSystem } from "../core/event-bus/EventBus.ts";
 export { Queue } from "../core/queue/Queue.ts";

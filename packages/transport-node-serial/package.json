@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/transport-node-serial",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "NodeJS-specific serial transport layer for Meshtastic web applications.",
   "exports": {
     ".": "./mod.ts"
@@ -44,7 +44,7 @@
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
   },
   "dependencies": {
-    "@meshtastic/core": "workspace:*",
+    "@meshtastic/sdk": "workspace:*",
     "serialport": "^13.0.0"
   }
 }

@@ -1,12 +1,9 @@
 /**
- * Phase-A compatibility shim.
- *
- * Provides a class with the same public surface as the legacy
- * `@meshtastic/core` `MeshDevice` so that existing consumers (including
- * `packages/web`) continue to build unchanged after swapping the package
- * import. Delegates all work to the new `MeshClient` and its feature slices.
- *
- * Removed in Phase C once `packages/web` has migrated to the feature clients.
+ * Coarse facade providing the legacy `MeshDevice` surface — preserved
+ * after Phase C because the web app's `connection.factoryResetDevice()` /
+ * `connection.reboot()` / etc. callsites still depend on it. Delegates to
+ * the new `MeshClient` + feature slices. New consumers should reach into
+ * the slice clients (`client.config`, `client.chat`, …) directly.
  */
 
 import { create, toBinary } from "@bufbuild/protobuf";

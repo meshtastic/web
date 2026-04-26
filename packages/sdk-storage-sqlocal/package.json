@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/sdk-storage-sqlocal",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "SQLite WASM (sqlocal + OPFS) persistence adapters for @meshtastic/sdk repository ports. Drizzle-typed queries, Web Lock + BroadcastChannel multi-tab coordination.",
   "exports": {
     ".": "./mod.ts",

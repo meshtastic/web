@@ -1,5 +1,5 @@
 import { Readable, Writable } from "node:stream";
-import { Types, Utils } from "@meshtastic/core";
+import { Types, Utils } from "@meshtastic/sdk";
 import { SerialPort } from "serialport";
 
 /**

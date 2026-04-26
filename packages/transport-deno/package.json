@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/transport-deno",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Deno-specific transport layer for Meshtastic web applications.",
   "exports": {
     ".": "./mod.ts"
@@ -34,6 +34,6 @@
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
   },
   "dependencies": {
-    "@meshtastic/core": "workspace:*"
+    "@meshtastic/sdk": "workspace:*"
   }
 }

@@ -1,4 +1,4 @@
-import { Types } from "@meshtastic/core";
+import { Types } from "@meshtastic/sdk";
 
 function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
   if (

@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/transport-web-serial",
-  "version": "0.2.5",
+  "version": "1.0.0",
   "description": "A transport layer for Meshtastic applications using Web Serial API.",
   "exports": {
     ".": "./mod.ts"
@@ -45,6 +45,6 @@
   },
   "dependencies": {
     "@types/w3c-web-serial": "npm:@types/w3c-web-serial@^1.0.7",
-    "@meshtastic/core": "workspace:*"
+    "@meshtastic/sdk": "workspace:*"
   }
 }

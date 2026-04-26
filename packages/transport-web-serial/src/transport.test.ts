@@ -1,4 +1,4 @@
-import { Types, Utils } from "@meshtastic/core";
+import { Types, Utils } from "@meshtastic/sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract.ts";
 import { TransportWebSerial } from "./transport.ts";
