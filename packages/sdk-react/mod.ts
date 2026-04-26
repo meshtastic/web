@@ -27,6 +27,7 @@ export { useNodes } from "./src/hooks/useNodes.ts";
 export { useNode } from "./src/hooks/useNode.ts";
 export { useChannels, useChannel } from "./src/hooks/useChannels.ts";
 export { useConfig, useModuleConfig } from "./src/hooks/useConfig.ts";
+export { useConfigEditor } from "./src/hooks/useConfigEditor.ts";
 export { useTelemetry } from "./src/hooks/useTelemetry.ts";
 export type { UseTelemetryResult } from "./src/hooks/useTelemetry.ts";
 export { usePosition } from "./src/hooks/usePosition.ts";

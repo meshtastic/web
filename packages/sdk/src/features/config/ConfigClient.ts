@@ -10,6 +10,7 @@ import {
   setConfig,
   setModuleConfig,
 } from "./application/ConfigUseCases.ts";
+import { ConfigEditor } from "./domain/ConfigEditor.ts";
 import type { ModuleConfig } from "./domain/ModuleConfig.ts";
 import type { RadioConfig } from "./domain/RadioConfig.ts";
 import { ConfigMapper } from "./infrastructure/ConfigMapper.ts";
@@ -20,12 +21,14 @@ export class ConfigClient {
   private readonly store: ConfigStore;
   public readonly radio: ReadonlySignal<RadioConfig>;
   public readonly modules: ReadonlySignal<ModuleConfig>;
+  public readonly editor: ConfigEditor;
 
   constructor(client: MeshClient) {
     this.client = client;
     this.store = createConfigStore();
     this.radio = this.store.radio.read;
     this.modules = this.store.modules.read;
+    this.editor = new ConfigEditor(client);
 
     client.events.onConfigPacket.subscribe((config) => {
       this.store.radio.write.value = ConfigMapper.mergeRadio(this.store.radio.write.value, config);

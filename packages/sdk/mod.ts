@@ -86,7 +86,7 @@ export { InMemoryNodesRepository } from "./src/features/nodes/index.ts";
 export { ChannelsClient } from "./src/features/channels/index.ts";
 export type { Channel } from "./src/features/channels/index.ts";
 
-export { ConfigClient } from "./src/features/config/index.ts";
+export { ConfigClient, ConfigEditor } from "./src/features/config/index.ts";
 export type {
   ModuleConfig,
   ModuleConfigSection,
