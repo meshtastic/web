@@ -1,4 +1,4 @@
-import { useNodeLegacy } from "@app/core/hooks/useNodesLegacy.ts";
+import { useNodeAsProto } from "@app/core/hooks/useNodesAsProto.ts";
 import { getColorFromNodeNum, isLightColor } from "@app/core/utils/color";
 import {
   Tooltip,
@@ -28,7 +28,7 @@ export const Avatar = ({
   className,
 }: AvatarProps) => {
   const { t } = useTranslation();
-  const node = useNodeLegacy(nodeNum);
+  const node = useNodeAsProto(nodeNum);
 
   if (!nodeNum) {
     return null;

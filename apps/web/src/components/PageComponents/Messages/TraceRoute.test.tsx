@@ -1,10 +1,10 @@
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
-import { useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@core/hooks/useNodesLegacy.ts");
+vi.mock("@core/hooks/useNodesAsProto.ts");
 
 describe("TraceRoute", () => {
   const fromUser = {
@@ -64,7 +64,7 @@ describe("TraceRoute", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(useNodesLegacy).mockReturnValue(Array.from(mockNodes.values()));
+    vi.mocked(useNodesAsProto).mockReturnValue(Array.from(mockNodes.values()));
   });
 
   it("renders the route to destination with SNR values", () => {

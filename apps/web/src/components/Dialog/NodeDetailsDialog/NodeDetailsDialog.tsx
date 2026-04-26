@@ -27,7 +27,7 @@ import {
 import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
 import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
 import { toast } from "@core/hooks/useToast.ts";
-import { useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@meshtastic/sdk";
@@ -60,7 +60,7 @@ export const NodeDetailsDialog = ({ open, onOpenChange }: NodeDetailsDialogProps
   const { updateFavorite } = useFavoriteNode();
   const { updateIgnored } = useIgnoreNode();
 
-  const node = useNodeLegacy(nodeNumDetails);
+  const node = useNodeAsProto(nodeNumDetails);
 
   const [isFavoriteState, setIsFavoriteState] = useState<boolean>(node?.isFavorite ?? false);
   const [isIgnoredState, setIsIgnoredState] = useState<boolean>(node?.isIgnored ?? false);

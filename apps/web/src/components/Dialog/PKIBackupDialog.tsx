@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { useMyNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useDevice } from "@core/stores";
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
@@ -23,7 +23,7 @@ export interface PkiBackupDialogProps {
 export const PkiBackupDialog = ({ open, onOpenChange }: PkiBackupDialogProps) => {
   const { t } = useTranslation("dialog");
   const { config, setDialogOpen } = useDevice();
-  const myNode = useMyNodeLegacy();
+  const myNode = useMyNodeAsProto();
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;
 

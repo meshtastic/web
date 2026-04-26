@@ -8,7 +8,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useChatLegacy } from "@core/hooks/useChatLegacy.ts";
-import { useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { MessageType, useDevice, useNodeDB, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
@@ -34,7 +34,7 @@ function SelectMessageChat() {
 export const MessagesPage = () => {
   const { channels, getUnreadCount, resetUnread } = useDevice();
   const { hasNodeError } = useNodeDB();
-  const allNodes = useNodesLegacy();
+  const allNodes = useNodesAsProto();
   const getNode = (n: number) => allNodes.find((node) => node.num === n);
   const meshClient = useActiveClient();
 

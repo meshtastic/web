@@ -10,7 +10,7 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
-import { useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { Protobuf, type Types } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
@@ -53,7 +53,7 @@ const NodesPage = (): JSX.Element => {
   // Nodes come from the SDK NodesClient (signals + sqlocal-backed history).
   // hasNodeError still lives on the legacy nodeDB store — node-validation /
   // PKI-error tracking has not been migrated to the SDK yet.
-  const allSdkNodes = useNodesLegacy();
+  const allSdkNodes = useNodesAsProto();
   const filteredNodes = useMemo(() => allSdkNodes.filter(predicate), [allSdkNodes, predicate]);
   const { hasNodeError } = useNodeDB(
     (db) => ({

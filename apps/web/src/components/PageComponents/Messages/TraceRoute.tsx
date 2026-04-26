@@ -1,4 +1,4 @@
-import { useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import type { Protobuf } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ interface RoutePathProps {
 }
 
 const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
-  const allNodes = useNodesLegacy();
+  const allNodes = useNodesAsProto();
   const getNode = (n: number) => allNodes.find((node) => node.num === n);
   const { t } = useTranslation();
 

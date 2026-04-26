@@ -1,4 +1,4 @@
-import { useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import type { Protobuf, Types } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ export const LocationResponseDialog = ({
   onOpenChange,
 }: LocationResponseDialogProps) => {
   const { t } = useTranslation("dialog");
-  const from = useNodeLegacy(location?.from ?? 0);
+  const from = useNodeAsProto(location?.from ?? 0);
   const longName =
     from?.user?.longName ?? (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
   const shortName =

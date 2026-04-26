@@ -1,6 +1,6 @@
 import { TimeAgo } from "@components/generic/TimeAgo";
 import { Separator } from "@components/UI/Separator.tsx";
-import { useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import type { WaypointWithMetadata } from "@core/stores";
 import { bearingDegrees, distanceMeters, hasPos, toLngLat } from "@core/utils/geo";
 import type { Protobuf } from "@meshtastic/sdk";
@@ -24,7 +24,7 @@ interface WaypointDetailProps {
 
 export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
   const { t } = useTranslation("map");
-  const lockedToNode = useNodeLegacy(waypoint.lockedTo ?? 0);
+  const lockedToNode = useNodeAsProto(waypoint.lockedTo ?? 0);
 
   const waypointLngLat = toLngLat({
     latitudeI: waypoint.latitudeI,

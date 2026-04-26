@@ -1,5 +1,5 @@
 import { Label } from "@components/UI/Label.tsx";
-import { useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
@@ -14,7 +14,7 @@ export const RemoveNodeDialog = ({ open, onOpenChange }: RemoveNodeDialogProps) 
   const { connection } = useDevice();
   const { removeNode } = useNodeDB();
   const { nodeNumToBeRemoved } = useAppStore();
-  const node = useNodeLegacy(nodeNumToBeRemoved);
+  const node = useNodeAsProto(nodeNumToBeRemoved);
 
   const handleConfirm = () => {
     connection?.removeNodeByNum(nodeNumToBeRemoved);

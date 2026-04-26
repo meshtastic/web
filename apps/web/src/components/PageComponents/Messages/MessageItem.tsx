@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { useMyNodeLegacy, useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useMyNodeAsProto, useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { MessageState, useAppStore, useDevice } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
@@ -25,7 +25,7 @@ const myNodePromises = new Map<string, Promise<Protobuf.Mesh.NodeInfo>>();
 // gap between mount and first onMyNodeInfo packet on a fresh connect.
 function useSuspendingMyNode() {
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
-  const myNode = useMyNodeLegacy();
+  const myNode = useMyNodeAsProto();
 
   if (!myNode) {
     const deviceKey = `device-${selectedDeviceId}`;
@@ -44,7 +44,7 @@ function useSuspendingMyNode() {
             return;
           }
           // Resolve a no-op promise to retrigger the Suspense boundary;
-          // the next render will call useMyNodeLegacy again.
+          // the next render will call useMyNodeAsProto again.
           resolve({} as Protobuf.Mesh.NodeInfo);
           myNodePromises.delete(deviceKey);
         };
@@ -94,7 +94,7 @@ interface MessageItemProps {
 export const MessageItem = ({ message }: MessageItemProps) => {
   const { config } = useDevice();
   const { t, i18n } = useTranslation("messages");
-  const messageUserNode = useNodeLegacy(message.from ?? 0);
+  const messageUserNode = useNodeAsProto(message.from ?? 0);
 
   // This will suspend if myNode is not available yet
   const myNode = useSuspendingMyNode();

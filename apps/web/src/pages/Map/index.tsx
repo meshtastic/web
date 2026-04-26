@@ -22,7 +22,7 @@ import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrap
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
-import { useMyNodeLegacy, useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useMyNodeAsProto, useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { cn } from "@core/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/sdk";
@@ -34,13 +34,13 @@ import { type MapLayerMouseEvent, useMap } from "react-map-gl/maplibre";
 
 const MapPage = () => {
   const { t } = useTranslation("map");
-  const allNodes = useNodesLegacy();
+  const allNodes = useNodesAsProto();
   const getNode = useCallback((n: number) => allNodes.find((node) => node.num === n), [allNodes]);
   const validNodes = useMemo(
     () => allNodes.filter((n): n is Protobuf.Mesh.NodeInfo => Boolean(n.position?.latitudeI)),
     [allNodes],
   );
-  const myNode = useMyNodeLegacy();
+  const myNode = useMyNodeAsProto();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const { default: mapRef } = useMap();
   const { focusLngLat, fitToNodes } = useMapFitting(mapRef);
