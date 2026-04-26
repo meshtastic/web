@@ -3,27 +3,36 @@ import { type DeviceValidation, DeviceValidationSchema } from "@app/validation/c
 import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface DeviceConfigProps {
   onFormInit: DynamicFormFormInit<DeviceValidation>;
 }
+
+const EMPTY_RADIO_SIGNAL = {
+  value: {} as { device?: Protobuf.Config.Config_DeviceConfig },
+  peek: () => ({}) as { device?: Protobuf.Config.Config_DeviceConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const Device = ({ onFormInit }: DeviceConfigProps) => {
   useWaitForConfig({ configCase: "device" });
 
-  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
+  const editor = useConfigEditor();
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const effective =
+    radio.device ??
+    (getEffectiveConfig("device") as Protobuf.Config.Config_DeviceConfig | undefined);
+
   const { t } = useTranslation("config");
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
   const onSubmit = (data: DeviceValidation) => {
-    if (deepCompareConfig(config.device, data, true)) {
-      removeChange({ type: "config", variant: "device" });
-      return;
-    }
-
-    setChange({ type: "config", variant: "device" }, data, config.device);
+    if (!editor) return;
+    editor.setRadioSection("device", data as unknown as Protobuf.Config.Config_DeviceConfig);
   };
 
   return (
@@ -32,11 +41,11 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={DeviceValidationSchema}
       defaultValues={config.device}
-      values={getEffectiveConfig("device")}
+      values={effective}
       fieldGroups={[
         {
-          label: t("device.title"),
-          description: t("device.description"),
+          label: t("device.options.label"),
+          description: t("device.options.description"),
           fields: [
             {
               type: "select",
@@ -48,18 +57,6 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
                 enumValue: Protobuf.Config.Config_DeviceConfig_Role,
                 formatEnumName: true,
               },
-            },
-            {
-              type: "number",
-              name: "buttonGpio",
-              label: t("device.buttonPin.label"),
-              description: t("device.buttonPin.description"),
-            },
-            {
-              type: "number",
-              name: "buzzerGpio",
-              label: t("device.buzzerPin.label"),
-              description: t("device.buzzerPin.description"),
             },
             {
               type: "select",
@@ -76,10 +73,14 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
               name: "nodeInfoBroadcastSecs",
               label: t("device.nodeInfoBroadcastInterval.label"),
               description: t("device.nodeInfoBroadcastInterval.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
+              properties: { suffix: t("unit.second.plural") },
             },
+          ],
+        },
+        {
+          label: t("device.hardware.label"),
+          description: t("device.hardware.description"),
+          fields: [
             {
               type: "toggle",
               name: "doubleTapAsButtonPress",
@@ -93,6 +94,18 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
               description: t("device.disableTripleClick.description"),
             },
             {
+              type: "toggle",
+              name: "ledHeartbeatDisabled",
+              label: t("device.ledHeartbeatDisabled.label"),
+              description: t("device.ledHeartbeatDisabled.description"),
+            },
+          ],
+        },
+        {
+          label: t("device.timeZone.label"),
+          description: t("device.timeZone.description"),
+          fields: [
+            {
               type: "text",
               name: "tzdef",
               label: t("device.posixTimezone.label"),
@@ -100,16 +113,28 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
               properties: {
                 fieldLength: {
                   max: 64,
-                  currentValueLength: getEffectiveConfig("device")?.tzdef?.length,
+                  currentValueLength: effective?.tzdef?.length,
                   showCharacterCount: true,
                 },
               },
             },
+          ],
+        },
+        {
+          label: t("device.gpio.label"),
+          description: t("device.gpio.description"),
+          fields: [
             {
-              type: "toggle",
-              name: "ledHeartbeatDisabled",
-              label: t("device.ledHeartbeatDisabled.label"),
-              description: t("device.ledHeartbeatDisabled.description"),
+              type: "number",
+              name: "buttonGpio",
+              label: t("device.buttonPin.label"),
+              description: t("device.buttonPin.description"),
+            },
+            {
+              type: "number",
+              name: "buzzerGpio",
+              label: t("device.buzzerPin.label"),
+              description: t("device.buzzerPin.description"),
             },
           ],
         },

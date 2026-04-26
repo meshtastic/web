@@ -5,26 +5,35 @@ import {
 } from "@app/validation/config/bluetooth.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface BluetoothConfigProps {
   onFormInit: DynamicFormFormInit<BluetoothValidation>;
 }
+
+const EMPTY_RADIO_SIGNAL = {
+  value: {} as { bluetooth?: Protobuf.Config.Config_BluetoothConfig },
+  peek: () => ({}) as { bluetooth?: Protobuf.Config.Config_BluetoothConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
   useWaitForConfig({ configCase: "bluetooth" });
 
-  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
+  const editor = useConfigEditor();
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const effective =
+    radio.bluetooth ??
+    (getEffectiveConfig("bluetooth") as Protobuf.Config.Config_BluetoothConfig | undefined);
+
   const { t } = useTranslation("config");
 
   const onSubmit = (data: BluetoothValidation) => {
-    if (deepCompareConfig(config.bluetooth, data, true)) {
-      removeChange({ type: "config", variant: "bluetooth" });
-      return;
-    }
-
-    setChange({ type: "config", variant: "bluetooth" }, data, config.bluetooth);
+    if (!editor) return;
+    editor.setRadioSection("bluetooth", data as unknown as Protobuf.Config.Config_BluetoothConfig);
   };
 
   return (
@@ -33,11 +42,11 @@ export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={BluetoothValidationSchema}
       defaultValues={config.bluetooth}
-      values={getEffectiveConfig("bluetooth")}
+      values={effective}
       fieldGroups={[
         {
-          label: t("bluetooth.title"),
-          description: t("bluetooth.description"),
+          label: t("bluetooth.bluetoothConfig.label"),
+          description: t("bluetooth.bluetoothConfig.description"),
           notes: t("bluetooth.note"),
           fields: [
             {
@@ -51,11 +60,6 @@ export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
               name: "mode",
               label: t("bluetooth.pairingMode.label"),
               description: t("bluetooth.pairingMode.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
               properties: {
                 enumValue: Protobuf.Config.Config_BluetoothConfig_PairingMode,
                 formatEnumName: true,

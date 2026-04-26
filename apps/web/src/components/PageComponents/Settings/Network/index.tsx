@@ -3,23 +3,47 @@ import { type NetworkValidation, NetworkValidationSchema } from "@app/validation
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { convertIntToIpAddress, convertIpAddressToInt } from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface NetworkConfigProps {
   onFormInit: DynamicFormFormInit<NetworkValidation>;
 }
+
+const EMPTY_RADIO_SIGNAL = {
+  value: {} as { network?: Protobuf.Config.Config_NetworkConfig },
+  peek: () => ({}) as { network?: Protobuf.Config.Config_NetworkConfig },
+  subscribe: () => () => {},
+} as const;
+
+const toFormShape = (cfg: Protobuf.Config.Config_NetworkConfig | undefined) => ({
+  ...cfg,
+  ipv4Config: {
+    ip: convertIntToIpAddress(cfg?.ipv4Config?.ip ?? 0),
+    gateway: convertIntToIpAddress(cfg?.ipv4Config?.gateway ?? 0),
+    subnet: convertIntToIpAddress(cfg?.ipv4Config?.subnet ?? 0),
+    dns: convertIntToIpAddress(cfg?.ipv4Config?.dns ?? 0),
+  },
+  enabledProtocols:
+    cfg?.enabledProtocols ?? Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
+});
+
 export const Network = ({ onFormInit }: NetworkConfigProps) => {
   useWaitForConfig({ configCase: "network" });
 
-  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
+  const editor = useConfigEditor();
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const effective =
+    radio.network ??
+    (getEffectiveConfig("network") as Protobuf.Config.Config_NetworkConfig | undefined);
+
   const { t } = useTranslation("config");
 
-  const networkConfig = getEffectiveConfig("network");
-
   const onSubmit = (data: NetworkValidation) => {
+    if (!editor) return;
     const payload = {
       ...data,
       ipv4Config: create(Protobuf.Config.Config_NetworkConfig_IpV4ConfigSchema, {
@@ -29,49 +53,20 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
         dns: convertIpAddressToInt(data.ipv4Config?.dns ?? ""),
       }),
     };
-
-    if (deepCompareConfig(config.network, payload, true)) {
-      removeChange({ type: "config", variant: "network" });
-      return;
-    }
-
-    setChange({ type: "config", variant: "network" }, payload, config.network);
+    editor.setRadioSection("network", payload as unknown as Protobuf.Config.Config_NetworkConfig);
   };
+
   return (
     <DynamicForm<NetworkValidation>
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={NetworkValidationSchema}
-      defaultValues={{
-        ...config.network,
-        ipv4Config: {
-          ip: convertIntToIpAddress(config.network?.ipv4Config?.ip ?? 0),
-          gateway: convertIntToIpAddress(config.network?.ipv4Config?.gateway ?? 0),
-          subnet: convertIntToIpAddress(config.network?.ipv4Config?.subnet ?? 0),
-          dns: convertIntToIpAddress(config.network?.ipv4Config?.dns ?? 0),
-        },
-        enabledProtocols:
-          config.network?.enabledProtocols ??
-          Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
-      }}
-      values={
-        {
-          ...networkConfig,
-          ipv4Config: {
-            ip: convertIntToIpAddress(networkConfig?.ipv4Config?.ip ?? 0),
-            gateway: convertIntToIpAddress(networkConfig?.ipv4Config?.gateway ?? 0),
-            subnet: convertIntToIpAddress(networkConfig?.ipv4Config?.subnet ?? 0),
-            dns: convertIntToIpAddress(networkConfig?.ipv4Config?.dns ?? 0),
-          },
-          enabledProtocols:
-            networkConfig?.enabledProtocols ??
-            Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
-        } as NetworkValidation
-      }
+      defaultValues={toFormShape(config.network) as NetworkValidation}
+      values={toFormShape(effective) as NetworkValidation}
       fieldGroups={[
         {
-          label: t("network.title"),
-          description: t("network.description"),
+          label: t("network.wifiOptions.label"),
+          description: t("network.wifiOptions.description"),
           notes: t("network.note"),
           fields: [
             {
@@ -85,28 +80,20 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
               name: "wifiSsid",
               label: t("network.ssid.label"),
               description: t("network.ssid.label"),
-              disabledBy: [
-                {
-                  fieldName: "wifiEnabled",
-                },
-              ],
+              disabledBy: [{ fieldName: "wifiEnabled" }],
             },
             {
               type: "password",
               name: "wifiPsk",
               label: t("network.psk.label"),
               description: t("network.psk.description"),
-              disabledBy: [
-                {
-                  fieldName: "wifiEnabled",
-                },
-              ],
+              disabledBy: [{ fieldName: "wifiEnabled" }],
             },
           ],
         },
         {
-          label: t("network.ethernetConfigSettings.label"),
-          description: t("network.ethernetConfigSettings.description"),
+          label: t("network.ethernetOptionsCard.label"),
+          description: t("network.ethernetOptionsCard.description"),
           fields: [
             {
               type: "toggle",
@@ -117,9 +104,29 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
           ],
         },
         {
-          label: t("network.ipConfigSettings.label"),
-          description: t("network.ipConfigSettings.description"),
+          label: t("network.advancedCard.label"),
+          description: t("network.advancedCard.description"),
           fields: [
+            {
+              type: "text",
+              name: "ntpServer",
+              label: t("network.ntpServer.label"),
+            },
+            {
+              type: "text",
+              name: "rsyslogServer",
+              label: t("network.rsyslogServer.label"),
+            },
+            {
+              type: "select",
+              name: "enabledProtocols",
+              label: t("network.meshViaUdp.label"),
+              description: t("network.meshViaUdp.description"),
+              properties: {
+                enumValue: Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
+                formatEnumName: true,
+              },
+            },
             {
               type: "select",
               name: "addressMode",
@@ -176,43 +183,6 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
                   selector: Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
-            },
-          ],
-        },
-        {
-          label: t("network.udpConfigSettings.label"),
-          description: t("network.udpConfigSettings.description"),
-          fields: [
-            {
-              type: "select",
-              name: "enabledProtocols",
-              label: t("network.meshViaUdp.label"),
-              properties: {
-                enumValue: Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
-                formatEnumName: true,
-              },
-            },
-          ],
-        },
-        {
-          label: t("network.ntpConfigSettings.label"),
-          description: t("network.ntpConfigSettings.description"),
-          fields: [
-            {
-              type: "text",
-              name: "ntpServer",
-              label: t("network.ntpServer.label"),
-            },
-          ],
-        },
-        {
-          label: t("network.rsyslogConfigSettings.label"),
-          description: t("network.rsyslogConfigSettings.description"),
-          fields: [
-            {
-              type: "text",
-              name: "rsyslogServer",
-              label: t("network.rsyslogServer.label"),
             },
           ],
         },
