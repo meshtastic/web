@@ -8,6 +8,7 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { DeviceConfig } from "@pages/Settings/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig.tsx";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -40,6 +41,11 @@ const ConfigPage = () => {
     getChannelChangeCount,
     getAdminMessageChangeCount,
   } = useDevice();
+
+  const editor = useConfigEditor();
+  const editorIsDirty = useSignal(
+    editor?.isDirty ?? { value: false, peek: () => false, subscribe: () => () => {} },
+  );
 
   const [isSaving, setIsSaving] = useState(false);
   const [rhfState, setRhfState] = useState({ isDirty: false, isValid: true });
@@ -168,6 +174,17 @@ const ConfigPage = () => {
         await connection?.commitEditSettings();
       }
 
+      // Run the SDK ConfigEditor commit for migrated sections (currently
+      // Position / LoRa / MQTT). It wraps its own beginEdit/commitEdit, so
+      // sequencing it after the legacy flow is fine — devices accept
+      // multiple edit windows in the same save.
+      if (editor && editor.isDirty.peek()) {
+        const result = await editor.commit();
+        if (result.status === "error") {
+          throw result.error;
+        }
+      }
+
       // Send queued admin messages after configs are committed
       if (adminMessages.length > 0) {
         await Promise.all(
@@ -228,6 +245,7 @@ const ConfigPage = () => {
     setConfig,
     setModuleConfig,
     clearAllChanges,
+    editor,
   ]);
 
   const handleReset = useCallback(() => {
@@ -262,7 +280,8 @@ const ConfigPage = () => {
     getConfigChangeCount() > 0 ||
     getModuleConfigChangeCount() > 0 ||
     getChannelChangeCount() > 0 ||
-    adminMessageChangeCount > 0;
+    adminMessageChangeCount > 0 ||
+    editorIsDirty;
   const hasPending = hasDrafts || rhfState.isDirty;
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
   const saveDisabled = isSaving || !rhfState.isValid || !hasPending;

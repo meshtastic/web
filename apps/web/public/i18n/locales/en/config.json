@@ -125,15 +125,15 @@
     }
   },
   "lora": {
-    "title": "Mesh Settings",
-    "description": "Settings for the LoRa mesh",
+    "title": "LoRa",
+    "description": "LoRa radio configuration",
     "bandwidth": {
       "description": "Channel bandwidth in kHz",
       "label": "Bandwidth"
     },
     "boostedRxGain": {
       "description": "Boosted RX gain",
-      "label": "Boosted RX Gain"
+      "label": "RX Boosted Gain"
     },
     "codingRate": {
       "description": "The denominator of the coding rate",
@@ -144,24 +144,24 @@
       "label": "Frequency Offset"
     },
     "frequencySlot": {
-      "description": "LoRa frequency channel number",
+      "description": "Your node's operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name and will change from the default public slot.",
       "label": "Frequency Slot"
     },
     "hopLimit": {
-      "description": "Maximum number of hops",
-      "label": "Hop Limit"
+      "description": "Sets the maximum number of hops, default is 3. Increasing hops also increases congestion and should be used carefully. 0 hop broadcast messages will not get ACKs.",
+      "label": "Number of Hops"
     },
     "ignoreMqtt": {
       "description": "Don't forward MQTT messages over the mesh",
       "label": "Ignore MQTT"
     },
     "modemPreset": {
-      "description": "Modem preset to use",
-      "label": "Modem Preset"
+      "description": "Available modem presets, default is Long Fast.",
+      "label": "Presets"
     },
     "okToMqtt": {
       "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
-      "label": "OK to MQTT"
+      "label": "Ok to MQTT"
     },
     "overrideDutyCycle": {
       "description": "Override Duty Cycle",
@@ -169,10 +169,10 @@
     },
     "overrideFrequency": {
       "description": "Override frequency",
-      "label": "Override Frequency"
+      "label": "Frequency Override"
     },
     "region": {
-      "description": "Sets the region for your node",
+      "description": "The region where you will be using your radios.",
       "label": "Region"
     },
     "spreadingFactor": {
@@ -210,6 +210,14 @@
     "serialHalOnly": {
       "label": "Serial HAL Only",
       "description": "Communicate with the radio exclusively over the serial hardware abstraction layer"
+    },
+    "optionsCard": {
+      "label": "Options",
+      "description": "LoRa core options"
+    },
+    "advancedCard": {
+      "label": "Advanced",
+      "description": "Advanced LoRa parameters"
     }
   },
   "network": {
@@ -283,15 +291,15 @@
     }
   },
   "position": {
-    "title": "Position Settings",
-    "description": "Settings for the position module",
+    "title": "Position",
+    "description": "Position settings",
     "broadcastInterval": {
-      "description": "How often your position is sent out over the mesh",
+      "description": "The maximum interval that can elapse without a node broadcasting a position.",
       "label": "Broadcast Interval"
     },
     "enablePin": {
-      "description": "GPS module enable pin override",
-      "label": "Enable Pin"
+      "description": "GPS enable GPIO pin override",
+      "label": "GPS EN GPIO"
     },
     "fixedPosition": {
       "description": "Don't report GPS position, but a manually-specified one",
@@ -311,35 +319,35 @@
     },
     "gpsMode": {
       "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-      "label": "GPS Mode"
+      "label": "GPS Mode (Physical Hardware)"
     },
     "gpsUpdateInterval": {
-      "description": "How often a GPS fix should be acquired",
-      "label": "GPS Update Interval"
+      "description": "How often should we try to get a GPS position (<10sec keeps GPS on).",
+      "label": "GPS Polling Interval"
     },
     "positionFlags": {
-      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
+      "description": "Optional fields to include when assembling position messages. The more fields are included, the larger the message will be — leading to longer airtime and a higher risk of packet loss.",
       "label": "Position Flags"
     },
     "receivePin": {
-      "description": "GPS module RX pin override",
-      "label": "Receive Pin"
+      "description": "GPS receive GPIO pin override",
+      "label": "GPS Receive GPIO"
     },
     "smartPositionEnabled": {
       "description": "Only send position when there has been a meaningful change in location",
-      "label": "Enable Smart Position"
+      "label": "Smart Position"
     },
     "smartPositionMinDistance": {
-      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
-      "label": "Smart Position Minimum Distance"
+      "description": "The minimum distance change in meters to be considered for a smart position broadcast.",
+      "label": "Smart Distance"
     },
     "smartPositionMinInterval": {
-      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
-      "label": "Smart Position Minimum Interval"
+      "description": "The fastest that position updates will be sent if the minimum distance has been satisfied.",
+      "label": "Smart Interval"
     },
     "transmitPin": {
-      "description": "GPS module TX pin override",
-      "label": "Transmit Pin"
+      "description": "GPS transmit GPIO pin override",
+      "label": "GPS Transmit GPIO"
     },
     "intervalsSettings": {
       "description": "How often to send position updates",
@@ -358,6 +366,18 @@
       "unset": "Unset",
       "vehicleHeading": "Vehicle heading",
       "vehicleSpeed": "Vehicle speed"
+    },
+    "positionPacket": {
+      "label": "Position Packet",
+      "description": "Position broadcast configuration"
+    },
+    "deviceGps": {
+      "label": "Device GPS",
+      "description": "Device GPS configuration"
+    },
+    "advancedDeviceGps": {
+      "label": "Advanced Device GPS",
+      "description": "GPIO pin overrides for the GPS hardware"
     }
   },
   "power": {

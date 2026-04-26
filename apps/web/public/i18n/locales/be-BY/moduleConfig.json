@@ -218,34 +218,34 @@
     }
   },
   "mqtt": {
-    "title": "MQTT Settings",
-    "description": "Settings for the MQTT module",
+    "title": "MQTT",
+    "description": "MQTT module configuration",
     "enabled": {
-      "label": "Enabled",
+      "label": "MQTT enabled",
       "description": "Enable or disable MQTT"
     },
     "address": {
-      "label": "MQTT Server Address",
+      "label": "Address",
       "description": "MQTT server address to use for default/custom servers"
     },
     "username": {
-      "label": "MQTT Username",
+      "label": "Username",
       "description": "MQTT username to use for default/custom servers"
     },
     "password": {
-      "label": "MQTT Password",
+      "label": "Password",
       "description": "MQTT password to use for default/custom servers"
     },
     "encryptionEnabled": {
-      "label": "Encryption Enabled",
+      "label": "Encryption enabled",
       "description": "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data."
     },
     "jsonEnabled": {
-      "label": "JSON Enabled",
+      "label": "JSON output enabled",
       "description": "Whether to send/consume JSON packets on MQTT"
     },
     "tlsEnabled": {
-      "label": "TLS Enabled",
+      "label": "TLS enabled",
       "description": "Enable or disable TLS"
     },
     "root": {
@@ -253,20 +253,20 @@
       "description": "MQTT root topic to use for default/custom servers"
     },
     "proxyToClientEnabled": {
-      "label": "MQTT Client Proxy Enabled",
+      "label": "Proxy to client enabled",
       "description": "Utilizes the network connection to proxy MQTT messages to the client."
     },
     "mapReportingEnabled": {
-      "label": "Map Reporting Enabled",
-      "description": "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
+      "label": "Map reporting",
+      "description": "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, long and short name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
     },
     "mapReportSettings": {
       "publishIntervalSecs": {
-        "label": "Map Report Publish Interval (s)",
+        "label": "Map reporting interval (seconds)",
         "description": "Interval in seconds to publish map reports"
       },
       "positionPrecision": {
-        "label": "Approximate Location",
+        "label": "Approximate location",
         "description": "Position shared will be accurate within this distance",
         "options": {
           "metric_km23": "Within 23 km",
@@ -290,7 +290,21 @@
           "imperial_ft300": "Within 300 feet",
           "imperial_ft150": "Within 150 feet"
         }
+      },
+      "shouldReportLocation": {
+        "label": "I agree.",
+        "description": "I have read and understand the above. I voluntarily consent to the unencrypted transmission of my node data via MQTT.",
+        "consentHeader": "Consent to Share Unencrypted Node Data via MQTT",
+        "consentText": "By enabling this feature, you acknowledge and expressly consent to the transmission of your device's real-time geographic location over the MQTT protocol without encryption. This location data may be used for purposes such as live map reporting, device tracking, and related telemetry functions."
       }
+    },
+    "mqttConfigCard": {
+      "label": "MQTT Config",
+      "description": "MQTT broker connection"
+    },
+    "mapReportingCard": {
+      "label": "Map reporting",
+      "description": "Periodic unencrypted map report"
     }
   },
   "neighborInfo": {

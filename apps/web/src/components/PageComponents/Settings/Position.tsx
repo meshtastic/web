@@ -8,55 +8,62 @@ import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicF
 import { type FlagName, usePositionFlags } from "@core/hooks/usePositionFlags.ts";
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 interface PositionConfigProps {
   onFormInit: DynamicFormFormInit<PositionValidation>;
 }
+
+const EMPTY_RADIO_SIGNAL = {
+  value: {} as { position?: Protobuf.Config.Config_PositionConfig },
+  peek: () => ({}) as { position?: Protobuf.Config.Config_PositionConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
-  const { setChange, config, getEffectiveConfig, removeChange, queueAdminMessage } = useDevice();
+  const { config, getEffectiveConfig, queueAdminMessage } = useDevice();
+  const editor = useConfigEditor();
   const myNode = useMyNodeAsProto();
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+
+  const effectivePosition =
+    radio.position ??
+    (getEffectiveConfig("position") as Protobuf.Config.Config_PositionConfig | undefined);
+
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
-    getEffectiveConfig("position")?.positionFlags ?? 0,
+    effectivePosition?.positionFlags ?? 0,
   );
   const { t } = useTranslation("config");
 
   const currentPosition = myNode?.position;
-
-  const effectiveConfig = getEffectiveConfig("position");
   const displayUnits = getEffectiveConfig("display")?.units;
 
   const formValues = useMemo(() => {
     return {
       ...config.position,
-      ...effectiveConfig,
-      // Include current position coordinates if available
+      ...effectivePosition,
       latitude: currentPosition?.latitudeI ? currentPosition.latitudeI / 1e7 : undefined,
       longitude: currentPosition?.longitudeI ? currentPosition.longitudeI / 1e7 : undefined,
       altitude: currentPosition?.altitude ?? 0,
     } as PositionValidation;
-  }, [config.position, effectiveConfig, currentPosition]);
+  }, [config.position, effectivePosition, currentPosition]);
 
   const onSubmit = (data: PositionValidation) => {
-    // Exclude position coordinates from config payload (they're handled via admin message)
     const { latitude: _latitude, longitude: _longitude, altitude: _altitude, ...configData } = data;
     const payload = { ...configData, positionFlags: flagsValue };
 
-    // Save config first
-    let configResult: ReturnType<typeof setChange> | undefined;
-    if (deepCompareConfig(config.position, payload, true)) {
-      removeChange({ type: "config", variant: "position" });
-      configResult = undefined;
-    } else {
-      configResult = setChange({ type: "config", variant: "position" }, payload, config.position);
+    if (editor) {
+      editor.setRadioSection(
+        "position",
+        payload as unknown as Protobuf.Config.Config_PositionConfig,
+      );
     }
 
-    // Then handle position coordinates via admin message if fixedPosition is enabled
     if (data.fixedPosition && data.latitude !== undefined && data.longitude !== undefined) {
       const message = create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
@@ -72,8 +79,6 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
 
       queueAdminMessage(message);
     }
-
-    return configResult;
   };
 
   const onPositonFlagChange = useCallback(
@@ -87,7 +92,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
     <DynamicForm<PositionValidation>
       onSubmit={(data) => {
         data.positionFlags = flagsValue;
-        return onSubmit(data);
+        onSubmit(data);
       }}
       onFormInit={onFormInit}
       validationSchema={PositionValidationSchema}
@@ -95,9 +100,16 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       values={formValues}
       fieldGroups={[
         {
-          label: t("position.title"),
-          description: t("position.description"),
+          label: t("position.positionPacket.label"),
+          description: t("position.positionPacket.description"),
           fields: [
+            {
+              type: "number",
+              name: "positionBroadcastSecs",
+              label: t("position.broadcastInterval.label"),
+              description: t("position.broadcastInterval.description"),
+              properties: { suffix: t("unit.second.plural") },
+            },
             {
               type: "toggle",
               name: "positionBroadcastSmartEnabled",
@@ -105,27 +117,32 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               description: t("position.smartPositionEnabled.description"),
             },
             {
-              type: "select",
-              name: "gpsMode",
-              label: t("position.gpsMode.label"),
-              description: t("position.gpsMode.description"),
-              properties: {
-                enumValue: Protobuf.Config.Config_PositionConfig_GpsMode,
-              },
+              type: "number",
+              name: "broadcastSmartMinimumIntervalSecs",
+              label: t("position.smartPositionMinInterval.label"),
+              description: t("position.smartPositionMinInterval.description"),
+              properties: { suffix: t("unit.second.plural") },
+              disabledBy: [{ fieldName: "positionBroadcastSmartEnabled" }],
             },
+            {
+              type: "number",
+              name: "broadcastSmartMinimumDistance",
+              label: t("position.smartPositionMinDistance.label"),
+              description: t("position.smartPositionMinDistance.description"),
+              disabledBy: [{ fieldName: "positionBroadcastSmartEnabled" }],
+            },
+          ],
+        },
+        {
+          label: t("position.deviceGps.label"),
+          description: t("position.deviceGps.description"),
+          fields: [
             {
               type: "toggle",
               name: "fixedPosition",
               label: t("position.fixedPosition.label"),
               description: t("position.fixedPosition.description"),
-              disabledBy: [
-                {
-                  fieldName: "gpsMode",
-                  selector: Protobuf.Config.Config_PositionConfig_GpsMode.ENABLED,
-                },
-              ],
             },
-            // Position coordinate fields (only shown when fixedPosition is enabled)
             {
               type: "number",
               name: "latitude",
@@ -134,15 +151,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               properties: {
                 step: 0.0000001,
                 suffix: "Degrees",
-                fieldLength: {
-                  max: 10,
-                },
+                fieldLength: { max: 10 },
               },
-              disabledBy: [
-                {
-                  fieldName: "fixedPosition",
-                },
-              ],
+              disabledBy: [{ fieldName: "fixedPosition" }],
             },
             {
               type: "number",
@@ -152,15 +163,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               properties: {
                 step: 0.0000001,
                 suffix: "Degrees",
-                fieldLength: {
-                  max: 10,
-                },
+                fieldLength: { max: 10 },
               },
-              disabledBy: [
-                {
-                  fieldName: "fixedPosition",
-                },
-              ],
+              disabledBy: [{ fieldName: "fixedPosition" }],
             },
             {
               type: "number",
@@ -179,12 +184,32 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
                     ? "Feet"
                     : "Meters",
               },
-              disabledBy: [
-                {
-                  fieldName: "fixedPosition",
-                },
-              ],
+              disabledBy: [{ fieldName: "fixedPosition" }],
             },
+            {
+              type: "select",
+              name: "gpsMode",
+              label: t("position.gpsMode.label"),
+              description: t("position.gpsMode.description"),
+              properties: {
+                enumValue: Protobuf.Config.Config_PositionConfig_GpsMode,
+              },
+              disabledBy: [{ fieldName: "fixedPosition", invert: true }],
+            },
+            {
+              type: "number",
+              name: "gpsUpdateInterval",
+              label: t("position.gpsUpdateInterval.label"),
+              description: t("position.gpsUpdateInterval.description"),
+              properties: { suffix: t("unit.second.plural") },
+              disabledBy: [{ fieldName: "fixedPosition", invert: true }],
+            },
+          ],
+        },
+        {
+          label: t("position.positionFlags.label"),
+          description: t("position.positionFlags.description"),
+          fields: [
             {
               type: "multiSelect",
               name: "positionFlags",
@@ -198,6 +223,12 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
                 enumValue: getAllFlags(),
               },
             },
+          ],
+        },
+        {
+          label: t("position.advancedDeviceGps.label"),
+          description: t("position.advancedDeviceGps.description"),
+          fields: [
             {
               type: "number",
               name: "rxGpio",
@@ -215,52 +246,6 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "gpsEnGpio",
               label: t("position.enablePin.label"),
               description: t("position.enablePin.description"),
-            },
-          ],
-        },
-        {
-          label: t("position.intervalsSettings.label"),
-          description: t("position.intervalsSettings.description"),
-          fields: [
-            {
-              type: "number",
-              name: "positionBroadcastSecs",
-              label: t("position.broadcastInterval.label"),
-              description: t("position.broadcastInterval.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
-            },
-            {
-              type: "number",
-              name: "gpsUpdateInterval",
-              label: t("position.gpsUpdateInterval.label"),
-              description: t("position.gpsUpdateInterval.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
-            },
-            {
-              type: "number",
-              name: "broadcastSmartMinimumDistance",
-              label: t("position.smartPositionMinDistance.label"),
-              description: t("position.smartPositionMinDistance.description"),
-              disabledBy: [
-                {
-                  fieldName: "positionBroadcastSmartEnabled",
-                },
-              ],
-            },
-            {
-              type: "number",
-              name: "broadcastSmartMinimumIntervalSecs",
-              label: t("position.smartPositionMinInterval.label"),
-              description: t("position.smartPositionMinInterval.description"),
-              disabledBy: [
-                {
-                  fieldName: "positionBroadcastSmartEnabled",
-                },
-              ],
             },
           ],
         },
