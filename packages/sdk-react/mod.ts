@@ -22,6 +22,7 @@ export { useDirectChat } from "./src/hooks/useDirectChat.ts";
 export type { UseDirectChatResult } from "./src/hooks/useDirectChat.ts";
 export { useDraft } from "./src/hooks/useDraft.ts";
 export type { UseDraftResult } from "./src/hooks/useDraft.ts";
+export { useHasNodeError, useNodeError, useNodeErrors } from "./src/hooks/useNodeError.ts";
 export { useNodes } from "./src/hooks/useNodes.ts";
 export { useNode } from "./src/hooks/useNode.ts";
 export { useChannels, useChannel } from "./src/hooks/useChannels.ts";

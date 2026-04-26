@@ -13,9 +13,9 @@ import { NodeDetail } from "@components/PageComponents/Map/Popups/NodeDetail.tsx
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { PopupWrapper } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting";
-import { useNodeDB } from "@core/stores";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/sdk";
+import { useNodeErrors } from "@meshtastic/sdk-react";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { MapRef } from "react-map-gl/maplibre";
@@ -43,7 +43,9 @@ export const NodesLayer = ({
 }: NodeMarkerProps): React.ReactNode[] => {
   const { t } = useTranslation("map");
 
-  const { hasNodeError } = useNodeDB();
+  const errors = useNodeErrors();
+  const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
+  const hasNodeError = useCallback((num: number) => errorSet.has(num), [errorSet]);
   const { focusLngLat } = useMapFitting(mapRef);
 
   const selectedNode = useMemo(

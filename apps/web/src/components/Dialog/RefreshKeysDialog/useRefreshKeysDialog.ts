@@ -1,9 +1,10 @@
-import { useDevice, useMessages, useNodeDB } from "@core/stores";
+import { useDevice, useMessages } from "@core/stores";
+import { useActiveClient } from "@meshtastic/sdk-react";
 import { useCallback } from "react";
 
 export function useRefreshKeysDialog() {
   const { setDialogOpen } = useDevice();
-  const { removeNode, clearNodeError, getNodeError } = useNodeDB();
+  const meshClient = useActiveClient();
   const { activeChat } = useMessages();
 
   const handleCloseDialog = useCallback(() => {
@@ -11,14 +12,13 @@ export function useRefreshKeysDialog() {
   }, [setDialogOpen]);
 
   const handleNodeRemove = useCallback(() => {
-    const nodeWithError = getNodeError(activeChat);
-    if (!nodeWithError) {
-      return;
-    }
-    clearNodeError(activeChat);
+    if (!meshClient) return;
+    const error = meshClient.nodes.errorFor(activeChat);
+    if (!error) return;
+    meshClient.nodes.clearError(activeChat);
     handleCloseDialog();
-    return removeNode(nodeWithError?.node);
-  }, [activeChat, clearNodeError, getNodeError, removeNode, handleCloseDialog]);
+    void meshClient.nodes.remove(error.node);
+  }, [meshClient, activeChat, handleCloseDialog]);
 
   return {
     handleCloseDialog,

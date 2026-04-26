@@ -142,18 +142,15 @@ export const subscribeAll = (
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
-          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          nodeDB.setNodeError(routingPacket.from, routingPacket?.data?.variant?.value);
-          device.setDialogOpen("refreshKeys", true);
-          break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          nodeDB.setNodeError(routingPacket.from, routingPacket?.data?.variant?.value);
+          // Per-node error tracking lives on the SDK NodesClient
+          // (client.nodes.errors); the dialog open trigger stays here so the
+          // legacy device-store-driven dialog manager keeps working.
           device.setDialogOpen("refreshKeys", true);
           break;
-        default: {
+        default:
           break;
-        }
       }
     }
   });

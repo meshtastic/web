@@ -10,10 +10,10 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useChatLegacy } from "@core/hooks/useChatLegacy.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
-import { MessageType, useDevice, useNodeDB, useSidebar } from "@core/stores";
+import { MessageType, useDevice, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf, Types } from "@meshtastic/sdk";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient, useNodeErrors } from "@meshtastic/sdk-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -33,9 +33,11 @@ function SelectMessageChat() {
 
 export const MessagesPage = () => {
   const { channels, getUnreadCount, resetUnread } = useDevice();
-  const { hasNodeError } = useNodeDB();
   const allNodes = useNodesAsProto();
   const getNode = (n: number) => allNodes.find((node) => node.num === n);
+  const errors = useNodeErrors();
+  const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
+  const hasNodeError = useCallback((num: number) => errorSet.has(num), [errorSet]);
   const meshClient = useActiveClient();
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });

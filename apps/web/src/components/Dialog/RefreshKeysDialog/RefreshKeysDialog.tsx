@@ -7,7 +7,8 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { useMessages, useNodeDB } from "@core/stores";
+import { useMessages } from "@core/stores";
+import { useNodeError } from "@meshtastic/sdk-react";
 import { LockKeyholeOpenIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
@@ -20,14 +21,12 @@ export interface RefreshKeysDialogProps {
 export const RefreshKeysDialog = ({ open, onOpenChange }: RefreshKeysDialogProps) => {
   const { t } = useTranslation("dialog");
   const { activeChat } = useMessages();
-  const { nodeErrors } = useNodeDB();
+  const nodeError = useNodeError(activeChat);
+  const nodeWithError = useNodeAsProto(nodeError?.node ?? 0);
 
   const { handleCloseDialog, handleNodeRemove } = useRefreshKeysDialog();
 
-  const nodeErrorNum = nodeErrors.get(activeChat);
-  const nodeWithError = useNodeAsProto(nodeErrorNum?.node ?? 0);
-
-  if (!nodeErrorNum) {
+  if (!nodeError) {
     return null;
   }
 

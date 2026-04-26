@@ -11,15 +11,14 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { useAppStore, useDevice, useNodeDB } from "@core/stores";
+import { useAppStore, useDevice } from "@core/stores";
 import { Protobuf, type Types } from "@meshtastic/sdk";
+import { useNodeErrors } from "@meshtastic/sdk-react";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
 import { type JSX, useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { base16 } from "rfc4648";
-
-const NODEDB_DEBOUNCE_MS = 250;
 
 export interface DeleteNoteDialogProps {
   open: boolean;
@@ -51,17 +50,13 @@ const NodesPage = (): JSX.Element => {
   );
 
   // Nodes come from the SDK NodesClient (signals + sqlocal-backed history).
-  // hasNodeError still lives on the legacy nodeDB store — node-validation /
-  // PKI-error tracking has not been migrated to the SDK yet.
+  // PKI / node-error tracking now also lives in the SDK; the legacy
+  // nodeDBStore is no longer consulted here.
   const allSdkNodes = useNodesAsProto();
   const filteredNodes = useMemo(() => allSdkNodes.filter(predicate), [allSdkNodes, predicate]);
-  const { hasNodeError } = useNodeDB(
-    (db) => ({
-      hasNodeError: db.hasNodeError,
-      _errorsRef: db.nodeErrors,
-    }),
-    { debounce: NODEDB_DEBOUNCE_MS },
-  );
+  const errors = useNodeErrors();
+  const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
+  const hasNodeError = useCallback((num: number) => errorSet.has(num), [errorSet]);
   const handleTraceroute = useCallback(
     (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
       setSelectedTraceroute(traceroute);
