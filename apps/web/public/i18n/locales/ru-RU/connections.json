@@ -29,6 +29,7 @@
     "pickConnectionAgain": "Не удалось подключиться. Возможно, нужно заново выбрать устройство/порт.",
     "added": "Подключение добавлено",
     "savedByName": "{{name}} сохранено.",
-    "savedCantConnect": "Подключение сохранено, но подключиться не удалось."
+    "savedCantConnect": "Подключение сохранено, но подключиться не удалось.",
+    "checkConnetion": "Check your device or settings and try again"
   }
 }

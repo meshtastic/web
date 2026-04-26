@@ -15,6 +15,26 @@
   },
   "lastConnectedAt": "Last connected: {{date}}",
   "neverConnected": "Never connected",
+  "default": "Default",
+  "button": {
+    "addConnection": "Add Connection",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "retry": "Retry",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "setDefault": "Set as default",
+    "unsetDefault": "Unset default",
+    "rename": "Rename",
+    "edit": "Edit"
+  },
+  "renameConnection": "Rename connection",
+  "renameDescription": "Enter a new name for this connection.",
+  "nameLabel": "Name",
+  "editConnection": {
+    "title": "Edit Connection",
+    "description": "Modify the settings for this connection."
+  },
   "toasts": {
     "connected": "Connected",
     "nowConnected": "{{name}} is now connected",
@@ -29,6 +49,10 @@
     "pickConnectionAgain": "Could not connect. You may need to reselect the device/port.",
     "added": "Connection added",
     "savedByName": "{{name}} saved.",
-    "savedCantConnect": "The connection was saved but could not connect."
+    "savedCantConnect": "The connection was saved but could not connect.",
+    "renamed": "Renamed",
+    "renamedByName": "Connection renamed to {{name}}.",
+    "updated": "Updated",
+    "updatedByName": "{{name}} has been updated."
   }
 }

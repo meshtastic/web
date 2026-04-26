@@ -24,7 +24,7 @@ All projects live under `packages/`.
 | --- | --- |
 | `packages/sdk` | Framework-agnostic TypeScript SDK. Domain-driven feature slices (device, chat, nodes, channels, config, telemetry, position, traceroute, files) built around a `MeshClient` orchestrator with `@preact/signals-core` reactive state. |
 | `packages/sdk-react` | React hooks + `MeshProvider` on top of `@meshtastic/sdk`. Wraps signals in `useSyncExternalStore` for concurrent-safe renders. |
-| `packages/web` | Reference React web client. Hosted at [client.meshtastic.org](https://client.meshtastic.org). |
+| `apps/web` | Reference React web client. Hosted at [client.meshtastic.org](https://client.meshtastic.org). |
 | `packages/ui` | Shared Radix + Tailwind component library. |
 | `packages/protobufs` | Generated TypeScript stubs from [`meshtastic/protobufs`](https://github.com/meshtastic/protobufs), produced via `buf generate`. Source of truth for every wire-level type. |
 | `packages/transport-http` | HTTP transport for devices exposing a network interface. |

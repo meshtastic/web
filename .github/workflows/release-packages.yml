@@ -44,7 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ "${{ github.event.inputs.packages }}" = "all" ] || [ -z "${{ github.event.inputs.packages }}" ]; then
-            mapfile -t TARGETS < <(ls -d packages/* | grep -v 'packages/web')
+            mapfile -t TARGETS < <(ls -d packages/*)
           else
             IFS=',' read -ra TARGETS <<< "${{ github.event.inputs.packages }}"
             TARGETS=("${TARGETS[@]/#/packages/}")

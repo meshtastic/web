@@ -54,28 +54,62 @@
     "megahertz": "МГц",
     "kilohertz": "кГц",
     "raw": "сырое",
-    "meter": { "one": "метр", "plural": "метров", "suffix": "м" },
-    "kilometer": { "one": "километр", "plural": "километров", "suffix": "км" },
-    "minute": { "one": "минута", "plural": "минут" },
-    "hour": { "one": "час", "plural": "часов" },
+    "meter": {
+      "one": "метр",
+      "plural": "метров",
+      "suffix": "м"
+    },
+    "kilometer": {
+      "one": "километр",
+      "plural": "километров",
+      "suffix": "км"
+    },
+    "minute": {
+      "one": "минута",
+      "plural": "минут"
+    },
+    "hour": {
+      "one": "час",
+      "plural": "часов"
+    },
     "millisecond": {
       "one": "миллисекунда",
       "plural": "миллисекунд",
       "suffix": "мс"
     },
-    "second": { "one": "секунда", "plural": "секунд" },
+    "second": {
+      "one": "секунда",
+      "plural": "секунд"
+    },
     "day": {
       "one": "день",
       "plural": "дней",
       "today": "Сегодня",
       "yesterday": "Вчера"
     },
-    "month": { "one": "месяц", "plural": "месяцев" },
-    "year": { "one": "год", "plural": "лет" },
+    "month": {
+      "one": "месяц",
+      "plural": "месяцев"
+    },
+    "year": {
+      "one": "год",
+      "plural": "лет"
+    },
     "snr": "SNR",
-    "volt": { "one": "вольт", "plural": "вольт", "suffix": "В" },
-    "record": { "one": "запись", "plural": "записей" },
-    "degree": { "one": "градус", "plural": "градусов", "suffix": "°" }
+    "volt": {
+      "one": "вольт",
+      "plural": "вольт",
+      "suffix": "В"
+    },
+    "record": {
+      "one": "запись",
+      "plural": "записей"
+    },
+    "degree": {
+      "one": "градус",
+      "plural": "градусов",
+      "suffix": "°"
+    }
   },
   "security": {
     "0bit": "Пусто",

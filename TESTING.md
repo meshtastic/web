@@ -19,8 +19,8 @@ Tests live in five tiers. Each PR should add coverage at the **lowest level that
 
 | Package | Required floor | Notes |
 | --- | --- | --- |
-| `packages/sdk` core | every primitive (signals, EventBus, Queue, packet-codec, identifiers) has a unit test; lifecycle covered by `MeshClient.test.ts` | adopt `c8` thresholds once stable |
-| `packages/sdk` features/* | each slice ships: 1 domain invariant test, 1 use-case test against fake transport, 1 mapper round-trip (where mappers exist) | Integration covered by `tests/integration/fake-transport.test.ts` |
+| `packages/sdk/core` | every primitive (signals, EventBus, Queue, packet-codec, identifiers) has a unit test; lifecycle covered by `MeshClient.test.ts` | adopt `c8` thresholds once stable |
+| `packages/sdk/features/*`  | each slice ships: 1 domain invariant test, 1 use-case test against fake transport, 1 mapper round-trip (where mappers exist) | Integration covered by `tests/integration/fake-transport.test.ts` |
 | `packages/sdk-react` | each public hook has a `renderHook` test that asserts initial render + re-render on signal change | uses jsdom; provider wrapper required |
 | `packages/sdk-storage-sqlocal` | every repository method tested against sql.js in-memory; **at least one OPFS-real test per repo** runs in browser mode | sql.js validates SQL correctness; OPFS validates VFS / Worker plumbing |
 | `packages/transport-*` | minimum: framing round-trip, disconnect cleans up streams, error path emits status | low-level; ship as is |
