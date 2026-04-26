@@ -188,7 +188,11 @@ export async function probeConnection(
           }
         ).getDevices?.();
         const hasPermission = known?.some((d: BluetoothDevice) => d.id === conn.deviceId);
-        return hasPermission ? "configured" : "disconnected";
+        // Permission granted ≠ device configured. The card surfaces "online"
+        // (i.e. "available, click to connect") so the user explicitly opts
+        // into the configure handshake. "configured" is reserved for when
+        // the firmware has actually replied with config-complete.
+        return hasPermission ? "online" : "disconnected";
       } catch {
         return "disconnected";
       }
@@ -210,7 +214,7 @@ export async function probeConnection(
             ).getInfo?.() ?? {};
           return info.usbVendorId === conn.usbVendorId && info.usbProductId === conn.usbProductId;
         });
-        return hasPermission ? "configured" : "disconnected";
+        return hasPermission ? "online" : "disconnected";
       } catch {
         return "disconnected";
       }

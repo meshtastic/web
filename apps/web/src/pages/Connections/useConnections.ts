@@ -49,7 +49,7 @@ export function useConnections() {
     [updateSavedConnection],
   );
 
-  const teardown = useCallback((id: ConnectionId, conn?: Connection) => {
+  const teardown = useCallback(async (id: ConnectionId, conn?: Connection) => {
     stopHeartbeat(id);
     configSubscriptions.get(id)?.();
     configSubscriptions.delete(id);
@@ -57,7 +57,10 @@ export function useConnections() {
     if (conn?.meshDeviceId) {
       const device = useDeviceStore.getState().getDevice(conn.meshDeviceId);
       try {
-        device?.connection?.disconnect();
+        // Await the underlying transport's close so the port is fully
+        // released before the user clicks reconnect — otherwise port.open()
+        // can race the close and throw "port already open".
+        await device?.connection?.disconnect();
       } catch {}
     }
     closeTransport(cachedTransports.get(id));
@@ -65,9 +68,9 @@ export function useConnections() {
   }, []);
 
   const removeConnection = useCallback(
-    (id: ConnectionId) => {
+    async (id: ConnectionId) => {
       const conn = connections.find((c) => c.id === id);
-      teardown(id, conn);
+      await teardown(id, conn);
       if (conn?.meshDeviceId) {
         try {
           useDeviceStore.getState().removeDevice(conn.meshDeviceId);
@@ -104,6 +107,14 @@ export function useConnections() {
       deviceId = deviceId ?? randId();
 
       const device = addDevice(deviceId);
+
+      // Flip status to "configuring" up front. buildMeshDevice awaits the
+      // OPFS DB open which can take a beat (or stall under multi-tab
+      // contention); we don't want the UI looking stuck at "connecting"
+      // while persistence is spinning up.
+      device.setConnectionPhase("configuring");
+      updateStatus(id, "configuring");
+
       const meshDevice = await buildMeshDevice(id, deviceId, transport);
 
       if (!meshRegistry.has(id)) {
@@ -127,9 +138,6 @@ export function useConnections() {
         startMaintenanceHeartbeat(id, meshDevice);
       });
       configSubscriptions.set(id, unsubConfigComplete);
-
-      device.setConnectionPhase("configuring");
-      updateStatus(id, "configuring");
 
       meshDevice
         .configure()
@@ -175,6 +183,7 @@ export function useConnections() {
         });
         return true;
       } catch (err) {
+        console.error("[useConnections] connect failed:", err);
         const message = err instanceof Error ? err.message : String(err);
         updateStatus(id, "error", message);
         return false;
@@ -188,7 +197,7 @@ export function useConnections() {
       const conn = connections.find((c) => c.id === id);
       if (!conn) return;
       try {
-        teardown(id, conn);
+        await teardown(id, conn);
         if (conn.meshDeviceId) {
           const device = useDeviceStore.getState().getDevice(conn.meshDeviceId);
           if (device) {
