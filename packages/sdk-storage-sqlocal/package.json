@@ -5,6 +5,7 @@
   "exports": {
     ".": "./mod.ts",
     "./chat": "./src/chat/index.ts",
+    "./nodes": "./src/nodes/index.ts",
     "./schema": "./src/schema/index.ts",
     "./testing": "./src/testing/index.ts"
   },

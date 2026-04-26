@@ -6,3 +6,5 @@ export { SqlocalMessageRepository } from "./src/chat/index.ts";
 export type { SqlocalMessageRepositoryOptions } from "./src/chat/index.ts";
 export { SqlocalDraftRepository } from "./src/chat/index.ts";
 export type { SqlocalDraftRepositoryOptions } from "./src/chat/index.ts";
+export { SqlocalNodesRepository } from "./src/nodes/index.ts";
+export type { SqlocalNodesRepositoryOptions } from "./src/nodes/index.ts";

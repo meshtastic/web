@@ -15,6 +15,7 @@ import {
   SqlocalDraftRepository,
   SqlocalMessageRepository,
 } from "@meshtastic/sdk-storage-sqlocal/chat";
+import { SqlocalNodesRepository } from "@meshtastic/sdk-storage-sqlocal/nodes";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
@@ -156,17 +157,20 @@ export function useConnections() {
       const nodeDB = addNodeDB(deviceId);
       const messageStore = addMessageStore(deviceId);
 
-      // Wire the SDK chat slice to the OPFS-backed SQLite repository so the
-      // user keeps message + draft history across reloads. The DB is opened
-      // lazily on first connect; subsequent connections share the same DB.
+      // Wire the SDK slices to the OPFS-backed SQLite repositories so the
+      // user keeps message + draft + node history across reloads. The DB is
+      // opened lazily on first connect; subsequent connections share the
+      // same DB instance.
       let chatRepository: SqlocalMessageRepository | undefined;
       let draftRepository: SqlocalDraftRepository | undefined;
+      let nodesRepository: SqlocalNodesRepository | undefined;
       try {
         const db = await getStorageDb();
         chatRepository = new SqlocalMessageRepository(db, { deviceId: id, coordinator });
         draftRepository = new SqlocalDraftRepository(db, { deviceId: id });
+        nodesRepository = new SqlocalNodesRepository(db, { deviceId: id });
       } catch (err) {
-        console.warn("[useConnections] sqlocal unavailable, falling back to in-memory chat:", err);
+        console.warn("[useConnections] sqlocal unavailable, falling back to in-memory:", err);
       }
       const meshDevice = new MeshDevice(transport, {
         configId: deviceId,
@@ -178,6 +182,7 @@ export function useConnections() {
                 retention: { maxPerBucket: 1000, olderThanMs: 1000 * 60 * 60 * 24 * 90 },
               }
             : undefined,
+        nodes: nodesRepository ? { repository: nodesRepository } : undefined,
       });
 
       // Register the underlying MeshClient so sdk-react hooks

@@ -74,7 +74,8 @@ export {
 } from "./src/features/chat/index.ts";
 
 export { NodesClient } from "./src/features/nodes/index.ts";
-export type { Node } from "./src/features/nodes/index.ts";
+export type { Node, NodesClientOptions, NodesRepository } from "./src/features/nodes/index.ts";
+export { InMemoryNodesRepository } from "./src/features/nodes/index.ts";
 
 export { ChannelsClient } from "./src/features/channels/index.ts";
 export type { Channel } from "./src/features/channels/index.ts";
