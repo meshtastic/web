@@ -13,8 +13,6 @@ import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
  * open triggers, unread counts).
  */
 export const subscribeAll = (device: Device, connection: MeshDevice) => {
-  let myNodeNum = 0;
-
   connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {
     device.addMetadata(metadataPacket.from, metadataPacket.data);
   });
@@ -61,7 +59,6 @@ export const subscribeAll = (device: Device, connection: MeshDevice) => {
 
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
     useNewNodeNum(device.id, nodeInfo);
-    myNodeNum = nodeInfo.myNodeNum;
   });
 
   // onUserPacket / onPositionPacket / onNodeInfoPacket are handled by the
@@ -77,19 +74,8 @@ export const subscribeAll = (device: Device, connection: MeshDevice) => {
     device.setModuleConfig(moduleConfig);
   });
 
-  connection.events.onMessagePacket.subscribe((messagePacket) => {
-    // Message persistence is handled by the SDK chat slice via the
-    // SqlocalMessageRepository wired in useConnections. This handler exists
-    // only to drive the legacy unread-count tracking on the device store.
-    const isDirect = messagePacket.type === "direct";
-    if (isDirect) {
-      if (messagePacket.to === myNodeNum) {
-        device.incrementUnread(messagePacket.from);
-      }
-    } else if (messagePacket.from !== myNodeNum) {
-      device.incrementUnread(messagePacket.channel);
-    }
-  });
+  // Inbound message handling (persistence, unread counts) lives entirely on
+  // the SDK ChatClient now — see ChatClient + chat.unread.
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
     device.addTraceRoute({

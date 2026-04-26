@@ -1,7 +1,8 @@
+import { signal } from "@preact/signals-core";
 import type { ResultType } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
-import type { ReadonlySignal } from "../../core/signals/createStore.ts";
+import { type ReadonlySignal, toReadonly } from "../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../core/types.ts";
 import type { DraftRepository } from "./domain/DraftRepository.ts";
 import type { Message } from "./domain/Message.ts";
@@ -37,6 +38,23 @@ export interface ChatDrafts {
 }
 
 /**
+ * Unread-counts namespace. Counts inbound messages per conversation; resets
+ * on `markRead(key)`. Counts are in-memory only (no persistence) — the
+ * recipe for persistence later is to track a `lastReadAt` timestamp per
+ * conversation in the message repository and compute unread on hydrate.
+ */
+export interface ChatUnread {
+  /** Map of conversation-key string -> unread count. */
+  readonly byKey: ReadonlySignal<ReadonlyMap<string, number>>;
+  /** Sum of all unread counts across conversations. */
+  readonly total: ReadonlySignal<number>;
+  /** Unread count for a single conversation. */
+  count(key: ConversationKey): ReadonlySignal<number>;
+  /** Zero out the unread count for a conversation. */
+  markRead(key: ConversationKey): void;
+}
+
+/**
  * Chat slice facade. Exposes message buckets keyed by channel or peer, drafts
  * keyed the same way, and the `send` command for outbound text. Optional
  * persistence via MessageRepository / DraftRepository.
@@ -51,8 +69,10 @@ export class ChatClient {
   private readonly initialLoadLimit: number;
   private readonly hydrated = new Set<string>();
   private readonly draftsHydrated = new Set<string>();
+  private readonly unreadByKey = signal<ReadonlyMap<string, number>>(new Map());
 
   public readonly drafts: ChatDrafts;
+  public readonly unread: ChatUnread;
 
   constructor(client: MeshClient, options: ChatClientOptions = {}) {
     this.client = client;
@@ -69,6 +89,13 @@ export class ChatClient {
       clear: (key) => this.setDraft(key, ""),
     };
 
+    this.unread = {
+      byKey: toReadonly(this.unreadByKey),
+      total: this.deriveTotalUnread(),
+      count: (key) => this.deriveUnreadCount(key),
+      markRead: (key) => this.markRead(key),
+    };
+
     client.events.onMessagePacket.subscribe((packet) => {
       const message = MessageMapper.fromPacket(packet);
       const conv: ConversationKey =
@@ -78,6 +105,12 @@ export class ChatClient {
       const key = this.keyFor(conv);
       this.store.append(key, message);
       void this.persistAppend(message);
+
+      // Increment unread count when the message is inbound (not from us). The
+      // outbound echo of our own send doesn't count as unread.
+      if (packet.from !== client.myNodeNum) {
+        this.bumpUnread(key);
+      }
     });
 
     client.events.onRoutingPacket.subscribe((packet) => {
@@ -199,5 +232,71 @@ export class ChatClient {
     return conv.kind === "channel"
       ? this.store.channelKey(conv.channel)
       : this.store.directKey(conv.peer);
+  }
+
+  private bumpUnread(key: string): void {
+    const next = new Map(this.unreadByKey.peek());
+    next.set(key, (next.get(key) ?? 0) + 1);
+    this.unreadByKey.value = next;
+  }
+
+  private markRead(key: ConversationKey): void {
+    const k = this.keyFor(key);
+    const current = this.unreadByKey.peek();
+    if ((current.get(k) ?? 0) === 0) return;
+    const next = new Map(current);
+    next.delete(k);
+    this.unreadByKey.value = next;
+  }
+
+  private deriveTotalUnread(): ReadonlySignal<number> {
+    const src = this.unreadByKey;
+    return {
+      get value() {
+        let total = 0;
+        for (const c of src.value.values()) total += c;
+        return total;
+      },
+      peek() {
+        let total = 0;
+        for (const c of src.peek().values()) total += c;
+        return total;
+      },
+      subscribe(listener) {
+        let first = true;
+        return src.subscribe((m) => {
+          if (first) {
+            first = false;
+            return;
+          }
+          let total = 0;
+          for (const c of m.values()) total += c;
+          listener(total);
+        });
+      },
+    };
+  }
+
+  private deriveUnreadCount(key: ConversationKey): ReadonlySignal<number> {
+    const k = this.keyFor(key);
+    const src = this.unreadByKey;
+    return {
+      get value() {
+        return src.value.get(k) ?? 0;
+      },
+      peek() {
+        return src.peek().get(k) ?? 0;
+      },
+      subscribe(listener) {
+        let first = true;
+        return src.subscribe((m) => {
+          if (first) {
+            first = false;
+            return;
+          }
+          listener(m.get(k) ?? 0);
+        });
+      },
+    };
   }
 }

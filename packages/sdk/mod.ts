@@ -56,6 +56,7 @@ export { ChatClient } from "./src/features/chat/index.ts";
 export type {
   ChatClientOptions,
   ChatDrafts,
+  ChatUnread,
   ConversationKey,
   DraftRepository,
   Message,

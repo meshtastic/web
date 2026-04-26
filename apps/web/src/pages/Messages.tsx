@@ -10,10 +10,10 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useChatAsLegacyMessages } from "@core/hooks/useChatAsLegacyMessages.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
-import { MessageType, useDevice, useSidebar } from "@core/stores";
+import { MessageType, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf, Types } from "@meshtastic/sdk";
-import { useActiveClient, useChannels, useNodeErrors } from "@meshtastic/sdk-react";
+import { useActiveClient, useChannels, useNodeErrors, useUnreadByKey } from "@meshtastic/sdk-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -32,14 +32,28 @@ function SelectMessageChat() {
 }
 
 export const MessagesPage = () => {
-  const { getUnreadCount, resetUnread } = useDevice();
   const channels = useChannels();
+  const unreadByKey = useUnreadByKey();
+  const meshClient = useActiveClient();
+  const directUnread = (peer: number): number => unreadByKey.get(`direct:${peer}`) ?? 0;
+  const channelUnread = (idx: number): number => unreadByKey.get(`channel:${idx}`) ?? 0;
+  const markChannelRead = useCallback(
+    (idx: number) =>
+      meshClient?.chat.unread.markRead({
+        kind: "channel",
+        channel: idx as Types.ChannelNumber,
+      }),
+    [meshClient],
+  );
+  const markDirectRead = useCallback(
+    (peer: number) => meshClient?.chat.unread.markRead({ kind: "direct", peer }),
+    [meshClient],
+  );
   const allNodes = useNodesAsProto();
   const getNode = (n: number) => allNodes.find((node) => node.num === n);
   const errors = useNodeErrors();
   const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
   const hasNodeError = useCallback((num: number) => errorSet.has(num), [errorSet]);
-  const meshClient = useActiveClient();
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
 
@@ -90,7 +104,7 @@ export const MessagesPage = () => {
       })
       .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
-        unreadCount: getUnreadCount(node.num) ?? 0,
+        unreadCount: directUnread(node.num),
       }))
       .sort((a: NodeInfoWithUnread, b: NodeInfoWithUnread) => {
         const diff = b.unreadCount - a.unreadCount;
@@ -99,7 +113,7 @@ export const MessagesPage = () => {
         }
         return Number(b.isFavorite) - Number(a.isFavorite);
       });
-  }, [deferredSearch, allNodes, getUnreadCount]);
+  }, [deferredSearch, allNodes, directUnread]);
 
   const sendText = useCallback(
     async (message: string) => {
@@ -146,7 +160,7 @@ export const MessagesPage = () => {
           {filteredChannels?.map((channel) => (
             <SidebarButton
               key={channel.index}
-              count={getUnreadCount(channel.index)}
+              count={channelUnread(channel.index)}
               label={
                 channel.settings?.name ||
                 (channel.index === 0
@@ -159,7 +173,7 @@ export const MessagesPage = () => {
               active={numericChatId === channel.index && chatType === MessageType.Broadcast}
               onClick={() => {
                 navigateToChat(MessageType.Broadcast, channel.index.toString());
-                resetUnread(channel.index);
+                markChannelRead(channel.index);
               }}
             >
               <HashIcon size={16} className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")} />
@@ -173,9 +187,9 @@ export const MessagesPage = () => {
       numericChatId,
       chatType,
       isCollapsed,
-      getUnreadCount,
+      channelUnread,
       navigateToChat,
-      resetUnread,
+      markChannelRead,
       t,
     ],
   );
@@ -205,7 +219,7 @@ export const MessagesPage = () => {
             active={numericChatId === node.num && chatType === MessageType.Direct}
             onClick={() => {
               navigateToChat(MessageType.Direct, node.num.toString());
-              resetUnread(node.num);
+              markDirectRead(node.num);
             }}
           >
             <Avatar

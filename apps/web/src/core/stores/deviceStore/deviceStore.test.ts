@@ -126,24 +126,6 @@ describe("DeviceStore – metadata, dialogs, unread counts, message draft", () =
     expect(() => device.getDialogOpen("reboot")).toThrow(/Device 5 not found/);
   });
 
-  it("unread counts: increment/get/getAll/reset", async () => {
-    const { useDeviceStore } = await freshStore(false);
-    const state = useDeviceStore.getState();
-    const device = state.addDevice(2);
-
-    expect(device.getUnreadCount(10)).toBe(0);
-    device.incrementUnread(10);
-    device.incrementUnread(10);
-    device.incrementUnread(11);
-    expect(device.getUnreadCount(10)).toBe(2);
-    expect(device.getUnreadCount(11)).toBe(1);
-    expect(device.getAllUnreadCount()).toBe(3);
-
-    device.resetUnread(10);
-    expect(device.getUnreadCount(10)).toBe(0);
-    expect(device.getAllUnreadCount()).toBe(1);
-  });
-
   it("setMessageDraft stores the text", async () => {
     const { useDeviceStore } = await freshStore(false);
     const device = useDeviceStore.getState().addDevice(3);

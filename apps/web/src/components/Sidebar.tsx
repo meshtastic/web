@@ -13,6 +13,7 @@ import {
   useSidebar,
 } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
+import { useTotalUnread } from "@meshtastic/sdk-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CircleChevronLeft,
@@ -67,7 +68,8 @@ const CollapseToggleButton = () => {
 };
 
 export const Sidebar = ({ children }: SidebarProps) => {
-  const { metadata, unreadCounts, setDialogOpen } = useDevice();
+  const { metadata, setDialogOpen } = useDevice();
+  const numUnread = useTotalUnread();
   const allNodes = useNodesAsProto();
   const { setCommandPaletteOpen } = useAppStore();
   const myNode = useMyNodeAsProto();
@@ -89,8 +91,6 @@ export const Sidebar = ({ children }: SidebarProps) => {
   });
 
   const myMetadata = metadata.get(0);
-
-  const numUnread = [...unreadCounts.values()].reduce((sum, v) => sum + v, 0);
 
   const [displayedNodeCount, setDisplayedNodeCount] = useState(() =>
     Math.max(getNodesLength() - 1, 0),

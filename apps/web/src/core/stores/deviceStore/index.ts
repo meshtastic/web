@@ -46,7 +46,6 @@ export interface Device extends DeviceData {
   activeNode: number;
   pendingSettingsChanges: boolean;
   messageDraft: string;
-  unreadCounts: Map<number, number>;
   dialog: Dialogs;
   clientNotifications: Protobuf.Mesh.ClientNotification[];
 
@@ -79,10 +78,6 @@ export interface Device extends DeviceData {
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   getDialogOpen: (dialog: DialogVariant) => boolean;
   setMessageDraft: (message: string) => void;
-  incrementUnread: (nodeNum: number) => void;
-  resetUnread: (nodeNum: number) => void;
-  getUnreadCount: (nodeNum: number) => number;
-  getAllUnreadCount: () => number;
   sendAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
   addClientNotification: (clientNotificationPacket: Protobuf.Mesh.ClientNotification) => void;
   removeClientNotification: (index: number) => void;
@@ -173,7 +168,6 @@ function deviceFactory(
     },
     pendingSettingsChanges: false,
     messageDraft: "",
-    unreadCounts: new Map(),
     clientNotifications: [],
 
     setStatus: (status: Types.DeviceStatusEnum) => {
@@ -558,51 +552,6 @@ function deviceFactory(
         }),
       );
     },
-    incrementUnread: (nodeNum: number) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          const currentCount = device.unreadCounts.get(nodeNum) ?? 0;
-          device.unreadCounts.set(nodeNum, currentCount + 1);
-        }),
-      );
-    },
-    getUnreadCount: (nodeNum: number): number => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-      return device.unreadCounts.get(nodeNum) ?? 0;
-    },
-    getAllUnreadCount: (): number => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-      let totalUnread = 0;
-      device.unreadCounts.forEach((count) => {
-        totalUnread += count;
-      });
-      return totalUnread;
-    },
-    resetUnread: (nodeNum: number) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          device.unreadCounts.set(nodeNum, 0);
-          if (device.unreadCounts.get(nodeNum) === 0) {
-            device.unreadCounts.delete(nodeNum);
-          }
-        }),
-      );
-    },
-
     sendAdminMessage(message: Protobuf.Admin.AdminMessage) {
       const device = get().devices.get(id);
       if (!device) {
