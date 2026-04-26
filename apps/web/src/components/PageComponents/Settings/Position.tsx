@@ -26,7 +26,7 @@ const EMPTY_RADIO_SIGNAL = {
 export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
-  const { config, getEffectiveConfig, queueAdminMessage } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
   const editor = useConfigEditor();
   const myNode = useMyNodeAsProto();
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
@@ -77,7 +77,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
         },
       });
 
-      queueAdminMessage(message);
+      editor?.queueAdminMessage(message);
     }
   };
 

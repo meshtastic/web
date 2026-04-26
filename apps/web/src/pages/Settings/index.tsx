@@ -1,13 +1,10 @@
 import { deviceRoute, moduleRoute, radioRoute } from "@app/routes";
-import { toBinary } from "@bufbuild/protobuf";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { DeviceConfig } from "@pages/Settings/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig.tsx";
@@ -25,27 +22,25 @@ import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { RadioConfig } from "./RadioConfig.tsx";
 
-const ConfigPage = () => {
-  const {
-    getAllConfigChanges,
-    getAllModuleConfigChanges,
-    getAllChannelChanges,
-    getAllQueuedAdminMessages,
-    connection,
-    clearAllChanges,
-    setConfig,
-    setModuleConfig,
-    addChannel,
-    getConfigChangeCount,
-    getModuleConfigChangeCount,
-    getChannelChangeCount,
-    getAdminMessageChangeCount,
-  } = useDevice();
+const EMPTY_DIRTY_STRING_SIGNAL = {
+  value: [] as readonly string[],
+  peek: () => [] as readonly string[],
+  subscribe: () => () => {},
+} as const;
+const EMPTY_DIRTY_NUMBER_SIGNAL = {
+  value: [] as readonly number[],
+  peek: () => [] as readonly number[],
+  subscribe: () => () => {},
+} as const;
 
+const ConfigPage = () => {
   const editor = useConfigEditor();
   const editorIsDirty = useSignal(
     editor?.isDirty ?? { value: false, peek: () => false, subscribe: () => () => {} },
   );
+  const dirtyRadio = useSignal(editor?.dirtyRadioSections ?? EMPTY_DIRTY_STRING_SIGNAL);
+  const dirtyModule = useSignal(editor?.dirtyModuleSections ?? EMPTY_DIRTY_STRING_SIGNAL);
+  const dirtyChannels = useSignal(editor?.dirtyChannels ?? EMPTY_DIRTY_NUMBER_SIGNAL);
 
   const [isSaving, setIsSaving] = useState(false);
   const [rhfState, setRhfState] = useState({ isDirty: false, isValid: true });
@@ -56,10 +51,9 @@ const ConfigPage = () => {
   const routerState = useRouterState();
   const { t } = useTranslation("config");
 
-  const configChangeCount = getConfigChangeCount();
-  const moduleConfigChangeCount = getModuleConfigChangeCount();
-  const channelChangeCount = getChannelChangeCount();
-  const adminMessageChangeCount = getAdminMessageChangeCount();
+  const configChangeCount = dirtyRadio.length;
+  const moduleConfigChangeCount = dirtyModule.length;
+  const channelChangeCount = dirtyChannels.length;
 
   const sections = useMemo(
     () => [
@@ -123,92 +117,18 @@ const ConfigPage = () => {
   }, []);
 
   const handleSave = useCallback(async () => {
+    if (!editor) return;
     setIsSaving(true);
 
     try {
-      const channelChanges = getAllChannelChanges();
-      const configChanges = getAllConfigChanges();
-      const moduleConfigChanges = getAllModuleConfigChanges();
-      const adminMessages = getAllQueuedAdminMessages();
-
-      await Promise.all(
-        channelChanges.map((channel) =>
-          connection?.setChannel(channel).then(() => {
-            toast({
-              title: t("toast.savedChannel.title", {
-                ns: "ui",
-                channelName: channel.settings?.name,
-              }),
-            });
-          }),
-        ),
-      );
-
-      await Promise.all(
-        configChanges.map((newConfig) =>
-          connection?.setConfig(newConfig).then(() => {
-            toast({
-              title: t("toast.saveSuccess.title"),
-              description: t("toast.saveSuccess.description", {
-                case: newConfig.payloadVariant.case,
-              }),
-            });
-          }),
-        ),
-      );
-
-      await Promise.all(
-        moduleConfigChanges.map((newModuleConfig) =>
-          connection?.setModuleConfig(newModuleConfig).then(() =>
-            toast({
-              title: t("toast.saveSuccess.title"),
-              description: t("toast.saveSuccess.description", {
-                case: newModuleConfig.payloadVariant.case,
-              }),
-            }),
-          ),
-        ),
-      );
-
-      if (configChanges.length > 0 || moduleConfigChanges.length > 0) {
-        await connection?.commitEditSettings();
+      const result = await editor.commit();
+      if (result.status === "error") {
+        throw result.error;
       }
-
-      // Run the SDK ConfigEditor commit for migrated sections (currently
-      // Position / LoRa / MQTT). It wraps its own beginEdit/commitEdit, so
-      // sequencing it after the legacy flow is fine — devices accept
-      // multiple edit windows in the same save.
-      if (editor && editor.isDirty.peek()) {
-        const result = await editor.commit();
-        if (result.status === "error") {
-          throw result.error;
-        }
-      }
-
-      // Send queued admin messages after configs are committed
-      if (adminMessages.length > 0) {
-        await Promise.all(
-          adminMessages.map((message) =>
-            connection?.sendPacket(
-              toBinary(Protobuf.Admin.AdminMessageSchema, message),
-              Protobuf.Portnums.PortNum.ADMIN_APP,
-              "self",
-            ),
-          ),
-        );
-      }
-
-      channelChanges.forEach((newChannel) => {
-        addChannel(newChannel);
+      toast({
+        title: t("toast.saveAllSuccess.title"),
+        description: t("toast.saveAllSuccess.description"),
       });
-      configChanges.forEach((newConfig) => {
-        setConfig(newConfig);
-      });
-      moduleConfigChanges.forEach((newModuleConfig) => {
-        setModuleConfig(newModuleConfig);
-      });
-
-      clearAllChanges();
 
       if (formMethods) {
         formMethods.reset(formMethods.getValues(), {
@@ -217,7 +137,6 @@ const ConfigPage = () => {
           keepTouched: false,
           keepValues: true,
         });
-
         formMethods.trigger();
       }
     } catch {
@@ -227,33 +146,15 @@ const ConfigPage = () => {
       });
     } finally {
       setIsSaving(false);
-      toast({
-        title: t("toast.saveAllSuccess.title"),
-        description: t("toast.saveAllSuccess.description"),
-      });
     }
-  }, [
-    toast,
-    t,
-    getAllConfigChanges,
-    connection,
-    getAllModuleConfigChanges,
-    getAllChannelChanges,
-    getAllQueuedAdminMessages,
-    formMethods,
-    addChannel,
-    setConfig,
-    setModuleConfig,
-    clearAllChanges,
-    editor,
-  ]);
+  }, [toast, t, formMethods, editor]);
 
   const handleReset = useCallback(() => {
     if (formMethods) {
       formMethods.reset();
     }
-    clearAllChanges();
-  }, [formMethods, clearAllChanges]);
+    editor?.reset();
+  }, [formMethods, editor]);
 
   const leftSidebar = useMemo(
     () => (
@@ -276,12 +177,7 @@ const ConfigPage = () => {
     [sections, activeSection?.key, navigate, t],
   );
 
-  const hasDrafts =
-    getConfigChangeCount() > 0 ||
-    getModuleConfigChangeCount() > 0 ||
-    getChannelChangeCount() > 0 ||
-    adminMessageChangeCount > 0 ||
-    editorIsDirty;
+  const hasDrafts = editorIsDirty;
   const hasPending = hasDrafts || rhfState.isDirty;
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
   const saveDisabled = isSaving || !rhfState.isValid || !hasPending;

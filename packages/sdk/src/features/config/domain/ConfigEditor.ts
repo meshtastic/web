@@ -7,6 +7,7 @@ import type { MeshClient } from "../../../core/client/MeshClient.ts";
 import { type ReadonlySignal, toReadonly } from "../../../core/signals/createStore.ts";
 import { setChannel } from "../../channels/application/ChannelUseCases.ts";
 import { DeviceStatusEnum } from "../../device/domain/DeviceStatus.ts";
+import { sendAdminMessage } from "../../device/infrastructure/AdminMessageSender.ts";
 import { setOwner } from "../../nodes/application/SetOwnerUseCase.ts";
 import {
   beginEditSettings,
@@ -48,6 +49,7 @@ export class ConfigEditor {
   );
   private readonly baselineOwner = signal<Protobuf.Mesh.User | undefined>(undefined);
   private readonly workingOwner = signal<Protobuf.Mesh.User | undefined>(undefined);
+  private readonly queuedAdminMessages = signal<readonly Protobuf.Admin.AdminMessage[]>([]);
   private readonly _dirtyRadioSections = signal<readonly RadioConfigSection[]>([]);
   private readonly _dirtyModuleSections = signal<readonly ModuleConfigSection[]>([]);
   private readonly _dirtyChannels = signal<readonly number[]>([]);
@@ -131,6 +133,7 @@ export class ConfigEditor {
         this.workingModules.value = {};
         this.workingChannels.value = new Map();
         this.workingOwner.value = undefined;
+        this.queuedAdminMessages.value = [];
         this._dirtyRadioSections.value = [];
         this._dirtyModuleSections.value = [];
         this._dirtyChannels.value = [];
@@ -155,6 +158,17 @@ export class ConfigEditor {
 
   public setOwner(owner: Protobuf.Mesh.User): void {
     this.workingOwner.value = owner;
+    this.recomputeDirty();
+  }
+
+  /**
+   * Queue an arbitrary admin message to be sent inside the next commit
+   * (between beginEdit and commitEdit). Used for one-off side flows like
+   * setFixedPosition where the user wants to commit a pending coordinate
+   * alongside their other edits.
+   */
+  public queueAdminMessage(message: Protobuf.Admin.AdminMessage): void {
+    this.queuedAdminMessages.value = [...this.queuedAdminMessages.peek(), message];
     this.recomputeDirty();
   }
 
@@ -234,6 +248,16 @@ export class ConfigEditor {
       }
     }
 
+    for (const message of this.queuedAdminMessages.peek()) {
+      const variant = message.payloadVariant;
+      if (!variant.case) continue;
+      try {
+        await sendAdminMessage(this.client, variant);
+      } catch (e) {
+        return Result.err(e instanceof Error ? e : new Error(String(e)));
+      }
+    }
+
     const commitResult = await commitEditSettings(this.client);
     if (Result.isError(commitResult)) return Result.err(commitResult.error);
 
@@ -241,6 +265,7 @@ export class ConfigEditor {
     this.baselineModules.value = this.workingModules.peek();
     this.baselineChannels.value = new Map(this.workingChannels.peek());
     this.baselineOwner.value = this.workingOwner.peek();
+    this.queuedAdminMessages.value = [];
     this._dirtyRadioSections.value = [];
     this._dirtyModuleSections.value = [];
     this._dirtyChannels.value = [];
@@ -289,13 +314,18 @@ export class ConfigEditor {
     }
 
     const ownerDirty = !shallowEqual(this.baselineOwner.peek(), this.workingOwner.peek());
+    const hasQueuedAdmin = this.queuedAdminMessages.peek().length > 0;
 
     this._dirtyRadioSections.value = radioDirty;
     this._dirtyModuleSections.value = moduleDirty;
     this._dirtyChannels.value = channelDirty;
     this._isOwnerDirty.value = ownerDirty;
     this._isDirty.value =
-      radioDirty.length > 0 || moduleDirty.length > 0 || channelDirty.length > 0 || ownerDirty;
+      radioDirty.length > 0 ||
+      moduleDirty.length > 0 ||
+      channelDirty.length > 0 ||
+      ownerDirty ||
+      hasQueuedAdmin;
   }
 }
 

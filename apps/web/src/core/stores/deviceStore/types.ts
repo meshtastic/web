@@ -1,5 +1,10 @@
 import type { Protobuf } from "@meshtastic/sdk";
-import type { ValidConfigType, ValidModuleConfigType } from "./changeRegistry.ts";
+
+type ValidConfigType = Exclude<keyof Protobuf.LocalOnly.LocalConfig, "version" | "$typeName">;
+type ValidModuleConfigType = Exclude<
+  keyof Protobuf.LocalOnly.LocalModuleConfig,
+  "version" | "$typeName"
+>;
 
 interface Dialogs {
   import: boolean;
