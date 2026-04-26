@@ -1,4 +1,4 @@
-import { Types } from "@meshtastic/sdk";
+import { DeviceStatusEnum, type DeviceOutput, type Transport } from "@meshtastic/sdk";
 
 function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
   if (
@@ -14,21 +14,21 @@ function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
 /**
  * Provides Web Bluetooth transport for Meshtastic devices.
  *
- * Implements the {@link Types.Transport} contract using the Web Bluetooth API.
+ * Implements the {@link Transport} contract using the Web Bluetooth API.
  * Use {@link TransportWebBluetooth.create} or {@link TransportWebBluetooth.createFromDevice}
  * to construct an instance.
  */
-export class TransportWebBluetooth implements Types.Transport {
+export class TransportWebBluetooth implements Transport {
   private _toDevice: WritableStream<Uint8Array>;
-  private _fromDevice: ReadableStream<Types.DeviceOutput>;
-  private fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
+  private _fromDevice: ReadableStream<DeviceOutput>;
+  private fromDeviceController?: ReadableStreamDefaultController<DeviceOutput>;
 
   private toRadioCharacteristic: BluetoothRemoteGATTCharacteristic;
   private fromRadioCharacteristic: BluetoothRemoteGATTCharacteristic;
   private fromNumCharacteristic: BluetoothRemoteGATTCharacteristic;
   private gattServer: BluetoothRemoteGATTServer;
 
-  private lastStatus: Types.DeviceStatusEnum = Types.DeviceStatusEnum.DeviceDisconnected;
+  private lastStatus: DeviceStatusEnum = DeviceStatusEnum.DeviceDisconnected;
 
   private closingByUser = false;
   private reading = false;
@@ -45,7 +45,7 @@ export class TransportWebBluetooth implements Types.Transport {
     if (this.closingByUser) {
       return;
     }
-    this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "gatt-disconnected");
+    this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "gatt-disconnected");
   };
   private onFromNumChanged = () => {
     void this.readFromRadio();
@@ -118,10 +118,10 @@ export class TransportWebBluetooth implements Types.Transport {
     this.fromNumCharacteristic = fromNumCharacteristic;
     this.gattServer = gattServer;
 
-    this._fromDevice = new ReadableStream<Types.DeviceOutput>({
+    this._fromDevice = new ReadableStream<DeviceOutput>({
       start: async (ctrl) => {
         this.fromDeviceController = ctrl;
-        this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
+        this.emitStatus(DeviceStatusEnum.DeviceConnecting);
 
         this.gattServer.device.addEventListener("gattserverdisconnected", this.onGattDisconnected);
 
@@ -131,11 +131,11 @@ export class TransportWebBluetooth implements Types.Transport {
             "characteristicvaluechanged",
             this.onFromNumChanged,
           );
-          this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
+          this.emitStatus(DeviceStatusEnum.DeviceConnected);
           // prime once in case data already queued
           void this.readFromRadio();
         } catch {
-          this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "notify-failed");
+          this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "notify-failed");
           this.gattServer.device.removeEventListener(
             "gattserverdisconnected",
             this.onGattDisconnected,
@@ -151,7 +151,7 @@ export class TransportWebBluetooth implements Types.Transport {
           await this.toRadioCharacteristic.writeValue(ab);
           void this.readFromRadio(); // ensure we read any response
         } catch (error) {
-          this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "write-error");
+          this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "write-error");
           throw error;
         }
       },
@@ -163,8 +163,8 @@ export class TransportWebBluetooth implements Types.Transport {
     return this._toDevice;
   }
 
-  /** Readable stream of {@link Types.DeviceOutput} from the device. */
-  get fromDevice(): ReadableStream<Types.DeviceOutput> {
+  /** Readable stream of {@link DeviceOutput} from the device. */
+  get fromDevice(): ReadableStream<DeviceOutput> {
     return this._fromDevice;
   }
 
@@ -174,7 +174,7 @@ export class TransportWebBluetooth implements Types.Transport {
   disconnect(): Promise<void> {
     try {
       this.closingByUser = true;
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "user");
       try {
         this.fromNumCharacteristic.stopNotifications?.();
       } catch {}
@@ -212,7 +212,7 @@ export class TransportWebBluetooth implements Types.Transport {
       }
     } catch (error) {
       if (!this.closingByUser) {
-        this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "read-error");
+        this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
       }
       throw error;
     } finally {
@@ -220,7 +220,7 @@ export class TransportWebBluetooth implements Types.Transport {
     }
   }
 
-  private emitStatus(next: Types.DeviceStatusEnum, reason?: string): void {
+  private emitStatus(next: DeviceStatusEnum, reason?: string): void {
     if (next === this.lastStatus) {
       return;
     }
@@ -231,7 +231,7 @@ export class TransportWebBluetooth implements Types.Transport {
     });
   }
 
-  private enqueue(output: Types.DeviceOutput): void {
+  private enqueue(output: DeviceOutput): void {
     this.fromDeviceController?.enqueue(output);
   }
 }

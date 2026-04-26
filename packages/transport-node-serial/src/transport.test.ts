@@ -1,13 +1,14 @@
 import { Duplex } from "node:stream";
-import { Types, Utils } from "@meshtastic/sdk";
+import * as MeshSDK from "@meshtastic/sdk";
+import { DeviceStatusEnum, type DeviceOutput, toDeviceStream } from "@meshtastic/sdk";
 import type { SerialPort } from "serialport";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract.ts";
 import { TransportNodeSerial } from "./transport.ts";
 
 function isStatusEvent(
-  output: Types.DeviceOutput | undefined,
-): output is Extract<Types.DeviceOutput, { type: "status" }> {
+  output: DeviceOutput | undefined,
+): output is Extract<DeviceOutput, { type: "status" }> {
   return output !== undefined && output.type === "status";
 }
 
@@ -53,18 +54,20 @@ function stubCoreTransforms() {
     });
 
   const fromDeviceFactory = () =>
-    new TransformStream<Uint8Array, Types.DeviceOutput>({
+    new TransformStream<Uint8Array, DeviceOutput>({
       transform(chunk, controller) {
         controller.enqueue({ type: "packet", data: chunk });
       },
     });
 
-  // Utils.toDeviceStream is a getter
-  const transform = Utils.toDeviceStream;
-  vi.spyOn(Utils, "toDeviceStream", "get").mockReturnValue(toDevice as unknown as typeof transform);
+  // toDeviceStream is a getter
+  const transform = toDeviceStream;
+  // biome-ignore lint/suspicious/noExplicitAny: vi.spyOn overloads don't match re-exported module bindings
+  const sdk = MeshSDK as any;
+  vi.spyOn(sdk, "toDeviceStream", "get").mockReturnValue(toDevice as unknown as typeof transform);
 
-  vi.spyOn(Utils, "fromDeviceStream").mockImplementation(
-    () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, Types.DeviceOutput>,
+  vi.spyOn(sdk, "fromDeviceStream").mockImplementation(
+    () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, DeviceOutput>,
   );
 
   return {
@@ -135,13 +138,13 @@ describe("TransportNodeSerial (extras)", () => {
     const first = await reader.read();
     expect(isStatusEvent(first.value)).toBe(true);
     if (isStatusEvent(first.value)) {
-      expect(first.value.data.status).toBe(Types.DeviceStatusEnum.DeviceConnecting);
+      expect(first.value.data.status).toBe(DeviceStatusEnum.DeviceConnecting);
     }
 
     const second = await reader.read();
     expect(isStatusEvent(second.value)).toBe(true);
     if (isStatusEvent(second.value)) {
-      expect(second.value.data.status).toBe(Types.DeviceStatusEnum.DeviceConnected);
+      expect(second.value.data.status).toBe(DeviceStatusEnum.DeviceConnected);
     }
 
     fakePort.emitClose();

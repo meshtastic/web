@@ -1,22 +1,28 @@
 import { Socket } from "node:net";
 import { Readable, Writable } from "node:stream";
-import { Types, Utils } from "@meshtastic/sdk";
+import {
+  DeviceStatusEnum,
+  type DeviceOutput,
+  fromDeviceStream,
+  toDeviceStream,
+  type Transport,
+} from "@meshtastic/sdk";
 
 /**
  * Node.js TCP transport for Meshtastic.
  *
- * Implements {@link Types.Transport} on top of a Node `net.Socket`.
+ * Implements {@link Transport} on top of a Node `net.Socket`.
  * Use {@link TransportNode.create} to open a new connection, or
  * construct directly with an existing socket.
  */
-export class TransportNode implements Types.Transport {
+export class TransportNode implements Transport {
   private readonly _toDevice: WritableStream<Uint8Array>;
-  private readonly _fromDevice: ReadableStream<Types.DeviceOutput>;
-  private fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
+  private readonly _fromDevice: ReadableStream<DeviceOutput>;
+  private fromDeviceController?: ReadableStreamDefaultController<DeviceOutput>;
   private socket: Socket | undefined;
   private pipePromise?: Promise<void>;
   private abortController: AbortController;
-  private lastStatus: Types.DeviceStatusEnum = Types.DeviceStatusEnum.DeviceDisconnected;
+  private lastStatus: DeviceStatusEnum = DeviceStatusEnum.DeviceDisconnected;
 
   private closingByUser = false;
   private errored = false;
@@ -60,7 +66,7 @@ export class TransportNode implements Types.Transport {
       this.socket?.removeAllListeners();
       this.socket?.destroy();
       if (!this.closingByUser) {
-        this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "socket-error");
+        this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "socket-error");
       }
     });
 
@@ -68,13 +74,13 @@ export class TransportNode implements Types.Transport {
       if (this.closingByUser) {
         return; // suppress close-derived disconnect in user flow
       }
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "socket-end");
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "socket-end");
       this.socket?.removeAllListeners();
       this.socket?.destroy();
     });
 
     this.socket.on("timeout", () => {
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "socket-timeout");
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "socket-timeout");
       this.socket?.removeAllListeners();
       this.socket?.destroy();
     });
@@ -83,21 +89,21 @@ export class TransportNode implements Types.Transport {
       if (this.closingByUser) {
         return; // suppress close-derived disconnect in user flow
       }
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "socket-closed");
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "socket-closed");
     });
 
     this.abortController = new AbortController();
     const abortController = this.abortController;
 
     const fromDeviceSource = Readable.toWeb(connection) as ReadableStream<Uint8Array>;
-    const transformed = fromDeviceSource.pipeThrough(Utils.fromDeviceStream());
+    const transformed = fromDeviceSource.pipeThrough(fromDeviceStream());
 
-    this._fromDevice = new ReadableStream<Types.DeviceOutput>({
+    this._fromDevice = new ReadableStream<DeviceOutput>({
       start: async (ctrl) => {
         this.fromDeviceController = ctrl;
 
-        this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
-        this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
+        this.emitStatus(DeviceStatusEnum.DeviceConnecting);
+        this.emitStatus(DeviceStatusEnum.DeviceConnected);
 
         const reader = transformed.getReader();
         try {
@@ -113,7 +119,7 @@ export class TransportNode implements Types.Transport {
           if (this.closingByUser || this.errored) {
             ctrl.close();
           } else {
-            this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "read-error");
+            this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
 
             ctrl.error(error instanceof Error ? error : new Error(String(error)));
           }
@@ -127,7 +133,7 @@ export class TransportNode implements Types.Transport {
     });
 
     // Stream for data going FROM the application TO the Meshtastic device.
-    const toDeviceTransform = Utils.toDeviceStream();
+    const toDeviceTransform = toDeviceStream();
     this._toDevice = toDeviceTransform.writable;
 
     this.pipePromise = toDeviceTransform.readable
@@ -149,7 +155,7 @@ export class TransportNode implements Types.Transport {
   }
 
   /** ReadableStream to receive data from the device. */
-  public get fromDevice(): ReadableStream<Types.DeviceOutput> {
+  public get fromDevice(): ReadableStream<DeviceOutput> {
     return this._fromDevice;
   }
 
@@ -160,7 +166,7 @@ export class TransportNode implements Types.Transport {
   async disconnect(): Promise<void> {
     try {
       this.closingByUser = true;
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "user");
 
       this.abortController.abort();
       if (this.pipePromise) {
@@ -174,7 +180,7 @@ export class TransportNode implements Types.Transport {
     }
   }
 
-  private emitStatus(next: Types.DeviceStatusEnum, reason?: string): void {
+  private emitStatus(next: DeviceStatusEnum, reason?: string): void {
     if (next === this.lastStatus) {
       return;
     }

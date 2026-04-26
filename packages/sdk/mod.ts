@@ -25,6 +25,14 @@ export { generatePacketId } from "./src/core/identifiers/PacketId.ts";
 // Event bus (advanced consumers)
 export { EventBus } from "./src/core/event-bus/EventBus.ts";
 
+// Packet codec streams (transport implementations)
+export { fromDeviceStream } from "./src/core/packet-codec/fromDevice.ts";
+export { toDeviceStream } from "./src/core/packet-codec/toDevice.ts";
+
+// Queue + Xmodem (advanced)
+export { Queue } from "./src/core/queue/Queue.ts";
+export { Xmodem } from "./src/core/xmodem/Xmodem.ts";
+
 // Transport interface
 export type { DeviceOutput, HttpRetryConfig, Transport } from "./src/core/transport/Transport.ts";
 export { DeviceStatusEnum } from "./src/core/transport/Transport.ts";
@@ -42,8 +50,10 @@ export type {
 } from "./src/core/types.ts";
 
 // Cross-cutting types kept under the Types namespace for consumers that
-// already reference legacy enums/interfaces.
-export * as Types from "./src/core/types.ts";
+// already reference legacy enums/interfaces. Imported via the wrapper to
+// dodge a tsdown dts emitter glitch on bare `export * as` namespaces.
+import * as Types from "./src/types-namespace.ts";
+export { Types };
 
 // Protobuf (re-export)
 export * as Protobuf from "@meshtastic/protobufs";
@@ -115,4 +125,7 @@ export type { FileTransfer, TransferStatus } from "./src/features/files/index.ts
 
 // Phase-A legacy shims (removed in Phase C)
 export { MeshDevice } from "./src/shim/legacyMeshDevice.ts";
-export * as Utils from "./src/shim/legacyUtils.ts";
+// Same workaround as Types — go through a wrapper to dodge tsdown's dts
+// emitter bug on `export * as`.
+import * as Utils from "./src/shim/legacyUtils.ts";
+export { Utils };

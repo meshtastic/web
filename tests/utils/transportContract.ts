@@ -1,9 +1,9 @@
-import { Types } from "@meshtastic/core";
+import { DeviceStatusEnum, type DeviceOutput, type Transport } from "@meshtastic/sdk";
 import { describe, expect, it } from "vitest";
 
 export interface TransportContract {
   name: string;
-  create: () => Promise<Types.Transport>;
+  create: () => Promise<Transport>;
   setup?: () => void | Promise<void>;
   teardown?: () => void | Promise<void>;
   pushIncoming?: (bytes: Uint8Array) => void | Promise<void>;
@@ -12,10 +12,10 @@ export interface TransportContract {
 }
 
 async function readUntilType(
-  reader: ReadableStreamDefaultReader<Types.DeviceOutput>,
-  expectedType: Types.DeviceOutput["type"],
+  reader: ReadableStreamDefaultReader<DeviceOutput>,
+  expectedType: DeviceOutput["type"],
   maxReads = 20,
-): Promise<Types.DeviceOutput> {
+): Promise<DeviceOutput> {
   for (let i = 0; i < maxReads; i++) {
     const { value, done } = await reader.read();
     if (done) {
@@ -75,7 +75,7 @@ export function runTransportContract(contract: TransportContract) {
         if (
           value &&
           value.type === "status" &&
-          value.data.status === Types.DeviceStatusEnum.DeviceDisconnected &&
+          value.data.status === DeviceStatusEnum.DeviceDisconnected &&
           value.data.reason === "user"
         ) {
           sawUser = true;
@@ -103,7 +103,7 @@ export function runTransportContract(contract: TransportContract) {
         if (
           value &&
           value.type === "status" &&
-          value.data.status === Types.DeviceStatusEnum.DeviceDisconnected
+          value.data.status === DeviceStatusEnum.DeviceDisconnected
         ) {
           sawDrop = true;
           break;
