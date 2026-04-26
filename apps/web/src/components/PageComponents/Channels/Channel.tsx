@@ -4,8 +4,8 @@ import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx"
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -17,8 +17,20 @@ export interface SettingsPanelProps {
   channel: Protobuf.Channel.Channel;
 }
 
+const EMPTY_CHANNELS_SIGNAL = {
+  value: new Map<number, Protobuf.Channel.Channel>() as ReadonlyMap<
+    number,
+    Protobuf.Channel.Channel
+  >,
+  peek: () =>
+    new Map<number, Protobuf.Channel.Channel>() as ReadonlyMap<number, Protobuf.Channel.Channel>,
+  subscribe: () => () => {},
+} as const;
+
 export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
-  const { config, setChange, getChange, removeChange } = useDevice();
+  const { config } = useDevice();
+  const editor = useConfigEditor();
+  const editorChannels = useSignal(editor?.channels ?? EMPTY_CHANNELS_SIGNAL);
   const { t } = useTranslation(["channels", "ui", "dialog"]);
 
   const defaultConfig = channel;
@@ -39,10 +51,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
     },
   };
 
-  const workingChannel = getChange({
-    type: "channel",
-    index: channel.index,
-  }) as Protobuf.Channel.Channel | undefined;
+  const workingChannel = editorChannels.get(channel.index);
   const effectiveConfig = workingChannel ?? channel;
   const formValues = {
     ...effectiveConfig,
@@ -95,7 +104,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
   }, [effectiveByteCount, trigger]);
 
   const onSubmit = (data: ChannelValidation) => {
-    if (!formState.isReady) {
+    if (!formState.isReady || !editor) {
       return;
     }
 
@@ -111,12 +120,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
       },
     });
 
-    if (deepCompareConfig(channel, payload, true)) {
-      removeChange({ type: "channel", index: channel.index });
-      return;
-    }
-
-    setChange({ type: "channel", index: channel.index }, payload, channel);
+    editor.setChannel(payload);
   };
 
   const preSharedKeyRegenerate = async () => {

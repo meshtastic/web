@@ -7,6 +7,7 @@ import type { MeshClient } from "../../../core/client/MeshClient.ts";
 import { type ReadonlySignal, toReadonly } from "../../../core/signals/createStore.ts";
 import { setChannel } from "../../channels/application/ChannelUseCases.ts";
 import { DeviceStatusEnum } from "../../device/domain/DeviceStatus.ts";
+import { setOwner } from "../../nodes/application/SetOwnerUseCase.ts";
 import {
   beginEditSettings,
   commitEditSettings,
@@ -45,9 +46,12 @@ export class ConfigEditor {
   private readonly workingChannels = signal<ReadonlyMap<number, Protobuf.Channel.Channel>>(
     new Map(),
   );
+  private readonly baselineOwner = signal<Protobuf.Mesh.User | undefined>(undefined);
+  private readonly workingOwner = signal<Protobuf.Mesh.User | undefined>(undefined);
   private readonly _dirtyRadioSections = signal<readonly RadioConfigSection[]>([]);
   private readonly _dirtyModuleSections = signal<readonly ModuleConfigSection[]>([]);
   private readonly _dirtyChannels = signal<readonly number[]>([]);
+  private readonly _isOwnerDirty = signal<boolean>(false);
   private readonly _isDirty = signal<boolean>(false);
 
   public readonly radio: ReadonlySignal<RadioConfig> = toReadonly(this.workingRadio);
@@ -63,6 +67,10 @@ export class ConfigEditor {
   public readonly dirtyChannels: ReadonlySignal<readonly number[]> = toReadonly(
     this._dirtyChannels,
   );
+  public readonly owner: ReadonlySignal<Protobuf.Mesh.User | undefined> = toReadonly(
+    this.workingOwner,
+  );
+  public readonly isOwnerDirty: ReadonlySignal<boolean> = toReadonly(this._isOwnerDirty);
   public readonly isDirty: ReadonlySignal<boolean> = toReadonly(this._isDirty);
 
   constructor(client: MeshClient) {
@@ -118,15 +126,36 @@ export class ConfigEditor {
         this.baselineRadio.value = {};
         this.baselineModules.value = {};
         this.baselineChannels.value = new Map();
+        this.baselineOwner.value = undefined;
         this.workingRadio.value = {};
         this.workingModules.value = {};
         this.workingChannels.value = new Map();
+        this.workingOwner.value = undefined;
         this._dirtyRadioSections.value = [];
         this._dirtyModuleSections.value = [];
         this._dirtyChannels.value = [];
+        this._isOwnerDirty.value = false;
         this._isDirty.value = false;
       }
     });
+  }
+
+  /**
+   * Update the baseline owner (the device's current user). Web pulls this
+   * from `useMyNode().user` after the NodeInfo packet arrives, so we accept
+   * it through a setter rather than subscribing to a SDK signal.
+   */
+  public setBaselineOwner(owner: Protobuf.Mesh.User | undefined): void {
+    this.baselineOwner.value = owner;
+    if (!this._isOwnerDirty.peek()) {
+      this.workingOwner.value = owner;
+    }
+    this.recomputeDirty();
+  }
+
+  public setOwner(owner: Protobuf.Mesh.User): void {
+    this.workingOwner.value = owner;
+    this.recomputeDirty();
   }
 
   public setRadioSection<K extends RadioConfigSection & string>(
@@ -156,6 +185,7 @@ export class ConfigEditor {
     this.workingRadio.value = this.baselineRadio.peek();
     this.workingModules.value = this.baselineModules.peek();
     this.workingChannels.value = new Map(this.baselineChannels.peek());
+    this.workingOwner.value = this.baselineOwner.peek();
     this.recomputeDirty();
   }
 
@@ -196,15 +226,25 @@ export class ConfigEditor {
       if (Result.isError(result)) return Result.err(result.error);
     }
 
+    if (this._isOwnerDirty.peek()) {
+      const owner = this.workingOwner.peek();
+      if (owner) {
+        const result = await setOwner(this.client, owner);
+        if (Result.isError(result)) return Result.err(result.error);
+      }
+    }
+
     const commitResult = await commitEditSettings(this.client);
     if (Result.isError(commitResult)) return Result.err(commitResult.error);
 
     this.baselineRadio.value = this.workingRadio.peek();
     this.baselineModules.value = this.workingModules.peek();
     this.baselineChannels.value = new Map(this.workingChannels.peek());
+    this.baselineOwner.value = this.workingOwner.peek();
     this._dirtyRadioSections.value = [];
     this._dirtyModuleSections.value = [];
     this._dirtyChannels.value = [];
+    this._isOwnerDirty.value = false;
     this._isDirty.value = false;
 
     return Result.ok(undefined);
@@ -248,11 +288,14 @@ export class ConfigEditor {
       }
     }
 
+    const ownerDirty = !shallowEqual(this.baselineOwner.peek(), this.workingOwner.peek());
+
     this._dirtyRadioSections.value = radioDirty;
     this._dirtyModuleSections.value = moduleDirty;
     this._dirtyChannels.value = channelDirty;
+    this._isOwnerDirty.value = ownerDirty;
     this._isDirty.value =
-      radioDirty.length > 0 || moduleDirty.length > 0 || channelDirty.length > 0;
+      radioDirty.length > 0 || moduleDirty.length > 0 || channelDirty.length > 0 || ownerDirty;
   }
 }
 

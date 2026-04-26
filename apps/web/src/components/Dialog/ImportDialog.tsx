@@ -20,8 +20,8 @@ import {
 } from "@components/UI/Select.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor } from "@meshtastic/sdk-react";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -33,7 +33,8 @@ export interface ImportDialogProps {
 }
 
 export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
-  const { setChange, channels, config } = useDevice();
+  const { config } = useDevice();
+  const editor = useConfigEditor();
   const { t } = useTranslation("dialog");
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
@@ -77,6 +78,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
   }, [importDialogInput, t]);
 
   const apply = () => {
+    if (!editor) return;
     channelSet?.settings.forEach((ch: Protobuf.Channel.ChannelSettings, index: number) => {
       if (importIndex[index] === -1) {
         return;
@@ -91,24 +93,15 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
         settings: ch,
       });
 
-      if (!deepCompareConfig(channels.get(importIndex[index] ?? 0), payload, true)) {
-        setChange(
-          { type: "channel", index: importIndex[index] ?? 0 },
-          payload,
-          channels.get(importIndex[index] ?? 0),
-        );
-      }
+      editor.setChannel(payload);
     });
 
     if (channelSet?.loraConfig && updateConfig) {
       const payload = {
         ...config.lora,
         ...channelSet.loraConfig,
-      };
-
-      if (!deepCompareConfig(config.lora, payload, true)) {
-        setChange({ type: "config", variant: "lora" }, payload, config.lora);
-      }
+      } as Protobuf.Config.Config_LoRaConfig;
+      editor.setRadioSection("lora", payload);
     }
     // Reset state after import
     setImportDialogInput("");

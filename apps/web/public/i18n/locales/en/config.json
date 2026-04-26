@@ -540,7 +540,7 @@
     }
   },
   "user": {
-    "title": "User Settings",
+    "title": "User",
     "description": "Configure your device name and identity settings",
     "longName": {
       "label": "Long Name",
@@ -560,11 +560,23 @@
     },
     "isUnmessageable": {
       "label": "Unmessageable",
-      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+      "description": "Unmonitored or Infrastructure"
     },
     "isLicensed": {
-      "label": "Licensed amateur radio (HAM)",
-      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+      "label": "Licensed amateur radio (Ham)",
+      "description": "Enabling this option disables encryption and is not compatible with the default Meshtastic network."
+    },
+    "userConfig": {
+      "label": "User Config",
+      "description": "Identity and licensing"
+    },
+    "nodeId": {
+      "label": "Node ID",
+      "description": "Read-only — assigned by the device"
+    },
+    "hardwareModel": {
+      "label": "Hardware model",
+      "description": "Read-only — reported by the device"
     }
   }
 }
