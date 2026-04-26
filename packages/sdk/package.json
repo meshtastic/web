@@ -4,26 +4,26 @@
   "description": "Domain-driven SDK for Meshtastic devices. Feature slices (device/chat/nodes/channels/config/telemetry/position/traceroute/files) with signals-backed reactive state. Replaces @meshtastic/core.",
   "exports": {
     ".": {
-      "types": "./mod.ts",
+      "types": "./dist/mod.d.ts",
       "default": "./mod.ts"
     },
     "./transport": {
-      "types": "./src/core/transport/index.ts",
+      "types": "./dist/transport.d.ts",
       "default": "./src/core/transport/index.ts"
     },
     "./protobuf": {
-      "types": "./src/core/protobuf/index.ts",
+      "types": "./dist/protobuf.d.ts",
       "default": "./src/core/protobuf/index.ts"
     },
     "./testing": {
-      "types": "./src/core/testing/index.ts",
+      "types": "./dist/testing.d.ts",
       "default": "./src/core/testing/index.ts"
     }
   },
   "type": "module",
   "main": "./dist/mod.js",
   "module": "./dist/mod.js",
-  "types": "./mod.ts",
+  "types": "./dist/mod.d.ts",
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
@@ -38,7 +38,9 @@
       "testing": "src/core/testing/index.ts"
     },
     "platform": "browser",
-    "dts": true,
+    "dts": {
+      "isolatedDeclarations": false
+    },
     "format": ["esm"],
     "splitting": false,
     "clean": true

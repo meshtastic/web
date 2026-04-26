@@ -1,4 +1,5 @@
-import { Types, Utils } from "@meshtastic/sdk";
+import * as MeshSDK from "@meshtastic/sdk";
+import { DeviceStatusEnum, type DeviceOutput, toDeviceStream } from "@meshtastic/sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract.ts";
 import { TransportWebSerial } from "./transport.ts";
@@ -13,21 +14,23 @@ function stubCoreTransforms() {
 
   // maps raw bytes -> DeviceOutput.packet
   const fromDeviceFactory = () =>
-    new TransformStream<Uint8Array, Types.DeviceOutput>({
+    new TransformStream<Uint8Array, DeviceOutput>({
       transform(chunk, controller) {
         controller.enqueue({ type: "packet", data: chunk });
       },
     });
 
-  const transform = Utils.toDeviceStream;
+  const transform = toDeviceStream;
+  // biome-ignore lint/suspicious/noExplicitAny: vi.spyOn's overloads on a re-exported module binding don't match
+  const sdk = MeshSDK as any;
   const restoreTo = vi
-    .spyOn(Utils, "toDeviceStream", "get")
+    .spyOn(sdk, "toDeviceStream", "get")
     .mockReturnValue(toDevice as unknown as typeof transform);
 
   const restoreFrom = vi
-    .spyOn(Utils, "fromDeviceStream")
+    .spyOn(sdk, "fromDeviceStream")
     .mockImplementation(
-      () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, Types.DeviceOutput>,
+      () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, DeviceOutput>,
     );
 
   return {
@@ -206,7 +209,7 @@ describe("TransportWebSerial (extras)", () => {
       if (!value || value.type !== "status") {
         break;
       }
-      if (value.data.status === Types.DeviceStatusEnum.DeviceConnected) {
+      if (value.data.status === DeviceStatusEnum.DeviceConnected) {
         break;
       }
     }

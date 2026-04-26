@@ -1,22 +1,28 @@
 import { Readable, Writable } from "node:stream";
-import { Types, Utils } from "@meshtastic/sdk";
+import {
+  DeviceStatusEnum,
+  type DeviceOutput,
+  fromDeviceStream,
+  toDeviceStream,
+  type Transport,
+} from "@meshtastic/sdk";
 import { SerialPort } from "serialport";
 
 /**
  * Node.js Serial transport for Meshtastic.
  *
- * Implements {@link Types.Transport} on top of a Node `SerialPort`.
+ * Implements {@link Transport} on top of a Node `SerialPort`.
  * Use {@link TransportNodeSerial.create} for a convenient factory, or
  * `new TransportNodeSerial(port)` if you already have an open port.
  */
-export class TransportNodeSerial implements Types.Transport {
+export class TransportNodeSerial implements Transport {
   private readonly _toDevice: WritableStream<Uint8Array>;
-  private readonly _fromDevice: ReadableStream<Types.DeviceOutput>;
-  private fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
+  private readonly _fromDevice: ReadableStream<DeviceOutput>;
+  private fromDeviceController?: ReadableStreamDefaultController<DeviceOutput>;
   private port: SerialPort | undefined;
   private pipePromise?: Promise<void>;
   private abortController: AbortController;
-  private lastStatus: Types.DeviceStatusEnum = Types.DeviceStatusEnum.DeviceDisconnected;
+  private lastStatus: DeviceStatusEnum = DeviceStatusEnum.DeviceDisconnected;
   private closingByUser = false;
 
   /**
@@ -54,27 +60,27 @@ export class TransportNodeSerial implements Types.Transport {
     this.port = port;
     this.port.on("error", (err) => {
       console.error("Serial port connection error:", err);
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "port-error");
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "port-error");
     });
     this.port.on("close", () => {
       if (this.closingByUser) {
         return;
       }
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "port-closed");
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "port-closed");
     });
 
     const fromDeviceSource = Readable.toWeb(port) as ReadableStream<Uint8Array>;
-    const transformed = fromDeviceSource.pipeThrough(Utils.fromDeviceStream());
+    const transformed = fromDeviceSource.pipeThrough(fromDeviceStream());
 
     this.abortController = new AbortController();
     const controller = this.abortController;
 
-    this._fromDevice = new ReadableStream<Types.DeviceOutput>({
+    this._fromDevice = new ReadableStream<DeviceOutput>({
       start: async (ctrl) => {
         this.fromDeviceController = ctrl;
 
-        this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
-        this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
+        this.emitStatus(DeviceStatusEnum.DeviceConnecting);
+        this.emitStatus(DeviceStatusEnum.DeviceConnected);
 
         const reader = transformed.getReader();
         try {
@@ -90,7 +96,7 @@ export class TransportNodeSerial implements Types.Transport {
           if (this.closingByUser) {
             ctrl.close(); // graceful EOF on user
           } else {
-            this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "read-error");
+            this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
             ctrl.error(error instanceof Error ? error : new Error(String(error)));
           }
           try {
@@ -103,7 +109,7 @@ export class TransportNodeSerial implements Types.Transport {
     });
 
     // Stream for data going FROM the application TO the Meshtastic device.
-    const toDeviceTransform = Utils.toDeviceStream();
+    const toDeviceTransform = toDeviceStream();
     this._toDevice = toDeviceTransform.writable;
 
     this.pipePromise = toDeviceTransform.readable
@@ -115,7 +121,7 @@ export class TransportNodeSerial implements Types.Transport {
           return;
         }
         console.error("Error piping data to serial port:", error);
-        this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "write-error");
+        this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "write-error");
         try {
           this.port?.close();
         } catch {}
@@ -132,7 +138,7 @@ export class TransportNodeSerial implements Types.Transport {
   /**
    * The ReadableStream to receive data from the Meshtastic device.
    */
-  public get fromDevice(): ReadableStream<Types.DeviceOutput> {
+  public get fromDevice(): ReadableStream<DeviceOutput> {
     return this._fromDevice;
   }
 
@@ -143,7 +149,7 @@ export class TransportNodeSerial implements Types.Transport {
   async disconnect() {
     try {
       this.closingByUser = true;
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "user");
 
       this.abortController?.abort();
       await this.pipePromise?.catch(() => {});
@@ -157,7 +163,7 @@ export class TransportNodeSerial implements Types.Transport {
     }
   }
 
-  private emitStatus(next: Types.DeviceStatusEnum, reason?: string): void {
+  private emitStatus(next: DeviceStatusEnum, reason?: string): void {
     if (next === this.lastStatus) {
       return;
     }
