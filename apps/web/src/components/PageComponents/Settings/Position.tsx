@@ -6,7 +6,8 @@ import {
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { type FlagName, usePositionFlags } from "@core/hooks/usePositionFlags.ts";
-import { useDevice, useNodeDB } from "@core/stores";
+import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
+import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useCallback, useMemo } from "react";
@@ -19,13 +20,12 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
   const { setChange, config, getEffectiveConfig, removeChange, queueAdminMessage } = useDevice();
-  const { getMyNode } = useNodeDB();
+  const myNode = useMyNodeAsProto();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     getEffectiveConfig("position")?.positionFlags ?? 0,
   );
   const { t } = useTranslation("config");
 
-  const myNode = getMyNode();
   const currentPosition = myNode?.position;
 
   const effectiveConfig = getEffectiveConfig("position");
