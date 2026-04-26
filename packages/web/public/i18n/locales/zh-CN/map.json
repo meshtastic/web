@@ -1,38 +1,38 @@
 {
   "maplibre": {
-    "GeolocateControl.FindMyLocation": "Find my location",
-    "NavigationControl.ZoomIn": "Zoom in",
-    "NavigationControl.ZoomOut": "Zoom out",
-    "CooperativeGesturesHandler.WindowsHelpText": "Use Ctrl + scroll to zoom the map",
-    "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
-    "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map"
+    "GeolocateControl.FindMyLocation": "查找我的位置",
+    "NavigationControl.ZoomIn": "放大",
+    "NavigationControl.ZoomOut": "缩小",
+    "CooperativeGesturesHandler.WindowsHelpText": "使用Ctrl + 滚动来缩放地图",
+    "CooperativeGesturesHandler.MacHelpText": "使用⌘ + 滚动来缩放地图",
+    "CooperativeGesturesHandler.MobileHelpText": "用两根手指移动地图"
   },
   "layerTool": {
-    "nodeMarkers": "Show nodes",
-    "directNeighbors": "Show direct connections",
-    "remoteNeighbors": "Show remote connections",
-    "positionPrecision": "Show position precision",
-    "traceroutes": "Show traceroutes",
-    "waypoints": "Show waypoints"
+    "nodeMarkers": "显示节点",
+    "directNeighbors": "显示直接连线",
+    "remoteNeighbors": "显示远程连接",
+    "positionPrecision": "显示位置精度",
+    "traceroutes": "显示轨迹",
+    "waypoints": "显示航点"
   },
   "mapMenu": {
-    "locateAria": "Locate my node",
-    "layersAria": "Change map style"
+    "locateAria": "定位我的节点",
+    "layersAria": "更改地图样式"
   },
   "waypointDetail": {
     "edit": "编辑",
-    "description": "Description:",
-    "createdBy": "Edited by:",
-    "createdDate": "Created:",
-    "updated": "Updated:",
-    "expires": "Expires:",
-    "distance": "Distance:",
-    "bearing": "Absolute bearing:",
-    "lockedTo": "Locked by:",
-    "latitude": "Latitude:",
-    "longitude": "Longitude:"
+    "description": "说明:",
+    "createdBy": "编辑者：",
+    "createdDate": "创建于:",
+    "updated": "更新:",
+    "expires": "有效期:",
+    "distance": "距离:",
+    "bearing": "绝对方位：",
+    "lockedTo": "被锁定",
+    "latitude": "纬度:",
+    "longitude": "经度:"
   },
   "myNode": {
-    "tooltip": "This device"
+    "tooltip": "此设备"
   }
 }
