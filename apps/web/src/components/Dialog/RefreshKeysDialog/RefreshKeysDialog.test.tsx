@@ -1,4 +1,6 @@
 import { CurrentDeviceContext, useDeviceStore, useMessageStore } from "@core/stores";
+import { MeshRegistry } from "@meshtastic/sdk";
+import { MeshRegistryProvider } from "@meshtastic/sdk-react";
 import { render } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { RefreshKeysDialog } from "./RefreshKeysDialog.tsx";
@@ -43,10 +45,16 @@ test("does not render dialog if no error exists for active chat", () => {
     handleNodeRemove: vi.fn(),
   });
 
+  // Empty MeshRegistry so the SDK adapter hooks (useNodeAsProto) do not
+  // throw when looking up the missing-key node — they return undefined.
+  const registry = new MeshRegistry();
+
   const { container } = render(
-    <CurrentDeviceContext.Provider value={{ deviceId }}>
-      <RefreshKeysDialog open onOpenChange={vi.fn()} />
-    </CurrentDeviceContext.Provider>,
+    <MeshRegistryProvider registry={registry}>
+      <CurrentDeviceContext.Provider value={{ deviceId }}>
+        <RefreshKeysDialog open onOpenChange={vi.fn()} />
+      </CurrentDeviceContext.Provider>
+    </MeshRegistryProvider>,
   );
 
   expect(container.firstChild).toBeNull();
