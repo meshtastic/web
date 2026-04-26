@@ -2,26 +2,40 @@ import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import { type AudioValidation, AudioValidationSchema } from "@app/validation/moduleConfig/audio.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface AudioModuleConfigProps {
   onFormInit: DynamicFormFormInit<AudioValidation>;
 }
 
+const EMPTY_MODULES_SIGNAL = {
+  value: {} as { audio?: Protobuf.ModuleConfig.ModuleConfig_AudioConfig },
+  peek: () => ({}) as { audio?: Protobuf.ModuleConfig.ModuleConfig_AudioConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "audio" });
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
+
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const editor = useConfigEditor();
+  const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
+  const effective =
+    modules.audio ??
+    (getEffectiveModuleConfig("audio") as
+      | Protobuf.ModuleConfig.ModuleConfig_AudioConfig
+      | undefined);
+
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AudioValidation) => {
-    if (deepCompareConfig(moduleConfig.audio, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "audio" });
-      return;
-    }
-
-    setChange({ type: "moduleConfig", variant: "audio" }, data, moduleConfig.audio);
+    if (!editor) return;
+    editor.setModuleSection(
+      "audio",
+      data as unknown as Protobuf.ModuleConfig.ModuleConfig_AudioConfig,
+    );
   };
 
   return (
@@ -30,11 +44,11 @@ export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={AudioValidationSchema}
       defaultValues={moduleConfig.audio}
-      values={getEffectiveModuleConfig("audio")}
+      values={effective}
       fieldGroups={[
         {
-          label: t("audio.title"),
-          description: t("audio.description"),
+          label: t("audio.audioConfig.label"),
+          description: t("audio.audioConfig.description"),
           fields: [
             {
               type: "toggle",

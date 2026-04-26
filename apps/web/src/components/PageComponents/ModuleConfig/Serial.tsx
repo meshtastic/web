@@ -5,27 +5,40 @@ import {
 } from "@app/validation/moduleConfig/serial.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface SerialModuleConfigProps {
   onFormInit: DynamicFormFormInit<SerialValidation>;
 }
 
+const EMPTY_MODULES_SIGNAL = {
+  value: {} as { serial?: Protobuf.ModuleConfig.ModuleConfig_SerialConfig },
+  peek: () => ({}) as { serial?: Protobuf.ModuleConfig.ModuleConfig_SerialConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "serial" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const editor = useConfigEditor();
+  const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
+  const effective =
+    modules.serial ??
+    (getEffectiveModuleConfig("serial") as
+      | Protobuf.ModuleConfig.ModuleConfig_SerialConfig
+      | undefined);
+
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: SerialValidation) => {
-    if (deepCompareConfig(moduleConfig.serial, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "serial" });
-      return;
-    }
-
-    setChange({ type: "moduleConfig", variant: "serial" }, data, moduleConfig.serial);
+    if (!editor) return;
+    editor.setModuleSection(
+      "serial",
+      data as unknown as Protobuf.ModuleConfig.ModuleConfig_SerialConfig,
+    );
   };
 
   return (
@@ -34,11 +47,11 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={SerialValidationSchema}
       defaultValues={moduleConfig.serial}
-      values={getEffectiveModuleConfig("serial")}
+      values={effective}
       fieldGroups={[
         {
-          label: t("serial.title"),
-          description: t("serial.description"),
+          label: t("serial.serialConfig.label"),
+          description: t("serial.serialConfig.description"),
           fields: [
             {
               type: "toggle",
@@ -51,45 +64,24 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
               name: "echo",
               label: t("serial.echo.label"),
               description: t("serial.echo.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
             },
             {
               type: "number",
               name: "rxd",
               label: t("serial.rxd.label"),
               description: t("serial.rxd.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
             },
             {
               type: "number",
               name: "txd",
               label: t("serial.txd.label"),
               description: t("serial.txd.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
             },
             {
               type: "select",
               name: "baud",
               label: t("serial.baud.label"),
               description: t("serial.baud.description"),
-
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
               properties: {
                 enumValue: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud,
               },
@@ -99,26 +91,13 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
               name: "timeout",
               label: t("serial.timeout.label"),
               description: t("serial.timeout.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
+              properties: { suffix: t("unit.second.plural") },
             },
             {
               type: "select",
               name: "mode",
               label: t("serial.mode.label"),
               description: t("serial.mode.description"),
-
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
               properties: {
                 enumValue: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode,
                 formatEnumName: true,
