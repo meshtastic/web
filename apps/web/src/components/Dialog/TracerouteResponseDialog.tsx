@@ -1,4 +1,4 @@
-import { useNodeDB } from "@core/stores";
+import { useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
 import type { Protobuf, Types } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
@@ -25,19 +25,18 @@ export const TracerouteResponseDialog = ({
   onOpenChange,
 }: TracerouteResponseDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { getNode } = useNodeDB();
   const route: number[] = traceroute?.data.route ?? [];
   const routeBack: number[] = traceroute?.data.routeBack ?? [];
   const snrTowards = (traceroute?.data.snrTowards ?? []).map((snr) => snr / 4);
   const snrBack = (traceroute?.data.snrBack ?? []).map((snr) => snr / 4);
-  const from = getNode(traceroute?.to ?? 0); // The origin of the traceroute = the "to" node of the mesh packet
+  const from = useNodeLegacy(traceroute?.to ?? 0); // The origin of the traceroute = the "to" node of the mesh packet
   const fromLongName =
     from?.user?.longName ?? (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
   const fromShortName =
     from?.user?.shortName ??
     (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : t("unknown.shortName"));
 
-  const toUser = getNode(traceroute?.from ?? 0); // The destination of the traceroute = the "from" node of the mesh packet
+  const toUser = useNodeLegacy(traceroute?.from ?? 0); // The destination of the traceroute = the "from" node of the mesh packet
 
   if (!toUser || !from) {
     return null;

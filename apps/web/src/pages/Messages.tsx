@@ -8,6 +8,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useChatLegacy } from "@core/hooks/useChatLegacy.ts";
+import { useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { MessageType, useDevice, useNodeDB, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
@@ -32,7 +33,9 @@ function SelectMessageChat() {
 
 export const MessagesPage = () => {
   const { channels, getUnreadCount, resetUnread } = useDevice();
-  const { getNodes, getNode, hasNodeError } = useNodeDB();
+  const { hasNodeError } = useNodeDB();
+  const allNodes = useNodesLegacy();
+  const getNode = (n: number) => allNodes.find((node) => node.num === n);
   const meshClient = useActiveClient();
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
@@ -76,11 +79,12 @@ export const MessagesPage = () => {
   const filteredNodes = useCallback((): NodeInfoWithUnread[] => {
     const lowerCaseSearchTerm = deferredSearch.toLowerCase();
 
-    return getNodes((node: Protobuf.Mesh.NodeInfo) => {
-      const longName = node.user?.longName?.toLowerCase() ?? "";
-      const shortName = node.user?.shortName?.toLowerCase() ?? "";
-      return longName.includes(lowerCaseSearchTerm) || shortName.includes(lowerCaseSearchTerm);
-    }, true)
+    return allNodes
+      .filter((node: Protobuf.Mesh.NodeInfo) => {
+        const longName = node.user?.longName?.toLowerCase() ?? "";
+        const shortName = node.user?.shortName?.toLowerCase() ?? "";
+        return longName.includes(lowerCaseSearchTerm) || shortName.includes(lowerCaseSearchTerm);
+      })
       .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
         unreadCount: getUnreadCount(node.num) ?? 0,
@@ -92,7 +96,7 @@ export const MessagesPage = () => {
         }
         return Number(b.isFavorite) - Number(a.isFavorite);
       });
-  }, [deferredSearch, getNodes, getUnreadCount]);
+  }, [deferredSearch, allNodes, getUnreadCount]);
 
   const sendText = useCallback(
     async (message: string) => {

@@ -1,7 +1,7 @@
 import { create } from "@bufbuild/protobuf";
 import type { Node as SdkNode } from "@meshtastic/sdk";
 import { Protobuf } from "@meshtastic/sdk";
-import { useNodes } from "@meshtastic/sdk-react";
+import { useMeshDevice, useNodes } from "@meshtastic/sdk-react";
 import { useMemo } from "react";
 
 /**
@@ -24,6 +24,21 @@ export function useNodeLegacy(nodeNum: number): Protobuf.Mesh.NodeInfo | undefin
     const found = nodes.find((n) => n.num === nodeNum);
     return found ? toNodeInfo(found) : undefined;
   }, [nodes, nodeNum]);
+}
+
+/**
+ * "My node" — the node info for the locally-connected device, if its
+ * NodeInfo packet has been observed yet. Returns undefined while the
+ * device is still configuring.
+ */
+export function useMyNodeLegacy(): Protobuf.Mesh.NodeInfo | undefined {
+  const { myNodeNum } = useMeshDevice();
+  const nodes = useNodes();
+  return useMemo(() => {
+    if (myNodeNum === undefined) return undefined;
+    const found = nodes.find((n) => n.num === myNodeNum);
+    return found ? toNodeInfo(found) : undefined;
+  }, [myNodeNum, nodes]);
 }
 
 function toNodeInfo(node: SdkNode): Protobuf.Mesh.NodeInfo {

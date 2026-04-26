@@ -6,7 +6,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { MessageState, useAppStore, useDevice, useNodeDB } from "@core/stores";
+import { useMyNodeLegacy, useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { MessageState, useAppStore, useDevice } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
 import { type Protobuf, Types } from "@meshtastic/sdk";
@@ -18,39 +19,41 @@ import { useTranslation } from "react-i18next";
 // Cache for pending promises
 const myNodePromises = new Map<string, Promise<Protobuf.Mesh.NodeInfo>>();
 
-// Hook that suspends when myNode is not available
+// Hook that suspends when myNode is not available. Reads from the SDK
+// (NodesClient signal hydrated by sqlocal + live packets) instead of the
+// legacy Zustand nodeDB. The polling fallback remains because there is a
+// gap between mount and first onMyNodeInfo packet on a fresh connect.
 function useSuspendingMyNode() {
-  const { getMyNode } = useNodeDB();
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
-  const myNode = getMyNode();
+  const myNode = useMyNodeLegacy();
 
   if (!myNode) {
-    // Use the selected device ID to cache promises per device
     const deviceKey = `device-${selectedDeviceId}`;
 
     if (!myNodePromises.has(deviceKey)) {
-      const promise = new Promise<Protobuf.Mesh.NodeInfo>((resolve) => {
-        // Poll for myNode to become available
-        const checkInterval = setInterval(() => {
-          const node = getMyNode();
-          if (node) {
-            console.log("[MessageItem] myNode now available, resolving promise");
-            clearInterval(checkInterval);
+      const promise = new Promise<Protobuf.Mesh.NodeInfo>((resolve, reject) => {
+        // setTimeout with a 100ms tick lets React re-render this component
+        // (and therefore re-run the hook) until myNode resolves through the
+        // SDK signal. Suspense re-throws the promise on each retry until
+        // the value is available.
+        const start = Date.now();
+        const tick = () => {
+          if (Date.now() - start > 10000) {
             myNodePromises.delete(deviceKey);
-            resolve(node);
+            reject(new Error("myNode not available after 10s"));
+            return;
           }
-        }, 100);
-
-        setTimeout(() => {
-          clearInterval(checkInterval);
+          // Resolve a no-op promise to retrigger the Suspense boundary;
+          // the next render will call useMyNodeLegacy again.
+          resolve({} as Protobuf.Mesh.NodeInfo);
           myNodePromises.delete(deviceKey);
-        }, 10000);
+        };
+        setTimeout(tick, 100);
       });
 
       myNodePromises.set(deviceKey, promise);
     }
 
-    // Throw the promise to trigger Suspense
     throw myNodePromises.get(deviceKey);
   }
 
@@ -90,8 +93,8 @@ interface MessageItemProps {
 
 export const MessageItem = ({ message }: MessageItemProps) => {
   const { config } = useDevice();
-  const { getNode } = useNodeDB();
   const { t, i18n } = useTranslation("messages");
+  const messageUserNode = useNodeLegacy(message.from ?? 0);
 
   // This will suspend if myNode is not available yet
   const myNode = useSuspendingMyNode();
@@ -138,9 +141,8 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     [MESSAGE_STATUS_MAP, UNKNOWN_STATUS],
   );
 
-  const messageUser: Protobuf.Mesh.NodeInfo | null | undefined = useMemo(() => {
-    return message.from != null ? getNode(message.from) : null;
-  }, [getNode, message.from]);
+  const messageUser: Protobuf.Mesh.NodeInfo | null | undefined =
+    message.from != null ? (messageUserNode ?? null) : null;
 
   const { displayName, isFavorite, nodeNum } = useMemo(() => {
     const userIdHex = message.from.toString(16).toUpperCase().padStart(2, "0");

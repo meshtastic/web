@@ -3,13 +3,13 @@ import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { useMyNodeLegacy, useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
 import {
   type Page,
   useActiveConnection,
   useAppStore,
   useDefaultConnection,
   useDevice,
-  useNodeDB,
   useSidebar,
 } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
@@ -67,10 +67,11 @@ const CollapseToggleButton = () => {
 };
 
 export const Sidebar = ({ children }: SidebarProps) => {
-  const { hardware, metadata, unreadCounts, setDialogOpen } = useDevice();
-  const { getNode, getNodesLength } = useNodeDB();
+  const { metadata, unreadCounts, setDialogOpen } = useDevice();
+  const allNodes = useNodesLegacy();
   const { setCommandPaletteOpen } = useAppStore();
-  const myNode = getNode(hardware.myNodeNum);
+  const myNode = useMyNodeLegacy();
+  const getNodesLength = () => allNodes.length;
   const { isCollapsed } = useSidebar();
   const { t } = useTranslation("ui");
   const navigate = useNavigate({ from: "/" });

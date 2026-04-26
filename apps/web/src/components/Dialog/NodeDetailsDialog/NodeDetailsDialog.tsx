@@ -27,7 +27,8 @@ import {
 import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
 import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
 import { toast } from "@core/hooks/useToast.ts";
-import { useAppStore, useDevice, useNodeDB } from "@core/stores";
+import { useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
+import { useAppStore, useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
@@ -54,13 +55,12 @@ export interface NodeDetailsDialogProps {
 export const NodeDetailsDialog = ({ open, onOpenChange }: NodeDetailsDialogProps) => {
   const { t } = useTranslation("dialog");
   const { setDialogOpen, connection } = useDevice();
-  const { getNode } = useNodeDB();
   const navigate = useNavigate();
   const { setNodeNumToBeRemoved, nodeNumDetails } = useAppStore();
   const { updateFavorite } = useFavoriteNode();
   const { updateIgnored } = useIgnoreNode();
 
-  const node = getNode(nodeNumDetails);
+  const node = useNodeLegacy(nodeNumDetails);
 
   const [isFavoriteState, setIsFavoriteState] = useState<boolean>(node?.isFavorite ?? false);
   const [isIgnoredState, setIsIgnoredState] = useState<boolean>(node?.isIgnored ?? false);

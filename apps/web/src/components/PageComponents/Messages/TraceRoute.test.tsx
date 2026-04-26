@@ -1,11 +1,10 @@
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
-import { useNodeDB } from "@core/stores";
-import { mockNodeDBStore } from "@core/stores/nodeDBStore/nodeDBStore.mock.ts";
+import { useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@core/stores");
+vi.mock("@core/hooks/useNodesLegacy.ts");
 
 describe("TraceRoute", () => {
   const fromUser = {
@@ -65,12 +64,7 @@ describe("TraceRoute", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(useNodeDB).mockReturnValue({
-      ...mockNodeDBStore,
-      getNode: (nodeNum: number): Protobuf.Mesh.NodeInfo | undefined => {
-        return mockNodes.get(nodeNum);
-      },
-    });
+    vi.mocked(useNodesLegacy).mockReturnValue(Array.from(mockNodes.values()));
   });
 
   it("renders the route to destination with SNR values", () => {

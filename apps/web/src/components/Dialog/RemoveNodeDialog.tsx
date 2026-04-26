@@ -1,4 +1,5 @@
 import { Label } from "@components/UI/Label.tsx";
+import { useNodeLegacy } from "@core/hooks/useNodesLegacy.ts";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
@@ -11,8 +12,9 @@ export interface RemoveNodeDialogProps {
 export const RemoveNodeDialog = ({ open, onOpenChange }: RemoveNodeDialogProps) => {
   const { t } = useTranslation("dialog");
   const { connection } = useDevice();
-  const { getNode, removeNode } = useNodeDB();
+  const { removeNode } = useNodeDB();
   const { nodeNumToBeRemoved } = useAppStore();
+  const node = useNodeLegacy(nodeNumToBeRemoved);
 
   const handleConfirm = () => {
     connection?.removeNodeByNum(nodeNumToBeRemoved);
@@ -31,7 +33,7 @@ export const RemoveNodeDialog = ({ open, onOpenChange }: RemoveNodeDialogProps) 
       onConfirm={handleConfirm}
     >
       <div className="gap-4">
-        <Label>{getNode(nodeNumToBeRemoved)?.user?.longName}</Label>
+        <Label>{node?.user?.longName}</Label>
       </div>
     </DialogWrapper>
   );

@@ -1,4 +1,4 @@
-import { useNodeDB } from "@app/core/stores";
+import { useNodeLegacy } from "@app/core/hooks/useNodesLegacy.ts";
 import { getColorFromNodeNum, isLightColor } from "@app/core/utils/color";
 import {
   Tooltip,
@@ -28,8 +28,7 @@ export const Avatar = ({
   className,
 }: AvatarProps) => {
   const { t } = useTranslation();
-  const { getNode } = useNodeDB();
-  const node = getNode(nodeNum);
+  const node = useNodeLegacy(nodeNum);
 
   if (!nodeNum) {
     return null;
