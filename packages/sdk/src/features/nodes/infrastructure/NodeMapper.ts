@@ -10,8 +10,12 @@ export const NodeMapper = {
       deviceMetrics: info.deviceMetrics,
       lastHeard: info.lastHeard,
       snr: info.snr,
+      channel: info.channel,
+      viaMqtt: info.viaMqtt,
+      hopsAway: info.hopsAway,
       isFavorite: info.isFavorite,
       isIgnored: info.isIgnored,
+      isKeyManuallyVerified: info.isKeyManuallyVerified,
     };
   },
 };

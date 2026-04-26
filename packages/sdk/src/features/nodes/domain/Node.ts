@@ -7,6 +7,10 @@ export interface Node {
   readonly deviceMetrics?: Protobuf.Telemetry.DeviceMetrics;
   readonly lastHeard?: number;
   readonly snr?: number;
+  readonly channel?: number;
+  readonly viaMqtt?: boolean;
+  readonly hopsAway?: number;
   readonly isFavorite: boolean;
   readonly isIgnored: boolean;
+  readonly isKeyManuallyVerified?: boolean;
 }
