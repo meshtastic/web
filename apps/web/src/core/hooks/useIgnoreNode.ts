@@ -1,7 +1,6 @@
-import { create } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice, useNodeDB } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
+import { useNodeDB } from "@core/stores";
+import { useActiveClient } from "@meshtastic/sdk-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -11,35 +10,24 @@ interface IgnoreNodeOptions {
 }
 
 export function useIgnoreNode() {
-  const { sendAdminMessage } = useDevice();
-  const { getNode, updateIgnore } = useNodeDB();
-
+  const meshClient = useActiveClient();
+  const { updateIgnore } = useNodeDB();
   const { t } = useTranslation();
-
   const { toast } = useToast();
 
   const updateIgnoredCB = useCallback(
     ({ nodeNum, isIgnored }: IgnoreNodeOptions) => {
-      const node = getNode(nodeNum);
-      if (!node) {
-        return;
-      }
+      if (!meshClient) return;
+      const node = meshClient.nodes.byNum(nodeNum);
+      if (!node) return;
 
-      sendAdminMessage(
-        create(Protobuf.Admin.AdminMessageSchema, {
-          payloadVariant: {
-            case: isIgnored ? "setIgnoredNode" : "removeIgnoredNode",
-            value: nodeNum,
-          },
-        }),
-      );
+      void (isIgnored ? meshClient.nodes.ignore(nodeNum) : meshClient.nodes.unignore(nodeNum));
 
-      // TODO: Wait for response before changing the store
       updateIgnore(nodeNum, isIgnored);
 
       toast({
         title: t("toast.ignoreNode.title", {
-          nodeName: node?.user?.longName ?? "node",
+          nodeName: node.user?.longName ?? "node",
           action: isIgnored
             ? t("toast.ignoreNode.action.added")
             : t("toast.ignoreNode.action.removed"),
@@ -49,7 +37,7 @@ export function useIgnoreNode() {
         }),
       });
     },
-    [sendAdminMessage, updateIgnore, getNode, t, toast],
+    [meshClient, updateIgnore, t, toast],
   );
 
   return { updateIgnored: updateIgnoredCB };

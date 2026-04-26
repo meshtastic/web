@@ -1,7 +1,6 @@
-import { create } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice, useNodeDB } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
+import { useNodeDB } from "@core/stores";
+import { useActiveClient } from "@meshtastic/sdk-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -11,28 +10,22 @@ interface FavoriteNodeOptions {
 }
 
 export function useFavoriteNode() {
-  const { sendAdminMessage } = useDevice();
-  const { getNode, updateFavorite } = useNodeDB();
+  const meshClient = useActiveClient();
+  // Mirror to the legacy nodeDB until the favorite/ignore-flag projection on
+  // the SDK Node entity drives the UI directly.
+  const { updateFavorite } = useNodeDB();
   const { t } = useTranslation();
   const { toast } = useToast();
 
   const updateFavoriteCB = useCallback(
     ({ nodeNum, isFavorite }: FavoriteNodeOptions) => {
-      const node = getNode(nodeNum);
-      if (!node) {
-        return;
-      }
+      if (!meshClient) return;
+      const node = meshClient.nodes.byNum(nodeNum);
+      if (!node) return;
 
-      sendAdminMessage(
-        create(Protobuf.Admin.AdminMessageSchema, {
-          payloadVariant: {
-            case: isFavorite ? "setFavoriteNode" : "removeFavoriteNode",
-            value: nodeNum,
-          },
-        }),
-      );
+      void (isFavorite ? meshClient.nodes.favorite(nodeNum) : meshClient.nodes.unfavorite(nodeNum));
 
-      // TODO: Wait for response before changing the store
+      // TODO: drive store mutation off the admin-message ack instead of optimistic.
       updateFavorite(nodeNum, isFavorite);
 
       toast({
@@ -40,14 +33,14 @@ export function useFavoriteNode() {
           action: isFavorite
             ? t("toast.favoriteNode.action.added")
             : t("toast.favoriteNode.action.removed"),
-          nodeName: node?.user?.longName ?? t("node"),
+          nodeName: node.user?.longName ?? t("node"),
           direction: isFavorite
             ? t("toast.favoriteNode.action.to")
             : t("toast.favoriteNode.action.from"),
         }),
       });
     },
-    [updateFavorite, sendAdminMessage, getNode, t, toast],
+    [meshClient, updateFavorite, t, toast],
   );
 
   return { updateFavorite: updateFavoriteCB };

@@ -1,20 +1,19 @@
-import type { Protobuf } from "@meshtastic/sdk";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useIgnoreNode } from "./useIgnoreNode.ts";
 
-const mockNode = {
-  num: 1234,
-  user: {
-    longName: "Test Node",
-  },
-  isIgnored: true,
-} as unknown | Protobuf.Mesh.NodeInfo;
-
 const mockUpdateIgnore = vi.fn();
-const mockGetNode = vi.fn(() => mockNode);
 const mockToast = vi.fn();
-const mockSendAdminMessage = vi.fn();
+const mockSdkIgnore = vi.fn();
+const mockSdkUnignore = vi.fn();
+const mockByNum = vi.fn();
+const { mockUseActiveClient } = vi.hoisted(() => ({
+  mockUseActiveClient: vi.fn(),
+}));
+
+vi.mock("@meshtastic/sdk-react", () => ({
+  useActiveClient: mockUseActiveClient,
+}));
 
 vi.mock("@core/stores", () => ({
   CurrentDeviceContext: {
@@ -22,10 +21,6 @@ vi.mock("@core/stores", () => ({
   },
   useNodeDB: () => ({
     updateIgnore: mockUpdateIgnore,
-    getNode: mockGetNode,
-  }),
-  useDevice: () => ({
-    sendAdminMessage: mockSendAdminMessage,
   }),
 }));
 
@@ -38,6 +33,18 @@ vi.mock("@core/hooks/useToast.ts", () => ({
 describe("useIgnoreNode hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockByNum.mockReturnValue({
+      num: 1234,
+      user: { longName: "Test Node" },
+      isIgnored: true,
+    });
+    mockUseActiveClient.mockReturnValue({
+      nodes: {
+        byNum: mockByNum,
+        ignore: mockSdkIgnore,
+        unignore: mockSdkUnignore,
+      },
+    });
   });
 
   it("calls updateIgnored and shows correct toast", () => {
@@ -47,8 +54,8 @@ describe("useIgnoreNode hook", () => {
       result.current.updateIgnored({ nodeNum: 1234, isIgnored: true });
     });
 
+    expect(mockSdkIgnore).toHaveBeenCalledWith(1234);
     expect(mockUpdateIgnore).toHaveBeenCalledWith(1234, true);
-    expect(mockGetNode).toHaveBeenCalledWith(1234);
     expect(mockToast).toHaveBeenCalledWith({
       title: "Added Test Node to ignore list",
     });
@@ -58,24 +65,18 @@ describe("useIgnoreNode hook", () => {
     const { result } = renderHook(() => useIgnoreNode());
 
     act(() => {
-      result.current.updateIgnored({
-        nodeNum: 1234,
-        isIgnored: false,
-      });
+      result.current.updateIgnored({ nodeNum: 1234, isIgnored: false });
     });
 
+    expect(mockSdkUnignore).toHaveBeenCalledWith(1234);
     expect(mockUpdateIgnore).toHaveBeenCalledWith(1234, false);
-    expect(mockGetNode).toHaveBeenCalledWith(1234);
     expect(mockToast).toHaveBeenCalledWith({
       title: "Removed Test Node from ignore list",
     });
   });
 
   it("falls back to 'node' if longName is missing", () => {
-    mockGetNode.mockReturnValueOnce({
-      num: 5678,
-      user: {},
-    }); // no longName
+    mockByNum.mockReturnValueOnce({ num: 5678, user: {} });
 
     const { result } = renderHook(() => useIgnoreNode());
 
@@ -88,8 +89,8 @@ describe("useIgnoreNode hook", () => {
     });
   });
 
-  it("falls back to 'node' if getNode returns undefined", () => {
-    mockGetNode.mockReturnValueOnce(undefined);
+  it("no-ops if node is not in the SDK store", () => {
+    mockByNum.mockReturnValueOnce(undefined);
 
     const { result } = renderHook(() => useIgnoreNode());
 
