@@ -3,7 +3,6 @@ import { Button } from "@components/UI/Button.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
 import { useDevice } from "@core/stores";
-import type { Protobuf } from "@meshtastic/sdk";
 import i18next from "i18next";
 import { QrCodeIcon, UploadIcon } from "lucide-react";
 import { Suspense, useMemo } from "react";
@@ -14,9 +13,9 @@ interface ConfigProps {
   onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
 }
 
-export const getChannelName = (channel: Protobuf.Channel.Channel) => {
-  return channel.settings?.name.length
-    ? channel.settings?.name
+export const getChannelName = (channel: { index: number; settings?: { name?: string } }) => {
+  return channel.settings?.name?.length
+    ? channel.settings.name
     : channel.index === 0
       ? i18next.t("page.broadcastLabel")
       : i18next.t("page.channelIndex", {

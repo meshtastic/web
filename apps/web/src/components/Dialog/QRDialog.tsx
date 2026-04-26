@@ -10,9 +10,10 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
-import { Protobuf, type Types } from "@meshtastic/sdk";
+import { Protobuf } from "@meshtastic/sdk";
+import { useChannels } from "@meshtastic/sdk-react";
 import { fromByteArray } from "base64-js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QRCode } from "react-qrcode-logo";
 import { Checkbox } from "../UI/Checkbox/index.tsx";
@@ -21,16 +22,15 @@ export interface QRDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   loraConfig?: Protobuf.Config.Config_LoRaConfig;
-  channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
 }
 
-export const QRDialog = ({ open, onOpenChange, loraConfig, channels }: QRDialogProps) => {
+export const QRDialog = ({ open, onOpenChange, loraConfig }: QRDialogProps) => {
   const { t } = useTranslation("dialog");
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [qrCodeAdd, setQrCodeAdd] = useState<boolean>();
 
-  const allChannels = useMemo(() => Array.from(channels.values()), [channels]);
+  const allChannels = useChannels();
 
   useEffect(() => {
     const channelsToEncode = allChannels

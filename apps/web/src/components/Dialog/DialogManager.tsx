@@ -16,7 +16,7 @@ import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRo
 import { useDevice } from "@core/stores";
 
 export const DialogManager = () => {
-  const { channels, config, dialog, setDialogOpen } = useDevice();
+  const { config, dialog, setDialogOpen } = useDevice();
   return (
     <>
       <QRDialog
@@ -24,7 +24,6 @@ export const DialogManager = () => {
         onOpenChange={(open) => {
           setDialogOpen("QR", open);
         }}
-        channels={channels}
         loraConfig={config.lora}
       />
       <ImportDialog

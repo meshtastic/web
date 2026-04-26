@@ -13,7 +13,7 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { MessageType, useDevice, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf, Types } from "@meshtastic/sdk";
-import { useActiveClient, useNodeErrors } from "@meshtastic/sdk-react";
+import { useActiveClient, useChannels, useNodeErrors } from "@meshtastic/sdk-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -32,7 +32,8 @@ function SelectMessageChat() {
 }
 
 export const MessagesPage = () => {
-  const { channels, getUnreadCount, resetUnread } = useDevice();
+  const { getUnreadCount, resetUnread } = useDevice();
+  const channels = useChannels();
   const allNodes = useNodesAsProto();
   const getNode = (n: number) => allNodes.find((node) => node.num === n);
   const errors = useNodeErrors();
@@ -60,9 +61,9 @@ export const MessagesPage = () => {
   const chatType = type === "direct" ? MessageType.Direct : MessageType.Broadcast;
   const numericChatId = Number(chatId);
 
-  const allChannels = Array.from(channels.values());
-  const filteredChannels = allChannels.filter(
-    (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
+  const filteredChannels = useMemo(
+    () => channels.filter((ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED),
+    [channels],
   );
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export const MessagesPage = () => {
     }
   }, [type, chatId, filteredChannels, navigateToChat]);
 
-  const currentChannel = channels.get(numericChatId);
+  const currentChannel = channels.find((ch) => ch.index === numericChatId);
   const otherNode = getNode(numericChatId);
 
   const isDirect = chatType === MessageType.Direct;
