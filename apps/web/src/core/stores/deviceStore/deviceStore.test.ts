@@ -31,8 +31,7 @@ async function freshStore(persist = false) {
   }));
 
   const storeMod = await import("./index.ts");
-  const { useNodeDB } = await import("../index.ts");
-  return { ...storeMod, useNodeDB };
+  return storeMod;
 }
 
 function makeHardware(myNodeNum: number) {

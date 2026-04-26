@@ -1,5 +1,5 @@
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
-import { type Device, type MessageStore, type NodeDB } from "@core/stores";
+import { type Device, type MessageStore } from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
 
 /**
@@ -17,8 +17,6 @@ export const subscribeAll = (
   connection: MeshDevice,
   // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for callsite stability while messageStore is being retired
   _messageStore: MessageStore,
-  // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for callsite stability while nodeDB is being retired
-  _nodeDB: NodeDB,
 ) => {
   let myNodeNum = 0;
 

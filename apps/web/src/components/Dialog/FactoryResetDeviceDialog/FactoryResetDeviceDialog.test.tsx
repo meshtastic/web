@@ -5,7 +5,6 @@ import { FactoryResetDeviceDialog } from "./FactoryResetDeviceDialog.tsx";
 const mockFactoryResetDevice = vi.fn();
 const mockRemoveDevice = vi.fn();
 const mockRemoveMessageStore = vi.fn();
-const mockRemoveNodeDB = vi.fn();
 const mockToast = vi.fn();
 
 vi.mock("@core/stores", () => {
@@ -15,9 +14,6 @@ vi.mock("@core/stores", () => {
   });
   const useMessageStore = Object.assign(vi.fn(), {
     getState: () => ({ removeMessageStore: mockRemoveMessageStore }),
-  });
-  const useNodeDBStore = Object.assign(vi.fn(), {
-    getState: () => ({ removeNodeDB: mockRemoveNodeDB }),
   });
 
   return {
@@ -30,7 +26,6 @@ vi.mock("@core/stores", () => {
     }),
     useDeviceStore,
     useMessageStore,
-    useNodeDBStore,
   };
 });
 
@@ -46,7 +41,6 @@ describe("FactoryResetDeviceDialog", () => {
     mockFactoryResetDevice.mockReset();
     mockRemoveDevice.mockClear();
     mockRemoveMessageStore.mockClear();
-    mockRemoveNodeDB.mockClear();
     mockToast.mockClear();
   });
 
@@ -77,7 +71,6 @@ describe("FactoryResetDeviceDialog", () => {
 
     expect(mockRemoveDevice).toHaveBeenCalledTimes(1);
     expect(mockRemoveMessageStore).toHaveBeenCalledTimes(1);
-    expect(mockRemoveNodeDB).toHaveBeenCalledTimes(1);
   });
 
   it("calls onOpenChange(false) and does not call factoryResetDevice when cancel is clicked", async () => {
@@ -92,6 +85,5 @@ describe("FactoryResetDeviceDialog", () => {
     expect(mockFactoryResetDevice).not.toHaveBeenCalled();
     expect(mockRemoveDevice).not.toHaveBeenCalled();
     expect(mockRemoveMessageStore).not.toHaveBeenCalled();
-    expect(mockRemoveNodeDB).not.toHaveBeenCalled();
   });
 });

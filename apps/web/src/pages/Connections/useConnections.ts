@@ -7,7 +7,7 @@ import type {
 import { createConnectionFromInput, testHttpReachable } from "@app/pages/Connections/utils";
 import { meshRegistry } from "@core/meshRegistry.ts";
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
-import { useAppStore, useDeviceStore, useMessageStore, useNodeDBStore } from "@core/stores";
+import { useAppStore, useDeviceStore, useMessageStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/sdk";
@@ -40,7 +40,6 @@ export function useConnections() {
   const setActiveConnectionId = useDeviceStore((s) => s.setActiveConnectionId);
 
   const { addDevice } = useDeviceStore();
-  const { addNodeDB } = useNodeDBStore();
   const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
@@ -144,17 +143,16 @@ export function useConnections() {
       btDevice?: BluetoothDevice,
       serialPort?: SerialPort,
     ): Promise<number> => {
-      // Reuse existing meshDeviceId if available to prevent duplicate nodeDBs,
-      // but only if the corresponding nodeDB still exists. Otherwise, generate a new ID.
+      // Reuse existing meshDeviceId if available to prevent duplicate device
+      // entries. Otherwise, generate a new ID.
       const conn = connections.find((c) => c.id === id);
       let deviceId = conn?.meshDeviceId;
-      if (deviceId && !useNodeDBStore.getState().getNodeDB(deviceId)) {
+      if (deviceId && !useDeviceStore.getState().getDevice(deviceId)) {
         deviceId = undefined;
       }
       deviceId = deviceId ?? randId();
 
       const device = addDevice(deviceId);
-      const nodeDB = addNodeDB(deviceId);
       const messageStore = addMessageStore(deviceId);
 
       // Wire the SDK slices to the OPFS-backed SQLite repositories so the
@@ -194,7 +192,7 @@ export function useConnections() {
 
       setSelectedDevice(deviceId);
       device.addConnection(meshDevice); // This stores meshDevice in Device.connection
-      subscribeAll(device, meshDevice, messageStore, nodeDB);
+      subscribeAll(device, meshDevice, messageStore);
 
       // Store transport locally for cleanup (BT/Serial only)
       if (btDevice || serialPort) {
@@ -268,7 +266,6 @@ export function useConnections() {
     [
       connections,
       addDevice,
-      addNodeDB,
       addMessageStore,
       setSelectedDevice,
       setActiveConnectionId,

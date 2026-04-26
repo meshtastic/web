@@ -1,5 +1,5 @@
 import { toast } from "@core/hooks/useToast.ts";
-import { useDevice, useDeviceStore, useMessageStore, useNodeDBStore } from "@core/stores";
+import { useDevice, useDeviceStore, useMessageStore } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 
@@ -24,7 +24,6 @@ export const FactoryResetDeviceDialog = ({ open, onOpenChange }: FactoryResetDev
     // so we proceed to clear all data associated with the device immediately
     useDeviceStore.getState().removeDevice(id);
     useMessageStore.getState().removeMessageStore(id);
-    useNodeDBStore.getState().removeNodeDB(id);
 
     // Reload the app to ensure all ephemeral state is cleared
     window.location.href = "/";

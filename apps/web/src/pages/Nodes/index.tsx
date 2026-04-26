@@ -50,8 +50,7 @@ const NodesPage = (): JSX.Element => {
   );
 
   // Nodes come from the SDK NodesClient (signals + sqlocal-backed history).
-  // PKI / node-error tracking now also lives in the SDK; the legacy
-  // nodeDBStore is no longer consulted here.
+  // PKI / node-error tracking lives on the SDK NodesClient too.
   const allSdkNodes = useNodesAsProto();
   const filteredNodes = useMemo(() => allSdkNodes.filter(predicate), [allSdkNodes, predicate]);
   const errors = useNodeErrors();

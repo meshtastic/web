@@ -8,9 +8,9 @@ import { useMemo } from "react";
  * Adapter hooks that surface SDK-managed nodes in the
  * `Protobuf.Mesh.NodeInfo` shape consumed by web components today.
  *
- * Lets components migrate off the Zustand `useNodeDB().getNodes/getNode`
- * API one at a time without rewriting their templates. Removed once
- * every consumer reads `Node` from the SDK directly.
+ * Wraps the SDK Node into the legacy proto shape so the existing
+ * components keep working without rewrites. Removed once every consumer
+ * reads `Node` from the SDK directly.
  *
  * Reads through `useActiveClient()` so that, when no client is active
  * (e.g. inside isolated component tests or before any device connects),
