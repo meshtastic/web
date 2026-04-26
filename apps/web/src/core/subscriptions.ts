@@ -1,5 +1,5 @@
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
-import { type Device, type MessageStore } from "@core/stores";
+import { type Device } from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
 
 /**
@@ -12,12 +12,7 @@ import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
  * device-store-only state (waypoints, traceroutes, neighbour info, dialog
  * open triggers, unread counts).
  */
-export const subscribeAll = (
-  device: Device,
-  connection: MeshDevice,
-  // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for callsite stability while messageStore is being retired
-  _messageStore: MessageStore,
-) => {
+export const subscribeAll = (device: Device, connection: MeshDevice) => {
   let myNodeNum = 0;
 
   connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {

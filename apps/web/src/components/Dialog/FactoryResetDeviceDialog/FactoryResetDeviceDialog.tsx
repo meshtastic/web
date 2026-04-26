@@ -1,5 +1,5 @@
 import { toast } from "@core/hooks/useToast.ts";
-import { useDevice, useDeviceStore, useMessageStore } from "@core/stores";
+import { useDevice, useDeviceStore } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 
@@ -23,7 +23,6 @@ export const FactoryResetDeviceDialog = ({ open, onOpenChange }: FactoryResetDev
     // The device will be wiped and disconnected without resolving the promise
     // so we proceed to clear all data associated with the device immediately
     useDeviceStore.getState().removeDevice(id);
-    useMessageStore.getState().removeMessageStore(id);
 
     // Reload the app to ensure all ephemeral state is cleared
     window.location.href = "/";

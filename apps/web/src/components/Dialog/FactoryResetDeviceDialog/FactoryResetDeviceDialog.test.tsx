@@ -4,16 +4,11 @@ import { FactoryResetDeviceDialog } from "./FactoryResetDeviceDialog.tsx";
 
 const mockFactoryResetDevice = vi.fn();
 const mockRemoveDevice = vi.fn();
-const mockRemoveMessageStore = vi.fn();
 const mockToast = vi.fn();
 
 vi.mock("@core/stores", () => {
-  // Make each store a callable fn (like a Zustand hook), and attach .getState()
   const useDeviceStore = Object.assign(vi.fn(), {
     getState: () => ({ removeDevice: mockRemoveDevice }),
-  });
-  const useMessageStore = Object.assign(vi.fn(), {
-    getState: () => ({ removeMessageStore: mockRemoveMessageStore }),
   });
 
   return {
@@ -25,7 +20,6 @@ vi.mock("@core/stores", () => {
       connection: { factoryResetDevice: mockFactoryResetDevice },
     }),
     useDeviceStore,
-    useMessageStore,
   };
 });
 
@@ -40,12 +34,10 @@ describe("FactoryResetDeviceDialog", () => {
     mockOnOpenChange.mockClear();
     mockFactoryResetDevice.mockReset();
     mockRemoveDevice.mockClear();
-    mockRemoveMessageStore.mockClear();
     mockToast.mockClear();
   });
 
-  it("calls factoryResetDevice, closes dialog, and after reset resolves clears messages and node DB", async () => {
-    // Control the promise returned by factoryResetDevice
+  it("calls factoryResetDevice, closes dialog, and after reset resolves removes the device", async () => {
     let resolveReset: (() => void) | undefined;
     mockFactoryResetDevice.mockImplementation(
       () =>
@@ -57,20 +49,16 @@ describe("FactoryResetDeviceDialog", () => {
     render(<FactoryResetDeviceDialog open onOpenChange={mockOnOpenChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Factory Reset Device" }));
 
-    // Called immediately
     expect(mockFactoryResetDevice).toHaveBeenCalledTimes(1);
 
-    // DialogWrapper awaits onConfirm (which returns undefined), so close happens on next microtask
     await waitFor(() => {
       expect(mockOnOpenChange).toHaveBeenCalledTimes(1);
       expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
 
-    // Resolve the reset
     resolveReset?.();
 
     expect(mockRemoveDevice).toHaveBeenCalledTimes(1);
-    expect(mockRemoveMessageStore).toHaveBeenCalledTimes(1);
   });
 
   it("calls onOpenChange(false) and does not call factoryResetDevice when cancel is clicked", async () => {
@@ -84,6 +72,5 @@ describe("FactoryResetDeviceDialog", () => {
 
     expect(mockFactoryResetDevice).not.toHaveBeenCalled();
     expect(mockRemoveDevice).not.toHaveBeenCalled();
-    expect(mockRemoveMessageStore).not.toHaveBeenCalled();
   });
 });

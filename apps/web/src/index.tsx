@@ -10,7 +10,7 @@ import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
 import { meshRegistry } from "@core/meshRegistry.ts";
-import { useAppStore, useMessageStore } from "@core/stores";
+import { useAppStore } from "@core/stores";
 import { MeshRegistryProvider } from "@meshtastic/sdk-react";
 import { type createRouter, RouterProvider } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -26,18 +26,16 @@ const root = createRoot(container);
 function IndexPage() {
   enableMapSet();
   const appStore = useAppStore();
-  const messageStore = useMessageStore();
   const translation = useTranslation();
 
   const context = React.useMemo(
     () => ({
       stores: {
         app: appStore,
-        message: messageStore,
       },
       i18n: translation,
     }),
-    [appStore, messageStore, translation],
+    [appStore, translation],
   );
 
   return (

@@ -7,8 +7,8 @@ import {
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
 import { useMyNodeAsProto, useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { MessageState, useAppStore, useDevice } from "@core/stores";
-import type { Message } from "@core/stores/messageStore/types.ts";
+import { useAppStore, useDevice } from "@core/stores";
+import { type Message, MessageState } from "@core/stores/messageStore";
 import { cn } from "@core/utils/cn.ts";
 import { type Protobuf, Types } from "@meshtastic/sdk";
 import type { LucideIcon } from "lucide-react";

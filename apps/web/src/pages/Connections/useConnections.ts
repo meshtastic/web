@@ -7,7 +7,7 @@ import type {
 import { createConnectionFromInput, testHttpReachable } from "@app/pages/Connections/utils";
 import { meshRegistry } from "@core/meshRegistry.ts";
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
-import { useAppStore, useDeviceStore, useMessageStore } from "@core/stores";
+import { useAppStore, useDeviceStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/sdk";
@@ -40,7 +40,6 @@ export function useConnections() {
   const setActiveConnectionId = useDeviceStore((s) => s.setActiveConnectionId);
 
   const { addDevice } = useDeviceStore();
-  const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
 
@@ -153,7 +152,6 @@ export function useConnections() {
       deviceId = deviceId ?? randId();
 
       const device = addDevice(deviceId);
-      const messageStore = addMessageStore(deviceId);
 
       // Wire the SDK slices to the OPFS-backed SQLite repositories so the
       // user keeps message + draft + node history across reloads. The DB is
@@ -192,7 +190,7 @@ export function useConnections() {
 
       setSelectedDevice(deviceId);
       device.addConnection(meshDevice); // This stores meshDevice in Device.connection
-      subscribeAll(device, meshDevice, messageStore);
+      subscribeAll(device, meshDevice);
 
       // Store transport locally for cleanup (BT/Serial only)
       if (btDevice || serialPort) {
@@ -266,7 +264,6 @@ export function useConnections() {
     [
       connections,
       addDevice,
-      addMessageStore,
       setSelectedDevice,
       setActiveConnectionId,
       updateSavedConnection,

@@ -1,5 +1,8 @@
-import { MessageState as LegacyMessageState, MessageType } from "@core/stores";
-import type { Message as LegacyMessage } from "@core/stores/messageStore/types.ts";
+import {
+  type Message as LegacyMessage,
+  MessageState as LegacyMessageState,
+  MessageType,
+} from "@core/stores/messageStore";
 import type { Message as SdkMessage } from "@meshtastic/sdk";
 import { MessageState as SdkMessageState, type Types } from "@meshtastic/sdk";
 import { useChat, useDirectChat } from "@meshtastic/sdk-react";
