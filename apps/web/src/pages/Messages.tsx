@@ -7,7 +7,7 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { useChatLegacy } from "@core/hooks/useChatLegacy.ts";
+import { useChatAsLegacyMessages } from "@core/hooks/useChatAsLegacyMessages.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { MessageType, useDevice, useSidebar } from "@core/stores";
@@ -118,11 +118,11 @@ export const MessagesPage = () => {
     [meshClient, numericChatId, isDirect],
   );
 
-  const broadcastMessages = useChatLegacy({
+  const broadcastMessages = useChatAsLegacyMessages({
     type: MessageType.Broadcast,
     channelId: numericChatId,
   });
-  const directMessages = useChatLegacy({
+  const directMessages = useChatAsLegacyMessages({
     type: MessageType.Direct,
     peer: numericChatId,
   });

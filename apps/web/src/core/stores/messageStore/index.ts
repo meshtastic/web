@@ -1,6 +1,6 @@
 /**
  * Legacy enums and message-shape types preserved for components that still
- * read from the SDK chat slice via the `useChatLegacy` adapter. The Zustand
+ * read from the SDK chat slice via the `useChatAsLegacyMessages` adapter. The Zustand
  * messageStore that previously lived here has been retired — chat
  * persistence is owned by the SDK ChatClient + SqlocalMessageRepository.
  */
