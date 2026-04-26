@@ -10,11 +10,12 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
+import { useNodesLegacy } from "@core/hooks/useNodesLegacy.ts";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { Protobuf, type Types } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { type JSX, useCallback, useDeferredValue, useEffect, useState } from "react";
+import { type JSX, useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { base16 } from "rfc4648";
 
@@ -49,12 +50,15 @@ const NodesPage = (): JSX.Element => {
     [nodeFilter, deferredFilterState],
   );
 
-  // subscribe to actual data (nodes array) and to nodeErrors ref for badge updates
-  const { nodes: filteredNodes, hasNodeError } = useNodeDB(
+  // Nodes come from the SDK NodesClient (signals + sqlocal-backed history).
+  // hasNodeError still lives on the legacy nodeDB store — node-validation /
+  // PKI-error tracking has not been migrated to the SDK yet.
+  const allSdkNodes = useNodesLegacy();
+  const filteredNodes = useMemo(() => allSdkNodes.filter(predicate), [allSdkNodes, predicate]);
+  const { hasNodeError } = useNodeDB(
     (db) => ({
-      nodes: db.getNodes(predicate, true),
       hasNodeError: db.hasNodeError,
-      _errorsRef: db.nodeErrors, // include the Map ref so UI also re-renders on error changes
+      _errorsRef: db.nodeErrors,
     }),
     { debounce: NODEDB_DEBOUNCE_MS },
   );
