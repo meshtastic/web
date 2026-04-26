@@ -19,10 +19,31 @@ const EMPTY_MODULES_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
+/**
+ * Compare a Meshtastic firmware version string ("X.Y.Z" or "X.Y.Z.suffix")
+ * against a (major, minor, patch) tuple. Returns true if the running
+ * firmware is at least that version. Unknown / unparseable versions return
+ * `true` to avoid hiding the toggle from devices we can't classify.
+ */
+function firmwareAtLeast(
+  version: string | undefined,
+  major: number,
+  minor: number,
+  patch: number,
+): boolean {
+  if (!version) return true;
+  const parts = version.split(/[.\-+]/).map((s) => Number.parseInt(s, 10));
+  const [maj = 0, min = 0, pat = 0] = parts;
+  if (Number.isNaN(maj) || Number.isNaN(min) || Number.isNaN(pat)) return true;
+  if (maj !== major) return maj > major;
+  if (min !== minor) return min > minor;
+  return pat >= patch;
+}
+
 export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "telemetry" });
 
-  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const { moduleConfig, metadata, getEffectiveModuleConfig } = useDevice();
   const editor = useConfigEditor();
   const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
   const effective =
@@ -30,6 +51,12 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
     (getEffectiveModuleConfig("telemetry") as
       | Protobuf.ModuleConfig.ModuleConfig_TelemetryConfig
       | undefined);
+
+  // Mirrors the Android `Capabilities.canToggleTelemetryEnabled` gate:
+  // device_telemetry_enabled is only writable on firmware ≥ v2.7.12. Hide
+  // the toggle on older firmware so we don't push a value the device will
+  // ignore.
+  const canToggleTelemetry = firmwareAtLeast(metadata.get(0)?.firmwareVersion, 2, 7, 12);
 
   const { t } = useTranslation("moduleConfig");
 
@@ -53,12 +80,16 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
           label: t("telemetry.telemetryConfig.label"),
           description: t("telemetry.telemetryConfig.description"),
           fields: [
-            {
-              type: "toggle",
-              name: "deviceTelemetryEnabled",
-              label: t("telemetry.deviceTelemetryEnabled.label"),
-              description: t("telemetry.deviceTelemetryEnabled.description"),
-            },
+            ...(canToggleTelemetry
+              ? [
+                  {
+                    type: "toggle" as const,
+                    name: "deviceTelemetryEnabled" as const,
+                    label: t("telemetry.deviceTelemetryEnabled.label"),
+                    description: t("telemetry.deviceTelemetryEnabled.description"),
+                  },
+                ]
+              : []),
             {
               type: "number",
               name: "deviceUpdateInterval",

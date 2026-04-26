@@ -5,16 +5,67 @@ import {
 } from "@app/validation/config/position.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import { Button } from "@components/UI/Button.tsx";
 import { type FlagName, usePositionFlags } from "@core/hooks/usePositionFlags.ts";
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
+import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
-import { useCallback, useMemo } from "react";
+import { LocateFixed } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 interface PositionConfigProps {
   onFormInit: DynamicFormFormInit<PositionValidation>;
+}
+
+/**
+ * Renders inside the Device GPS card. Pulls the browser's current location
+ * via navigator.geolocation and writes lat/lng/altitude into the form.
+ * No-op without a geolocation API (e.g. insecure context).
+ */
+function UseBrowserLocationButton() {
+  const { setValue } = useFormContext<PositionValidation>();
+  const { toast } = useToast();
+  const { t } = useTranslation("config");
+  const [busy, setBusy] = useState(false);
+
+  if (typeof navigator === "undefined" || !navigator.geolocation) {
+    return null;
+  }
+
+  const onClick = (): void => {
+    setBusy(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setBusy(false);
+        setValue("latitude", Number(pos.coords.latitude.toFixed(7)), { shouldDirty: true });
+        setValue("longitude", Number(pos.coords.longitude.toFixed(7)), { shouldDirty: true });
+        if (pos.coords.altitude !== null && !Number.isNaN(pos.coords.altitude)) {
+          setValue("altitude", Math.round(pos.coords.altitude), { shouldDirty: true });
+        }
+      },
+      (err) => {
+        setBusy(false);
+        toast({
+          title: t("position.useBrowserLocation.failed", "Could not read browser location"),
+          description: err.message,
+        });
+      },
+      { enableHighAccuracy: true, timeout: 10_000 },
+    );
+  };
+
+  return (
+    <Button type="button" variant="subtle" disabled={busy} onClick={onClick}>
+      <LocateFixed className="mr-2 size-4" />
+      {busy
+        ? t("position.useBrowserLocation.busy", "Reading location…")
+        : t("position.useBrowserLocation.label", "Use browser location")}
+    </Button>
+  );
 }
 
 const EMPTY_RADIO_SIGNAL = {
@@ -136,6 +187,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
         {
           label: t("position.deviceGps.label"),
           description: t("position.deviceGps.description"),
+          footer: <UseBrowserLocationButton />,
           fields: [
             {
               type: "toggle",

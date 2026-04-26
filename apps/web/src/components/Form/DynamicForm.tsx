@@ -4,7 +4,7 @@ import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import {
   type Control,
   type DefaultValues,
@@ -59,6 +59,9 @@ export interface DynamicFormProps<T extends FieldValues> {
     valid?: boolean;
     validationText?: string;
     fields: FieldProps<T>[];
+    /** Optional JSX rendered after the field list (e.g. action buttons that
+     * reach into the form via useFormContext). */
+    footer?: ReactNode;
   }[];
   validationSchema?: ZodType<T>;
 }
@@ -168,6 +171,7 @@ export function DynamicForm<T extends FieldValues>({
                 </FieldWrapper>
               );
             })}
+            {fieldGroup.footer}
           </div>
         ))}
         {hasSubmitButton && (

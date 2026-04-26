@@ -426,6 +426,11 @@
     "advancedDeviceGps": {
       "label": "Advanced Device GPS",
       "description": "GPIO pin overrides for the GPS hardware"
+    },
+    "useBrowserLocation": {
+      "label": "Use browser location",
+      "busy": "Reading location…",
+      "failed": "Could not read browser location"
     }
   },
   "power": {
