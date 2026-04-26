@@ -94,8 +94,14 @@ export type {
   RadioConfigSection,
 } from "./src/features/config/index.ts";
 
-export { TelemetryClient } from "./src/features/telemetry/index.ts";
-export type { TelemetryKind, TelemetryReading } from "./src/features/telemetry/index.ts";
+export { InMemoryTelemetryRepository, TelemetryClient } from "./src/features/telemetry/index.ts";
+export type {
+  TelemetryClientOptions,
+  TelemetryKind,
+  TelemetryReading,
+  TelemetryRepository,
+  TelemetryRetentionPolicy,
+} from "./src/features/telemetry/index.ts";
 
 export { PositionClient } from "./src/features/position/index.ts";
 export type { Position } from "./src/features/position/index.ts";

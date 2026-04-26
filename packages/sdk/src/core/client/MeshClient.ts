@@ -20,6 +20,7 @@ import { FilesClient } from "../../features/files/index.ts";
 import { NodesClient } from "../../features/nodes/index.ts";
 import { PositionClient } from "../../features/position/index.ts";
 import { TelemetryClient } from "../../features/telemetry/index.ts";
+import type { TelemetryClientOptions } from "../../features/telemetry/index.ts";
 import { TraceRouteClient } from "../../features/traceroute/index.ts";
 
 import type { ChatClientOptions } from "../../features/chat/ChatClient.ts";
@@ -31,6 +32,7 @@ export interface MeshClientOptions {
   logger?: Logger<unknown>;
   chat?: ChatClientOptions;
   nodes?: NodesClientOptions;
+  telemetry?: TelemetryClientOptions;
 }
 
 /**
@@ -73,7 +75,7 @@ export class MeshClient {
     this.nodes = new NodesClient(this, options.nodes);
     this.channels = new ChannelsClient(this);
     this.config = new ConfigClient(this);
-    this.telemetry = new TelemetryClient(this);
+    this.telemetry = new TelemetryClient(this, options.telemetry);
     this.position = new PositionClient(this);
     this.traceroute = new TraceRouteClient(this);
     this.files = new FilesClient(this);

@@ -16,6 +16,7 @@ import {
   SqlocalMessageRepository,
 } from "@meshtastic/sdk-storage-sqlocal/chat";
 import { SqlocalNodesRepository } from "@meshtastic/sdk-storage-sqlocal/nodes";
+import { SqlocalTelemetryRepository } from "@meshtastic/sdk-storage-sqlocal/telemetry";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
@@ -160,11 +161,13 @@ export function useConnections() {
       let chatRepository: SqlocalMessageRepository | undefined;
       let draftRepository: SqlocalDraftRepository | undefined;
       let nodesRepository: SqlocalNodesRepository | undefined;
+      let telemetryRepository: SqlocalTelemetryRepository | undefined;
       try {
         const db = await getStorageDb();
         chatRepository = new SqlocalMessageRepository(db, { deviceId: id, coordinator });
         draftRepository = new SqlocalDraftRepository(db, { deviceId: id });
         nodesRepository = new SqlocalNodesRepository(db, { deviceId: id });
+        telemetryRepository = new SqlocalTelemetryRepository(db, { deviceId: id });
       } catch (err) {
         console.warn("[useConnections] sqlocal unavailable, falling back to in-memory:", err);
       }
@@ -179,6 +182,12 @@ export function useConnections() {
               }
             : undefined,
         nodes: nodesRepository ? { repository: nodesRepository } : undefined,
+        telemetry: telemetryRepository
+          ? {
+              repository: telemetryRepository,
+              retention: { maxPerNode: 500, olderThanMs: 1000 * 60 * 60 * 24 * 30 },
+            }
+          : undefined,
       });
 
       // Register the underlying MeshClient so sdk-react hooks

@@ -8,3 +8,5 @@ export { SqlocalDraftRepository } from "./src/chat/index.ts";
 export type { SqlocalDraftRepositoryOptions } from "./src/chat/index.ts";
 export { SqlocalNodesRepository } from "./src/nodes/index.ts";
 export type { SqlocalNodesRepositoryOptions } from "./src/nodes/index.ts";
+export { SqlocalTelemetryRepository } from "./src/telemetry/index.ts";
+export type { SqlocalTelemetryRepositoryOptions } from "./src/telemetry/index.ts";
