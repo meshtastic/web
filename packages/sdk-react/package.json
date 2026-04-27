@@ -18,14 +18,35 @@
   "tsdown": {
     "entry": "mod.ts",
     "platform": "neutral",
+    "target": "esnext",
     "dts": true,
-    "format": ["esm"],
+    "format": [
+      "esm"
+    ],
     "splitting": false,
+    "sourcemap": false,
+    "minify": false,
+    "treeshake": true,
+    "report": false,
     "clean": true
   },
-  "jsrInclude": ["mod.ts", "src", "README.md", "LICENSE"],
-  "jsrExclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "tests"],
-  "files": ["package.json", "README.md", "LICENSE", "dist"],
+  "jsrInclude": [
+    "mod.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "jsrExclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "tests"
+  ],
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",

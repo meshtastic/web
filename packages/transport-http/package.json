@@ -18,11 +18,16 @@
   "license": "GPL-3.0-only",
   "tsdown": {
     "entry": "mod.ts",
+    "target": "esnext",
     "dts": true,
     "format": [
       "esm"
     ],
     "splitting": false,
+    "sourcemap": false,
+    "minify": false,
+    "treeshake": true,
+    "report": false,
     "clean": true
   },
   "jsrInclude": [
@@ -39,7 +44,6 @@
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rm -rf dist LICENSE",
     "build:npm": "tsdown",
-
     "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public --no-git-checks",
     "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
