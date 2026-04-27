@@ -38,11 +38,14 @@
       "testing": "src/core/testing/index.ts"
     },
     "platform": "browser",
-    "dts": {
-      "isolatedDeclarations": false
-    },
+    "target": "esnext",
+    "dts": true,
     "format": ["esm"],
     "splitting": false,
+    "sourcemap": false,
+    "minify": false,
+    "treeshake": true,
+    "report": false,
     "clean": true
   },
   "jsrInclude": ["mod.ts", "src", "README.md", "LICENSE"],
