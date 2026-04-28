@@ -1,7 +1,7 @@
 import type { Connection } from "@core/stores/deviceStore/types";
 import { testHttpReachable } from "@pages/Connections/utils";
 import { TransportHTTP } from "@meshtastic/transport-http";
-import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
+import { BluetoothConnectError, TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import type { AnyTransport } from "./sdkClient.ts";
 
@@ -101,40 +101,16 @@ async function openBluetooth(
     throw new Error("Bluetooth device not available. Re-select the device.");
   }
 
-  // GATT `Connection attempt failed` is a common transient — the radio is
-  // advertising but the OS BT stack hiccuped, or the device just woke from
-  // sleep. One retry with a short delay clears most of these. Persistent
-  // failures usually mean the device is out of range, off, or paired with
-  // another client (phone / second tab).
-  try {
-    const transport = await TransportWebBluetooth.createFromDevice(device);
-    return { transport, bluetoothDevice: device };
-  } catch (err) {
-    if (!isGattConnectFailure(err)) throw wrapBluetoothError(err);
-    await new Promise((r) => setTimeout(r, 750));
-    try {
-      const transport = await TransportWebBluetooth.createFromDevice(device);
-      return { transport, bluetoothDevice: device };
-    } catch (retryErr) {
-      throw wrapBluetoothError(retryErr);
-    }
-  }
+  // Connect-failure semantics (transient retries, user-friendly messages)
+  // live inside the transport package — see BluetoothConnectError. This
+  // layer just surfaces whatever the transport produces.
+  const transport = await TransportWebBluetooth.createFromDevice(device);
+  return { transport, bluetoothDevice: device };
 }
 
-function isGattConnectFailure(err: unknown): boolean {
-  if (!(err instanceof Error)) return false;
-  if ((err as DOMException).name === "NetworkError") return true;
-  return /connection attempt failed|gatt/i.test(err.message);
-}
-
-function wrapBluetoothError(err: unknown): Error {
-  const original = err instanceof Error ? err : new Error(String(err));
-  if (!isGattConnectFailure(original)) return original;
-  return new Error(
-    "Bluetooth connection failed. Make sure the device is in range, powered on, and not connected to a phone or another browser tab. Then click Retry.",
-    { cause: original },
-  );
-}
+// Re-export so the Connections UI can `instanceof`-check for transient
+// vs fatal failures without depending on the transport package directly.
+export { BluetoothConnectError };
 
 async function openSerial(
   conn: Connection & {
