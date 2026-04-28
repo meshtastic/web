@@ -1,4 +1,5 @@
 import {
+  createLogger,
   DeviceStatusEnum,
   type DeviceOutput,
   fromDeviceStream,
@@ -6,6 +7,8 @@ import {
   type Transport,
 } from "@meshtastic/sdk";
 import { Result, type ResultType } from "better-result";
+
+const log = createLogger("TransportWebSerial");
 
 /**
  * Typed error produced when preparing a `SerialPort` for use fails. `kind`
@@ -114,10 +117,20 @@ export class TransportWebSerial implements Transport {
     port: SerialPort,
     baudRate: number,
   ): Promise<ResultType<true, SerialConnectError>> {
+    log.debug("preparePort: enter", {
+      readable: !!port.readable,
+      writable: !!port.writable,
+      baudRate,
+    });
+
     if (port.readable || port.writable) {
+      log.debug("preparePort: port has live streams, closing");
       try {
         await port.close();
+        log.debug("preparePort: close() ok");
       } catch (cause) {
+        const err = cause as Error;
+        log.warn("preparePort: close() threw", { name: err?.name, message: err?.message });
         return Result.err(
           new SerialConnectError(
             "in-use",
@@ -132,14 +145,26 @@ export class TransportWebSerial implements Transport {
     let lastErr: unknown;
     for (let attempt = 0; attempt <= PORT_OPEN_RETRY_DELAYS_MS.length; attempt++) {
       try {
+        log.debug("preparePort: open() attempt", { attempt });
         await port.open({ baudRate });
+        log.debug("preparePort: open() ok", { attempt });
         return Result.ok(true);
       } catch (err) {
         lastErr = err;
+        const e = err as Error;
+        log.warn("preparePort: open() threw", {
+          attempt,
+          name: e?.name,
+          message: e?.message,
+          willRetry: isPortBusyError(err) && attempt < PORT_OPEN_RETRY_DELAYS_MS.length,
+        });
         if (!isPortBusyError(err) || attempt === PORT_OPEN_RETRY_DELAYS_MS.length) break;
         await new Promise((r) => setTimeout(r, PORT_OPEN_RETRY_DELAYS_MS[attempt]));
       }
     }
+
+    const e = lastErr as Error | undefined;
+    log.error("preparePort: failed", { name: e?.name, message: e?.message });
 
     if (isPortBusyError(lastErr)) {
       return Result.err(
@@ -173,6 +198,8 @@ export class TransportWebSerial implements Transport {
     this.abortController = new AbortController();
     const abortController = this.abortController;
 
+    log.debug("constructor: wiring pipe + reader");
+
     // Set up the pipe with abort signal for clean cancellation
     const toDeviceTransform = toDeviceStream();
     this.pipePromise = toDeviceTransform.readable
@@ -180,9 +207,11 @@ export class TransportWebSerial implements Transport {
       .catch((err) => {
         // Ignore expected rejection when we cancel it via the AbortController.
         if (abortController.signal.aborted) {
+          log.debug("toDevice pipe aborted (expected)");
           return;
         }
-        console.error("Error piping data to serial port:", err);
+        const e = err as Error;
+        log.error("toDevice pipe rejected", { name: e?.name, message: e?.message });
         this.connection.close().catch(() => {});
         this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "write-error");
       });
@@ -202,23 +231,32 @@ export class TransportWebSerial implements Transport {
         const onOsDisconnect = (ev: Event) => {
           const { port } = ev as unknown as { port?: SerialPort };
           if (port && port === this.connection) {
+            log.warn("OS-level disconnect event");
             this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "serial-disconnected");
           }
         };
         navigator.serial.addEventListener("disconnect", onOsDisconnect);
 
+        log.debug("read loop starting");
         this.emitStatus(DeviceStatusEnum.DeviceConnected);
 
         try {
           while (true) {
             const { value, done } = await reader.read();
             if (done) {
+              log.debug("read loop: done=true");
               break;
             }
             ctrl.enqueue(value);
           }
           ctrl.close();
         } catch (error) {
+          const e = error as Error;
+          log.warn("read loop threw", {
+            closingByUser: this.closingByUser,
+            name: e?.name,
+            message: e?.message,
+          });
           if (!this.closingByUser) {
             this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
           }
@@ -229,6 +267,7 @@ export class TransportWebSerial implements Transport {
         } finally {
           reader.releaseLock();
           navigator.serial.removeEventListener("disconnect", onOsDisconnect);
+          log.debug("read loop: released reader lock + listener");
         }
       },
     });
@@ -259,31 +298,41 @@ export class TransportWebSerial implements Transport {
    * Closes the serial port and emits `DeviceDisconnected("user")`.
    */
   public async disconnect(): Promise<void> {
+    log.debug("disconnect: enter");
     try {
       this.closingByUser = true;
 
       // Stop outbound piping
       this.abortController.abort();
+      log.debug("disconnect: aborted toDevice pipe");
       if (this.pipePromise) {
         await this.pipePromise;
+        log.debug("disconnect: pipePromise settled");
       }
 
       // Cancel any remaining streams
       if (this._fromDevice?.locked) {
         try {
           await this._fromDevice.cancel();
-        } catch {
-          // Stream cancellation might fail if already cancelled
+          log.debug("disconnect: cancelled fromDevice");
+        } catch (e) {
+          const err = e as Error;
+          log.warn("disconnect: fromDevice.cancel() threw", {
+            name: err?.name,
+            message: err?.message,
+          });
         }
       }
 
       await this.connection.close();
+      log.debug("disconnect: connection.close() ok");
     } catch (error) {
-      // If we can't close cleanly, let the browser handle cleanup
-      console.warn("Could not cleanly disconnect serial port:", error);
+      const e = error as Error;
+      log.warn("disconnect: cleanup failed", { name: e?.name, message: e?.message });
     } finally {
       this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "user");
       this.closingByUser = false;
+      log.debug("disconnect: done");
     }
   }
 

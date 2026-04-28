@@ -1,10 +1,13 @@
 import type { Connection } from "@core/stores/deviceStore/types";
 import { testHttpReachable } from "@pages/Connections/utils";
+import { createLogger } from "@meshtastic/sdk";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { BluetoothConnectError, TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { SerialConnectError, TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { Result } from "better-result";
 import type { AnyTransport } from "./sdkClient.ts";
+
+const log = createLogger("transports");
 
 /**
  * Per-transport-type factories. Each resolves a Transport from a saved
@@ -121,6 +124,12 @@ async function openSerial(
   },
   opts: OpenTransportOptions,
 ): Promise<OpenTransportResult> {
+  log.debug("openSerial: enter", {
+    hasCached: !!opts.cachedSerialPort,
+    allowPrompt: !!opts.allowPrompt,
+    vid: conn.usbVendorId,
+    pid: conn.usbProductId,
+  });
   if (!("serial" in navigator)) {
     throw new Error("Web Serial not supported");
   }
@@ -137,6 +146,7 @@ async function openSerial(
   let port = opts.cachedSerialPort;
   if (!port) {
     const ports = await serial.getPorts();
+    log.debug("openSerial: getPorts", { count: ports.length });
     if (ports && conn.usbVendorId && conn.usbProductId) {
       port = ports.find((p: SerialPort) => {
         const info =
@@ -150,17 +160,31 @@ async function openSerial(
     }
   }
   if (!port && opts.allowPrompt) {
+    log.debug("openSerial: requesting port via picker");
     port = await serial.requestPort({});
   }
   if (!port) {
+    log.warn("openSerial: no port resolved");
     throw new Error("Serial port not available. Re-select the port.");
   }
+
+  log.debug("openSerial: resolved port", {
+    readable: !!(port as SerialPort).readable,
+    writable: !!(port as SerialPort).writable,
+  });
 
   // Port-state hygiene (force-close + retry open + busy detection) lives
   // inside the transport package — see SerialConnectError. We just unwrap
   // the Result and surface the user-facing message on failure.
   const result = await TransportWebSerial.createFromPort(port);
-  if (Result.isError(result)) throw result.error;
+  if (Result.isError(result)) {
+    log.error("openSerial: createFromPort returned Err", {
+      kind: result.error.kind,
+      userMessage: result.error.userMessage,
+    });
+    throw result.error;
+  }
+  log.info("openSerial: transport ready");
   return { transport: result.value, serialPort: port };
 }
 
