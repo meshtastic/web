@@ -9,6 +9,9 @@ import {
   openTransport,
   probeConnection,
 } from "@app/core/connections/transports.ts";
+import { createLogger } from "@meshtastic/sdk";
+
+const log = createLogger("useConnections");
 import type {
   Connection,
   ConnectionId,
@@ -50,6 +53,7 @@ export function useConnections() {
   );
 
   const teardown = useCallback(async (id: ConnectionId, conn?: Connection) => {
+    log.debug("teardown: enter", { id });
     stopHeartbeat(id);
     configSubscriptions.get(id)?.();
     configSubscriptions.delete(id);
@@ -61,10 +65,18 @@ export function useConnections() {
         // released before the user clicks reconnect — otherwise port.open()
         // can race the close and throw "port already open".
         await device?.connection?.disconnect();
-      } catch {}
+        log.debug("teardown: transport disconnect awaited");
+      } catch (e) {
+        const err = e as Error;
+        log.warn("teardown: transport disconnect threw", {
+          name: err?.name,
+          message: err?.message,
+        });
+      }
     }
     closeTransport(cachedTransports.get(id));
     cachedTransports.delete(id);
+    log.debug("teardown: done", { id });
   }, []);
 
   const removeConnection = useCallback(
@@ -114,8 +126,10 @@ export function useConnections() {
       // while persistence is spinning up.
       device.setConnectionPhase("configuring");
       updateStatus(id, "configuring");
+      log.debug("setupMeshDevice: building MeshDevice", { id, deviceId });
 
       const meshDevice = await buildMeshDevice(id, deviceId, transport);
+      log.debug("setupMeshDevice: MeshDevice built", { id });
 
       if (!meshRegistry.has(id)) {
         meshRegistry.register(id, meshDevice.meshClient);
@@ -133,17 +147,27 @@ export function useConnections() {
       device.setConnectionId(id);
 
       const unsubConfigComplete = meshDevice.events.onConfigComplete.subscribe(() => {
+        log.info("onConfigComplete fired", { id });
         device.setConnectionPhase("configured");
         updateStatus(id, "configured");
         startMaintenanceHeartbeat(id, meshDevice);
       });
       configSubscriptions.set(id, unsubConfigComplete);
 
+      log.debug("setupMeshDevice: calling configure()", { id });
       meshDevice
         .configure()
-        .then(() => meshDevice.heartbeat().then(() => startConfigHeartbeat(id, meshDevice)))
+        .then(() => {
+          log.debug("setupMeshDevice: configure() resolved, sending heartbeat", { id });
+          return meshDevice.heartbeat().then(() => startConfigHeartbeat(id, meshDevice));
+        })
         .catch((error) => {
-          console.error("[useConnections] configure failed:", error);
+          const e = error as Error;
+          log.error("setupMeshDevice: configure() rejected", {
+            id,
+            name: e?.name,
+            message: e?.message,
+          });
           updateStatus(id, "error", error?.message ?? String(error));
         });
 
@@ -163,9 +187,16 @@ export function useConnections() {
   const connect = useCallback(
     async (id: ConnectionId, opts?: { allowPrompt?: boolean }) => {
       const conn = connections.find((c) => c.id === id);
-      if (!conn) return false;
-      if (conn.status === "configured" || conn.status === "connected") return true;
+      if (!conn) {
+        log.warn("connect: unknown connection id", { id });
+        return false;
+      }
+      if (conn.status === "configured" || conn.status === "connected") {
+        log.debug("connect: already connected", { id, status: conn.status });
+        return true;
+      }
 
+      log.info("connect: enter", { id, type: conn.type, allowPrompt: !!opts?.allowPrompt });
       updateStatus(id, "connecting");
       try {
         const cached = cachedTransports.get(id);
@@ -175,15 +206,19 @@ export function useConnections() {
             conn.type === "bluetooth" ? (cached as BluetoothDevice | undefined) : undefined,
           cachedSerialPort: conn.type === "serial" ? (cached as SerialPort | undefined) : undefined,
         });
+        log.debug("connect: openTransport ok", { id });
         await setupMeshDevice(id, result.transport, result.bluetoothDevice, result.serialPort);
+        log.info("connect: setupMeshDevice resolved, awaiting onConfigComplete", { id });
 
         // BT-specific: catch device-side disconnect to flip status.
         result.bluetoothDevice?.addEventListener("gattserverdisconnected", () => {
+          log.warn("BT gattserverdisconnected", { id });
           updateStatus(id, "disconnected");
         });
         return true;
       } catch (err) {
-        console.error("[useConnections] connect failed:", err);
+        const e = err as Error;
+        log.error("connect: failed", { id, name: e?.name, message: e?.message });
         const message = err instanceof Error ? err.message : String(err);
         updateStatus(id, "error", message);
         return false;
