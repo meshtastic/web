@@ -1,1 +1,1 @@
-export { TransportWebSerial } from "./src/transport.ts";
+export { SerialConnectError, TransportWebSerial } from "./src/transport.ts";

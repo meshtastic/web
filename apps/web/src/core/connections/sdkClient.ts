@@ -11,10 +11,7 @@ import type { TransportHTTP } from "@meshtastic/transport-http";
 import type { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import type { TransportWebSerial } from "@meshtastic/transport-web-serial";
 
-export type AnyTransport =
-  | Awaited<ReturnType<typeof TransportHTTP.create>>
-  | Awaited<ReturnType<typeof TransportWebBluetooth.createFromDevice>>
-  | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>;
+export type AnyTransport = TransportHTTP | TransportWebBluetooth | TransportWebSerial;
 
 const CHAT_RETENTION = { maxPerBucket: 1000, olderThanMs: 1000 * 60 * 60 * 24 * 90 } as const;
 const TELEMETRY_RETENTION = { maxPerNode: 500, olderThanMs: 1000 * 60 * 60 * 24 * 30 } as const;

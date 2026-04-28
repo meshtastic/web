@@ -2,7 +2,8 @@ import type { Connection } from "@core/stores/deviceStore/types";
 import { testHttpReachable } from "@pages/Connections/utils";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { BluetoothConnectError, TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
-import { TransportWebSerial } from "@meshtastic/transport-web-serial";
+import { SerialConnectError, TransportWebSerial } from "@meshtastic/transport-web-serial";
+import { Result } from "better-result";
 import type { AnyTransport } from "./sdkClient.ts";
 
 /**
@@ -109,8 +110,8 @@ async function openBluetooth(
 }
 
 // Re-export so the Connections UI can `instanceof`-check for transient
-// vs fatal failures without depending on the transport package directly.
-export { BluetoothConnectError };
+// vs fatal failures without depending on the transport packages directly.
+export { BluetoothConnectError, SerialConnectError };
 
 async function openSerial(
   conn: Connection & {
@@ -155,23 +156,12 @@ async function openSerial(
     throw new Error("Serial port not available. Re-select the port.");
   }
 
-  // Close-then-reopen cycle in case a prior connection left streams open.
-  const portWithStreams = port as SerialPort & {
-    readable: ReadableStream | null;
-    writable: WritableStream | null;
-    close: () => Promise<void>;
-  };
-  if (portWithStreams.readable || portWithStreams.writable) {
-    try {
-      await portWithStreams.close();
-      await new Promise((r) => setTimeout(r, 100));
-    } catch (err) {
-      console.warn("[transports] error closing serial port before reconnect:", err);
-    }
-  }
-
-  const transport = await TransportWebSerial.createFromPort(port);
-  return { transport, serialPort: port };
+  // Port-state hygiene (force-close + retry open + busy detection) lives
+  // inside the transport package — see SerialConnectError. We just unwrap
+  // the Result and surface the user-facing message on failure.
+  const result = await TransportWebSerial.createFromPort(port);
+  if (Result.isError(result)) throw result.error;
+  return { transport: result.value, serialPort: port };
 }
 
 /**

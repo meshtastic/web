@@ -153,6 +153,9 @@ importers:
       base64-js:
         specifier: ^1.5.1
         version: 1.5.1
+      better-result:
+        specifier: ^1.0.0
+        version: 1.0.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -426,6 +429,9 @@ importers:
       '@types/w3c-web-serial':
         specifier: npm:@types/w3c-web-serial@^1.0.7
         version: 1.0.8
+      better-result:
+        specifier: ^1.0.0
+        version: 1.0.1
 
   packages/ui:
     dependencies:

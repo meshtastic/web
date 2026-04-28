@@ -76,6 +76,7 @@
     "i18next-http-backend": "^3.0.2",
     "idb-keyval": "^6.2.2",
     "immer": "^10.1.3",
+    "better-result": "^1.0.0",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.545.0",
     "maplibre-gl": "5.8.0",
