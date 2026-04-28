@@ -5,6 +5,39 @@ import {
   toDeviceStream,
   type Transport,
 } from "@meshtastic/sdk";
+import { Result, type ResultType } from "better-result";
+
+/**
+ * Typed error produced when preparing a `SerialPort` for use fails. `kind`
+ * lets callers distinguish recoverable cases (port held briefly during
+ * USB re-enumeration) from fatal ones (another tab or process owns the
+ * port). `userMessage` is a human-readable, actionable string ready for
+ * UI without further interpretation.
+ */
+export class SerialConnectError extends Error {
+  public readonly kind: "in-use" | "busy" | "unavailable";
+  public readonly userMessage: string;
+
+  constructor(
+    kind: SerialConnectError["kind"],
+    userMessage: string,
+    options?: { cause?: unknown },
+  ) {
+    super(userMessage, options);
+    this.name = "SerialConnectError";
+    this.kind = kind;
+    this.userMessage = userMessage;
+  }
+}
+
+const PORT_OPEN_RETRY_DELAYS_MS = [250, 500, 750] as const;
+const POST_CLOSE_DELAY_MS = 200;
+
+function isPortBusyError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  if ((err as DOMException).name === "InvalidStateError") return true;
+  return /already open|failed to open serial port|access is denied/i.test(err.message);
+}
 
 /**
  * Provides Web Serial transport for Meshtastic devices.
@@ -26,26 +59,104 @@ export class TransportWebSerial implements Transport {
   private closingByUser = false;
 
   /**
-   * Create a new TransportWebSerial instance using a serial port.
+   * Prompt the user to pick a serial port and open a transport on it.
+   * Returns `Err` on permission denial or open failure rather than
+   * throwing — callers don't need a try/catch.
    */
-  public static async create(baudRate?: number): Promise<TransportWebSerial> {
-    const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: baudRate || 115200 });
-    return new TransportWebSerial(port);
+  public static async create(
+    baudRate?: number,
+  ): Promise<ResultType<TransportWebSerial, SerialConnectError>> {
+    let port: SerialPort;
+    try {
+      port = await navigator.serial.requestPort();
+    } catch (cause) {
+      return Result.err(
+        new SerialConnectError("unavailable", "Serial port not selected.", { cause }),
+      );
+    }
+    return TransportWebSerial.createFromPort(port, baudRate);
   }
 
   /**
-   * Creates a new TransportWebSerial instance from an existing, provided {@link SerialPort}.
-   * Opens it if not already open.
+   * Open a transport on an already-known {@link SerialPort}. Performs the
+   * port-state hygiene needed for reconnect flows:
+   *
+   * - If `readable` / `writable` are non-null (port still open from a
+   *   previous session), close it and wait for the descriptor to settle.
+   * - Try `port.open()` up to four times with backoff on
+   *   `InvalidStateError` — common during USB re-enumeration.
+   *
+   * Returns `Err(SerialConnectError)` on persistent failure; the kind
+   * distinguishes "port owned by another tab/process" (`in-use`) from
+   * "transient busy / could not open" (`busy`) from
+   * "permission denied / no streams" (`unavailable`).
    */
   public static async createFromPort(
     port: SerialPort,
     baudRate?: number,
-  ): Promise<TransportWebSerial> {
-    if (!port.readable || !port.writable) {
-      await port.open({ baudRate: baudRate || 115200 });
+  ): Promise<ResultType<TransportWebSerial, SerialConnectError>> {
+    const prep = await TransportWebSerial.preparePort(port, baudRate ?? 115200);
+    if (Result.isError(prep)) return Result.err(prep.error);
+    try {
+      return Result.ok(new TransportWebSerial(port));
+    } catch (cause) {
+      return Result.err(
+        new SerialConnectError(
+          "unavailable",
+          "Serial port opened but its read / write streams are not accessible. Re-plug the device and try again.",
+          { cause },
+        ),
+      );
     }
-    return new TransportWebSerial(port);
+  }
+
+  private static async preparePort(
+    port: SerialPort,
+    baudRate: number,
+  ): Promise<ResultType<true, SerialConnectError>> {
+    if (port.readable || port.writable) {
+      try {
+        await port.close();
+      } catch (cause) {
+        return Result.err(
+          new SerialConnectError(
+            "in-use",
+            "Serial port is open and could not be released. Close any other tab, terminal, or app using it (Arduino IDE, screen, picocom, esptool) and try again.",
+            { cause },
+          ),
+        );
+      }
+      await new Promise((r) => setTimeout(r, POST_CLOSE_DELAY_MS));
+    }
+
+    let lastErr: unknown;
+    for (let attempt = 0; attempt <= PORT_OPEN_RETRY_DELAYS_MS.length; attempt++) {
+      try {
+        await port.open({ baudRate });
+        return Result.ok(true);
+      } catch (err) {
+        lastErr = err;
+        if (!isPortBusyError(err) || attempt === PORT_OPEN_RETRY_DELAYS_MS.length) break;
+        await new Promise((r) => setTimeout(r, PORT_OPEN_RETRY_DELAYS_MS[attempt]));
+      }
+    }
+
+    if (isPortBusyError(lastErr)) {
+      return Result.err(
+        new SerialConnectError(
+          "in-use",
+          "Serial port is busy. Another tab, terminal, or app is holding it (Arduino IDE, screen, picocom, esptool, Meshtastic CLI). Close it and try again.",
+          { cause: lastErr },
+        ),
+      );
+    }
+    return Result.err(
+      new SerialConnectError(
+        "busy",
+        "Could not open the serial port. Re-plug the device and try again.",
+        { cause: lastErr },
+      ),
+    );
   }
 
   /**
