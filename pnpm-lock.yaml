@@ -343,6 +343,9 @@ importers:
       '@meshtastic/sdk':
         specifier: workspace:*
         version: link:../sdk
+      better-result:
+        specifier: ^1.0.0
+        version: 1.0.1
     devDependencies:
       '@testing-library/react':
         specifier: ^16.0.0

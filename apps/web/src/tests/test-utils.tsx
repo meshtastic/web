@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import "@app/i18n-config.ts";
 
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
-import { routeTree } from "../routeTree.gen.ts";
+import { routeTree } from "../routes.tsx";
 
 const Providers = () => {
   const memoryHistory = createMemoryHistory({
@@ -14,10 +14,14 @@ const Providers = () => {
   const router = createRouter({
     routeTree,
     history: memoryHistory,
+    context: {
+      stores: {} as never,
+      i18n: {} as never,
+    },
   });
 
   return (
-    <DeviceWrapper>
+    <DeviceWrapper deviceId={0}>
       <RouterProvider router={router} />
     </DeviceWrapper>
   );

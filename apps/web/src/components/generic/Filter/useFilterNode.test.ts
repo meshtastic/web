@@ -13,6 +13,7 @@ function createMockNode(): Protobuf.Mesh.NodeInfo {
     viaMqtt: false,
     isFavorite: true,
     isIgnored: false,
+    isMuted: false,
     hopsAway: 2,
     isKeyManuallyVerified: false,
     user: {

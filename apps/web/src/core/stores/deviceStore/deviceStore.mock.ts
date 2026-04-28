@@ -16,6 +16,8 @@ export const mockDeviceStore: Device = {
   id: 0,
   myNodeNum: 123456,
   status: 5 as const,
+  connectionPhase: "disconnected",
+  connectionId: null,
   channels: new Map(),
   config: {} as Protobuf.LocalOnly.LocalConfig,
   moduleConfig: {} as Protobuf.LocalOnly.LocalModuleConfig,
@@ -50,6 +52,8 @@ export const mockDeviceStore: Device = {
   neighborInfo: new Map(),
 
   setStatus: vi.fn(),
+  setConnectionPhase: vi.fn(),
+  setConnectionId: vi.fn(),
   setConfig: vi.fn(),
   setModuleConfig: vi.fn(),
   getEffectiveConfig: vi.fn(),

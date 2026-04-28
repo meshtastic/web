@@ -22,14 +22,7 @@ export function App() {
   const device = getDevice(selectedDeviceId);
 
   return (
-    // <ThemeProvider defaultTheme="system" storageKey="theme">
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      {/* <NewDeviceDialog
-        open={connectDialogOpen}
-        onOpenChange={(open) => {
-          setConnectDialogOpen(open);
-        }}
-      /> */}
       <Toaster />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>

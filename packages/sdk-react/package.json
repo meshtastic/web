@@ -56,7 +56,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@meshtastic/sdk": "workspace:*"
+    "@meshtastic/sdk": "workspace:*",
+    "better-result": "^1.0.0"
   },
   "peerDependencies": {
     "react": "^18 || ^19"

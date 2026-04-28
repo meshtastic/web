@@ -11,9 +11,11 @@ export interface HeatmapLayerProps {
   id: string;
   filteredNodes: Protobuf.Mesh.NodeInfo[];
   mode: HeatmapMode;
+  isVisible: boolean;
 }
 
-export const HeatmapLayer = ({ id, filteredNodes, mode }: HeatmapLayerProps) => {
+export const HeatmapLayer = ({ id, filteredNodes, mode, isVisible }: HeatmapLayerProps) => {
+  if (!isVisible) return null;
   const data: FeatureCollection = useMemo(() => {
     const features: Feature[] = filteredNodes
       .filter((node) => hasPos(node.position))
