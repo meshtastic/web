@@ -146,7 +146,7 @@ const connectionsRoute = createRoute({
   component: Connections,
 });
 
-const routeTree = rootRoute.addChildren([
+export const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
   messagesWithParamsRoute,

@@ -6,7 +6,7 @@ interface UseCopyToClipboardProps {
 
 export function useCopyToClipboard({ timeout = 2000 }: UseCopyToClipboardProps = {}) {
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {

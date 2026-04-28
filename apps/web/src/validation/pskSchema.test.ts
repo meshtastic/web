@@ -19,7 +19,7 @@ describe("stringSchema", () => {
     const result = stringSchema().safeParse(invalid);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe(msgs.length);
+      expect(result.error.issues[0]!.message).toBe(msgs.length);
     }
   });
 
@@ -28,7 +28,7 @@ describe("stringSchema", () => {
     const result = stringSchema().safeParse("not_base64!");
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe(msgs.format);
+      expect(result.error.issues[0]!.message).toBe(msgs.format);
     }
   });
 
@@ -37,7 +37,7 @@ describe("stringSchema", () => {
     const result = stringSchema().safeParse("");
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe(msgs.required);
+      expect(result.error.issues[0]!.message).toBe(msgs.required);
     }
   });
 
@@ -75,7 +75,7 @@ describe("stringSchema", () => {
     const result = stringSchema().safeParse(valid);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe(msgs.format);
+      expect(result.error.issues[0]!.message).toBe(msgs.format);
     }
   });
 
@@ -91,7 +91,7 @@ describe("stringSchema", () => {
     const result = stringSchema().safeParse(invalid);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe(msgs.length);
+      expect(result.error.issues[0]!.message).toBe(msgs.length);
     }
   });
 
@@ -108,7 +108,7 @@ describe("stringSchema", () => {
       const result = bytesSchema().safeParse(invalid);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(msgs.length);
+        expect(result.error.issues[0]!.message).toBe(msgs.length);
       }
     });
 
@@ -123,7 +123,7 @@ describe("stringSchema", () => {
       const result = bytesSchema().safeParse(new Uint8Array(0));
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(msgs.required);
+        expect(result.error.issues[0]!.message).toBe(msgs.required);
       }
     });
 
@@ -167,7 +167,7 @@ describe("stringSchema", () => {
       const result = bytesSchema().safeParse(invalid);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(msgs.length);
+        expect(result.error.issues[0]!.message).toBe(msgs.length);
       }
     });
   });

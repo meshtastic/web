@@ -2,7 +2,7 @@ import { create, toBinary } from "@bufbuild/protobuf";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { type MeshDevice, Protobuf, Types } from "@meshtastic/sdk";
-import { produce } from "immer";
+import { type Draft, produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist, subscribeWithSelector } from "zustand/middleware";
 import type {
@@ -492,7 +492,7 @@ function deviceFactory(
         produce<PrivateDeviceState>((draft) => {
           const device = draft.devices.get(id);
           if (device) {
-            device.connection = connection;
+            device.connection = connection as unknown as Draft<MeshDevice>;
           }
         }),
       );
@@ -632,7 +632,7 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (set, ge
     const device = deviceFactory(id, get, set);
     set(
       produce<PrivateDeviceState>((draft) => {
-        draft.devices = new Map(draft.devices).set(id, device);
+        draft.devices = new Map(draft.devices).set(id, device as unknown as Draft<Device>);
 
         // Enforce retention limit
         evictOldestEntries(draft.devices, DEVICESTORE_RETENTION_NUM);
@@ -753,7 +753,7 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
             );
           }
         }
-        draft.devices = rebuilt;
+        draft.devices = rebuilt as unknown as Map<number, Draft<Device>>;
       }),
     );
   },

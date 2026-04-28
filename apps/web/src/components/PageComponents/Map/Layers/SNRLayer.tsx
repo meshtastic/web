@@ -31,7 +31,7 @@ export interface SNRTooltipProps {
   pos: { x: number; y: number };
   snr: number;
   from: string;
-  to: string;
+  to: string | undefined;
 }
 
 type NeighborPlus = Protobuf.Mesh.Neighbor & {

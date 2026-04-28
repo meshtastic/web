@@ -112,17 +112,17 @@ describe("Generic Table", () => {
     expect(getRenderedOrder()).toEqual(["TST2", "TST4", "TST1", "TST3"]);
 
     // Click "Short Name" to sort asc
-    fireEvent.click(columnHeaders[0]);
+    fireEvent.click(columnHeaders[0]!);
     // TST2 is favorite, so it's first. Then TST1, TST3, TST4 alphabetically.
     expect(getRenderedOrder()).toEqual(["TST2", "TST1", "TST3", "TST4"]);
 
     // Click "Short Name" again to sort desc
-    fireEvent.click(columnHeaders[0]);
+    fireEvent.click(columnHeaders[0]!);
     // TST2 is favorite, so it's first. Then TST4, TST3, TST1 reverse alphabetically.
     expect(getRenderedOrder()).toEqual(["TST2", "TST4", "TST3", "TST1"]);
 
     // Click "Connection" to sort by hops asc
-    fireEvent.click(columnHeaders[2]);
+    fireEvent.click(columnHeaders[2]!);
     // TST2 is favorite (and also has 0 hops). Then sorted by hops: TST1 (1), TST4 (3), TST3 (4).
     expect(getRenderedOrder()).toEqual(["TST2", "TST1", "TST4", "TST3"]);
   });
