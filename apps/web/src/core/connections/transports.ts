@@ -101,8 +101,39 @@ async function openBluetooth(
     throw new Error("Bluetooth device not available. Re-select the device.");
   }
 
-  const transport = await TransportWebBluetooth.createFromDevice(device);
-  return { transport, bluetoothDevice: device };
+  // GATT `Connection attempt failed` is a common transient — the radio is
+  // advertising but the OS BT stack hiccuped, or the device just woke from
+  // sleep. One retry with a short delay clears most of these. Persistent
+  // failures usually mean the device is out of range, off, or paired with
+  // another client (phone / second tab).
+  try {
+    const transport = await TransportWebBluetooth.createFromDevice(device);
+    return { transport, bluetoothDevice: device };
+  } catch (err) {
+    if (!isGattConnectFailure(err)) throw wrapBluetoothError(err);
+    await new Promise((r) => setTimeout(r, 750));
+    try {
+      const transport = await TransportWebBluetooth.createFromDevice(device);
+      return { transport, bluetoothDevice: device };
+    } catch (retryErr) {
+      throw wrapBluetoothError(retryErr);
+    }
+  }
+}
+
+function isGattConnectFailure(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  if ((err as DOMException).name === "NetworkError") return true;
+  return /connection attempt failed|gatt/i.test(err.message);
+}
+
+function wrapBluetoothError(err: unknown): Error {
+  const original = err instanceof Error ? err : new Error(String(err));
+  if (!isGattConnectFailure(original)) return original;
+  return new Error(
+    "Bluetooth connection failed. Make sure the device is in range, powered on, and not connected to a phone or another browser tab. Then click Retry.",
+    { cause: original },
+  );
 }
 
 async function openSerial(
