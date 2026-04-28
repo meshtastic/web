@@ -1,5 +1,37 @@
 import { DeviceStatusEnum, type DeviceOutput, type Transport } from "@meshtastic/sdk";
 
+/**
+ * Typed error thrown when establishing the GATT connection fails. `kind`
+ * lets callers distinguish recoverable transients (BT stack hiccup, device
+ * just woke from sleep) from fatal states (out of range, no service).
+ *
+ * `userMessage` is a human-readable, actionable string suitable for
+ * surfacing in UI without further interpretation.
+ */
+export class BluetoothConnectError extends Error {
+  public readonly kind: "transient" | "unavailable" | "missing-service";
+  public readonly userMessage: string;
+
+  constructor(
+    kind: BluetoothConnectError["kind"],
+    userMessage: string,
+    options?: { cause?: unknown },
+  ) {
+    super(userMessage, options);
+    this.name = "BluetoothConnectError";
+    this.kind = kind;
+    this.userMessage = userMessage;
+  }
+}
+
+function isTransientGattFailure(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  if ((err as DOMException).name === "NetworkError") return true;
+  return /connection attempt failed|gatt/i.test(err.message);
+}
+
+const TRANSIENT_RETRY_DELAY_MS = 750;
+
 function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
   if (
     uint8array.buffer instanceof ArrayBuffer &&
@@ -69,18 +101,31 @@ export class TransportWebBluetooth implements Transport {
   }
 
   /**
-   * Prepares and connects to a {@link BluetoothDevice}, resolving its GATT server
-   * and characteristics, then returning a transport.
+   * Prepares and connects to a {@link BluetoothDevice}, resolving its GATT
+   * server and characteristics, then returning a transport.
    *
-   * @throws if required services or characteristics are missing.
+   * Retries the GATT `connect()` call once on transient failures
+   * (`NetworkError: Connection attempt failed`) — these are common when
+   * the device just woke from sleep or the OS BT stack hiccuped.
+   *
+   * @throws {BluetoothConnectError} when the GATT connect persistently
+   *   fails, the BluetoothDevice has no `gatt`, or the Meshtastic GATT
+   *   service / characteristics aren't found on the device.
    */
   public static async prepareConnection(device: BluetoothDevice): Promise<TransportWebBluetooth> {
-    const gattServer = await device.gatt?.connect();
-    if (!gattServer) {
-      throw new Error("Failed to connect to GATT server");
+    const gattServer = await TransportWebBluetooth.connectGatt(device);
+
+    let service: BluetoothRemoteGATTService;
+    try {
+      service = await gattServer.getPrimaryService(TransportWebBluetooth.ServiceUuid);
+    } catch (cause) {
+      throw new BluetoothConnectError(
+        "missing-service",
+        "Device does not advertise the Meshtastic GATT service. The firmware may be too old or the device is in another mode.",
+        { cause },
+      );
     }
 
-    const service = await gattServer.getPrimaryService(TransportWebBluetooth.ServiceUuid);
     const toRadioCharacteristic = await service.getCharacteristic(
       TransportWebBluetooth.ToRadioUuid,
     );
@@ -92,7 +137,10 @@ export class TransportWebBluetooth implements Transport {
     );
 
     if (!toRadioCharacteristic || !fromRadioCharacteristic || !fromNumCharacteristic) {
-      throw new Error("Failed to find required characteristics");
+      throw new BluetoothConnectError(
+        "missing-service",
+        "Meshtastic GATT characteristics not found on this device.",
+      );
     }
 
     return new TransportWebBluetooth(
@@ -101,6 +149,40 @@ export class TransportWebBluetooth implements Transport {
       fromNumCharacteristic,
       gattServer,
     );
+  }
+
+  private static async connectGatt(device: BluetoothDevice): Promise<BluetoothRemoteGATTServer> {
+    if (!device.gatt) {
+      throw new BluetoothConnectError(
+        "unavailable",
+        "Device does not expose a GATT server. Re-pair the device.",
+      );
+    }
+    try {
+      const server = await device.gatt.connect();
+      if (!server) throw new Error("gatt.connect() returned undefined");
+      return server;
+    } catch (firstErr) {
+      if (!isTransientGattFailure(firstErr)) {
+        throw new BluetoothConnectError(
+          "unavailable",
+          "Bluetooth connection failed. Make sure the device is in range, powered on, and not connected to a phone or another browser tab.",
+          { cause: firstErr },
+        );
+      }
+      await new Promise((r) => setTimeout(r, TRANSIENT_RETRY_DELAY_MS));
+      try {
+        const server = await device.gatt.connect();
+        if (!server) throw new Error("gatt.connect() returned undefined");
+        return server;
+      } catch (retryErr) {
+        throw new BluetoothConnectError(
+          "transient",
+          "Bluetooth connection failed twice. Check the device is in range, powered on, and not paired with a phone or another browser tab. Then click Retry.",
+          { cause: retryErr },
+        );
+      }
+    }
   }
 
   /**
