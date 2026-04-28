@@ -11,3 +11,14 @@ export function useModuleConfig(): ModuleConfig {
   const client = useClient();
   return useSignal(client.config.modules);
 }
+
+/**
+ * `true` when the connected device's LoRa region is UNSET — the canonical
+ * "this device was just flashed and hasn't been provisioned" cue. See
+ * `ConfigClient.isRegionUnset` for semantics + reference to the equivalent
+ * Meshtastic-Android flow.
+ */
+export function useIsRegionUnset(): boolean {
+  const client = useClient();
+  return useSignal(client.config.isRegionUnset);
+}
