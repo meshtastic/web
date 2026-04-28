@@ -147,6 +147,11 @@
     "remindNever": "Never remind me",
     "backupNow": "Back up now"
   },
+  "regionSetup": {
+    "title": "Set your region",
+    "description": "This device has no LoRa region configured and won't transmit until you pick one.",
+    "cta": "Set region"
+  },
   "pkiRegenerate": {
     "description": "Are you sure you want to regenerate key pair?",
     "title": "Regenerate Key Pair"

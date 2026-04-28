@@ -40,4 +40,48 @@ describe("ConfigClient", () => {
 
     expect(client.config.modules.value.mqtt?.enabled).toBe(true);
   });
+
+  describe("isRegionUnset", () => {
+    it("starts false until the first LoRa config packet arrives", () => {
+      const { transport } = createFakeTransport();
+      const client = new MeshClient({ transport });
+      expect(client.config.isRegionUnset.value).toBe(false);
+    });
+
+    it("flips true when an UNSET (0) LoRa region arrives", () => {
+      const { transport } = createFakeTransport();
+      const client = new MeshClient({ transport });
+
+      client.events.onConfigPacket.dispatch(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: "lora",
+            value: create(Protobuf.Config.Config_LoRaConfigSchema, {
+              region: Protobuf.Config.Config_LoRaConfig_RegionCode.UNSET,
+            }),
+          },
+        }),
+      );
+
+      expect(client.config.isRegionUnset.value).toBe(true);
+    });
+
+    it("stays false once a real region is set", () => {
+      const { transport } = createFakeTransport();
+      const client = new MeshClient({ transport });
+
+      client.events.onConfigPacket.dispatch(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: "lora",
+            value: create(Protobuf.Config.Config_LoRaConfigSchema, {
+              region: Protobuf.Config.Config_LoRaConfig_RegionCode.US,
+            }),
+          },
+        }),
+      );
+
+      expect(client.config.isRegionUnset.value).toBe(false);
+    });
+  });
 });

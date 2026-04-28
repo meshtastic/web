@@ -2,6 +2,7 @@ import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
+import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
@@ -36,6 +37,7 @@ export function App() {
                 <div className="h-full flex w-full">
                   <DialogManager />
                   <KeyBackupReminder />
+                  <RegionSetupReminder />
                   <CommandPalette />
                   <MapProvider>
                     <Outlet />

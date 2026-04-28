@@ -26,7 +26,7 @@ export { useHasNodeError, useNodeError, useNodeErrors } from "./src/hooks/useNod
 export { useNodes } from "./src/hooks/useNodes.ts";
 export { useNode } from "./src/hooks/useNode.ts";
 export { useChannels, useChannel } from "./src/hooks/useChannels.ts";
-export { useConfig, useModuleConfig } from "./src/hooks/useConfig.ts";
+export { useConfig, useIsRegionUnset, useModuleConfig } from "./src/hooks/useConfig.ts";
 export { useConfigEditor } from "./src/hooks/useConfigEditor.ts";
 export { useTotalUnread, useUnreadByKey, useUnreadCount } from "./src/hooks/useUnread.ts";
 export { useTelemetry } from "./src/hooks/useTelemetry.ts";

@@ -1,7 +1,8 @@
-import type * as Protobuf from "@meshtastic/protobufs";
+import * as Protobuf from "@meshtastic/protobufs";
+import { computed } from "@preact/signals-core";
 import type { ResultType } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
-import type { ReadonlySignal } from "../../core/signals/createStore.ts";
+import { type ReadonlySignal, toReadonly } from "../../core/signals/createStore.ts";
 import {
   beginEditSettings,
   commitEditSettings,
@@ -22,6 +23,16 @@ export class ConfigClient {
   public readonly radio: ReadonlySignal<RadioConfig>;
   public readonly modules: ReadonlySignal<ModuleConfig>;
   public readonly editor: ConfigEditor;
+  /**
+   * `true` when the device has not yet been assigned a LoRa region — the
+   * canonical "newly-flashed / unconfigured device" cue. Mirrors
+   * Meshtastic-Android's `regionUnset` flow (a freshly-flashed firmware
+   * defaults `Config.LoRa.region` to `UNSET = 0` until the user picks one).
+   *
+   * Stays `false` until a LoRa config packet arrives, so consumers don't
+   * flash a "set region" prompt during the connect handshake.
+   */
+  public readonly isRegionUnset: ReadonlySignal<boolean>;
 
   constructor(client: MeshClient) {
     this.client = client;
@@ -29,6 +40,14 @@ export class ConfigClient {
     this.radio = this.store.radio.read;
     this.modules = this.store.modules.read;
     this.editor = new ConfigEditor(client);
+
+    this.isRegionUnset = toReadonly(
+      computed(() => {
+        const lora = this.store.radio.write.value.lora;
+        if (!lora) return false;
+        return lora.region === Protobuf.Config.Config_LoRaConfig_RegionCode.UNSET;
+      }),
+    );
 
     client.events.onConfigPacket.subscribe((config) => {
       this.store.radio.write.value = ConfigMapper.mergeRadio(this.store.radio.write.value, config);
