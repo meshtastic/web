@@ -28,6 +28,7 @@ export { useNode } from "./src/hooks/useNode.ts";
 export { useChannels, useChannel } from "./src/hooks/useChannels.ts";
 export { useConfig, useIsRegionUnset, useModuleConfig } from "./src/hooks/useConfig.ts";
 export { useConfigEditor } from "./src/hooks/useConfigEditor.ts";
+export { useConnectionProgress } from "./src/hooks/useConnectionProgress.ts";
 export { useTotalUnread, useUnreadByKey, useUnreadCount } from "./src/hooks/useUnread.ts";
 export { useTelemetry } from "./src/hooks/useTelemetry.ts";
 export type { UseTelemetryResult } from "./src/hooks/useTelemetry.ts";
