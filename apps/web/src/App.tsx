@@ -1,5 +1,6 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
+import { ConnectingOverlay } from "@components/ConnectingOverlay.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
 import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
@@ -27,6 +28,10 @@ export function App() {
       <Toaster />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>
+        {/* Overlay sits outside the device-conditional branch so it shows
+            during a first-time connect from the Connections screen as
+            well as reconnects from inside the app. */}
+        <ConnectingOverlay />
         <div
           className="flex h-screen flex-col bg-background-primary text-text-primary"
           style={{ scrollbarWidth: "thin" }}

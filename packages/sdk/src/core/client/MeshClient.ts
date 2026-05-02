@@ -8,6 +8,7 @@ import { generatePacketId } from "../identifiers/PacketId.ts";
 import { createLogger } from "../logging/logger.ts";
 import { decodePacket } from "../packet-codec/decodePacket.ts";
 import { Queue } from "../queue/Queue.ts";
+import { createStore, type ReadonlySignal } from "../signals/createStore.ts";
 import type { Transport } from "../transport/Transport.ts";
 import { DeviceStatusEnum } from "../transport/Transport.ts";
 import { ChannelNumber, type Destination, Emitter, type PacketMetadata } from "../types.ts";
@@ -36,6 +37,39 @@ export interface MeshClientOptions {
 }
 
 /**
+ * Per-section / per-event tally of what has streamed in since the most
+ * recent `configure()` call. UI surfaces use this for live "received X
+ * channels, Y nodes" feedback during the handshake.
+ */
+export interface ConnectionProgressCounters {
+  config: number;
+  modules: number;
+  channels: number;
+  nodes: number;
+  myInfo: boolean;
+  metadata: boolean;
+}
+
+/**
+ * Connection progress signal shape. The state machine moves
+ * `idle → configuring → configured` once `configure()` runs and the
+ * device finishes streaming its config bundle.
+ */
+export type ConnectionProgress =
+  | { phase: "idle" }
+  | { phase: "configuring"; received: ConnectionProgressCounters }
+  | { phase: "configured"; received: ConnectionProgressCounters };
+
+const EMPTY_COUNTERS: ConnectionProgressCounters = {
+  config: 0,
+  modules: 0,
+  channels: 0,
+  nodes: 0,
+  myInfo: false,
+  metadata: false,
+};
+
+/**
  * Orchestrator for a single connected Meshtastic device.
  *
  * Owns the transport, event bus, queue, and xmodem instances. Exposes one
@@ -60,6 +94,15 @@ export class MeshClient {
   public readonly traceroute: TraceRouteClient;
   public readonly files: FilesClient;
 
+  /**
+   * Live connection-handshake progress. Resets to `configuring` with empty
+   * counters when `configure()` is called; tallies each inbound config /
+   * module / channel / node packet; flips to `configured` when the device
+   * sends `configCompleteId`.
+   */
+  public readonly progress: ReadonlySignal<ConnectionProgress>;
+  private readonly progressStore = createStore<ConnectionProgress>({ phase: "idle" });
+
   private _heartbeatIntervalId: ReturnType<typeof setInterval> | undefined;
 
   constructor(options: MeshClientOptions) {
@@ -79,6 +122,9 @@ export class MeshClient {
     this.position = new PositionClient(this);
     this.traceroute = new TraceRouteClient(this);
     this.files = new FilesClient(this);
+
+    this.progress = this.progressStore.read;
+    this.wireProgressTracking();
 
     this.events.onDeviceStatus.subscribe((status) => {
       if (status === DeviceStatusEnum.DeviceDisconnected) {
@@ -109,6 +155,10 @@ export class MeshClient {
   public configure(): Promise<number> {
     this.log.debug(Emitter[Emitter.Configure], "⚙️ Requesting device configuration");
     this.updateDeviceStatus(DeviceStatusEnum.DeviceConfiguring);
+    this.progressStore.write.value = {
+      phase: "configuring",
+      received: { ...EMPTY_COUNTERS },
+    };
 
     const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
       payloadVariant: { case: "wantConfigId", value: this.configId },
@@ -119,6 +169,39 @@ export class MeshClient {
         throw new Error("Device connection lost");
       }
       throw e;
+    });
+  }
+
+  /**
+   * Subscribe progress counters to the relevant inbound events. Each
+   * subscriber bumps the matching field on the current `configuring`
+   * snapshot; `onConfigComplete` flips the phase to `configured`.
+   *
+   * Outside of an active handshake (phase=idle) inbound packets are
+   * ignored — they belong to a later session that re-runs configure().
+   */
+  private wireProgressTracking(): void {
+    const bump = (field: keyof ConnectionProgressCounters): void => {
+      const cur = this.progressStore.read.value;
+      if (cur.phase !== "configuring") return;
+      const next: ConnectionProgressCounters = {
+        ...cur.received,
+        [field]: typeof cur.received[field] === "number" ? cur.received[field] + 1 : true,
+      } as ConnectionProgressCounters;
+      this.progressStore.write.value = { phase: "configuring", received: next };
+    };
+
+    this.events.onConfigPacket.subscribe(() => bump("config"));
+    this.events.onModuleConfigPacket.subscribe(() => bump("modules"));
+    this.events.onChannelPacket.subscribe(() => bump("channels"));
+    this.events.onNodeInfoPacket.subscribe(() => bump("nodes"));
+    this.events.onMyNodeInfo.subscribe(() => bump("myInfo"));
+    this.events.onDeviceMetadataPacket.subscribe(() => bump("metadata"));
+
+    this.events.onConfigComplete.subscribe(() => {
+      const cur = this.progressStore.read.value;
+      const received = cur.phase === "configuring" ? cur.received : { ...EMPTY_COUNTERS };
+      this.progressStore.write.value = { phase: "configured", received };
     });
   }
 
