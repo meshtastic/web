@@ -9,7 +9,7 @@ import {
   openTransport,
   probeConnection,
 } from "@app/core/connections/transports.ts";
-import { createLogger } from "@meshtastic/sdk";
+import { createLogger, DeviceStatusEnum } from "@meshtastic/sdk";
 
 const log = createLogger("useConnections");
 import type {
@@ -146,13 +146,43 @@ export function useConnections() {
       setActiveConnectionId(id);
       device.setConnectionId(id);
 
-      const unsubConfigComplete = meshDevice.events.onConfigComplete.subscribe(() => {
-        log.info("onConfigComplete fired", { id });
+      // Two paths drive the "configured" transition:
+      //   1. The `onConfigComplete` event from the firmware. The handler is
+      //      attached AFTER buildMeshDevice, which means MeshClient already
+      //      started piping fromDevice → decodePacket. If the serial port
+      //      had a buffered configCompleteId from a prior session, the
+      //      dispatch happens synchronously before this subscribe and we
+      //      miss it.
+      //   2. The MeshClient.device.status signal. decodePacket flips the
+      //      signal to DeviceConfigured on the same configCompleteId, and
+      //      signals replay their current value to new subscribers — so we
+      //      catch the case the event missed.
+      // Either path may fire first; `markConfigured` is idempotent.
+      let configuredHandled = false;
+      const markConfigured = (source: string): void => {
+        if (configuredHandled) return;
+        configuredHandled = true;
+        log.info("connect transitioned to configured", { id, source });
         device.setConnectionPhase("configured");
         updateStatus(id, "configured");
         startMaintenanceHeartbeat(id, meshDevice);
+      };
+
+      const unsubConfigComplete = meshDevice.events.onConfigComplete.subscribe(() =>
+        markConfigured("onConfigComplete"),
+      );
+      const unsubStatusSignal = meshDevice.meshClient.device.status.subscribe((s) => {
+        if (s === DeviceStatusEnum.DeviceConfigured) markConfigured("device.status");
       });
-      configSubscriptions.set(id, unsubConfigComplete);
+      // Catch-up: signal subscribe doesn't fire for the current value, so
+      // check synchronously if the device is already past the gate.
+      if (meshDevice.meshClient.device.status.value === DeviceStatusEnum.DeviceConfigured) {
+        markConfigured("initial-check");
+      }
+      configSubscriptions.set(id, () => {
+        unsubConfigComplete();
+        unsubStatusSignal();
+      });
 
       log.debug("setupMeshDevice: calling configure()", { id });
       meshDevice
