@@ -56,18 +56,16 @@
     "updatedByName": "{{name}} has been updated."
   },
   "overlay": {
-    "log": {
-      "header": "meshtastic — connect",
-      "transportOpening": "Opening transport…",
-      "transportReady": "Transport ready",
-      "requestingConfig": "Requesting configuration",
-      "configReceived": "Received config section ({{n}})",
-      "moduleReceived": "Received module config ({{n}})",
-      "channelReceived": "Received channel ({{n}})",
-      "nodeReceived": "Received node info ({{n}})",
-      "myInfo": "Identity received",
-      "metadata": "Metadata received",
-      "configured": "Configuration complete"
+    "srTitle": "Connecting to device",
+    "phase": {
+      "connecting": "Opening transport…",
+      "configuring": "Streaming configuration…"
+    },
+    "chip": {
+      "identity": "Identity",
+      "metadata": "Metadata",
+      "channels": "Channels",
+      "nodes": "Nodes"
     }
   }
 }
