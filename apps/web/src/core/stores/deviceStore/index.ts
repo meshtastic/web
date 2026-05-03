@@ -754,6 +754,22 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
           }
         }
         draft.devices = rebuilt as unknown as Map<number, Draft<Device>>;
+
+        // Stale in-flight states can't survive a reload — no JS code is
+        // running that could complete them. Reset any persisted
+        // "connecting" / "configuring" / "disconnecting" entries to
+        // "disconnected" so the connecting overlay (which keys off
+        // these statuses) doesn't get stuck visible on cold boot.
+        for (const conn of draft.savedConnections) {
+          if (
+            conn.status === "connecting" ||
+            conn.status === "configuring" ||
+            conn.status === "disconnecting"
+          ) {
+            conn.status = "disconnected";
+            conn.error = undefined;
+          }
+        }
       }),
     );
   },

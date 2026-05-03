@@ -1,10 +1,15 @@
 import { Dialog, DialogContent, DialogTitle } from "@components/UI/Dialog.tsx";
+import { Button } from "@components/UI/Button.tsx";
 import { useDeviceStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
+import { useConnections } from "@app/pages/Connections/useConnections";
 import { useConnectionProgress } from "@meshtastic/sdk-react";
 import { Bluetooth, Cable, CheckCircle2, Globe, Loader2 } from "lucide-react";
 import type { ComponentType, ReactElement } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+
+const STUCK_THRESHOLD_MS = 15_000;
 
 const TRANSPORT_ICON: Record<
   "http" | "bluetooth" | "serial",
@@ -31,11 +36,27 @@ const TRANSPORT_ICON: Record<
 export const ConnectingOverlay = (): ReactElement | null => {
   const savedConnections = useDeviceStore((s) => s.savedConnections);
   const progress = useConnectionProgress();
+  const { disconnect } = useConnections();
   const { t } = useTranslation("connections");
 
   const active = savedConnections.find(
     (c) => c.status === "connecting" || c.status === "configuring",
   );
+
+  // Stuck-detection: once an attempt has been visible for STUCK_THRESHOLD_MS,
+  // surface a Cancel button so the user can bail out of the overlay even when
+  // `onConfigComplete` never arrives (firmware in CLI / bootloader, framing
+  // out of sync, etc.). Resets when a fresh attempt starts.
+  const [showCancel, setShowCancel] = useState(false);
+  useEffect(() => {
+    if (!active) {
+      setShowCancel(false);
+      return;
+    }
+    setShowCancel(false);
+    const t = setTimeout(() => setShowCancel(true), STUCK_THRESHOLD_MS);
+    return () => clearTimeout(t);
+  }, [active?.id]);
 
   if (!active) return null;
 
@@ -100,6 +121,25 @@ export const ConnectingOverlay = (): ReactElement | null => {
               done={counters.nodes > 0 && progress.phase === "configured"}
             />
           </div>
+
+          {showCancel && (
+            <div className="flex w-full flex-col items-center gap-2">
+              <p className="text-center text-xs text-slate-500">
+                {t("overlay.stuckHint", {
+                  defaultValue:
+                    "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
+                })}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                className="border-slate-700 bg-slate-900/80 text-slate-200 hover:bg-slate-800"
+                onClick={() => void disconnect(active.id)}
+              >
+                {t("overlay.cancel", { defaultValue: "Cancel" })}
+              </Button>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
