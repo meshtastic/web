@@ -66,6 +66,8 @@
       "metadata": "Metadata",
       "channels": "Channels",
       "nodes": "Nodes"
-    }
+    },
+    "stuckHint": "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
+    "cancel": "Cancel"
   }
 }
