@@ -74,7 +74,7 @@ export const ConnectingOverlay = (): ReactElement | null => {
   return (
     <Dialog open>
       <DialogContent
-        className="max-w-sm overflow-hidden border-0 bg-gradient-to-b from-slate-900 via-slate-950 to-black p-0 text-slate-100 shadow-2xl"
+        className="max-w-sm overflow-hidden bg-background-primary p-0 text-text-primary shadow-2xl"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
@@ -83,18 +83,21 @@ export const ConnectingOverlay = (): ReactElement | null => {
         </DialogTitle>
 
         <div className="flex flex-col items-center gap-6 px-8 pt-10 pb-8">
-          {/* Hero icon with radial pings */}
+          {/* Hero icon with radial pings — uses the theme link color so light
+              and dark modes both look at-home. */}
           <div className="relative flex h-28 w-28 items-center justify-center">
-            <span className="absolute inset-0 animate-ping rounded-full bg-sky-500/20 [animation-duration:1.8s]" />
-            <span className="absolute inset-3 animate-ping rounded-full bg-sky-500/30 [animation-duration:2.4s] [animation-delay:0.4s]" />
-            <span className="absolute inset-6 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 shadow-lg shadow-sky-500/40" />
-            <Icon className="relative h-9 w-9 text-white" />
+            <span className="absolute inset-0 animate-ping rounded-full bg-link/20 [animation-duration:1.8s]" />
+            <span className="absolute inset-3 animate-ping rounded-full bg-link/30 [animation-duration:2.4s] [animation-delay:0.4s]" />
+            <span className="absolute inset-6 rounded-full bg-link shadow-lg shadow-link/40" />
+            <Icon className="relative h-9 w-9 text-background-primary" />
           </div>
 
           {/* Name + phase */}
           <div className="text-center">
-            <div className="text-lg font-semibold tracking-tight text-white">{active.name}</div>
-            <div className="mt-1 inline-flex items-center gap-1.5 text-xs text-slate-400">
+            <div className="text-lg font-semibold tracking-tight text-text-primary">
+              {active.name}
+            </div>
+            <div className="mt-1 inline-flex items-center gap-1.5 text-xs text-text-secondary">
               <Loader2 className="h-3 w-3 animate-spin" />
               {phaseLabel}
             </div>
@@ -124,18 +127,13 @@ export const ConnectingOverlay = (): ReactElement | null => {
 
           {showCancel && (
             <div className="flex w-full flex-col items-center gap-2">
-              <p className="text-center text-xs text-slate-500">
+              <p className="text-center text-xs text-text-secondary">
                 {t("overlay.stuckHint", {
                   defaultValue:
                     "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
                 })}
               </p>
-              <Button
-                type="button"
-                variant="outline"
-                className="border-slate-700 bg-slate-900/80 text-slate-200 hover:bg-slate-800"
-                onClick={() => void disconnect(active.id)}
-              >
+              <Button type="button" variant="outline" onClick={() => void disconnect(active.id)}>
                 {t("overlay.cancel", { defaultValue: "Cancel" })}
               </Button>
             </div>
@@ -159,17 +157,17 @@ function Chip({ label, count, done }: ChipProps): ReactElement {
       className={cn(
         "flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
         filled
-          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
-          : "border-slate-700/60 bg-slate-800/40 text-slate-400",
+          ? "border-green-500/40 bg-green-500/10 text-green-700 dark:text-green-300"
+          : "border-text-secondary/30 bg-text-secondary/5 text-text-secondary",
       )}
     >
       <span className="font-medium">{label}</span>
       {count !== undefined ? (
         <span className="font-mono text-xs tabular-nums">{count}</span>
       ) : done ? (
-        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+        <CheckCircle2 className="h-4 w-4 text-green-500" />
       ) : (
-        <span className="h-4 w-4 rounded-full border border-dashed border-slate-600" />
+        <span className="h-4 w-4 rounded-full border border-dashed border-text-secondary/50" />
       )}
     </div>
   );
