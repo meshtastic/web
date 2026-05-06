@@ -244,6 +244,7 @@ export class MeshClient {
     echoResponse = false,
     replyId?: number,
     emoji?: number,
+    packetId?: number,
   ): Promise<number> {
     this.log.trace(
       Emitter[Emitter.SendPacket],
@@ -272,7 +273,7 @@ export class MeshClient {
           : destination === "self"
             ? myNum
             : destination,
-      id: generatePacketId(),
+      id: packetId ?? generatePacketId(),
       wantAck,
       channel,
     });
