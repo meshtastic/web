@@ -35,6 +35,17 @@ export class ChatStore {
   }
 
   /**
+   * Whether a message with `id` is already present in the bucket. Used by
+   * the inbound-packet subscriber to skip duplicates of an outbound message
+   * that was optimistically appended on send.
+   */
+  hasMessage(key: string, id: number): boolean {
+    const bucket = this.buckets.get(key);
+    if (!bucket) return false;
+    return bucket.value.some((m) => m.id === id);
+  }
+
+  /**
    * Inserts an older message at the front of the bucket. Used when paginating
    * backwards; preserves chronological order because callers feed older-first.
    */
