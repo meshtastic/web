@@ -93,6 +93,48 @@ describe("ChatClient.send optimistic append", () => {
     expect(messages.value).toHaveLength(1);
   });
 
+  it("appends the optimistic message before the send promise resolves", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const messages = client.chat.messages(ChannelNumber.Primary);
+
+    // Kick off the send but do NOT await yet.
+    const sendPromise = client.chat.send({
+      text: "instant",
+      destination: "broadcast",
+      channel: ChannelNumber.Primary,
+    });
+
+    // Synchronously, the message must already be in the bucket — the
+    // optimistic append runs before any await in send().
+    expect(messages.value).toHaveLength(1);
+    expect(messages.value[0]!.text).toBe("instant");
+    expect(messages.value[0]!.state).toBe(MessageState.Pending);
+
+    // Now drain the queue so the test doesn't dangle.
+    for (const item of client.queue.getState()) client.queue.processAck(item.id);
+    await sendPromise;
+  });
+
+  it("flips outbound state to Failed when sendText returns Err", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const messages = client.chat.messages(ChannelNumber.Primary);
+
+    // Empty text triggers EmptyMessageError synchronously inside sendText.
+    const result = await client.chat.send({
+      text: "",
+      destination: "broadcast",
+      channel: ChannelNumber.Primary,
+    });
+    expect(result.status).toBe("error");
+    // Empty-text path errors before the optimistic append runs in the
+    // current implementation? It actually appends first — so the bucket
+    // should contain the placeholder with state=Failed.
+    expect(messages.value).toHaveLength(1);
+    expect(messages.value[0]!.state).toBe(MessageState.Failed);
+  });
+
   it("flips outbound state to Ack on a routing-error=NONE packet matching the id", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });

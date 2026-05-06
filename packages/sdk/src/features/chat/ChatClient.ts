@@ -2,6 +2,7 @@ import { signal } from "@preact/signals-core";
 import type { ResultType } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
+import { generatePacketId } from "../../core/identifiers/PacketId.ts";
 import { type ReadonlySignal, toReadonly } from "../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../core/types.ts";
 import type { DraftRepository } from "./domain/DraftRepository.ts";
@@ -174,37 +175,48 @@ export class ChatClient {
   }
 
   public async send(input: SendTextInput): Promise<ResultType<number, SendTextError>> {
-    const result = await sendText(this.client, input);
-    if (result.status === "ok") {
-      const conv: ConversationKey =
-        typeof input.destination === "number"
-          ? { kind: "direct", peer: input.destination }
-          : { kind: "channel", channel: input.channel ?? 0 };
+    const conv: ConversationKey =
+      typeof input.destination === "number"
+        ? { kind: "direct", peer: input.destination }
+        : { kind: "channel", channel: input.channel ?? 0 };
 
-      // Optimistic local echo. `MeshClient.sendPacket(echoResponse=true)`
-      // dispatches `onMeshPacket` only — not the per-portnum
-      // `onMessagePacket` event the chat slice subscribes to — and the
-      // firmware does not loop the user's own outbound text back via
-      // `fromradio`. Without this, the message vanishes on send and
-      // never lands in the conversation bucket.
-      const message: Message = {
-        id: result.value,
-        from: this.client.myNodeNum,
-        to: typeof input.destination === "number" ? input.destination : Constants.broadcastNum,
-        channel: input.channel ?? 0,
-        rxTime: new Date(),
-        type: typeof input.destination === "number" ? "direct" : "broadcast",
-        text: input.text,
-        state: MessageState.Pending,
-      };
-      const key = this.keyFor(conv);
-      if (!this.store.hasMessage(key, message.id)) {
-        this.store.append(key, message);
-        void this.persistAppend(message);
-      }
+    // Optimistic-append BEFORE awaiting `sendText`. The send pipeline
+    // resolves only after `queue.processAck(id)` fires (firmware ack —
+    // can be 1–3 s on LoRa) and we don't want the UI to wait that long
+    // to render the user's own message. We pre-generate the packet id
+    // so the eventual routing-ack subscriber can match by id and flip
+    // state Pending → Ack.
+    //
+    // (The firmware does not echo own outbound text back via `fromradio`
+    // and `MeshClient.sendPacket(echoResponse=true)` only dispatches the
+    // raw `onMeshPacket` — not the per-portnum `onMessagePacket` the
+    // chat slice subscribes to. Hence the explicit append here.)
+    const packetId = generatePacketId();
+    const key = this.keyFor(conv);
+    const message: Message = {
+      id: packetId,
+      from: this.client.myNodeNum,
+      to: typeof input.destination === "number" ? input.destination : Constants.broadcastNum,
+      channel: input.channel ?? 0,
+      rxTime: new Date(),
+      type: typeof input.destination === "number" ? "direct" : "broadcast",
+      text: input.text,
+      state: MessageState.Pending,
+    };
+    if (!this.store.hasMessage(key, packetId)) {
+      this.store.append(key, message);
+      void this.persistAppend(message);
+    }
+    this.draftStore.clear(conv);
+    void this.draftRepository.clear(conv).catch(() => {});
 
-      this.draftStore.clear(conv);
-      void this.draftRepository.clear(conv).catch(() => {});
+    const result = await sendText(this.client, { ...input, packetId });
+    if (result.status === "error") {
+      // Send pipeline failed (transport closed, validation, etc.). Keep
+      // the optimistic message visible but mark it Failed so the user
+      // sees the error state next to their bubble.
+      this.store.updateState(packetId, MessageState.Failed);
+      void this.repository.updateState(packetId, MessageState.Failed).catch(() => {});
     }
     return result;
   }

@@ -11,6 +11,12 @@ export interface SendTextInput {
   channel?: ChannelNumber;
   replyId?: number;
   emoji?: number;
+  /**
+   * Override the auto-generated packet id. Used by callers (e.g. the
+   * chat slice's optimistic-append path) that need to know the id
+   * synchronously before the send round-trip resolves.
+   */
+  packetId?: number;
 }
 
 export class EmptyMessageError extends Error {
@@ -71,6 +77,7 @@ export async function sendText(
       true,
       input.replyId,
       input.emoji,
+      input.packetId,
     );
     return Result.ok(id);
   } catch (e) {
