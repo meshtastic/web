@@ -103,6 +103,11 @@ export class ChatClient {
           ? { kind: "direct", peer: packet.from === client.myNodeNum ? packet.to : packet.from }
           : { kind: "channel", channel: packet.channel };
       const key = this.keyFor(conv);
+
+      // Outbound is optimistic-appended in `send()`. If the firmware later
+      // echoes the same packet via `fromradio`, skip the duplicate.
+      if (this.store.hasMessage(key, message.id)) return;
+
       this.store.append(key, message);
       void this.persistAppend(message);
 
@@ -175,6 +180,29 @@ export class ChatClient {
         typeof input.destination === "number"
           ? { kind: "direct", peer: input.destination }
           : { kind: "channel", channel: input.channel ?? 0 };
+
+      // Optimistic local echo. `MeshClient.sendPacket(echoResponse=true)`
+      // dispatches `onMeshPacket` only — not the per-portnum
+      // `onMessagePacket` event the chat slice subscribes to — and the
+      // firmware does not loop the user's own outbound text back via
+      // `fromradio`. Without this, the message vanishes on send and
+      // never lands in the conversation bucket.
+      const message: Message = {
+        id: result.value,
+        from: this.client.myNodeNum,
+        to: typeof input.destination === "number" ? input.destination : Constants.broadcastNum,
+        channel: input.channel ?? 0,
+        rxTime: new Date(),
+        type: typeof input.destination === "number" ? "direct" : "broadcast",
+        text: input.text,
+        state: MessageState.Pending,
+      };
+      const key = this.keyFor(conv);
+      if (!this.store.hasMessage(key, message.id)) {
+        this.store.append(key, message);
+        void this.persistAppend(message);
+      }
+
       this.draftStore.clear(conv);
       void this.draftRepository.clear(conv).catch(() => {});
     }
