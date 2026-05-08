@@ -165,7 +165,7 @@ const NodesPage = (): JSX.Element => {
                 ? node?.viaMqtt === false && node.hopsAway === 0
                   ? t("nodesTable.connectionStatus.direct")
                   : `${node.hopsAway?.toString()} ${
-                      (node.hopsAway ?? 0 > 1) ? t("unit.hop.plural") : t("unit.hops_one")
+                      (node.hopsAway ?? 0) > 1 ? t("unit.hop.plural") : t("unit.hop.one")
                     } ${t("nodesTable.connectionStatus.away")}`
                 : t("unknown.longName")}
               {node?.viaMqtt === true ? t("nodesTable.connectionStatus.viaMqtt") : ""}
