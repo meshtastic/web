@@ -47,9 +47,16 @@ We split it into three pieces:
   `disconnect()`), so you can write your own without forking anything.
 - `@meshtastic/sdk-react` lives separately for the React hooks. Skip it if you're not using React.
 
-The old `MeshDevice` class is still exported from `src/shim/` so existing `@meshtastic/core` apps can
-upgrade without a full rewrite. The shim will be removed once the web client finishes its migration —
-new code should use `MeshClient` directly.
+### Upgrading from `@meshtastic/core`
+
+You don't have to port everything at once. `@meshtastic/sdk` re-exports the old `MeshDevice` class
+from `src/shim/`, with the same public surface it had in core, so most apps can swap the dependency
+and keep building while they migrate file by file.
+
+Treat the shim as a moving truck, not furniture. New code should target `MeshClient` and the feature
+clients directly — that's where everything new lands (the `onRebooted` event added in this release,
+for instance, is on `client.events`, not the shim). We'll delete `src/shim/` once the web client
+itself is fully off `MeshDevice`, so don't build anything new on top of it.
 
 ## What's in the client
 
@@ -95,9 +102,27 @@ respond.withConfigCompleteId(1);
 
 The fake transport is the same one the SDK's own integration tests use.
 
-## React?
+## Using this with React
 
-[`@meshtastic/sdk-react`](https://www.npmjs.com/package/@meshtastic/sdk-react).
+You can use `@meshtastic/sdk` straight from a React component — every signal exposes a `.subscribe()`
+that pairs cleanly with `useSyncExternalStore`, and `.value` for synchronous reads. If you want to
+write that bridge yourself, go ahead; nothing in the SDK requires React.
+
+For most apps it's not worth it. [`@meshtastic/sdk-react`](https://www.npmjs.com/package/@meshtastic/sdk-react)
+ships the bridge plus a set of opinionated hooks:
+
+- `MeshProvider` / `MeshRegistryProvider` so you don't have to thread the `MeshClient` through props.
+  The registry provider is useful when an app holds connections to several radios at once (USB +
+  Bluetooth in a desktop dashboard, for example) and you want hooks to default to the active one.
+- Hooks that mirror the feature clients — `useDevice`, `useChat`, `useNodes`, `useChannels`,
+  `useConfig`, `useConnectionProgress`, and so on — each scoped to a single signal so re-renders stay
+  narrow.
+- `useSignal` / `useSignalValue` escape hatches for the cases where the bundled hooks aren't quite
+  the right shape.
+
+The bindings are kept in a separate package on purpose. Node CLIs, Deno scripts, and embedded use
+cases all consume `@meshtastic/sdk` without dragging React along — the dependency only enters the
+tree when you actually need it.
 
 ## Source / issues
 
