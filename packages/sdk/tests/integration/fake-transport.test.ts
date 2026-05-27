@@ -49,3 +49,23 @@ describe("MeshClient with fake transport", () => {
     expect(messages[0]?.text).toBe("hello mesh");
   });
 });
+
+describe("MeshClient rebooted event", () => {
+  it("dispatches onRebooted when firmware emits a `rebooted` FromRadio", async () => {
+    const { transport, respond } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    let fired = 0;
+    client.events.onRebooted.subscribe(() => {
+      fired += 1;
+    });
+
+    respond.withRaw(
+      create(Protobuf.Mesh.FromRadioSchema, {
+        payloadVariant: { case: "rebooted", value: true },
+      }),
+    );
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(fired).toBe(1);
+  });
+});
