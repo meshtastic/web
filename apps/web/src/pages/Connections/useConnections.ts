@@ -179,9 +179,26 @@ export function useConnections() {
       if (meshDevice.meshClient.device.status.value === DeviceStatusEnum.DeviceConfigured) {
         markConfigured("initial-check");
       }
+
+      // Reboot: firmware emits `rebooted` after a soft reset (config write,
+      // OTA, manual reboot). The SDK re-runs configure() so MeshClient state
+      // re-streams, but the saved-connection status is already "configured"
+      // — so the overlay would stay hidden. Flip status back to "configuring"
+      // and reset `configuredHandled` so the next onConfigComplete re-marks.
+      // Maintenance heartbeat is stopped here so the reconfigure handshake
+      // isn't racing pings; markConfigured() restarts it.
+      const unsubRebooted = meshDevice.events.onRebooted.subscribe(() => {
+        log.info("device rebooted — re-entering configuring", { id });
+        stopHeartbeat(id);
+        configuredHandled = false;
+        device.setConnectionPhase("configuring");
+        updateStatus(id, "configuring");
+      });
+
       configSubscriptions.set(id, () => {
         unsubConfigComplete();
         unsubStatusSignal();
+        unsubRebooted();
       });
 
       log.debug("setupMeshDevice: calling configure()", { id });

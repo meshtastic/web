@@ -144,6 +144,7 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
               break;
             }
             case "rebooted": {
+              sink.events.onRebooted.dispatch();
               sink.configure().catch(() => {
                 // workaround for `wantConfigId` not getting acks
               });

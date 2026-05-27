@@ -72,4 +72,5 @@ export class EventBus {
   public readonly onPendingSettingsChange = new SimpleEventDispatcher<boolean>();
   public readonly onQueueStatus = new SimpleEventDispatcher<Protobuf.Mesh.QueueStatus>();
   public readonly onConfigComplete = new SimpleEventDispatcher<number>();
+  public readonly onRebooted = new SimpleEventDispatcher<void>();
 }
