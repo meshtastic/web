@@ -44,6 +44,25 @@ export class NodesClient {
 
     client.events.onNodeInfoPacket.subscribe((info) => this.handleIncoming(info));
 
+    // Seed a self-node stub from MyNodeInfo. Firmware always emits MyNodeInfo
+    // during the wantConfigId handshake, but not every session includes a
+    // NodeInfo for the device itself in the config bundle (fresh flash,
+    // cleared nodeDB, etc.). Without this seed, consumers that look up
+    // `nodes.list.find(n => n.num === myNodeNum)` — notably the web sidebar —
+    // sit empty forever. The real NodeInfo / UserPacket / PositionPacket
+    // handlers above patch the stub when they arrive.
+    client.events.onMyNodeInfo.subscribe((info) => {
+      if (info.myNodeNum === 0) return;
+      if (this.store.has(info.myNodeNum)) return;
+      const seeded: Node = {
+        num: info.myNodeNum,
+        isFavorite: false,
+        isIgnored: false,
+      };
+      this.store.set(info.myNodeNum, seeded);
+      void this.repository.upsert(seeded).catch(() => {});
+    });
+
     client.events.onUserPacket.subscribe((packet) => {
       this.patch(packet.from, { user: packet.data });
     });
