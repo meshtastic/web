@@ -136,18 +136,16 @@ export const Connections = () => {
               connection={c}
               onConnect={async () => {
                 const ok = await connect(c.id, { allowPrompt: true });
-                toast({
-                  title: ok ? t("toasts.connected") : t("toasts.failed"),
-                  description: ok
-                    ? t("toasts.nowConnected", {
-                        name: c.name,
-                        interpolation: { escapeValue: false },
-                      })
-                    : t("toasts.checkConnection"),
-                });
-                if (ok) {
-                  navigate({ to: "/" });
+                // Success path: ConnectingOverlay surfaces the "Connected"
+                // affirmation, so no toast here. Only toast on failure.
+                if (!ok) {
+                  toast({
+                    title: t("toasts.failed"),
+                    description: t("toasts.checkConnection"),
+                  });
+                  return;
                 }
+                navigate({ to: "/" });
               }}
               onDisconnect={async () => {
                 await disconnect(c.id);
@@ -182,18 +180,15 @@ export const Connections = () => {
               }}
               onRetry={async () => {
                 const ok = await connect(c.id, { allowPrompt: true });
-                toast({
-                  title: ok ? t("toasts.connected") : t("toasts.failed"),
-                  description: ok
-                    ? t("toasts.nowConnected", {
-                        name: c.name,
-                        interpolation: { escapeValue: false },
-                      })
-                    : t("toasts.pickConnectionAgain"),
-                });
-                if (ok) {
-                  navigate({ to: "/" });
+                // Success path handled by ConnectingOverlay.
+                if (!ok) {
+                  toast({
+                    title: t("toasts.failed"),
+                    description: t("toasts.pickConnectionAgain"),
+                  });
+                  return;
                 }
+                navigate({ to: "/" });
               }}
             />
           ))}

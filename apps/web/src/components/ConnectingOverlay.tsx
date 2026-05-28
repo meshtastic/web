@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const STUCK_THRESHOLD_MS = 15_000;
+const SUCCESS_DISPLAY_MS = 1_800;
 
 const TRANSPORT_ICON: Record<
   "http" | "bluetooth" | "serial",
@@ -30,8 +31,13 @@ const TRANSPORT_ICON: Record<
  * Center: device name + transport icon with an animated radial pulse.
  * Surrounding: 4 stat chips (Identity / Channels / Nodes / Metadata)
  * that flip from gray to green as the SDK reports each piece arriving.
- * Auto-dismisses on "configured" (with a brief success state) or
- * "disconnected" / "error".
+ *
+ * On `configured`, holds a brief "Connected" affirmation for
+ * SUCCESS_DISPLAY_MS and then dismisses. This replaces the old
+ * "Connected" toast — overlay is the canonical place to surface
+ * connect-flow feedback.
+ *
+ * Dismisses immediately on `disconnected` / `error`.
  */
 export const ConnectingOverlay = (): ReactElement | null => {
   const savedConnections = useDeviceStore((s) => s.savedConnections);
@@ -42,6 +48,43 @@ export const ConnectingOverlay = (): ReactElement | null => {
   const active = savedConnections.find(
     (c) => c.status === "connecting" || c.status === "configuring",
   );
+
+  // Success affirmation: when the conn we were tracking flips to "configured",
+  // hold the overlay for SUCCESS_DISPLAY_MS so the user sees a clear "connected"
+  // confirmation (replaces the old toast). Tracked by id so a fresh attempt
+  // from another conn doesn't inherit the previous one's success window.
+  const [successId, setSuccessId] = useState<number | null>(null);
+  const [trackedId, setTrackedId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (active) {
+      setTrackedId(active.id);
+      // A new attempt cancels any leftover success view.
+      setSuccessId(null);
+    }
+  }, [active?.id]);
+
+  useEffect(() => {
+    if (!trackedId) return;
+    const conn = savedConnections.find((c) => c.id === trackedId);
+    if (!conn) {
+      setTrackedId(null);
+      setSuccessId(null);
+      return;
+    }
+    if (conn.status === "configured") {
+      setSuccessId(trackedId);
+      const handle = setTimeout(() => {
+        setSuccessId(null);
+        setTrackedId(null);
+      }, SUCCESS_DISPLAY_MS);
+      return () => clearTimeout(handle);
+    }
+    if (conn.status === "disconnected" || conn.status === "error") {
+      setTrackedId(null);
+      setSuccessId(null);
+    }
+  }, [trackedId, savedConnections]);
 
   // Stuck-detection: once an attempt has been visible for STUCK_THRESHOLD_MS,
   // surface a Cancel button so the user can bail out of the overlay even when
@@ -54,22 +97,29 @@ export const ConnectingOverlay = (): ReactElement | null => {
       return;
     }
     setShowCancel(false);
-    const t = setTimeout(() => setShowCancel(true), STUCK_THRESHOLD_MS);
-    return () => clearTimeout(t);
+    const handle = setTimeout(() => setShowCancel(true), STUCK_THRESHOLD_MS);
+    return () => clearTimeout(handle);
   }, [active?.id]);
 
-  if (!active) return null;
+  const successConn =
+    successId != null ? (savedConnections.find((c) => c.id === successId) ?? null) : null;
+  const display = active ?? successConn;
 
-  const Icon = TRANSPORT_ICON[active.type];
+  if (!display) return null;
+
+  const Icon = TRANSPORT_ICON[display.type];
   const counters =
     progress.phase === "configuring" || progress.phase === "configured"
       ? progress.received
       : { config: 0, modules: 0, channels: 0, nodes: 0, myInfo: false, metadata: false };
 
-  const isConnecting = active.status === "connecting";
-  const phaseLabel = isConnecting
-    ? t("overlay.phase.connecting", { defaultValue: "Opening transport…" })
-    : t("overlay.phase.configuring", { defaultValue: "Streaming configuration…" });
+  const isSuccess = successConn != null && !active;
+  const isConnecting = !isSuccess && display.status === "connecting";
+  const phaseLabel = isSuccess
+    ? t("overlay.phase.connected", { defaultValue: "Connected" })
+    : isConnecting
+      ? t("overlay.phase.connecting", { defaultValue: "Opening transport…" })
+      : t("overlay.phase.configuring", { defaultValue: "Streaming configuration…" });
 
   return (
     <Dialog open>
@@ -79,53 +129,78 @@ export const ConnectingOverlay = (): ReactElement | null => {
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogTitle className="sr-only">
-          {t("overlay.srTitle", { defaultValue: "Connecting to device" })}
+          {isSuccess
+            ? t("overlay.srTitleConnected", { defaultValue: "Connected to device" })
+            : t("overlay.srTitle", { defaultValue: "Connecting to device" })}
         </DialogTitle>
 
         <div className="flex flex-col items-center gap-6 px-8 pt-10 pb-8">
-          {/* Hero icon with radial pings — uses the theme link color so light
-              and dark modes both look at-home. */}
+          {/* Hero icon. In success state the radial pings stop and the badge
+              swaps to a checkmark over the brand green, so the visual flip is
+              immediate. */}
           <div className="relative flex h-28 w-28 items-center justify-center">
-            <span className="absolute inset-0 animate-ping rounded-full bg-link/20 [animation-duration:1.8s]" />
-            <span className="absolute inset-3 animate-ping rounded-full bg-link/30 [animation-duration:2.4s] [animation-delay:0.4s]" />
-            <span className="absolute inset-6 rounded-full bg-link shadow-lg shadow-link/40" />
-            <Icon className="relative h-9 w-9 text-background-primary" />
+            {!isSuccess && (
+              <>
+                <span className="absolute inset-0 animate-ping rounded-full bg-link/20 [animation-duration:1.8s]" />
+                <span className="absolute inset-3 animate-ping rounded-full bg-link/30 [animation-duration:2.4s] [animation-delay:0.4s]" />
+              </>
+            )}
+            <span
+              className={cn(
+                "absolute inset-6 rounded-full shadow-lg",
+                isSuccess ? "bg-green-500 shadow-green-500/40" : "bg-link shadow-link/40",
+              )}
+            />
+            {isSuccess ? (
+              <CheckCircle2 className="relative h-10 w-10 text-background-primary" />
+            ) : (
+              <Icon className="relative h-9 w-9 text-background-primary" />
+            )}
           </div>
 
           {/* Name + phase */}
           <div className="text-center">
             <div className="text-lg font-semibold tracking-tight text-text-primary">
-              {active.name}
+              {display.name}
             </div>
-            <div className="mt-1 inline-flex items-center gap-1.5 text-xs text-text-secondary">
-              <Loader2 className="h-3 w-3 animate-spin" />
+            <div
+              className={cn(
+                "mt-1 inline-flex items-center gap-1.5 text-xs",
+                isSuccess
+                  ? "font-medium text-green-600 dark:text-green-400"
+                  : "text-text-secondary",
+              )}
+            >
+              {!isSuccess && <Loader2 className="h-3 w-3 animate-spin" />}
               {phaseLabel}
             </div>
           </div>
 
-          {/* Stat chips — 2x2 grid */}
+          {/* Stat chips — 2x2 grid. In success state all chips snap to "done"
+              styling regardless of the counter values that were observed
+              mid-stream. */}
           <div className="grid w-full grid-cols-2 gap-2">
             <Chip
               label={t("overlay.chip.identity", { defaultValue: "Identity" })}
-              done={counters.myInfo}
+              done={isSuccess || counters.myInfo}
             />
             <Chip
               label={t("overlay.chip.metadata", { defaultValue: "Metadata" })}
-              done={counters.metadata}
+              done={isSuccess || counters.metadata}
             />
             <Chip
               label={t("overlay.chip.channels", { defaultValue: "Channels" })}
               count={counters.channels}
-              done={counters.channels > 0 && progress.phase === "configured"}
+              done={isSuccess || (counters.channels > 0 && progress.phase === "configured")}
             />
             <Chip
               label={t("overlay.chip.nodes", { defaultValue: "Nodes" })}
               count={counters.nodes}
-              done={counters.nodes > 0 && progress.phase === "configured"}
+              done={isSuccess || (counters.nodes > 0 && progress.phase === "configured")}
             />
           </div>
 
-          {showCancel && (
+          {!isSuccess && showCancel && (
             <div className="flex w-full flex-col items-center gap-2">
               <p className="text-center text-xs text-text-secondary">
                 {t("overlay.stuckHint", {
@@ -133,7 +208,7 @@ export const ConnectingOverlay = (): ReactElement | null => {
                     "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
                 })}
               </p>
-              <Button type="button" variant="outline" onClick={() => void disconnect(active.id)}>
+              <Button type="button" variant="outline" onClick={() => void disconnect(display.id)}>
                 {t("overlay.cancel", { defaultValue: "Cancel" })}
               </Button>
             </div>
