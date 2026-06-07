@@ -123,7 +123,7 @@ jobs:
       DRY_RUN: ${{ inputs.dry_run }}
     steps:
       - name: Download TypeScript code
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ts_code
 
