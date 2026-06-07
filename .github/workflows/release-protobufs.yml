@@ -70,8 +70,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
-        with:
-          version: latest
       
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
