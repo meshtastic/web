@@ -46,7 +46,7 @@
     "oxlint": "^1.41.0",
     "tsdown": "^0.15.0",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.8"
   },
   "packageManager": "pnpm@10.32.1",
   "pnpm": {
