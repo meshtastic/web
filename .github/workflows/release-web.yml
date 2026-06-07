@@ -131,7 +131,7 @@ jobs:
       # - release (released or prereleased)
       # - manual with a tag_name (adhoc builds can still be pushed by name)
       - name: Build and push image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./packages/web/infra/Containerfile
