@@ -124,7 +124,7 @@
     "title": "Inställningar för nät",
     "description": "Inställningar för LoRa-nätet",
     "bandwidth": {
-      "description": "Kanalens bandbredd i kHz",
+      "description": "Kanalens bandbredd i MHz",
       "label": "Bandbredd"
     },
     "boostedRxGain": {

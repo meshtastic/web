@@ -5,13 +5,13 @@
     "broadcastLabel": "Основний",
     "channelIndex": "Кн {{index}}",
     "import": "Імпортувати",
-    "export": "Export"
+    "export": "Експортувати"
   },
   "validation": {
     "pskInvalid": "Please enter a valid {{bits}} bit PSK."
   },
   "settings": {
-    "label": "Channel Settings",
+    "label": "Налаштування каналу",
     "description": "Crypto, MQTT & misc settings"
   },
   "role": {
