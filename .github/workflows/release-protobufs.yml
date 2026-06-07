@@ -108,7 +108,7 @@ jobs:
           cp README.md $PROTOBUF_DIR/packages/ts
 
       - name: Upload TypeScript code
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ts_code
           path: ${{ env.PROTOBUF_DIR }}/packages/ts

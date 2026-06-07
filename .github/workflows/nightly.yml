@@ -47,7 +47,7 @@ jobs:
         run: pnpm run package
 
       - name: Upload compressed build (artifact)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: web-build-nightly
           path: packages/web/dist/build.tar
