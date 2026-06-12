@@ -81,7 +81,7 @@
     "react-dom": "^19.2.0",
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.64.0",
-    "react-i18next": "^16.0.0",
+    "react-i18next": "^17.0.8",
     "react-map-gl": "8.1.0",
     "react-qrcode-logo": "^4.0.0",
     "rfc4648": "^1.5.4",
