@@ -21,6 +21,9 @@ importers:
         specifier: ^4.9.3
         version: 4.10.2
     devDependencies:
+      '@meshtastic/core':
+        specifier: jsr:^2.6.6
+        version: '@jsr/meshtastic__core@2.6.6'
       '@types/node':
         specifier: ^24.3.1
         version: 24.12.0
@@ -1294,6 +1297,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@jsr/meshtastic__core@2.6.6':
+    resolution: {integrity: sha512-f9c/HV6d7fGg+FtsnnC6DSomdGQ7Hr96JiT3epTUduwClYFdi/ftKEadfV55cMhCrp1QK9y6lkPG2S+X1AwN5Q==, tarball: https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.6.tgz}
 
   '@jsr/meshtastic__protobufs@2.7.20':
     resolution: {integrity: sha512-GrHWfOzi9i7xk2Br3MkKWLxbzreZuwgjZKNooednYpa1V/abnSj9e4twNTtKyqXYaAOzthY3Cdk4IXouBN9dbA==, tarball: https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.7.20.tgz}
@@ -6866,6 +6872,16 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@jsr/meshtastic__core@2.6.6':
+    dependencies:
+      '@bufbuild/protobuf': 2.11.0
+      '@jsr/meshtastic__protobufs': 2.7.20
+      crc: 4.3.2
+      ste-simple-events: 3.0.11
+      tslog: 4.10.2
+    transitivePeerDependencies:
+      - buffer
 
   '@jsr/meshtastic__protobufs@2.7.20':
     dependencies:
