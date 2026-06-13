@@ -341,8 +341,8 @@ importers:
         specifier: ^7.64.0
         version: 7.71.2(react@19.2.4)
       react-i18next:
-        specifier: ^16.0.0
-        version: 16.5.6(i18next@25.8.17(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+        specifier: ^17.0.8
+        version: 17.0.8(i18next@25.8.17(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       react-map-gl:
         specifier: 8.1.0
         version: 8.1.0(maplibre-gl@5.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -4854,14 +4854,14 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
 
-  react-i18next@16.5.6:
-    resolution: {integrity: sha512-Ua7V2/efA88ido7KyK51fb8Ki8M/sRfW8LR/rZ/9ZKr2luhuTI7kwYZN5agT1rWG7aYm5G0RYE/6JR8KJoCMDw==}
+  react-i18next@17.0.8:
+    resolution: {integrity: sha512-0ooKbGLU8JXhe1zwpQUWIeXSgLPOfwJmgheWRIUpcoA0CpyabpGhayjdG+/eA5esC1AQ8h2jWpXjJfzQzeDOCw==}
     peerDependencies:
-      i18next: '>= 25.6.2'
+      i18next: '>= 26.2.0'
       react: '>= 16.8.0'
       react-dom: '*'
       react-native: '*'
-      typescript: ^5
+      typescript: ^5 || ^6
     peerDependenciesMeta:
       react-dom:
         optional: true
@@ -11460,9 +11460,9 @@ snapshots:
     dependencies:
       react: 19.2.4
 
-  react-i18next@16.5.6(i18next@25.8.17(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3):
+  react-i18next@17.0.8(i18next@25.8.17(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3):
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.7
       html-parse-stringify: 3.0.1
       i18next: 25.8.17(typescript@5.9.3)
       react: 19.2.4
