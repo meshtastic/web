@@ -1,11 +1,12 @@
 syntax = "proto3";
 
+/* trunk-ignore(buf-lint/PACKAGE_DIRECTORY_MATCH) */
 package meshtastic;
 
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
 option java_outer_classname = "ATAKProtos";
-option java_package = "com.geeksville.mesh";
+option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
 /*
@@ -54,7 +55,21 @@ message TAKPacket {
  */
 message GeoChat {
   /*
-   * The text message
+   * Receipt discriminator. Set alongside cot_type_id = b-t-f-d (delivered)
+   * or b-t-f-r (read). ReceiptType_None is the default for a normal chat
+   * message (cot_type_id = b-t-f).
+   *
+   * Receivers can detect a receipt by checking receipt_type != ReceiptType_None
+   * without re-parsing the envelope cot_type_id.
+   */
+  enum ReceiptType {
+    ReceiptType_None = 0; // normal chat message
+    ReceiptType_Delivered = 1; // b-t-f-d delivered receipt
+    ReceiptType_Read = 2; // b-t-f-r read receipt
+  }
+
+  /*
+   * The text message. Empty for receipts.
    */
   string message = 1;
 
@@ -67,6 +82,57 @@ message GeoChat {
    * Callsign of the recipient for the message
    */
   optional string to_callsign = 3;
+
+  /*
+   * UID of the chat message this event is acknowledging. Empty for a
+   * normal chat message; set for delivered / read receipts. Paired with
+   * receipt_type so receivers can match the ack back to the original
+   * outbound GeoChat by its event uid.
+   */
+  string receipt_for_uid = 4;
+
+  /*
+   * Receipt kind discriminator. See ReceiptType doc. Default ReceiptType_None
+   * means this is a regular chat message, not a receipt.
+   */
+  ReceiptType receipt_type = 5;
+
+  /*
+   * --- TAKTALK-flavored b-t-f extensions ---
+   *
+   * Set when the ATAK TAKTALK plugin originates the chat, so the message
+   * carries the room/language metadata TAKTALK uses to thread its UI.
+   * These fields are absent / empty for non-TAKTALK CoT chat, so the wire
+   * cost is paid only when TAKTALK is actually involved.
+   *
+   * Wire shape in source XML (inside <event type="b-t-f">/<detail>):
+   *   <Ea>English</Ea>                          - lang
+   *   <roomId>UUID</roomId>                     - room_id
+   *   <voice_profile_id>X</voice_profile_id>    - voice_profile_id
+   *   <voice_profile_id/>                       - empty marker; encoded as
+   *                                               present-but-empty string
+   */
+
+  /*
+   * BCP-47-ish language tag or human-readable name (e.g. "en", "English")
+   * that the originator's TAKTALK plugin recorded for the message.
+   */
+  optional string lang = 6;
+
+  /*
+   * TAKTALK chatroom UUID (e.g. "30b2755c-c547-44ef-a0cc-cdbd8a15616f") that
+   * the receiver's TAKTALK plugin uses to thread the message under the
+   * right room. Resolved to a friendly name via TakTalkRoomData broadcasts.
+   */
+  optional string room_id = 7;
+
+  /*
+   * TAKTALK voice profile pointer. Often empty in practice (the empty
+   * marker `<voice_profile_id/>` still signals TAKTALK origination), so
+   * receivers should treat empty-but-present as the equivalent of the
+   * marker rather than a missing field.
+   */
+  optional string voice_profile_id = 8;
 }
 
 /*
@@ -260,4 +326,1908 @@ message PLI {
    * Course in degrees
    */
   uint32 course = 5;
+}
+
+/*
+ * CoT how field values.
+ * Represents how the coordinates were generated.
+ */
+enum CotHow {
+  /*
+   * Unspecified
+   */
+  CotHow_Unspecified = 0;
+  /*
+   * Human entered
+   */
+  CotHow_h_e = 1;
+  /*
+   * Machine generated
+   */
+  CotHow_m_g = 2;
+  /*
+   * Human GPS/INS derived
+   */
+  CotHow_h_g_i_g_o = 3;
+  /*
+   * Machine relayed (imported from another system/gateway)
+   */
+  CotHow_m_r = 4;
+  /*
+   * Machine fused (corroborated from multiple sources)
+   */
+  CotHow_m_f = 5;
+  /*
+   * Machine predicted
+   */
+  CotHow_m_p = 6;
+  /*
+   * Machine simulated
+   */
+  CotHow_m_s = 7;
+}
+
+/*
+ * Well-known CoT event types.
+ * When the type is known, use the enum value for efficient encoding.
+ * For unknown types, set cot_type_id to CotType_Other and populate cot_type_str.
+ */
+enum CotType {
+  /*
+   * Unknown or unmapped type, use cot_type_str
+   */
+  CotType_Other = 0;
+  /*
+   * a-f-G-U-C: Friendly ground unit combat
+   */
+  CotType_a_f_G_U_C = 1;
+  /*
+   * a-f-G-U-C-I: Friendly ground unit combat infantry
+   */
+  CotType_a_f_G_U_C_I = 2;
+  /*
+   * a-n-A-C-F: Neutral aircraft civilian fixed-wing
+   */
+  CotType_a_n_A_C_F = 3;
+  /*
+   * a-n-A-C-H: Neutral aircraft civilian helicopter
+   */
+  CotType_a_n_A_C_H = 4;
+  /*
+   * a-n-A-C: Neutral aircraft civilian
+   */
+  CotType_a_n_A_C = 5;
+  /*
+   * a-f-A-M-H: Friendly aircraft military helicopter
+   */
+  CotType_a_f_A_M_H = 6;
+  /*
+   * a-f-A-M: Friendly aircraft military
+   */
+  CotType_a_f_A_M = 7;
+  /*
+   * a-f-A-M-F-F: Friendly aircraft military fixed-wing fighter
+   */
+  CotType_a_f_A_M_F_F = 8;
+  /*
+   * a-f-A-M-H-A: Friendly aircraft military helicopter attack
+   */
+  CotType_a_f_A_M_H_A = 9;
+  /*
+   * a-f-A-M-H-U-M: Friendly aircraft military helicopter utility medium
+   */
+  CotType_a_f_A_M_H_U_M = 10;
+  /*
+   * a-h-A-M-F-F: Hostile aircraft military fixed-wing fighter
+   */
+  CotType_a_h_A_M_F_F = 11;
+  /*
+   * a-h-A-M-H-A: Hostile aircraft military helicopter attack
+   */
+  CotType_a_h_A_M_H_A = 12;
+  /*
+   * a-u-A-C: Unknown aircraft civilian
+   */
+  CotType_a_u_A_C = 13;
+  /*
+   * t-x-d-d: Tasking delete/disconnect
+   */
+  CotType_t_x_d_d = 14;
+  /*
+   * a-f-G-E-S-E: Friendly ground equipment sensor
+   */
+  CotType_a_f_G_E_S_E = 15;
+  /*
+   * a-f-G-E-V-C: Friendly ground equipment vehicle
+   */
+  CotType_a_f_G_E_V_C = 16;
+  /*
+   * a-f-S: Friendly sea
+   */
+  CotType_a_f_S = 17;
+  /*
+   * a-f-A-M-F: Friendly aircraft military fixed-wing
+   */
+  CotType_a_f_A_M_F = 18;
+  /*
+   * a-f-A-M-F-C-H: Friendly aircraft military fixed-wing cargo heavy
+   */
+  CotType_a_f_A_M_F_C_H = 19;
+  /*
+   * a-f-A-M-F-U-L: Friendly aircraft military fixed-wing utility light
+   */
+  CotType_a_f_A_M_F_U_L = 20;
+  /*
+   * a-f-A-M-F-L: Friendly aircraft military fixed-wing liaison
+   */
+  CotType_a_f_A_M_F_L = 21;
+  /*
+   * a-f-A-M-F-P: Friendly aircraft military fixed-wing patrol
+   */
+  CotType_a_f_A_M_F_P = 22;
+  /*
+   * a-f-A-C-H: Friendly aircraft civilian helicopter
+   */
+  CotType_a_f_A_C_H = 23;
+  /*
+   * a-n-A-M-F-Q: Neutral aircraft military fixed-wing drone
+   */
+  CotType_a_n_A_M_F_Q = 24;
+
+  // --- Chat / messaging ---
+
+  /*
+   * b-t-f: GeoChat message
+   */
+  CotType_b_t_f = 25;
+
+  // --- CASEVAC / MEDEVAC ---
+
+  /*
+   * b-r-f-h-c: CASEVAC/MEDEVAC report
+   */
+  CotType_b_r_f_h_c = 26;
+
+  // --- Alerts ---
+
+  /*
+   * b-a-o-pan: Ring the bell / alert all
+   */
+  CotType_b_a_o_pan = 27;
+  /*
+   * b-a-o-opn: Troops in contact
+   */
+  CotType_b_a_o_opn = 28;
+  /*
+   * b-a-o-can: Cancel alert
+   */
+  CotType_b_a_o_can = 29;
+  /*
+   * b-a-o-tbl: 911 alert
+   */
+  CotType_b_a_o_tbl = 30;
+  /*
+   * b-a-g: Geofence breach alert
+   */
+  CotType_b_a_g = 31;
+
+  // --- Generic ground atoms (simplified affiliation types) ---
+
+  /*
+   * a-f-G: Friendly ground (generic)
+   */
+  CotType_a_f_G = 32;
+  /*
+   * a-f-G-U: Friendly ground unit (generic)
+   */
+  CotType_a_f_G_U = 33;
+  /*
+   * a-h-G: Hostile ground (generic)
+   */
+  CotType_a_h_G = 34;
+  /*
+   * a-u-G: Unknown ground (generic)
+   */
+  CotType_a_u_G = 35;
+  /*
+   * a-n-G: Neutral ground (generic)
+   */
+  CotType_a_n_G = 36;
+
+  // --- Routes and waypoints ---
+
+  /*
+   * b-m-r: Route
+   */
+  CotType_b_m_r = 37;
+  /*
+   * b-m-p-w: Route waypoint
+   */
+  CotType_b_m_p_w = 38;
+  /*
+   * b-m-p-s-p-i: Self-position marker
+   */
+  CotType_b_m_p_s_p_i = 39;
+
+  // --- Drawing / tactical graphics ---
+
+  /*
+   * u-d-f: Freeform shape (line/polygon)
+   */
+  CotType_u_d_f = 40;
+  /*
+   * u-d-r: Rectangle
+   */
+  CotType_u_d_r = 41;
+  /*
+   * u-d-c-c: Circle
+   */
+  CotType_u_d_c_c = 42;
+  /*
+   * u-rb-a: Range/bearing line
+   */
+  CotType_u_rb_a = 43;
+
+  // --- Additional hostile/unknown aircraft ---
+
+  /*
+   * a-h-A: Hostile aircraft (generic)
+   */
+  CotType_a_h_A = 44;
+  /*
+   * a-u-A: Unknown aircraft (generic)
+   */
+  CotType_a_u_A = 45;
+  /*
+   * a-f-A-M-H-Q: Friendly aircraft military helicopter observation
+   */
+  CotType_a_f_A_M_H_Q = 46;
+
+  // Friendly aircraft civilian
+
+  /*
+   * a-f-A-C-F: Friendly aircraft civilian fixed-wing
+   */
+  CotType_a_f_A_C_F = 47;
+  /*
+   * a-f-A-C: Friendly aircraft civilian (generic)
+   */
+  CotType_a_f_A_C = 48;
+  /*
+   * a-f-A-C-L: Friendly aircraft civilian lighter-than-air
+   */
+  CotType_a_f_A_C_L = 49;
+  /*
+   * a-f-A: Friendly aircraft (generic)
+   */
+  CotType_a_f_A = 50;
+
+  // Friendly aircraft military helicopter variants
+
+  /*
+   * a-f-A-M-H-C: Friendly aircraft military helicopter cargo
+   */
+  CotType_a_f_A_M_H_C = 51;
+
+  // Neutral aircraft military
+
+  /*
+   * a-n-A-M-F-F: Neutral aircraft military fixed-wing fighter
+   */
+  CotType_a_n_A_M_F_F = 52;
+
+  // Unknown aircraft civilian
+
+  /*
+   * a-u-A-C-F: Unknown aircraft civilian fixed-wing
+   */
+  CotType_a_u_A_C_F = 53;
+
+  // Friendly ground unit subtypes
+
+  /*
+   * a-f-G-U-C-F-T-A: Friendly ground unit combat forces theater aviation
+   */
+  CotType_a_f_G_U_C_F_T_A = 54;
+  /*
+   * a-f-G-U-C-V-S: Friendly ground unit combat vehicle support
+   */
+  CotType_a_f_G_U_C_V_S = 55;
+  /*
+   * a-f-G-U-C-R-X: Friendly ground unit combat reconnaissance exploitation
+   */
+  CotType_a_f_G_U_C_R_X = 56;
+  /*
+   * a-f-G-U-C-I-Z: Friendly ground unit combat infantry mechanized
+   */
+  CotType_a_f_G_U_C_I_Z = 57;
+  /*
+   * a-f-G-U-C-E-C-W: Friendly ground unit combat engineer construction wheeled
+   */
+  CotType_a_f_G_U_C_E_C_W = 58;
+  /*
+   * a-f-G-U-C-I-L: Friendly ground unit combat infantry light
+   */
+  CotType_a_f_G_U_C_I_L = 59;
+  /*
+   * a-f-G-U-C-R-O: Friendly ground unit combat reconnaissance other
+   */
+  CotType_a_f_G_U_C_R_O = 60;
+  /*
+   * a-f-G-U-C-R-V: Friendly ground unit combat reconnaissance cavalry
+   */
+  CotType_a_f_G_U_C_R_V = 61;
+  /*
+   * a-f-G-U-H: Friendly ground unit headquarters
+   */
+  CotType_a_f_G_U_H = 62;
+  /*
+   * a-f-G-U-U-M-S-E: Friendly ground unit support medical surgical evacuation
+   */
+  CotType_a_f_G_U_U_M_S_E = 63;
+  /*
+   * a-f-G-U-S-M-C: Friendly ground unit support maintenance collection
+   */
+  CotType_a_f_G_U_S_M_C = 64;
+
+  // Friendly ground equipment
+
+  /*
+   * a-f-G-E-S: Friendly ground equipment sensor (generic)
+   */
+  CotType_a_f_G_E_S = 65;
+  /*
+   * a-f-G-E: Friendly ground equipment (generic)
+   */
+  CotType_a_f_G_E = 66;
+  /*
+   * a-f-G-E-V-C-U: Friendly ground equipment vehicle utility
+   */
+  CotType_a_f_G_E_V_C_U = 67;
+  /*
+   * a-f-G-E-V-C-ps: Friendly ground equipment vehicle public safety
+   */
+  CotType_a_f_G_E_V_C_ps = 68;
+
+  // Unknown ground
+
+  /*
+   * a-u-G-E-V: Unknown ground equipment vehicle
+   */
+  CotType_a_u_G_E_V = 69;
+
+  // Sea
+
+  /*
+   * a-f-S-N-N-R: Friendly sea surface non-naval rescue
+   */
+  CotType_a_f_S_N_N_R = 70;
+
+  // Friendly force (non-domain-specific)
+
+  /*
+   * a-f-F-B: Friendly force boundary
+   */
+  CotType_a_f_F_B = 71;
+
+  // Bits / data messages
+
+  /*
+   * b-m-p-s-p-loc: Self-position location marker
+   */
+  CotType_b_m_p_s_p_loc = 72;
+  /*
+   * b-i-v: Imagery/video
+   */
+  CotType_b_i_v = 73;
+  /*
+   * b-f-t-r: File transfer request
+   */
+  CotType_b_f_t_r = 74;
+  /*
+   * b-f-t-a: File transfer acknowledgment
+   */
+  CotType_b_f_t_a = 75;
+
+  // --- Additional drawing / tactical graphics ---
+
+  /*
+   * u-d-f-m: Freehand telestration / annotation. Anchor at event point,
+   * geometry carried via DrawnShape.vertices. May be truncated to
+   * MAX_VERTICES by the sender.
+   */
+  CotType_u_d_f_m = 76;
+  /*
+   * u-d-p: Closed polygon. Geometry carried via DrawnShape.vertices,
+   * implicitly closed (receiver duplicates first vertex as needed).
+   */
+  CotType_u_d_p = 77;
+
+  // --- Additional markers ---
+
+  /*
+   * b-m-p-s-m: Spot map marker (colored dot at a point of interest).
+   */
+  CotType_b_m_p_s_m = 78;
+  /*
+   * b-m-p-c: Checkpoint (intermediate route control point).
+   */
+  CotType_b_m_p_c = 79;
+
+  // --- Ranging tools ---
+
+  /*
+   * u-r-b-c-c: Ranging circle (range rings centered on the event point).
+   */
+  CotType_u_r_b_c_c = 80;
+  /*
+   * u-r-b-bullseye: Bullseye with configurable range rings and bearing
+   * reference (magnetic / true / grid).
+   */
+  CotType_u_r_b_bullseye = 81;
+
+  // ======================================================================
+  // Expanded coverage from the ATAK-CIV quick-drop pallet (values 82-124).
+  // ======================================================================
+  //
+  // All of these types existed as cot_type_str strings; promoting them to
+  // enum values turns a ~10-byte string into a 1-byte varint on the wire
+  // for every event that uses them. Grouped below by pallet section.
+
+  // --- PLI self-reporting (1) ------------------------------------------
+  /*
+   * a-f-G-E-V-A: Friendly armored vehicle, user-selectable self PLI.
+   */
+  CotType_a_f_G_E_V_A = 82;
+
+  // --- 2525 quick-drop: basic affiliation gaps -------------------------
+  /*
+   * a-n-A: Neutral aircraft (friendly/hostile/unknown already present).
+   */
+  CotType_a_n_A = 83;
+
+  // --- 2525 quick-drop: artillery (4) ----------------------------------
+  CotType_a_u_G_U_C_F = 84;
+  CotType_a_n_G_U_C_F = 85;
+  CotType_a_h_G_U_C_F = 86;
+  CotType_a_f_G_U_C_F = 87;
+
+  // --- 2525 quick-drop: building (4) -----------------------------------
+  CotType_a_u_G_I = 88;
+  CotType_a_n_G_I = 89;
+  CotType_a_h_G_I = 90;
+  CotType_a_f_G_I = 91;
+
+  // --- 2525 quick-drop: mine (4) ---------------------------------------
+  CotType_a_u_G_E_X_M = 92;
+  CotType_a_n_G_E_X_M = 93;
+  CotType_a_h_G_E_X_M = 94;
+  CotType_a_f_G_E_X_M = 95;
+
+  // --- 2525 quick-drop: ship (3; a-f-S already at 17) ------------------
+  CotType_a_u_S = 96;
+  CotType_a_n_S = 97;
+  CotType_a_h_S = 98;
+
+  // --- 2525 quick-drop: sniper (4) -------------------------------------
+  CotType_a_u_G_U_C_I_d = 99;
+  CotType_a_n_G_U_C_I_d = 100;
+  CotType_a_h_G_U_C_I_d = 101;
+  CotType_a_f_G_U_C_I_d = 102;
+
+  // --- 2525 quick-drop: tank (4) ---------------------------------------
+  CotType_a_u_G_E_V_A_T = 103;
+  CotType_a_n_G_E_V_A_T = 104;
+  CotType_a_h_G_E_V_A_T = 105;
+  CotType_a_f_G_E_V_A_T = 106;
+
+  // --- 2525 quick-drop: troops (3; a-f-G-U-C-I already at 2) -----------
+  CotType_a_u_G_U_C_I = 107;
+  CotType_a_n_G_U_C_I = 108;
+  CotType_a_h_G_U_C_I = 109;
+
+  // --- 2525 quick-drop: generic vehicle (3; a-u-G-E-V already at 69) ---
+  CotType_a_n_G_E_V = 110;
+  CotType_a_h_G_E_V = 111;
+  CotType_a_f_G_E_V = 112;
+
+  // --- Mission-specific points (4) -------------------------------------
+  /*
+   * b-m-p-w-GOTO: Go To / bloodhound navigation target.
+   */
+  CotType_b_m_p_w_GOTO = 113;
+  /*
+   * b-m-p-c-ip: Initial point (mission planning).
+   */
+  CotType_b_m_p_c_ip = 114;
+  /*
+   * b-m-p-c-cp: Contact point (mission planning).
+   */
+  CotType_b_m_p_c_cp = 115;
+  /*
+   * b-m-p-s-p-op: Observation post.
+   */
+  CotType_b_m_p_s_p_op = 116;
+
+  // --- Vehicle drawings (2) --------------------------------------------
+  /*
+   * u-d-v: 2D vehicle outline drawn on the map.
+   */
+  CotType_u_d_v = 117;
+  /*
+   * u-d-v-m: 3D vehicle model reference.
+   */
+  CotType_u_d_v_m = 118;
+
+  // --- Drawing shapes (1) ----------------------------------------------
+  /*
+   * u-d-c-e: Non-circular ellipse (circle with distinct major/minor axes).
+   */
+  CotType_u_d_c_e = 119;
+
+  // --- Image / media marker (1) ----------------------------------------
+  /*
+   * b-i-x-i: Quick Pic geotagged image marker. The image itself does not
+   * ride on LoRa; this event references the image via iconset metadata.
+   */
+  CotType_b_i_x_i = 120;
+
+  // --- GeoChat receipts (2) --------------------------------------------
+  /*
+   * b-t-f-d: GeoChat delivered receipt. Carried on the existing `chat`
+   * payload_variant via GeoChat.receipt_for_uid + receipt_type.
+   */
+  CotType_b_t_f_d = 121;
+  /*
+   * b-t-f-r: GeoChat read receipt. Same wire slot as b-t-f-d.
+   */
+  CotType_b_t_f_r = 122;
+
+  // --- Custom emergency (1) --------------------------------------------
+  /*
+   * b-a-o-c: Custom / generic emergency beacon.
+   */
+  CotType_b_a_o_c = 123;
+
+  // --- Tasking (1) -----------------------------------------------------
+  /*
+   * t-s: Task / engage request. Structured payload carried via the new
+   * TaskRequest typed variant.
+   */
+  CotType_t_s = 124;
+
+  // -- TAKTALK plugin shapes --
+  // CoT types unique to the TAKTALK ATAK plugin. Note `y-` has a literal
+  // trailing dash and no second atom — that's the wire format ATAK emits
+  // for TAKTALK room broadcasts. The CotType enum encodes the literal
+  // string verbatim (CotType_y -> "y-") so receivers reconstruct the
+  // original event type byte-for-byte without consulting cot_type_str.
+
+  /*
+   * m-t-t: TAKTALK voice/text chat message. Payload carried via the
+   * TakTalkMessage typed variant (text, chatroom_id, lang, from_voice).
+   */
+  CotType_m_t_t = 125;
+
+  /*
+   * y-: TAKTALK room/membership broadcast. Payload carried via the
+   * TakTalkRoomData typed variant (sender_callsign, room_id, room_name,
+   * participants). The CoT type literally has a trailing dash and no
+   * second atom — not a typo.
+   */
+  CotType_y = 126;
+}
+
+/*
+ * Geopoint and altitude source
+ */
+enum GeoPointSource {
+  /*
+   * Unspecified
+   */
+  GeoPointSource_Unspecified = 0;
+  /*
+   * GPS derived
+   */
+  GeoPointSource_GPS = 1;
+  /*
+   * User entered
+   */
+  GeoPointSource_USER = 2;
+  /*
+   * Network/external
+   */
+  GeoPointSource_NETWORK = 3;
+}
+
+/*
+ * Aircraft track information from ADS-B or military air tracking.
+ * Covers the majority of observed real-world CoT traffic.
+ */
+message AircraftTrack {
+  /*
+   * ICAO hex identifier (e.g. "AD237C")
+   */
+  string icao = 1;
+  /*
+   * Aircraft registration (e.g. "N946AK")
+   */
+  string registration = 2;
+  /*
+   * Flight number/callsign (e.g. "ASA864")
+   */
+  string flight = 3;
+  /*
+   * ICAO aircraft type designator (e.g. "B39M")
+   */
+  string aircraft_type = 4;
+  /*
+   * Transponder squawk code (0-7777 octal)
+   */
+  uint32 squawk = 5;
+  /*
+   * ADS-B emitter category (e.g. "A3")
+   */
+  string category = 6;
+  /*
+   * Received signal strength * 10 (e.g. -194 for -19.4 dBm)
+   */
+  sint32 rssi_x10 = 7;
+  /*
+   * Whether receiver has GPS fix
+   */
+  bool gps = 8;
+  /*
+   * CoT host ID for source attribution
+   */
+  string cot_host_id = 9;
+}
+
+/*
+ * Compact geographic vertex used by repeated vertex lists in TAK geometry
+ * payloads. Named with a `Cot` prefix to avoid a namespace collision with
+ * `meshtastic.GeoPoint` in `device_ui.proto`, which is an unrelated zoom/
+ * latitude/longitude type used by the on-device map UI.
+ *
+ * Encoded as a signed DELTA from TAKPacketV2.latitude_i / longitude_i (the
+ * enclosing event's anchor point). The absolute coordinate is recovered by
+ * the receiver as `event.latitude_i + vertex.lat_delta_i` (and likewise for
+ * longitude).
+ *
+ * Why deltas: a 32-vertex telestration with vertices clustered within a few
+ * hundred meters of the anchor has per-vertex deltas in the ±10^4 range.
+ * Under sint32+zigzag those encode as 2 bytes each (tag+varint), versus the
+ * 4 bytes that sfixed32 would always require. At 32 vertices that is ~128
+ * bytes of savings — the difference between fitting under the LoRa MTU or
+ * not. Absolute coordinates (values ~10^9) would cost sint32 varint 5 bytes
+ * per field, which is why TAKPacketV2's top-level latitude_i / longitude_i
+ * stay sfixed32 — only small values win with sint32.
+ */
+message CotGeoPoint {
+  /*
+   * Latitude delta from TAKPacketV2.latitude_i, in 1e-7 degree units.
+   * Add to the enclosing event's latitude_i to recover the absolute latitude.
+   */
+  sint32 lat_delta_i = 1;
+  /*
+   * Longitude delta from TAKPacketV2.longitude_i, in 1e-7 degree units.
+   */
+  sint32 lon_delta_i = 2;
+}
+
+/*
+ * User-drawn tactical graphic: circle, rectangle, polygon, polyline, freehand
+ * telestration, ranging circle, or bullseye.
+ *
+ * Covers CoT types u-d-c-c, u-d-r, u-d-f, u-d-f-m, u-d-p, u-r-b-c-c,
+ * u-r-b-bullseye. The shape's anchor position is carried on
+ * TAKPacketV2.latitude_i/longitude_i; polyline/polygon vertices are in the
+ * `vertices` repeated field as `CotGeoPoint` deltas from that anchor.
+ *
+ * Colors use the Team enum as a 14-color palette (see color encoding below)
+ * with a fixed32 exact-ARGB fallback for custom user-picked colors that
+ * don't map to a palette entry.
+ */
+message DrawnShape {
+  /*
+   * Shape kind discriminator. Drives receiver rendering and also controls
+   * which optional fields below are meaningful.
+   */
+  enum Kind {
+    /*
+     * Unspecified (do not use on the wire)
+     */
+    Kind_Unspecified = 0;
+    /*
+     * u-d-c-c: User-drawn circle (uses major/minor/angle, anchor = event point)
+     */
+    Kind_Circle = 1;
+    /*
+     * u-d-r: User-drawn rectangle (uses vertices = 4 corners)
+     */
+    Kind_Rectangle = 2;
+    /*
+     * u-d-f: User-drawn polyline (uses vertices, not closed)
+     */
+    Kind_Freeform = 3;
+    /*
+     * u-d-f-m: Freehand telestration / annotation (uses vertices, may be truncated)
+     */
+    Kind_Telestration = 4;
+    /*
+     * u-d-p: Closed polygon (uses vertices, implicitly closed)
+     */
+    Kind_Polygon = 5;
+    /*
+     * u-r-b-c-c: Ranging circle (major/minor/angle, stroke + optional fill)
+     */
+    Kind_RangingCircle = 6;
+    /*
+     * u-r-b-bullseye: Bullseye ring with range rings and bearing reference
+     */
+    Kind_Bullseye = 7;
+    /*
+     * u-d-c-e: Ellipse with distinct major/minor axes (same storage as
+     * Kind_Circle — uses major_cm/minor_cm/angle_deg — but receivers
+     * render it as a non-circular ellipse rather than a round circle).
+     */
+    Kind_Ellipse = 8;
+    /*
+     * u-d-v: 2D vehicle outline drawn on the map. Vertices carry the
+     * outline polygon; receivers draw it as a filled polygon.
+     */
+    Kind_Vehicle2D = 9;
+    /*
+     * u-d-v-m: 3D vehicle model reference. Same vertex polygon as
+     * Kind_Vehicle2D; receivers that support 3D rendering extrude it.
+     */
+    Kind_Vehicle3D = 10;
+  }
+  /*
+   * Explicit stroke/fill/both discriminator.
+   *
+   * ATAK's source XML distinguishes "stroke-only polyline" from "closed shape
+   * with both stroke and fill" by the presence of the <fillColor> element.
+   * Both states can hash to all-zero color fields, so we carry the signal
+   * explicitly. Parser sets this from (sawStrokeColor, sawFillColor) at the
+   * end of parse; builder uses it to decide which of <strokeColor> /
+   * <fillColor> to emit in the reconstructed XML.
+   */
+  enum StyleMode {
+    /*
+     * Unspecified — receiver infers from which color fields are non-zero.
+     */
+    StyleMode_Unspecified = 0;
+    /*
+     * Stroke only. No <fillColor> in the source XML. Used for polylines,
+     * ranging lines, bullseye rings.
+     */
+    StyleMode_StrokeOnly = 1;
+    /*
+     * Fill only. No <strokeColor> in the source XML. Rare but valid in
+     * ATAK (solid region with no outline).
+     */
+    StyleMode_FillOnly = 2;
+    /*
+     * Both stroke and fill present. Closed shapes: circle, rectangle,
+     * polygon, ranging circle.
+     */
+    StyleMode_StrokeAndFill = 3;
+  }
+  /*
+   * Shape kind (circle, rectangle, freeform, etc.)
+   */
+  Kind kind = 1;
+  /*
+   * Explicit stroke/fill/both discriminator. See StyleMode doc.
+   */
+  StyleMode style = 2;
+  /*
+   * Ellipse major radius in centimeters. 0 for non-ellipse kinds.
+   */
+  uint32 major_cm = 3;
+  /*
+   * Ellipse minor radius in centimeters. 0 for non-ellipse kinds.
+   */
+  uint32 minor_cm = 4;
+  /*
+   * Ellipse rotation angle in degrees. Valid values are 0..360 inclusive;
+   * 0 and 360 are equivalent rotations. In proto3, an unset uint32 reads
+   * as 0, so senders should emit 0 when the angle is unspecified.
+   */
+  uint32 angle_deg = 5;
+  /*
+   * Stroke color as a named palette entry from the Team enum. If
+   * Unspecifed_Color, the exact ARGB is carried in stroke_argb.
+   * Valid only when style is StrokeOnly or StrokeAndFill.
+   */
+  Team stroke_color = 6;
+  /*
+   * Stroke color as an exact 32-bit ARGB bit pattern. Always populated
+   * on the wire; readers MUST use this value when stroke_color ==
+   * Unspecifed_Color and MAY use it to recover the exact original bytes
+   * even when a palette entry is set.
+   */
+  fixed32 stroke_argb = 7;
+  /*
+   * Stroke weight in tenths of a unit (e.g. 30 = 3.0). Typical ATAK
+   * range 10..60.
+   */
+  uint32 stroke_weight_x10 = 8;
+  /*
+   * Fill color as a named palette entry. See stroke_color docs.
+   * Valid only when style is FillOnly or StrokeAndFill.
+   */
+  Team fill_color = 9;
+  /*
+   * Fill color exact ARGB fallback. See stroke_argb docs.
+   */
+  fixed32 fill_argb = 10;
+  /*
+   * Whether labels are rendered on this shape.
+   */
+  bool labels_on = 11;
+  /*
+   * Vertex list for polyline/polygon/rectangle/telestration shapes, stored as
+   * two PACKED parallel columns of signed deltas from the event anchor
+   * (TAKPacketV2.latitude_i/longitude_i), in 1e-7 degree units. vertex N is
+   * (lat_deltas[N], lon_deltas[N]); the two columns MUST stay the same length.
+   *
+   * Replaces the former `repeated CotGeoPoint vertices = 12` (one length-
+   * delimited sub-message per vertex = ~2 B framing each). Packing into two
+   * `repeated sint32` columns pays the field framing ONCE per column instead
+   * of once per vertex — ~58 B saved on a 32-vertex telestration — while
+   * keeping the same zigzag small-delta win CotGeoPoint had. Capped at 32 by
+   * the nanopb pool; senders MUST truncate longer inputs and set `truncated`.
+   *
+   * Tag 12 (the old repeated-message field) is reserved to prevent reuse.
+   */
+  reserved 12;
+  repeated sint32 vertex_lat_deltas = 18;
+  repeated sint32 vertex_lon_deltas = 19;
+  /*
+   * True if the sender truncated the vertex columns to fit the pool.
+   */
+  bool truncated = 13;
+  // --- Bullseye-only fields. All ignored unless kind == Kind_Bullseye. ---
+  /*
+   * Bullseye distance in meters * 10 (e.g. 3285 = 328.5 m). 0 = unset.
+   */
+  uint32 bullseye_distance_dm = 14;
+  /*
+   * Bullseye bearing reference: 0 unset, 1 Magnetic, 2 True, 3 Grid.
+   */
+  uint32 bullseye_bearing_ref = 15;
+  /*
+   * Bullseye attribute bit flags:
+   *   bit 0: rangeRingVisible
+   *   bit 1: hasRangeRings
+   *   bit 2: edgeToCenter
+   *   bit 3: mils
+   */
+  uint32 bullseye_flags = 16;
+  /*
+   * Bullseye reference UID (anchor marker). Empty = anchor is self.
+   */
+  string bullseye_uid_ref = 17;
+}
+
+/*
+ * Fixed point of interest: spot marker, waypoint, checkpoint, 2525 symbol,
+ * or custom icon.
+ *
+ * Covers CoT types b-m-p-s-m, b-m-p-w, b-m-p-c, b-m-p-s-p-i, b-m-p-s-p-loc,
+ * plus a-u-G / a-f-G / a-h-G / a-n-G with iconset paths. The marker position
+ * is carried on TAKPacketV2.latitude_i/longitude_i; fields below carry only
+ * the marker-specific metadata.
+ */
+message Marker {
+  /*
+   * Marker kind. Used to pick sensible receiver defaults when the CoT type
+   * alone is ambiguous (e.g. a-u-G could be a 2525 symbol or a custom icon
+   * depending on the iconset path).
+   */
+  enum Kind {
+    /*
+     * Unspecified — fall back to TAKPacketV2.cot_type_id
+     */
+    Kind_Unspecified = 0;
+    /*
+     * b-m-p-s-m: Spot map marker
+     */
+    Kind_Spot = 1;
+    /*
+     * b-m-p-w: Route waypoint
+     */
+    Kind_Waypoint = 2;
+    /*
+     * b-m-p-c: Checkpoint
+     */
+    Kind_Checkpoint = 3;
+    /*
+     * b-m-p-s-p-i / b-m-p-s-p-loc: Self-position marker
+     */
+    Kind_SelfPosition = 4;
+    /*
+     * 2525B/C military symbol (iconsetpath = COT_MAPPING_2525B/...)
+     */
+    Kind_Symbol2525 = 5;
+    /*
+     * COT_MAPPING_SPOTMAP icon (e.g. colored dot)
+     */
+    Kind_SpotMap = 6;
+    /*
+     * Custom icon set (UUID/GroupName/filename.png)
+     */
+    Kind_CustomIcon = 7;
+    /*
+     * b-m-p-w-GOTO: Go To / bloodhound navigation waypoint.
+     */
+    Kind_GoToPoint = 8;
+    /*
+     * b-m-p-c-ip: Initial point (mission planning control point).
+     */
+    Kind_InitialPoint = 9;
+    /*
+     * b-m-p-c-cp: Contact point (mission planning control point).
+     */
+    Kind_ContactPoint = 10;
+    /*
+     * b-m-p-s-p-op: Observation post.
+     */
+    Kind_ObservationPost = 11;
+    /*
+     * b-i-x-i: Quick Pic geotagged image marker. iconset carries the
+     * image reference (local filename or remote URL); the image itself
+     * does not ride on the LoRa wire.
+     */
+    Kind_ImageMarker = 12;
+  }
+  /*
+   * Marker kind
+   */
+  Kind kind = 1;
+  /*
+   * Marker color as a named palette entry. If Unspecifed_Color, the exact
+   * ARGB is in color_argb.
+   */
+  Team color = 2;
+  /*
+   * Marker color exact ARGB bit pattern. Always populated on the wire.
+   */
+  fixed32 color_argb = 3;
+  /*
+   * Status readiness flag (ATAK <status readiness="true"/>).
+   */
+  bool readiness = 4;
+  /*
+   * Parent link UID (ATAK <link uid=... relation="p-p"/>). Empty = no parent.
+   * For spot/waypoint markers this is typically the producing TAK user's UID.
+   */
+  string parent_uid = 5;
+  /*
+   * Parent CoT type (e.g. "a-f-G-U-C"). Usually the parent TAK user's type.
+   */
+  string parent_type = 6;
+  /*
+   * Parent callsign (e.g. "HOPE").
+   */
+  string parent_callsign = 7;
+  /*
+   * Iconset path stored verbatim. ATAK emits three flavors:
+   *   Kind_Symbol2525    -> "COT_MAPPING_2525B/<cot-type-prefix>/<cot-type>"
+   *   Kind_SpotMap       -> "COT_MAPPING_SPOTMAP/<cot-type>/<argb>"
+   *   Kind_CustomIcon    -> "<UUID>/<GroupName>/<filename>.png"
+   * Stored end-to-end without prefix stripping; the ~19 bytes saved by
+   * stripping well-known prefixes are not worth the builder-side bug
+   * surface, and the dict compresses the repetition effectively.
+   */
+  string iconset = 8;
+}
+
+/*
+ * Range and bearing measurement line from the event anchor to a target point.
+ *
+ * Covers CoT type u-rb-a. The anchor position is on
+ * TAKPacketV2.latitude_i/longitude_i; the target endpoint is carried as a
+ * CotGeoPoint — same delta-from-anchor encoding used by DrawnShape.vertices
+ * so a self-anchored RAB (common case) encodes in zero bytes.
+ */
+message RangeAndBearing {
+  /*
+   * Target/anchor endpoint (delta-encoded from TAKPacketV2.latitude_i/longitude_i).
+   */
+  CotGeoPoint anchor = 1;
+  /*
+   * Anchor UID (from <link uid="anchor-1"/>). Empty = free-standing.
+   */
+  string anchor_uid = 2;
+  /*
+   * Range in centimeters (value * 100). Range 0..4294 km.
+   */
+  uint32 range_cm = 3;
+  /*
+   * Bearing in degrees * 100 (0..36000).
+   */
+  uint32 bearing_cdeg = 4;
+  /*
+   * Stroke color as a Team palette entry. See DrawnShape.stroke_color doc.
+   */
+  Team stroke_color = 5;
+  /*
+   * Stroke color exact ARGB fallback.
+   */
+  fixed32 stroke_argb = 6;
+  /*
+   * Stroke weight * 10 (e.g. 30 = 3.0).
+   */
+  uint32 stroke_weight_x10 = 7;
+}
+
+/*
+ * Named route consisting of ordered waypoints and control points.
+ *
+ * Covers CoT type b-m-r. The first waypoint's position is on
+ * TAKPacketV2.latitude_i/longitude_i; subsequent waypoints and checkpoints
+ * are in `links`. Link count is capped at 16 by the nanopb pool; senders
+ * MUST truncate longer routes and set `truncated = true`.
+ */
+message Route {
+  /*
+   * Travel method for the route.
+   */
+  enum Method {
+    /*
+     * Unspecified / unknown
+     */
+    Method_Unspecified = 0;
+    /*
+     * Driving / vehicle
+     */
+    Method_Driving = 1;
+    /*
+     * Walking / foot
+     */
+    Method_Walking = 2;
+    /*
+     * Flying
+     */
+    Method_Flying = 3;
+    /*
+     * Swimming (individual)
+     */
+    Method_Swimming = 4;
+    /*
+     * Watercraft (boat)
+     */
+    Method_Watercraft = 5;
+  }
+  /*
+   * Route direction (infil = ingress, exfil = egress).
+   */
+  enum Direction {
+    /*
+     * Unspecified
+     */
+    Direction_Unspecified = 0;
+    /*
+     * Infiltration (ingress)
+     */
+    Direction_Infil = 1;
+    /*
+     * Exfiltration (egress)
+     */
+    Direction_Exfil = 2;
+  }
+  /*
+   * Route waypoint or control point. Each link corresponds to one ATAK
+   * <link type=... point=...> entry inside the b-m-r event.
+   */
+  message Link {
+    /*
+     * Waypoint position (delta-encoded from TAKPacketV2.latitude_i/longitude_i).
+     */
+    CotGeoPoint point = 1;
+    /*
+     * Optional UID (empty = receiver derives).
+     */
+    string uid = 2;
+    /*
+     * Optional display callsign (e.g. "CP1"). Empty for unnamed control points.
+     */
+    string callsign = 3;
+    /*
+     * Link role: 0 = waypoint (b-m-p-w), 1 = checkpoint (b-m-p-c).
+     */
+    uint32 link_type = 4;
+  }
+  /*
+   * Travel method
+   */
+  Method method = 1;
+  /*
+   * Direction (infil/exfil)
+   */
+  Direction direction = 2;
+  /*
+   * Waypoint name prefix (e.g. "CP").
+   */
+  string prefix = 3;
+  /*
+   * Stroke weight * 10 (e.g. 30 = 3.0). 0 = default.
+   */
+  uint32 stroke_weight_x10 = 4;
+  /*
+   * Ordered list of route control points. Capped at 16.
+   */
+  repeated Link links = 5;
+  /*
+   * True if the sender truncated `links` to fit the pool.
+   */
+  bool truncated = 6;
+}
+
+/*
+ * 9-line MEDEVAC request (CoT type b-r-f-h-c).
+ *
+ * Mirrors the ATAK MedLine tool's <_medevac_> detail element. Every field
+ * is optional (proto3 default); senders omit lines they don't have. The
+ * envelope (TAKPacketV2.uid, cot_type_id=b-r-f-h-c, latitude_i/longitude_i,
+ * altitude, callsign) carries Line 1 (location) and Line 2 (callsign).
+ *
+ * All numeric fields are tight varints so a complete 9-line request fits
+ * in well under 100 bytes of proto on the wire.
+ */
+message CasevacReport {
+  /*
+   * Line 3: precedence / urgency.
+   */
+  enum Precedence {
+    Precedence_Unspecified = 0;
+    Precedence_Urgent = 1; // A - immediate, life-threatening
+    Precedence_UrgentSurgical = 2; // B - needs surgery
+    Precedence_Priority = 3; // C - within 4 hours
+    Precedence_Routine = 4; // D - within 24 hours
+    Precedence_Convenience = 5; // E - convenience
+  }
+  /*
+   * Line 7: HLZ marking method.
+   */
+  enum HlzMarking {
+    HlzMarking_Unspecified = 0;
+    HlzMarking_Panels = 1;
+    HlzMarking_PyroSignal = 2;
+    HlzMarking_Smoke = 3;
+    HlzMarking_None = 4;
+    HlzMarking_Other = 5;
+  }
+  /*
+   * Line 6: security situation at the pickup zone.
+   */
+  enum Security {
+    Security_Unspecified = 0;
+    Security_NoEnemy = 1; // N - no enemy activity
+    Security_PossibleEnemy = 2; // P - possible enemy
+    Security_EnemyInArea = 3; // E - enemy, approach with caution
+    Security_EnemyInArmedContact = 4; // X - armed escort required
+  }
+
+  /*
+   * Line 3: precedence / urgency.
+   */
+  Precedence precedence = 1;
+  /*
+   * Line 4: special equipment required, as a bitfield.
+   *   bit 0: none
+   *   bit 1: hoist
+   *   bit 2: extraction equipment
+   *   bit 3: ventilator
+   *   bit 4: blood
+   */
+  uint32 equipment_flags = 2;
+  /*
+   * Line 5: number of litter (stretcher-bound) patients.
+   */
+  uint32 litter_patients = 3;
+  /*
+   * Line 5: number of ambulatory (walking-wounded) patients.
+   */
+  uint32 ambulatory_patients = 4;
+  /*
+   * Line 6: security situation at the PZ.
+   */
+  Security security = 5;
+  /*
+   * Line 7: HLZ marking method.
+   */
+  HlzMarking hlz_marking = 6;
+  /*
+   * Line 7 supplementary: short free-text describing the zone marker
+   * (e.g. "Green smoke", "VS-17 panel west"). Capped tight in options.
+   */
+  string zone_marker = 7;
+  // --- Line 8: patient nationality counts ---
+  uint32 us_military = 8;
+  uint32 us_civilian = 9;
+  uint32 non_us_military = 10;
+  uint32 non_us_civilian = 11;
+  uint32 epw = 12; // enemy prisoner of war
+  uint32 child = 13;
+  /*
+   * Line 9: terrain and obstacles at the PZ, as a bitfield.
+   *   bit 0: slope
+   *   bit 1: rough
+   *   bit 2: loose
+   *   bit 3: trees
+   *   bit 4: wires
+   *   bit 5: other
+   */
+  uint32 terrain_flags = 14;
+  /*
+   * Line 2: radio frequency / callsign metadata (e.g. "38.90 Mhz" or
+   * "Victor 6"). Capped tight in options.
+   */
+  string frequency = 15;
+
+  // --- v2.x medline extensions (tags 16–33) --------------------------------
+  //
+  // Fields 16+ cost a 2-byte tag instead of 1 byte, but they're usually
+  // sparse so the on-wire delta is modest when most stay unset. A fully
+  // populated CASEVAC with 13 free-text fields + 2 ZMIST entries can run
+  // 200-400 bytes compressed, i.e. potentially over the 237 B LoRa MTU.
+  // Callers that hit the MTU on the `compressWithRemarksFallback` path
+  // SHOULD strip the tier-2 situational fields (tags 28-32 + terrain_other_detail)
+  // before dropping the packet entirely. See README "CASEVAC tier-2 stripping".
+
+  /*
+   * Short title / MEDEVAC identifier (e.g. "EAGLE.15.181230"). Usually the
+   * same as the envelope callsign but ATAK sometimes carries a distinct
+   * ops-number here.
+   */
+  string title = 16;
+  /*
+   * Primary medline free-text — the single most clinically important line
+   * on a MEDLINE form (e.g. "2 urgent litter patients, smoke on approach").
+   * MUST be preserved under MTU pressure as long as any casevac is sent.
+   */
+  string medline_remarks = 17;
+
+  /*
+   * Line 3 (newer ATAK format): patient counts by precedence level.
+   * Coexists with the enum-style `precedence` field (tag 1) — older ATAK
+   * emits a single enum, newer ATAK emits these counts, and both can be
+   * set simultaneously. Senders populate whichever style(s) the source
+   * XML had; receivers prefer counts when non-zero.
+   */
+  uint32 urgent_count = 18;
+  uint32 urgent_surgical_count = 19;
+  uint32 priority_count = 20;
+  uint32 routine_count = 21;
+  uint32 convenience_count = 22;
+
+  /*
+   * Line 4 supplementary: free-text description of non-standard equipment
+   * (e.g. "Blood warmer"). Pairs with the `equipment_flags` bitfield.
+   */
+  string equipment_detail = 23;
+  /*
+   * Line 1 override: MGRS grid when distinct from the event anchor point
+   * (e.g. "34T CQ 12345 67890"). Event lat/lon/hae still carries the
+   * numeric location; this field preserves the exact MGRS string the
+   * medic entered.
+   */
+  string zone_protected_coord = 24;
+  /*
+   * Line 9 supplementary: slope direction (e.g. "N", "NE", "SSW") when
+   * `terrain_flags` bit 0 (slope) is set.
+   */
+  string terrain_slope_dir = 25;
+  /*
+   * Line 9 supplementary: free-text description of "other" terrain hazards
+   * (e.g. "Loose debris on west edge") when `terrain_flags` bit 5 (other)
+   * is set. Tier-2 strippable under MTU pressure.
+   */
+  string terrain_other_detail = 26;
+  /*
+   * Line 7 supplementary: how the zone is being marked right now
+   * (e.g. "Orange smoke", "VS-17 panel"). Complements the structured
+   * `hlz_marking` enum with a specific human-readable description.
+   */
+  string marked_by = 27;
+
+  // --- Tier-2 situational awareness (stripped first under MTU pressure) ---
+  // These fields are free-text context that helps the receiver plan the
+  // approach but aren't strictly required to evacuate the patient.
+
+  /*
+   * Nearby obstacles on the approach (e.g. "Power lines north of HLZ").
+   */
+  string obstacles = 28;
+  /*
+   * Wind direction and speed (e.g. "270 at 12 kts").
+   */
+  string winds_are_from = 29;
+  /*
+   * Friendly forces posture near the pickup zone
+   * (e.g. "Squad east of HLZ").
+   */
+  string friendlies = 30;
+  /*
+   * Known or suspected enemy positions near the pickup zone
+   * (e.g. "Possible enemy on south ridge").
+   */
+  string enemy = 31;
+  /*
+   * Free-text description of the HLZ itself
+   * (e.g. "Primary HLZ is soccer field").
+   */
+  string hlz_remarks = 32;
+
+  /*
+   * Per-patient clinical records. Each entry is one patient's ZMIST card
+   * (Zap number / Mechanism / Injuries / Signs / Treatment). Repeatable —
+   * a mass-casualty event can carry 1-6 entries in practice, limited by
+   * the 237 B LoRa MTU.
+   */
+  repeated ZMistEntry zmist = 33;
+}
+
+/*
+ * Per-patient clinical summary record — one entry per patient in a CASEVAC.
+ * Maps directly to ATAK's <zMist> child element inside <zMistsMap>.
+ * All fields are optional free-text; senders populate what they have.
+ */
+message ZMistEntry {
+  /*
+   * Patient identifier / sequence label (e.g. "ZMIST-1", "ZMIST-2").
+   */
+  string title = 1;
+  /*
+   * Zap number — unique patient tracking ID (often a terse code like
+   * "Gunshot" or a serial).
+   */
+  string z = 2;
+  /*
+   * Mechanism of injury (e.g. "Penetrating trauma", "Blast injury").
+   */
+  string m = 3;
+  /*
+   * Injuries observed (e.g. "Left thigh", "Concussion").
+   */
+  string i = 4;
+  /*
+   * Signs / vital stats (e.g. "Stable", "Priority", "BP 110/70").
+   */
+  string s = 5;
+  /*
+   * Treatment given (e.g. "Tourniquet 1810Z", "O2 administered").
+   */
+  string t = 6;
+}
+
+/*
+ * Emergency alert / 911 beacon (CoT types b-a-o-tbl, b-a-o-pan, b-a-o-opn,
+ * b-a-o-can, b-a-o-c, b-a-g).
+ *
+ * Small, high-priority structured record. The CoT type string is still set
+ * on cot_type_id so receivers that ignore payload_variant can still display
+ * the alert from the enum alone; the typed fields let modern receivers show
+ * the authoring unit and handle cancel-referencing without XML parsing.
+ */
+message EmergencyAlert {
+  enum Type {
+    Type_Unspecified = 0;
+    Type_Alert911 = 1; // b-a-o-tbl
+    Type_RingTheBell = 2; // b-a-o-pan
+    Type_InContact = 3; // b-a-o-opn
+    Type_GeoFenceBreached = 4; // b-a-g
+    Type_Custom = 5; // b-a-o-c
+    Type_Cancel = 6; // b-a-o-can
+  }
+  /*
+   * Alert discriminator.
+   */
+  Type type = 1;
+  /*
+   * UID of the unit that raised the alert. Often the same as
+   * TAKPacketV2.uid but can be a parent device uid when a tracker raises
+   * an alert on behalf of a dismount.
+   */
+  string authoring_uid = 2;
+  /*
+   * For Type_Cancel: the uid of the alert being cancelled. Empty for
+   * non-cancel alert types.
+   */
+  string cancel_reference_uid = 3;
+}
+
+/*
+ * Task / engage request (CoT type t-s).
+ *
+ * Mirrors ATAK's TaskCotReceiver / CotTaskBuilder workflow. The envelope
+ * carries the task's originating uid (implicit requester), position, and
+ * creation time; the fields below carry structured metadata the raw-detail
+ * fallback currently loses.
+ *
+ * Fields are deliberately lean — this variant is closer to the MTU ceiling
+ * than the others, so every string is capped in options.
+ */
+message TaskRequest {
+  enum Priority {
+    Priority_Unspecified = 0;
+    Priority_Low = 1;
+    Priority_Normal = 2;
+    Priority_High = 3;
+    Priority_Critical = 4;
+  }
+  enum Status {
+    Status_Unspecified = 0;
+    Status_Pending = 1; // assigned, not yet acknowledged
+    Status_Acknowledged = 2; // assignee has seen it
+    Status_InProgress = 3; // assignee is working it
+    Status_Completed = 4; // task done
+    Status_Cancelled = 5; // cancelled before completion
+  }
+
+  /*
+   * Short tag for the task category (e.g. "engage", "observe", "recon",
+   * "rescue"). Free text on the wire so ATAK-specific task taxonomies
+   * don't need proto coordination; capped tight in options.
+   */
+  string task_type = 1;
+  /*
+   * UID of the target / map item being tasked.
+   */
+  string target_uid = 2;
+  /*
+   * UID of the assigned unit. Empty = unassigned / broadcast task.
+   */
+  string assignee_uid = 3;
+  Priority priority = 4;
+  Status status = 5;
+  /*
+   * Optional short note (reason, constraints, grid reference). Capped
+   * tight in options to keep the worst-case under the LoRa MTU.
+   */
+  string note = 6;
+}
+
+/*
+ * Weather annotation from <environment> CoT detail element.
+ *
+ * Attaches to any TAKPacketV2 regardless of payload_variant — an Aircraft,
+ * PLI, or Marker can all carry observed conditions at the emitting station.
+ * ATAK-CIV ships an XSD for <environment> but no dedicated handler, so the
+ * element round-trips through the generic detail pipeline; this message
+ * promotes it to a first-class structured field.
+ *
+ * Target wire cost: ~6-8 bytes compressed with a fully populated instance.
+ *
+ * Named `TAKEnvironment` (not just `Environment`) because the bare name
+ * collides with `SwiftUI.Environment` — every SwiftUI view in a consuming
+ * iOS app uses the `@Environment` property wrapper, and importing the
+ * generated proto module would make `Environment` ambiguous in every one
+ * of those files. The `TAK` prefix matches the convention used by the
+ * outer `TAKPacketV2` wrapper and is unambiguous across all target
+ * languages (Swift, Kotlin, Python, TypeScript, C#).
+ */
+message TAKEnvironment {
+  /*
+   * Temperature in deci-degrees Celsius. 225 = 22.5°C.
+   * Range covers -50°C to +50°C (-500 to +500) which spans every realistic
+   * outdoor TAK deployment. sint32 because negative temps are common in
+   * cold-weather ops.
+   */
+  sint32 temperature_c_x10 = 1;
+  /*
+   * Wind direction in whole degrees, 0-359. "Direction FROM" per
+   * meteorological convention (matches CoT / ATAK).
+   */
+  uint32 wind_direction_deg = 2;
+  /*
+   * Wind speed in cm/s. Matches the unit of TAKPacketV2.speed for
+   * consistency. 1200 = 12.00 m/s = ~27 mph.
+   */
+  uint32 wind_speed_cm_s = 3;
+}
+
+/*
+ * Sensor field-of-view cone from <sensor> CoT detail element.
+ *
+ * Encodes the 8 geometry attributes that ATAK-CIV's SensorDetailHandler
+ * reads from the wire; drops the 9 visual-styling attributes that are
+ * receiver-side render hints (fovAlpha, fovRed/Green/Blue, strokeColor,
+ * strokeWeight, displayMagneticReference, hideFov, fovLabels, rangeLines).
+ * The receiving ATAK client restores those from its own defaults, same as
+ * every other CoT carried over Meshtastic today.
+ *
+ * Attaches to any TAKPacketV2 — a PLI with a sensor on the operator's head,
+ * an Aircraft with a FLIR turret, a Marker dropped on a UAV.
+ * Target wire cost: ~7-14 bytes compressed (dominated by model string).
+ */
+message SensorFov {
+  /*
+   * Coarse sensor category, inferred from `model` on parse when the source
+   * XML doesn't label it. Receivers that render differently per sensor
+   * class (thermal overlay vs daylight cone) use this.
+   */
+  enum SensorType {
+    SensorType_Unspecified = 0;
+    SensorType_Camera = 1; // daylight / general optical
+    SensorType_Thermal = 2; // FLIR, thermal imager
+    SensorType_Laser = 3; // rangefinder, LRF, designator
+    SensorType_Nvg = 4; // night vision goggles
+    SensorType_Rf = 5; // radio/radar direction-finding
+    SensorType_Other = 6;
+  }
+
+  SensorType type = 1;
+  /*
+   * Azimuth in whole degrees, 0-359. "Pointing direction" of the cone axis,
+   * measured clockwise from true north. Whole degrees match ATAK-CIV's
+   * SensorDetailHandler default (270°) and save varint bytes over centi-deg.
+   */
+  uint32 azimuth_deg = 2;
+  /*
+   * Maximum range of the cone in meters.
+   * Optional — if unset, receivers should use the ATAK-CIV default of 100m.
+   */
+  optional uint32 range_m = 3;
+  /*
+   * Horizontal field of view in whole degrees (cone's angular width).
+   * ATAK-CIV default is 45°.
+   */
+  uint32 fov_horizontal_deg = 4;
+  /*
+   * Vertical field of view in whole degrees. ATAK-CIV default is 45°.
+   * Optional — a value of 0 means "not set / use horizontal FOV".
+   */
+  uint32 fov_vertical_deg = 5;
+  /*
+   * Elevation angle in whole degrees. Positive = up, negative = down.
+   * Range -90 to +90. sint32 for varint efficiency on small negatives.
+   */
+  sint32 elevation_deg = 6;
+  /*
+   * Roll (camera tilt) in whole degrees, -180 to +180.
+   * Optional — use 0 if the sensor doesn't track roll.
+   */
+  sint32 roll_deg = 7;
+  /*
+   * Free-form device model identifier, e.g. "FLIR-Boson-640", "SEEK".
+   * Optional — empty string means "unknown model" (ATAK-CIV default).
+   */
+  string model = 8;
+}
+
+/*
+ * TAKTALK chat message payload (CoT type m-t-t).
+ *
+ * TAKTALK is an ATAK plugin for voice + text team messaging. The voice
+ * audio stream goes over UDP/RTP and is NOT carried by the mesh — only
+ * the text envelope (this message) is. `from_voice` marks messages sent
+ * via push-to-talk speech-to-text so receivers can render a mic icon
+ * next to the text.
+ *
+ * Wire shape inside <event type="m-t-t">/<detail>:
+ *   <callsign>...</callsign>        - mapped to TAKPacketV2.callsign
+ *   <lang>English</lang>            - lang
+ *   <text>...</text>                - text
+ *   <chatroom-id>1</chatroom-id>    - chatroom_id
+ *   <voice/>                        - presence sets from_voice = true
+ */
+message TakTalkMessage {
+  /*
+   * The text body of the TAKTALK message (speech-to-text transcript when
+   * from_voice = true, typed message otherwise).
+   */
+  string text = 1;
+
+  /*
+   * TAKTALK chatroom identifier. May be a short id like "1" for the
+   * default room or a UUID like "30b2755c-c547-44ef-a0cc-cdbd8a15616f"
+   * for custom rooms (resolved by TakTalkRoomData broadcasts).
+   * Empty = broadcast room.
+   */
+  string chatroom_id = 2;
+
+  /*
+   * BCP-47-ish language tag or human-readable name (e.g. "en", "English").
+   * Empty = unspecified.
+   */
+  string lang = 3;
+
+  /*
+   * True when the source CoT carried a <voice/> marker, i.e. the message
+   * originated as push-to-talk speech-to-text. Lets receivers show a mic
+   * icon. Proto3 only encodes when true so empty payload cost is 0 bytes.
+   */
+  bool from_voice = 4;
+}
+
+/*
+ * TAKTALK room/membership broadcast (CoT type y-).
+ *
+ * Announces a TAKTALK chatroom's friendly name and roster so peers can
+ * resolve room UUIDs (used in TakTalkMessage.chatroom_id and
+ * GeoChat.room_id) to a display name and participant list. Not a chat
+ * message itself — these events are emitted by TAKTALK when rooms are
+ * created or memberships change.
+ */
+message TakTalkRoomData {
+  /*
+   * Callsign of the device broadcasting the room state (typically the
+   * room owner / latest writer).
+   *
+   * DEPRECATED in v0.3.2: always equals TAKPacketV2.callsign, so the wire
+   * byte was redundant. Builders stop emitting this field in v0.3.2;
+   * parsers still read it for one release so v0.3.1-encoded packets decode
+   * cleanly. To be removed entirely in v0.4.x.
+   */
+  string sender_callsign = 1 [deprecated = true];
+
+  /*
+   * Room UUID, matches TakTalkMessage.chatroom_id / GeoChat.room_id on
+   * messages routed into this room.
+   */
+  string room_id = 2;
+
+  /*
+   * Friendly display name for the room (e.g. "test", "Alpha Team").
+   */
+  string room_name = 3;
+
+  /*
+   * Member callsigns. Wire-encoded as repeated strings; the underlying
+   * CoT carries them as a single <chatroom-participants>A,B,C</> element
+   * which parsers split / builders join on ','.
+   */
+  repeated string participants = 4;
+}
+
+/*
+ * ATAK directed-routing recipient list (CoT <marti><dest callsign='X'/>…</marti>).
+ *
+ * Present when an event is addressed to specific TAK users rather than the
+ * broadcast group. TAKTALK gates voice TTS on this element matching the
+ * receiver's callsign; directed b-t-f chats use it for the same purpose. A
+ * missing <marti> means "broadcast to all peers", which is the default for
+ * PLI, alerts, drawings, and most situational-awareness events.
+ *
+ * Carried as repeated strings (not indexes into a per-packet table) because
+ * the typical event has 1-2 destinations and table overhead would erase the
+ * savings. Receivers that need the original XML element rebuild it from
+ * dest_callsign on emit.
+ */
+message Marti {
+  /*
+   * Recipient callsigns. Order is preserved end-to-end so receivers can show
+   * primary-vs-cc distinction the same way ATAK does.
+   *
+   * If dest_callsign is [TAKPacketV2.callsign] (self-addressed, unusual but
+   * legal — e.g. ATAK echoing back to its own room), the builder still emits
+   * the element so loopback shapes round-trip cleanly.
+   */
+  repeated string dest_callsign = 1;
+}
+
+/*
+ * ATAK v2 packet with expanded CoT field support and zstd dictionary compression.
+ * Sent on ATAK_PLUGIN_V2 port. The wire payload is:
+ *   [1 byte flags][zstd-compressed TAKPacketV2 protobuf]
+ * Flags byte: bits 0-5 = dictionary ID, bits 6-7 = reserved.
+ */
+message TAKPacketV2 {
+  /*
+   * Well-known CoT event type enum.
+   * Use CotType_Other with cot_type_str for unknown types.
+   */
+  CotType cot_type_id = 1;
+  /*
+   * How the coordinates were generated
+   */
+  CotHow how = 2;
+  /*
+   * Callsign
+   */
+  string callsign = 3;
+  /*
+   * Team color assignment
+   */
+  Team team = 4;
+  /*
+   * Role of the group member
+   */
+  MemberRole role = 5;
+  /*
+   * Latitude, multiply by 1e-7 to get degrees in floating point
+   */
+  sfixed32 latitude_i = 6;
+  /*
+   * Longitude, multiply by 1e-7 to get degrees in floating point
+   */
+  sfixed32 longitude_i = 7;
+  /*
+   * Altitude in meters (HAE). ATAK's "no altitude" sentinel is hae=9999999.0.
+   *
+   * NOTE: an earlier v0.4.0 attempt made this `optional` to omit the 9999999
+   * sentinel from the wire, but measurement showed it was net-negative: the
+   * zstd dictionary already compresses the literal 9999999 to ~nothing, while
+   * proto3 `optional` forces a genuine 0 m HAE (common on routes/drawings that
+   * carry hae="0.0" or omit hae → parsed as 0) to encode explicitly (+2 bytes),
+   * which REGRESSED the worst-case route fixture. Kept as a plain field.
+   */
+  sint32 altitude = 8;
+  /*
+   * Speed in cm/s
+   */
+  uint32 speed = 9;
+  /*
+   * Course in degrees * 100 (0-36000)
+   */
+  uint32 course = 10;
+  /*
+   * Battery level 0-100
+   */
+  uint32 battery = 11;
+  /*
+   * Geopoint source
+   */
+  GeoPointSource geo_src = 12;
+  /*
+   * Altitude source
+   */
+  GeoPointSource alt_src = 13;
+  /*
+   * Device UID (UUID string or device ID like "ANDROID-xxxx")
+   */
+  string uid = 14;
+  /*
+   * Device callsign
+   */
+  string device_callsign = 15;
+  /*
+   * Stale time as seconds offset from event time
+   */
+  uint32 stale_seconds = 16;
+  /*
+   * TAK client version string
+   */
+  string tak_version = 17;
+  /*
+   * TAK device model
+   */
+  string tak_device = 18;
+  /*
+   * TAK platform (ATAK-CIV, WebTAK, etc.)
+   */
+  string tak_platform = 19;
+  /*
+   * TAK OS version
+   */
+  string tak_os = 20;
+  /*
+   * Connection endpoint
+   */
+  string endpoint = 21;
+  /*
+   * Phone number
+   */
+  string phone = 22;
+  /*
+   * CoT event type string, only populated when cot_type_id is CotType_Other
+   */
+  string cot_type_str = 23;
+  /*
+   * Optional remarks / free-text annotation from the <remarks> element.
+   * Populated for non-GeoChat payload types (shapes, markers, routes, etc.)
+   * when the original CoT event carried non-empty remarks text.
+   * GeoChat messages carry their text in GeoChat.message instead.
+   * Empty string (proto3 default) means no remarks were present.
+   */
+  string remarks = 24;
+
+  // --- Sensor / environment annotations ----------------------------------
+  //
+  // Both fields are OPTIONAL and attach to any payload_variant. They
+  // describe observed conditions at the emitting station — a PLI with
+  // environment data, an Aircraft with a sensor cone, a Marker with both.
+  // Absent by default; presence is signaled by the message being non-null.
+
+  /*
+   * Observed weather conditions (temperature, wind). From <environment>.
+   * Type is `TAKEnvironment`, not `Environment`, to avoid colliding with
+   * SwiftUI's `@Environment` property wrapper in iOS consumers.
+   */
+  optional TAKEnvironment environment = 25;
+  /*
+   * Sensor field-of-view cone (camera, FLIR, laser, etc.). From <sensor>.
+   */
+  optional SensorFov sensor_fov = 26;
+
+  reserved 27, 28, 30;
+  // Tags 27, 28 reserved for future top-level annotations. Tag 29 is consumed
+  // by `marti` below. Tag 30 was the former `bool pli` oneof arm — dropped
+  // (PLI is now the implicit payload); reserved here at the message level
+  // because proto3 forbids `reserved` inside a oneof.
+
+  /*
+   * Directed-routing recipient list (CoT <marti><dest callsign='X'/>…</marti>).
+   * Empty / unset = broadcast to all peers (the default for situational-awareness
+   * events). Populated for TAKTALK m-t-t, directed b-t-f DMs, and any other CoT
+   * shape that ATAK addresses to specific recipients. TAKTALK gates voice TTS
+   * playback on this element matching the receiver's callsign, so dropping it
+   * silently breaks voice messaging end-to-end.
+   *
+   * See Marti.
+   */
+  optional Marti marti = 29;
+
+  /*
+   * The payload of the packet
+   */
+  oneof payload_variant {
+    // Tag 30 was `bool pli` — a PLI carries no fields beyond the common
+    // envelope (position is in latitude_i/longitude_i), so the boolean was
+    // pure overhead (~3 wire bytes on every position beacon, the highest-
+    // frequency packet). PLI is now the IMPLICIT payload: a packet with NO
+    // payload_variant set decodes as a position report. Tag 30 is reserved at
+    // the message level (proto3 forbids `reserved` inside a oneof).
+    /*
+     * ATAK GeoChat message
+     */
+    GeoChat chat = 31;
+    /*
+     * Aircraft track data (ADS-B, military air)
+     */
+    AircraftTrack aircraft = 32;
+    /*
+     * Generic CoT detail XML for unmapped types. Kept as a fallback for CoT
+     * types not yet promoted to a typed variant; drawings, markers, ranging
+     * tools, and routes have dedicated variants below and should not land here.
+     */
+    bytes raw_detail = 33;
+    /*
+     * User-drawn tactical graphic: circle, rectangle, polygon, polyline,
+     * telestration, ranging circle, or bullseye. See DrawnShape.
+     */
+    DrawnShape shape = 34;
+    /*
+     * Fixed point of interest: spot marker, waypoint, checkpoint, 2525
+     * symbol, or custom icon. See Marker.
+     */
+    Marker marker = 35;
+    /*
+     * Range and bearing measurement line. See RangeAndBearing.
+     */
+    RangeAndBearing rab = 36;
+    /*
+     * Named route with ordered waypoints and control points. See Route.
+     */
+    Route route = 37;
+    /*
+     * 9-line MEDEVAC request. See CasevacReport.
+     */
+    CasevacReport casevac = 38;
+    /*
+     * Emergency beacon / 911 alert. See EmergencyAlert.
+     */
+    EmergencyAlert emergency = 39;
+    /*
+     * Task / engage request. See TaskRequest.
+     */
+    TaskRequest task = 40;
+    /*
+     * TAKTALK chat message (CoT type m-t-t). See TakTalkMessage.
+     * Voice audio itself rides UDP/RTP outside the mesh; this carries the
+     * text envelope plus a from_voice marker for receiver UX.
+     */
+    TakTalkMessage taktalk = 41;
+    /*
+     * TAKTALK room/membership broadcast (CoT type y-). See TakTalkRoomData.
+     * Resolves room UUIDs (used in TakTalkMessage.chatroom_id and
+     * GeoChat.room_id) to display name + roster on receivers.
+     */
+    TakTalkRoomData taktalk_room = 42;
+  }
 }

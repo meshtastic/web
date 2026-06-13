@@ -1,5 +1,5 @@
 {
-  "name": "@meshtastic/protobufs-ws",
+  "name": "@meshtastic/protobufs",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,20 +9,18 @@
     "./packages/ts/dist/"
   ],
   "exports": {
-    ".": {
-      "types": "./packages/ts/dist/mod.d.ts",
-      "default": "./packages/ts/dist/mod.js"
-    },
-    "./*": "./packages/ts/dist/*"
+    ".": "./packages/ts/mod.ts"
   },
-  "types": "./packages/ts/dist/mod.d.ts",
+  "types": "./packages/ts/mod.ts",
   "sideEffects": false,
   "scripts": {
     "gen": "buf generate",
     "clean": "rimraf dist",
     "build": "pnpm run clean && pnpm run gen"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.9.0"
+  },
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^1.9.0",
     "rimraf": "^6.0.0"

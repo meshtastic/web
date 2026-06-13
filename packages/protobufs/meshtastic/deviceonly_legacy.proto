@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package meshtastic;
+
+/* trunk-ignore(buf-lint/COMPILE) */
+import "meshtastic/deviceonly.proto";
+import "meshtastic/telemetry.proto";
+import "nanopb.proto";
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "DeviceOnlyLegacy";
+option java_package = "org.meshtastic.proto";
+option swift_prefix = "";
+option (nanopb_fileopt).include = "<vector>";
+
+/*
+ * Legacy NodeInfoLite descriptor used only to decode pre-split
+ * /prefs/nodes.proto saves during the v24 -> v25 migration boot.
+ * This preserves the original NodeInfoLite-compatible field numbers needed
+ * to parse old wire bytes cleanly, including user (2), position (3),
+ * device_metrics (6), and the legacy-only compatibility fields via_mqtt (8),
+ * is_favorite (10), and is_ignored (11). Steady-state code does not use
+ * this struct; it is dropped after migration completes. This file should be
+ * removed once DEVICESTATE_MIN_VER advances past 24.
+ */
+message NodeInfoLite_Legacy {
+  uint32 num = 1;
+  UserLite user = 2;
+  PositionLite position = 3;
+  float snr = 4;
+  fixed32 last_heard = 5;
+  DeviceMetrics device_metrics = 6;
+  uint32 channel = 7;
+  bool via_mqtt = 8;
+  optional uint32 hops_away = 9;
+  bool is_favorite = 10;
+  bool is_ignored = 11;
+  uint32 next_hop = 12;
+  uint32 bitfield = 13;
+}
+
+/*
+ * Legacy NodeDatabase shape: one repeated array of fat NodeInfoLite_Legacy
+ * with no satellite position/telemetry arrays.
+ */
+message NodeDatabase_Legacy {
+  uint32 version = 1;
+  repeated NodeInfoLite_Legacy nodes = 2 [(nanopb).callback_datatype = "std::vector<meshtastic_NodeInfoLite_Legacy>"];
+}

@@ -5,7 +5,7 @@ package meshtastic;
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
 option java_outer_classname = "TelemetryProtos";
-option java_package = "com.geeksville.mesh";
+option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
 /*
@@ -153,6 +153,11 @@ message EnvironmentMetrics {
    * Soil temperature measured (*C)
    */
   optional float soil_temperature = 22;
+
+  /*
+   * One-wire temperature (*C)
+   */
+  repeated float one_wire_temperature = 23;
 }
 
 /*
@@ -443,6 +448,51 @@ message LocalStats {
    * Number of packets that were dropped because the transmit queue was full.
    */
   uint32 num_tx_dropped = 14;
+
+  /*
+   * Noise floor value measured in dBm
+   */
+  int32 noise_floor = 15;
+}
+
+/*
+ * Traffic management statistics for mesh network optimization
+ */
+message TrafficManagementStats {
+  /*
+   * Total number of packets inspected by traffic management
+   */
+  uint32 packets_inspected = 1;
+
+  /*
+   * Number of position packets dropped due to deduplication
+   */
+  uint32 position_dedup_drops = 2;
+
+  /*
+   * Number of NodeInfo requests answered from cache
+   */
+  uint32 nodeinfo_cache_hits = 3;
+
+  /*
+   * Number of packets dropped due to rate limiting
+   */
+  uint32 rate_limit_drops = 4;
+
+  /*
+   * Number of unknown/undecryptable packets dropped
+   */
+  uint32 unknown_packet_drops = 5;
+
+  /*
+   * Number of packets with hop_limit exhausted for local-only broadcast
+   */
+  uint32 hop_exhausted_packets = 6;
+
+  /*
+   * Number of times router hop preservation was applied
+   */
+  uint32 router_hops_preserved = 7;
 }
 
 /*
@@ -560,6 +610,11 @@ message Telemetry {
      * Linux host metrics
      */
     HostMetrics host_metrics = 8;
+
+    /*
+     * Traffic management statistics
+     */
+    TrafficManagementStats traffic_management_stats = 9;
   }
 }
 
@@ -603,7 +658,7 @@ enum TelemetrySensorType {
   BMP280 = 6;
 
   /*
-   * High accuracy temperature and humidity
+   * TODO - REMOVE High accuracy temperature and humidity
    */
   SHTC3 = 7;
 
@@ -628,7 +683,7 @@ enum TelemetrySensorType {
   QMC5883L = 11;
 
   /*
-   * High accuracy temperature and humidity
+   * TODO - REMOVE High accuracy temperature and humidity
    */
   SHT31 = 12;
 
@@ -653,7 +708,7 @@ enum TelemetrySensorType {
   RCWL9620 = 16;
 
   /*
-   * Sensirion High accuracy temperature and humidity
+   * TODO - REMOVE Sensirion High accuracy temperature and humidity
    */
   SHT4X = 17;
 
@@ -786,10 +841,56 @@ enum TelemetrySensorType {
    * SEN5X PM SENSORS
    */
   SEN5X = 43;
+
   /*
    * TSL2561 light sensor
    */
   TSL2561 = 44;
+
+  /*
+   * BH1750 light sensor
+   */
+  BH1750 = 45;
+
+  /*
+   * HDC1080 Temperature and Humidity Sensor
+   */
+  HDC1080 = 46;
+
+  /*
+   * TODO - REMOVE STH21 Temperature and R. Humidity sensor
+   */
+  SHT21 = 47;
+
+  /*
+   * Sensirion STC31 CO2 sensor
+   */
+  STC31 = 48;
+
+  /*
+   * SCD30 CO2, humidity, temperature sensor
+   */
+  SCD30 = 49;
+
+  /*
+   * SHT family of sensors for temperature and humidity
+   */
+  SHTXX = 50;
+
+  /*
+   * DS248X Bridge for one-wire temperature sensors
+   */
+  DS248X = 51;
+
+  /*
+   * MMC5983MA 3-Axis Digital Magnetic Sensor
+   */
+  MMC5983MA = 52;
+
+  /*
+   * ICM-42607-P 6‑Axis IMU
+   */
+  ICM42607P = 53;
 }
 
 /*
@@ -805,4 +906,39 @@ message Nau7802Config {
    * The calibration factor for the NAU7802
    */
   float calibrationFactor = 2;
+}
+
+/*
+ * SEN5X State, for saving to flash
+ */
+message SEN5XState {
+  /*
+   * Last cleaning time for SEN5X
+   */
+  uint32 last_cleaning_time = 1;
+
+  /*
+   * Last cleaning time for SEN5X - valid flag
+   */
+  bool last_cleaning_valid = 2;
+
+  /*
+   * Config flag for one-shot mode (see admin.proto)
+   */
+  bool one_shot_mode = 3;
+
+  /*
+   * Last VOC state time for SEN55
+   */
+  optional uint32 voc_state_time = 4;
+
+  /*
+   * Last VOC state validity flag for SEN55
+   */
+  optional bool voc_state_valid = 5;
+
+  /*
+   * VOC state array (8x uint8t) for SEN55
+   */
+  optional fixed64 voc_state_array = 6;
 }

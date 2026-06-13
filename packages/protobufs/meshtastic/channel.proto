@@ -1,11 +1,12 @@
 syntax = "proto3";
 
+/* trunk-ignore(buf-lint/PACKAGE_DIRECTORY_MATCH) */
 package meshtastic;
 
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
 option java_outer_classname = "ChannelProtos";
-option java_package = "com.geeksville.mesh";
+option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
 /*
@@ -86,11 +87,6 @@ message ChannelSettings {
    * Per-channel module settings.
    */
   ModuleSettings module_settings = 7;
-
-  /*
-   * Whether or not we should receive notifactions / alerts through this channel
-   */
-  bool mute = 8;
 }
 
 /*
@@ -103,10 +99,10 @@ message ModuleSettings {
   uint32 position_precision = 1;
 
   /*
-   * Controls whether or not the phone / clients should mute the current channel
+   * Controls whether or not the client / device should mute the current channel
    * Useful for noisy public channels you don't necessarily want to disable
    */
-  bool is_client_muted = 2;
+  bool is_muted = 2;
 }
 
 /*

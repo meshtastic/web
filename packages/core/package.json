@@ -45,6 +45,7 @@
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
   },
   "dependencies": {
+    "@meshtastic/protobufs": "workspace:*",
     "crc": "npm:crc@^4.3.2"
   }
 }

@@ -13,7 +13,7 @@ import "meshtastic/xmodem.proto";
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
 option java_outer_classname = "MeshProtos";
-option java_package = "com.geeksville.mesh";
+option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
 /*
@@ -388,9 +388,9 @@ enum HardwareModel {
   LORA_RELAY_V1 = 32;
 
   /*
-   * TODO: REPLACE
+   * T-Echo Plus device from LilyGo
    */
-  NRF52840DK = 33;
+  T_ECHO_PLUS = 33;
 
   /*
    * TODO: REPLACE
@@ -700,9 +700,9 @@ enum HardwareModel {
   HELTEC_SENSOR_HUB = 92;
 
   /*
-   * Reserved Fried Chicken ID for future use
+   * Muzi Works Muzi-Base device
    */
-  RESERVED_FRIED_CHICKEN = 93;
+  MUZI_BASE = 93;
 
   /*
    * Heltec Magnetic Power Bank with Meshtastic compatible
@@ -811,6 +811,129 @@ enum HardwareModel {
   T_WATCH_ULTRA = 114;
 
   /*
+   * Elecrow ThinkNode M3
+   */
+  THINKNODE_M3 = 115;
+
+  /*
+   * RAK WISMESH_TAP_V2 with ESP32-S3 CPU
+   */
+  WISMESH_TAP_V2 = 116;
+
+  /*
+   * RAK3401
+   */
+  RAK3401 = 117;
+
+  /*
+   * RAK6421 Hat+
+   */
+  RAK6421 = 118;
+
+  /*
+   * Elecrow ThinkNode M4
+   */
+  THINKNODE_M4 = 119;
+
+  /*
+   * Elecrow ThinkNode M6
+   */
+  THINKNODE_M6 = 120;
+
+  /*
+   * Elecrow Meshstick 1262
+   */
+  MESHSTICK_1262 = 121;
+
+  /*
+   * LilyGo T-Beam 1W
+   */
+  TBEAM_1_WATT = 122;
+
+  /*
+   * LilyGo T5 S3 ePaper Pro (V1 and V2)
+   */
+  T5_S3_EPAPER_PRO = 123;
+
+  /*
+   * LilyGo T-Beam BPF (144-148Mhz)
+   */
+  TBEAM_BPF = 124;
+
+  /*
+   * LilyGo T-Mini E-paper S3 Kit
+   */
+  MINI_EPAPER_S3 = 125;
+
+  /*
+   * LilyGo T-Display S3 Pro LR1121
+   */
+  TDISPLAY_S3_PRO = 126;
+
+  /*
+   * Heltec Mesh Node T096 board features an nRF52840 CPU and a TFT screen.
+   */
+  HELTEC_MESH_NODE_T096 = 127;
+
+  /*
+   * Seeed studio T1000-E Pro tracker card. NRF52840 w/ LR2021 radio,
+   * GPS, button, buzzer, and sensors.
+   */
+  TRACKER_T1000_E_PRO = 128;
+
+  /*
+   * Elecrow ThinkNode M7, M8 and M9
+   */
+  THINKNODE_M7 = 129;
+  THINKNODE_M8 = 130;
+  THINKNODE_M9 = 131;
+
+  /*
+   * The Heltec-V4-R8 uses an ESP32S3R8 chip, plus an SX1262.
+   */
+  HELTEC_V4_R8 = 132;
+
+  /*
+   * The HELTEC_MESH_NODE_T1 uses an NRF52840 chip, plus an SX1262.
+   */
+  HELTEC_MESH_NODE_T1 = 133;
+
+  /*
+   * B&Q Consulting Station G3: TBD
+   */
+  STATION_G3 = 134;
+
+  /*
+   * Lilygo T-Impulse-Plus
+   */
+  T_IMPULSE_PLUS = 135;
+
+  /*
+   * Lilygo T-Echo Card
+   */
+  T_ECHO_CARD = 136;
+
+  /*
+   * Seeed Tracker L2
+   */
+  SEEED_WIO_TRACKER_L2 = 137;
+
+  /*
+   * Elecrow CrowPanel Advance P4 models, ESP32-P4 and TFT with SX1262 radio plugin
+   */
+  CROWPANEL_P4 = 138;
+
+  /*
+   * Heltec Mesh Tower V2
+   */
+  HELTEC_MESH_TOWER_V2 = 139;
+
+  /*
+   * Meshnology W10
+   */
+  MESHNOLOGY_W10 = 140;
+
+  /*
    * ------------------------------------------------------------------------------------------------------------------------------------------
    * Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
    * ------------------------------------------------------------------------------------------------------------------------------------------
@@ -851,6 +974,9 @@ message User {
 
   /*
    * A full name for this user, i.e. "Kevin Hester"
+   * Limited to 24 bytes of UTF-8: longer names are accepted from senders
+   * built against the older 39-byte limit, but devices truncate them before
+   * storing or rebroadcasting. Clients should enforce 24 bytes in their UI.
    */
   string long_name = 2;
 
@@ -1020,6 +1146,12 @@ message Routing {
      * This typically enforced per portnum and is used to prevent a single node from monopolizing airtime
      */
     RATE_LIMIT_EXCEEDED = 38;
+
+    /*
+     * PKI encryption failed, due to no public key for the remote node
+     * This is different from PKI_UNKNOWN_PUBKEY which indicates a failure upon receiving a packet
+     */
+    PKI_SEND_FAIL_PUBLIC_KEY = 39;
   }
 
   oneof variant {
@@ -1101,6 +1233,11 @@ message Data {
    * Bitfield for extra flags. First use is to indicate that user approves the packet being uploaded to MQTT.
    */
   optional uint32 bitfield = 9;
+
+  /*
+   * XEdDSA signature for the payload
+   */
+  bytes xeddsa_signature = 10;
 }
 
 /*
@@ -1122,6 +1259,176 @@ message KeyVerification {
    * sent from NodeB to NodeA in response to the initial message.
    */
   bytes hash2 = 3;
+}
+
+/*
+ * The actual over-the-mesh message doing store and forward++
+ */
+message StoreForwardPlusPlus {
+  /*
+   * Enum of message types
+   */
+  enum SFPP_message_type {
+    /*
+     * Send an announcement of the canonical tip of a chain
+     */
+    CANON_ANNOUNCE = 0;
+
+    /*
+     * Query whether a specific link is on the chain
+     */
+    CHAIN_QUERY = 1;
+
+    /*
+     * Request the next link in the chain
+     */
+    LINK_REQUEST = 3;
+
+    /*
+     * Provide a link to add to the chain
+     */
+    LINK_PROVIDE = 4;
+
+    /*
+     * If we must fragment, send the first half
+     */
+    LINK_PROVIDE_FIRSTHALF = 5;
+
+    /*
+     * If we must fragment, send the second half
+     */
+    LINK_PROVIDE_SECONDHALF = 6;
+  }
+
+  /*
+   * Which message type is this
+   */
+  SFPP_message_type sfpp_message_type = 1;
+
+  /*
+   * The hash of the specific message
+   */
+  bytes message_hash = 2;
+
+  /*
+   * The hash of a link on a chain
+   */
+  bytes commit_hash = 3;
+
+  /*
+   * the root hash of a chain
+   */
+  bytes root_hash = 4;
+
+  /*
+   * The encrypted bytes from a message
+   */
+  bytes message = 5;
+
+  /*
+   * Message ID of the contained message
+   */
+  uint32 encapsulated_id = 6;
+
+  /*
+   * Destination of the contained message
+   */
+  uint32 encapsulated_to = 7;
+
+  /*
+   * Sender of the contained message
+   */
+  uint32 encapsulated_from = 8;
+
+  /*
+   * The receive time of the message in question
+   */
+  uint32 encapsulated_rxtime = 9;
+
+  /*
+   * Used in a LINK_REQUEST to specify the message X spots back from head
+   */
+  uint32 chain_count = 10;
+}
+
+/*
+ * The actual over-the-mesh message doing RemoteShell
+ */
+message RemoteShell {
+  /*
+   * Frame op code for PTY session control and stream transport.
+   *
+   * Values 1-63 are client->server requests.
+   * Values 64-127 are server->client responses/events.
+   */
+  enum OpCode {
+    OP_UNSET = 0;
+
+    // Client -> server
+    OPEN = 1;
+    INPUT = 2;
+    RESIZE = 3;
+    CLOSE = 4;
+    PING = 5;
+    ACK = 6;
+
+    // Server -> client
+    OPEN_OK = 64;
+    OUTPUT = 65;
+    CLOSED = 66;
+    ERROR = 67;
+    PONG = 68;
+  }
+
+  /*
+   * Structured frame operation.
+   */
+  OpCode op = 1;
+
+  /*
+   * Logical PTY session identifier.
+   */
+  uint32 session_id = 2;
+
+  /*
+   * Monotonic sequence number for this frame.
+   */
+  uint32 seq = 3;
+
+  /*
+   * Cumulative ack sequence number.
+   */
+  uint32 ack_seq = 4;
+
+  /*
+   * Opaque bytes payload for INPUT/OUTPUT/ERROR and other frame bodies.
+   */
+  bytes payload = 5;
+
+  /*
+   * Terminal size columns used for OPEN/RESIZE signaling.
+   */
+  uint32 cols = 6;
+
+  /*
+   * Terminal size rows used for OPEN/RESIZE signaling.
+   */
+  uint32 rows = 7;
+
+  /*
+   * Bit flags for protocol extensions.
+   */
+  uint32 flags = 8;
+
+  /*
+   * The last sequence number TX'd.
+   */
+  uint32 last_tx_seq = 9;
+
+  /*
+   * The last sequence number RX'd.
+   */
+  uint32 last_rx_seq = 10;
 }
 
 /*
@@ -1168,6 +1475,13 @@ message Waypoint {
    * Designator icon for the waypoint in the form of a unicode emoji
    */
   fixed32 icon = 8;
+}
+
+/*
+ * Message for node status
+ */
+message StatusMessage {
+  string status = 1;
 }
 
 /*
@@ -1345,6 +1659,11 @@ message MeshPacket {
      * Arrived via API connection
      */
     TRANSPORT_API = 7;
+
+    /*
+     * Arrived via Unicast UDP
+     */
+    TRANSPORT_UNICAST_UDP = 8;
   }
 
   /*
@@ -1356,6 +1675,10 @@ message MeshPacket {
 
   /*
    * The (immediate) destination for this packet
+   * If the value is 4,294,967,295 (maximum value of an unsigned 32bit integer), this indicates that the packet was
+   * not destined for a specific node, but for a channel as indicated by the value of `channel` below.
+   * If the value is another, this indicates that the packet was destined for a specific
+   * node (i.e. a kind of "Direct Message" to this node) and not broadcast on a channel.
    */
   fixed32 to = 2;
 
@@ -1499,6 +1822,11 @@ message MeshPacket {
    * Indicates which transport mechanism this packet arrived over
    */
   TransportMechanism transport_mechanism = 21;
+
+  /*
+   * Indicates whether the packet has a valid signature
+   */
+  bool xeddsa_signed = 22;
 }
 
 /*
@@ -1629,6 +1957,19 @@ message NodeInfo {
    * LSB 0 of the bitfield
    */
   bool is_key_manually_verified = 12;
+
+  /*
+   * True if node has been muted
+   * Persistes between NodeDB internal clean ups
+   */
+  bool is_muted = 13;
+
+  /*
+   * True if node is signing its packets via XEdDSA
+   * Persists between NodeDB internal clean ups
+   * LSB 1 of the bitfield
+   */
+  bool has_xeddsa_signed = 14;
 }
 
 /*
@@ -1987,7 +2328,103 @@ message FromRadio {
      * Persistent data for device-ui
      */
     DeviceUIConfig deviceuiConfig = 17;
+
+    /*
+     * Lockdown state notification for hardened firmware builds.
+     * Sent post-config (so unauthorized clients learn they must
+     * provision/unlock) and after each LockdownAuth admin command
+     * to report success or failure. Replaces the earlier scheme of
+     * encoding state as magic-string prefixes inside ClientNotification.
+     */
+    LockdownStatus lockdown_status = 18;
   }
+}
+
+/*
+ * Lockdown state report from firmware to client (for hardened builds
+ * with MESHTASTIC_LOCKDOWN). Sent immediately after config_complete_id
+ * to inform a freshly-connected unauthorized client what it must do,
+ * and again in response to each LockdownAuth admin command.
+ */
+message LockdownStatus {
+  enum State {
+    /* Default; should not be sent. */
+    STATE_UNSPECIFIED = 0;
+
+    /*
+     * No passphrase has ever been provisioned on this device.
+     * Client should prompt the operator to set one.
+     */
+    NEEDS_PROVISION = 1;
+
+    /*
+     * Storage is locked or this client has not authenticated yet.
+     * lock_reason carries a machine-readable detail string.
+     * Client should present (or auto-replay) a passphrase via
+     * AdminMessage.lockdown_auth.
+     */
+    LOCKED = 2;
+
+    /*
+     * Passphrase accepted; client is now authorized for this connection.
+     * boots_remaining and valid_until_epoch describe the active session
+     * token's TTL.
+     */
+    UNLOCKED = 3;
+
+    /*
+     * Passphrase rejected. backoff_seconds is non-zero when rate-limited.
+     */
+    UNLOCK_FAILED = 4;
+
+    /*
+     * Lockdown is supported by this firmware but not currently active
+     * (no passphrase has been provisioned, or it was disabled via
+     * AdminMessage.lockdown_auth.disable). The device is operating in
+     * normal, non-encrypted mode. Clients render the lockdown-mode
+     * toggle as OFF on receiving this. Distinct from NEEDS_PROVISION,
+     * which is only used during an in-progress enable flow.
+     */
+    DISABLED = 5;
+  }
+
+  /* Current lockdown state being reported. */
+  State state = 1;
+
+  /*
+   * For LOCKED: machine-readable reason. Known values:
+   *   "needs_auth"        — storage already unlocked, client must auth
+   *   "token_missing"     — no boot token on flash
+   *   "token_expired"     — boot token wall-clock TTL elapsed
+   *   "token_boots_zero"  — boot token boot-count TTL exhausted
+   *   "token_hmac_fail"   — token tampered or wrong device
+   *   "token_dek_fail"    — token DEK decrypt failed
+   *   "token_wrong_size"  — token file corrupted
+   *   "token_bad_magic"   — token file corrupted
+   *   "not_provisioned"   — should generally use NEEDS_PROVISION state instead
+   * Other values may be added; clients should treat unknown values as
+   * "locked, ask for passphrase".
+   */
+  string lock_reason = 2;
+
+  /*
+   * For UNLOCKED: remaining boots on the issued session token.
+   * Decrements by 1 on each subsequent boot.
+   */
+  uint32 boots_remaining = 3;
+
+  /*
+   * For UNLOCKED: wall-clock expiry of the issued session token,
+   * absolute Unix-epoch seconds. 0 = no time limit.
+   */
+  uint32 valid_until_epoch = 4;
+
+  /*
+   * For UNLOCK_FAILED: seconds the client must wait before another
+   * passphrase attempt will be accepted. 0 = wrong passphrase, no
+   * backoff (immediate retry allowed but advisable to prompt user).
+   */
+  uint32 backoff_seconds = 5;
 }
 
 /*

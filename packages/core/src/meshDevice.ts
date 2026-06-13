@@ -575,7 +575,9 @@ export class MeshDevice {
     const resetNodes = create(Protobuf.Admin.AdminMessageSchema, {
       payloadVariant: {
         case: "nodedbReset",
-        value: 1,
+        // nodedb_reset is now a bool (proto >= 2.7): setting the oneof case
+        // triggers the reset; `true` preserves favorites through it.
+        value: true,
       },
     });
 
