@@ -37,18 +37,18 @@ jobs:
         run: pnpm run test
 
       - name: Build web package
-        working-directory: packages/web
+        working-directory: apps/web
         run: pnpm run build
 
       - name: Package output
-        working-directory: packages/web
+        working-directory: apps/web
         run: pnpm run package
 
       - name: Upload compressed build (artifact)
         uses: actions/upload-artifact@v7
         with:
           name: web-build-nightly
-          path: packages/web/dist/build.tar
+          path: apps/web/dist/build.tar
           if-no-files-found: error
 
       - name: Compute tags and labels
@@ -64,8 +64,8 @@ jobs:
 
           # Try to use latest release tag if it exists; fallback to package version; else date
           LATEST_TAG="$(gh release view --json tagName --jq .tagName 2>/dev/null || true)"
-          if [ -z "$LATEST_TAG" ] && [ -f packages/web/package.json ]; then
-            LATEST_TAG="v$(jq -r .version packages/web/package.json)"
+          if [ -z "$LATEST_TAG" ] && [ -f apps/web/package.json ]; then
+            LATEST_TAG="v$(jq -r .version apps/web/package.json)"
           fi
 
           if [ -n "${LATEST_TAG:-}" ] && [ "$LATEST_TAG" != "vnull" ]; then
@@ -89,7 +89,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./packages/web/infra/Containerfile
+            ./apps/web/infra/Containerfile
           image: ${{ env.REGISTRY_IMAGE }}
           tags: |
             ${{ steps.meta.outputs.moving_tag }}

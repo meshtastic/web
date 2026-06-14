@@ -3,7 +3,7 @@
 
   "files": [],
   "references": [
-    { "path": "packages/web" },
+    { "path": "apps/web" },
     { "path": "packages/transport-http" }
   ]
 }
