@@ -78,7 +78,7 @@
       "namePlaceholder": "My HTTP Node",
       "inputPlaceholder": "192.168.1.10 or meshtastic.local",
       "heading": "URL or IP",
-      "useHttps": "Use HTTTPS",
+      "useHttps": "Use HTTPS",
       "invalidUrl": {
         "title": "Invalid URL",
         "description": "Please enter a valid HTTP or HTTPS URL."

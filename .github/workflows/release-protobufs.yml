@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -69,9 +69,7 @@ jobs:
           github_token: ${{ github.token }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
+        uses: pnpm/action-setup@v6
       
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
@@ -108,7 +106,7 @@ jobs:
           cp README.md $PROTOBUF_DIR/packages/ts
 
       - name: Upload TypeScript code
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ts_code
           path: ${{ env.PROTOBUF_DIR }}/packages/ts
@@ -123,7 +121,7 @@ jobs:
       DRY_RUN: ${{ inputs.dry_run }}
     steps:
       - name: Download TypeScript code
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ts_code
 

@@ -14,15 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: pnpm
@@ -40,7 +38,7 @@ jobs:
           set -euo pipefail
 
           # List packages to exclude (full paths under repo root)
-          EXCLUDED_DIRS=("packages/protobufs" "packages/transport-deno" "packages/ui" "pacakges/web")
+          EXCLUDED_DIRS=("packages/protobufs" "packages/transport-deno" "packages/ui" "packages/web")
 
           is_excluded() {
             local dir="$1"
