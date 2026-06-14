@@ -15,7 +15,7 @@
   "sideEffects": false,
   "scripts": {
     "gen": "buf generate",
-    "clean": "rimraf dist",
+    "clean": "rimraf packages/ts/dist",
     "build": "pnpm run clean && pnpm run gen"
   },
   "dependencies": {
