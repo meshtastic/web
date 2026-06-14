@@ -1,15 +1,17 @@
 import type { Types } from "@meshtastic/core";
 
 // Config type discriminators
-export type ValidConfigType =
+export type ValidRadioConfigType = "lora" | "security";
+
+export type ValidDeviceConfigType =
   | "device"
   | "position"
   | "power"
   | "network"
   | "display"
-  | "lora"
-  | "bluetooth"
-  | "security";
+  | "bluetooth";
+
+export type ValidConfigType = ValidRadioConfigType | ValidDeviceConfigType;
 
 export type ValidModuleConfigType =
   | "mqtt"
@@ -153,6 +155,47 @@ export function getConfigChangeCount(registry: ChangeRegistry): number {
     if (key.type === "config") {
       count++;
     }
+  }
+  return count;
+}
+
+/**
+ * Get count of radio config changes
+ */
+export function getRadioConfigChangeCount(registry: ChangeRegistry): number {
+  let count = 0;
+  for (const keyStr of registry.changes.keys()) {
+    const key = deserializeKey(keyStr);
+    if (key.type === "config" && (key.variant === "lora" || key.variant === "security")) {
+      count++;
+    }
+  }
+  // Channel is displayed under Radio section in UI, so include channel changes in the count
+  count += getChannelChangeCount(registry);
+  return count;
+}
+
+/**
+ * Get count of device config changes
+ */
+export function getDeviceConfigChangeCount(registry: ChangeRegistry): number {
+  let count = 0;
+  for (const keyStr of registry.changes.keys()) {
+    const key = deserializeKey(keyStr);
+    if (
+      key.type === "config" &&
+      (key.variant === "device" ||
+        key.variant === "position" ||
+        key.variant === "power" ||
+        key.variant === "network" ||
+        key.variant === "display" ||
+        key.variant === "bluetooth")
+    ) {
+      count++;
+    }
+  }
+  if (hasUserChange(registry)) {
+    count++;
   }
   return count;
 }
