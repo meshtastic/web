@@ -25,7 +25,11 @@ export type ValidModuleConfigType =
   | "neighborInfo"
   | "ambientLighting"
   | "detectionSensor"
-  | "paxcounter";
+  | "paxcounter"
+  | "remoteHardware"
+  | "statusmessage"
+  | "trafficManagement"
+  | "tak";
 
 // Admin message types that can be queued
 export type ValidAdminMessageType = "setFixedPosition" | "other";

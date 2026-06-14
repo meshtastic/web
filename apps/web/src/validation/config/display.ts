@@ -22,6 +22,7 @@ export const DisplayValidationSchema = z.object({
   wakeOnTapOrMotion: z.boolean(),
   compassOrientation: CompassOrientationEnum,
   use12hClock: z.boolean(),
+  enableMessageBubbles: z.boolean(),
 });
 
 export type DisplayValidation = z.infer<typeof DisplayValidationSchema>;

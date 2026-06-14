@@ -29,6 +29,7 @@ export interface NodeDB extends NodeDBData {
   processPacket: (data: ProcessPacketParams) => void;
   addUser: (user: Types.PacketMetadata<Protobuf.Mesh.User>) => void;
   addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
+  addDeviceMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry.DeviceMetrics>) => void;
   updateFavorite: (nodeNum: number, isFavorite: boolean) => void;
   updateIgnore: (nodeNum: number, isIgnored: boolean) => void;
   setNodeNum: (nodeNum: number) => void;
@@ -324,6 +325,28 @@ function nodeDBFactory(
           if (isNew) {
             console.log(`[NodeDB] Adding new node from position packet: ${position.from}`);
           }
+        }),
+      ),
+
+    addDeviceMetrics: (metrics) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          const current = nodeDB.nodeMap.get(metrics.from);
+          // Only fold live device metrics into nodes we already know about, to
+          // avoid creating identity-less phantom nodes from a stray telemetry packet.
+          if (!current) {
+            return;
+          }
+          const updated = {
+            ...current,
+            deviceMetrics: metrics.data,
+            num: metrics.from,
+          };
+          nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(metrics.from, updated);
         }),
       ),
 

@@ -14,6 +14,7 @@ export const mockNodeDBStore: NodeDB = {
   addNode: vi.fn(),
   addUser: vi.fn(),
   addPosition: vi.fn(),
+  addDeviceMetrics: vi.fn(),
   removeNode: vi.fn(),
   removeAllNodes: vi.fn(),
   pruneStaleNodes: vi.fn().mockReturnValue(0),

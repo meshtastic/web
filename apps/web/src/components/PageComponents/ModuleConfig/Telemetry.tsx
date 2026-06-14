@@ -89,6 +89,12 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
             },
             {
               type: "toggle",
+              name: "airQualityScreenEnabled",
+              label: t("telemetry.airQualityScreenEnabled.label"),
+              description: t("telemetry.airQualityScreenEnabled.description"),
+            },
+            {
+              type: "toggle",
               name: "powerMeasurementEnabled",
               label: t("telemetry.powerMeasurementEnabled.label"),
               description: t("telemetry.powerMeasurementEnabled.description"),

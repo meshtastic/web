@@ -7,9 +7,13 @@ import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.tsx";
 import { NeighborInfo } from "@components/PageComponents/ModuleConfig/NeighborInfo.tsx";
 import { Paxcounter } from "@components/PageComponents/ModuleConfig/Paxcounter.tsx";
 import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.tsx";
+import { RemoteHardware } from "@components/PageComponents/ModuleConfig/RemoteHardware.tsx";
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.tsx";
+import { StatusMessage } from "@components/PageComponents/ModuleConfig/StatusMessage.tsx";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
+import { Tak } from "@components/PageComponents/ModuleConfig/Tak.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
+import { TrafficManagement } from "@components/PageComponents/ModuleConfig/TrafficManagement.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
 import { useDevice, type ValidModuleConfigType } from "@core/stores";
@@ -89,6 +93,22 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
         element: DetectionSensor,
       },
       { case: "paxcounter", label: t("page.tabPaxcounter"), element: Paxcounter },
+      {
+        case: "remoteHardware",
+        label: t("page.tabRemoteHardware"),
+        element: RemoteHardware,
+      },
+      {
+        case: "trafficManagement",
+        label: t("page.tabTrafficManagement"),
+        element: TrafficManagement,
+      },
+      {
+        case: "statusmessage",
+        label: t("page.tabStatusMessage"),
+        element: StatusMessage,
+      },
+      { case: "tak", label: t("page.tabTak"), element: Tak },
     ],
     [t],
   );

@@ -11,6 +11,7 @@ export const TelemetryValidationSchema = z.object({
   powerMeasurementEnabled: z.boolean(),
   powerUpdateInterval: z.coerce.number().int().min(0),
   powerScreenEnabled: z.boolean(),
+  airQualityScreenEnabled: z.boolean(),
 });
 
 export type TelemetryValidation = z.infer<typeof TelemetryValidationSchema>;

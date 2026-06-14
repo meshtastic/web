@@ -345,6 +345,22 @@ function deviceFactory(
                 device.moduleConfig.paxcounter = config.payloadVariant.value;
                 break;
               }
+              case "remoteHardware": {
+                device.moduleConfig.remoteHardware = config.payloadVariant.value;
+                break;
+              }
+              case "statusmessage": {
+                device.moduleConfig.statusmessage = config.payloadVariant.value;
+                break;
+              }
+              case "trafficManagement": {
+                device.moduleConfig.trafficManagement = config.payloadVariant.value;
+                break;
+              }
+              case "tak": {
+                device.moduleConfig.tak = config.payloadVariant.value;
+                break;
+              }
             }
           }
         }),

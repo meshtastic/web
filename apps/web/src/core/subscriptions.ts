@@ -34,8 +34,15 @@ export const subscribeAll = (
     }
   });
 
-  connection.events.onTelemetryPacket.subscribe(() => {
-    // device.setMetrics(telemetryPacket);
+  connection.events.onTelemetryPacket.subscribe((telemetryPacket) => {
+    // Fold live device-metrics telemetry into the node so battery / channel
+    // utilisation / voltage stay current between NodeInfo broadcasts.
+    if (telemetryPacket.data.variant.case === "deviceMetrics") {
+      nodeDB.addDeviceMetrics({
+        ...telemetryPacket,
+        data: telemetryPacket.data.variant.value,
+      });
+    }
   });
 
   connection.events.onDeviceStatus.subscribe((status) => {

@@ -196,6 +196,48 @@ describe("DeviceStore – change registry API", () => {
     expect(device.hasModuleConfigChange("mqtt")).toBe(false);
   });
 
+  it("setModuleConfig stores the firmware-current module variants", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const device = useDeviceStore.getState().addDevice(11);
+
+    device.setModuleConfig(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: {
+          case: "trafficManagement",
+          value: create(Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfigSchema, {
+            enabled: true,
+            rateLimitMaxPackets: 5,
+          }),
+        },
+      }),
+    );
+    device.setModuleConfig(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: {
+          case: "statusmessage",
+          value: create(Protobuf.ModuleConfig.ModuleConfig_StatusMessageConfigSchema, {
+            nodeStatus: "online",
+          }),
+        },
+      }),
+    );
+    device.setModuleConfig(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: {
+          case: "remoteHardware",
+          value: create(Protobuf.ModuleConfig.ModuleConfig_RemoteHardwareConfigSchema, {
+            enabled: true,
+          }),
+        },
+      }),
+    );
+
+    expect(device.getEffectiveModuleConfig("trafficManagement")?.enabled).toBe(true);
+    expect(device.getEffectiveModuleConfig("trafficManagement")?.rateLimitMaxPackets).toBe(5);
+    expect(device.getEffectiveModuleConfig("statusmessage")?.nodeStatus).toBe("online");
+    expect(device.getEffectiveModuleConfig("remoteHardware")?.enabled).toBe(true);
+  });
+
   it("channel change tracking add/update/remove/get", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();

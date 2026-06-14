@@ -11,7 +11,11 @@
     "tabRangeTest": "Range Test",
     "tabSerial": "Serial",
     "tabStoreAndForward": "S&F",
-    "tabTelemetry": "Telemetry"
+    "tabTelemetry": "Telemetry",
+    "tabRemoteHardware": "Remote Hardware",
+    "tabTrafficManagement": "Traffic Management",
+    "tabStatusMessage": "Status Message",
+    "tabTak": "TAK"
   },
   "ambientLighting": {
     "title": "Ambient Lighting Settings",
@@ -443,6 +447,102 @@
     "powerScreenEnabled": {
       "label": "Power Screen Enabled",
       "description": "Enable the Power Telemetry Screen"
+    },
+    "airQualityScreenEnabled": {
+      "label": "Air Quality Screen Enabled",
+      "description": "Show the Air Quality telemetry on the device screen"
+    }
+  },
+  "remoteHardware": {
+    "title": "Remote Hardware Settings",
+    "description": "Settings for the Remote Hardware module",
+    "enabled": {
+      "label": "Module Enabled",
+      "description": "Enable the Remote Hardware module"
+    },
+    "allowUndefinedPinAccess": {
+      "label": "Allow Undefined Pin Access",
+      "description": "Allow reading/writing GPIO pins not defined in the available pins list"
+    }
+  },
+  "statusMessage": {
+    "title": "Status Message Settings",
+    "description": "Periodically rebroadcast a short status message for this node",
+    "nodeStatus": {
+      "label": "Status Message",
+      "description": "The status string this node broadcasts on change and on a timer"
+    }
+  },
+  "tak": {
+    "title": "TAK Settings",
+    "description": "Settings for the ATAK (Team Awareness Kit) plugin module",
+    "team": {
+      "label": "Team",
+      "description": "Team color / designation reported to ATAK"
+    },
+    "role": {
+      "label": "Role",
+      "description": "Member role reported to ATAK"
+    }
+  },
+  "trafficManagement": {
+    "title": "Traffic Management Settings",
+    "description": "Packet inspection and traffic shaping to reduce channel utilization",
+    "enabled": {
+      "label": "Module Enabled",
+      "description": "Enable traffic management packet inspection and shaping"
+    },
+    "positionDedupEnabled": {
+      "label": "Position Deduplication",
+      "description": "Drop redundant position broadcasts"
+    },
+    "positionPrecisionBits": {
+      "label": "Position Precision Bits",
+      "description": "Bits of precision used for position deduplication (0-32)"
+    },
+    "positionMinIntervalSecs": {
+      "label": "Position Min Interval",
+      "description": "Minimum seconds between position updates from the same node"
+    },
+    "nodeinfoDirectResponse": {
+      "label": "NodeInfo Direct Response",
+      "description": "Answer NodeInfo requests directly from the local cache"
+    },
+    "nodeinfoDirectResponseMaxHops": {
+      "label": "NodeInfo Response Max Hops",
+      "description": "Minimum hop distance from the requester before responding to NodeInfo requests"
+    },
+    "rateLimitEnabled": {
+      "label": "Rate Limiting",
+      "description": "Throttle chatty nodes with per-node rate limiting"
+    },
+    "rateLimitWindowSecs": {
+      "label": "Rate Limit Window",
+      "description": "Time window in seconds for rate-limit calculations"
+    },
+    "rateLimitMaxPackets": {
+      "label": "Rate Limit Max Packets",
+      "description": "Maximum packets allowed per node within the rate-limit window"
+    },
+    "dropUnknownEnabled": {
+      "label": "Drop Unknown Packets",
+      "description": "Drop undecryptable packets per rate-limit window"
+    },
+    "unknownPacketThreshold": {
+      "label": "Unknown Packet Threshold",
+      "description": "Number of unknown packets before dropping from a node"
+    },
+    "exhaustHopTelemetry": {
+      "label": "Exhaust Hop (Telemetry)",
+      "description": "Set hop limit to 0 for relayed telemetry broadcasts"
+    },
+    "exhaustHopPosition": {
+      "label": "Exhaust Hop (Position)",
+      "description": "Set hop limit to 0 for relayed position broadcasts"
+    },
+    "routerPreserveHops": {
+      "label": "Preserve Router Hops",
+      "description": "Preserve hop limit for router-to-router traffic"
     }
   }
 }

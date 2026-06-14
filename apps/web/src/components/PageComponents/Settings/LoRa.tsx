@@ -194,6 +194,22 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
                 step: 0.001,
               },
             },
+            {
+              type: "select",
+              name: "femLnaMode",
+              label: t("lora.femLnaMode.label"),
+              description: t("lora.femLnaMode.description"),
+              properties: {
+                enumValue: Protobuf.Config.Config_LoRaConfig_FEM_LNA_Mode,
+                formatEnumName: true,
+              },
+            },
+            {
+              type: "toggle",
+              name: "serialHalOnly",
+              label: t("lora.serialHalOnly.label"),
+              description: t("lora.serialHalOnly.description"),
+            },
           ],
         },
       ]}

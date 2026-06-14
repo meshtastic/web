@@ -38,6 +38,7 @@ import {
   BellOffIcon,
   MapPinnedIcon,
   MessageSquareIcon,
+  ShieldCheckIcon,
   StarIcon,
   TrashIcon,
   WaypointsIcon,
@@ -113,6 +114,22 @@ export const NodeDetailsDialog = ({ open, onOpenChange }: NodeDetailsDialogProps
         title: t("toast.tracerouteSent.title", { ns: "ui" }),
       }),
     );
+    onOpenChange(false);
+  }
+
+  function handleInitiateKeyVerification() {
+    if (!node) {
+      return;
+    }
+    connection
+      ?.sendKeyVerification(
+        Protobuf.Admin.KeyVerificationAdmin_MessageType.INITIATE_VERIFICATION,
+        node.num,
+        0n,
+      )
+      .catch((error) => {
+        console.error("Failed to initiate key verification:", error);
+      });
     onOpenChange(false);
   }
 
@@ -207,6 +224,12 @@ export const NodeDetailsDialog = ({ open, onOpenChange }: NodeDetailsDialogProps
                   className={cn(isFavoriteState ? " fill-yellow-400 stroke-yellow-400" : "")}
                 />
               </Button>
+              {node.user?.publicKey && node.user.publicKey.length > 0 && (
+                <Button className="mr-1" name="verifyKey" onClick={handleInitiateKeyVerification}>
+                  <ShieldCheckIcon className="mr-2" />
+                  {t("nodeDetails.verifyKey")}
+                </Button>
+              )}
               <div className="flex flex-1 justify-start" />
 
               <TooltipProvider delayDuration={300}>

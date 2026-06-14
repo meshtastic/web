@@ -125,6 +125,12 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
               label: t("display.wakeOnTapOrMotion.label"),
               description: t("display.wakeOnTapOrMotion.description"),
             },
+            {
+              type: "toggle",
+              name: "enableMessageBubbles",
+              label: t("display.enableMessageBubbles.label"),
+              description: t("display.enableMessageBubbles.description"),
+            },
           ],
         },
       ]}

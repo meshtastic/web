@@ -118,6 +118,10 @@
     "wakeOnTapOrMotion": {
       "description": "Wake the device on tap or motion",
       "label": "Wake on Tap or Motion"
+    },
+    "enableMessageBubbles": {
+      "label": "Message Bubbles",
+      "description": "Display incoming messages as bubbles on the device screen"
     }
   },
   "lora": {
@@ -198,6 +202,14 @@
     "radioSettings": {
       "label": "Radio Settings",
       "description": "Settings for the LoRa radio"
+    },
+    "femLnaMode": {
+      "label": "FEM/LNA Mode",
+      "description": "Control an external RF front-end module / low-noise amplifier (only on boards that have one)"
+    },
+    "serialHalOnly": {
+      "label": "Serial HAL Only",
+      "description": "Communicate with the radio exclusively over the serial hardware abstraction layer"
     }
   },
   "network": {

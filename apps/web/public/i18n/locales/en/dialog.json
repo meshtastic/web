@@ -128,7 +128,8 @@
     "publicKey": "Public Key: ",
     "messageable": "Messageable: ",
     "KeyManuallyVerifiedTrue": "Public Key has been manually verified",
-    "KeyManuallyVerifiedFalse": "Public Key is not manually verified"
+    "KeyManuallyVerifiedFalse": "Public Key is not manually verified",
+    "verifyKey": "Verify Key"
   },
   "pkiBackup": {
     "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
@@ -234,5 +235,25 @@
     "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
     "confirm": "Factory Reset Config",
     "failedTitle": "There was an error performing the factory reset. Please try again."
+  },
+  "keyVerification": {
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "inform": {
+      "title": "Key Verification",
+      "description": "Share this security number with {{name}} so they can enter it on their device:"
+    },
+    "request": {
+      "title": "Key Verification",
+      "description": "Enter the security number shown on {{name}}'s device:",
+      "placeholder": "Security number",
+      "submit": "Submit"
+    },
+    "final": {
+      "title": "Verify Key",
+      "description": "Confirm these characters match the ones shown on {{name}}'s device:",
+      "verify": "Verify",
+      "reject": "Don't Verify"
+    }
   }
 }

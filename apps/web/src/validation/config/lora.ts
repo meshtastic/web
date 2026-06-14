@@ -3,6 +3,7 @@ import { z } from "zod/v4";
 
 const ModemPresetEnum = z.enum(Protobuf.Config.Config_LoRaConfig_ModemPreset);
 const RegionCodeEnum = z.enum(Protobuf.Config.Config_LoRaConfig_RegionCode);
+const FemLnaModeEnum = z.enum(Protobuf.Config.Config_LoRaConfig_FEM_LNA_Mode);
 
 export const LoRaValidationSchema = z.object({
   usePreset: z.boolean(),
@@ -24,6 +25,8 @@ export const LoRaValidationSchema = z.object({
   ignoreIncoming: z.coerce.number().array(),
   ignoreMqtt: z.boolean(),
   configOkToMqtt: z.boolean(),
+  femLnaMode: FemLnaModeEnum,
+  serialHalOnly: z.boolean(),
 });
 
 export type LoRaValidation = z.infer<typeof LoRaValidationSchema>;

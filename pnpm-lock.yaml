@@ -69,6 +69,9 @@ importers:
       '@noble/curves':
         specifier: ^1.9.2
         version: 1.9.7
+      '@preact/signals-core':
+        specifier: ^1.8.0
+        version: 1.14.2
       '@radix-ui/react-accordion':
         specifier: ^1.2.12
         version: 1.2.12(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -150,6 +153,9 @@ importers:
       base64-js:
         specifier: ^1.5.1
         version: 1.5.1
+      better-result:
+        specifier: ^1.0.0
+        version: 1.0.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1487,6 +1493,9 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [win32]
+
+  '@preact/signals-core@1.14.2':
+    resolution: {integrity: sha512-RZHdBj9ZF4n40Rp4jS052EHHjBWf96P9oNdXPfhQTovCuWY9iQn3Gq+gOTJSgBO9A/JBuPfMOWsSX/lIU9Pc/A==}
 
   '@publint/pack@0.1.4':
     resolution: {integrity: sha512-HDVTWq3H0uTXiU0eeSQntcVUTPP3GamzeXI41+x7uU9J65JgWQh3qWZHblR1i0npXfFtF+mxBiU2nJH8znxWnQ==}
@@ -3512,6 +3521,9 @@ packages:
     resolution: {integrity: sha512-honAfLBde0HAFLdNyBEfuuENkF6zR+ozxqxa/2zJKHBe1qzLqyTSeRKpdPEHAP03rlDGyQOPnCSxnVpVqQo9Mg==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  better-result@1.0.1:
+    resolution: {integrity: sha512-5IUPG5P3cUJgAc7rizc3heHqcJzVQDG+YrcJXhjhsjfJrFdCerpfe0RTL3nIYJCT3nU3GN/BJCaahIyqWfLYyg==}
 
   bignumber.js@9.3.1:
     resolution: {integrity: sha512-Ko0uX15oIUS7wJ3Rb30Fs6SkVbLmPBAKdlm7q9+ak9bbIeFf0MwuBsQV6z7+X768/cHsfg+WlysDWJcmthjsjQ==}
@@ -7062,6 +7074,8 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.52.0':
     optional: true
 
+  '@preact/signals-core@1.14.2': {}
+
   '@publint/pack@0.1.4': {}
 
   '@quansync/fs@1.0.0':
@@ -10131,6 +10145,8 @@ snapshots:
   base64-js@1.5.1: {}
 
   baseline-browser-mapping@2.10.35: {}
+
+  better-result@1.0.1: {}
 
   bignumber.js@9.3.1: {}
 
