@@ -15,6 +15,8 @@ import {
   getAllModuleConfigChanges,
   getChannelChangeCount,
   getConfigChangeCount,
+  getRadioConfigChangeCount,
+  getDeviceConfigChangeCount,
   getModuleConfigChangeCount,
   hasChannelChange,
   hasConfigChange,
@@ -119,6 +121,8 @@ export interface Device extends DeviceData {
   hasChannelChange: (index: Types.ChannelNumber) => boolean;
   hasUserChange: () => boolean;
   getConfigChangeCount: () => number;
+  getRadioConfigChangeCount: () => number;
+  getDeviceConfigChangeCount: () => number;
   getModuleConfigChangeCount: () => number;
   getChannelChangeCount: () => number;
   getAllConfigChanges: () => Protobuf.Config.Config[];
@@ -815,6 +819,24 @@ function deviceFactory(
       }
 
       return getConfigChangeCount(device.changeRegistry);
+    },
+
+    getRadioConfigChangeCount: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return 0;
+      }
+
+      return getRadioConfigChangeCount(device.changeRegistry);
+    },
+
+    getDeviceConfigChangeCount: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return 0;
+      }
+
+      return getDeviceConfigChangeCount(device.changeRegistry);
     },
 
     getModuleConfigChangeCount: () => {
