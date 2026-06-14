@@ -20,7 +20,15 @@
  *    without an accompanying `declare namespace ...` block.
  */
 
-import { existsSync, readdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 
 const distDir = new URL("../dist", import.meta.url).pathname;
