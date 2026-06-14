@@ -36,8 +36,6 @@ const ConfigPage = () => {
     setModuleConfig,
     addChannel,
     getConfigChangeCount,
-    getRadioConfigChangeCount,
-    getDeviceConfigChangeCount,
     getModuleConfigChangeCount,
     getChannelChangeCount,
     getAdminMessageChangeCount,
@@ -52,9 +50,9 @@ const ConfigPage = () => {
   const routerState = useRouterState();
   const { t } = useTranslation("config");
 
-  const radioConfigChangeCount = getRadioConfigChangeCount();
-  const deviceConfigChangeCount = getDeviceConfigChangeCount();
+  const configChangeCount = getConfigChangeCount();
   const moduleConfigChangeCount = getModuleConfigChangeCount();
+  const channelChangeCount = getChannelChangeCount();
   const adminMessageChangeCount = getAdminMessageChangeCount();
 
   const sections = useMemo(
@@ -64,7 +62,7 @@ const ConfigPage = () => {
         route: radioRoute,
         label: t("navigation.radioConfig"),
         icon: RadioTowerIcon,
-        changeCount: radioConfigChangeCount,
+        changeCount: configChangeCount,
         component: RadioConfig,
       },
       {
@@ -72,7 +70,7 @@ const ConfigPage = () => {
         route: deviceRoute,
         label: t("navigation.deviceConfig"),
         icon: RouterIcon,
-        changeCount: deviceConfigChangeCount,
+        changeCount: moduleConfigChangeCount,
         component: DeviceConfig,
       },
       {
@@ -80,11 +78,11 @@ const ConfigPage = () => {
         route: moduleRoute,
         label: t("navigation.moduleConfig"),
         icon: LayersIcon,
-        changeCount: moduleConfigChangeCount,
+        changeCount: channelChangeCount,
         component: ModuleConfig,
       },
     ],
-    [t, radioConfigChangeCount, deviceConfigChangeCount, moduleConfigChangeCount],
+    [t, configChangeCount, moduleConfigChangeCount, channelChangeCount],
   );
 
   const activeSection =
@@ -265,7 +263,7 @@ const ConfigPage = () => {
     getModuleConfigChangeCount() > 0 ||
     getChannelChangeCount() > 0 ||
     adminMessageChangeCount > 0;
-  const hasPending = hasDrafts;
+  const hasPending = hasDrafts || rhfState.isDirty;
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
   const saveDisabled = isSaving || !rhfState.isValid || !hasPending;
 
