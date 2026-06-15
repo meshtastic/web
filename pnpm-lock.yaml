@@ -296,8 +296,8 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@4.2.1)
       tar:
-        specifier: ^7.5.11
-        version: 7.5.11
+        specifier: ^7.5.16
+        version: 7.5.16
       testing-library:
         specifier: ^0.0.2
         version: 0.0.2(@angular/common@6.1.10(@angular/core@6.1.10(rxjs@6.6.7)(zone.js@0.8.29))(rxjs@6.6.7))(@angular/core@6.1.10(rxjs@6.6.7)(zone.js@0.8.29))
@@ -5566,8 +5566,8 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
-  tar@7.5.11:
-    resolution: {integrity: sha512-ChjMH33/KetonMTAtpYdgUFr0tbz69Fp2v7zWxQfYZX4g5ZN2nOBXm1R2xyA+lMIKrLKIoKAwFj93jE/avX9cQ==}
+  tar@7.5.16:
+    resolution: {integrity: sha512-56adEpPMouktRlBLXiaYFFzZ/3+JXa8P9n7WbR+ibIjtviN55mEaOkiysCnPnWm+7kkui1Dn8J9l+g6zV8731w==}
     engines: {node: '>=18'}
 
   temp-dir@2.0.0:
@@ -12493,7 +12493,7 @@ snapshots:
 
   tapable@2.3.0: {}
 
-  tar@7.5.11:
+  tar@7.5.16:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
