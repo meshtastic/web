@@ -9,7 +9,7 @@ import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx"
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig, normalizeBytes } from "@core/utils/deepCompareConfig.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
@@ -87,20 +87,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
       ],
     };
 
-    // Normalize empty byte arrays -> undefined for comparison so
-    // empty base64 strings from the form match undefined/empty fields
-    // in the existing config and allow removeChange to work.
-    const normalizeSecurity = (s: ParsedSecurity | undefined) => {
-      if (!s) return s;
-      return {
-        ...s,
-        privateKey: normalizeBytes(s.privateKey),
-        publicKey: normalizeBytes(s.publicKey),
-        adminKey: s.adminKey?.map((b) => normalizeBytes(b)) as unknown,
-      } as ParsedSecurity;
-    };
-
-    if (deepCompareConfig(normalizeSecurity(config.security), normalizeSecurity(payload), true)) {
+    if (deepCompareConfig(config.security, payload, true)) {
       removeChange({ type: "config", variant: "security" });
       return;
     }
