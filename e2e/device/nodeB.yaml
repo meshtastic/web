@@ -1,0 +1,11 @@
+# Node B — the peer node driven/observed by the Python peer over the TCP phone API.
+# Same simulated radio + UDP mesh as Node A, distinct node number, no webserver.
+---
+Lora:
+  Module: sim
+Config:
+  EnableUDP: true
+General:
+  MACAddress: AA:BB:CC:DD:EE:02
+Logging:
+  LogLevel: info

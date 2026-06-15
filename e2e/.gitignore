@@ -1,0 +1,7 @@
+# Playwright run artifacts
+.results/
+.report/
+
+# Python mesh-peer virtualenv + caches
+peer/.venv/
+peer/__pycache__/

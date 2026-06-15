@@ -1,0 +1,3 @@
+# The off-browser "mesh peer" used by the E2E suite. `meshtastic` pulls in
+# pypubsub (the `pubsub` module) and the protobufs it needs.
+meshtastic>=2.7.8

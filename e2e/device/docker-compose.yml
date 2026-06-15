@@ -1,0 +1,41 @@
+# Two real meshtasticd firmware nodes in simulated-radio mode, meshed over the
+# firmware's built-in UDP multicast (no MQTT, no relay). Node A exposes the HTTPS
+# phone API for the browser; Node B exposes the TCP phone API for the Python peer.
+#
+# Multicast (224.0.0.69:4403) is flooded between the two containers by the Linux
+# bridge (no IGMP querier on a default docker network => multicast floods).
+name: meshtastic-e2e
+
+services:
+  node-a:
+    image: meshtastic/meshtasticd:daily-debian
+    container_name: meshtastic-e2e-node-a
+    # NB: simulated radio is selected via `Lora: Module: sim` in the mounted
+    # config.yaml — NOT the --sim CLI flag. --sim/force_simradio takes an early
+    # branch in portduinoSetup() that skips config-file loading entirely
+    # (firmware PortduinoGlue.cpp:235), which would drop our Webserver/EnableUDP/MAC.
+    command: ["sh", "-cx", "meshtasticd --fsdir=/var/lib/meshtasticd"]
+    volumes:
+      - ./nodeA.yaml:/etc/meshtasticd/config.yaml:ro
+    ports:
+      - "9443:9443" # HTTPS phone API — browser / device-under-test
+      - "14403:4403" # TCP phone API — debug only
+    networks: [mesh]
+
+  node-b:
+    image: meshtastic/meshtasticd:daily-debian
+    container_name: meshtastic-e2e-node-b
+    # NB: simulated radio is selected via `Lora: Module: sim` in the mounted
+    # config.yaml — NOT the --sim CLI flag. --sim/force_simradio takes an early
+    # branch in portduinoSetup() that skips config-file loading entirely
+    # (firmware PortduinoGlue.cpp:235), which would drop our Webserver/EnableUDP/MAC.
+    command: ["sh", "-cx", "meshtasticd --fsdir=/var/lib/meshtasticd"]
+    volumes:
+      - ./nodeB.yaml:/etc/meshtasticd/config.yaml:ro
+    ports:
+      - "14404:4403" # TCP phone API — Python peer
+    networks: [mesh]
+
+networks:
+  mesh:
+    driver: bridge
