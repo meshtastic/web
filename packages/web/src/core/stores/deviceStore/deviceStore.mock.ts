@@ -91,8 +91,6 @@ export const mockDeviceStore: Device = {
   hasChannelChange: vi.fn().mockReturnValue(false),
   hasUserChange: vi.fn().mockReturnValue(false),
   getConfigChangeCount: vi.fn().mockReturnValue(0),
-  getRadioConfigChangeCount: vi.fn().mockReturnValue(0),
-  getDeviceConfigChangeCount: vi.fn().mockReturnValue(0),
   getModuleConfigChangeCount: vi.fn().mockReturnValue(0),
   getChannelChangeCount: vi.fn().mockReturnValue(0),
   getAllConfigChanges: vi.fn().mockReturnValue([]),

@@ -6,13 +6,6 @@ function isUint8Array(v: unknown): v is Uint8Array {
   return v instanceof Uint8Array;
 }
 
-export function normalizeBytes(value: unknown): unknown {
-  if (value instanceof Uint8Array && value.byteLength === 0) {
-    return undefined;
-  }
-  return value;
-}
-
 function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
   if (a.byteLength !== b.byteLength) {
     return false;
