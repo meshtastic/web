@@ -220,8 +220,8 @@ importers:
         specifier: 8.1.0
         version: 8.1.0(maplibre-gl@5.8.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react-qrcode-logo:
-        specifier: ^4.0.0
-        version: 4.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^4.1.0
+        version: 4.1.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       rfc4648:
         specifier: ^1.5.4
         version: 1.5.4
@@ -5402,8 +5402,8 @@ packages:
       maplibre-gl:
         optional: true
 
-  react-qrcode-logo@4.0.0:
-    resolution: {integrity: sha512-TcDdsJQe7P0OY7uA7Do4Z0DfIIjjqx81RbBGQY+90T2Ba42pUCx/cSI2UTwPPoH9WwE0StLb8A98mFgKIAI4JQ==}
+  react-qrcode-logo@4.1.0:
+    resolution: {integrity: sha512-drcieitJFX3u66XpFn+4PxsCzrQo5nAMXsyOtiuTZCJPUQwGwysIlr14MjKbXDhBNz3iOqM8/yV5K1mllt/mTw==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -12065,7 +12065,7 @@ snapshots:
     optionalDependencies:
       maplibre-gl: 5.8.0
 
-  react-qrcode-logo@4.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  react-qrcode-logo@4.1.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       qrcode-generator: 2.0.4
       react: 19.2.7
