@@ -41,7 +41,7 @@ importers:
         version: 1.52.0
       tsdown:
         specifier: ^0.15.0
-        version: 0.15.12(publint@0.3.18)(typescript@5.9.3)
+        version: 0.15.12(publint@0.3.21)(typescript@5.9.3)
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
@@ -433,8 +433,8 @@ importers:
         specifier: ^4.3.4
         version: 4.7.0(vite@7.3.5(@types/node@24.12.0)(jiti@2.7.0)(lightningcss@1.31.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.8.2))
       publint:
-        specifier: ^0.3.14
-        version: 0.3.18
+        specifier: ^0.3.21
+        version: 0.3.21
       tailwindcss:
         specifier: ^4.1.14
         version: 4.2.1
@@ -5007,8 +5007,8 @@ packages:
   protocol-buffers-schema@3.6.0:
     resolution: {integrity: sha512-TdDRD+/QNdrCGCE7v8340QyuXd4kIWIgapsE2+n/SaGiSSbomYl4TjHlvIoCWRpE7wFt02EpB35VVA2ImcBVqw==}
 
-  publint@0.3.18:
-    resolution: {integrity: sha512-JRJFeBTrfx4qLwEuGFPk+haJOJN97KnPuK01yj+4k/Wj5BgoOK5uNsivporiqBjk2JDaslg7qJOhGRnpltGeog==}
+  publint@0.3.21:
+    resolution: {integrity: sha512-OqejcnMV6E9zel2oCrUOJEiiFkGiAAni0A6ibfQNh1k9Gu5z4F+Yso8lllam7AzmV6Do0vp7u3UpZNRBwuXaHQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -11838,7 +11838,7 @@ snapshots:
 
   protocol-buffers-schema@3.6.0: {}
 
-  publint@0.3.18:
+  publint@0.3.21:
     dependencies:
       '@publint/pack': 0.1.4
       package-manager-detector: 1.6.0
@@ -12572,7 +12572,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tsdown@0.15.12(publint@0.3.18)(typescript@5.9.3):
+  tsdown@0.15.12(publint@0.3.21)(typescript@5.9.3):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -12589,7 +12589,7 @@ snapshots:
       tree-kill: 1.2.2
       unconfig: 7.5.0
     optionalDependencies:
-      publint: 0.3.18
+      publint: 0.3.21
       typescript: 5.9.3
     transitivePeerDependencies:
       - '@ts-macro/tsc'
