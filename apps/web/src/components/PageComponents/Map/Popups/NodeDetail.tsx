@@ -37,6 +37,10 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       ? t("unset")
       : rawHardwareType.replaceAll("_", " ")
     : `${hwModel}`;
+  // SNR is in dB; derive a 0–100% quality heuristic (-10 dB → 0%, +10 dB → 100%).
+  const snrQuality = Math.min(Math.max(Math.round((node.snr + 10) * 5), 0), 100);
+  const snrTone =
+    snrQuality >= 67 ? "text-green-600" : snrQuality >= 34 ? "text-yellow-600" : "text-red-600";
   function handleDirectMessage() {
     navigate({ to: `/messages/direct/${node.num}` });
   }
@@ -180,14 +184,12 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       {node.snr !== 0 && (
         <div className="mt-2">
           <div>{t("unit.snr")}</div>
-          <Mono className="flex items-center text-xs text-gray-500">
-            {node.snr}
-            {t("unit.dbm")}
-            <Dot />
-            {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%
-            <Dot />
-            {(node.snr + 10) * 5}
-            {t("unit.raw")}
+          <Mono className="flex items-center gap-1 text-xs">
+            <span className={snrTone}>
+              {Number(node.snr.toFixed(1))} {t("unit.db")}
+            </span>
+            <Dot className="text-gray-400" />
+            <span className="text-gray-500">{snrQuality}%</span>
           </Mono>
         </div>
       )}

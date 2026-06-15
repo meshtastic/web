@@ -128,6 +128,13 @@ const NodesPage = (): JSX.Element => {
         last4: shortName,
       });
 
+    // SNR is reported in dB. Map it to a 0–100% signal-quality heuristic
+    // (-10 dB → 0%, +10 dB → 100%) for an at-a-glance read, and pick a tone.
+    const snr = node.snr ?? 0;
+    const snrQuality = Math.min(Math.max(Math.round((snr + 10) * 5), 0), 100);
+    const snrTone =
+      snrQuality >= 67 ? "text-green-500" : snrQuality >= 34 ? "text-yellow-500" : "text-red-500";
+
     return {
       id: node.num,
       isFavorite: node.isFavorite,
@@ -199,12 +206,11 @@ const NodesPage = (): JSX.Element => {
         },
         {
           content: (
-            <Mono>
-              {node.snr}
-              {t("unit.dbm")}/{Math.min(Math.max((node.snr + 10) * 5, 0), 100)}
-              %/{/* Percentage */}
-              {(node.snr + 10) * 5}
-              {t("unit.raw")}
+            <Mono className="flex items-baseline gap-1.5">
+              <span className={snrTone}>
+                {Number(snr.toFixed(1))} {t("unit.db")}
+              </span>
+              <span className="text-gray-500 dark:text-gray-400/70">{snrQuality}%</span>
             </Mono>
           ),
           sortValue: node.snr,

@@ -40,6 +40,7 @@
   "loading": "Loading...",
   "unit": {
     "cps": "CPS",
+    "db": "dB",
     "dbm": "dBm",
     "hertz": "Hz",
     "hop": {
