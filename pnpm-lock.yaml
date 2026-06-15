@@ -187,8 +187,8 @@ importers:
         specifier: ^3.0.7
         version: 3.0.7
       lucide-react:
-        specifier: ^1.17.0
-        version: 1.17.0(react@19.2.4)
+        specifier: ^1.18.0
+        version: 1.18.0(react@19.2.4)
       maplibre-gl:
         specifier: 5.8.0
         version: 5.8.0
@@ -405,8 +405,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       lucide-react:
-        specifier: ^1.17.0
-        version: 1.17.0(react@19.2.4)
+        specifier: ^1.18.0
+        version: 1.18.0(react@19.2.4)
       react:
         specifier: '>=19'
         version: 19.2.4
@@ -4731,8 +4731,8 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  lucide-react@1.17.0:
-    resolution: {integrity: sha512-9FA9evdox/JQL5PT57fdA1x/yg8T7knJ98+zjTL3UfKza6pflQUUh3XtaQIHKvnsJw1lmsEyHVlt5jchYxOQ5w==}
+  lucide-react@1.18.0:
+    resolution: {integrity: sha512-LZDb7H/0YfM+RJncD0hDQRCAu+vSGODqpe35TuVI8EuXaRjkczbsx7p8dY4J87F/MUSj6bpYqeI8nw8qXaAdmA==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -11550,7 +11550,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  lucide-react@1.17.0(react@19.2.4):
+  lucide-react@1.18.0(react@19.2.4):
     dependencies:
       react: 19.2.4
 
