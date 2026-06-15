@@ -233,7 +233,10 @@ export function useConnections() {
 
   const connect = useCallback(
     async (id: ConnectionId, opts?: { allowPrompt?: boolean }) => {
-      const conn = connections.find((c) => c.id === id);
+      // Read from the live store, not the memoized `connections` closure: callers
+      // such as addConnectionAndConnect() add a connection and connect to it in the
+      // same tick, before this hook re-renders, so the closure would be stale.
+      const conn = useDeviceStore.getState().savedConnections.find((c) => c.id === id);
       if (!conn) {
         log.warn("connect: unknown connection id", { id });
         return false;
@@ -271,7 +274,7 @@ export function useConnections() {
         return false;
       }
     },
-    [connections, updateStatus, setupMeshDevice],
+    [updateStatus, setupMeshDevice],
   );
 
   const disconnect = useCallback(
