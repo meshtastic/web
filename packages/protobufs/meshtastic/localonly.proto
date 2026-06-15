@@ -8,7 +8,7 @@ import "meshtastic/module_config.proto";
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
 option java_outer_classname = "LocalOnlyProtos";
-option java_package = "com.geeksville.mesh";
+option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
 /*
@@ -130,6 +130,21 @@ message LocalModuleConfig {
    * Paxcounter Config
    */
   ModuleConfig.PaxcounterConfig paxcounter = 14;
+
+  /*
+   * StatusMessage Config
+   */
+  ModuleConfig.StatusMessageConfig statusmessage = 15;
+
+  /*
+   * The part of the config that is specific to the Traffic Management module
+   */
+  ModuleConfig.TrafficManagementConfig traffic_management = 16;
+
+  /*
+   * TAK Config
+   */
+  ModuleConfig.TAKConfig tak = 17;
 
   /*
    * A version integer used to invalidate old save files when we make

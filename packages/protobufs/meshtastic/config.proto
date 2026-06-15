@@ -7,7 +7,7 @@ import "meshtastic/device_ui.proto";
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
 option java_outer_classname = "ConfigProtos";
-option java_package = "com.geeksville.mesh";
+option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
 message Config {
@@ -111,7 +111,7 @@ message Config {
       ROUTER_LATE = 11;
 
       /*
-       * Description: Treats packets from or to favorited nodes as ROUTER, and all other packets as CLIENT.
+       * Description: Treats packets from or to favorited nodes as ROUTER_LATE, and all other packets as CLIENT.
        * Technical Details: Used for stronger attic/roof nodes to distribute messages more widely
        *    from weaker, indoor, or less-well-positioned nodes. Recommended for users with multiple nodes
        *    where one CLIENT_BASE acts as a more powerful base station, such as an attic/roof node.
@@ -648,6 +648,11 @@ message Config {
        * Can not be auto detected but set by proto. Used for 128x128 screens
        */
       OLED_SH1107_128_128 = 4;
+
+      /*
+       * Can not be auto detected but set by proto. Used for 64x128 rotated screens
+       */
+      OLED_SH1107_ROTATED = 5;
     }
 
     /*
@@ -783,6 +788,11 @@ message Config {
      * If true, node names will show in long format
      */
     bool use_long_node_name = 13;
+
+    /*
+     * If true, the device will display message bubbles on screen.
+     */
+    bool enable_message_bubbles = 14;
   }
 
   /*
@@ -924,6 +934,62 @@ message Config {
        * Brazil 902MHz
        */
       BR_902 = 26;
+
+      /*
+       * ITU Region 1 Amateur Radio 2m band (144-146 MHz)
+       */
+      ITU1_2M = 27;
+
+      /*
+       * ITU Region 2 Amateur Radio 2m band (144-148 MHz)
+       */
+      ITU2_2M = 28;
+
+      /*
+       * EU 866MHz band (Band no. 47b of 2006/771/EC and subsequent amendments) for Non-specific short-range devices (SRD)
+       */
+      EU_866 = 29;
+
+      /*
+       * EU 874MHz and 917MHz bands (Band no. 1 and 4 of 2022/172/EC and subsequent amendments) for Non-specific short-range devices (SRD)
+       */
+      EU_874 = 30;
+      EU_917 = 31;
+
+      /*
+       * EU 868MHz band, with narrow presets
+       */
+      EU_N_868 = 32;
+
+      /*
+       * ITU Region 3 Amateur Radio 2m band (144-148 MHz)
+       */
+      ITU3_2M = 33;
+
+      /*
+       * ITU Region 1 Amateur Radio 70cm band (430-440 MHz)
+       */
+      ITU1_70CM = 34;
+
+      /*
+       * ITU Region 2 Amateur Radio 70cm band (420-450 MHz)
+       * Note: Some countries do not allocate 420-430 MHz or 440-450 MHz.
+       * Check local law!
+       */
+      ITU2_70CM = 35;
+
+      /*
+       * ITU Region 3 Amateur Radio 70cm band (430-450 MHz)
+       * Note: Some countries do not allocate 440-450 MHz. Check local law!
+       */
+      ITU3_70CM = 36;
+
+      /*
+       * ITU Region 2 Amateur Radio 1.25m '125cm' band (220-225 MHz)
+       * Note: Some countries do not allocate 220-222 MHz (Ex: USA/Canada).
+       * Check local law!
+       */
+      ITU2_125CM = 37;
     }
 
     /*
@@ -938,8 +1004,9 @@ message Config {
 
       /*
        * Long Range - Slow
+       * Deprecated in 2.7: Unpopular slow preset.
        */
-      LONG_SLOW = 1;
+      LONG_SLOW = 1 [deprecated = true];
 
       /*
        * Very Long Range - Slow
@@ -978,6 +1045,78 @@ message Config {
        * It is not legal to use in all regions due to this wider bandwidth.
        */
       SHORT_TURBO = 8;
+
+      /*
+       * Long Range - Turbo
+       * This preset performs similarly to LongFast, but with 500Khz bandwidth.
+       */
+      LONG_TURBO = 9;
+
+      /*
+       * Lite Fast
+       * Medium range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
+       * Comparable link budget to MEDIUM_FAST but compliant with Band no. 47b of 2006/771/EC.
+       */
+      LITE_FAST = 10;
+
+      /*
+       * Lite Slow
+       * Medium-to-moderate range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
+       * Comparable link budget to LONG_FAST but compliant with Band no. 47b of 2006/771/EC.
+       */
+      LITE_SLOW = 11;
+
+      /*
+       * Narrow Fast
+       * Medium-to-moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
+       * Comparable link budget to SHORT_SLOW, but with half the data rate.
+       * Intended to avoid interference with other devices.
+       */
+      NARROW_FAST = 12;
+
+      /*
+       * Narrow Slow
+       * Moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
+       * Comparable link budget and data rate to LONG_FAST.
+       */
+      NARROW_SLOW = 13;
+
+      /*
+       * Tiny Fast
+       * Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+       * Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+       * Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+       * Only compatible with SX127x and SX126x chipsets.
+       * Comparable link budget and data rate to LONG_FAST.
+       */
+      TINY_FAST = 14;
+
+      /*
+       * Tiny Slow
+       * Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+       * Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+       * Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+       * Only compatible with SX127x and SX126x chipsets.
+       * Comparable link budget and data rate to LONG_MODERATE.
+       */
+      TINY_SLOW = 15;
+    }
+
+    enum FEM_LNA_Mode {
+      /*
+       * FEM_LNA is present but disabled
+       */
+      DISABLED = 0;
+
+      /*
+       * FEM_LNA is present and enabled
+       */
+      ENABLED = 1;
+
+      /*
+       * FEM_LNA is not present on the device
+       */
+      NOT_PRESENT = 2;
     }
 
     /*
@@ -1100,6 +1239,16 @@ message Config {
      * Sets the ok_to_mqtt bit on outgoing packets
      */
     bool config_ok_to_mqtt = 105;
+
+    /*
+     * Set where LORA FEM is enabled, disabled, or not present
+     */
+    FEM_LNA_Mode fem_lna_mode = 106;
+
+    /*
+     * Don't use radiolib to initialize the radio, instead listen for a serialHal connection
+     */
+    bool serial_hal_only = 107;
   }
 
   message BluetoothConfig {

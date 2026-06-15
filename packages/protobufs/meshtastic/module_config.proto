@@ -2,10 +2,12 @@ syntax = "proto3";
 
 package meshtastic;
 
+import "meshtastic/atak.proto";
+
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
 option java_outer_classname = "ModuleConfigProtos";
-option java_package = "com.geeksville.mesh";
+option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
 /*
@@ -51,9 +53,9 @@ message ModuleConfig {
     bool encryption_enabled = 5;
 
     /*
-     * Whether to send / consume json packets on MQTT
+     * Deprecated: JSON packet support on MQTT was removed, and this field is ignored.
      */
-    bool json_enabled = 6;
+    bool json_enabled = 6 [deprecated = true];
 
     /*
      * If true, we attempt to establish a secure connection using TLS
@@ -296,6 +298,82 @@ message ModuleConfig {
   }
 
   /*
+   * Config for the Traffic Management module.
+   * Provides packet inspection and traffic shaping to help reduce channel utilization
+   */
+  message TrafficManagementConfig {
+    /*
+     * Master enable for traffic management module
+     */
+    bool enabled = 1;
+
+    /*
+     * Enable position deduplication to drop redundant position broadcasts
+     */
+    bool position_dedup_enabled = 2;
+
+    /*
+     * Number of bits of precision for position deduplication (0-32)
+     */
+    uint32 position_precision_bits = 3;
+
+    /*
+     * Minimum interval in seconds between position updates from the same node
+     */
+    uint32 position_min_interval_secs = 4;
+
+    /*
+     * Enable direct response to NodeInfo requests from local cache
+     */
+    bool nodeinfo_direct_response = 5;
+
+    /*
+     * Minimum hop distance from requestor before responding to NodeInfo requests
+     */
+    uint32 nodeinfo_direct_response_max_hops = 6;
+
+    /*
+     * Enable per-node rate limiting to throttle chatty nodes
+     */
+    bool rate_limit_enabled = 7;
+
+    /*
+     * Time window in seconds for rate limiting calculations
+     */
+    uint32 rate_limit_window_secs = 8;
+
+    /*
+     * Maximum packets allowed per node within the rate limit window
+     */
+    uint32 rate_limit_max_packets = 9;
+
+    /*
+     * Enable dropping of unknown/undecryptable packets per rate_limit_window_secs
+     */
+    bool drop_unknown_enabled = 10;
+
+    /*
+     * Number of unknown packets before dropping from a node
+     */
+    uint32 unknown_packet_threshold = 11;
+
+    /*
+     * Set hop_limit to 0 for relayed telemetry broadcasts (own packets unaffected)
+     */
+    bool exhaust_hop_telemetry = 12;
+
+    /*
+     * Set hop_limit to 0 for relayed position broadcasts (own packets unaffected)
+     */
+    bool exhaust_hop_position = 13;
+
+    /*
+     * Preserve hop_limit for router-to-router traffic
+     */
+    bool router_preserve_hops = 14;
+  }
+
+  /*
    * Serial Config
    */
   message SerialConfig {
@@ -337,9 +415,12 @@ message ModuleConfig {
       // VE.Direct is a serial protocol used by Victron Energy products
       // https://beta.ivc.no/wiki/index.php/Victron_VE_Direct_DIY_Cable
       VE_DIRECT = 7;
-      //Used to configure and view some parameters of MeshSolar.
-      //https://heltec.org/project/meshsolar/
+      // Used to configure and view some parameters of MeshSolar.
+      // https://heltec.org/project/meshsolar/
       MS_CONFIG = 8;
+      // Logs mesh traffic to the serial pins, ideal for logging via openLog or similar.
+      LOG = 9; // includes other packets
+      LOGTEXT = 10; // only text (channel & DM)
     }
 
     /*
@@ -621,6 +702,11 @@ message ModuleConfig {
      * Note: We will still send telemtry to the connected phone / client every minute over the API
      */
     bool device_telemetry_enabled = 14;
+
+    /*
+     * Enable/Disable the air quality telemetry measurement module on-device display
+     */
+    bool air_quality_screen_enabled = 15;
   }
 
   /*
@@ -762,6 +848,16 @@ message ModuleConfig {
   }
 
   /*
+   * StatusMessage config - Allows setting a status message for a node to periodically rebroadcast
+   */
+  message StatusMessageConfig {
+    /*
+     * The actual status string
+     */
+    string node_status = 1;
+  }
+
+  /*
    * TODO: REPLACE
    */
   oneof payload_variant {
@@ -829,6 +925,37 @@ message ModuleConfig {
      * TODO: REPLACE
      */
     PaxcounterConfig paxcounter = 13;
+
+    /*
+     * TODO: REPLACE
+     */
+    StatusMessageConfig statusmessage = 14;
+
+    /*
+     * Traffic management module config for mesh network optimization
+     */
+    TrafficManagementConfig traffic_management = 15;
+
+    /*
+     * TAK team/role configuration for TAK_TRACKER
+     */
+    TAKConfig tak = 16;
+  }
+
+  /*
+   * TAK team/role configuration
+   */
+  message TAKConfig {
+    /*
+     * Team color.
+     * Default Unspecifed_Color -> firmware uses Cyan
+     */
+    Team team = 1;
+    /*
+     * Member role.
+     * Default Unspecifed -> firmware uses TeamMember
+     */
+    MemberRole role = 2;
   }
 }
 

@@ -313,6 +313,61 @@ export class MeshDevice {
   }
 
   /**
+   * Sends a key verification admin message to the connected node, driving the
+   * manual public-key verification handshake (see firmware KeyVerificationModule).
+   * The node correlates each exchange by nonce, so a response message only needs
+   * to echo the nonce supplied by the matching ClientNotification; remoteNodenum
+   * is only meaningful for the initial INITIATE_VERIFICATION request.
+   */
+  public async sendKeyVerification(
+    messageType: Protobuf.Admin.KeyVerificationAdmin_MessageType,
+    remoteNodenum: number,
+    nonce: bigint,
+    securityNumber?: number,
+  ): Promise<number> {
+    this.log.debug("sendKeyVerification", "🔑 Sending key verification message");
+
+    const keyVerificationMessage = create(Protobuf.Admin.AdminMessageSchema, {
+      payloadVariant: {
+        case: "keyVerification",
+        value: create(Protobuf.Admin.KeyVerificationAdminSchema, {
+          messageType,
+          remoteNodenum,
+          nonce,
+          securityNumber,
+        }),
+      },
+    });
+
+    return await this.sendPacket(
+      toBinary(Protobuf.Admin.AdminMessageSchema, keyVerificationMessage),
+      Protobuf.Portnums.PortNum.ADMIN_APP,
+      "self",
+    );
+  }
+
+  /**
+   * Toggles the muted state of a node (by node number) on the connected device.
+   * Muted nodes are silenced for notification purposes.
+   */
+  public async toggleMutedNode(nodeNum: number): Promise<number> {
+    this.log.debug("toggleMutedNode", "🔇 Toggling muted node");
+
+    const toggleMutedMessage = create(Protobuf.Admin.AdminMessageSchema, {
+      payloadVariant: {
+        case: "toggleMutedNode",
+        value: nodeNum,
+      },
+    });
+
+    return await this.sendPacket(
+      toBinary(Protobuf.Admin.AdminMessageSchema, toggleMutedMessage),
+      Protobuf.Portnums.PortNum.ADMIN_APP,
+      "self",
+    );
+  }
+
+  /**
    * Sets devices ChannelSettings
    */
   public async setChannel(channel: Protobuf.Channel.Channel): Promise<number> {
@@ -575,7 +630,9 @@ export class MeshDevice {
     const resetNodes = create(Protobuf.Admin.AdminMessageSchema, {
       payloadVariant: {
         case: "nodedbReset",
-        value: 1,
+        // nodedb_reset is now a bool (proto >= 2.7): setting the oneof case
+        // triggers the reset; `true` preserves favorites through it.
+        value: true,
       },
     });
 
@@ -1154,7 +1211,16 @@ export class MeshDevice {
       }
 
       default:
-        throw new Error(`Unhandled case ${dataPacket.portnum}`);
+        // Unknown / newer portnums (e.g. firmware modules this client predates)
+        // are ignored rather than throwing, so a single unsupported packet can't
+        // break decoding of the rest of the stream.
+        this.log.debug(
+          Emitter[Emitter.HandleMeshPacket],
+          `📦 Ignoring unhandled ${
+            Protobuf.Portnums.PortNum[dataPacket.portnum] ?? dataPacket.portnum
+          } packet`,
+        );
+        break;
     }
   }
 }

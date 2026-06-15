@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package meshtastic;
 
+/* trunk-ignore(buf-lint/COMPILE) */
 import "meshtastic/channel.proto";
 import "meshtastic/config.proto";
 import "meshtastic/connection_status.proto";
@@ -12,7 +13,7 @@ import "meshtastic/module_config.proto";
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
 option java_outer_classname = "AdminProtos";
-option java_package = "com.geeksville.mesh";
+option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
 /*
@@ -151,6 +152,21 @@ message AdminMessage {
      * TODO: REPLACE
      */
     PAXCOUNTER_CONFIG = 12;
+
+    /*
+     * TODO: REPLACE
+     */
+    STATUSMESSAGE_CONFIG = 13;
+
+    /*
+     * Traffic management module config
+     */
+    TRAFFICMANAGEMENT_CONFIG = 14;
+
+    /*
+     * TAK module config
+     */
+    TAK_CONFIG = 15;
   }
 
   enum BackupLocation {
@@ -185,6 +201,23 @@ message AdminMessage {
      * The touch Y coordinate
      */
     uint32 touch_y = 4;
+  }
+
+  /*
+   * User is requesting an over the air update.
+   * Node will reboot into the OTA loader
+   */
+  message OTAEvent {
+    /*
+     * Tell the node to reboot into OTA mode for firmware update via BLE or WiFi (ESP32 only for now)
+     */
+    OTAMode reboot_ota_mode = 1;
+
+    /*
+     * A 32 byte hash of the OTA firmware.
+     * Used to verify the integrity of the firmware before applying an update.
+     */
+    bytes ota_hash = 2;
   }
 
   /*
@@ -415,6 +448,11 @@ message AdminMessage {
     uint32 remove_ignored_node = 48;
 
     /*
+     * Set specified node-num to be muted
+     */
+    uint32 toggle_muted_node = 49;
+
+    /*
      * Begins an edit transaction for config, module config, owner, and channel settings changes
      * This will delay the standard *implicit* save to the file system and subsequent reboot behavior until committed (commit_edit_settings)
      */
@@ -443,8 +481,9 @@ message AdminMessage {
     /*
      * Tell the node to reboot into the OTA Firmware in this many seconds (or <0 to cancel reboot)
      * Only Implemented for ESP32 Devices. This needs to be issued to send a new main firmware via bluetooth.
+     * Deprecated in favor of reboot_ota_mode in 2.7.17
      */
-    int32 reboot_ota_seconds = 95;
+    int32 reboot_ota_seconds = 95 [deprecated = true];
 
     /*
      * This message is only supported for the simulator Portduino build.
@@ -469,9 +508,162 @@ message AdminMessage {
 
     /*
      * Tell the node to reset the nodedb.
+     * When true, favorites are preserved through reset.
      */
-    int32 nodedb_reset = 100;
+    bool nodedb_reset = 100;
+
+    /*
+     * Tell the node to reset into the OTA Loader
+     */
+    OTAEvent ota_request = 102;
+
+    /*
+     * Parameters and sensor configuration
+     */
+    SensorConfig sensor_config = 103;
+
+    /*
+     * Lockdown passphrase delivery / unlock / lock-now command for hardened
+     * firmware builds (see MESHTASTIC_LOCKDOWN). Used to provision the
+     * passphrase on first boot, unlock encrypted storage on subsequent
+     * reboots, re-verify on already-unlocked devices to authorize a new
+     * client connection, or immediately re-lock the device.
+     *
+     * Replaces the earlier scheme that repurposed SecurityConfig.private_key
+     * to carry passphrase bytes; that hack is retired.
+     */
+    LockdownAuth lockdown_auth = 104;
   }
+}
+
+/*
+ * Lockdown passphrase delivery payload.
+ *
+ * One message handles three operations distinguished by content:
+ *   - Provision (first-time): passphrase set, lock_now=false. Firmware
+ *     generates DEK, wraps with passphrase-derived KEK, persists.
+ *   - Unlock: passphrase set, lock_now=false. Firmware verifies
+ *     passphrase against stored DEK, unlocks storage, authorizes the
+ *     connection that delivered this packet.
+ *   - Lock now: lock_now=true, passphrase ignored. Firmware revokes
+ *     all client auth and reboots into the locked state.
+ *
+ * Firmware decides between provision and unlock based on its own state
+ * (whether a DEK file already exists). Clients do not need to track
+ * which case applies.
+ */
+message LockdownAuth {
+  /*
+   * Passphrase bytes (1-32). Empty when lock_now is true.
+   * Capped to 32 to match the proto cap on related security fields.
+   */
+  bytes passphrase = 1;
+
+  /*
+   * Optional override of the boot-count token TTL granted on success.
+   * 0 = use firmware default (TOKEN_DEFAULT_BOOTS).
+   * On reboot the firmware decrements this; when it reaches 0 the
+   * device boots fully locked and requires a fresh passphrase.
+   */
+  uint32 boots_remaining = 2;
+
+  /*
+   * Optional wall-clock expiry for the unlock token, as absolute
+   * Unix-epoch seconds. 0 = no time limit (only the boot-count TTL
+   * applies). On boot, if the device RTC is set and now > this value,
+   * the token is treated as expired.
+   */
+  uint32 valid_until_epoch = 3;
+
+  /*
+   * If true, ignore passphrase fields, immediately revoke all
+   * connection-level admin authorization, and reboot the device into
+   * the locked state. Always honoured regardless of current lock state.
+   */
+  bool lock_now = 4;
+
+  /*
+   * Optional per-boot uptime cap on the unlocked session, in seconds.
+   * 0 = unlimited (token-only enforcement, suitable for unattended
+   * tower / infrastructure nodes).
+   *
+   * When non-zero, the firmware arms an uptime timer at unlock. On
+   * each expiry, while there is still boot-count budget, the firmware
+   * decrements the on-flash boot count in place, revokes per-
+   * connection admin auth (clients must re-authenticate to see
+   * content), re-engages the screen lock, and re-arms the timer
+   * without rebooting. Mesh routing keeps running across session
+   * boundaries; only when the boot-count budget reaches zero does
+   * the device hard-lock and reboot.
+   *
+   * Total exposure ceiling = ((resolved boot count) + 1) * max_session_seconds.
+   * The +1 accounts for the initial passphrase-unlocked session
+   * itself, since boots_remaining is the number of subsequent
+   * session rolls (each consuming one boot from the rollback ledger).
+   * The resolved boot count is the value the firmware writes into the
+   * token at unlock time: the client-supplied boots_remaining when
+   * non-zero, otherwise the firmware default (TOKEN_DEFAULT_BOOTS).
+   * Note that boots_remaining == 0 in this message means "use firmware
+   * default", NOT "zero boots" — a client computing the ceiling for
+   * display should mirror that resolution rather than multiplying the
+   * raw request value.
+   *
+   * The cap is persisted in the token, so it survives token-based
+   * auto-unlock across reboots. Explicit operator Lock Now still
+   * deletes the token and forces passphrase re-entry.
+   *
+   * Uses millis() (CPU uptime), not wall-clock time, so the cap is
+   * immune to GPS spoofing, RTC backup-battery removal, and Faraday
+   * cage isolation — none of those move the uptime counter. The only
+   * way to reset the session clock is a reboot, which costs a boot
+   * from the on-flash, HMAC-bound counter.
+   */
+  uint32 max_session_seconds = 5;
+
+  /*
+   * Disable lockdown mode. Requires a valid passphrase in the same
+   * message (the device must prove the operator owns it before
+   * reverting at-rest encryption). On success the firmware decrypts
+   * every stored config / channel / nodedb file back to plaintext,
+   * removes the wrapped DEK, unlock token, monotonic-counter, and
+   * backoff files, and reboots out of lockdown.
+   *
+   * This is the inverse of the provision/unlock path: it is how the
+   * client app's "lockdown mode" toggle returns a device to normal
+   * operation.
+   *
+   * NOT reversed by this operation: APPROTECT. Once the debug port
+   * lockout has been burned (on silicon where it is effective) it is
+   * permanent — disabling lockdown decrypts your data and removes the
+   * access gates, but the SWD/JTAG port stays locked for the life of
+   * the device (recoverable only via a full chip erase over a debug
+   * probe, which destroys all data). Clients should make this
+   * irreversibility clear at the moment lockdown is first enabled.
+   *
+   * When true the passphrase field is still required; boots_remaining,
+   * valid_until_epoch, max_session_seconds, and lock_now are ignored.
+   */
+  bool disable = 6;
+}
+
+/*
+ * Firmware update mode for OTA updates
+ */
+enum OTAMode {
+  /*
+   * Do not reboot into OTA mode
+   */
+  NO_REBOOT_OTA = 0;
+
+  /*
+   * Reboot into OTA mode for BLE firmware update
+   */
+  OTA_BLE = 1;
+
+  /*
+   * Reboot into OTA mode for WiFi firmware update
+   */
+  OTA_WIFI = 2;
 }
 
 /*
@@ -499,6 +691,12 @@ message HamParameters {
    * Optional short name of user
    */
   string short_name = 4;
+
+  /*
+   * Optional long name of user
+   * Appended to callsign
+   */
+  string long_name = 5;
 }
 
 /*
@@ -579,4 +777,114 @@ message KeyVerificationAdmin {
    * The 4 digit code generated by the remote node, and communicated outside the mesh
    */
   optional uint32 security_number = 4;
+}
+
+message SensorConfig {
+  /*
+   * SCD4X CO2 Sensor configuration
+   */
+  SCD4X_config scd4x_config = 1;
+
+  /*
+   * SEN5X PM Sensor configuration
+   */
+  SEN5X_config sen5x_config = 2;
+
+  /*
+   * SCD30 CO2 Sensor configuration
+   */
+  SCD30_config scd30_config = 3;
+
+  /*
+   * SHTXX temperature and relative humidity sensor configuration
+   */
+  SHTXX_config shtxx_config = 4;
+}
+
+message SCD4X_config {
+  /*
+   * Set Automatic self-calibration enabled
+   */
+  optional bool set_asc = 1;
+
+  /*
+   * Recalibration target CO2 concentration in ppm (FRC or ASC)
+   */
+  optional uint32 set_target_co2_conc = 2;
+
+  /*
+   * Reference temperature in degC
+   */
+  optional float set_temperature = 3;
+
+  /*
+   * Altitude of sensor in meters above sea level. 0 - 3000m (overrides ambient pressure)
+   */
+  optional uint32 set_altitude = 4;
+
+  /*
+   * Sensor ambient pressure in Pa. 70000 - 120000 Pa (overrides altitude)
+   */
+  optional uint32 set_ambient_pressure = 5;
+
+  /*
+   * Perform a factory reset of the sensor
+   */
+  optional bool factory_reset = 6;
+
+  /*
+   * Power mode for sensor (true for low power, false for normal)
+   */
+  optional bool set_power_mode = 7;
+}
+
+message SEN5X_config {
+  /*
+   * Reference temperature in degC
+   */
+  optional float set_temperature = 1;
+
+  /*
+   * One-shot mode (true for low power - one-shot mode, false for normal - continuous mode)
+   */
+  optional bool set_one_shot_mode = 2;
+}
+
+message SCD30_config {
+  /*
+   * Set Automatic self-calibration enabled
+   */
+  optional bool set_asc = 1;
+
+  /*
+   * Recalibration target CO2 concentration in ppm (FRC or ASC)
+   */
+  optional uint32 set_target_co2_conc = 2;
+
+  /*
+   * Reference temperature in degC
+   */
+  optional float set_temperature = 3;
+
+  /*
+   * Altitude of sensor in meters above sea level. 0 - 3000m (overrides ambient pressure)
+   */
+  optional uint32 set_altitude = 4;
+
+  /*
+   * Power mode for sensor (true for low power, false for normal)
+   */
+  optional uint32 set_measurement_interval = 5;
+
+  /*
+   * Perform a factory reset of the sensor
+   */
+  optional bool soft_reset = 6;
+}
+
+message SHTXX_config {
+  /*
+   * Accuracy mode (0 = low, 1 = medium, 2 = high)
+   */
+  optional uint32 set_accuracy = 1;
 }
