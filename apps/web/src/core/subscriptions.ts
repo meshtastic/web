@@ -1,15 +1,18 @@
-import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
-import { type Device, type MessageStore, MessageType, type NodeDB } from "@core/stores";
-import { type MeshDevice, Protobuf } from "@meshtastic/core";
-export const subscribeAll = (
-  device: Device,
-  connection: MeshDevice,
-  messageStore: MessageStore,
-  nodeDB: NodeDB,
-) => {
-  let myNodeNum = 0;
+import { type Device } from "@core/stores";
+import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
 
+/**
+ * Wires up the legacy MeshDevice event stream into the web's Zustand stores.
+ *
+ * Note: the SDK now owns chat persistence (via SqlocalMessageRepository) and
+ * the entire NodesClient surface — node info, user, position, lastHeard /
+ * snr, favourite / ignored flags, and PKI-error tracking. This handler no
+ * longer mirrors any of that into the legacy stores; what remains is
+ * device-store-only state (waypoints, traceroutes, neighbour info, dialog
+ * open triggers, unread counts).
+ */
+export const subscribeAll = (device: Device, connection: MeshDevice) => {
   connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {
     device.addMetadata(metadataPacket.from, metadataPacket.data);
   });
@@ -56,23 +59,10 @@ export const subscribeAll = (
 
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
     useNewNodeNum(device.id, nodeInfo);
-    myNodeNum = nodeInfo.myNodeNum;
   });
 
-  connection.events.onUserPacket.subscribe((user) => {
-    nodeDB.addUser(user);
-  });
-
-  connection.events.onPositionPacket.subscribe((position) => {
-    nodeDB.addPosition(position);
-  });
-
-  // NOTE: Node handling is managed by the nodeDB
-  // Nodes are added via subscriptions.ts and stored in nodeDB
-  // Configuration is handled directly by meshDevice.configure() in useConnections
-  connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    nodeDB.addNode(nodeInfo);
-  });
+  // onUserPacket / onPositionPacket / onNodeInfoPacket are handled by the
+  // SDK NodesClient (see packages/sdk/src/features/nodes/NodesClient.ts).
 
   connection.events.onChannelPacket.subscribe((channel) => {
     device.addChannel(channel);
@@ -84,22 +74,8 @@ export const subscribeAll = (
     device.setModuleConfig(moduleConfig);
   });
 
-  connection.events.onMessagePacket.subscribe((messagePacket) => {
-    // incoming and outgoing messages are handled by this event listener
-    const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
-    const message = dto.toMessage();
-    messageStore.saveMessage(message);
-
-    if (message.type === MessageType.Direct) {
-      if (message.to === myNodeNum) {
-        device.incrementUnread(messagePacket.from);
-      }
-    } else if (message.type === MessageType.Broadcast) {
-      if (message.from !== myNodeNum) {
-        device.incrementUnread(message.channel);
-      }
-    }
-  });
+  // Inbound message handling (persistence, unread counts) lives entirely on
+  // the SDK ChatClient now — see ChatClient + chat.unread.
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
     device.addTraceRoute({
@@ -111,13 +87,8 @@ export const subscribeAll = (
     device.setPendingSettingsChanges(state);
   });
 
-  connection.events.onMeshPacket.subscribe((meshPacket) => {
-    nodeDB.processPacket({
-      from: meshPacket.from,
-      snr: meshPacket.rxSnr,
-      time: meshPacket.rxTime,
-    });
-  });
+  // onMeshPacket → lastHeard / snr per-node updates are handled by the SDK
+  // NodesClient.
 
   connection.events.onClientNotificationPacket.subscribe((clientNotificationPacket) => {
     device.addClientNotification(clientNotificationPacket);
@@ -135,18 +106,15 @@ export const subscribeAll = (
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
-          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          nodeDB.setNodeError(routingPacket.from, routingPacket?.data?.variant?.value);
-          device.setDialogOpen("refreshKeys", true);
-          break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          nodeDB.setNodeError(routingPacket.from, routingPacket?.data?.variant?.value);
+          // Per-node error tracking lives on the SDK NodesClient
+          // (client.nodes.errors); the dialog open trigger stays here so the
+          // legacy device-store-driven dialog manager keeps working.
           device.setDialogOpen("refreshKeys", true);
           break;
-        default: {
+        default:
           break;
-        }
       }
     }
   });

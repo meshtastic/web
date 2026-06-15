@@ -3,16 +3,17 @@ import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { useMyNodeAsProto, useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import {
   type Page,
   useActiveConnection,
   useAppStore,
   useDefaultConnection,
   useDevice,
-  useNodeDB,
   useSidebar,
 } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
+import { useTotalUnread } from "@meshtastic/sdk-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CircleChevronLeft,
@@ -67,10 +68,12 @@ const CollapseToggleButton = () => {
 };
 
 export const Sidebar = ({ children }: SidebarProps) => {
-  const { hardware, metadata, unreadCounts, setDialogOpen } = useDevice();
-  const { getNode, getNodesLength } = useNodeDB();
+  const { metadata, setDialogOpen } = useDevice();
+  const numUnread = useTotalUnread();
+  const allNodes = useNodesAsProto();
   const { setCommandPaletteOpen } = useAppStore();
-  const myNode = getNode(hardware.myNodeNum);
+  const myNode = useMyNodeAsProto();
+  const getNodesLength = () => allNodes.length;
   const { isCollapsed } = useSidebar();
   const { t } = useTranslation("ui");
   const navigate = useNavigate({ from: "/" });
@@ -88,8 +91,6 @@ export const Sidebar = ({ children }: SidebarProps) => {
   });
 
   const myMetadata = metadata.get(0);
-
-  const numUnread = [...unreadCounts.values()].reduce((sum, v) => sum + v, 0);
 
   const [displayedNodeCount, setDisplayedNodeCount] = useState(() =>
     Math.max(getNodesLength() - 1, 0),

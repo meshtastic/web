@@ -1,9 +1,9 @@
 import { TimeAgo } from "@components/generic/TimeAgo";
 import { Separator } from "@components/UI/Separator.tsx";
+import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import type { WaypointWithMetadata } from "@core/stores";
-import { useNodeDB } from "@core/stores";
 import { bearingDegrees, distanceMeters, hasPos, toLngLat } from "@core/utils/geo";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import {
   ClockFadingIcon,
   ClockPlusIcon,
@@ -24,7 +24,7 @@ interface WaypointDetailProps {
 
 export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
   const { t } = useTranslation("map");
-  const { getNode } = useNodeDB();
+  const lockedToNode = useNodeAsProto(waypoint.lockedTo ?? 0);
 
   const waypointLngLat = toLngLat({
     latitudeI: waypoint.latitudeI,
@@ -166,7 +166,7 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
                 <span className="truncate">{t("waypointDetail.lockedTo")}</span>
               </dt>
               <dd className="ms-auto text-right">
-                {getNode(waypoint.lockedTo)?.user?.longName ?? t("unknown.longName")}
+                {lockedToNode?.user?.longName ?? t("unknown.longName")}
               </dd>
             </div>
           )}

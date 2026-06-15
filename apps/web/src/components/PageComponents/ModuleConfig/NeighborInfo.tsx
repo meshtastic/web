@@ -5,26 +5,40 @@ import {
 } from "@app/validation/moduleConfig/neighborInfo.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface NeighborInfoModuleConfigProps {
   onFormInit: DynamicFormFormInit<NeighborInfoValidation>;
 }
 
+const EMPTY_MODULES_SIGNAL = {
+  value: {} as { neighborInfo?: Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig },
+  peek: () => ({}) as { neighborInfo?: Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "neighborInfo" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const editor = useConfigEditor();
+  const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
+  const effective =
+    modules.neighborInfo ??
+    (getEffectiveModuleConfig("neighborInfo") as
+      | Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig
+      | undefined);
+
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: NeighborInfoValidation) => {
-    if (deepCompareConfig(moduleConfig.neighborInfo, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "neighborInfo" });
-      return;
-    }
-
-    setChange({ type: "moduleConfig", variant: "neighborInfo" }, data, moduleConfig.neighborInfo);
+    if (!editor) return;
+    editor.setModuleSection(
+      "neighborInfo",
+      data as unknown as Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig,
+    );
   };
 
   return (
@@ -33,11 +47,11 @@ export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={NeighborInfoValidationSchema}
       defaultValues={moduleConfig.neighborInfo}
-      values={getEffectiveModuleConfig("neighborInfo")}
+      values={effective}
       fieldGroups={[
         {
-          label: t("neighborInfo.title"),
-          description: t("neighborInfo.description"),
+          label: t("neighborInfo.neighborInfoConfig.label"),
+          description: t("neighborInfo.neighborInfoConfig.description"),
           fields: [
             {
               type: "toggle",
@@ -50,14 +64,13 @@ export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
               name: "updateInterval",
               label: t("neighborInfo.updateInterval.label"),
               description: t("neighborInfo.updateInterval.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
+              properties: { suffix: t("unit.second.plural") },
+            },
+            {
+              type: "toggle",
+              name: "transmitOverLora",
+              label: t("neighborInfo.transmitOverLora.label"),
+              description: t("neighborInfo.transmitOverLora.description"),
             },
           ],
         },

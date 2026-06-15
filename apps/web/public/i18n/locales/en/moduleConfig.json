@@ -39,6 +39,10 @@
     "blue": {
       "label": "Blue",
       "description": "Sets the blue LED level. Values are 0-255"
+    },
+    "ambientLightingConfig": {
+      "label": "Ambient Lighting Config",
+      "description": "Ambient Lighting configuration"
     }
   },
   "audio": {
@@ -71,6 +75,10 @@
     "i2sSck": {
       "label": "i2S SCK",
       "description": "GPIO pin to use for i2S SCK"
+    },
+    "audioConfig": {
+      "label": "Audio Config",
+      "description": "Audio configuration"
     }
   },
   "cannedMessage": {
@@ -119,6 +127,14 @@
     "sendBell": {
       "label": "Send Bell",
       "description": "Sends a bell character with each message"
+    },
+    "cannedMessageConfig": {
+      "label": "Canned Message Config",
+      "description": "Canned Message configuration"
+    },
+    "enabled": {
+      "label": "Canned message enabled",
+      "description": "Enable Canned Message"
     }
   },
   "detectionSensor": {
@@ -155,6 +171,10 @@
     "usePullup": {
       "label": "Use Pullup",
       "description": "Whether or not use INPUT_PULLUP mode for GPIO pin"
+    },
+    "detectionSensorConfig": {
+      "label": "Detection Sensor Config",
+      "description": "Detection Sensor configuration"
     }
   },
   "externalNotification": {
@@ -219,6 +239,22 @@
     "useI2sAsBuzzer": {
       "label": "Use I²S Pin as Buzzer",
       "description": "Designate I²S Pin as Buzzer Output"
+    },
+    "externalNotificationConfig": {
+      "label": "External Notification Config",
+      "description": "External notification configuration"
+    },
+    "notificationsOnMessage": {
+      "label": "Notifications on message receipt",
+      "description": "Alerts on incoming text messages"
+    },
+    "notificationsOnAlert": {
+      "label": "Notifications on alert/bell receipt",
+      "description": "Alerts on incoming bell/alert packets"
+    },
+    "advanced": {
+      "label": "Advanced",
+      "description": "Pin assignments and timing"
     }
   },
   "mqtt": {
@@ -294,7 +330,21 @@
           "imperial_ft300": "Within 300 feet",
           "imperial_ft150": "Within 150 feet"
         }
+      },
+      "shouldReportLocation": {
+        "label": "I agree.",
+        "description": "I have read and understand the above. I voluntarily consent to the unencrypted transmission of my node data via MQTT.",
+        "consentHeader": "Consent to Share Unencrypted Node Data via MQTT",
+        "consentText": "By enabling this feature, you acknowledge and expressly consent to the transmission of your device's real-time geographic location over the MQTT protocol without encryption. This location data may be used for purposes such as live map reporting, device tracking, and related telemetry functions."
       }
+    },
+    "mqttConfigCard": {
+      "label": "MQTT Config",
+      "description": "MQTT broker connection"
+    },
+    "mapReportingCard": {
+      "label": "Map reporting",
+      "description": "Periodic unencrypted map report"
     }
   },
   "neighborInfo": {
@@ -307,6 +357,14 @@
     "updateInterval": {
       "label": "Update Interval",
       "description": "Interval in seconds of how often we should try to send our Neighbor Info to the mesh"
+    },
+    "neighborInfoConfig": {
+      "label": "Neighbor Info Config",
+      "description": "Neighbor Info configuration"
+    },
+    "transmitOverLora": {
+      "label": "Transmit over LoRa",
+      "description": "Whether NeighborInfo should be transmitted over LoRa. Not available on a channel with default key and name."
     }
   },
   "paxcounter": {
@@ -327,6 +385,10 @@
     "bleThreshold": {
       "label": "BLE RSSI Threshold",
       "description": "At what BLE RSSI level should the counter increase. Defaults to -80."
+    },
+    "paxcounterConfig": {
+      "label": "Paxcounter Config",
+      "description": "Paxcounter configuration"
     }
   },
   "rangeTest": {
@@ -343,6 +405,10 @@
     "save": {
       "label": "Save CSV to storage",
       "description": "ESP32 Only"
+    },
+    "rangeTestConfig": {
+      "label": "Range Test Config",
+      "description": "Range Test configuration"
     }
   },
   "serial": {
@@ -379,6 +445,10 @@
     "overrideConsoleSerialPort": {
       "label": "Override Console Serial Port",
       "description": "If you have a serial port connected to the console, this will override it."
+    },
+    "serialConfig": {
+      "label": "Serial Config",
+      "description": "Serial module configuration"
     }
   },
   "storeForward": {
@@ -403,6 +473,14 @@
     "historyReturnWindow": {
       "label": "History return window",
       "description": "Return records from this time window (minutes)"
+    },
+    "storeForwardConfig": {
+      "label": "Store & Forward Config",
+      "description": "Store & Forward configuration"
+    },
+    "isServer": {
+      "label": "Server",
+      "description": "Run as a Store & Forward server"
     }
   },
   "telemetry": {
@@ -451,6 +529,14 @@
     "airQualityScreenEnabled": {
       "label": "Air Quality Screen Enabled",
       "description": "Show the Air Quality telemetry on the device screen"
+    },
+    "telemetryConfig": {
+      "label": "Telemetry Config",
+      "description": "Telemetry configuration"
+    },
+    "deviceTelemetryEnabled": {
+      "label": "Send Device Telemetry",
+      "description": "Enable/Disable the device telemetry module to send metrics to the mesh."
     }
   },
   "remoteHardware": {

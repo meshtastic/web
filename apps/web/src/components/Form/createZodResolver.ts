@@ -1,5 +1,6 @@
 import type {
   FieldError,
+  FieldErrors,
   FieldValues,
   Resolver,
   ResolverOptions,
@@ -49,8 +50,8 @@ export function createZodResolver<T extends FieldValues>(
     }
 
     return {
-      values: {} as T,
-      errors,
+      values: {} as Record<string, never>,
+      errors: errors as FieldErrors<T>,
     };
   };
 }

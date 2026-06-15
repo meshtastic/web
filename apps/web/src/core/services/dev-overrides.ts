@@ -5,7 +5,6 @@ console.log(`Dev mode: ${isDev}`);
 
 if (isDev) {
   featureFlags.setOverrides({
-    persistNodeDB: true,
     persistMessages: true,
     persistApp: true,
   });

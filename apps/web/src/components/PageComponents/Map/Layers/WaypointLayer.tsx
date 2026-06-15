@@ -4,7 +4,7 @@ import { PopupWrapper } from "@components/PageComponents/Map/Popups/PopupWrapper
 import { WaypointDetail } from "@components/PageComponents/Map/Popups/WaypointDetail.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting";
 import { useDevice, type WaypointWithMetadata } from "@core/stores";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import { useCallback } from "react";
 import type { MapRef } from "react-map-gl/maplibre";
 

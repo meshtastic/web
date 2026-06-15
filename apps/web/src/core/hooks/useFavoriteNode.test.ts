@@ -1,32 +1,17 @@
-import type { Protobuf } from "@meshtastic/core";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFavoriteNode } from "./useFavoriteNode.ts";
 
-const mockNode = {
-  num: 1234,
-  user: {
-    longName: "Test Node",
-  },
-  isFavorite: true,
-} as unknown | Protobuf.Mesh.NodeInfo;
-
-const mockUpdateFavorite = vi.fn();
-const mockGetNode = vi.fn(() => mockNode);
 const mockToast = vi.fn();
-const mockSendAdminMessage = vi.fn();
+const mockSdkFavorite = vi.fn();
+const mockSdkUnfavorite = vi.fn();
+const mockByNum = vi.fn();
+const { mockUseActiveClient } = vi.hoisted(() => ({
+  mockUseActiveClient: vi.fn(),
+}));
 
-vi.mock("@core/stores", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
-  useNodeDB: () => ({
-    updateFavorite: mockUpdateFavorite,
-    getNode: mockGetNode,
-  }),
-  useDevice: () => ({
-    sendAdminMessage: mockSendAdminMessage,
-  }),
+vi.mock("@meshtastic/sdk-react", () => ({
+  useActiveClient: mockUseActiveClient,
 }));
 
 vi.mock("@core/hooks/useToast.ts", () => ({
@@ -38,17 +23,28 @@ vi.mock("@core/hooks/useToast.ts", () => ({
 describe("useFavoriteNode hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockByNum.mockReturnValue({
+      num: 1234,
+      user: { longName: "Test Node" },
+      isFavorite: true,
+    });
+    mockUseActiveClient.mockReturnValue({
+      nodes: {
+        byNum: mockByNum,
+        favorite: mockSdkFavorite,
+        unfavorite: mockSdkUnfavorite,
+      },
+    });
   });
 
-  it("calls updateFavorite and shows correct toast", () => {
+  it("calls SDK favorite and shows correct toast", () => {
     const { result } = renderHook(() => useFavoriteNode());
 
     act(() => {
       result.current.updateFavorite({ nodeNum: 1234, isFavorite: true });
     });
 
-    expect(mockUpdateFavorite).toHaveBeenCalledWith(1234, true);
-    expect(mockGetNode).toHaveBeenCalledWith(1234);
+    expect(mockSdkFavorite).toHaveBeenCalledWith(1234);
     expect(mockToast).toHaveBeenCalledWith({
       title: "Added Test Node to favorites.",
     });
@@ -61,18 +57,14 @@ describe("useFavoriteNode hook", () => {
       result.current.updateFavorite({ nodeNum: 1234, isFavorite: false });
     });
 
-    expect(mockUpdateFavorite).toHaveBeenCalledWith(1234, false);
-    expect(mockGetNode).toHaveBeenCalledWith(1234);
+    expect(mockSdkUnfavorite).toHaveBeenCalledWith(1234);
     expect(mockToast).toHaveBeenCalledWith({
       title: "Removed Test Node from favorites.",
     });
   });
 
   it("falls back to 'node' if longName is missing", () => {
-    mockGetNode.mockReturnValueOnce({
-      num: 5678,
-      user: {},
-    }); // no longName
+    mockByNum.mockReturnValueOnce({ num: 5678, user: {} });
 
     const { result } = renderHook(() => useFavoriteNode());
 
@@ -85,8 +77,8 @@ describe("useFavoriteNode hook", () => {
     });
   });
 
-  it("falls back to 'node' if getNode returns undefined", () => {
-    mockGetNode.mockReturnValueOnce(undefined);
+  it("no-ops if node is not in the SDK store", () => {
+    mockByNum.mockReturnValueOnce(undefined);
 
     const { result } = renderHook(() => useFavoriteNode());
 
@@ -94,7 +86,8 @@ describe("useFavoriteNode hook", () => {
       result.current.updateFavorite({ nodeNum: 9999, isFavorite: false });
     });
 
-    expect(mockUpdateFavorite).not.toHaveBeenCalled();
+    expect(mockSdkFavorite).not.toHaveBeenCalled();
+    expect(mockSdkUnfavorite).not.toHaveBeenCalled();
     expect(mockToast).not.toHaveBeenCalled();
   });
 });

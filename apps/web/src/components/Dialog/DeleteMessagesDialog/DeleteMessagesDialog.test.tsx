@@ -1,33 +1,25 @@
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
-import { type MessageStore, useMessages } from "@core/stores";
+import { useActiveClient } from "@meshtastic/sdk-react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@core/stores", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
-  useMessages: vi.fn(() => ({
-    deleteAllMessages: vi.fn(),
+const mockClearAll = vi.fn();
+
+vi.mock("@meshtastic/sdk-react", () => ({
+  useActiveClient: vi.fn(() => ({
+    chat: { clearAll: mockClearAll },
   })),
 }));
 
 describe("DeleteMessagesDialog", () => {
   const mockOnOpenChange = vi.fn();
-  const mockClearAllMessages = vi.fn();
 
   beforeEach(() => {
     mockOnOpenChange.mockClear();
-    mockClearAllMessages.mockClear();
-
-    const mockedUseMessages = vi.mocked(useMessages);
-    mockedUseMessages.mockImplementation(
-      () =>
-        ({
-          deleteAllMessages: mockClearAllMessages,
-        }) as unknown as MessageStore,
-    );
-    mockedUseMessages.mockClear();
+    mockClearAll.mockClear();
+    vi.mocked(useActiveClient).mockReturnValue({
+      chat: { clearAll: mockClearAll },
+    } as never);
   });
 
   it("calls onOpenChange with false when the close button (X) is clicked", () => {
@@ -59,15 +51,23 @@ describe("DeleteMessagesDialog", () => {
   it("calls onOpenChange with false when the dismiss button is clicked", () => {
     render(<DeleteMessagesDialog open onOpenChange={mockOnOpenChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
-    expect(mockOnOpenChange).toHaveBeenCalledTimes(1); // Add count check
+    expect(mockOnOpenChange).toHaveBeenCalledTimes(1);
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it("calls deleteAllMessages and onOpenChange with false when the clear messages button is clicked", () => {
+  it("calls chat.clearAll and onOpenChange with false when Clear Messages is clicked", () => {
     render(<DeleteMessagesDialog open onOpenChange={mockOnOpenChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Clear Messages" }));
-    expect(mockClearAllMessages).toHaveBeenCalledTimes(1);
-    expect(mockOnOpenChange).toHaveBeenCalledTimes(1); // Add count check
+    expect(mockClearAll).toHaveBeenCalledTimes(1);
+    expect(mockOnOpenChange).toHaveBeenCalledTimes(1);
+    expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("no-ops gracefully when there is no active client", () => {
+    vi.mocked(useActiveClient).mockReturnValue(undefined);
+    render(<DeleteMessagesDialog open onOpenChange={mockOnOpenChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Clear Messages" }));
+    expect(mockClearAll).not.toHaveBeenCalled();
     expect(mockOnOpenChange).toHaveBeenCalledWith(false);
   });
 });

@@ -6,6 +6,7 @@ export const StoreForwardValidationSchema = z.object({
   records: z.coerce.number().int().min(0),
   historyReturnMax: z.coerce.number().int().min(0),
   historyReturnWindow: z.coerce.number().int().min(0),
+  isServer: z.boolean(),
 });
 
 export type StoreForwardValidation = z.infer<typeof StoreForwardValidationSchema>;

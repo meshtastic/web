@@ -1,5 +1,5 @@
 import { toast } from "@core/hooks/useToast.ts";
-import { useDevice, useMessages, useNodeDB } from "@core/stores";
+import { useActiveClient } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 
@@ -10,22 +10,18 @@ export interface ResetNodeDbDialogProps {
 
 export const ResetNodeDbDialog = ({ open, onOpenChange }: ResetNodeDbDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection } = useDevice();
-  const { removeAllNodeErrors, removeAllNodes } = useNodeDB();
-  const { deleteAllMessages } = useMessages();
+  const meshClient = useActiveClient();
 
   const handleResetNodeDb = () => {
-    connection
-      ?.resetNodes()
-      .then(() => {
-        deleteAllMessages();
-        removeAllNodeErrors();
-        removeAllNodes(true);
+    if (!meshClient) return;
+    meshClient.nodes
+      .reset({ keepMyNode: true })
+      .then((result) => {
+        if (result.status === "error") throw result.error;
+        return meshClient.chat.clearAll();
       })
       .catch((error) => {
-        toast({
-          title: t("resetNodeDb.failedTitle"),
-        });
+        toast({ title: t("resetNodeDb.failedTitle") });
         console.error("Failed to reset Node DB:", error);
       });
   };

@@ -1,7 +1,7 @@
 import { MessageItem } from "@components/PageComponents/Messages/MessageItem.tsx";
 import { Separator } from "@components/UI/Separator";
 import { Skeleton } from "@components/UI/Skeleton.tsx";
-import type { Message } from "@core/stores/messageStore/types.ts";
+import type { Message } from "@core/stores/messageStore";
 import type { TFunction } from "i18next";
 import { InboxIcon } from "lucide-react";
 import { Fragment, Suspense, useMemo } from "react";

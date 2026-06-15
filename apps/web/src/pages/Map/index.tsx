@@ -22,33 +22,25 @@ import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrap
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
-import { useNodeDB } from "@core/stores";
+import { useMyNodeAsProto, useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { cn } from "@core/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useId, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type MapLayerMouseEvent, useMap } from "react-map-gl/maplibre";
 
-const NODEDB_DEBOUNCE_MS = 250;
-
 const MapPage = () => {
   const { t } = useTranslation("map");
-  const { getNode } = useNodeDB();
-  const { nodes: validNodes, myNode } = useNodeDB(
-    (db) => ({
-      // only nodes with a position
-      nodes: db.getNodes((n): n is Protobuf.Mesh.NodeInfo => Boolean(n.position?.latitudeI)),
-      myNode: db.getMyNode(),
-
-      // References to cause re-render on change
-      _errorsRef: db.nodeErrors,
-      _nodeNumRef: db.myNodeNum,
-    }),
-    { debounce: NODEDB_DEBOUNCE_MS },
+  const allNodes = useNodesAsProto();
+  const getNode = useCallback((n: number) => allNodes.find((node) => node.num === n), [allNodes]);
+  const validNodes = useMemo(
+    () => allNodes.filter((n): n is Protobuf.Mesh.NodeInfo => Boolean(n.position?.latitudeI)),
+    [allNodes],
   );
+  const myNode = useMyNodeAsProto();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const { default: mapRef } = useMap();
   const { focusLngLat, fitToNodes } = useMapFitting(mapRef);

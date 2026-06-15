@@ -9,7 +9,9 @@ import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
-import { useAppStore, useMessageStore } from "@core/stores";
+import { meshRegistry } from "@core/meshRegistry.ts";
+import { useAppStore } from "@core/stores";
+import { MeshRegistryProvider } from "@meshtastic/sdk-react";
 import { type createRouter, RouterProvider } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
@@ -24,24 +26,24 @@ const root = createRoot(container);
 function IndexPage() {
   enableMapSet();
   const appStore = useAppStore();
-  const messageStore = useMessageStore();
   const translation = useTranslation();
 
   const context = React.useMemo(
     () => ({
       stores: {
         app: appStore,
-        message: messageStore,
       },
       i18n: translation,
     }),
-    [appStore, messageStore, translation],
+    [appStore, translation],
   );
 
   return (
     <React.StrictMode>
       <Suspense fallback={null}>
-        <RouterProvider router={router} context={context} />
+        <MeshRegistryProvider registry={meshRegistry}>
+          <RouterProvider router={router} context={context} />
+        </MeshRegistryProvider>
       </Suspense>
     </React.StrictMode>
   );

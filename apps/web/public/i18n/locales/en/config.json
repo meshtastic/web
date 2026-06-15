@@ -16,15 +16,15 @@
     "label": "Configuration"
   },
   "device": {
-    "title": "Device Settings",
+    "title": "Device",
     "description": "Settings for the device",
     "buttonPin": {
       "description": "Button pin override",
-      "label": "Button Pin"
+      "label": "Button GPIO"
     },
     "buzzerPin": {
       "description": "Buzzer pin override",
-      "label": "Buzzer Pin"
+      "label": "Buzzer GPIO"
     },
     "disableTripleClick": {
       "description": "Disable triple click",
@@ -43,8 +43,8 @@
       "label": "Node Info Broadcast Interval"
     },
     "posixTimezone": {
-      "description": "The POSIX timezone string for the device",
-      "label": "POSIX Timezone"
+      "description": "Time zone for dates on the device screen and log.",
+      "label": "Time zone"
     },
     "rebroadcastMode": {
       "description": "How to handle rebroadcasting",
@@ -52,52 +52,75 @@
     },
     "role": {
       "description": "What role the device performs on the mesh",
-      "label": "Role"
+      "label": "Device Role"
+    },
+    "options": {
+      "label": "Options",
+      "description": "Device role, rebroadcast mode, and node-info broadcast cadence"
+    },
+    "hardware": {
+      "label": "Hardware",
+      "description": "Hardware-related toggles"
+    },
+    "timeZone": {
+      "label": "Time Zone",
+      "description": "POSIX time zone for dates on the device screen and log"
+    },
+    "gpio": {
+      "label": "GPIO",
+      "description": "GPIO pin overrides"
+    },
+    "useBrowserTimeZone": {
+      "label": "Use browser time zone"
     }
   },
   "bluetooth": {
-    "title": "Bluetooth Settings",
+    "title": "Bluetooth",
     "description": "Settings for the Bluetooth module",
     "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
     "enabled": {
       "description": "Enable or disable Bluetooth",
-      "label": "Enabled"
+      "label": "Bluetooth enabled"
     },
     "pairingMode": {
       "description": "Pin selection behaviour.",
       "label": "Pairing mode"
     },
     "pin": {
-      "description": "Pin to use when pairing",
-      "label": "Pin"
+      "description": "PIN to use when pairing in fixed-PIN mode",
+      "label": "Fixed PIN"
+    },
+    "bluetoothConfig": {
+      "label": "Bluetooth Config",
+      "description": "Bluetooth configuration"
     }
   },
   "display": {
     "description": "Settings for the device display",
-    "title": "Display Settings",
+    "title": "Display",
     "headingBold": {
       "description": "Bolden the heading text",
       "label": "Bold Heading"
     },
     "carouselDelay": {
       "description": "How fast to cycle through windows",
-      "label": "Carousel Delay"
+      "label": "Carousel interval"
     },
     "compassNorthTop": {
       "description": "Fix north to the top of compass",
-      "label": "Compass North Top"
+      "label": "Always point north"
     },
     "displayMode": {
       "description": "Screen layout variant",
-      "label": "Display Mode"
+      "label": "Display mode"
     },
     "displayUnits": {
       "description": "Display metric or imperial units",
-      "label": "Display Units"
+      "label": "Display units"
     },
     "flipScreen": {
       "description": "Flip display 180 degrees",
-      "label": "Flip Screen"
+      "label": "Flip screen"
     },
     "gpsDisplayUnits": {
       "description": "Coordinate display format",
@@ -105,35 +128,47 @@
     },
     "oledType": {
       "description": "Type of OLED screen attached to the device",
-      "label": "OLED Type"
+      "label": "OLED type"
     },
     "screenTimeout": {
       "description": "Turn off the display after this long",
-      "label": "Screen Timeout"
+      "label": "Screen on for"
     },
     "twelveHourClock": {
-      "description": "Use 12-hour clock format",
-      "label": "12-Hour Clock"
+      "description": "Display time in 12h format",
+      "label": "Use 12h clock format"
     },
     "wakeOnTapOrMotion": {
       "description": "Wake the device on tap or motion",
-      "label": "Wake on Tap or Motion"
+      "label": "Wake on tap or motion"
     },
     "enableMessageBubbles": {
       "label": "Message Bubbles",
       "description": "Display incoming messages as bubbles on the device screen"
+    },
+    "deviceDisplay": {
+      "label": "Device Display",
+      "description": "Display orientation and clock"
+    },
+    "advanced": {
+      "label": "Advanced",
+      "description": "Advanced display settings"
+    },
+    "compassOrientation": {
+      "label": "Compass orientation",
+      "description": "Compass orientation relative to the screen"
     }
   },
   "lora": {
-    "title": "Mesh Settings",
-    "description": "Settings for the LoRa mesh",
+    "title": "LoRa",
+    "description": "LoRa radio configuration",
     "bandwidth": {
       "description": "Channel bandwidth in kHz",
       "label": "Bandwidth"
     },
     "boostedRxGain": {
       "description": "Boosted RX gain",
-      "label": "Boosted RX Gain"
+      "label": "RX Boosted Gain"
     },
     "codingRate": {
       "description": "The denominator of the coding rate",
@@ -144,24 +179,24 @@
       "label": "Frequency Offset"
     },
     "frequencySlot": {
-      "description": "LoRa frequency channel number",
+      "description": "Your node's operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name and will change from the default public slot.",
       "label": "Frequency Slot"
     },
     "hopLimit": {
-      "description": "Maximum number of hops",
-      "label": "Hop Limit"
+      "description": "Sets the maximum number of hops, default is 3. Increasing hops also increases congestion and should be used carefully. 0 hop broadcast messages will not get ACKs.",
+      "label": "Number of Hops"
     },
     "ignoreMqtt": {
       "description": "Don't forward MQTT messages over the mesh",
       "label": "Ignore MQTT"
     },
     "modemPreset": {
-      "description": "Modem preset to use",
-      "label": "Modem Preset"
+      "description": "Available modem presets, default is Long Fast.",
+      "label": "Presets"
     },
     "okToMqtt": {
       "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
-      "label": "OK to MQTT"
+      "label": "Ok to MQTT"
     },
     "overrideDutyCycle": {
       "description": "Override Duty Cycle",
@@ -169,10 +204,10 @@
     },
     "overrideFrequency": {
       "description": "Override frequency",
-      "label": "Override Frequency"
+      "label": "Frequency Override"
     },
     "region": {
-      "description": "Sets the region for your node",
+      "description": "The region where you will be using your radios.",
       "label": "Region"
     },
     "spreadingFactor": {
@@ -210,15 +245,23 @@
     "serialHalOnly": {
       "label": "Serial HAL Only",
       "description": "Communicate with the radio exclusively over the serial hardware abstraction layer"
+    },
+    "optionsCard": {
+      "label": "Options",
+      "description": "LoRa core options"
+    },
+    "advancedCard": {
+      "label": "Advanced",
+      "description": "Advanced LoRa parameters"
     }
   },
   "network": {
-    "title": "WiFi Config",
-    "description": "WiFi radio configuration",
+    "title": "Network",
+    "description": "Network configuration",
     "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
     "addressMode": {
       "description": "Address assignment selection",
-      "label": "Address Mode"
+      "label": "IPv4 mode"
     },
     "dns": {
       "description": "DNS Server",
@@ -226,7 +269,7 @@
     },
     "ethernetEnabled": {
       "description": "Enable or disable the Ethernet port",
-      "label": "Enabled"
+      "label": "Ethernet enabled"
     },
     "gateway": {
       "description": "Default Gateway",
@@ -238,7 +281,7 @@
     },
     "psk": {
       "description": "Network password",
-      "label": "PSK"
+      "label": "Password"
     },
     "ssid": {
       "description": "Network name",
@@ -250,16 +293,17 @@
     },
     "wifiEnabled": {
       "description": "Enable or disable the WiFi radio",
-      "label": "Enabled"
+      "label": "WiFi enabled"
     },
     "meshViaUdp": {
-      "label": "Mesh via UDP"
+      "label": "Enabled",
+      "description": "Forward mesh packets over UDP"
     },
     "ntpServer": {
-      "label": "NTP Server"
+      "label": "NTP server"
     },
     "rsyslogServer": {
-      "label": "Rsyslog Server"
+      "label": "rsyslog server"
     },
     "ethernetConfigSettings": {
       "description": "Ethernet port configuration",
@@ -280,18 +324,30 @@
     "udpConfigSettings": {
       "description": "UDP over Mesh configuration",
       "label": "UDP Config"
+    },
+    "wifiOptions": {
+      "label": "WiFi Options",
+      "description": "WiFi configuration"
+    },
+    "ethernetOptionsCard": {
+      "label": "Ethernet Options",
+      "description": "Ethernet configuration"
+    },
+    "advancedCard": {
+      "label": "Advanced",
+      "description": "NTP, rsyslog, IPv4 mode and address overrides"
     }
   },
   "position": {
-    "title": "Position Settings",
-    "description": "Settings for the position module",
+    "title": "Position",
+    "description": "Position settings",
     "broadcastInterval": {
-      "description": "How often your position is sent out over the mesh",
+      "description": "The maximum interval that can elapse without a node broadcasting a position.",
       "label": "Broadcast Interval"
     },
     "enablePin": {
-      "description": "GPS module enable pin override",
-      "label": "Enable Pin"
+      "description": "GPS enable GPIO pin override",
+      "label": "GPS EN GPIO"
     },
     "fixedPosition": {
       "description": "Don't report GPS position, but a manually-specified one",
@@ -311,35 +367,35 @@
     },
     "gpsMode": {
       "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-      "label": "GPS Mode"
+      "label": "GPS Mode (Physical Hardware)"
     },
     "gpsUpdateInterval": {
-      "description": "How often a GPS fix should be acquired",
-      "label": "GPS Update Interval"
+      "description": "How often should we try to get a GPS position (<10sec keeps GPS on).",
+      "label": "GPS Polling Interval"
     },
     "positionFlags": {
-      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
+      "description": "Optional fields to include when assembling position messages. The more fields are included, the larger the message will be — leading to longer airtime and a higher risk of packet loss.",
       "label": "Position Flags"
     },
     "receivePin": {
-      "description": "GPS module RX pin override",
-      "label": "Receive Pin"
+      "description": "GPS receive GPIO pin override",
+      "label": "GPS Receive GPIO"
     },
     "smartPositionEnabled": {
       "description": "Only send position when there has been a meaningful change in location",
-      "label": "Enable Smart Position"
+      "label": "Smart Position"
     },
     "smartPositionMinDistance": {
-      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
-      "label": "Smart Position Minimum Distance"
+      "description": "The minimum distance change in meters to be considered for a smart position broadcast.",
+      "label": "Smart Distance"
     },
     "smartPositionMinInterval": {
-      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
-      "label": "Smart Position Minimum Interval"
+      "description": "The fastest that position updates will be sent if the minimum distance has been satisfied.",
+      "label": "Smart Interval"
     },
     "transmitPin": {
-      "description": "GPS module TX pin override",
-      "label": "Transmit Pin"
+      "description": "GPS transmit GPIO pin override",
+      "label": "GPS Transmit GPIO"
     },
     "intervalsSettings": {
       "description": "How often to send position updates",
@@ -358,16 +414,33 @@
       "unset": "Unset",
       "vehicleHeading": "Vehicle heading",
       "vehicleSpeed": "Vehicle speed"
+    },
+    "positionPacket": {
+      "label": "Position Packet",
+      "description": "Position broadcast configuration"
+    },
+    "deviceGps": {
+      "label": "Device GPS",
+      "description": "Device GPS configuration"
+    },
+    "advancedDeviceGps": {
+      "label": "Advanced Device GPS",
+      "description": "GPIO pin overrides for the GPS hardware"
+    },
+    "useBrowserLocation": {
+      "label": "Use browser location",
+      "busy": "Reading location…",
+      "failed": "Could not read browser location"
     }
   },
   "power": {
     "adcMultiplierOverride": {
       "description": "Used for tweaking battery voltage reading",
-      "label": "ADC Multiplier Override ratio"
+      "label": "ADC multiplier override ratio"
     },
     "ina219Address": {
       "description": "Address of the INA219 battery monitor",
-      "label": "INA219 Address"
+      "label": "Battery INA_2XX I2C address"
     },
     "lightSleepDuration": {
       "description": "How long the device will be in light sleep for",
@@ -375,11 +448,11 @@
     },
     "minimumWakeTime": {
       "description": "Minimum amount of time the device will stay awake for after receiving a packet",
-      "label": "Minimum Wake Time"
+      "label": "Minimum wake time"
     },
     "noConnectionBluetoothDisabled": {
       "description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
-      "label": "No Connection Bluetooth Disabled"
+      "label": "Wait for Bluetooth duration"
     },
     "powerSavingEnabled": {
       "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
@@ -387,11 +460,11 @@
     },
     "shutdownOnBatteryDelay": {
       "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
-      "label": "Shutdown on battery delay"
+      "label": "Shutdown on power loss"
     },
     "superDeepSleepDuration": {
       "description": "How long the device will be in super deep sleep for",
-      "label": "Super Deep Sleep Duration"
+      "label": "Super deep sleep duration"
     },
     "powerConfigSettings": {
       "description": "Settings for the power module",
@@ -400,23 +473,27 @@
     "sleepSettings": {
       "description": "Sleep settings for the power module",
       "label": "Sleep Settings"
+    },
+    "powerConfig": {
+      "label": "Power Config",
+      "description": "Power and sleep configuration"
     }
   },
   "security": {
     "description": "Settings for the Security configuration",
-    "title": "Security Settings",
+    "title": "Security",
     "button_backupKey": "Backup Key",
     "adminChannelEnabled": {
       "description": "Allow incoming device control over the insecure legacy admin channel",
-      "label": "Allow Legacy Admin"
+      "label": "Legacy Admin channel"
     },
     "enableDebugLogApi": {
       "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
-      "label": "Enable Debug Log API"
+      "label": "Debug log API enabled"
     },
     "managed": {
       "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
-      "label": "Managed"
+      "label": "Managed Mode"
     },
     "privateKey": {
       "description": "Used to create a shared key with a remote device",
@@ -436,7 +513,7 @@
     },
     "serialOutputEnabled": {
       "description": "Serial Console over the Stream API",
-      "label": "Serial Output Enabled"
+      "label": "Serial console"
     },
     "tertiaryAdminKey": {
       "description": "The tertiary public key authorized to send admin messages to this node",
@@ -449,10 +526,26 @@
     "loggingSettings": {
       "description": "Settings for Logging",
       "label": "Logging Settings"
+    },
+    "directMessageKey": {
+      "label": "Direct Message Key",
+      "description": "Public + private direct-message keys"
+    },
+    "adminKeysCard": {
+      "label": "Admin Keys",
+      "description": "Admin authentication keys"
+    },
+    "logsCard": {
+      "label": "Logs",
+      "description": "Logging configuration"
+    },
+    "administration": {
+      "label": "Administration",
+      "description": "Managed-mode and legacy admin channel"
     }
   },
   "user": {
-    "title": "User Settings",
+    "title": "User",
     "description": "Configure your device name and identity settings",
     "longName": {
       "label": "Long Name",
@@ -472,11 +565,23 @@
     },
     "isUnmessageable": {
       "label": "Unmessageable",
-      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+      "description": "Unmonitored or Infrastructure"
     },
     "isLicensed": {
-      "label": "Licensed amateur radio (HAM)",
-      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+      "label": "Licensed amateur radio (Ham)",
+      "description": "Enabling this option disables encryption and is not compatible with the default Meshtastic network."
+    },
+    "userConfig": {
+      "label": "User Config",
+      "description": "Identity and licensing"
+    },
+    "nodeId": {
+      "label": "Node ID",
+      "description": "Read-only — assigned by the device"
+    },
+    "hardwareModel": {
+      "label": "Hardware model",
+      "description": "Read-only — reported by the device"
     }
   }
 }

@@ -16,7 +16,7 @@ devices. Installation instructions are available at
 ## Usage
 
 ```ts
-import { MeshDevice } from "@meshtastic/core";
+import { MeshDevice } from "@meshtastic/sdk";
 import { TransportNode } from "@meshtastic/transport-node";
 
 const transport = await TransportNode.create("10.10.0.57");

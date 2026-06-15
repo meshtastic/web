@@ -2,25 +2,34 @@ import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import { type DisplayValidation, DisplayValidationSchema } from "@app/validation/config/display.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface DisplayConfigProps {
   onFormInit: DynamicFormFormInit<DisplayValidation>;
 }
+
+const EMPTY_RADIO_SIGNAL = {
+  value: {} as { display?: Protobuf.Config.Config_DisplayConfig },
+  peek: () => ({}) as { display?: Protobuf.Config.Config_DisplayConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const Display = ({ onFormInit }: DisplayConfigProps) => {
   useWaitForConfig({ configCase: "display" });
-  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
+  const editor = useConfigEditor();
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const effective =
+    radio.display ??
+    (getEffectiveConfig("display") as Protobuf.Config.Config_DisplayConfig | undefined);
+
   const { t } = useTranslation("config");
 
   const onSubmit = (data: DisplayValidation) => {
-    if (deepCompareConfig(config.display, data, true)) {
-      removeChange({ type: "config", variant: "display" });
-      return;
-    }
-
-    setChange({ type: "config", variant: "display" }, data, config.display);
+    if (!editor) return;
+    editor.setRadioSection("display", data as unknown as Protobuf.Config.Config_DisplayConfig);
   };
 
   return (
@@ -29,43 +38,12 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={DisplayValidationSchema}
       defaultValues={config.display}
-      values={getEffectiveConfig("display")}
+      values={effective}
       fieldGroups={[
         {
-          label: t("display.title"),
-          description: t("display.description"),
+          label: t("display.deviceDisplay.label"),
+          description: t("display.deviceDisplay.description"),
           fields: [
-            {
-              type: "number",
-              name: "screenOnSecs",
-              label: t("display.screenTimeout.label"),
-              description: t("display.screenTimeout.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
-            },
-            // TODO: This field is deprecated since protobufs 2.7.4 and only has UNUSED=0 value.
-            // GPS format has been moved to DeviceUIConfig.gps_format with proper enum values (DEC, DMS, UTM, MGRS, OLC, OSGR, MLS).
-            // This should be removed once DeviceUI settings are implemented.
-            // See: packages/protobufs/meshtastic/device_ui.proto
-            {
-              type: "select",
-              name: "gpsFormat",
-              label: t("display.gpsDisplayUnits.label"),
-              description: t("display.gpsDisplayUnits.description"),
-              properties: {
-                enumValue: Protobuf.Config.Config_DisplayConfig_DeprecatedGpsCoordinateFormat,
-              },
-            },
-            {
-              type: "number",
-              name: "autoScreenCarouselSecs",
-              label: t("display.carouselDelay.label"),
-              description: t("display.carouselDelay.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
-            },
             {
               type: "toggle",
               name: "compassNorthTop",
@@ -80,9 +58,9 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
             },
             {
               type: "toggle",
-              name: "flipScreen",
-              label: t("display.flipScreen.label"),
-              description: t("display.flipScreen.description"),
+              name: "headingBold",
+              label: t("display.headingBold.label"),
+              description: t("display.headingBold.description"),
             },
             {
               type: "select",
@@ -91,6 +69,48 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
               description: t("display.displayUnits.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_DisplayConfig_DisplayUnits,
+                formatEnumName: true,
+              },
+            },
+          ],
+        },
+        {
+          label: t("display.advanced.label"),
+          description: t("display.advanced.description"),
+          fields: [
+            {
+              type: "number",
+              name: "screenOnSecs",
+              label: t("display.screenTimeout.label"),
+              description: t("display.screenTimeout.description"),
+              properties: { suffix: t("unit.second.plural") },
+            },
+            {
+              type: "number",
+              name: "autoScreenCarouselSecs",
+              label: t("display.carouselDelay.label"),
+              description: t("display.carouselDelay.description"),
+              properties: { suffix: t("unit.second.plural") },
+            },
+            {
+              type: "toggle",
+              name: "wakeOnTapOrMotion",
+              label: t("display.wakeOnTapOrMotion.label"),
+              description: t("display.wakeOnTapOrMotion.description"),
+            },
+            {
+              type: "toggle",
+              name: "flipScreen",
+              label: t("display.flipScreen.label"),
+              description: t("display.flipScreen.description"),
+            },
+            {
+              type: "select",
+              name: "displaymode",
+              label: t("display.displayMode.label"),
+              description: t("display.displayMode.description"),
+              properties: {
+                enumValue: Protobuf.Config.Config_DisplayConfig_DisplayMode,
                 formatEnumName: true,
               },
             },
@@ -105,25 +125,13 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
             },
             {
               type: "select",
-              name: "displaymode",
-              label: t("display.displayMode.label"),
-              description: t("display.displayMode.description"),
+              name: "compassOrientation",
+              label: t("display.compassOrientation.label"),
+              description: t("display.compassOrientation.description"),
               properties: {
-                enumValue: Protobuf.Config.Config_DisplayConfig_DisplayMode,
+                enumValue: Protobuf.Config.Config_DisplayConfig_CompassOrientation,
                 formatEnumName: true,
               },
-            },
-            {
-              type: "toggle",
-              name: "headingBold",
-              label: t("display.headingBold.label"),
-              description: t("display.headingBold.description"),
-            },
-            {
-              type: "toggle",
-              name: "wakeOnTapOrMotion",
-              label: t("display.wakeOnTapOrMotion.label"),
-              description: t("display.wakeOnTapOrMotion.description"),
             },
             {
               type: "toggle",

@@ -10,15 +10,15 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
-import { useAppStore, useDevice, useNodeDB } from "@core/stores";
-import { Protobuf, type Types } from "@meshtastic/core";
+import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
+import { useAppStore, useDevice } from "@core/stores";
+import { Protobuf, type Types } from "@meshtastic/sdk";
+import { useNodeErrors } from "@meshtastic/sdk-react";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { type JSX, useCallback, useDeferredValue, useEffect, useState } from "react";
+import { type JSX, useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { base16 } from "rfc4648";
-
-const NODEDB_DEBOUNCE_MS = 250;
 
 export interface DeleteNoteDialogProps {
   open: boolean;
@@ -49,15 +49,13 @@ const NodesPage = (): JSX.Element => {
     [nodeFilter, deferredFilterState],
   );
 
-  // subscribe to actual data (nodes array) and to nodeErrors ref for badge updates
-  const { nodes: filteredNodes, hasNodeError } = useNodeDB(
-    (db) => ({
-      nodes: db.getNodes(predicate, true),
-      hasNodeError: db.hasNodeError,
-      _errorsRef: db.nodeErrors, // include the Map ref so UI also re-renders on error changes
-    }),
-    { debounce: NODEDB_DEBOUNCE_MS },
-  );
+  // Nodes come from the SDK NodesClient (signals + sqlocal-backed history).
+  // PKI / node-error tracking lives on the SDK NodesClient too.
+  const allSdkNodes = useNodesAsProto();
+  const filteredNodes = useMemo(() => allSdkNodes.filter(predicate), [allSdkNodes, predicate]);
+  const errors = useNodeErrors();
+  const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
+  const hasNodeError = useCallback((num: number) => errorSet.has(num), [errorSet]);
   const handleTraceroute = useCallback(
     (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
       setSelectedTraceroute(traceroute);

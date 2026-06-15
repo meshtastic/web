@@ -1,9 +1,11 @@
 import { Channel } from "@app/components/PageComponents/Channels/Channel";
+import { create } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
 import { useDevice } from "@core/stores";
-import type { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
+import { useChannels, useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import i18next from "i18next";
 import { QrCodeIcon, UploadIcon } from "lucide-react";
 import { Suspense, useMemo } from "react";
@@ -14,9 +16,9 @@ interface ConfigProps {
   onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
 }
 
-export const getChannelName = (channel: Protobuf.Channel.Channel) => {
-  return channel.settings?.name.length
-    ? channel.settings?.name
+export const getChannelName = (channel: { index: number; settings?: { name?: string } }) => {
+  return channel.settings?.name?.length
+    ? channel.settings.name
     : channel.index === 0
       ? i18next.t("page.broadcastLabel")
       : i18next.t("page.channelIndex", {
@@ -25,14 +27,34 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) => {
         });
 };
 
+const EMPTY_DIRTY_CHANNELS_SIGNAL = {
+  value: [] as readonly number[],
+  peek: () => [] as readonly number[],
+  subscribe: () => () => {},
+} as const;
+
 export const Channels = ({ onFormInit }: ConfigProps) => {
-  const { channels, hasChannelChange, setDialogOpen } = useDevice();
+  const { setDialogOpen } = useDevice();
+  const editor = useConfigEditor();
+  const channels = useChannels();
+  const dirtyChannels = useSignal(editor?.dirtyChannels ?? EMPTY_DIRTY_CHANNELS_SIGNAL);
   const { t } = useTranslation("channels");
 
-  const allChannels = Array.from(channels.values());
+  const allChannels = useMemo(
+    () =>
+      channels.map((c) =>
+        create(Protobuf.Channel.ChannelSchema, {
+          index: c.index,
+          role: c.role,
+          settings: c.settings,
+        }),
+      ),
+    [channels],
+  );
   const flags = useMemo(
-    () => new Map(allChannels.map((channel) => [channel.index, hasChannelChange(channel.index)])),
-    [allChannels, hasChannelChange],
+    () =>
+      new Map(allChannels.map((channel) => [channel.index, dirtyChannels.includes(channel.index)])),
+    [allChannels, dirtyChannels],
   );
 
   return (

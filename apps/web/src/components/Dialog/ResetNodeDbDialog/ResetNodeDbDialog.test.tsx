@@ -1,93 +1,66 @@
-// ResetNodeDbDialog.test.tsx
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ResetNodeDbDialog } from "./ResetNodeDbDialog.tsx";
 
 const mockResetNodes = vi.fn();
-const mockDeleteAllMessages = vi.fn();
-const mockRemoveAllNodeErrors = vi.fn();
-const mockRemoveAllNodes = vi.fn();
+const mockClearAll = vi.fn();
 
-vi.mock("@core/stores", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
-  useDevice: () => ({
-    connection: {
-      resetNodes: mockResetNodes,
-    },
-  }),
-  useMessages: () => ({
-    deleteAllMessages: mockDeleteAllMessages,
-  }),
-  useNodeDB: () => ({
-    removeAllNodeErrors: mockRemoveAllNodeErrors,
-    removeAllNodes: mockRemoveAllNodes,
-  }),
+const { mockUseActiveClient } = vi.hoisted(() => ({
+  mockUseActiveClient: vi.fn(),
+}));
+
+vi.mock("@meshtastic/sdk-react", () => ({
+  useActiveClient: mockUseActiveClient,
 }));
 
 describe("ResetNodeDbDialog", () => {
   const mockOnOpenChange = vi.fn();
 
   beforeEach(() => {
-    mockOnOpenChange.mockClear();
-    mockResetNodes.mockClear();
-    mockDeleteAllMessages.mockClear();
-    mockRemoveAllNodeErrors.mockClear();
-    mockRemoveAllNodes.mockClear();
+    vi.clearAllMocks();
+    mockUseActiveClient.mockReturnValue({
+      nodes: { reset: mockResetNodes },
+      chat: { clearAll: mockClearAll },
+    });
   });
 
-  it("calls resetNodes, closes dialog, and after resolve clears messages and node DB (with true flag)", async () => {
-    // Control the promise returned by resetNodes
-    let resolveReset: (() => void) | undefined;
+  it("calls reset({ keepMyNode: true }) then clears chat after resolve", async () => {
+    let resolveReset: ((value: { status: "ok"; value: number }) => void) | undefined;
     mockResetNodes.mockImplementation(
       () =>
-        new Promise<void>((resolve) => {
+        new Promise((resolve) => {
           resolveReset = resolve;
         }),
     );
+    mockClearAll.mockResolvedValue(undefined);
 
     render(<ResetNodeDbDialog open onOpenChange={mockOnOpenChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Reset Node Database" }));
 
-    // Called immediately
-    expect(mockResetNodes).toHaveBeenCalledTimes(1);
+    expect(mockResetNodes).toHaveBeenCalledWith({ keepMyNode: true });
 
-    // DialogWrapper awaits onConfirm (which returns undefined), so close happens on next microtask
     await waitFor(() => {
-      expect(mockOnOpenChange).toHaveBeenCalledTimes(1);
       expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
 
-    // Nothing else should have happened yet (the promise hasn't resolved)
-    expect(mockDeleteAllMessages).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodeErrors).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodes).not.toHaveBeenCalled();
+    expect(mockClearAll).not.toHaveBeenCalled();
 
-    // Resolve the reset
-    resolveReset?.();
+    resolveReset?.({ status: "ok", value: 1 });
 
-    // Now the .then() chain should fire
     await waitFor(() => {
-      expect(mockDeleteAllMessages).toHaveBeenCalledTimes(1);
-      expect(mockRemoveAllNodeErrors).toHaveBeenCalledTimes(1);
-      expect(mockRemoveAllNodes).toHaveBeenCalledTimes(1);
-      expect(mockRemoveAllNodes).toHaveBeenCalledWith(true);
+      expect(mockClearAll).toHaveBeenCalledTimes(1);
     });
   });
 
-  it("calls onOpenChange(false) and does not call resetNodes when cancel is clicked", async () => {
+  it("does not call reset when cancel is clicked", async () => {
     render(<ResetNodeDbDialog open onOpenChange={mockOnOpenChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     await waitFor(() => {
-      expect(mockOnOpenChange).toHaveBeenCalledTimes(1);
       expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
 
     expect(mockResetNodes).not.toHaveBeenCalled();
-    expect(mockDeleteAllMessages).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodeErrors).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodes).not.toHaveBeenCalled();
+    expect(mockClearAll).not.toHaveBeenCalled();
   });
 });

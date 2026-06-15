@@ -16,7 +16,7 @@ devices. Installation instructions are avaliable at
 ## Usage
 
 ```ts
-import { MeshDevice } from "@meshtastic/core";
+import { MeshDevice } from "@meshtastic/sdk";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 
 const transport = await TransportWebSerial.create();

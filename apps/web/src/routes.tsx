@@ -1,5 +1,5 @@
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
-import type { useAppStore, useMessageStore } from "@core/stores";
+import type { useAppStore } from "@core/stores";
 import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
@@ -18,7 +18,6 @@ import { App } from "./App.tsx";
 interface AppContext {
   stores: {
     app: ReturnType<typeof useAppStore>;
-    message: ReturnType<typeof useMessageStore>;
   };
   i18n: ReturnType<typeof useTranslation>;
 }
@@ -147,7 +146,7 @@ const connectionsRoute = createRoute({
   component: Connections,
 });
 
-const routeTree = rootRoute.addChildren([
+export const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
   messagesWithParamsRoute,
@@ -164,7 +163,6 @@ const router = createRouter({
   context: {
     stores: {
       app: {} as ReturnType<typeof useAppStore>,
-      message: {} as ReturnType<typeof useMessageStore>,
     },
     i18n: {} as ReturnType<typeof import("react-i18next").useTranslation>,
   },

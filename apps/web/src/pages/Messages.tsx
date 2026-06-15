@@ -7,18 +7,13 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
+import { useChatAsLegacyMessages } from "@core/hooks/useChatAsLegacyMessages.ts";
+import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
-import {
-  MessageState,
-  MessageType,
-  useDevice,
-  useMessages,
-  useNodeDB,
-  useSidebar,
-} from "@core/stores";
+import { MessageType, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import { randId } from "@core/utils/randId.ts";
-import { Protobuf, Types } from "@meshtastic/core";
+import { Protobuf, Types } from "@meshtastic/sdk";
+import { useActiveClient, useChannels, useNodeErrors, useUnreadByKey } from "@meshtastic/sdk-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -37,10 +32,28 @@ function SelectMessageChat() {
 }
 
 export const MessagesPage = () => {
-  const { channels, getUnreadCount, resetUnread, connection } = useDevice();
-  const { getNodes, getNode, getMyNode, hasNodeError } = useNodeDB();
-
-  const { getMessages, setMessageState } = useMessages();
+  const channels = useChannels();
+  const unreadByKey = useUnreadByKey();
+  const meshClient = useActiveClient();
+  const directUnread = (peer: number): number => unreadByKey.get(`direct:${peer}`) ?? 0;
+  const channelUnread = (idx: number): number => unreadByKey.get(`channel:${idx}`) ?? 0;
+  const markChannelRead = useCallback(
+    (idx: number) =>
+      meshClient?.chat.unread.markRead({
+        kind: "channel",
+        channel: idx as Types.ChannelNumber,
+      }),
+    [meshClient],
+  );
+  const markDirectRead = useCallback(
+    (peer: number) => meshClient?.chat.unread.markRead({ kind: "direct", peer }),
+    [meshClient],
+  );
+  const allNodes = useNodesAsProto();
+  const getNode = (n: number) => allNodes.find((node) => node.num === n);
+  const errors = useNodeErrors();
+  const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
+  const hasNodeError = useCallback((num: number) => errorSet.has(num), [errorSet]);
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
 
@@ -62,9 +75,9 @@ export const MessagesPage = () => {
   const chatType = type === "direct" ? MessageType.Direct : MessageType.Broadcast;
   const numericChatId = Number(chatId);
 
-  const allChannels = Array.from(channels.values());
-  const filteredChannels = allChannels.filter(
-    (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
+  const filteredChannels = useMemo(
+    () => channels.filter((ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED),
+    [channels],
   );
 
   useEffect(() => {
@@ -74,7 +87,7 @@ export const MessagesPage = () => {
     }
   }, [type, chatId, filteredChannels, navigateToChat]);
 
-  const currentChannel = channels.get(numericChatId);
+  const currentChannel = channels.find((ch) => ch.index === numericChatId);
   const otherNode = getNode(numericChatId);
 
   const isDirect = chatType === MessageType.Direct;
@@ -83,14 +96,15 @@ export const MessagesPage = () => {
   const filteredNodes = useCallback((): NodeInfoWithUnread[] => {
     const lowerCaseSearchTerm = deferredSearch.toLowerCase();
 
-    return getNodes((node: Protobuf.Mesh.NodeInfo) => {
-      const longName = node.user?.longName?.toLowerCase() ?? "";
-      const shortName = node.user?.shortName?.toLowerCase() ?? "";
-      return longName.includes(lowerCaseSearchTerm) || shortName.includes(lowerCaseSearchTerm);
-    }, true)
+    return allNodes
+      .filter((node: Protobuf.Mesh.NodeInfo) => {
+        const longName = node.user?.longName?.toLowerCase() ?? "";
+        const shortName = node.user?.shortName?.toLowerCase() ?? "";
+        return longName.includes(lowerCaseSearchTerm) || shortName.includes(lowerCaseSearchTerm);
+      })
       .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
-        unreadCount: getUnreadCount(node.num) ?? 0,
+        unreadCount: directUnread(node.num),
       }))
       .sort((a: NodeInfoWithUnread, b: NodeInfoWithUnread) => {
         const diff = b.unreadCount - a.unreadCount;
@@ -99,82 +113,41 @@ export const MessagesPage = () => {
         }
         return Number(b.isFavorite) - Number(a.isFavorite);
       });
-  }, [deferredSearch, getNodes, getUnreadCount]);
+  }, [deferredSearch, allNodes, directUnread]);
 
   const sendText = useCallback(
     async (message: string) => {
-      const toValue = isDirect ? numericChatId : MessageType.Broadcast;
-      const channelValue = isDirect ? Types.ChannelNumber.Primary : numericChatId;
-
-      let messageId: number | undefined;
-
-      try {
-        messageId = await connection?.sendText(message, toValue, true, channelValue);
-        if (messageId !== undefined) {
-          if (chatType === MessageType.Broadcast) {
-            setMessageState({
-              type: MessageType.Broadcast,
-              channelId: channelValue,
-              messageId,
-              newState: MessageState.Ack,
-            });
-          } else {
-            setMessageState({
-              type: MessageType.Direct,
-              nodeA: getMyNode().num,
-              nodeB: numericChatId,
-              messageId,
-              newState: MessageState.Ack,
-            });
-          }
-        } else {
-          console.warn("sendText completed but messageId is undefined");
-        }
-      } catch (e: unknown) {
-        console.error("Failed to send message:", e);
-        const failedId = messageId ?? randId();
-        if (chatType === MessageType.Broadcast) {
-          setMessageState({
-            type: MessageType.Broadcast,
-            channelId: channelValue,
-            messageId: failedId,
-            newState: MessageState.Failed,
-          });
-        } else {
-          setMessageState({
-            type: MessageType.Direct,
-            nodeA: getMyNode().num,
-            nodeB: numericChatId,
-            messageId: failedId,
-            newState: MessageState.Failed,
-          });
-        }
+      if (!meshClient) {
+        console.warn("[MessagesPage] no active mesh client; send dropped");
+        return;
       }
+      const destination: Types.Destination = isDirect ? numericChatId : "broadcast";
+      const channel = isDirect ? Types.ChannelNumber.Primary : numericChatId;
+      const result = await meshClient.chat.send({ text: message, destination, channel });
+      if (result.status === "error") {
+        console.error("Failed to send message:", result.error);
+      }
+      // Outbound state (Ack / Failed) is updated by the SDK chat slice when the
+      // routing packet for this message id arrives.
     },
-    [numericChatId, chatType, connection, getMyNode, setMessageState, isDirect],
+    [meshClient, numericChatId, isDirect],
   );
+
+  const broadcastMessages = useChatAsLegacyMessages({
+    type: MessageType.Broadcast,
+    channelId: numericChatId,
+  });
+  const directMessages = useChatAsLegacyMessages({
+    type: MessageType.Direct,
+    peer: numericChatId,
+  });
 
   const renderChatContent = () => {
     switch (chatType) {
       case MessageType.Broadcast:
-        return (
-          <ChannelChat
-            messages={getMessages({
-              type: MessageType.Broadcast,
-              channelId: numericChatId,
-            }).reverse()}
-          />
-        );
+        return <ChannelChat messages={[...broadcastMessages].reverse()} />;
       case MessageType.Direct:
-        return (
-          <ChannelChat
-            messages={getMessages({
-              type: MessageType.Direct,
-              nodeA: getMyNode().num,
-              nodeB: numericChatId,
-            }).reverse()}
-          />
-        );
+        return <ChannelChat messages={[...directMessages].reverse()} />;
       default:
         return <SelectMessageChat />;
     }
@@ -187,7 +160,7 @@ export const MessagesPage = () => {
           {filteredChannels?.map((channel) => (
             <SidebarButton
               key={channel.index}
-              count={getUnreadCount(channel.index)}
+              count={channelUnread(channel.index)}
               label={
                 channel.settings?.name ||
                 (channel.index === 0
@@ -200,7 +173,7 @@ export const MessagesPage = () => {
               active={numericChatId === channel.index && chatType === MessageType.Broadcast}
               onClick={() => {
                 navigateToChat(MessageType.Broadcast, channel.index.toString());
-                resetUnread(channel.index);
+                markChannelRead(channel.index);
               }}
             >
               <HashIcon size={16} className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")} />
@@ -214,9 +187,9 @@ export const MessagesPage = () => {
       numericChatId,
       chatType,
       isCollapsed,
-      getUnreadCount,
+      channelUnread,
       navigateToChat,
-      resetUnread,
+      markChannelRead,
       t,
     ],
   );
@@ -246,7 +219,7 @@ export const MessagesPage = () => {
             active={numericChatId === node.num && chatType === MessageType.Direct}
             onClick={() => {
               navigateToChat(MessageType.Direct, node.num.toString());
-              resetUnread(node.num);
+              markDirectRead(node.num);
             }}
           >
             <Avatar
@@ -303,7 +276,11 @@ export const MessagesPage = () => {
         <div className="flex-none dark:bg-slate-900 p-2">
           {isBroadcast || isDirect ? (
             <MessageInput
-              to={isDirect ? numericChatId : MessageType.Broadcast}
+              conversation={
+                isDirect
+                  ? { kind: "direct", peer: numericChatId }
+                  : { kind: "channel", channel: numericChatId }
+              }
               onSend={sendText}
               maxBytes={200}
             />

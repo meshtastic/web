@@ -2,25 +2,34 @@ import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import { type PowerValidation, PowerValidationSchema } from "@app/validation/config/power.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface PowerConfigProps {
   onFormInit: DynamicFormFormInit<PowerValidation>;
 }
+
+const EMPTY_RADIO_SIGNAL = {
+  value: {} as { power?: Protobuf.Config.Config_PowerConfig },
+  peek: () => ({}) as { power?: Protobuf.Config.Config_PowerConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const Power = ({ onFormInit }: PowerConfigProps) => {
   useWaitForConfig({ configCase: "power" });
 
-  const { setChange, config, getEffectiveConfig, removeChange } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
+  const editor = useConfigEditor();
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const effective =
+    radio.power ?? (getEffectiveConfig("power") as Protobuf.Config.Config_PowerConfig | undefined);
+
   const { t } = useTranslation("config");
 
   const onSubmit = (data: PowerValidation) => {
-    if (deepCompareConfig(config.power, data, true)) {
-      removeChange({ type: "config", variant: "power" });
-      return;
-    }
-
-    setChange({ type: "config", variant: "power" }, data, config.power);
+    if (!editor) return;
+    editor.setRadioSection("power", data as unknown as Protobuf.Config.Config_PowerConfig);
   };
 
   return (
@@ -29,11 +38,11 @@ export const Power = ({ onFormInit }: PowerConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={PowerValidationSchema}
       defaultValues={config.power}
-      values={getEffectiveConfig("power")}
+      values={effective}
       fieldGroups={[
         {
-          label: t("power.powerConfigSettings.label"),
-          description: t("power.powerConfigSettings.description"),
+          label: t("power.powerConfig.label"),
+          description: t("power.powerConfig.description"),
           fields: [
             {
               type: "toggle",
@@ -46,66 +55,41 @@ export const Power = ({ onFormInit }: PowerConfigProps) => {
               name: "onBatteryShutdownAfterSecs",
               label: t("power.shutdownOnBatteryDelay.label"),
               description: t("power.shutdownOnBatteryDelay.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
+              properties: { suffix: t("unit.second.plural") },
             },
             {
               type: "number",
               name: "adcMultiplierOverride",
               label: t("power.adcMultiplierOverride.label"),
               description: t("power.adcMultiplierOverride.description"),
-              properties: {
-                step: 0.0001,
-              },
+              properties: { step: 0.0001 },
             },
             {
               type: "number",
               name: "waitBluetoothSecs",
               label: t("power.noConnectionBluetoothDisabled.label"),
               description: t("power.noConnectionBluetoothDisabled.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
+              properties: { suffix: t("unit.second.plural") },
             },
-            {
-              type: "number",
-              name: "deviceBatteryInaAddress",
-              label: t("power.ina219Address.label"),
-              description: t("power.ina219Address.description"),
-            },
-          ],
-        },
-        {
-          label: t("power.sleepSettings.label"),
-          description: t("power.sleepSettings.description"),
-          fields: [
             {
               type: "number",
               name: "sdsSecs",
               label: t("power.superDeepSleepDuration.label"),
               description: t("power.superDeepSleepDuration.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
-            },
-            {
-              type: "number",
-              name: "lsSecs",
-              label: t("power.lightSleepDuration.label"),
-              description: t("power.lightSleepDuration.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
+              properties: { suffix: t("unit.second.plural") },
             },
             {
               type: "number",
               name: "minWakeSecs",
               label: t("power.minimumWakeTime.label"),
               description: t("power.minimumWakeTime.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
+              properties: { suffix: t("unit.second.plural") },
+            },
+            {
+              type: "number",
+              name: "deviceBatteryInaAddress",
+              label: t("power.ina219Address.label"),
+              description: t("power.ina219Address.description"),
             },
           ],
         },

@@ -1,27 +1,10 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
-import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
-import { produce } from "immer";
+import { type MeshDevice, Protobuf, Types } from "@meshtastic/sdk";
+import { type Draft, produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist, subscribeWithSelector } from "zustand/middleware";
-import type { ChangeRegistry, ConfigChangeKey } from "./changeRegistry.ts";
-import {
-  createChangeRegistry,
-  getAdminMessageChangeCount,
-  getAllAdminMessages,
-  getAllChannelChanges,
-  getAllConfigChanges,
-  getAllModuleConfigChanges,
-  getChannelChangeCount,
-  getConfigChangeCount,
-  getModuleConfigChangeCount,
-  hasChannelChange,
-  hasConfigChange,
-  hasModuleConfigChange,
-  hasUserChange,
-  serializeKey,
-} from "./changeRegistry.ts";
 import type {
   Connection,
   ConnectionId,
@@ -57,14 +40,12 @@ export interface Device extends DeviceData {
   channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
   config: Protobuf.LocalOnly.LocalConfig;
   moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
-  changeRegistry: ChangeRegistry; // Unified change tracking
   hardware: Protobuf.Mesh.MyNodeInfo;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
   connection?: MeshDevice;
   activeNode: number;
   pendingSettingsChanges: boolean;
   messageDraft: string;
-  unreadCounts: Map<number, number>;
   dialog: Dialogs;
   clientNotifications: Protobuf.Mesh.ClientNotification[];
 
@@ -97,36 +78,12 @@ export interface Device extends DeviceData {
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   getDialogOpen: (dialog: DialogVariant) => boolean;
   setMessageDraft: (message: string) => void;
-  incrementUnread: (nodeNum: number) => void;
-  resetUnread: (nodeNum: number) => void;
-  getUnreadCount: (nodeNum: number) => number;
-  getAllUnreadCount: () => number;
   sendAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
   addClientNotification: (clientNotificationPacket: Protobuf.Mesh.ClientNotification) => void;
   removeClientNotification: (index: number) => void;
   getClientNotification: (index: number) => Protobuf.Mesh.ClientNotification | undefined;
   addNeighborInfo: (nodeNum: number, neighborInfo: Protobuf.Mesh.NeighborInfo) => void;
   getNeighborInfo: (nodeNum: number) => Protobuf.Mesh.NeighborInfo | undefined;
-
-  // New unified change tracking methods
-  setChange: (key: ConfigChangeKey, value: unknown, originalValue?: unknown) => void;
-  removeChange: (key: ConfigChangeKey) => void;
-  hasChange: (key: ConfigChangeKey) => boolean;
-  getChange: (key: ConfigChangeKey) => unknown | undefined;
-  clearAllChanges: () => void;
-  hasConfigChange: (variant: ValidConfigType) => boolean;
-  hasModuleConfigChange: (variant: ValidModuleConfigType) => boolean;
-  hasChannelChange: (index: Types.ChannelNumber) => boolean;
-  hasUserChange: () => boolean;
-  getConfigChangeCount: () => number;
-  getModuleConfigChangeCount: () => number;
-  getChannelChangeCount: () => number;
-  getAllConfigChanges: () => Protobuf.Config.Config[];
-  getAllModuleConfigChanges: () => Protobuf.ModuleConfig.ModuleConfig[];
-  getAllChannelChanges: () => Protobuf.Channel.Channel[];
-  queueAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
-  getAllQueuedAdminMessages: () => Protobuf.Admin.AdminMessage[];
-  getAdminMessageChangeCount: () => number;
 }
 
 export interface deviceState {
@@ -186,7 +143,6 @@ function deviceFactory(
     channels: new Map(),
     config: create(Protobuf.LocalOnly.LocalConfigSchema),
     moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
-    changeRegistry: createChangeRegistry(),
     hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
     metadata: new Map(),
     connection: undefined,
@@ -212,7 +168,6 @@ function deviceFactory(
     },
     pendingSettingsChanges: false,
     messageDraft: "",
-    unreadCounts: new Map(),
     clientNotifications: [],
 
     setStatus: (status: Types.DeviceStatusEnum) => {
@@ -369,35 +324,13 @@ function deviceFactory(
         return;
       }
       const device = get().devices.get(id);
-      if (!device) {
-        return;
-      }
-
-      const workingValue = device.changeRegistry.changes.get(
-        serializeKey({ type: "config", variant: payloadVariant }),
-      )?.value as Protobuf.LocalOnly.LocalConfig[K] | undefined;
-
-      return {
-        ...device.config[payloadVariant],
-        ...workingValue,
-      };
+      return device?.config[payloadVariant];
     },
     getEffectiveModuleConfig<K extends ValidModuleConfigType>(
       payloadVariant: K,
     ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined {
       const device = get().devices.get(id);
-      if (!device) {
-        return;
-      }
-
-      const workingValue = device.changeRegistry.changes.get(
-        serializeKey({ type: "moduleConfig", variant: payloadVariant }),
-      )?.value as Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
-
-      return {
-        ...device.moduleConfig[payloadVariant],
-        ...workingValue,
-      };
+      return device?.moduleConfig[payloadVariant];
     },
 
     setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
@@ -559,7 +492,7 @@ function deviceFactory(
         produce<PrivateDeviceState>((draft) => {
           const device = draft.devices.get(id);
           if (device) {
-            device.connection = connection;
+            device.connection = connection as unknown as Draft<MeshDevice>;
           }
         }),
       );
@@ -619,51 +552,6 @@ function deviceFactory(
         }),
       );
     },
-    incrementUnread: (nodeNum: number) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          const currentCount = device.unreadCounts.get(nodeNum) ?? 0;
-          device.unreadCounts.set(nodeNum, currentCount + 1);
-        }),
-      );
-    },
-    getUnreadCount: (nodeNum: number): number => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-      return device.unreadCounts.get(nodeNum) ?? 0;
-    },
-    getAllUnreadCount: (): number => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-      let totalUnread = 0;
-      device.unreadCounts.forEach((count) => {
-        totalUnread += count;
-      });
-      return totalUnread;
-    },
-    resetUnread: (nodeNum: number) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          device.unreadCounts.set(nodeNum, 0);
-          if (device.unreadCounts.get(nodeNum) === 0) {
-            device.unreadCounts.delete(nodeNum);
-          }
-        }),
-      );
-    },
-
     sendAdminMessage(message: Protobuf.Admin.AdminMessage) {
       const device = get().devices.get(id);
       if (!device) {
@@ -727,242 +615,6 @@ function deviceFactory(
       }
       return device.neighborInfo.get(nodeNum);
     },
-
-    // New unified change tracking methods
-    setChange: (key: ConfigChangeKey, value: unknown, originalValue?: unknown) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-
-          const keyStr = serializeKey(key);
-          device.changeRegistry.changes.set(keyStr, {
-            key,
-            value,
-            originalValue,
-            timestamp: Date.now(),
-          });
-        }),
-      );
-    },
-
-    removeChange: (key: ConfigChangeKey) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-
-          device.changeRegistry.changes.delete(serializeKey(key));
-        }),
-      );
-    },
-
-    hasChange: (key: ConfigChangeKey) => {
-      const device = get().devices.get(id);
-      return device?.changeRegistry.changes.has(serializeKey(key)) ?? false;
-    },
-
-    getChange: (key: ConfigChangeKey) => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return;
-      }
-
-      return device.changeRegistry.changes.get(serializeKey(key))?.value;
-    },
-
-    clearAllChanges: () => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-
-          device.changeRegistry.changes.clear();
-        }),
-      );
-    },
-
-    hasConfigChange: (variant: ValidConfigType) => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return false;
-      }
-
-      return hasConfigChange(device.changeRegistry, variant);
-    },
-
-    hasModuleConfigChange: (variant: ValidModuleConfigType) => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return false;
-      }
-
-      return hasModuleConfigChange(device.changeRegistry, variant);
-    },
-
-    hasChannelChange: (index: Types.ChannelNumber) => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return false;
-      }
-
-      return hasChannelChange(device.changeRegistry, index);
-    },
-
-    hasUserChange: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return false;
-      }
-
-      return hasUserChange(device.changeRegistry);
-    },
-
-    getConfigChangeCount: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-
-      return getConfigChangeCount(device.changeRegistry);
-    },
-
-    getModuleConfigChangeCount: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-
-      return getModuleConfigChangeCount(device.changeRegistry);
-    },
-
-    getChannelChangeCount: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-
-      return getChannelChangeCount(device.changeRegistry);
-    },
-
-    getAllConfigChanges: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return [];
-      }
-
-      const changes = getAllConfigChanges(device.changeRegistry);
-      return changes
-        .map((entry) => {
-          if (entry.key.type !== "config") {
-            return null;
-          }
-          if (!entry.value) {
-            return null;
-          }
-          return create(Protobuf.Config.ConfigSchema, {
-            payloadVariant: {
-              case: entry.key.variant,
-              value: entry.value,
-            },
-          });
-        })
-        .filter((c): c is Protobuf.Config.Config => c !== null);
-    },
-
-    getAllModuleConfigChanges: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return [];
-      }
-
-      const changes = getAllModuleConfigChanges(device.changeRegistry);
-      return changes
-        .map((entry) => {
-          if (entry.key.type !== "moduleConfig") {
-            return null;
-          }
-          if (!entry.value) {
-            return null;
-          }
-          return create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-            payloadVariant: {
-              case: entry.key.variant,
-              value: entry.value,
-            },
-          });
-        })
-        .filter((c): c is Protobuf.ModuleConfig.ModuleConfig => c !== null);
-    },
-
-    getAllChannelChanges: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return [];
-      }
-
-      const changes = getAllChannelChanges(device.changeRegistry);
-      return changes
-        .map((entry) => entry.value as Protobuf.Channel.Channel)
-        .filter((c): c is Protobuf.Channel.Channel => c !== undefined);
-    },
-
-    queueAdminMessage: (message: Protobuf.Admin.AdminMessage) => {
-      // Generate a unique ID for this admin message
-      const messageId = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
-
-      // Determine the variant type
-      const variant =
-        message.payloadVariant.case === "setFixedPosition" ? "setFixedPosition" : "other";
-
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-
-          const keyStr = serializeKey({
-            type: "adminMessage",
-            variant,
-            id: messageId,
-          });
-
-          device.changeRegistry.changes.set(keyStr, {
-            key: { type: "adminMessage", variant, id: messageId },
-            value: message,
-            timestamp: Date.now(),
-          });
-        }),
-      );
-    },
-
-    getAllQueuedAdminMessages: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return [];
-      }
-
-      const changes = getAllAdminMessages(device.changeRegistry);
-      return changes
-        .map((entry) => entry.value as Protobuf.Admin.AdminMessage)
-        .filter((m): m is Protobuf.Admin.AdminMessage => m !== undefined);
-    },
-
-    getAdminMessageChangeCount: () => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return 0;
-      }
-
-      return getAdminMessageChangeCount(device.changeRegistry);
-    },
   };
 }
 
@@ -980,7 +632,7 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (set, ge
     const device = deviceFactory(id, get, set);
     set(
       produce<PrivateDeviceState>((draft) => {
-        draft.devices = new Map(draft.devices).set(id, device);
+        draft.devices = new Map(draft.devices).set(id, device as unknown as Draft<Device>);
 
         // Enforce retention limit
         evictOldestEntries(draft.devices, DEVICESTORE_RETENTION_NUM);
@@ -1101,7 +753,23 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
             );
           }
         }
-        draft.devices = rebuilt;
+        draft.devices = rebuilt as unknown as Map<number, Draft<Device>>;
+
+        // Stale in-flight states can't survive a reload — no JS code is
+        // running that could complete them. Reset any persisted
+        // "connecting" / "configuring" / "disconnecting" entries to
+        // "disconnected" so the connecting overlay (which keys off
+        // these statuses) doesn't get stuck visible on cold boot.
+        for (const conn of draft.savedConnections) {
+          if (
+            conn.status === "connecting" ||
+            conn.status === "configuring" ||
+            conn.status === "disconnecting"
+          ) {
+            conn.status = "disconnected";
+            conn.error = undefined;
+          }
+        }
       }),
     );
   },

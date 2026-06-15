@@ -1,5 +1,5 @@
 import { hasPos, toLngLat } from "@core/utils/geo";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import type { Feature, FeatureCollection } from "geojson";
 import type { HeatmapLayerSpecification } from "maplibre-gl";
 import { useMemo } from "react";
@@ -11,9 +11,11 @@ export interface HeatmapLayerProps {
   id: string;
   filteredNodes: Protobuf.Mesh.NodeInfo[];
   mode: HeatmapMode;
+  isVisible: boolean;
 }
 
-export const HeatmapLayer = ({ id, filteredNodes, mode }: HeatmapLayerProps) => {
+export const HeatmapLayer = ({ id, filteredNodes, mode, isVisible }: HeatmapLayerProps) => {
+  if (!isVisible) return null;
   const data: FeatureCollection = useMemo(() => {
     const features: Feature[] = filteredNodes
       .filter((node) => hasPos(node.position))

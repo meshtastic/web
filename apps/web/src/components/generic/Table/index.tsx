@@ -64,6 +64,7 @@ export const Table = ({ headings, rows }: TableProps) => {
 
       const aCell = a.cells[columnIndex];
       const bCell = b.cells[columnIndex];
+      if (!aCell || !bCell) return 0;
 
       let aValue: string | number;
       let bValue: string | number;

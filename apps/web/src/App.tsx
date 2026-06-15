@@ -1,7 +1,9 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
+import { ConnectingOverlay } from "@components/ConnectingOverlay.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
+import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
@@ -22,17 +24,14 @@ export function App() {
   const device = getDevice(selectedDeviceId);
 
   return (
-    // <ThemeProvider defaultTheme="system" storageKey="theme">
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      {/* <NewDeviceDialog
-        open={connectDialogOpen}
-        onOpenChange={(open) => {
-          setConnectDialogOpen(open);
-        }}
-      /> */}
       <Toaster />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>
+        {/* Overlay sits outside the device-conditional branch so it shows
+            during a first-time connect from the Connections screen as
+            well as reconnects from inside the app. */}
+        <ConnectingOverlay />
         <div
           className="flex h-screen flex-col bg-background-primary text-text-primary"
           style={{ scrollbarWidth: "thin" }}
@@ -43,6 +42,7 @@ export function App() {
                 <div className="h-full flex w-full">
                   <DialogManager />
                   <KeyBackupReminder />
+                  <RegionSetupReminder />
                   <CommandPalette />
                   <MapProvider>
                     <Outlet />

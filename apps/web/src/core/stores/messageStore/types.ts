@@ -1,5 +1,5 @@
 import type { MessageState, MessageType } from "@core/stores";
-import type { Types } from "@meshtastic/core";
+import type { Types } from "@meshtastic/sdk";
 
 type NodeNum = number;
 type MessageId = number;

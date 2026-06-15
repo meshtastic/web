@@ -9,8 +9,9 @@ import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx"
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
+import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";
@@ -19,48 +20,43 @@ import { useTranslation } from "react-i18next";
 interface SecurityConfigProps {
   onFormInit: DynamicFormFormInit<RawSecurity>;
 }
+
+const EMPTY_RADIO_SIGNAL = {
+  value: {} as { security?: Protobuf.Config.Config_SecurityConfig },
+  peek: () => ({}) as { security?: Protobuf.Config.Config_SecurityConfig },
+  subscribe: () => () => {},
+} as const;
+
+const toFormShape = (cfg: Protobuf.Config.Config_SecurityConfig | undefined) => ({
+  ...cfg,
+  privateKey: fromByteArray(cfg?.privateKey ?? new Uint8Array(0)),
+  publicKey: fromByteArray(cfg?.publicKey ?? new Uint8Array(0)),
+  adminKey: [
+    fromByteArray(cfg?.adminKey?.at(0) ?? new Uint8Array(0)),
+    fromByteArray(cfg?.adminKey?.at(1) ?? new Uint8Array(0)),
+    fromByteArray(cfg?.adminKey?.at(2) ?? new Uint8Array(0)),
+  ],
+});
+
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
 
-  const { config, setChange, setDialogOpen, getEffectiveConfig, removeChange } = useDevice();
+  const { config, setDialogOpen, getEffectiveConfig } = useDevice();
+  const editor = useConfigEditor();
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const effective =
+    radio.security ??
+    (getEffectiveConfig("security") as Protobuf.Config.Config_SecurityConfig | undefined);
 
   const { t } = useTranslation("config");
 
-  const defaultConfig = config.security;
-  const defaultValues = {
-    ...defaultConfig,
-    ...{
-      privateKey: fromByteArray(defaultConfig?.privateKey ?? new Uint8Array(0)),
-      publicKey: fromByteArray(defaultConfig?.publicKey ?? new Uint8Array(0)),
-      adminKey: [
-        fromByteArray(defaultConfig?.adminKey?.at(0) ?? new Uint8Array(0)),
-        fromByteArray(defaultConfig?.adminKey?.at(1) ?? new Uint8Array(0)),
-        fromByteArray(defaultConfig?.adminKey?.at(2) ?? new Uint8Array(0)),
-      ],
-    },
-  };
-
-  const effectiveConfig = getEffectiveConfig("security");
-  const formValues = {
-    ...effectiveConfig,
-    ...{
-      privateKey: fromByteArray(effectiveConfig?.privateKey ?? new Uint8Array(0)),
-      publicKey: fromByteArray(effectiveConfig?.publicKey ?? new Uint8Array(0)),
-      adminKey: [
-        fromByteArray(effectiveConfig?.adminKey?.at(0) ?? new Uint8Array(0)),
-        fromByteArray(effectiveConfig?.adminKey?.at(1) ?? new Uint8Array(0)),
-        fromByteArray(effectiveConfig?.adminKey?.at(2) ?? new Uint8Array(0)),
-      ],
-    },
-  };
-
   const formMethods = useForm<RawSecurity>({
     mode: "onChange",
-    defaultValues: defaultValues as DefaultValues<RawSecurity>,
+    defaultValues: toFormShape(config.security) as DefaultValues<RawSecurity>,
     resolver: createZodResolver(RawSecuritySchema),
     shouldFocusError: false,
     resetOptions: { keepDefaultValues: true },
-    values: formValues as RawSecurity,
+    values: toFormShape(effective) as RawSecurity,
   });
   const { setValue, trigger, handleSubmit, formState } = formMethods;
 
@@ -72,9 +68,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   const [managedModeDialogOpen, setManagedModeDialogOpen] = useState<boolean>(false);
 
   const onSubmit = (data: RawSecurity) => {
-    if (!formState.isReady) {
-      return;
-    }
+    if (!formState.isReady || !editor) return;
 
     const payload: ParsedSecurity = {
       ...data,
@@ -86,13 +80,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
         toByteArray(data.adminKey.at(2) ?? ""),
       ],
     };
-
-    if (deepCompareConfig(config.security, payload, true)) {
-      removeChange({ type: "config", variant: "security" });
-      return;
-    }
-
-    setChange({ type: "config", variant: "security" }, payload, config.security);
+    editor.setRadioSection("security", payload as unknown as Protobuf.Config.Config_SecurityConfig);
   };
 
   const pkiRegenerate = () => {
@@ -112,7 +100,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     }
     const valid = await trigger(["privateKey", "publicKey"]);
     if (valid) {
-      handleSubmit(onSubmit)(); // manually invoke form submit
+      handleSubmit(onSubmit)();
     }
   };
 
@@ -131,8 +119,8 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
         onSubmit={onSubmit}
         fieldGroups={[
           {
-            label: t("security.title"),
-            description: t("security.description"),
+            label: t("security.directMessageKey.label"),
+            description: t("security.directMessageKey.description"),
             fields: [
               {
                 type: "passwordGenerator",
@@ -176,8 +164,8 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
             ],
           },
           {
-            label: t("security.adminSettings.label"),
-            description: t("security.adminSettings.description"),
+            label: t("security.adminKeysCard.label"),
+            description: t("security.adminKeysCard.description"),
             fields: [
               {
                 type: "passwordGenerator",
@@ -189,9 +177,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 devicePSKBitCount: 32,
                 actionButtons: [],
                 disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
-                properties: {
-                  showCopyButton: true,
-                },
+                properties: { showCopyButton: true },
               },
               {
                 type: "passwordGenerator",
@@ -203,9 +189,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 devicePSKBitCount: 32,
                 actionButtons: [],
                 disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
-                properties: {
-                  showCopyButton: true,
-                },
+                properties: { showCopyButton: true },
               },
               {
                 type: "passwordGenerator",
@@ -217,10 +201,32 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 devicePSKBitCount: 32,
                 actionButtons: [],
                 disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
-                properties: {
-                  showCopyButton: true,
-                },
+                properties: { showCopyButton: true },
               },
+            ],
+          },
+          {
+            label: t("security.logsCard.label"),
+            description: t("security.logsCard.description"),
+            fields: [
+              {
+                type: "toggle",
+                name: "serialEnabled",
+                label: t("security.serialOutputEnabled.label"),
+                description: t("security.serialOutputEnabled.description"),
+              },
+              {
+                type: "toggle",
+                name: "debugLogApiEnabled",
+                label: t("security.enableDebugLogApi.label"),
+                description: t("security.enableDebugLogApi.description"),
+              },
+            ],
+          },
+          {
+            label: t("security.administration.label"),
+            description: t("security.administration.description"),
+            fields: [
               {
                 type: "toggle",
                 name: "isManaged",
@@ -230,7 +236,6 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                   if (checked) {
                     setManagedModeDialogOpen(true);
                   }
-
                   setValue("isManaged", false);
                 },
               },
@@ -239,24 +244,6 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 name: "adminChannelEnabled",
                 label: t("security.adminChannelEnabled.label"),
                 description: t("security.adminChannelEnabled.description"),
-              },
-            ],
-          },
-          {
-            label: t("security.loggingSettings.label"),
-            description: t("security.loggingSettings.description"),
-            fields: [
-              {
-                type: "toggle",
-                name: "debugLogApiEnabled",
-                label: t("security.enableDebugLogApi.label"),
-                description: t("security.enableDebugLogApi.description"),
-              },
-              {
-                type: "toggle",
-                name: "serialEnabled",
-                label: t("security.serialOutputEnabled.label"),
-                description: t("security.serialOutputEnabled.description"),
               },
             ],
           },

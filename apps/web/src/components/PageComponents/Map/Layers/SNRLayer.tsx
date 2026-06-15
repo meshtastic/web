@@ -11,7 +11,7 @@ import {
   mercatorToLngLat,
   toLngLat,
 } from "@core/utils/geo";
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import type { Feature, FeatureCollection } from "geojson";
 import { useTranslation } from "react-i18next";
 import { Layer, Source } from "react-map-gl/maplibre";
@@ -31,7 +31,7 @@ export interface SNRTooltipProps {
   pos: { x: number; y: number };
   snr: number;
   from: string;
-  to: string;
+  to: string | undefined;
 }
 
 type NeighborPlus = Protobuf.Mesh.Neighbor & {

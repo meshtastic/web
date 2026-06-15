@@ -7,7 +7,8 @@ import { Power } from "@components/PageComponents/Settings/Power.tsx";
 import { User } from "@components/PageComponents/Settings/User.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
-import { useDevice, type ValidConfigType } from "@core/stores";
+import type { ValidConfigType } from "@core/stores";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -23,8 +24,22 @@ type TabItem = {
   count?: number;
 };
 
+const EMPTY_DIRTY_RADIO_SIGNAL = {
+  value: [] as readonly string[],
+  peek: () => [] as readonly string[],
+  subscribe: () => () => {},
+} as const;
+
+const EMPTY_OWNER_DIRTY_SIGNAL = {
+  value: false,
+  peek: () => false,
+  subscribe: () => () => {},
+} as const;
+
 export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
-  const { hasConfigChange, hasUserChange } = useDevice();
+  const editor = useConfigEditor();
+  const dirtyRadio = useSignal(editor?.dirtyRadioSections ?? EMPTY_DIRTY_RADIO_SIGNAL);
+  const isOwnerDirty = useSignal(editor?.isOwnerDirty ?? EMPTY_OWNER_DIRTY_SIGNAL);
   const { t } = useTranslation("config");
   const tabs: TabItem[] = useMemo(
     () => [
@@ -72,10 +87,10 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
       new Map(
         tabs.map((tab) => [
           tab.case,
-          tab.case === "user" ? hasUserChange() : hasConfigChange(tab.case as ValidConfigType),
+          tab.case === "user" ? isOwnerDirty : dirtyRadio.includes(tab.case as ValidConfigType),
         ]),
       ),
-    [tabs, hasConfigChange, hasUserChange],
+    [tabs, dirtyRadio, isOwnerDirty],
   );
 
   return (

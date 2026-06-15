@@ -1,0 +1,135 @@
+// Main entry
+export { MeshClient } from "./src/core/client/MeshClient.ts";
+export type {
+  ConnectionProgress,
+  ConnectionProgressCounters,
+  MeshClientOptions,
+} from "./src/core/client/MeshClient.ts";
+export { MeshRegistry } from "./src/core/registry/MeshRegistry.ts";
+export type { ConnectionId, RegistryEntry } from "./src/core/registry/MeshRegistry.ts";
+
+// Constants & errors
+export { Constants } from "./src/core/constants/index.ts";
+export {
+  MeshError,
+  PacketTooLargeError,
+  TransportClosedError,
+} from "./src/core/errors/MeshError.ts";
+
+// Shared signal primitives
+export { createStore, SignalMap, toReadonly } from "./src/core/signals/createStore.ts";
+export type { ReadonlySignal } from "./src/core/signals/createStore.ts";
+
+// Logging
+export { createLogger } from "./src/core/logging/logger.ts";
+
+// Identifiers
+export { generatePacketId } from "./src/core/identifiers/PacketId.ts";
+
+// Event bus (advanced consumers)
+export { EventBus } from "./src/core/event-bus/EventBus.ts";
+
+// Packet codec streams (transport implementations)
+export { fromDeviceStream } from "./src/core/packet-codec/fromDevice.ts";
+export { toDeviceStream } from "./src/core/packet-codec/toDevice.ts";
+
+// Queue + Xmodem (advanced)
+export { Queue } from "./src/core/queue/Queue.ts";
+export { Xmodem } from "./src/core/xmodem/Xmodem.ts";
+
+// Transport interface
+export type { DeviceOutput, HttpRetryConfig, Transport } from "./src/core/transport/Transport.ts";
+export { DeviceStatusEnum } from "./src/core/transport/Transport.ts";
+
+// Commonly-used runtime enums exported directly for ergonomic access.
+export { ChannelNumber, Emitter, EmitterScope } from "./src/core/types.ts";
+export type {
+  Destination,
+  LogEvent,
+  LogEventPacket,
+  PacketDestination,
+  PacketError,
+  PacketMetadata,
+  QueueItem,
+} from "./src/core/types.ts";
+
+// Cross-cutting types kept under the Types namespace for consumers that
+// already reference legacy enums/interfaces. Imported via the wrapper to
+// dodge a tsdown dts emitter glitch on bare `export * as` namespaces.
+import * as Types from "./src/types-namespace.ts";
+export { Types };
+
+// Protobuf (re-export)
+export * as Protobuf from "@meshtastic/protobufs";
+
+// Feature slice clients + domain types
+export { DeviceClient } from "./src/features/device/index.ts";
+export type { Device } from "./src/features/device/index.ts";
+
+export { ChatClient } from "./src/features/chat/index.ts";
+export type {
+  ChatClientOptions,
+  ChatDrafts,
+  ChatUnread,
+  ConversationKey,
+  DraftRepository,
+  Message,
+  MessageRepository,
+  RetentionPolicy,
+  SendTextError,
+  SendTextInput,
+} from "./src/features/chat/index.ts";
+export {
+  conversationKeyString,
+  EmptyMessageError,
+  InMemoryDraftRepository,
+  InMemoryMessageRepository,
+  MessageState,
+  MessageTooLongError,
+} from "./src/features/chat/index.ts";
+
+export { NodesClient } from "./src/features/nodes/index.ts";
+export type {
+  Node,
+  NodeError,
+  NodeErrorType,
+  NodesClientOptions,
+  NodesRepository,
+} from "./src/features/nodes/index.ts";
+export { InMemoryNodesRepository } from "./src/features/nodes/index.ts";
+
+export { ChannelsClient } from "./src/features/channels/index.ts";
+export type { Channel } from "./src/features/channels/index.ts";
+
+export { ConfigClient, ConfigEditor } from "./src/features/config/index.ts";
+export type {
+  ModuleConfig,
+  ModuleConfigSection,
+  RadioConfig,
+  RadioConfigSection,
+} from "./src/features/config/index.ts";
+
+export { InMemoryTelemetryRepository, TelemetryClient } from "./src/features/telemetry/index.ts";
+export type {
+  TelemetryClientOptions,
+  TelemetryKind,
+  TelemetryReading,
+  TelemetryRepository,
+  TelemetryRetentionPolicy,
+} from "./src/features/telemetry/index.ts";
+
+export { PositionClient } from "./src/features/position/index.ts";
+export type { Position } from "./src/features/position/index.ts";
+
+export { TraceRouteClient } from "./src/features/traceroute/index.ts";
+export type { TraceRoute } from "./src/features/traceroute/index.ts";
+
+export { FilesClient } from "./src/features/files/index.ts";
+export type { FileTransfer, TransferStatus } from "./src/features/files/index.ts";
+
+// Phase-A legacy shims (removed in Phase C)
+export { MeshDevice } from "./src/shim/legacyMeshDevice.ts";
+// Same workaround as Types — go through a wrapper to dodge tsdown's dts
+// emitter bug on `export * as`.
+import * as Utils from "./src/shim/legacyUtils.ts";
+export { Utils };

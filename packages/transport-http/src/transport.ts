@@ -1,4 +1,4 @@
-import { Types } from "@meshtastic/core";
+import { DeviceStatusEnum, type DeviceOutput, type Transport } from "@meshtastic/sdk";
 
 const FETCH_INTERVAL_MS = 3000;
 const READ_TIMEOUT_MS = 7000;
@@ -18,13 +18,13 @@ function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
 /**
  * Provides HTTP(S) transport for Meshtastic devices.
  *
- * Implements {@link Types.Transport} using the device's HTTP API.
+ * Implements {@link Transport} using the device's HTTP API.
  * Polls `/api/v1/fromradio` for incoming packets and writes to `/api/v1/toradio`.
  */
-export class TransportHTTP implements Types.Transport {
+export class TransportHTTP implements Transport {
   private _toDevice: WritableStream<Uint8Array>;
-  private _fromDevice: ReadableStream<Types.DeviceOutput>;
-  private fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
+  private _fromDevice: ReadableStream<DeviceOutput>;
+  private fromDeviceController?: ReadableStreamDefaultController<DeviceOutput>;
 
   private url: string;
   private receiveBatchRequests: boolean;
@@ -34,7 +34,7 @@ export class TransportHTTP implements Types.Transport {
 
   private inflightReadController?: AbortController;
 
-  private lastStatus: Types.DeviceStatusEnum = Types.DeviceStatusEnum.DeviceDisconnected;
+  private lastStatus: DeviceStatusEnum = DeviceStatusEnum.DeviceDisconnected;
   private closingByUser = false;
 
   /**
@@ -69,7 +69,7 @@ export class TransportHTTP implements Types.Transport {
         } catch (error) {
           if (!this.closingByUser) {
             this.emitStatus(
-              Types.DeviceStatusEnum.DeviceDisconnected,
+              DeviceStatusEnum.DeviceDisconnected,
               this.isTimeoutOrAbort(error) ? "write-timeout" : "write-error",
             );
             return;
@@ -79,10 +79,10 @@ export class TransportHTTP implements Types.Transport {
       },
     });
 
-    this._fromDevice = new ReadableStream<Types.DeviceOutput>({
+    this._fromDevice = new ReadableStream<DeviceOutput>({
       start: (ctrl) => {
         this.fromDeviceController = ctrl;
-        this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
+        this.emitStatus(DeviceStatusEnum.DeviceConnecting);
 
         // Start polling immediately
         void this.safePoll();
@@ -120,7 +120,7 @@ export class TransportHTTP implements Types.Transport {
           throw new Error(`fromradio ${response.status} ${response.statusText}`);
         }
 
-        this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
+        this.emitStatus(DeviceStatusEnum.DeviceConnected);
 
         readBuffer = await response.arrayBuffer();
 
@@ -151,7 +151,7 @@ export class TransportHTTP implements Types.Transport {
     } catch (error) {
       if (!this.closingByUser) {
         this.emitStatus(
-          Types.DeviceStatusEnum.DeviceDisconnected,
+          DeviceStatusEnum.DeviceDisconnected,
           this.isTimeoutOrAbort(error) ? "write-timeout" : "write-error",
         );
         return;
@@ -165,8 +165,8 @@ export class TransportHTTP implements Types.Transport {
     return this._toDevice;
   }
 
-  /** Readable stream of {@link Types.DeviceOutput} from the device. */
-  get fromDevice(): ReadableStream<Types.DeviceOutput> {
+  /** Readable stream of {@link DeviceOutput} from the device. */
+  get fromDevice(): ReadableStream<DeviceOutput> {
     return this._fromDevice;
   }
 
@@ -187,12 +187,12 @@ export class TransportHTTP implements Types.Transport {
     } catch {}
     this.inflightReadController = undefined;
 
-    this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
+    this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "user");
 
     return Promise.resolve();
   }
 
-  private emitStatus(next: Types.DeviceStatusEnum, reason?: string): void {
+  private emitStatus(next: DeviceStatusEnum, reason?: string): void {
     if (next === this.lastStatus) {
       return;
     }
@@ -220,7 +220,7 @@ export class TransportHTTP implements Types.Transport {
     } catch (error) {
       if (!this.closingByUser) {
         this.emitStatus(
-          Types.DeviceStatusEnum.DeviceDisconnected,
+          DeviceStatusEnum.DeviceDisconnected,
           this.isTimeoutOrAbort(error) ? "read-timeout" : "read-error",
         );
       }

@@ -1,0 +1,342 @@
+import { signal } from "@preact/signals-core";
+import type { ResultType } from "better-result";
+import type { MeshClient } from "../../core/client/MeshClient.ts";
+import { Constants } from "../../core/constants/index.ts";
+import { generatePacketId } from "../../core/identifiers/PacketId.ts";
+import { type ReadonlySignal, toReadonly } from "../../core/signals/createStore.ts";
+import type { ChannelNumber } from "../../core/types.ts";
+import type { DraftRepository } from "./domain/DraftRepository.ts";
+import type { Message } from "./domain/Message.ts";
+import type {
+  ConversationKey,
+  MessageRepository,
+  RetentionPolicy,
+} from "./domain/MessageRepository.ts";
+import { MessageState } from "./domain/MessageState.ts";
+import { MessageMapper } from "./infrastructure/MessageMapper.ts";
+import { InMemoryDraftRepository } from "./infrastructure/repositories/InMemoryDraftRepository.ts";
+import { InMemoryMessageRepository } from "./infrastructure/repositories/InMemoryMessageRepository.ts";
+import { type SendTextError, type SendTextInput, sendText } from "./application/SendTextUseCase.ts";
+import { ChatStore } from "./state/chatStore.ts";
+import { DraftStore } from "./state/draftStore.ts";
+
+export interface ChatClientOptions {
+  repository?: MessageRepository;
+  draftRepository?: DraftRepository;
+  retention?: RetentionPolicy;
+  /** Messages to load into the store on first subscription of a conversation. */
+  initialLoadLimit?: number;
+}
+
+/**
+ * Drafts namespace: per-conversation working text. Lazy-hydrates from the
+ * configured DraftRepository on first read; auto-clears on successful send.
+ */
+export interface ChatDrafts {
+  get(key: ConversationKey): ReadonlySignal<string>;
+  set(key: ConversationKey, text: string): void;
+  clear(key: ConversationKey): void;
+}
+
+/**
+ * Unread-counts namespace. Counts inbound messages per conversation; resets
+ * on `markRead(key)`. Counts are in-memory only (no persistence) — the
+ * recipe for persistence later is to track a `lastReadAt` timestamp per
+ * conversation in the message repository and compute unread on hydrate.
+ */
+export interface ChatUnread {
+  /** Map of conversation-key string -> unread count. */
+  readonly byKey: ReadonlySignal<ReadonlyMap<string, number>>;
+  /** Sum of all unread counts across conversations. */
+  readonly total: ReadonlySignal<number>;
+  /** Unread count for a single conversation. */
+  count(key: ConversationKey): ReadonlySignal<number>;
+  /** Zero out the unread count for a conversation. */
+  markRead(key: ConversationKey): void;
+}
+
+/**
+ * Chat slice facade. Exposes message buckets keyed by channel or peer, drafts
+ * keyed the same way, and the `send` command for outbound text. Optional
+ * persistence via MessageRepository / DraftRepository.
+ */
+export class ChatClient {
+  private readonly client: MeshClient;
+  private readonly store: ChatStore;
+  private readonly draftStore: DraftStore;
+  private readonly repository: MessageRepository;
+  private readonly draftRepository: DraftRepository;
+  private readonly retention: RetentionPolicy | undefined;
+  private readonly initialLoadLimit: number;
+  private readonly hydrated = new Set<string>();
+  private readonly draftsHydrated = new Set<string>();
+  private readonly unreadByKey = signal<ReadonlyMap<string, number>>(new Map());
+
+  public readonly drafts: ChatDrafts;
+  public readonly unread: ChatUnread;
+
+  constructor(client: MeshClient, options: ChatClientOptions = {}) {
+    this.client = client;
+    this.store = new ChatStore();
+    this.draftStore = new DraftStore();
+    this.repository = options.repository ?? new InMemoryMessageRepository();
+    this.draftRepository = options.draftRepository ?? new InMemoryDraftRepository();
+    this.retention = options.retention;
+    this.initialLoadLimit = options.initialLoadLimit ?? 50;
+
+    this.drafts = {
+      get: (key) => this.draftFor(key),
+      set: (key, text) => this.setDraft(key, text),
+      clear: (key) => this.setDraft(key, ""),
+    };
+
+    this.unread = {
+      byKey: toReadonly(this.unreadByKey),
+      total: this.deriveTotalUnread(),
+      count: (key) => this.deriveUnreadCount(key),
+      markRead: (key) => this.markRead(key),
+    };
+
+    client.events.onMessagePacket.subscribe((packet) => {
+      const message = MessageMapper.fromPacket(packet);
+      const conv: ConversationKey =
+        packet.type === "direct" && packet.to !== Constants.broadcastNum
+          ? { kind: "direct", peer: packet.from === client.myNodeNum ? packet.to : packet.from }
+          : { kind: "channel", channel: packet.channel };
+      const key = this.keyFor(conv);
+
+      // Outbound is optimistic-appended in `send()`. If the firmware later
+      // echoes the same packet via `fromradio`, skip the duplicate.
+      if (this.store.hasMessage(key, message.id)) return;
+
+      this.store.append(key, message);
+      void this.persistAppend(message);
+
+      // Increment unread count when the message is inbound (not from us). The
+      // outbound echo of our own send doesn't count as unread.
+      if (packet.from !== client.myNodeNum) {
+        this.bumpUnread(key);
+      }
+    });
+
+    client.events.onRoutingPacket.subscribe((packet) => {
+      if (packet.data.variant.case === "errorReason") {
+        const state = packet.data.variant.value === 0 ? MessageState.Ack : MessageState.Failed;
+        this.store.updateState(packet.id, state);
+        void this.repository.updateState(packet.id, state).catch(() => {});
+      }
+    });
+  }
+
+  public messages(channel: ChannelNumber): ReadonlySignal<Message[]> {
+    this.ensureHydrated({ kind: "channel", channel });
+    return this.store.messagesForChannel(channel);
+  }
+
+  public direct(peer: number): ReadonlySignal<Message[]> {
+    this.ensureHydrated({ kind: "direct", peer });
+    return this.store.messagesForDirect(peer);
+  }
+
+  public async loadOlder(conv: ConversationKey, before: Date, limit = 50): Promise<Message[]> {
+    const older = await this.repository.loadBefore(conv, before, limit);
+    const key = this.keyFor(conv);
+    for (let i = older.length - 1; i >= 0; i--) this.store.prepend(key, older[i]!);
+    return older;
+  }
+
+  /**
+   * Empties a single conversation from memory + persistence. Draft for the
+   * same conversation is untouched; callers invoke `drafts.clear(conv)` too
+   * if they want the compose box wiped.
+   */
+  public async clearConversation(conv: ConversationKey): Promise<void> {
+    const key = this.keyFor(conv);
+    this.store.clearBucket(key);
+    this.hydrated.delete(key);
+    try {
+      await this.repository.clearConversation(conv);
+    } catch {
+      // ok
+    }
+  }
+
+  /**
+   * Wipes every message across every conversation for this client.
+   */
+  public async clearAll(): Promise<void> {
+    this.store.clearAll();
+    this.hydrated.clear();
+    try {
+      await this.repository.clear();
+    } catch {
+      // ok
+    }
+  }
+
+  public async send(input: SendTextInput): Promise<ResultType<number, SendTextError>> {
+    const conv: ConversationKey =
+      typeof input.destination === "number"
+        ? { kind: "direct", peer: input.destination }
+        : { kind: "channel", channel: input.channel ?? 0 };
+
+    // Optimistic-append BEFORE awaiting `sendText`. The send pipeline
+    // resolves only after `queue.processAck(id)` fires (firmware ack —
+    // can be 1–3 s on LoRa) and we don't want the UI to wait that long
+    // to render the user's own message. We pre-generate the packet id
+    // so the eventual routing-ack subscriber can match by id and flip
+    // state Pending → Ack.
+    //
+    // (The firmware does not echo own outbound text back via `fromradio`
+    // and `MeshClient.sendPacket(echoResponse=true)` only dispatches the
+    // raw `onMeshPacket` — not the per-portnum `onMessagePacket` the
+    // chat slice subscribes to. Hence the explicit append here.)
+    const packetId = generatePacketId();
+    const key = this.keyFor(conv);
+    const message: Message = {
+      id: packetId,
+      from: this.client.myNodeNum,
+      to: typeof input.destination === "number" ? input.destination : Constants.broadcastNum,
+      channel: input.channel ?? 0,
+      rxTime: new Date(),
+      type: typeof input.destination === "number" ? "direct" : "broadcast",
+      text: input.text,
+      state: MessageState.Pending,
+    };
+    if (!this.store.hasMessage(key, packetId)) {
+      this.store.append(key, message);
+      void this.persistAppend(message);
+    }
+    this.draftStore.clear(conv);
+    void this.draftRepository.clear(conv).catch(() => {});
+
+    const result = await sendText(this.client, { ...input, packetId });
+    if (result.status === "error") {
+      // Send pipeline failed (transport closed, validation, etc.). Keep
+      // the optimistic message visible but mark it Failed so the user
+      // sees the error state next to their bubble.
+      this.store.updateState(packetId, MessageState.Failed);
+      void this.repository.updateState(packetId, MessageState.Failed).catch(() => {});
+    }
+    return result;
+  }
+
+  private ensureHydrated(conv: ConversationKey): void {
+    const key = this.keyFor(conv);
+    if (this.hydrated.has(key)) return;
+    this.hydrated.add(key);
+    void (async () => {
+      try {
+        const recent = await this.repository.loadRecent(conv, this.initialLoadLimit);
+        for (const m of recent) this.store.append(key, m);
+      } catch {
+        // adapter may not have history yet; safe to ignore
+      }
+    })();
+  }
+
+  private draftFor(conv: ConversationKey): ReadonlySignal<string> {
+    const key = this.keyFor(conv);
+    if (!this.draftsHydrated.has(key)) {
+      this.draftsHydrated.add(key);
+      void (async () => {
+        try {
+          const stored = await this.draftRepository.load(conv);
+          if (stored) this.draftStore.set(conv, stored);
+        } catch {
+          // ok
+        }
+      })();
+    }
+    return this.draftStore.get(conv);
+  }
+
+  private setDraft(conv: ConversationKey, text: string): void {
+    this.draftsHydrated.add(this.keyFor(conv));
+    this.draftStore.set(conv, text);
+    void this.draftRepository.save(conv, text).catch(() => {
+      // persistence failure must not break reactive flow
+    });
+  }
+
+  private async persistAppend(message: Message): Promise<void> {
+    try {
+      await this.repository.append(message);
+      if (this.retention) await this.repository.prune(this.retention);
+    } catch {
+      // persistence failure must not break reactive flow
+    }
+  }
+
+  private keyFor(conv: ConversationKey): string {
+    return conv.kind === "channel"
+      ? this.store.channelKey(conv.channel)
+      : this.store.directKey(conv.peer);
+  }
+
+  private bumpUnread(key: string): void {
+    const next = new Map(this.unreadByKey.peek());
+    next.set(key, (next.get(key) ?? 0) + 1);
+    this.unreadByKey.value = next;
+  }
+
+  private markRead(key: ConversationKey): void {
+    const k = this.keyFor(key);
+    const current = this.unreadByKey.peek();
+    if ((current.get(k) ?? 0) === 0) return;
+    const next = new Map(current);
+    next.delete(k);
+    this.unreadByKey.value = next;
+  }
+
+  private deriveTotalUnread(): ReadonlySignal<number> {
+    const src = this.unreadByKey;
+    return {
+      get value() {
+        let total = 0;
+        for (const c of src.value.values()) total += c;
+        return total;
+      },
+      peek() {
+        let total = 0;
+        for (const c of src.peek().values()) total += c;
+        return total;
+      },
+      subscribe(listener) {
+        let first = true;
+        return src.subscribe((m) => {
+          if (first) {
+            first = false;
+            return;
+          }
+          let total = 0;
+          for (const c of m.values()) total += c;
+          listener(total);
+        });
+      },
+    };
+  }
+
+  private deriveUnreadCount(key: ConversationKey): ReadonlySignal<number> {
+    const k = this.keyFor(key);
+    const src = this.unreadByKey;
+    return {
+      get value() {
+        return src.value.get(k) ?? 0;
+      },
+      peek() {
+        return src.peek().get(k) ?? 0;
+      },
+      subscribe(listener) {
+        let first = true;
+        return src.subscribe((m) => {
+          if (first) {
+            first = false;
+            return;
+          }
+          listener(m.get(k) ?? 0);
+        });
+      },
+    };
+  }
+}

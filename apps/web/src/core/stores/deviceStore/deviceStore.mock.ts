@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import { vi } from "vitest";
 import type { Device } from "./index.ts";
 
@@ -16,10 +16,11 @@ export const mockDeviceStore: Device = {
   id: 0,
   myNodeNum: 123456,
   status: 5 as const,
+  connectionPhase: "disconnected",
+  connectionId: null,
   channels: new Map(),
   config: {} as Protobuf.LocalOnly.LocalConfig,
   moduleConfig: {} as Protobuf.LocalOnly.LocalModuleConfig,
-  changeRegistry: { changes: new Map() },
   hardware: {} as Protobuf.Mesh.MyNodeInfo,
   metadata: new Map(),
   traceroutes: new Map(),
@@ -28,7 +29,6 @@ export const mockDeviceStore: Device = {
   waypoints: [],
   pendingSettingsChanges: false,
   messageDraft: "",
-  unreadCounts: new Map(),
   dialog: {
     import: false,
     QR: false,
@@ -52,6 +52,8 @@ export const mockDeviceStore: Device = {
   neighborInfo: new Map(),
 
   setStatus: vi.fn(),
+  setConnectionPhase: vi.fn(),
+  setConnectionId: vi.fn(),
   setConfig: vi.fn(),
   setModuleConfig: vi.fn(),
   getEffectiveConfig: vi.fn(),
@@ -69,31 +71,10 @@ export const mockDeviceStore: Device = {
   setDialogOpen: vi.fn(),
   getDialogOpen: vi.fn().mockReturnValue(false),
   setMessageDraft: vi.fn(),
-  incrementUnread: vi.fn(),
-  resetUnread: vi.fn(),
   sendAdminMessage: vi.fn(),
   addClientNotification: vi.fn(),
   removeClientNotification: vi.fn(),
   getClientNotification: vi.fn(),
-  getAllUnreadCount: vi.fn().mockReturnValue(0),
-  getUnreadCount: vi.fn().mockReturnValue(0),
   getNeighborInfo: vi.fn(),
   addNeighborInfo: vi.fn(),
-
-  // New unified change tracking methods
-  setChange: vi.fn(),
-  removeChange: vi.fn(),
-  hasChange: vi.fn().mockReturnValue(false),
-  getChange: vi.fn(),
-  clearAllChanges: vi.fn(),
-  hasConfigChange: vi.fn().mockReturnValue(false),
-  hasModuleConfigChange: vi.fn().mockReturnValue(false),
-  hasChannelChange: vi.fn().mockReturnValue(false),
-  hasUserChange: vi.fn().mockReturnValue(false),
-  getConfigChangeCount: vi.fn().mockReturnValue(0),
-  getModuleConfigChangeCount: vi.fn().mockReturnValue(0),
-  getChannelChangeCount: vi.fn().mockReturnValue(0),
-  getAllConfigChanges: vi.fn().mockReturnValue([]),
-  getAllModuleConfigChanges: vi.fn().mockReturnValue([]),
-  getAllChannelChanges: vi.fn().mockReturnValue([]),
 };

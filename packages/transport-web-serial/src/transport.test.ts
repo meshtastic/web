@@ -1,7 +1,9 @@
-import { Types, Utils } from "@meshtastic/core";
+import * as MeshSDK from "@meshtastic/sdk";
+import { DeviceStatusEnum, type DeviceOutput, toDeviceStream } from "@meshtastic/sdk";
+import { Result } from "better-result";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract.ts";
-import { TransportWebSerial } from "./transport.ts";
+import { SerialConnectError, TransportWebSerial } from "./transport.ts";
 
 function stubCoreTransforms() {
   const toDevice = () =>
@@ -13,21 +15,23 @@ function stubCoreTransforms() {
 
   // maps raw bytes -> DeviceOutput.packet
   const fromDeviceFactory = () =>
-    new TransformStream<Uint8Array, Types.DeviceOutput>({
+    new TransformStream<Uint8Array, DeviceOutput>({
       transform(chunk, controller) {
         controller.enqueue({ type: "packet", data: chunk });
       },
     });
 
-  const transform = Utils.toDeviceStream;
+  const transform = toDeviceStream;
+  // biome-ignore lint/suspicious/noExplicitAny: vi.spyOn's overloads on a re-exported module binding don't match
+  const sdk = MeshSDK as any;
   const restoreTo = vi
-    .spyOn(Utils, "toDeviceStream", "get")
+    .spyOn(sdk, "toDeviceStream", "get")
     .mockReturnValue(toDevice as unknown as typeof transform);
 
   const restoreFrom = vi
-    .spyOn(Utils, "fromDeviceStream")
+    .spyOn(sdk, "fromDeviceStream")
     .mockImplementation(
-      () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, Types.DeviceOutput>,
+      () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, DeviceOutput>,
     );
 
   return {
@@ -102,19 +106,25 @@ function stubNavigatorSerial() {
 }
 
 class FakeSerialPort {
-  readable: ReadableStream<Uint8Array>;
-  writable: WritableStream<Uint8Array>;
+  // Mirrors the Web Serial spec: streams are null until `open()` resolves
+  // and become null again after `close()`. preparePort relies on this to
+  // decide whether the port is currently open.
+  readable: ReadableStream<Uint8Array> | null = null;
+  writable: WritableStream<Uint8Array> | null = null;
   lastWritten?: Uint8Array;
 
   private _readController!: ReadableStreamDefaultController<Uint8Array>;
 
   constructor() {
+    this.openStreams();
+  }
+
+  private openStreams(): void {
     this.readable = new ReadableStream<Uint8Array>({
       start: (controller) => {
         this._readController = controller;
       },
     });
-
     this.writable = new WritableStream<Uint8Array>({
       write: async (chunk) => {
         this.lastWritten = chunk;
@@ -123,6 +133,9 @@ class FakeSerialPort {
   }
 
   open(_options?: { baudRate?: number }): Promise<void> {
+    if (!this.readable || !this.writable) {
+      this.openStreams();
+    }
     return Promise.resolve();
   }
 
@@ -130,6 +143,8 @@ class FakeSerialPort {
     try {
       this._readController.close();
     } catch {}
+    this.readable = null;
+    this.writable = null;
     return Promise.resolve();
   }
 
@@ -159,7 +174,8 @@ describe("TransportWebSerial (contract)", () => {
     teardown: () => {},
     create: async () => {
       const fake = new FakeSerialPort();
-      const transport = await TransportWebSerial.createFromPort(fake as any);
+      const result = await TransportWebSerial.createFromPort(fake as any);
+      const transport = result.unwrap();
       (globalThis as any).__ws = { fake, serial: navSerial!.serialStub };
       await Promise.resolve();
       return transport;
@@ -195,7 +211,8 @@ describe("TransportWebSerial (extras)", () => {
 
   it("emits DeviceDisconnected('serial-disconnected') on OS disconnect event", async () => {
     const fake = new FakeSerialPort();
-    const transport = await TransportWebSerial.createFromPort(fake as any);
+    const result = await TransportWebSerial.createFromPort(fake as any);
+    const transport = result.unwrap();
     (globalThis as any).__ws = { fake, serial: navSerial!.serialStub };
 
     const reader = transport.fromDevice.getReader();
@@ -206,7 +223,7 @@ describe("TransportWebSerial (extras)", () => {
       if (!value || value.type !== "status") {
         break;
       }
-      if (value.data.status === Types.DeviceStatusEnum.DeviceConnected) {
+      if (value.data.status === DeviceStatusEnum.DeviceConnected) {
         break;
       }
     }
@@ -227,5 +244,70 @@ describe("TransportWebSerial (extras)", () => {
 
     reader.releaseLock();
     await transport.disconnect();
+  });
+});
+
+describe("TransportWebSerial.createFromPort port hygiene", () => {
+  let transforms: { restore(): void } | undefined;
+  let navSerial: { serialStub: any; restore(): void } | undefined;
+
+  beforeEach(() => {
+    transforms = stubCoreTransforms();
+    navSerial = stubNavigatorSerial();
+  });
+
+  afterEach(() => {
+    transforms?.restore();
+    navSerial?.restore();
+    vi.restoreAllMocks();
+  });
+
+  it("force-closes a port that's still open from a prior session", async () => {
+    const fake = new FakeSerialPort();
+    // Streams are non-null right after construction — simulate "previous
+    // session left it open". preparePort should close + reopen rather
+    // than barfing on the already-open state.
+    expect(fake.readable).not.toBeNull();
+    const closeSpy = vi.spyOn(fake, "close");
+    const result = await TransportWebSerial.createFromPort(fake as any);
+    expect(Result.isOk(result)).toBe(true);
+    expect(closeSpy).toHaveBeenCalledTimes(1);
+    if (Result.isOk(result)) await result.value.disconnect();
+  });
+
+  it("retries open() with backoff on InvalidStateError", async () => {
+    const fake = new FakeSerialPort();
+    await fake.close();
+    let attempts = 0;
+    vi.spyOn(fake, "open").mockImplementation(async () => {
+      attempts += 1;
+      if (attempts < 3) {
+        const err = new Error("Failed to open serial port") as Error & { name: string };
+        err.name = "InvalidStateError";
+        throw err;
+      }
+      // 3rd attempt succeeds — recreate streams as the real port would.
+      (fake as any).openStreams();
+    });
+    const result = await TransportWebSerial.createFromPort(fake as any);
+    expect(attempts).toBe(3);
+    expect(Result.isOk(result)).toBe(true);
+    if (Result.isOk(result)) await result.value.disconnect();
+  });
+
+  it("returns Err(kind=in-use) when open() keeps throwing InvalidStateError", async () => {
+    const fake = new FakeSerialPort();
+    await fake.close();
+    vi.spyOn(fake, "open").mockImplementation(async () => {
+      const err = new Error("Failed to open serial port") as Error & { name: string };
+      err.name = "InvalidStateError";
+      throw err;
+    });
+    const result = await TransportWebSerial.createFromPort(fake as any);
+    expect(Result.isError(result)).toBe(true);
+    if (Result.isError(result)) {
+      expect(result.error).toBeInstanceOf(SerialConnectError);
+      expect(result.error.kind).toBe("in-use");
+    }
   });
 });

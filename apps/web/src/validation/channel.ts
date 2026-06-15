@@ -1,5 +1,5 @@
 import { validateMaxByteLength } from "@core/utils/string.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { z } from "zod/v4";
 import { makePskHelpers } from "./pskSchema.ts";
 

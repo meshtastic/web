@@ -42,14 +42,28 @@
     "commandPalette": "Поиск команд..."
   },
   "toast": {
-    "positionRequestSent": { "title": "Запрос позиции отправлен." },
-    "requestingPosition": { "title": "Запрашиваем позицию, пожалуйста, подождите..." },
-    "sendingTraceroute": { "title": "Отправляем трассировку, пожалуйста, подождите..." },
-    "tracerouteSent": { "title": "Трассировка отправлена." },
-    "savedChannel": { "title": "Канал сохранён: {{channelName}}" },
+    "positionRequestSent": {
+      "title": "Запрос позиции отправлен."
+    },
+    "requestingPosition": {
+      "title": "Запрашиваем позицию, пожалуйста, подождите..."
+    },
+    "sendingTraceroute": {
+      "title": "Отправляем трассировку, пожалуйста, подождите..."
+    },
+    "tracerouteSent": {
+      "title": "Трассировка отправлена."
+    },
+    "savedChannel": {
+      "title": "Канал сохранён: {{channelName}}"
+    },
     "messages": {
-      "pkiEncryption": { "title": "Чат использует шифрование PKI." },
-      "pskEncryption": { "title": "Чат использует шифрование PSK." }
+      "pkiEncryption": {
+        "title": "Чат использует шифрование PKI."
+      },
+      "pskEncryption": {
+        "title": "Чат использует шифрование PSK."
+      }
     },
     "configSaveError": {
       "title": "Ошибка сохранения настроек",
@@ -212,5 +226,9 @@
   "footer": {
     "text": "Работает на <0>▲ Vercel</0> | Meshtastic® — зарегистрированный товарный знак Meshtastic LLC. | <1>Юридическая информация</1>",
     "commitSha": "SHA коммита: {{sha}}"
+  },
+  "language": {
+    "label": "Язык",
+    "changeLanguage": "Change Language"
   }
 }

@@ -5,28 +5,40 @@ import {
 } from "@app/validation/moduleConfig/ambientLighting.ts";
 import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface AmbientLightingModuleConfigProps {
   onFormInit: DynamicFormFormInit<AmbientLightingValidation>;
 }
 
+const EMPTY_MODULES_SIGNAL = {
+  value: {} as { ambientLighting?: Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig },
+  peek: () =>
+    ({}) as { ambientLighting?: Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const AmbientLighting = ({ onFormInit }: AmbientLightingModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "ambientLighting" });
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
+
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const editor = useConfigEditor();
+  const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
+  const effective =
+    modules.ambientLighting ??
+    (getEffectiveModuleConfig("ambientLighting") as
+      | Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig
+      | undefined);
+
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AmbientLightingValidation) => {
-    if (deepCompareConfig(moduleConfig.ambientLighting, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "ambientLighting" });
-      return;
-    }
-
-    setChange(
-      { type: "moduleConfig", variant: "ambientLighting" },
-      data,
-      moduleConfig.ambientLighting,
+    if (!editor) return;
+    editor.setModuleSection(
+      "ambientLighting",
+      data as unknown as Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig,
     );
   };
 
@@ -36,11 +48,11 @@ export const AmbientLighting = ({ onFormInit }: AmbientLightingModuleConfigProps
       onFormInit={onFormInit}
       validationSchema={AmbientLightingValidationSchema}
       defaultValues={moduleConfig.ambientLighting}
-      values={getEffectiveModuleConfig("ambientLighting")}
+      values={effective}
       fieldGroups={[
         {
-          label: t("ambientLighting.title"),
-          description: t("ambientLighting.description"),
+          label: t("ambientLighting.ambientLightingConfig.label"),
+          description: t("ambientLighting.ambientLightingConfig.description"),
           fields: [
             {
               type: "toggle",

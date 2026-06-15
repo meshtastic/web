@@ -16,7 +16,7 @@ Installation instructions are available at
 ## Usage
 
 ```ts
-import { MeshDevice } from "@meshtastic/core";
+import { MeshDevice } from "@meshtastic/sdk";
 import { TransportHTTP } from "@meshtastic/transport-http";
 
 const transport = await TransportHTTP.create("10.10.0.57");

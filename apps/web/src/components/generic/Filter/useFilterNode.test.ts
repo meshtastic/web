@@ -1,5 +1,5 @@
 import { useFilterNode } from "@components/generic/Filter/useFilterNode.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
@@ -13,6 +13,7 @@ function createMockNode(): Protobuf.Mesh.NodeInfo {
     viaMqtt: false,
     isFavorite: true,
     isIgnored: false,
+    isMuted: false,
     hopsAway: 2,
     isKeyManuallyVerified: false,
     user: {

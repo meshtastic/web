@@ -2,7 +2,6 @@ import { z } from "zod";
 
 /** Map feature keys -> env var names (Vite exposes only VITE_*). */
 export const FLAG_ENV = {
-  persistNodeDB: "VITE_PERSIST_NODE_DB",
   persistMessages: "VITE_PERSIST_MESSAGES",
   persistDevices: "VITE_PERSIST_DEVICES",
   persistApp: "VITE_PERSIST_APP",

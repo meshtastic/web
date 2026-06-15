@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 
 export const TelemetryValidationSchema = z.object({
+  deviceTelemetryEnabled: z.boolean(),
   deviceUpdateInterval: z.coerce.number().int().min(0),
   environmentUpdateInterval: z.coerce.number().int().min(0),
   environmentMeasurementEnabled: z.boolean(),

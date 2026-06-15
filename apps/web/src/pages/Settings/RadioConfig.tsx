@@ -3,7 +3,8 @@ import { LoRa } from "@components/PageComponents/Settings/LoRa.tsx";
 import { Security } from "@components/PageComponents/Settings/Security/Security.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
-import { useDevice, type ValidConfigType } from "@core/stores";
+import type { ValidConfigType } from "@core/stores";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -19,8 +20,22 @@ type TabItem = {
   count?: number;
 };
 
+const EMPTY_DIRTY_RADIO_SIGNAL = {
+  value: [] as readonly string[],
+  peek: () => [] as readonly string[],
+  subscribe: () => () => {},
+} as const;
+
+const EMPTY_DIRTY_CHANNELS_SIGNAL = {
+  value: [] as readonly number[],
+  peek: () => [] as readonly number[],
+  subscribe: () => () => {},
+} as const;
+
 export const RadioConfig = ({ onFormInit }: ConfigProps) => {
-  const { hasConfigChange } = useDevice();
+  const editor = useConfigEditor();
+  const dirtyRadio = useSignal(editor?.dirtyRadioSections ?? EMPTY_DIRTY_RADIO_SIGNAL);
+  const dirtyChannels = useSignal(editor?.dirtyChannels ?? EMPTY_DIRTY_CHANNELS_SIGNAL);
   const { t } = useTranslation("config");
   const tabs: TabItem[] = useMemo(
     () => [
@@ -45,8 +60,13 @@ export const RadioConfig = ({ onFormInit }: ConfigProps) => {
 
   const flags = useMemo(
     () =>
-      new Map(tabs.map((tab) => [tab.case, tab.case !== "channels" && hasConfigChange(tab.case)])),
-    [tabs, hasConfigChange],
+      new Map(
+        tabs.map((tab) => [
+          tab.case,
+          tab.case === "channels" ? dirtyChannels.length > 0 : dirtyRadio.includes(tab.case),
+        ]),
+      ),
+    [tabs, dirtyRadio, dirtyChannels],
   );
 
   return (
