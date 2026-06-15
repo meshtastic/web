@@ -14,3 +14,8 @@ updates:
       tanstack:
         patterns:
           - "@tanstack/*"
+      react-ecosystem:
+        patterns:
+          - react
+          - react-dom
+          - "@types/react*"
