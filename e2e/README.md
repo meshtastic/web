@@ -105,17 +105,19 @@ pnpm test:e2e
 
 ## Known limitations
 
-- **Direct messages (`messaging.direct`) are `fixme` — a simulator limitation,
-  not a web-app issue.** Current firmware requires PKI for DMs (`Unknown public
-  key for destination ... refusing to send legacy DM`) and the `meshtasticd` sim
-  nodes never end up with a usable **broadcast** public key, so the two nodes
-  can't exchange keys and the send is NAK'd (`NO_CHANNEL`, routing error 6). The
-  device's `config.security` keys ARE settable and persist (verified via admin),
-  but on the native sim they don't sync to the node's owner / NodeInfo key
-  (`owner.public_key` stays empty, the node keeps its MAC-derived num), so
-  provisioning them doesn't help. The app behaves correctly (it raises the
-  key-refresh dialog). Broadcast already covers bidirectional messaging;
-  re-enable against real hardware, where keys generate and exchange normally.
+- **Direct messages (`messaging.direct`) are `fixme` — a SimRadio limitation, not
+  a web-app issue.** DMs go out PKI-encrypted. PKI keygen is gated on a set LoRa
+  region (NodeDB.cpp:3051; the sim boots region-UNSET) — setting `lora.region`
+  via admin *does* make the nodes generate and exchange keys (verified: both
+  learn each other's public key). But a PKI DM still can't traverse the SimRadio:
+  the PKC overhead exceeds its payload limit (`Payload size larger than compressed
+  message allows! Send empty payload`), so the packet is truncated and the
+  receiver NAKs `NO_CHANNEL` (`No suitable channel found for decoding, hash 0x0`).
+  The firmware skips PKC under `--sim` (Router.cpp:730) for exactly this reason,
+  but `--sim` also disables the config-file loading (Webserver/EnableUDP/MAC) the
+  web app needs, so the two are mutually exclusive. The app behaves correctly
+  (key-refresh dialog). Broadcast covers bidirectional messaging; re-enable
+  against real hardware, where real LoRa carries PKC fine.
 
 ## App bugs surfaced by this suite (fixed on this branch)
 
