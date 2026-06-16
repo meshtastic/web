@@ -105,7 +105,7 @@
     "@types/js-cookie": "^3.0.6",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@types/serviceworker": "^0.0.158",
+    "@types/serviceworker": "^0.0.197",
     "@types/w3c-web-serial": "^1.0.8",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
     "@vitejs/plugin-react": "^6.0.2",
