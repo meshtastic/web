@@ -83,7 +83,7 @@
     "maplibre-gl": "5.24.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-error-boundary": "^6.0.0",
+    "react-error-boundary": "^6.1.2",
     "react-hook-form": "^7.79.0",
     "react-i18next": "^17.0.8",
     "react-map-gl": "8.1.0",
