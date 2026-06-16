@@ -8,7 +8,10 @@ export interface ResetNodeDbDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const ResetNodeDbDialog = ({ open, onOpenChange }: ResetNodeDbDialogProps) => {
+export const ResetNodeDbDialog = ({
+  open,
+  onOpenChange,
+}: ResetNodeDbDialogProps) => {
   const { t } = useTranslation("dialog");
   const meshClient = useActiveClient();
 

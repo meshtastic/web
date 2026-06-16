@@ -18,8 +18,12 @@ export class DeviceClient {
   public readonly isConfigured: ReadonlySignal<boolean>;
   public readonly pendingSettingsChanges: ReadonlySignal<boolean>;
   public readonly myNodeNum: ReadonlySignal<number | undefined>;
-  public readonly metadata: ReadonlySignal<Protobuf.Mesh.DeviceMetadata | undefined>;
-  public readonly myNodeInfo: ReadonlySignal<Protobuf.Mesh.MyNodeInfo | undefined>;
+  public readonly metadata: ReadonlySignal<
+    Protobuf.Mesh.DeviceMetadata | undefined
+  >;
+  public readonly myNodeInfo: ReadonlySignal<
+    Protobuf.Mesh.MyNodeInfo | undefined
+  >;
 
   constructor(client: MeshClient) {
     this.client = client;

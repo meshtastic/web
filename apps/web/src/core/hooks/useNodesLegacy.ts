@@ -18,7 +18,9 @@ export function useNodesAsProto(): Protobuf.Mesh.NodeInfo[] {
   return useMemo(() => nodes.map(toNodeInfo), [nodes]);
 }
 
-export function useNodeAsProto(nodeNum: number): Protobuf.Mesh.NodeInfo | undefined {
+export function useNodeAsProto(
+  nodeNum: number,
+): Protobuf.Mesh.NodeInfo | undefined {
   const nodes = useNodes();
   return useMemo(() => {
     const found = nodes.find((n) => n.num === nodeNum);

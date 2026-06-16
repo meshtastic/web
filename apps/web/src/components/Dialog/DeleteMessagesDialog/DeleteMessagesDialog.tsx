@@ -8,7 +8,10 @@ export interface DeleteMessagesDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const DeleteMessagesDialog = ({ open, onOpenChange }: DeleteMessagesDialogProps) => {
+export const DeleteMessagesDialog = ({
+  open,
+  onOpenChange,
+}: DeleteMessagesDialogProps) => {
   const { t } = useTranslation("dialog");
   const meshClient = useActiveClient();
 

@@ -13,10 +13,19 @@ import type { TransportWebSerial } from "@meshtastic/transport-web-serial";
 
 const log = createLogger("sdkClient");
 
-export type AnyTransport = TransportHTTP | TransportWebBluetooth | TransportWebSerial;
+export type AnyTransport =
+  | TransportHTTP
+  | TransportWebBluetooth
+  | TransportWebSerial;
 
-const CHAT_RETENTION = { maxPerBucket: 1000, olderThanMs: 1000 * 60 * 60 * 24 * 90 } as const;
-const TELEMETRY_RETENTION = { maxPerNode: 500, olderThanMs: 1000 * 60 * 60 * 24 * 30 } as const;
+const CHAT_RETENTION = {
+  maxPerBucket: 1000,
+  olderThanMs: 1000 * 60 * 60 * 24 * 90,
+} as const;
+const TELEMETRY_RETENTION = {
+  maxPerNode: 500,
+  olderThanMs: 1000 * 60 * 60 * 24 * 30,
+} as const;
 const STORAGE_OPEN_TIMEOUT_MS = 5000;
 
 /**
@@ -44,24 +53,38 @@ export async function buildMeshDevice(
         setTimeout(
           () =>
             reject(
-              new Error(`sqlocal DB open did not resolve within ${STORAGE_OPEN_TIMEOUT_MS}ms`),
+              new Error(
+                `sqlocal DB open did not resolve within ${STORAGE_OPEN_TIMEOUT_MS}ms`,
+              ),
             ),
           STORAGE_OPEN_TIMEOUT_MS,
         ),
       ),
     ]);
     log.debug("buildMeshDevice: storage DB ready", { ms: Date.now() - t0 });
-    chatRepository = new SqlocalMessageRepository(db, { deviceId: connectionId, coordinator });
-    draftRepository = new SqlocalDraftRepository(db, { deviceId: connectionId });
-    nodesRepository = new SqlocalNodesRepository(db, { deviceId: connectionId });
-    telemetryRepository = new SqlocalTelemetryRepository(db, { deviceId: connectionId });
+    chatRepository = new SqlocalMessageRepository(db, {
+      deviceId: connectionId,
+      coordinator,
+    });
+    draftRepository = new SqlocalDraftRepository(db, {
+      deviceId: connectionId,
+    });
+    nodesRepository = new SqlocalNodesRepository(db, {
+      deviceId: connectionId,
+    });
+    telemetryRepository = new SqlocalTelemetryRepository(db, {
+      deviceId: connectionId,
+    });
     log.debug("buildMeshDevice: repositories opened");
   } catch (err) {
     const e = err as Error;
-    log.warn("buildMeshDevice: sqlocal unavailable, falling back to in-memory", {
-      name: e?.name,
-      message: e?.message,
-    });
+    log.warn(
+      "buildMeshDevice: sqlocal unavailable, falling back to in-memory",
+      {
+        name: e?.name,
+        message: e?.message,
+      },
+    );
   }
 
   return new MeshDevice(transport, {

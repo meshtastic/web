@@ -10,7 +10,10 @@ export interface RemoveNodeDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const RemoveNodeDialog = ({ open, onOpenChange }: RemoveNodeDialogProps) => {
+export const RemoveNodeDialog = ({
+  open,
+  onOpenChange,
+}: RemoveNodeDialogProps) => {
   const { t } = useTranslation("dialog");
   const meshClient = useActiveClient();
   const { nodeNumToBeRemoved } = useAppStore();

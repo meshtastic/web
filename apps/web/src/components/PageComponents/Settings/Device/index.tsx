@@ -1,7 +1,13 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import { type DeviceValidation, DeviceValidationSchema } from "@app/validation/config/device.ts";
+import {
+  type DeviceValidation,
+  DeviceValidationSchema,
+} from "@app/validation/config/device.ts";
 import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -25,14 +31,19 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
     radio.device ??
-    (getEffectiveConfig("device") as Protobuf.Config.Config_DeviceConfig | undefined);
+    (getEffectiveConfig("device") as
+      | Protobuf.Config.Config_DeviceConfig
+      | undefined);
 
   const { t } = useTranslation("config");
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
   const onSubmit = (data: DeviceValidation) => {
     if (!editor) return;
-    editor.setRadioSection("device", data as unknown as Protobuf.Config.Config_DeviceConfig);
+    editor.setRadioSection(
+      "device",
+      data as unknown as Protobuf.Config.Config_DeviceConfig,
+    );
   };
 
   return (

@@ -1,7 +1,13 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import { type MqttValidation, MqttValidationSchema } from "@app/validation/moduleConfig/mqtt.ts";
+import {
+  type MqttValidation,
+  MqttValidationSchema,
+} from "@app/validation/moduleConfig/mqtt.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -17,7 +23,9 @@ const EMPTY_MODULES_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
-const populateDefaults = (cfg: Protobuf.ModuleConfig.ModuleConfig_MQTTConfig | undefined) =>
+const populateDefaults = (
+  cfg: Protobuf.ModuleConfig.ModuleConfig_MQTTConfig | undefined,
+) =>
   cfg
     ? {
         ...cfg,
@@ -38,7 +46,9 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
 
   const effectiveMqtt =
     modules.mqtt ??
-    (getEffectiveModuleConfig("mqtt") as Protobuf.ModuleConfig.ModuleConfig_MQTTConfig | undefined);
+    (getEffectiveModuleConfig("mqtt") as
+      | Protobuf.ModuleConfig.ModuleConfig_MQTTConfig
+      | undefined);
 
   const { t } = useTranslation("moduleConfig");
 
@@ -60,20 +70,37 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
   const positionPrecisionOptions =
     config.display?.units === 0
       ? {
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km23")]: 10,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km12")]: 11,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km5_8")]: 12,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km2_9")]: 13,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km1_5")]: 14,
-          [t("mqtt.mapReportSettings.positionPrecision.options.metric_m700")]: 15,
+          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km23")]:
+            10,
+          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km12")]:
+            11,
+          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km5_8")]:
+            12,
+          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km2_9")]:
+            13,
+          [t("mqtt.mapReportSettings.positionPrecision.options.metric_km1_5")]:
+            14,
+          [t("mqtt.mapReportSettings.positionPrecision.options.metric_m700")]:
+            15,
         }
       : {
-          [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi15")]: 10,
-          [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3")]: 11,
-          [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6")]: 12,
-          [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8")]: 13,
-          [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9")]: 14,
-          [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5")]: 15,
+          [t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi15")]:
+            10,
+          [t(
+            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3",
+          )]: 11,
+          [t(
+            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6",
+          )]: 12,
+          [t(
+            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8",
+          )]: 13,
+          [t(
+            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9",
+          )]: 14,
+          [t(
+            "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5",
+          )]: 15,
         };
 
   return (
@@ -167,14 +194,21 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
               type: "toggle",
               name: "mapReportSettings.shouldReportLocation",
               label: t("mqtt.mapReportSettings.shouldReportLocation.label"),
-              description: t("mqtt.mapReportSettings.shouldReportLocation.description"),
-              disabledBy: [{ fieldName: "enabled" }, { fieldName: "mapReportingEnabled" }],
+              description: t(
+                "mqtt.mapReportSettings.shouldReportLocation.description",
+              ),
+              disabledBy: [
+                { fieldName: "enabled" },
+                { fieldName: "mapReportingEnabled" },
+              ],
             },
             {
               type: "select",
               name: "mapReportSettings.positionPrecision",
               label: t("mqtt.mapReportSettings.positionPrecision.label"),
-              description: t("mqtt.mapReportSettings.positionPrecision.description"),
+              description: t(
+                "mqtt.mapReportSettings.positionPrecision.description",
+              ),
               properties: { enumValue: positionPrecisionOptions },
               disabledBy: [
                 { fieldName: "enabled" },
@@ -186,7 +220,9 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
               type: "number",
               name: "mapReportSettings.publishIntervalSecs",
               label: t("mqtt.mapReportSettings.publishIntervalSecs.label"),
-              description: t("mqtt.mapReportSettings.publishIntervalSecs.description"),
+              description: t(
+                "mqtt.mapReportSettings.publishIntervalSecs.description",
+              ),
               properties: { suffix: t("unit.second.plural") },
               disabledBy: [
                 { fieldName: "enabled" },

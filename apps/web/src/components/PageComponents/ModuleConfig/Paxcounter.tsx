@@ -3,7 +3,10 @@ import {
   type PaxcounterValidation,
   PaxcounterValidationSchema,
 } from "@app/validation/moduleConfig/paxcounter.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -14,8 +17,13 @@ interface PaxcounterModuleConfigProps {
 }
 
 const EMPTY_MODULES_SIGNAL = {
-  value: {} as { paxcounter?: Protobuf.ModuleConfig.ModuleConfig_PaxcounterConfig },
-  peek: () => ({}) as { paxcounter?: Protobuf.ModuleConfig.ModuleConfig_PaxcounterConfig },
+  value: {} as {
+    paxcounter?: Protobuf.ModuleConfig.ModuleConfig_PaxcounterConfig;
+  },
+  peek: () =>
+    ({}) as {
+      paxcounter?: Protobuf.ModuleConfig.ModuleConfig_PaxcounterConfig;
+    },
   subscribe: () => () => {},
 } as const;
 

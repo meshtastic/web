@@ -3,7 +3,10 @@ import {
   type StatusMessageValidation,
   StatusMessageValidationSchema,
 } from "@app/validation/moduleConfig/statusMessage.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
@@ -12,10 +15,13 @@ interface StatusMessageModuleConfigProps {
   onFormInit: DynamicFormFormInit<StatusMessageValidation>;
 }
 
-export const StatusMessage = ({ onFormInit }: StatusMessageModuleConfigProps) => {
+export const StatusMessage = ({
+  onFormInit,
+}: StatusMessageModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "statusmessage" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: StatusMessageValidation) => {
@@ -24,7 +30,11 @@ export const StatusMessage = ({ onFormInit }: StatusMessageModuleConfigProps) =>
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "statusmessage" }, data, moduleConfig.statusmessage);
+    setChange(
+      { type: "moduleConfig", variant: "statusmessage" },
+      data,
+      moduleConfig.statusmessage,
+    );
   };
 
   return (

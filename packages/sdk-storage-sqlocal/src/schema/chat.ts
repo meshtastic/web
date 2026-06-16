@@ -22,7 +22,11 @@ export const messages = sqliteTable(
   },
   (t) => ({
     pk: index("messages_pk").on(t.deviceId, t.id),
-    convRxTime: index("idx_messages_conv_rxtime").on(t.deviceId, t.conversationKey, t.rxTime),
+    convRxTime: index("idx_messages_conv_rxtime").on(
+      t.deviceId,
+      t.conversationKey,
+      t.rxTime,
+    ),
     pending: index("idx_messages_pending").on(t.deviceId, t.state),
   }),
 );

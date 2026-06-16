@@ -1,5 +1,9 @@
 import * as MeshSDK from "@meshtastic/sdk";
-import { DeviceStatusEnum, type DeviceOutput, toDeviceStream } from "@meshtastic/sdk";
+import {
+  DeviceStatusEnum,
+  type DeviceOutput,
+  toDeviceStream,
+} from "@meshtastic/sdk";
 import { Result } from "better-result";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract.ts";
@@ -31,7 +35,11 @@ function stubCoreTransforms() {
   const restoreFrom = vi
     .spyOn(sdk, "fromDeviceStream")
     .mockImplementation(
-      () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, DeviceOutput>,
+      () =>
+        fromDeviceFactory() as unknown as TransformStream<
+          Uint8Array,
+          DeviceOutput
+        >,
     );
 
   return {
@@ -47,12 +55,18 @@ function stubNavigatorSerial() {
   const handlers = new Set<SerialDisconnectHandler>();
 
   const serialStub = {
-    addEventListener: (type: string, handler: EventListenerOrEventListenerObject) => {
+    addEventListener: (
+      type: string,
+      handler: EventListenerOrEventListenerObject,
+    ) => {
       if (type === "disconnect") {
         handlers.add(handler as any as SerialDisconnectHandler);
       }
     },
-    removeEventListener: (type: string, handler: EventListenerOrEventListenerObject) => {
+    removeEventListener: (
+      type: string,
+      handler: EventListenerOrEventListenerObject,
+    ) => {
       if (type === "disconnect") {
         handlers.delete(handler as any as SerialDisconnectHandler);
       }
@@ -188,7 +202,9 @@ describe("TransportWebSerial (contract)", () => {
       expect((globalThis as any).__ws.fake.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (globalThis as any).__ws.serial.dispatchDisconnect((globalThis as any).__ws.fake);
+      (globalThis as any).__ws.serial.dispatchDisconnect(
+        (globalThis as any).__ws.fake,
+      );
       await Promise.resolve();
     },
   });
@@ -235,7 +251,10 @@ describe("TransportWebSerial (extras)", () => {
     let saw = false;
     for (let i = 0; i < 6; i++) {
       const { value } = await reader.read();
-      if (value?.type === "status" && value.data.reason === "serial-disconnected") {
+      if (
+        value?.type === "status" &&
+        value.data.reason === "serial-disconnected"
+      ) {
         saw = true;
         break;
       }
@@ -282,7 +301,9 @@ describe("TransportWebSerial.createFromPort port hygiene", () => {
     vi.spyOn(fake, "open").mockImplementation(async () => {
       attempts += 1;
       if (attempts < 3) {
-        const err = new Error("Failed to open serial port") as Error & { name: string };
+        const err = new Error("Failed to open serial port") as Error & {
+          name: string;
+        };
         err.name = "InvalidStateError";
         throw err;
       }
@@ -299,7 +320,9 @@ describe("TransportWebSerial.createFromPort port hygiene", () => {
     const fake = new FakeSerialPort();
     await fake.close();
     vi.spyOn(fake, "open").mockImplementation(async () => {
-      const err = new Error("Failed to open serial port") as Error & { name: string };
+      const err = new Error("Failed to open serial port") as Error & {
+        name: string;
+      };
       err.name = "InvalidStateError";
       throw err;
     });

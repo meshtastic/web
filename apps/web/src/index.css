@@ -1,17 +1,17 @@
 @font-face {
-  font-family: 'Inter var';
+  font-family: "Inter var";
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/InterVariable.woff2') format('woff2');
+  src: url("/fonts/InterVariable.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: 'Inter var';
+  font-family: "Inter var";
   font-style: italic;
   font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/InterVariable-Italic.woff2') format('woff2');
+  src: url("/fonts/InterVariable-Italic.woff2") format("woff2");
 }
 
 @import "tailwindcss";
@@ -23,12 +23,10 @@
   navigation: auto;
 }
 
-
-
 @theme {
   --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   --font-sans:
     Inter var, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -47,7 +45,7 @@
   --brightness-hover: var(--brightnessHover);
   --brightness-press: var(--brightnessPress);
   --brightness-disabled: var(--brightnessDisabled);
-  --sidebar-width: @apply w-50 lg:w-64;
+  --sidebar-width: @apply w-50 lg: w-64;
 }
 
 [data-theme="light"] {
@@ -98,7 +96,6 @@
   transition: transform 200ms ease-out;
 }
 
-
 html {
   overflow: hidden;
 }
@@ -110,12 +107,9 @@ body {
 
 body {
   font-family: var(--font-sans);
-
 }
 
-
 @layer base {
-
   *,
   ::after,
   ::before,

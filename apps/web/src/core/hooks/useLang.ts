@@ -16,7 +16,10 @@ type LanguageState = {
 
 function useLang() {
   const { i18n } = useTranslation();
-  const [_, setLanguageInStorage] = useLocalStorage<LanguageState | null>(STORAGE_KEY, null);
+  const [_, setLanguageInStorage] = useLocalStorage<LanguageState | null>(
+    STORAGE_KEY,
+    null,
+  );
 
   const currentLanguage = useMemo((): Lang | undefined => {
     const lang = supportedLanguages.find((l) => l.code === i18n.language);

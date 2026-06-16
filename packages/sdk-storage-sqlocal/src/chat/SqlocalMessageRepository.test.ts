@@ -28,12 +28,20 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
 
   it("loadRecent returns the tail in chronological order", async () => {
     await repo.appendBatch([msg(1, 1000), msg(2, 2000), msg(3, 3000)]);
-    const out = await repo.loadRecent({ kind: "channel", channel: ChannelNumber.Primary }, 2);
+    const out = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      2,
+    );
     expect(out.map((m) => m.id)).toEqual([2, 3]);
   });
 
   it("loadBefore paginates older messages", async () => {
-    await repo.appendBatch([msg(1, 1000), msg(2, 2000), msg(3, 3000), msg(4, 4000)]);
+    await repo.appendBatch([
+      msg(1, 1000),
+      msg(2, 2000),
+      msg(3, 3000),
+      msg(4, 4000),
+    ]);
     const out = await repo.loadBefore(
       { kind: "channel", channel: ChannelNumber.Primary },
       new Date(3000),
@@ -45,22 +53,39 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
   it("updateState mutates the matching row", async () => {
     await repo.append(msg(42, 1000));
     await repo.updateState(42, MessageState.Failed);
-    const [found] = await repo.loadRecent({ kind: "channel", channel: ChannelNumber.Primary }, 1);
+    const [found] = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      1,
+    );
     expect(found?.state).toBe(MessageState.Failed);
   });
 
   it("prune enforces maxPerBucket", async () => {
-    await repo.appendBatch([msg(1, 1000), msg(2, 2000), msg(3, 3000), msg(4, 4000)]);
+    await repo.appendBatch([
+      msg(1, 1000),
+      msg(2, 2000),
+      msg(3, 3000),
+      msg(4, 4000),
+    ]);
     await repo.prune({ maxPerBucket: 2 });
-    const out = await repo.loadRecent({ kind: "channel", channel: ChannelNumber.Primary }, 10);
+    const out = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      10,
+    );
     expect(out.map((m) => m.id)).toEqual([3, 4]);
   });
 
   it("prune enforces olderThanMs", async () => {
     const now = Date.now();
-    await repo.appendBatch([msg(1, now - 1000 * 60 * 60 * 24 * 10), msg(2, now)]);
+    await repo.appendBatch([
+      msg(1, now - 1000 * 60 * 60 * 24 * 10),
+      msg(2, now),
+    ]);
     await repo.prune({ olderThanMs: 1000 * 60 * 60 * 24 });
-    const out = await repo.loadRecent({ kind: "channel", channel: ChannelNumber.Primary }, 10);
+    const out = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      10,
+    );
     expect(out.map((m) => m.id)).toEqual([2]);
   });
 
@@ -68,8 +93,14 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     const repoB = new SqlocalMessageRepository(db, { deviceId: 2 });
     await repo.append(msg(1, 1000, "from-1"));
     await repoB.append(msg(2, 2000, "from-2"));
-    const a = await repo.loadRecent({ kind: "channel", channel: ChannelNumber.Primary }, 10);
-    const b = await repoB.loadRecent({ kind: "channel", channel: ChannelNumber.Primary }, 10);
+    const a = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      10,
+    );
+    const b = await repoB.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      10,
+    );
     expect(a.map((m) => m.text)).toEqual(["from-1"]);
     expect(b.map((m) => m.text)).toEqual(["from-2"]);
   });

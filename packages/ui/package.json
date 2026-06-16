@@ -6,14 +6,17 @@
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git"
   },
-  "type": "module",
   "files": [
     "dist",
     "!dist/**/*.test.*"
   ],
+  "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -21,9 +24,6 @@
     },
     "./theme/default.css": "./dist/theme/default.css"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "start": "npm run dev",
     "dev": "vite dev",
@@ -36,14 +36,6 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "test": "vitest"
-  },
-  "peerDependencies": {
-    "@radix-ui/react-slot": ">=1.0.2",
-    "class-variance-authority": ">=0.7.0",
-    "react": ">=19",
-    "react-dom": ">=19",
-    "tailwind-merge": ">=2.5.0",
-    "tailwindcss": "^4.1.7"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.13",
@@ -72,5 +64,13 @@
     "vite-plugin-dts": "^5.0.2",
     "vite-plugin-static-copy": "^4.1.1",
     "vitest": "^4.1.8"
+  },
+  "peerDependencies": {
+    "@radix-ui/react-slot": ">=1.0.2",
+    "class-variance-authority": ">=0.7.0",
+    "react": ">=19",
+    "react-dom": ">=19",
+    "tailwind-merge": ">=2.5.0",
+    "tailwindcss": "^4.1.7"
   }
 }

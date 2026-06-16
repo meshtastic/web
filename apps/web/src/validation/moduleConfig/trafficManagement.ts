@@ -17,4 +17,6 @@ export const TrafficManagementValidationSchema = z.object({
   routerPreserveHops: z.boolean(),
 });
 
-export type TrafficManagementValidation = z.infer<typeof TrafficManagementValidationSchema>;
+export type TrafficManagementValidation = z.infer<
+  typeof TrafficManagementValidationSchema
+>;

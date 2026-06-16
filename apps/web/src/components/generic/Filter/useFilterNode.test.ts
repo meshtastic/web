@@ -111,7 +111,9 @@ describe("useFilterNode", () => {
           hwModel: [Protobuf.Mesh.HardwareModel.TLORA_T3_S3],
         }),
       ).toBe(true);
-      expect(nodeFilter(node, { hwModel: [Protobuf.Mesh.HardwareModel.HELTEC_V3] })).toBe(false);
+      expect(
+        nodeFilter(node, { hwModel: [Protobuf.Mesh.HardwareModel.HELTEC_V3] }),
+      ).toBe(false);
     });
 
     it("filters by hopsUnknown", () => {
@@ -188,8 +190,12 @@ describe("useFilterNode", () => {
         lastHeard: [lastHeardMin, lastHeardMax],
       } = defaultFilterValues;
       const veryOld = { ...node, lastHeard: lastHeardMax + 1 }; // older than slider max
-      expect(nodeFilter(veryOld, { lastHeard: [lastHeardMin, lastHeardMax] })).toBe(true); // open upper
-      expect(nodeFilter(veryOld, { lastHeard: [lastHeardMin, lastHeardMax - 1] })).toBe(false); // now bounded
+      expect(
+        nodeFilter(veryOld, { lastHeard: [lastHeardMin, lastHeardMax] }),
+      ).toBe(true); // open upper
+      expect(
+        nodeFilter(veryOld, { lastHeard: [lastHeardMin, lastHeardMax - 1] }),
+      ).toBe(false); // now bounded
     });
 
     it("snr: max at default means no upper bound", () => {
@@ -222,7 +228,9 @@ describe("useFilterNode", () => {
         },
       } satisfies Protobuf.Mesh.NodeInfo;
       expect(nodeFilter(hiV, { voltage: [voltageMin, voltageMax] })).toBe(true); // open upper
-      expect(nodeFilter(hiV, { voltage: [voltageMin, voltageMax - 0.01] })).toBe(false); // bounded
+      expect(
+        nodeFilter(hiV, { voltage: [voltageMin, voltageMax - 0.01] }),
+      ).toBe(false); // bounded
     });
   });
 });

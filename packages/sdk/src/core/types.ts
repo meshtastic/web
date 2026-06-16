@@ -1,6 +1,10 @@
 import type * as Protobuf from "@meshtastic/protobufs";
 
-export type { DeviceOutput, HttpRetryConfig, Transport } from "./transport/Transport.ts";
+export type {
+  DeviceOutput,
+  HttpRetryConfig,
+  Transport,
+} from "./transport/Transport.ts";
 export { DeviceStatusEnum } from "./transport/Transport.ts";
 
 export interface QueueItem {

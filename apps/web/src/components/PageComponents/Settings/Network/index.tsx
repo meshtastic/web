@@ -1,9 +1,18 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import { type NetworkValidation, NetworkValidationSchema } from "@app/validation/config/network.ts";
+import {
+  type NetworkValidation,
+  NetworkValidationSchema,
+} from "@app/validation/config/network.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { convertIntToIpAddress, convertIpAddressToInt } from "@core/utils/ip.ts";
+import {
+  convertIntToIpAddress,
+  convertIpAddressToInt,
+} from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
@@ -18,7 +27,9 @@ const EMPTY_RADIO_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
-const toFormShape = (cfg: Protobuf.Config.Config_NetworkConfig | undefined) => ({
+const toFormShape = (
+  cfg: Protobuf.Config.Config_NetworkConfig | undefined,
+) => ({
   ...cfg,
   ipv4Config: {
     ip: convertIntToIpAddress(cfg?.ipv4Config?.ip ?? 0),
@@ -27,7 +38,8 @@ const toFormShape = (cfg: Protobuf.Config.Config_NetworkConfig | undefined) => (
     dns: convertIntToIpAddress(cfg?.ipv4Config?.dns ?? 0),
   },
   enabledProtocols:
-    cfg?.enabledProtocols ?? Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
+    cfg?.enabledProtocols ??
+    Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
 });
 
 export const Network = ({ onFormInit }: NetworkConfigProps) => {
@@ -38,7 +50,9 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
     radio.network ??
-    (getEffectiveConfig("network") as Protobuf.Config.Config_NetworkConfig | undefined);
+    (getEffectiveConfig("network") as
+      | Protobuf.Config.Config_NetworkConfig
+      | undefined);
 
   const { t } = useTranslation("config");
 
@@ -46,14 +60,20 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
     if (!editor) return;
     const payload = {
       ...data,
-      ipv4Config: create(Protobuf.Config.Config_NetworkConfig_IpV4ConfigSchema, {
-        ip: convertIpAddressToInt(data.ipv4Config?.ip ?? ""),
-        gateway: convertIpAddressToInt(data.ipv4Config?.gateway ?? ""),
-        subnet: convertIpAddressToInt(data.ipv4Config?.subnet ?? ""),
-        dns: convertIpAddressToInt(data.ipv4Config?.dns ?? ""),
-      }),
+      ipv4Config: create(
+        Protobuf.Config.Config_NetworkConfig_IpV4ConfigSchema,
+        {
+          ip: convertIpAddressToInt(data.ipv4Config?.ip ?? ""),
+          gateway: convertIpAddressToInt(data.ipv4Config?.gateway ?? ""),
+          subnet: convertIpAddressToInt(data.ipv4Config?.subnet ?? ""),
+          dns: convertIpAddressToInt(data.ipv4Config?.dns ?? ""),
+        },
+      ),
     };
-    editor.setRadioSection("network", payload as unknown as Protobuf.Config.Config_NetworkConfig);
+    editor.setRadioSection(
+      "network",
+      payload as unknown as Protobuf.Config.Config_NetworkConfig,
+    );
   };
 
   return (
@@ -144,7 +164,8 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
+                  selector:
+                    Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
             },
@@ -156,7 +177,8 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
+                  selector:
+                    Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
             },
@@ -168,7 +190,8 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
+                  selector:
+                    Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
             },
@@ -180,7 +203,8 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
+                  selector:
+                    Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
             },

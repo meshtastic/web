@@ -4,7 +4,10 @@ import LanguageSwitcher from "@app/components/LanguageSwitcher";
 import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { useConnections } from "@app/pages/Connections/useConnections";
-import { connectionTypeIcon, formatConnectionSubtext } from "@app/pages/Connections/utils";
+import {
+  connectionTypeIcon,
+  formatConnectionSubtext,
+} from "@app/pages/Connections/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +21,13 @@ import {
 } from "@components/UI/AlertDialog.tsx";
 import { Badge } from "@components/UI/Badge.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@components/UI/Card.tsx";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@components/UI/Card.tsx";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -96,7 +105,9 @@ export const Connections = () => {
             <ArrowLeft className="size-5" />
           </button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{t("page.title")}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              {t("page.title")}
+            </h1>
             <p className="lg:w-4/6 md:w-5/6 text-slate-500 dark:text-slate-400 mt-1">
               {t("page.description")}
             </p>
@@ -116,7 +127,9 @@ export const Connections = () => {
       {sorted.length === 0 ? (
         <Card className="border-dashed">
           <CardHeader>
-            <CardTitle className="text-lg">{t("noConnections.title")} </CardTitle>
+            <CardTitle className="text-lg">
+              {t("noConnections.title")}{" "}
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-slate-500 dark:text-slate-400">
             {t("noConnections.description")}
@@ -215,7 +228,10 @@ export const Connections = () => {
                 interpolation: { escapeValue: false },
               }),
             });
-            if (created.status === "connected" || created.status === "configured") {
+            if (
+              created.status === "connected" ||
+              created.status === "configured"
+            ) {
               navigate({ to: "/" });
             }
           } else {
@@ -232,7 +248,8 @@ export const Connections = () => {
 
 function TypeBadge({ type }: { type: Connection["type"] }) {
   const Icon = connectionTypeIcon(type);
-  const label = type === "http" ? "HTTP" : type === "bluetooth" ? "Bluetooth" : "Serial";
+  const label =
+    type === "http" ? "HTTP" : type === "bluetooth" ? "Bluetooth" : "Serial";
   return (
     <Badge variant="default" className="gap-1.5">
       <Icon className="h-3.5 w-3.5" />
@@ -259,8 +276,10 @@ function ConnectionCard({
   const { t } = useTranslation("connections");
 
   const Icon = connectionTypeIcon(connection.type);
-  const isBusy = connection.status === "connecting" || connection.status === "configuring";
-  const isConnected = connection.status === "connected" || connection.status === "configured";
+  const isBusy =
+    connection.status === "connecting" || connection.status === "configuring";
+  const isConnected =
+    connection.status === "connected" || connection.status === "configured";
   const isError = connection.status === "error";
 
   return (
@@ -297,13 +316,19 @@ function ConnectionCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {connection.type === "http" && connection.isDefault && (
-                  <DropdownMenuItem className="gap-2" onClick={() => onSetDefault()}>
+                  <DropdownMenuItem
+                    className="gap-2"
+                    onClick={() => onSetDefault()}
+                  >
                     <StarOff className="size-4" />
                     {t("button.unsetDefault")}
                   </DropdownMenuItem>
                 )}
                 {connection.type === "http" && !connection.isDefault && (
-                  <DropdownMenuItem className="gap-2" onClick={() => onSetDefault()}>
+                  <DropdownMenuItem
+                    className="gap-2"
+                    onClick={() => onSetDefault()}
+                  >
                     <Star className="size-4" />
                     {t("button.setDefault")}
                   </DropdownMenuItem>
@@ -320,13 +345,17 @@ function ConnectionCard({
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>{t("deleteConnection")}</AlertDialogTitle>
+                      <AlertDialogTitle>
+                        {t("deleteConnection")}
+                      </AlertDialogTitle>
                       <AlertDialogDescription>
                         {t("areYouSure", { name: connection.name })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>{t("button.cancel")}</AlertDialogCancel>
+                      <AlertDialogCancel>
+                        {t("button.cancel")}
+                      </AlertDialogCancel>
                       <AlertDialogAction
                         className="bg-red-600 hover:bg-red-700"
                         onClick={() => onDelete()}
@@ -343,7 +372,9 @@ function ConnectionCard({
       </CardHeader>
       <CardContent className="pt-0">
         {connection.error ? (
-          <p className="text-sm text-red-600 dark:text-red-400">{connection.error}</p>
+          <p className="text-sm text-red-600 dark:text-red-400">
+            {connection.error}
+          </p>
         ) : connection.lastConnectedAt ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {t("lastConnectedAt", { date: "" })}{" "}
@@ -353,7 +384,9 @@ function ConnectionCard({
             />
           </p>
         ) : (
-          <p className="text-sm text-slate-500 dark:text-slate-400">{t("neverConnected")}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t("neverConnected")}
+          </p>
         )}
       </CardContent>
       <CardFooter className="flex items-center gap-2 mt-auto">

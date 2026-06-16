@@ -3,7 +3,10 @@ import {
   type RemoteHardwareValidation,
   RemoteHardwareValidationSchema,
 } from "@app/validation/moduleConfig/remoteHardware.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
@@ -12,10 +15,13 @@ interface RemoteHardwareModuleConfigProps {
   onFormInit: DynamicFormFormInit<RemoteHardwareValidation>;
 }
 
-export const RemoteHardware = ({ onFormInit }: RemoteHardwareModuleConfigProps) => {
+export const RemoteHardware = ({
+  onFormInit,
+}: RemoteHardwareModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "remoteHardware" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: RemoteHardwareValidation) => {
@@ -53,7 +59,9 @@ export const RemoteHardware = ({ onFormInit }: RemoteHardwareModuleConfigProps) 
               type: "toggle",
               name: "allowUndefinedPinAccess",
               label: t("remoteHardware.allowUndefinedPinAccess.label"),
-              description: t("remoteHardware.allowUndefinedPinAccess.description"),
+              description: t(
+                "remoteHardware.allowUndefinedPinAccess.description",
+              ),
             },
           ],
         },

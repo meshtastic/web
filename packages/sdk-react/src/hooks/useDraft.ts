@@ -15,13 +15,19 @@ export interface UseDraftResult {
  */
 export function useDraft(conv: ConversationKey): UseDraftResult {
   const client = useClient();
-  const sig = useMemo(() => client.chat.drafts.get(conv), [client, conv.kind, keyOf(conv)]);
+  const sig = useMemo(
+    () => client.chat.drafts.get(conv),
+    [client, conv.kind, keyOf(conv)],
+  );
   const text = useSignal(sig);
   const setText = useCallback(
     (value: string) => client.chat.drafts.set(conv, value),
     [client, conv],
   );
-  const clear = useCallback(() => client.chat.drafts.clear(conv), [client, conv]);
+  const clear = useCallback(
+    () => client.chat.drafts.clear(conv),
+    [client, conv],
+  );
   return { text, setText, clear };
 }
 

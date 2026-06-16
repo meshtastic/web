@@ -16,4 +16,6 @@ export const DetectionSensorValidationSchema = z.object({
   usePullup: z.boolean(),
 });
 
-export type DetectionSensorValidation = z.infer<typeof DetectionSensorValidationSchema>;
+export type DetectionSensorValidation = z.infer<
+  typeof DetectionSensorValidationSchema
+>;

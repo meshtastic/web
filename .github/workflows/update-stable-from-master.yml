@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          fetch-tags: true  # IMPORTANT: we need tags to resolve the release commit
+          fetch-tags: true # IMPORTANT: we need tags to resolve the release commit
 
       - name: Configure Git author
         run: |

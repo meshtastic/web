@@ -23,7 +23,9 @@ export function useIgnoreNode() {
       const node = meshClient.nodes.byNum(nodeNum);
       if (!node) return;
 
-      void (isIgnored ? meshClient.nodes.ignore(nodeNum) : meshClient.nodes.unignore(nodeNum));
+      void (isIgnored
+        ? meshClient.nodes.ignore(nodeNum)
+        : meshClient.nodes.unignore(nodeNum));
 
       toast({
         title: t("toast.ignoreNode.title", {

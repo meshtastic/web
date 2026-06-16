@@ -18,7 +18,9 @@ interface LanguageSwitcherProps {
   disableHover?: boolean;
 }
 
-export default function LanguageSwitcher({ disableHover = false }: LanguageSwitcherProps) {
+export default function LanguageSwitcher({
+  disableHover = false,
+}: LanguageSwitcherProps) {
   const { i18n } = useTranslation("ui");
   const { set: setLanguage, current, getSupportedLangs } = useLang();
 
@@ -44,13 +46,15 @@ export default function LanguageSwitcher({ disableHover = false }: LanguageSwitc
             size={16}
             className={cn(
               "text-gray-500 dark:text-gray-400 w-4 flex-shrink-0 transition-colors duration-150",
-              !disableHover && "group-hover:text-gray-700 dark:group-hover:text-gray-200",
+              !disableHover &&
+                "group-hover:text-gray-700 dark:group-hover:text-gray-200",
             )}
           />
           <Subtle
             className={cn(
               "text-sm text-gray-600 dark:text-gray-100 transition-colors duration-150",
-              !disableHover && "group-hover:text-gray-800 dark:group-hover:text-gray-100",
+              !disableHover &&
+                "group-hover:text-gray-800 dark:group-hover:text-gray-100",
             )}
           >
             {`${t("languagePicker.label")}:`}
@@ -58,7 +62,8 @@ export default function LanguageSwitcher({ disableHover = false }: LanguageSwitc
           <Subtle
             className={cn(
               "text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors duration-150",
-              !disableHover && "group-hover:text-gray-900 dark:group-hover:text-white",
+              !disableHover &&
+                "group-hover:text-gray-900 dark:group-hover:text-white",
             )}
           >
             {current?.name}
@@ -76,7 +81,9 @@ export default function LanguageSwitcher({ disableHover = false }: LanguageSwitc
               <span>{language.flag}</span>
               <span>{language.name}</span>
             </div>
-            {i18n.language === language.code && <Check className="h-4 w-4 text-primary" />}
+            {i18n.language === language.code && (
+              <Check className="h-4 w-4 text-primary" />
+            )}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

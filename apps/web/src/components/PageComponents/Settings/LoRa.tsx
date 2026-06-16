@@ -1,6 +1,12 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import { type LoRaValidation, LoRaValidationSchema } from "@app/validation/config/lora.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  type LoRaValidation,
+  LoRaValidationSchema,
+} from "@app/validation/config/lora.ts";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -24,13 +30,19 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
 
   const effectiveLora =
-    radio.lora ?? (getEffectiveConfig("lora") as Protobuf.Config.Config_LoRaConfig | undefined);
+    radio.lora ??
+    (getEffectiveConfig("lora") as
+      | Protobuf.Config.Config_LoRaConfig
+      | undefined);
 
   const { t } = useTranslation("config");
 
   const onSubmit = (data: LoRaValidation) => {
     if (!editor) return;
-    editor.setRadioSection("lora", data as unknown as Protobuf.Config.Config_LoRaConfig);
+    editor.setRadioSection(
+      "lora",
+      data as unknown as Protobuf.Config.Config_LoRaConfig,
+    );
   };
 
   return (

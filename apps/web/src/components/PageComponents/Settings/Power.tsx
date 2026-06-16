@@ -1,6 +1,12 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import { type PowerValidation, PowerValidationSchema } from "@app/validation/config/power.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  type PowerValidation,
+  PowerValidationSchema,
+} from "@app/validation/config/power.ts";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -23,13 +29,19 @@ export const Power = ({ onFormInit }: PowerConfigProps) => {
   const editor = useConfigEditor();
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
-    radio.power ?? (getEffectiveConfig("power") as Protobuf.Config.Config_PowerConfig | undefined);
+    radio.power ??
+    (getEffectiveConfig("power") as
+      | Protobuf.Config.Config_PowerConfig
+      | undefined);
 
   const { t } = useTranslation("config");
 
   const onSubmit = (data: PowerValidation) => {
     if (!editor) return;
-    editor.setRadioSection("power", data as unknown as Protobuf.Config.Config_PowerConfig);
+    editor.setRadioSection(
+      "power",
+      data as unknown as Protobuf.Config.Config_PowerConfig,
+    );
   };
 
   return (

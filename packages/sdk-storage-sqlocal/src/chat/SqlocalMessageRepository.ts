@@ -1,4 +1,9 @@
-import type { ConversationKey, Message, MessageRepository, RetentionPolicy } from "@meshtastic/sdk";
+import type {
+  ConversationKey,
+  Message,
+  MessageRepository,
+  RetentionPolicy,
+} from "@meshtastic/sdk";
 import { conversationKeyString, MessageState } from "@meshtastic/sdk";
 import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { type MultiTabCoordinator } from "../coordination/MultiTabCoordinator.ts";
@@ -33,7 +38,11 @@ export class SqlocalMessageRepository implements MessageRepository {
     return rows.reverse().map(rowToMessage);
   }
 
-  async loadBefore(key: ConversationKey, cursor: Date, limit: number): Promise<Message[]> {
+  async loadBefore(
+    key: ConversationKey,
+    cursor: Date,
+    limit: number,
+  ): Promise<Message[]> {
     const rows = await this.db
       .select()
       .from(messages)
@@ -66,7 +75,12 @@ export class SqlocalMessageRepository implements MessageRepository {
       const cutoff = Date.now() - policy.olderThanMs;
       await this.db
         .delete(messages)
-        .where(and(eq(messages.deviceId, this.deviceId), lt(messages.rxTime, cutoff))!);
+        .where(
+          and(
+            eq(messages.deviceId, this.deviceId),
+            lt(messages.rxTime, cutoff),
+          )!,
+        );
     }
     if (policy.maxPerBucket !== undefined) {
       // Keep the newest N per (device, conversation_key). SQLite has no

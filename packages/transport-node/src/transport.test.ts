@@ -1,7 +1,11 @@
 import type { Socket } from "node:net";
 import { Duplex } from "node:stream";
 import * as MeshSDK from "@meshtastic/sdk";
-import { DeviceStatusEnum, type DeviceOutput, toDeviceStream } from "@meshtastic/sdk";
+import {
+  DeviceStatusEnum,
+  type DeviceOutput,
+  toDeviceStream,
+} from "@meshtastic/sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract.ts";
 import { TransportNode } from "./transport.ts";
@@ -21,8 +25,16 @@ class FakeSocket extends Duplex {
 
   _read() {}
 
-  _write(chunk: Buffer, _encoding: BufferEncoding, callback: (error?: Error | null) => void) {
-    this.lastWritten = new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+  _write(
+    chunk: Buffer,
+    _encoding: BufferEncoding,
+    callback: (error?: Error | null) => void,
+  ) {
+    this.lastWritten = new Uint8Array(
+      chunk.buffer,
+      chunk.byteOffset,
+      chunk.byteLength,
+    );
     callback();
   }
 
@@ -64,10 +76,16 @@ function stubCoreTransforms() {
   const transform = toDeviceStream;
   // biome-ignore lint/suspicious/noExplicitAny: vi.spyOn overloads don't match re-exported module bindings
   const sdk = MeshSDK as any;
-  vi.spyOn(sdk, "toDeviceStream", "get").mockReturnValue(toDevice as unknown as typeof transform);
+  vi.spyOn(sdk, "toDeviceStream", "get").mockReturnValue(
+    toDevice as unknown as typeof transform,
+  );
 
   vi.spyOn(sdk, "fromDeviceStream").mockImplementation(
-    () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, DeviceOutput>,
+    () =>
+      fromDeviceFactory() as unknown as TransformStream<
+        Uint8Array,
+        DeviceOutput
+      >,
   );
 
   return {
@@ -96,22 +114,26 @@ describe("TransportNode (contract)", () => {
       const fakeSocket = new FakeSocket();
       const transport = new TransportNode(fakeSocket as unknown as Socket);
       await Promise.resolve();
-      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock = fakeSocket;
+      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock =
+        fakeSocket;
       return transport;
     },
     pushIncoming: async (bytes) => {
-      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock.pushIncoming(bytes);
+      (
+        globalThis as unknown as { __nodeSock: FakeSocket }
+      ).__nodeSock.pushIncoming(bytes);
       await Promise.resolve();
     },
     assertLastWritten: (bytes) => {
-      const sock = (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock;
+      const sock = (globalThis as unknown as { __nodeSock: FakeSocket })
+        .__nodeSock;
       expect(sock.lastWritten).toBeDefined();
       expect(sock.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock.emitErrorOnce(
-        "test-disconnect",
-      );
+      (
+        globalThis as unknown as { __nodeSock: FakeSocket }
+      ).__nodeSock.emitErrorOnce("test-disconnect");
       await Promise.resolve();
     },
   });

@@ -28,7 +28,9 @@ export interface MeshClientEvents {
 export interface MeshClientPort {
   readonly events: MeshClientEvents;
   setConfig(config: Protobuf.Config.Config): Promise<number>;
-  setModuleConfig(moduleConfig: Protobuf.ModuleConfig.ModuleConfig): Promise<number>;
+  setModuleConfig(
+    moduleConfig: Protobuf.ModuleConfig.ModuleConfig,
+  ): Promise<number>;
   beginEditSettings(): Promise<number>;
   commitEditSettings(): Promise<number>;
 }

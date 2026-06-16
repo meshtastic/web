@@ -3,7 +3,10 @@ import {
   type RangeTestValidation,
   RangeTestValidationSchema,
 } from "@app/validation/moduleConfig/rangeTest.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -14,8 +17,11 @@ interface RangeTestModuleConfigProps {
 }
 
 const EMPTY_MODULES_SIGNAL = {
-  value: {} as { rangeTest?: Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig },
-  peek: () => ({}) as { rangeTest?: Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig },
+  value: {} as {
+    rangeTest?: Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig;
+  },
+  peek: () =>
+    ({}) as { rangeTest?: Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig },
   subscribe: () => () => {},
 } as const;
 

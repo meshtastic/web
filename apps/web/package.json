@@ -1,17 +1,17 @@
 {
   "name": "meshtastic-web",
   "version": "2.6.6-0",
-  "type": "module",
   "description": "Meshtastic web client",
+  "homepage": "https://meshtastic.org",
+  "bugs": {
+    "url": "https://github.com/meshtastic/web/issues"
+  },
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git"
   },
-  "bugs": {
-    "url": "https://github.com/meshtastic/web/issues"
-  },
-  "homepage": "https://meshtastic.org",
+  "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "setup:certs": "mkcert localhost 127.0.0.1 ::1",
@@ -41,7 +41,6 @@
     "@meshtastic/transport-web-serial": "workspace:*",
     "@noble/curves": "^1.9.2",
     "@preact/signals-core": "^1.8.0",
-    "better-result": "^2.9.2",
     "@radix-ui/react-accordion": "^1.2.13",
     "@radix-ui/react-alert-dialog": "^1.1.16",
     "@radix-ui/react-checkbox": "^1.3.4",
@@ -69,6 +68,7 @@
     "@types/node": "^25.9.3",
     "@types/web-bluetooth": "^0.0.21",
     "base64-js": "^1.5.1",
+    "better-result": "^2.9.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

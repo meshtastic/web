@@ -1,6 +1,9 @@
 import type { Protobuf } from "@meshtastic/sdk";
 
-type ValidConfigType = Exclude<keyof Protobuf.LocalOnly.LocalConfig, "version" | "$typeName">;
+type ValidConfigType = Exclude<
+  keyof Protobuf.LocalOnly.LocalConfig,
+  "version" | "$typeName"
+>;
 type ValidModuleConfigType = Exclude<
   keyof Protobuf.LocalOnly.LocalModuleConfig,
   "version" | "$typeName"

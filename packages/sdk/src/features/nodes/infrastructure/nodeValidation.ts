@@ -6,7 +6,10 @@ import type { NodeErrorType } from "../domain/NodeError.ts";
  * Byte-equal compare for two public keys. Empty / undefined keys never
  * match each other.
  */
-export function equalKey(a?: Uint8Array | null, b?: Uint8Array | null): boolean {
+export function equalKey(
+  a?: Uint8Array | null,
+  b?: Uint8Array | null,
+): boolean {
   if (!a || !b) return false;
   if (a === b) return true;
   if (a.byteLength !== b.byteLength) return false;

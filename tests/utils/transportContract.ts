@@ -1,4 +1,8 @@
-import { DeviceStatusEnum, type DeviceOutput, type Transport } from "@meshtastic/sdk";
+import {
+  DeviceStatusEnum,
+  type DeviceOutput,
+  type Transport,
+} from "@meshtastic/sdk";
 import { describe, expect, it } from "vitest";
 
 export interface TransportContract {
@@ -25,7 +29,9 @@ async function readUntilType(
       return value;
     }
   }
-  throw new Error(`Did not receive a '${expectedType}' event within ${maxReads} reads`);
+  throw new Error(
+    `Did not receive a '${expectedType}' event within ${maxReads} reads`,
+  );
 }
 
 export function runTransportContract(contract: TransportContract) {
@@ -40,7 +46,9 @@ export function runTransportContract(contract: TransportContract) {
       await contract.pushIncoming?.(sampleBytes);
 
       const packetEvent = await readUntilType(reader, "packet");
-      expect("data" in packetEvent ? packetEvent.data : undefined).toEqual(sampleBytes);
+      expect("data" in packetEvent ? packetEvent.data : undefined).toEqual(
+        sampleBytes,
+      );
 
       reader.releaseLock();
       await contract.teardown?.();

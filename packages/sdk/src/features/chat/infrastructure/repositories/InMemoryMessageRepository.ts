@@ -19,7 +19,11 @@ export class InMemoryMessageRepository implements MessageRepository {
     return bucket.slice(-limit);
   }
 
-  async loadBefore(key: ConversationKey, cursor: Date, limit: number): Promise<Message[]> {
+  async loadBefore(
+    key: ConversationKey,
+    cursor: Date,
+    limit: number,
+  ): Promise<Message[]> {
     const bucket = this.buckets.get(conversationKeyString(key)) ?? [];
     const idx = bucket.findIndex((m) => m.rxTime >= cursor);
     const end = idx === -1 ? bucket.length : idx;
@@ -59,8 +63,13 @@ export class InMemoryMessageRepository implements MessageRepository {
       let filtered =
         policy.olderThanMs === undefined
           ? bucket
-          : bucket.filter((m) => nowMs - m.rxTime.getTime() <= policy.olderThanMs!);
-      if (policy.maxPerBucket !== undefined && filtered.length > policy.maxPerBucket) {
+          : bucket.filter(
+              (m) => nowMs - m.rxTime.getTime() <= policy.olderThanMs!,
+            );
+      if (
+        policy.maxPerBucket !== undefined &&
+        filtered.length > policy.maxPerBucket
+      ) {
         filtered = filtered.slice(-policy.maxPerBucket);
       }
       this.buckets.set(key, filtered);

@@ -1,1 +1,4 @@
-export { BluetoothConnectError, TransportWebBluetooth } from "./src/transport.ts";
+export {
+  BluetoothConnectError,
+  TransportWebBluetooth,
+} from "./src/transport.ts";

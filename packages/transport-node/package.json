@@ -2,43 +2,20 @@
   "name": "@meshtastic/transport-node",
   "version": "1.0.0",
   "description": "NodeJS-specific transport layer for Meshtastic web applications.",
-  "exports": {
-    ".": "./mod.ts"
-  },
-  "type": "module",
+  "license": "GPL-3.0-only",
   "files": [
     "package.json",
     "README.md",
     "LICENSE",
     "dist"
   ],
+  "type": "module",
   "main": "./dist/mod.js",
   "module": "./dist/mod.js",
   "types": "./dist/mod.d.ts",
-  "license": "GPL-3.0-only",
-  "tsdown": {
-    "entry": "mod.ts",
-    "target": "esnext",
-    "dts": true,
-    "format": [
-      "esm"
-    ],
-    "splitting": false,
-    "sourcemap": false,
-    "minify": false,
-    "treeshake": true,
-    "report": false,
-    "clean": true
+  "exports": {
+    ".": "./mod.ts"
   },
-  "jsrInclude": [
-    "mod.ts",
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
-  "jsrExclude": [
-    "src/**/*.test.ts"
-  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
@@ -50,5 +27,28 @@
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*"
-  }
+  },
+  "tsdown": {
+    "clean": true,
+    "dts": true,
+    "entry": "mod.ts",
+    "format": [
+      "esm"
+    ],
+    "minify": false,
+    "report": false,
+    "sourcemap": false,
+    "splitting": false,
+    "target": "esnext",
+    "treeshake": true
+  },
+  "jsrExclude": [
+    "src/**/*.test.ts"
+  ],
+  "jsrInclude": [
+    "mod.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
 }

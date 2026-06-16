@@ -2,7 +2,11 @@ import * as Protobuf from "@meshtastic/protobufs";
 import { Result } from "better-result";
 import type { ResultType } from "better-result";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
-import { ChannelNumber, type Destination, Emitter } from "../../../core/types.ts";
+import {
+  ChannelNumber,
+  type Destination,
+  Emitter,
+} from "../../../core/types.ts";
 
 export interface SendTextInput {
   text: string;
@@ -30,7 +34,9 @@ export class EmptyMessageError extends Error {
 export class MessageTooLongError extends Error {
   readonly _tag = "MessageTooLongError";
   constructor(readonly byteLength: number) {
-    super(`Message text encodes to ${byteLength} bytes; max payload is ~228 bytes`);
+    super(
+      `Message text encodes to ${byteLength} bytes; max payload is ~228 bytes`,
+    );
     this.name = "MessageTooLongError";
   }
 }

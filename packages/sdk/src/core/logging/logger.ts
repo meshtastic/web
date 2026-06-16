@@ -1,6 +1,7 @@
 import { Logger } from "tslog";
 
-const prettyLogTemplate = "{{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t[{{name}}]\t";
+const prettyLogTemplate =
+  "{{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t[{{name}}]\t";
 
 /**
  * Minimum log level. Default is `info` (3). Lifts to `debug` (2) when:
@@ -15,8 +16,11 @@ function defaultMinLevel(): number {
   try {
     if (
       typeof globalThis !== "undefined" &&
-      typeof (globalThis as { localStorage?: Storage }).localStorage !== "undefined" &&
-      (globalThis as { localStorage: Storage }).localStorage.getItem("mesh-debug") === "1"
+      typeof (globalThis as { localStorage?: Storage }).localStorage !==
+        "undefined" &&
+      (globalThis as { localStorage: Storage }).localStorage.getItem(
+        "mesh-debug",
+      ) === "1"
     ) {
       return 2;
     }
@@ -25,15 +29,18 @@ function defaultMinLevel(): number {
   }
   if (
     typeof globalThis !== "undefined" &&
-    (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
-      ?.MESH_DEBUG === "1"
+    (globalThis as { process?: { env?: Record<string, string | undefined> } })
+      .process?.env?.MESH_DEBUG === "1"
   ) {
     return 2;
   }
   return 3;
 }
 
-export function createLogger(name: string, options?: { minLevel?: number }): Logger<unknown> {
+export function createLogger(
+  name: string,
+  options?: { minLevel?: number },
+): Logger<unknown> {
   return new Logger({
     name,
     prettyLogTemplate,

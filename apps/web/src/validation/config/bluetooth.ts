@@ -1,7 +1,9 @@
 import { Protobuf } from "@meshtastic/sdk";
 import { z } from "zod/v4";
 
-const PairingModeEnum = z.enum(Protobuf.Config.Config_BluetoothConfig_PairingMode);
+const PairingModeEnum = z.enum(
+  Protobuf.Config.Config_BluetoothConfig_PairingMode,
+);
 
 export const BluetoothValidationSchema = z.object({
   enabled: z.boolean(),

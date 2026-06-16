@@ -3,7 +3,9 @@ import type * as Protobuf from "@meshtastic/protobufs";
 import type { TelemetryReading } from "../domain/TelemetryReading.ts";
 
 export const TelemetryMapper = {
-  fromPacket(packet: PacketMetadata<Protobuf.Telemetry.Telemetry>): TelemetryReading {
+  fromPacket(
+    packet: PacketMetadata<Protobuf.Telemetry.Telemetry>,
+  ): TelemetryReading {
     return {
       nodeNum: packet.from,
       time: packet.rxTime,

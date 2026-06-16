@@ -1,23 +1,17 @@
 {
   "name": "@meshtastic/web",
   "version": "2.7.0-0",
-  "type": "module",
   "description": "Meshtastic web client monorepo",
+  "homepage": "https://meshtastic.org",
+  "bugs": {
+    "url": "https://github.com/meshtastic/web/issues"
+  },
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git"
   },
-  "bugs": {
-    "url": "https://github.com/meshtastic/web/issues"
-  },
-  "homepage": "https://meshtastic.org",
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "oxlint",
-      "oxfmt"
-    ]
-  },
+  "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "lint": "oxlint",
@@ -49,6 +43,12 @@
     "tsdown": "^0.22.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "oxlint",
+      "oxfmt"
+    ]
   },
   "packageManager": "pnpm@11.5.2"
 }

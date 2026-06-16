@@ -48,7 +48,8 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
     try {
       const channelsUrl = new URL(importDialogInput);
       if (
-        (channelsUrl.hostname !== "meshtastic.org" && channelsUrl.pathname !== "/e/") ||
+        (channelsUrl.hostname !== "meshtastic.org" &&
+          channelsUrl.pathname !== "/e/") ||
         !channelsUrl.hash
       ) {
         throw t("import.error.invalidUrl");
@@ -56,7 +57,11 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
 
       const encodedChannelConfig = channelsUrl.hash.substring(1);
       const paddedString = encodedChannelConfig
-        .padEnd(encodedChannelConfig.length + ((4 - (encodedChannelConfig.length % 4)) % 4), "=")
+        .padEnd(
+          encodedChannelConfig.length +
+            ((4 - (encodedChannelConfig.length % 4)) % 4),
+          "=",
+        )
         .replace(/-/g, "+")
         .replace(/_/g, "/");
 
@@ -79,22 +84,24 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
 
   const apply = () => {
     if (!editor) return;
-    channelSet?.settings.forEach((ch: Protobuf.Channel.ChannelSettings, index: number) => {
-      if (importIndex[index] === -1) {
-        return;
-      }
+    channelSet?.settings.forEach(
+      (ch: Protobuf.Channel.ChannelSettings, index: number) => {
+        if (importIndex[index] === -1) {
+          return;
+        }
 
-      const payload = create(Protobuf.Channel.ChannelSchema, {
-        index: importIndex[index],
-        role:
-          importIndex[index] === 0
-            ? Protobuf.Channel.Channel_Role.PRIMARY
-            : Protobuf.Channel.Channel_Role.SECONDARY,
-        settings: ch,
-      });
+        const payload = create(Protobuf.Channel.ChannelSchema, {
+          index: importIndex[index],
+          role:
+            importIndex[index] === 0
+              ? Protobuf.Channel.Channel_Role.PRIMARY
+              : Protobuf.Channel.Channel_Role.SECONDARY,
+          settings: ch,
+        });
 
-      editor.setChannel(payload);
-    });
+        editor.setChannel(payload);
+      },
+    );
 
     if (channelSet?.loraConfig && updateConfig) {
       const payload = {
@@ -126,14 +133,23 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
         <DialogHeader>
           <DialogTitle>{t("import.title")}</DialogTitle>
           <DialogDescription>
-            <Trans i18nKey={"import.description"} components={{ italic: <i />, br: <br /> }} />
+            <Trans
+              i18nKey={"import.description"}
+              components={{ italic: <i />, br: <br /> }}
+            />
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
           <Label>{t("import.channelSetUrl")}</Label>
           <Input
             value={importDialogInput}
-            variant={importDialogInput === "" ? "default" : validUrl ? "dirty" : "invalid"}
+            variant={
+              importDialogInput === ""
+                ? "default"
+                : validUrl
+                  ? "dirty"
+                  : "invalid"
+            }
             onChange={(e) => {
               setImportDialogInput(e.target.value);
             }}
@@ -162,7 +178,10 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
                   <span className="flex-1">{t("import.channelSlot")}</span>
                 </div>
                 {channelSet?.settings.map((channel, index) => (
-                  <div className="flex items-center" key={`channel_${channel.id}_${index}`}>
+                  <div
+                    className="flex items-center"
+                    key={`channel_${channel.id}_${index}`}
+                  >
                     <Label className="flex-1">
                       {channel.name.length
                         ? channel.name
@@ -182,10 +201,14 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
                             disabled={importIndex.includes(i) && index !== i}
                             value={i.toString()}
                           >
-                            {i === 0 ? t("import.primary") : `${t("import.channelPrefix")}${i}`}
+                            {i === 0
+                              ? t("import.primary")
+                              : `${t("import.channelPrefix")}${i}`}
                           </SelectItem>
                         ))}
-                        <SelectItem value="-1">{t("import.doNotImport")}</SelectItem>
+                        <SelectItem value="-1">
+                          {t("import.doNotImport")}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

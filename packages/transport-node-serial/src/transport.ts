@@ -31,7 +31,10 @@ export class TransportNodeSerial implements Transport {
    * @param baudRate - Baud rate for the serial connection (default is 115200).
    * @returns A promise that resolves with a connected TransportNode instance.
    */
-  public static create(path: string, baudRate = 115200): Promise<TransportNodeSerial> {
+  public static create(
+    path: string,
+    baudRate = 115200,
+  ): Promise<TransportNodeSerial> {
     return new Promise((resolve, reject) => {
       const port = new SerialPort({
         path,
@@ -97,7 +100,9 @@ export class TransportNodeSerial implements Transport {
             ctrl.close(); // graceful EOF on user
           } else {
             this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
-            ctrl.error(error instanceof Error ? error : new Error(String(error)));
+            ctrl.error(
+              error instanceof Error ? error : new Error(String(error)),
+            );
           }
           try {
             await transformed.cancel();

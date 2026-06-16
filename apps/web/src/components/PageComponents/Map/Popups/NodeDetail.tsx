@@ -16,7 +16,14 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import { useNavigate } from "@tanstack/react-router";
-import { Dot, LockIcon, LockOpenIcon, MessageSquareIcon, MountainSnow, Star } from "lucide-react";
+import {
+  Dot,
+  LockIcon,
+  LockOpenIcon,
+  MessageSquareIcon,
+  MountainSnow,
+  Star,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export interface NodeDetailProps {
@@ -38,9 +45,16 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       : rawHardwareType.replaceAll("_", " ")
     : `${hwModel}`;
   // SNR is in dB; derive a 0–100% quality heuristic (-10 dB → 0%, +10 dB → 100%).
-  const snrQuality = Math.min(Math.max(Math.round((node.snr + 10) * 5), 0), 100);
+  const snrQuality = Math.min(
+    Math.max(Math.round((node.snr + 10) * 5), 0),
+    100,
+  );
   const snrTone =
-    snrQuality >= 67 ? "text-green-600" : snrQuality >= 34 ? "text-yellow-600" : "text-red-600";
+    snrQuality >= 67
+      ? "text-green-600"
+      : snrQuality >= 34
+        ? "text-yellow-600"
+        : "text-red-600";
   function handleDirectMessage() {
     navigate({ to: `/messages/direct/${node.num}` });
   }
@@ -101,7 +115,9 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               fill={node.isFavorite ? "black" : "none"}
               size={15}
               aria-label={
-                node.isFavorite ? t("nodeDetail.favorite.label") : t("nodeDetail.notFavorite.label")
+                node.isFavorite
+                  ? t("nodeDetail.favorite.label")
+                  : t("nodeDetail.notFavorite.label")
               }
             />
           </div>
@@ -122,12 +138,15 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
 
           <div
             className="flex gap-1"
-            title={new Date(node.lastHeard * 1000).toLocaleString(navigator.language)}
+            title={new Date(node.lastHeard * 1000).toLocaleString(
+              navigator.language,
+            )}
           >
             <div>
               {node.lastHeard > 0 && (
                 <div>
-                  {t("nodeDetail.status.heard")} <TimeAgo timestamp={node.lastHeard * 1000} />
+                  {t("nodeDetail.status.heard")}{" "}
+                  <TimeAgo timestamp={node.lastHeard * 1000} />
                 </div>
               )}
             </div>
@@ -145,9 +164,13 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <div className="flex mt-2 text-sm">
         <div className="flex items-center grow">
           <div className="border-2 border-slate-900 rounded-sm px-0.5 mr-1">
-            {Number.isNaN(node.hopsAway) ? t("unit.hopsAway.unknown") : node.hopsAway}
+            {Number.isNaN(node.hopsAway)
+              ? t("unit.hopsAway.unknown")
+              : node.hopsAway}
           </div>
-          <div>{node.hopsAway === 1 ? t("unit.hop.one") : t("unit.hop.plural")}</div>
+          <div>
+            {node.hopsAway === 1 ? t("unit.hop.one") : t("unit.hop.plural")}
+          </div>
         </div>
         {node.position?.altitude && (
           <div className="flex items-center grow">
@@ -170,13 +193,17 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         {!!node.deviceMetrics?.channelUtilization && (
           <div className="grow">
             <div>{t("channelUtilization.short")}</div>
-            <Mono>{node.deviceMetrics?.channelUtilization.toPrecision(3)}%</Mono>
+            <Mono>
+              {node.deviceMetrics?.channelUtilization.toPrecision(3)}%
+            </Mono>
           </div>
         )}
         {!!node.deviceMetrics?.airUtilTx && (
           <div className="grow">
             <div>{t("airtimeUtilization.short")}</div>
-            <Mono className="text-gray-500">{node.deviceMetrics?.airUtilTx.toPrecision(3)}%</Mono>
+            <Mono className="text-gray-500">
+              {node.deviceMetrics?.airUtilTx.toPrecision(3)}%
+            </Mono>
           </div>
         )}
       </div>

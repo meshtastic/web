@@ -7,9 +7,13 @@ interface SidebarContextProps {
   toggleSidebar: () => void;
 }
 
-const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
+const SidebarContext = createContext<SidebarContextProps | undefined>(
+  undefined,
+);
 
-export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   const toggleSidebar = useMemo(
@@ -28,7 +32,9 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
     [isCollapsed, toggleSidebar],
   );
 
-  return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>;
+  return (
+    <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>
+  );
 };
 
 export const useSidebar = (): SidebarContextProps => {

@@ -62,7 +62,9 @@ export interface UseDialogReturn {
 }
 
 export const useDialog = (initialState?: DialogState): UseDialogReturn => {
-  const [state, setState] = useState<DialogState>(initialState ?? { isOpen: false });
+  const [state, setState] = useState<DialogState>(
+    initialState ?? { isOpen: false },
+  );
 
   const openDialog = useCallback((config: DialogConfig) => {
     setState({ isOpen: true, config });
@@ -95,7 +97,10 @@ export const useDialog = (initialState?: DialogState): UseDialogReturn => {
   };
 };
 
-export const getDefaultTexts = (type: DialogType, t: ReturnType<typeof useTranslation>["t"]) => {
+export const getDefaultTexts = (
+  type: DialogType,
+  t: ReturnType<typeof useTranslation>["t"],
+) => {
   switch (type) {
     case "confirm":
       return {

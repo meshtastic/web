@@ -13,8 +13,12 @@ export interface FakeTransportHandle {
   close(): Promise<void>;
 }
 
-type MyNodeInfoInit = Parameters<typeof create<typeof Protobuf.Mesh.MyNodeInfoSchema>>[1];
-type NodeInfoInit = Parameters<typeof create<typeof Protobuf.Mesh.NodeInfoSchema>>[1];
+type MyNodeInfoInit = Parameters<
+  typeof create<typeof Protobuf.Mesh.MyNodeInfoSchema>
+>[1];
+type NodeInfoInit = Parameters<
+  typeof create<typeof Protobuf.Mesh.NodeInfoSchema>
+>[1];
 
 export interface FakeResponder {
   withMyNodeInfo(info: MyNodeInfoInit & { myNodeNum: number }): void;
@@ -31,7 +35,9 @@ export interface FakeResponder {
  */
 export function createFakeTransport(): FakeTransportHandle {
   const sent: Uint8Array[] = [];
-  let fromDeviceController: ReadableStreamDefaultController<Uint8Array> | undefined;
+  let fromDeviceController:
+    | ReadableStreamDefaultController<Uint8Array>
+    | undefined;
 
   const fromDeviceRaw = new ReadableStream<Uint8Array>({
     start(controller) {

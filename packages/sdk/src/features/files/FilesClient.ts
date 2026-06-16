@@ -42,7 +42,9 @@ export class FilesClient {
     }
   }
 
-  public async download(filename: string): Promise<ResultType<FileTransfer, Error>> {
+  public async download(
+    filename: string,
+  ): Promise<ResultType<FileTransfer, Error>> {
     const id = generatePacketId();
     const transfer: FileTransfer = {
       id,

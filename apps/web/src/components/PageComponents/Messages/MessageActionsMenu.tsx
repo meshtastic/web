@@ -14,7 +14,10 @@ interface MessageActionsMenuProps {
   onReply?: () => void;
 }
 
-export const MessageActionsMenu = ({ onAddReaction, onReply }: MessageActionsMenuProps) => {
+export const MessageActionsMenu = ({
+  onAddReaction,
+  onReply,
+}: MessageActionsMenuProps) => {
   const { t } = useTranslation();
   const hoverIconBarClass = cn(
     "absolute top-2 right-2",

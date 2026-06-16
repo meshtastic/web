@@ -15,7 +15,11 @@ export function useClient(): MeshClient {
   const direct = useContext(MeshContext);
   const registry = useContext(MeshRegistryContext);
   const active = useSignal(
-    registry?.active ?? { value: undefined, peek: () => undefined, subscribe: () => () => {} },
+    registry?.active ?? {
+      value: undefined,
+      peek: () => undefined,
+      subscribe: () => () => {},
+    },
   );
   const client = direct ?? active;
   if (!client) {

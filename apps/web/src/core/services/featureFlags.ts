@@ -79,7 +79,10 @@ class FeatureFlags {
 export function createFeatureFlags(env: Record<string, unknown>): FeatureFlags {
   const parsed = EnvSchema.parse(env);
   const base = Object.fromEntries(
-    (Object.keys(FLAG_ENV) as FlagKey[]).map((k) => [k, parsed[FLAG_ENV[k]] as boolean]),
+    (Object.keys(FLAG_ENV) as FlagKey[]).map((k) => [
+      k,
+      parsed[FLAG_ENV[k]] as boolean,
+    ]),
   ) as Flags;
   return new FeatureFlags(base);
 }

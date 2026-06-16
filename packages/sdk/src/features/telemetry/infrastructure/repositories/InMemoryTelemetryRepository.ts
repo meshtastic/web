@@ -11,11 +11,18 @@ import type {
 export class InMemoryTelemetryRepository implements TelemetryRepository {
   private readonly buckets = new Map<number, TelemetryReading[]>();
 
-  async loadRecent(nodeNum: number, limit: number): Promise<TelemetryReading[]> {
+  async loadRecent(
+    nodeNum: number,
+    limit: number,
+  ): Promise<TelemetryReading[]> {
     return (this.buckets.get(nodeNum) ?? []).slice(-limit);
   }
 
-  async loadBefore(nodeNum: number, cursor: Date, limit: number): Promise<TelemetryReading[]> {
+  async loadBefore(
+    nodeNum: number,
+    cursor: Date,
+    limit: number,
+  ): Promise<TelemetryReading[]> {
     const bucket = this.buckets.get(nodeNum) ?? [];
     const idx = bucket.findIndex((r) => r.time >= cursor);
     const end = idx === -1 ? bucket.length : idx;
@@ -37,7 +44,9 @@ export class InMemoryTelemetryRepository implements TelemetryRepository {
   }
 
   async prune(policy: TelemetryRetentionPolicy): Promise<void> {
-    const cutoff = policy.olderThanMs ? Date.now() - policy.olderThanMs : undefined;
+    const cutoff = policy.olderThanMs
+      ? Date.now() - policy.olderThanMs
+      : undefined;
     for (const [nodeNum, bucket] of this.buckets.entries()) {
       let next = bucket;
       if (cutoff !== undefined) {

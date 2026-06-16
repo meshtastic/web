@@ -1,6 +1,12 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import { type AudioValidation, AudioValidationSchema } from "@app/validation/moduleConfig/audio.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  type AudioValidation,
+  AudioValidationSchema,
+} from "@app/validation/moduleConfig/audio.ts";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -12,7 +18,8 @@ interface AudioModuleConfigProps {
 
 const EMPTY_MODULES_SIGNAL = {
   value: {} as { audio?: Protobuf.ModuleConfig.ModuleConfig_AudioConfig },
-  peek: () => ({}) as { audio?: Protobuf.ModuleConfig.ModuleConfig_AudioConfig },
+  peek: () =>
+    ({}) as { audio?: Protobuf.ModuleConfig.ModuleConfig_AudioConfig },
   subscribe: () => () => {},
 } as const;
 
@@ -68,7 +75,8 @@ export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
               label: t("audio.bitrate.label"),
               description: t("audio.bitrate.description"),
               properties: {
-                enumValue: Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud,
+                enumValue:
+                  Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud,
               },
             },
             {

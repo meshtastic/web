@@ -32,7 +32,9 @@ describe("sdk-react hooks", () => {
 
   it("useChat surfaces inbound messages", async () => {
     const { handle, wrapper } = setup();
-    const { result } = renderHook(() => useChat(ChannelNumber.Primary), { wrapper });
+    const { result } = renderHook(() => useChat(ChannelNumber.Primary), {
+      wrapper,
+    });
     expect(result.current.messages).toEqual([]);
     // Exhaustive integration coverage is in packages/sdk; this test ensures
     // the hook wiring re-renders on a signal change.

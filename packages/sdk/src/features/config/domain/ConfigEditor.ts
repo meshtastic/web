@@ -4,7 +4,10 @@ import { signal } from "@preact/signals-core";
 import { Result } from "better-result";
 import type { ResultType } from "better-result";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
-import { type ReadonlySignal, toReadonly } from "../../../core/signals/createStore.ts";
+import {
+  type ReadonlySignal,
+  toReadonly,
+} from "../../../core/signals/createStore.ts";
 import { setChannel } from "../../channels/application/ChannelUseCases.ts";
 import { DeviceStatusEnum } from "../../device/domain/DeviceStatus.ts";
 import { sendAdminMessage } from "../../device/infrastructure/AdminMessageSender.ts";
@@ -39,40 +42,56 @@ export class ConfigEditor {
   private readonly client: MeshClient;
   private readonly baselineRadio = signal<RadioConfig>({});
   private readonly baselineModules = signal<ModuleConfig>({});
-  private readonly baselineChannels = signal<ReadonlyMap<number, Protobuf.Channel.Channel>>(
-    new Map(),
-  );
+  private readonly baselineChannels = signal<
+    ReadonlyMap<number, Protobuf.Channel.Channel>
+  >(new Map());
   private readonly workingRadio = signal<RadioConfig>({});
   private readonly workingModules = signal<ModuleConfig>({});
-  private readonly workingChannels = signal<ReadonlyMap<number, Protobuf.Channel.Channel>>(
-    new Map(),
+  private readonly workingChannels = signal<
+    ReadonlyMap<number, Protobuf.Channel.Channel>
+  >(new Map());
+  private readonly baselineOwner = signal<Protobuf.Mesh.User | undefined>(
+    undefined,
   );
-  private readonly baselineOwner = signal<Protobuf.Mesh.User | undefined>(undefined);
-  private readonly workingOwner = signal<Protobuf.Mesh.User | undefined>(undefined);
-  private readonly queuedAdminMessages = signal<readonly Protobuf.Admin.AdminMessage[]>([]);
-  private readonly _dirtyRadioSections = signal<readonly RadioConfigSection[]>([]);
-  private readonly _dirtyModuleSections = signal<readonly ModuleConfigSection[]>([]);
+  private readonly workingOwner = signal<Protobuf.Mesh.User | undefined>(
+    undefined,
+  );
+  private readonly queuedAdminMessages = signal<
+    readonly Protobuf.Admin.AdminMessage[]
+  >([]);
+  private readonly _dirtyRadioSections = signal<readonly RadioConfigSection[]>(
+    [],
+  );
+  private readonly _dirtyModuleSections = signal<
+    readonly ModuleConfigSection[]
+  >([]);
   private readonly _dirtyChannels = signal<readonly number[]>([]);
   private readonly _isOwnerDirty = signal<boolean>(false);
   private readonly _isDirty = signal<boolean>(false);
 
-  public readonly radio: ReadonlySignal<RadioConfig> = toReadonly(this.workingRadio);
-  public readonly modules: ReadonlySignal<ModuleConfig> = toReadonly(this.workingModules);
-  public readonly channels: ReadonlySignal<ReadonlyMap<number, Protobuf.Channel.Channel>> =
-    toReadonly(this.workingChannels);
-  public readonly dirtyRadioSections: ReadonlySignal<readonly RadioConfigSection[]> = toReadonly(
-    this._dirtyRadioSections,
+  public readonly radio: ReadonlySignal<RadioConfig> = toReadonly(
+    this.workingRadio,
   );
-  public readonly dirtyModuleSections: ReadonlySignal<readonly ModuleConfigSection[]> = toReadonly(
-    this._dirtyModuleSections,
+  public readonly modules: ReadonlySignal<ModuleConfig> = toReadonly(
+    this.workingModules,
   );
+  public readonly channels: ReadonlySignal<
+    ReadonlyMap<number, Protobuf.Channel.Channel>
+  > = toReadonly(this.workingChannels);
+  public readonly dirtyRadioSections: ReadonlySignal<
+    readonly RadioConfigSection[]
+  > = toReadonly(this._dirtyRadioSections);
+  public readonly dirtyModuleSections: ReadonlySignal<
+    readonly ModuleConfigSection[]
+  > = toReadonly(this._dirtyModuleSections);
   public readonly dirtyChannels: ReadonlySignal<readonly number[]> = toReadonly(
     this._dirtyChannels,
   );
-  public readonly owner: ReadonlySignal<Protobuf.Mesh.User | undefined> = toReadonly(
-    this.workingOwner,
+  public readonly owner: ReadonlySignal<Protobuf.Mesh.User | undefined> =
+    toReadonly(this.workingOwner);
+  public readonly isOwnerDirty: ReadonlySignal<boolean> = toReadonly(
+    this._isOwnerDirty,
   );
-  public readonly isOwnerDirty: ReadonlySignal<boolean> = toReadonly(this._isOwnerDirty);
   public readonly isDirty: ReadonlySignal<boolean> = toReadonly(this._isDirty);
 
   constructor(client: MeshClient) {
@@ -88,14 +107,20 @@ export class ConfigEditor {
         // their edit in place; the dirty bookkeeping will refresh below.
         const wasDirty = this._dirtyRadioSections.peek().includes(variant);
         if (!wasDirty) {
-          this.workingRadio.value = { ...this.workingRadio.peek(), [variant]: next[variant] };
+          this.workingRadio.value = {
+            ...this.workingRadio.peek(),
+            [variant]: next[variant],
+          };
         }
       }
       this.recomputeDirty();
     });
 
     client.events.onModuleConfigPacket.subscribe((moduleConfig) => {
-      const next = ConfigMapper.mergeModule(this.baselineModules.peek(), moduleConfig);
+      const next = ConfigMapper.mergeModule(
+        this.baselineModules.peek(),
+        moduleConfig,
+      );
       this.baselineModules.value = next;
       const variant = moduleConfig.payloadVariant.case;
       if (variant) {
@@ -168,7 +193,10 @@ export class ConfigEditor {
    * alongside their other edits.
    */
   public queueAdminMessage(message: Protobuf.Admin.AdminMessage): void {
-    this.queuedAdminMessages.value = [...this.queuedAdminMessages.peek(), message];
+    this.queuedAdminMessages.value = [
+      ...this.queuedAdminMessages.peek(),
+      message,
+    ];
     this.recomputeDirty();
   }
 
@@ -279,10 +307,16 @@ export class ConfigEditor {
     const radioBase = this.baselineRadio.peek();
     const radioWorking = this.workingRadio.peek();
     const radioDirty: RadioConfigSection[] = [];
-    const radioKeys = new Set<string>([...Object.keys(radioBase), ...Object.keys(radioWorking)]);
+    const radioKeys = new Set<string>([
+      ...Object.keys(radioBase),
+      ...Object.keys(radioWorking),
+    ]);
     for (const key of radioKeys) {
       if (
-        !shallowEqual(radioBase[key as keyof RadioConfig], radioWorking[key as keyof RadioConfig])
+        !shallowEqual(
+          radioBase[key as keyof RadioConfig],
+          radioWorking[key as keyof RadioConfig],
+        )
       ) {
         radioDirty.push(key as RadioConfigSection);
       }
@@ -291,7 +325,10 @@ export class ConfigEditor {
     const moduleBase = this.baselineModules.peek();
     const moduleWorking = this.workingModules.peek();
     const moduleDirty: ModuleConfigSection[] = [];
-    const moduleKeys = new Set<string>([...Object.keys(moduleBase), ...Object.keys(moduleWorking)]);
+    const moduleKeys = new Set<string>([
+      ...Object.keys(moduleBase),
+      ...Object.keys(moduleWorking),
+    ]);
     for (const key of moduleKeys) {
       if (
         !shallowEqual(
@@ -306,14 +343,20 @@ export class ConfigEditor {
     const channelDirty: number[] = [];
     const channelBase = this.baselineChannels.peek();
     const channelWorking = this.workingChannels.peek();
-    const channelKeys = new Set<number>([...channelBase.keys(), ...channelWorking.keys()]);
+    const channelKeys = new Set<number>([
+      ...channelBase.keys(),
+      ...channelWorking.keys(),
+    ]);
     for (const idx of channelKeys) {
       if (!shallowEqual(channelBase.get(idx), channelWorking.get(idx))) {
         channelDirty.push(idx);
       }
     }
 
-    const ownerDirty = !shallowEqual(this.baselineOwner.peek(), this.workingOwner.peek());
+    const ownerDirty = !shallowEqual(
+      this.baselineOwner.peek(),
+      this.workingOwner.peek(),
+    );
     const hasQueuedAdmin = this.queuedAdminMessages.peek().length > 0;
 
     this._dirtyRadioSections.value = radioDirty;
@@ -329,9 +372,15 @@ export class ConfigEditor {
   }
 }
 
-function buildRadioConfig(variant: RadioConfigSection, value: unknown): Protobuf.Config.Config {
+function buildRadioConfig(
+  variant: RadioConfigSection,
+  value: unknown,
+): Protobuf.Config.Config {
   return create(Protobuf.Config.ConfigSchema, {
-    payloadVariant: { case: variant, value } as Protobuf.Config.Config["payloadVariant"],
+    payloadVariant: {
+      case: variant,
+      value,
+    } as Protobuf.Config.Config["payloadVariant"],
   });
 }
 

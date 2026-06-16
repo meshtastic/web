@@ -46,7 +46,11 @@ export const PkiRegenerateDialog = ({
           <DialogDescription>{dialogText.description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="destructive" name="regenerate" onClick={() => onSubmit()}>
+          <Button
+            variant="destructive"
+            name="regenerate"
+            onClick={() => onSubmit()}
+          >
             {dialogText.button}
           </Button>
         </DialogFooter>

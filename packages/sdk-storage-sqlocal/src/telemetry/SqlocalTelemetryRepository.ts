@@ -34,17 +34,29 @@ export class SqlocalTelemetryRepository implements TelemetryRepository {
     this.deviceId = options.deviceId;
   }
 
-  async loadRecent(nodeNum: number, limit: number): Promise<TelemetryReading[]> {
+  async loadRecent(
+    nodeNum: number,
+    limit: number,
+  ): Promise<TelemetryReading[]> {
     const rows = await this.db
       .select()
       .from(telemetry)
-      .where(and(eq(telemetry.deviceId, this.deviceId), eq(telemetry.nodeNum, nodeNum))!)
+      .where(
+        and(
+          eq(telemetry.deviceId, this.deviceId),
+          eq(telemetry.nodeNum, nodeNum),
+        )!,
+      )
       .orderBy(desc(telemetry.ts))
       .limit(limit);
     return rows.map(rowToReading).reverse();
   }
 
-  async loadBefore(nodeNum: number, cursor: Date, limit: number): Promise<TelemetryReading[]> {
+  async loadBefore(
+    nodeNum: number,
+    cursor: Date,
+    limit: number,
+  ): Promise<TelemetryReading[]> {
     const rows = await this.db
       .select()
       .from(telemetry)
@@ -78,7 +90,9 @@ export class SqlocalTelemetryRepository implements TelemetryRepository {
       const cutoff = Date.now() - policy.olderThanMs;
       await this.db
         .delete(telemetry)
-        .where(and(eq(telemetry.deviceId, this.deviceId), lt(telemetry.ts, cutoff))!);
+        .where(
+          and(eq(telemetry.deviceId, this.deviceId), lt(telemetry.ts, cutoff))!,
+        );
     }
     if (policy.maxPerNode !== undefined) {
       const max = policy.maxPerNode;
@@ -95,7 +109,12 @@ export class SqlocalTelemetryRepository implements TelemetryRepository {
         const cutoffRows = await this.db
           .select({ ts: telemetry.ts })
           .from(telemetry)
-          .where(and(eq(telemetry.deviceId, this.deviceId), eq(telemetry.nodeNum, row.nodeNum))!)
+          .where(
+            and(
+              eq(telemetry.deviceId, this.deviceId),
+              eq(telemetry.nodeNum, row.nodeNum),
+            )!,
+          )
           .orderBy(desc(telemetry.ts))
           .limit(1)
           .offset(max - 1);
@@ -119,11 +138,18 @@ export class SqlocalTelemetryRepository implements TelemetryRepository {
   async clearNode(nodeNum: number): Promise<void> {
     await this.db
       .delete(telemetry)
-      .where(and(eq(telemetry.deviceId, this.deviceId), eq(telemetry.nodeNum, nodeNum))!);
+      .where(
+        and(
+          eq(telemetry.deviceId, this.deviceId),
+          eq(telemetry.nodeNum, nodeNum),
+        )!,
+      );
   }
 
   async clear(): Promise<void> {
-    await this.db.delete(telemetry).where(eq(telemetry.deviceId, this.deviceId));
+    await this.db
+      .delete(telemetry)
+      .where(eq(telemetry.deviceId, this.deviceId));
   }
 }
 
@@ -135,7 +161,10 @@ interface TelemetryRow {
   payloadJson: string;
 }
 
-function readingToRow(deviceId: number, reading: TelemetryReading): TelemetryRow | null {
+function readingToRow(
+  deviceId: number,
+  reading: TelemetryReading,
+): TelemetryRow | null {
   if (!reading.kind) return null;
   const schema = SCHEMA_FOR_KIND[reading.kind as KnownKind];
   if (!schema) return null;

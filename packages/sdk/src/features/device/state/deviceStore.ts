@@ -8,14 +8,27 @@ import { DeviceStatusEnum } from "../../../core/transport/Transport.ts";
  * DeviceClient.
  */
 export function createDeviceStore() {
-  const status = createStore<DeviceStatusEnum>(DeviceStatusEnum.DeviceDisconnected);
+  const status = createStore<DeviceStatusEnum>(
+    DeviceStatusEnum.DeviceDisconnected,
+  );
   const isConfigured = createStore(false);
   const pendingSettingsChanges = createStore(false);
   const myNodeNum = createStore<number | undefined>(undefined);
-  const metadata = createStore<Protobuf.Mesh.DeviceMetadata | undefined>(undefined);
-  const myNodeInfo = createStore<Protobuf.Mesh.MyNodeInfo | undefined>(undefined);
+  const metadata = createStore<Protobuf.Mesh.DeviceMetadata | undefined>(
+    undefined,
+  );
+  const myNodeInfo = createStore<Protobuf.Mesh.MyNodeInfo | undefined>(
+    undefined,
+  );
 
-  return { status, isConfigured, pendingSettingsChanges, myNodeNum, metadata, myNodeInfo };
+  return {
+    status,
+    isConfigured,
+    pendingSettingsChanges,
+    myNodeNum,
+    metadata,
+    myNodeInfo,
+  };
 }
 
 export type DeviceStore = ReturnType<typeof createDeviceStore>;
