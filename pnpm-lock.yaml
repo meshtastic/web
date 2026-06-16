@@ -55,8 +55,8 @@ importers:
   apps/web:
     dependencies:
       '@hookform/resolvers':
-        specifier: ^5.2.2
-        version: 5.2.2(react-hook-form@7.79.0(react@19.2.7))
+        specifier: ^5.4.0
+        version: 5.4.0(react-hook-form@7.79.0(react@19.2.7))
       '@meshtastic/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
@@ -1353,8 +1353,8 @@ packages:
     resolution: {integrity: sha512-7mBgpi7UD82fsff5ThQKet0uBTl4BYerQuc+/qA1ELTwWEiIedRTcD3JgiUu9wwZ2kytW8JOb165rSdAt8PfcQ==}
     engines: {node: '>= 8'}
 
-  '@hookform/resolvers@5.2.2':
-    resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
+  '@hookform/resolvers@5.4.0':
+    resolution: {integrity: sha512-EIsqr/t/qbinPIhGjMdtvutIN1Kk4uwbROE9/UQ93CAVGR7GkA7Y92+fX80OzXi/OB67jVFYwKGO1WzkxmkFZw==}
     peerDependencies:
       react-hook-form: ^7.55.0
 
@@ -7159,7 +7159,7 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
 
-  '@hookform/resolvers@5.2.2(react-hook-form@7.79.0(react@19.2.7))':
+  '@hookform/resolvers@5.4.0(react-hook-form@7.79.0(react@19.2.7))':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.79.0(react@19.2.7)

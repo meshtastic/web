@@ -32,7 +32,7 @@
     "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "^5.4.0",
     "@meshtastic/sdk": "workspace:*",
     "@meshtastic/sdk-react": "workspace:*",
     "@meshtastic/sdk-storage-sqlocal": "workspace:*",
