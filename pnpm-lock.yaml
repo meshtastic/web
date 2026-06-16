@@ -269,8 +269,8 @@ importers:
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.17)
       '@types/serviceworker':
-        specifier: ^0.0.158
-        version: 0.0.158
+        specifier: ^0.0.197
+        version: 0.0.197
       '@types/w3c-web-serial':
         specifier: ^1.0.8
         version: 1.0.8
@@ -3577,8 +3577,8 @@ packages:
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
 
-  '@types/serviceworker@0.0.158':
-    resolution: {integrity: sha512-5+ih2bc5g1QWNE9LibbUTBS/hVx7+Oe1WpR3dDg23TTj+1jWZSC878QDO9MtHLxlhFHNDmircQ9OrpI7KZEbYw==}
+  '@types/serviceworker@0.0.197':
+    resolution: {integrity: sha512-PaeOFYHcR2c7guBn9M4Y5H1++snluHYzZ6DzzRCUf6kue2FFfpTjF82aZq31DJ2c/Qyb3KGf5ROQH/fOU8NdxQ==}
 
   '@types/sql.js@1.4.11':
     resolution: {integrity: sha512-QXIx38p2ZThJaK9vP5ZdqdlRe1FG9I8SmCZOS7FHfB/2qPAjZwkL7/vlfPg6N/oWHuuOaGg/P/IRwfP2W0kWVQ==}
@@ -10237,7 +10237,7 @@ snapshots:
 
   '@types/resolve@1.20.2': {}
 
-  '@types/serviceworker@0.0.158': {}
+  '@types/serviceworker@0.0.197': {}
 
   '@types/sql.js@1.4.11':
     dependencies:
