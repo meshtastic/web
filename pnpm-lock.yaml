@@ -388,8 +388,8 @@ importers:
         specifier: ^0.45.2
         version: 0.45.2(@types/sql.js@1.4.11)(sql.js@1.14.1)
       sqlocal:
-        specifier: ^0.14.0
-        version: 0.14.2(drizzle-orm@0.45.2(@types/sql.js@1.4.11)(sql.js@1.14.1))
+        specifier: ^0.18.0
+        version: 0.18.0(drizzle-orm@0.45.2(@types/sql.js@1.4.11)(sql.js@1.14.1))(react@19.2.7)(vite@8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
     devDependencies:
       '@types/sql.js':
         specifier: ^1.4.9
@@ -2917,9 +2917,9 @@ packages:
     resolution: {integrity: sha512-F7xLJKsjGo2WuEWMSEO1SimRcOA+WtWICsY13r0ahx8s2SecPQH06338g28OT7cW7uRXI7oEQAk62qh5gHJW3g==}
     engines: {node: '>=20.0.0'}
 
-  '@sqlite.org/sqlite-wasm@3.50.1-build1':
-    resolution: {integrity: sha512-yH4M/SHN98NibniIwTVk6rwTJjy7n39l7zwWY3u+qsfZBGTi4lC1uEl2NDvIlkzsFtfCBvHBJJFJ1iuU3UzzEQ==}
-    hasBin: true
+  '@sqlite.org/sqlite-wasm@3.51.2-build9':
+    resolution: {integrity: sha512-tj2Sa6X4gVZqS9SiT2xlEeChSUklSGq8Hz6zKNbHW6NRiGyrSXiFcspnrWru1wPBT76RX/VxweESKxawCxfDxg==}
+    engines: {node: '>=22'}
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
@@ -5840,15 +5840,27 @@ packages:
   sql.js@1.14.1:
     resolution: {integrity: sha512-gcj8zBWU5cFsi9WUP+4bFNXAyF1iRpA3LLyS/DP5xlrNzGmPIizUeBggKa8DbDwdqaKwUcTEnChtd2grWo/x/A==}
 
-  sqlocal@0.14.2:
-    resolution: {integrity: sha512-U2NLx7rUABfBaOc9404gljuMirpXR7Tlvza/oA2A5yFfKG1ntCNvxEe4cdNKsirjZyI8ri8uW5Ise9NJOyBrBw==}
+  sqlocal@0.18.0:
+    resolution: {integrity: sha512-AJvbSe7W52YeI3KWt3TOl6Xf4oH/72JdQ0oig78G6v6Hrk906dIVP0vT9uIx7HmJaYHU/G+AgyqCW12W2IJ1OA==}
     peerDependencies:
+      '@angular/core': '>=17.0.0'
       drizzle-orm: '*'
       kysely: '*'
+      react: '>=18.0.0'
+      vite: '>=4.0.0'
+      vue: '>=3.0.0'
     peerDependenciesMeta:
+      '@angular/core':
+        optional: true
       drizzle-orm:
         optional: true
       kysely:
+        optional: true
+      react:
+        optional: true
+      vite:
+        optional: true
+      vue:
         optional: true
 
   stackback@0.0.2:
@@ -6481,6 +6493,18 @@ packages:
 
   ws@8.20.0:
     resolution: {integrity: sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
+  ws@8.21.0:
+    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -8836,7 +8860,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@sqlite.org/sqlite-wasm@3.50.1-build1': {}
+  '@sqlite.org/sqlite-wasm@3.51.2-build9': {}
 
   '@standard-schema/spec@1.1.0': {}
 
@@ -10728,7 +10752,7 @@ snapshots:
       gc-hook: 0.3.1
       proxy-target: 3.0.2
     optionalDependencies:
-      ws: 8.20.0
+      ws: 8.21.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -12561,12 +12585,14 @@ snapshots:
 
   sql.js@1.14.1: {}
 
-  sqlocal@0.14.2(drizzle-orm@0.45.2(@types/sql.js@1.4.11)(sql.js@1.14.1)):
+  sqlocal@0.18.0(drizzle-orm@0.45.2(@types/sql.js@1.4.11)(sql.js@1.14.1))(react@19.2.7)(vite@8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)):
     dependencies:
-      '@sqlite.org/sqlite-wasm': 3.50.1-build1
+      '@sqlite.org/sqlite-wasm': 3.51.2-build9
       coincident: 1.2.3
     optionalDependencies:
       drizzle-orm: 0.45.2(@types/sql.js@1.4.11)(sql.js@1.14.1)
+      react: 19.2.7
+      vite: 8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -13284,6 +13310,9 @@ snapshots:
   wrappy@1.0.2: {}
 
   ws@8.20.0: {}
+
+  ws@8.21.0:
+    optional: true
 
   xml-name-validator@5.0.0: {}
 
