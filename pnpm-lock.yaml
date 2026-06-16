@@ -275,8 +275,8 @@ importers:
         specifier: ^1.0.8
         version: 1.0.8
       '@vitejs/plugin-basic-ssl':
-        specifier: ^2.1.0
-        version: 2.1.4(vite@8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
+        specifier: ^2.3.0
+        version: 2.3.0(vite@8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
       '@vitejs/plugin-react':
         specifier: ^6.0.2
         version: 6.0.2(vite@8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
@@ -3632,11 +3632,11 @@ packages:
       maplibre-gl:
         optional: true
 
-  '@vitejs/plugin-basic-ssl@2.1.4':
-    resolution: {integrity: sha512-HXciTXN/sDBYWgeAD4V4s0DN0g72x5mlxQhHxtYu3Tt8BLa6MzcJZUyDVFCdtjNs3bfENVHVzOsmooTVuNgAAw==}
+  '@vitejs/plugin-basic-ssl@2.3.0':
+    resolution: {integrity: sha512-bdyo8rB3NnQbikdMpHaML9Z1OZPBu6fFOBo+OtxsBlvMJtysWskmBcnbIDhUqgC8tcxNv/a+BcV5U+2nQMm1OQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     peerDependencies:
-      vite: ^6.0.0 || ^7.0.0
+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
 
   '@vitejs/plugin-react@6.0.2':
     resolution: {integrity: sha512-DlSMqo4WhThw4vB8Mpn0Woe9J+Jfq1geJ61AKW0QEgLzGMNwtIMdxbDUzLxcun8W7NbJO0e2Jg/Nxm3cCSVzzg==}
@@ -10282,7 +10282,7 @@ snapshots:
     optionalDependencies:
       maplibre-gl: 5.24.0
 
-  '@vitejs/plugin-basic-ssl@2.1.4(vite@8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))':
+  '@vitejs/plugin-basic-ssl@2.3.0(vite@8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))':
     dependencies:
       vite: 8.0.16(@types/node@24.12.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
 
