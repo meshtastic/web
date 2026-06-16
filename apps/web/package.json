@@ -86,7 +86,7 @@
     "react-error-boundary": "^6.1.2",
     "react-hook-form": "^7.79.0",
     "react-i18next": "^17.0.8",
-    "react-map-gl": "8.1.0",
+    "react-map-gl": "8.1.1",
     "react-qrcode-logo": "^4.1.0",
     "rfc4648": "^1.5.4",
     "vite": "^8.0.16",
