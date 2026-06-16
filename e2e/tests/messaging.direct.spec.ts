@@ -4,14 +4,15 @@ import { expect, test } from "../fixtures/test.ts";
 /**
  * Direct (node-addressed) messaging across the real two-node mesh.
  *
- * NOTE: currently marked fixme. The DM thread opens and the message composes,
- * but the app raises a "Keys Mismatch" dialog and refuses to send — the SDK's
- * stored public key for the peer node does not match the key presented during
- * NodeInfo exchange (a PKI key-verification edge case observed even with fresh
- * sim nodes). The app blocks the send by design, so the DM never reaches the
- * mesh. Bidirectional text messaging is already covered by the broadcast suite;
- * re-enable this once DM key verification is resolved (or the suite pre-seeds /
- * accepts the peer key).
+ * NOTE: marked fixme — this is a SIMULATOR limitation, not a web-app issue. The
+ * DM thread opens and the message composes, but the device NAKs the send with a
+ * NO_CHANNEL routing error (6): the `meshtasticd` sim nodes never end up with a
+ * usable PKI keypair (no Curve25519 key is provisioned/propagated in their
+ * NodeInfo), and current firmware cannot deliver a direct message without a
+ * per-node key / decryptable channel, so node B can't decrypt it. The web app
+ * surfaces this correctly (it raises the key-refresh dialog). Broadcast already
+ * covers bidirectional messaging; re-enable this against real hardware (nodes
+ * with PKI keys) or once the sim provisions and shares keys.
  */
 test.describe("direct messaging over a real two-node mesh", () => {
   test.beforeEach(async ({ connectionPage, messagesPage, device }) => {

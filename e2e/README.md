@@ -48,8 +48,9 @@ pnpm test:e2e:report     # open the HTML report
 ```
 
 Global setup runs `docker compose up -d` (idempotent) and waits for the device.
-Locally the mesh is **left running** between runs for speed; set
-`E2E_DOCKER_DOWN=1` to tear it down on exit (CI always tears down).
+The mesh is **left running** between runs for speed; set `E2E_DOCKER_DOWN=1` to
+tear it down on exit. CI leaves the containers up through the run (so the
+workflow can dump device logs on failure) and tears them down in a final step.
 
 ## Environment variables
 
@@ -60,7 +61,7 @@ Locally the mesh is **left running** between runs for speed; set
 | `E2E_PEER_HOST` / `E2E_PEER_PORT` | `127.0.0.1` / `14404` | TCP phone API the Python peer drives |
 | `E2E_WEB_PORT` | `3100` | Dev-server port for the app under test |
 | `E2E_PEER_PYTHON` | `e2e/peer/.venv/bin/python` | Python used to run the peer |
-| `E2E_DOCKER_DOWN` | _unset_ | `1` to `compose down` on teardown (always in CI) |
+| `E2E_DOCKER_DOWN` | _unset_ | `1` to `compose down` on teardown (CI tears down in a final workflow step) |
 
 ## Running against real hardware
 
@@ -104,11 +105,15 @@ pnpm test:e2e
 
 ## Known limitations
 
-- **Direct messages (`messaging.direct`) are `fixme`.** The DM thread opens and
-  the message composes, but the app raises a **"Keys Mismatch"** dialog and
-  refuses to send: the SDK's stored public key for the peer doesn't match the key
-  presented during NodeInfo exchange (a PKI key-verification edge case, seen even
-  with fresh sim nodes). Broadcast already covers bidirectional messaging.
+- **Direct messages (`messaging.direct`) are `fixme` — a simulator limitation,
+  not a web-app issue.** The DM thread opens and the message composes, but the
+  device NAKs the send with a **`NO_CHANNEL`** routing error (6): the `meshtasticd`
+  sim nodes never end up with a usable PKI keypair (no Curve25519 key is
+  provisioned/propagated in their NodeInfo), and current firmware can't deliver a
+  direct message without a per-node key / decryptable channel, so node B can't
+  decrypt it. The app surfaces this correctly (it raises the key-refresh dialog).
+  Broadcast already covers bidirectional messaging; re-enable against real
+  hardware, or once the sim provisions and shares keys.
 
 ## App bugs surfaced by this suite (fixed on this branch)
 
@@ -116,10 +121,8 @@ pnpm test:e2e
    `connect()` read the just-added connection from a stale memoized closure, so
    "Save" never actually connected ("unknown connection id"). Fixed to read from
    the live store.
-
-Still open (not fixed here, surfaced by the suite):
-
-2. **`ReferenceError: nodeDB is not defined`** in
-   `apps/web/src/core/subscriptions.ts` — the device-metrics telemetry handler
-   calls a node store that the #1050 migration removed. Caught per-packet, so it
-   doesn't block messaging, but every telemetry packet logs an error.
+2. **`ReferenceError: nodeDB is not defined`** (`apps/web/src/core/subscriptions.ts`):
+   the device-metrics telemetry handler called a node store the #1050 migration
+   removed, throwing on every telemetry packet. Fixed by folding device metrics
+   into the node inside the SDK `NodesClient` (`onTelemetryPacket`) and dropping
+   the dead app-side handler.
