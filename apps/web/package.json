@@ -26,7 +26,7 @@
     "dev": "vite",
     "dev:https": "USE_HTTPS=true vite",
     "test": "vitest",
-    "typecheck": "pnpm run tsc --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "preview": "vite preview",
     "docker:build": "docker build -t meshtastic-web:latest -f ./infra/Containerfile .",
     "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
@@ -119,7 +119,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tar": "^7.5.16",
     "testing-library": "^0.0.2",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   }
 }
