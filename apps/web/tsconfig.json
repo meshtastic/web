@@ -3,16 +3,13 @@
   "compilerOptions": {
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "strictNullChecks": true,
     "strictPropertyInitialization": false,
-    "allowImportingTsExtensions": true,
     "types": [
       "vite/client",
       "node",
       "@types/w3c-web-serial",
       "@types/web-bluetooth"
     ],
-    "baseUrl": ".",
     "paths": {
       "@app/*": ["./src/*"],
       "@public/*": ["./public/*"],
