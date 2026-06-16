@@ -80,7 +80,7 @@
     "immer": "^11.1.8",
     "js-cookie": "^3.0.7",
     "lucide-react": "^1.18.0",
-    "maplibre-gl": "5.8.0",
+    "maplibre-gl": "5.24.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-error-boundary": "^6.0.0",
