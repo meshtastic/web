@@ -115,7 +115,7 @@
     "oxfmt": "^0.16.0",
     "oxlint": "^1.69.0",
     "tailwind-merge": "^3.6.0",
-    "tailwindcss": "^4.1.14",
+    "tailwindcss": "^4.3.1",
     "tailwindcss-animate": "^1.0.7",
     "tar": "^7.5.16",
     "testing-library": "^0.0.2",
