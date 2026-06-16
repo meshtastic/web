@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
-    "better-result": "^1.0.0"
+    "better-result": "^2.9.2"
   },
   "peerDependencies": {
     "react": "^18 || ^19"

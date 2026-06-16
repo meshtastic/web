@@ -65,7 +65,7 @@
     "@bufbuild/protobuf": "^2.9.0",
     "@meshtastic/protobufs": "jsr:^2.7.18",
     "@preact/signals-core": "^1.8.0",
-    "better-result": "^1.0.0",
+    "better-result": "^2.9.2",
     "crc": "npm:crc@^4.3.2",
     "ste-simple-events": "^3.0.11",
     "tslog": "^4.9.3"

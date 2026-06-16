@@ -163,8 +163,8 @@ importers:
         specifier: ^1.5.1
         version: 1.5.1
       better-result:
-        specifier: ^1.0.0
-        version: 1.0.1
+        specifier: ^2.9.2
+        version: 2.9.2
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -342,8 +342,8 @@ importers:
         specifier: ^1.8.0
         version: 1.14.2
       better-result:
-        specifier: ^1.0.0
-        version: 1.0.1
+        specifier: ^2.9.2
+        version: 2.9.2
       crc:
         specifier: npm:crc@^4.3.2
         version: 4.3.2
@@ -360,8 +360,8 @@ importers:
         specifier: workspace:*
         version: link:../sdk
       better-result:
-        specifier: ^1.0.0
-        version: 1.0.1
+        specifier: ^2.9.2
+        version: 2.9.2
     devDependencies:
       '@testing-library/react':
         specifier: ^16.0.0
@@ -443,8 +443,8 @@ importers:
         specifier: npm:@types/w3c-web-serial@^1.0.7
         version: 1.0.8
       better-result:
-        specifier: ^1.0.0
-        version: 1.0.1
+        specifier: ^2.9.2
+        version: 2.9.2
 
   packages/ui:
     dependencies:
@@ -3809,8 +3809,8 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  better-result@1.0.1:
-    resolution: {integrity: sha512-5IUPG5P3cUJgAc7rizc3heHqcJzVQDG+YrcJXhjhsjfJrFdCerpfe0RTL3nIYJCT3nU3GN/BJCaahIyqWfLYyg==}
+  better-result@2.9.2:
+    resolution: {integrity: sha512-WIFoBPCdnTOdk9inkE1ZRvCZ4P0CpSkAiLlchC65N7n9DcjZ3NhqkBOlafzpOVnO8ixyi37kicmSJ3ENhPZl7Q==}
 
   bignumber.js@9.3.1:
     resolution: {integrity: sha512-Ko0uX15oIUS7wJ3Rb30Fs6SkVbLmPBAKdlm7q9+ak9bbIeFf0MwuBsQV6z7+X768/cHsfg+WlysDWJcmthjsjQ==}
@@ -10484,7 +10484,7 @@ snapshots:
 
   baseline-browser-mapping@2.10.37: {}
 
-  better-result@1.0.1: {}
+  better-result@2.9.2: {}
 
   bignumber.js@9.3.1: {}
 

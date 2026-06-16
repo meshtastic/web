@@ -51,6 +51,6 @@
   "dependencies": {
     "@types/w3c-web-serial": "npm:@types/w3c-web-serial@^1.0.7",
     "@meshtastic/sdk": "workspace:*",
-    "better-result": "^1.0.0"
+    "better-result": "^2.9.2"
   }
 }
