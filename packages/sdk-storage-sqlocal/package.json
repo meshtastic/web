@@ -46,7 +46,7 @@
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
     "drizzle-orm": "^0.45.2",
-    "sqlocal": "^0.14.0"
+    "sqlocal": "^0.18.0"
   },
   "devDependencies": {
     "sql.js": "^1.12.0",
