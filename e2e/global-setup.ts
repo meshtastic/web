@@ -61,6 +61,7 @@ async function waitForTcp(host: string, port: number, timeoutMs: number): Promis
       });
       sock.once("error", (e) => {
         lastErr = e.message;
+        sock.destroy();
         resolve(false);
       });
       sock.once("timeout", () => {

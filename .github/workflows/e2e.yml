@@ -60,3 +60,7 @@ jobs:
       - name: Dump device logs on failure
         if: failure()
         run: docker compose -f e2e/device/docker-compose.yml logs --no-color || true
+
+      - name: Tear down mesh
+        if: always()
+        run: docker compose -f e2e/device/docker-compose.yml down -v || true
