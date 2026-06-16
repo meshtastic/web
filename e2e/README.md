@@ -106,14 +106,16 @@ pnpm test:e2e
 ## Known limitations
 
 - **Direct messages (`messaging.direct`) are `fixme` — a simulator limitation,
-  not a web-app issue.** The DM thread opens and the message composes, but the
-  device NAKs the send with a **`NO_CHANNEL`** routing error (6): the `meshtasticd`
-  sim nodes never end up with a usable PKI keypair (no Curve25519 key is
-  provisioned/propagated in their NodeInfo), and current firmware can't deliver a
-  direct message without a per-node key / decryptable channel, so node B can't
-  decrypt it. The app surfaces this correctly (it raises the key-refresh dialog).
-  Broadcast already covers bidirectional messaging; re-enable against real
-  hardware, or once the sim provisions and shares keys.
+  not a web-app issue.** Current firmware requires PKI for DMs (`Unknown public
+  key for destination ... refusing to send legacy DM`) and the `meshtasticd` sim
+  nodes never end up with a usable **broadcast** public key, so the two nodes
+  can't exchange keys and the send is NAK'd (`NO_CHANNEL`, routing error 6). The
+  device's `config.security` keys ARE settable and persist (verified via admin),
+  but on the native sim they don't sync to the node's owner / NodeInfo key
+  (`owner.public_key` stays empty, the node keeps its MAC-derived num), so
+  provisioning them doesn't help. The app behaves correctly (it raises the
+  key-refresh dialog). Broadcast already covers bidirectional messaging;
+  re-enable against real hardware, where keys generate and exchange normally.
 
 ## App bugs surfaced by this suite (fixed on this branch)
 
