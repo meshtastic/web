@@ -41,7 +41,7 @@
   "devDependencies": {
     "@meshtastic/core": "jsr:^2.6.6",
     "@meshtastic/sdk": "workspace:*",
-    "@types/node": "^24.3.1",
+    "@types/node": "^25.9.3",
     "husky": "^9.1.0",
     "lint-staged": "^17.0.7",
     "oxfmt": "^0.16.0",
