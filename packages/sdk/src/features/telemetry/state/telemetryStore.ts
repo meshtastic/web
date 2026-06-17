@@ -1,14 +1,26 @@
 import { type Signal, signal } from "@preact/signals-core";
-import { type ReadonlySignal, toReadonly } from "../../../core/signals/createStore.ts";
+import {
+  type ReadonlySignal,
+  toReadonly,
+} from "../../../core/signals/createStore.ts";
 import type { TelemetryReading } from "../domain/TelemetryReading.ts";
 
 const MAX_HISTORY = 256;
 
 export class TelemetryStore {
-  private readonly latest = new Map<number, Signal<TelemetryReading | undefined>>();
-  private readonly latestRead = new Map<number, ReadonlySignal<TelemetryReading | undefined>>();
+  private readonly latest = new Map<
+    number,
+    Signal<TelemetryReading | undefined>
+  >();
+  private readonly latestRead = new Map<
+    number,
+    ReadonlySignal<TelemetryReading | undefined>
+  >();
   private readonly history = new Map<number, Signal<TelemetryReading[]>>();
-  private readonly historyRead = new Map<number, ReadonlySignal<TelemetryReading[]>>();
+  private readonly historyRead = new Map<
+    number,
+    ReadonlySignal<TelemetryReading[]>
+  >();
 
   append(reading: TelemetryReading): void {
     const latestSig = this.ensureLatest(reading.nodeNum);

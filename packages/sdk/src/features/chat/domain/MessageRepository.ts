@@ -26,7 +26,11 @@ export interface RetentionPolicy {
  */
 export interface MessageRepository {
   loadRecent(key: ConversationKey, limit: number): Promise<Message[]>;
-  loadBefore(key: ConversationKey, cursor: Date, limit: number): Promise<Message[]>;
+  loadBefore(
+    key: ConversationKey,
+    cursor: Date,
+    limit: number,
+  ): Promise<Message[]>;
   append(message: Message): Promise<void>;
   appendBatch(messages: ReadonlyArray<Message>): Promise<void>;
   updateState(id: number, state: MessageState): Promise<void>;
@@ -38,5 +42,7 @@ export interface MessageRepository {
 }
 
 export function conversationKeyString(key: ConversationKey): string {
-  return key.kind === "channel" ? `channel:${key.channel}` : `direct:${key.peer}`;
+  return key.kind === "channel"
+    ? `channel:${key.channel}`
+    : `direct:${key.peer}`;
 }

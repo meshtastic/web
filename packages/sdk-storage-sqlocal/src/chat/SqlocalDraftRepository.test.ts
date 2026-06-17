@@ -14,8 +14,13 @@ describe("SqlocalDraftRepository", () => {
   });
 
   it("save then load returns the same text", async () => {
-    await repo.save({ kind: "channel", channel: ChannelNumber.Primary }, "hello");
-    expect(await repo.load({ kind: "channel", channel: ChannelNumber.Primary })).toBe("hello");
+    await repo.save(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      "hello",
+    );
+    expect(
+      await repo.load({ kind: "channel", channel: ChannelNumber.Primary }),
+    ).toBe("hello");
   });
 
   it("save with empty text deletes the row", async () => {
@@ -25,9 +30,14 @@ describe("SqlocalDraftRepository", () => {
   });
 
   it("clear removes the row", async () => {
-    await repo.save({ kind: "channel", channel: ChannelNumber.Channel1 }, "draft");
+    await repo.save(
+      { kind: "channel", channel: ChannelNumber.Channel1 },
+      "draft",
+    );
     await repo.clear({ kind: "channel", channel: ChannelNumber.Channel1 });
-    expect(await repo.load({ kind: "channel", channel: ChannelNumber.Channel1 })).toBe("");
+    expect(
+      await repo.load({ kind: "channel", channel: ChannelNumber.Channel1 }),
+    ).toBe("");
   });
 
   it("upsert overwrites prior text without throwing", async () => {
@@ -38,10 +48,20 @@ describe("SqlocalDraftRepository", () => {
 
   it("scoped per device_id", async () => {
     const repoB = new SqlocalDraftRepository(db, { deviceId: 2 });
-    await repo.save({ kind: "channel", channel: ChannelNumber.Primary }, "from-1");
-    await repoB.save({ kind: "channel", channel: ChannelNumber.Primary }, "from-2");
-    expect(await repo.load({ kind: "channel", channel: ChannelNumber.Primary })).toBe("from-1");
-    expect(await repoB.load({ kind: "channel", channel: ChannelNumber.Primary })).toBe("from-2");
+    await repo.save(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      "from-1",
+    );
+    await repoB.save(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      "from-2",
+    );
+    expect(
+      await repo.load({ kind: "channel", channel: ChannelNumber.Primary }),
+    ).toBe("from-1");
+    expect(
+      await repoB.load({ kind: "channel", channel: ChannelNumber.Primary }),
+    ).toBe("from-2");
   });
 
   it("loadAll returns all drafts for the device", async () => {

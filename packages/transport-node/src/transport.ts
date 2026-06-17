@@ -34,7 +34,11 @@ export class TransportNode implements Transport {
    * @param timeout - TCP socket timeout in milliseconds (defaults to 60000).
    * @returns A promise that resolves with a connected TransportNode instance.
    */
-  public static create(hostname: string, port = 4403, timeout = 60000): Promise<TransportNode> {
+  public static create(
+    hostname: string,
+    port = 4403,
+    timeout = 60000,
+  ): Promise<TransportNode> {
     return new Promise((resolve, reject) => {
       const socket = new Socket();
 
@@ -95,7 +99,9 @@ export class TransportNode implements Transport {
     this.abortController = new AbortController();
     const abortController = this.abortController;
 
-    const fromDeviceSource = Readable.toWeb(connection) as ReadableStream<Uint8Array>;
+    const fromDeviceSource = Readable.toWeb(
+      connection,
+    ) as ReadableStream<Uint8Array>;
     const transformed = fromDeviceSource.pipeThrough(fromDeviceStream());
 
     this._fromDevice = new ReadableStream<DeviceOutput>({
@@ -121,7 +127,9 @@ export class TransportNode implements Transport {
           } else {
             this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
 
-            ctrl.error(error instanceof Error ? error : new Error(String(error)));
+            ctrl.error(
+              error instanceof Error ? error : new Error(String(error)),
+            );
           }
           try {
             await transformed.cancel();

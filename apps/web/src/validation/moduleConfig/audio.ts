@@ -1,7 +1,9 @@
 import { Protobuf } from "@meshtastic/sdk";
 import { z } from "zod/v4";
 
-const Audio_BaudEnum = z.enum(Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud);
+const Audio_BaudEnum = z.enum(
+  Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud,
+);
 
 export const AudioValidationSchema = z.object({
   codec2Enabled: z.boolean(),

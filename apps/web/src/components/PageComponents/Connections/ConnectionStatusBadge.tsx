@@ -1,7 +1,11 @@
 import { Button } from "@app/components/UI/Button";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 
-export function ConnectionStatusBadge({ status }: { status: Connection["status"] }) {
+export function ConnectionStatusBadge({
+  status,
+}: {
+  status: Connection["status"];
+}) {
   let color = "";
   let displayStatus = status;
 
@@ -26,8 +30,13 @@ export function ConnectionStatusBadge({ status }: { status: Connection["status"]
   }
   return (
     <Button variant="subtle" className="inline-flex items-center gap-2">
-      <span className={`h-2.5 w-2.5 rounded-full ${color}`} aria-hidden="true" />
-      <span className="text-xs capitalize text-slate-500 dark:text-slate-400">{displayStatus}</span>
+      <span
+        className={`h-2.5 w-2.5 rounded-full ${color}`}
+        aria-hidden="true"
+      />
+      <span className="text-xs capitalize text-slate-500 dark:text-slate-400">
+        {displayStatus}
+      </span>
     </Button>
   );
 }

@@ -1,4 +1,10 @@
-import { index, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 /**
  * Snapshot of the device's NodeDB. Position / metrics / user are stored as
@@ -12,8 +18,12 @@ export const nodes = sqliteTable(
     num: integer("num").notNull(),
     lastHeard: integer("last_heard"),
     snr: integer("snr"),
-    isFavorite: integer("is_favorite", { mode: "boolean" }).notNull().default(false),
-    isIgnored: integer("is_ignored", { mode: "boolean" }).notNull().default(false),
+    isFavorite: integer("is_favorite", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    isIgnored: integer("is_ignored", { mode: "boolean" })
+      .notNull()
+      .default(false),
     userJson: text("user_json"),
     positionJson: text("position_json"),
     metricsJson: text("metrics_json"),

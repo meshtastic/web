@@ -45,7 +45,9 @@ export const BaseMap = ({
 
   const locale = useMemo(() => {
     return {
-      "GeolocateControl.FindMyLocation": t("maplibre.GeolocateControl.FindMyLocation"),
+      "GeolocateControl.FindMyLocation": t(
+        "maplibre.GeolocateControl.FindMyLocation",
+      ),
       "NavigationControl.ZoomIn": t("maplibre.NavigationControl.ZoomIn"),
       "NavigationControl.ZoomOut": t("maplibre.NavigationControl.ZoomOut"),
       "ScaleControl.Meters": t("unit.meter.suffix"),

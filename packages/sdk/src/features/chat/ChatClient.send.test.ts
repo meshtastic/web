@@ -14,9 +14,13 @@ type SendResult = ResultType<number, SendTextError>;
  * for us, so this helper polls the queue and acks any pending items
  * until the send promise settles.
  */
-async function withAckFlush<T>(client: MeshClient, run: () => Promise<T>): Promise<T> {
+async function withAckFlush<T>(
+  client: MeshClient,
+  run: () => Promise<T>,
+): Promise<T> {
   const flush = setInterval(() => {
-    for (const item of client.queue.getState()) client.queue.processAck(item.id);
+    for (const item of client.queue.getState())
+      client.queue.processAck(item.id);
   }, 5);
   try {
     return await run();
@@ -112,7 +116,8 @@ describe("ChatClient.send optimistic append", () => {
     expect(messages.value[0]!.state).toBe(MessageState.Pending);
 
     // Now drain the queue so the test doesn't dangle.
-    for (const item of client.queue.getState()) client.queue.processAck(item.id);
+    for (const item of client.queue.getState())
+      client.queue.processAck(item.id);
     await sendPromise;
   });
 

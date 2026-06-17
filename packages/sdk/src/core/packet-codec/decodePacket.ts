@@ -48,9 +48,16 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
         case "packet": {
           let decodedMessage: Protobuf.Mesh.FromRadio;
           try {
-            decodedMessage = fromBinary(Protobuf.Mesh.FromRadioSchema, chunk.data);
+            decodedMessage = fromBinary(
+              Protobuf.Mesh.FromRadioSchema,
+              chunk.data,
+            );
           } catch (e) {
-            sink.log.error(Emitter[Emitter.HandleFromRadio], "⚠️ Received undecodable packet", e);
+            sink.log.error(
+              Emitter[Emitter.HandleFromRadio],
+              "⚠️ Received undecodable packet",
+              e,
+            );
             break;
           }
           sink.events.onFromRadio.dispatch(decodedMessage);
@@ -69,7 +76,9 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
               break;
             }
             case "myInfo": {
-              sink.events.onMyNodeInfo.dispatch(decodedMessage.payloadVariant.value);
+              sink.events.onMyNodeInfo.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               sink.log.info(
                 Emitter[Emitter.HandleFromRadio],
                 "📱 Received Node info for this device",
@@ -81,7 +90,9 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                 Emitter[Emitter.HandleFromRadio],
                 `📱 Received Node Info packet for node: ${decodedMessage.payloadVariant.value.num}`,
               );
-              sink.events.onNodeInfoPacket.dispatch(decodedMessage.payloadVariant.value);
+              sink.events.onNodeInfoPacket.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
 
               if (decodedMessage.payloadVariant.value.position) {
                 sink.events.onPositionPacket.dispatch({
@@ -120,12 +131,19 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                   "⚠️ Received Config packet of variant: UNK",
                 );
               }
-              sink.events.onConfigPacket.dispatch(decodedMessage.payloadVariant.value);
+              sink.events.onConfigPacket.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               break;
             }
             case "logRecord": {
-              sink.log.trace(Emitter[Emitter.HandleFromRadio], "Received onLogRecord");
-              sink.events.onLogRecord.dispatch(decodedMessage.payloadVariant.value);
+              sink.log.trace(
+                Emitter[Emitter.HandleFromRadio],
+                "Received onLogRecord",
+              );
+              sink.events.onLogRecord.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               break;
             }
             case "configCompleteId": {
@@ -133,7 +151,9 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                 Emitter[Emitter.HandleFromRadio],
                 `⚙️ Received config complete id: ${decodedMessage.payloadVariant.value}`,
               );
-              sink.events.onConfigComplete.dispatch(decodedMessage.payloadVariant.value);
+              sink.events.onConfigComplete.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               if (decodedMessage.payloadVariant.value === sink.configId) {
                 sink.log.info(
                   Emitter[Emitter.HandleFromRadio],
@@ -162,7 +182,9 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                   "⚠️ Received Module Config packet of variant: UNK",
                 );
               }
-              sink.events.onModuleConfigPacket.dispatch(decodedMessage.payloadVariant.value);
+              sink.events.onModuleConfigPacket.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               break;
             }
             case "channel": {
@@ -170,7 +192,9 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                 Emitter[Emitter.HandleFromRadio],
                 `🔐 Received Channel: ${decodedMessage.payloadVariant.value.index}`,
               );
-              sink.events.onChannelPacket.dispatch(decodedMessage.payloadVariant.value);
+              sink.events.onChannelPacket.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               break;
             }
             case "queueStatus": {
@@ -178,7 +202,9 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                 Emitter[Emitter.HandleFromRadio],
                 `🚧 Received Queue Status: ${decodedMessage.payloadVariant.value}`,
               );
-              sink.events.onQueueStatus.dispatch(decodedMessage.payloadVariant.value);
+              sink.events.onQueueStatus.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               break;
             }
             case "xmodemPacket": {
@@ -187,15 +213,19 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
             }
             case "metadata": {
               if (
-                Number.parseFloat(decodedMessage.payloadVariant.value.firmwareVersion) <
-                Constants.minFwVer
+                Number.parseFloat(
+                  decodedMessage.payloadVariant.value.firmwareVersion,
+                ) < Constants.minFwVer
               ) {
                 sink.log.fatal(
                   Emitter[Emitter.HandleFromRadio],
                   `Device firmware outdated. Min supported: ${Constants.minFwVer} got: ${decodedMessage.payloadVariant.value.firmwareVersion}`,
                 );
               }
-              sink.log.debug(Emitter[Emitter.GetMetadata], "🏷️ Received metadata packet");
+              sink.log.debug(
+                Emitter[Emitter.GetMetadata],
+                "🏷️ Received metadata packet",
+              );
               sink.events.onDeviceMetadataPacket.dispatch({
                 id: decodedMessage.id,
                 rxTime: new Date(),
@@ -215,7 +245,9 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                 Emitter[Emitter.HandleFromRadio],
                 `📣 Received ClientNotification: ${decodedMessage.payloadVariant.value.message}`,
               );
-              sink.events.onClientNotificationPacket.dispatch(decodedMessage.payloadVariant.value);
+              sink.events.onClientNotificationPacket.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               break;
             }
             default: {
@@ -230,7 +262,10 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
     },
   });
 
-function handleMeshPacket(sink: PacketSink, meshPacket: Protobuf.Mesh.MeshPacket): void {
+function handleMeshPacket(
+  sink: PacketSink,
+  meshPacket: Protobuf.Mesh.MeshPacket,
+): void {
   sink.events.onMeshPacket.dispatch(meshPacket);
   if (meshPacket.from !== sink.myNodeNum) {
     sink.events.onMeshHeartbeat.dispatch(new Date());
@@ -283,7 +318,10 @@ function handleDecodedPacket(
     case Protobuf.Portnums.PortNum.REMOTE_HARDWARE_APP: {
       sink.events.onRemoteHardwarePacket.dispatch({
         ...packetMetadata,
-        data: fromBinary(Protobuf.RemoteHardware.HardwareMessageSchema, dataPacket.payload),
+        data: fromBinary(
+          Protobuf.RemoteHardware.HardwareMessageSchema,
+          dataPacket.payload,
+        ),
       });
       break;
     }
@@ -302,11 +340,19 @@ function handleDecodedPacket(
       break;
     }
     case Protobuf.Portnums.PortNum.ROUTING_APP: {
-      const routingPacket = fromBinary(Protobuf.Mesh.RoutingSchema, dataPacket.payload);
-      sink.events.onRoutingPacket.dispatch({ ...packetMetadata, data: routingPacket });
+      const routingPacket = fromBinary(
+        Protobuf.Mesh.RoutingSchema,
+        dataPacket.payload,
+      );
+      sink.events.onRoutingPacket.dispatch({
+        ...packetMetadata,
+        data: routingPacket,
+      });
       switch (routingPacket.variant.case) {
         case "errorReason": {
-          if (routingPacket.variant.value === Protobuf.Mesh.Routing_Error.NONE) {
+          if (
+            routingPacket.variant.value === Protobuf.Mesh.Routing_Error.NONE
+          ) {
             sink.queue.processAck(dataPacket.requestId);
           } else {
             sink.queue.processError({
@@ -325,10 +371,15 @@ function handleDecodedPacket(
       break;
     }
     case Protobuf.Portnums.PortNum.ADMIN_APP: {
-      const adminMessage = fromBinary(Protobuf.Admin.AdminMessageSchema, dataPacket.payload);
+      const adminMessage = fromBinary(
+        Protobuf.Admin.AdminMessageSchema,
+        dataPacket.payload,
+      );
       switch (adminMessage.payloadVariant.case) {
         case "getChannelResponse": {
-          sink.events.onChannelPacket.dispatch(adminMessage.payloadVariant.value);
+          sink.events.onChannelPacket.dispatch(
+            adminMessage.payloadVariant.value,
+          );
           break;
         }
         case "getOwnerResponse": {
@@ -339,11 +390,15 @@ function handleDecodedPacket(
           break;
         }
         case "getConfigResponse": {
-          sink.events.onConfigPacket.dispatch(adminMessage.payloadVariant.value);
+          sink.events.onConfigPacket.dispatch(
+            adminMessage.payloadVariant.value,
+          );
           break;
         }
         case "getModuleConfigResponse": {
-          sink.events.onModuleConfigPacket.dispatch(adminMessage.payloadVariant.value);
+          sink.events.onModuleConfigPacket.dispatch(
+            adminMessage.payloadVariant.value,
+          );
           break;
         }
         case "getDeviceMetadataResponse": {
@@ -388,7 +443,10 @@ function handleDecodedPacket(
       break;
     }
     case Protobuf.Portnums.PortNum.AUDIO_APP: {
-      sink.events.onAudioPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onAudioPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.DETECTION_SENSOR_APP: {
@@ -399,11 +457,17 @@ function handleDecodedPacket(
       break;
     }
     case Protobuf.Portnums.PortNum.REPLY_APP: {
-      sink.events.onPingPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onPingPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.IP_TUNNEL_APP: {
-      sink.events.onIpTunnelPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onIpTunnelPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.PAXCOUNTER_APP: {
@@ -414,36 +478,57 @@ function handleDecodedPacket(
       break;
     }
     case Protobuf.Portnums.PortNum.SERIAL_APP: {
-      sink.events.onSerialPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onSerialPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.STORE_FORWARD_APP: {
-      sink.events.onStoreForwardPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onStoreForwardPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.RANGE_TEST_APP: {
-      sink.events.onRangeTestPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onRangeTestPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.TELEMETRY_APP: {
       sink.events.onTelemetryPacket.dispatch({
         ...packetMetadata,
-        data: fromBinary(Protobuf.Telemetry.TelemetrySchema, dataPacket.payload),
+        data: fromBinary(
+          Protobuf.Telemetry.TelemetrySchema,
+          dataPacket.payload,
+        ),
       });
       break;
     }
     case Protobuf.Portnums.PortNum.ZPS_APP: {
-      sink.events.onZpsPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onZpsPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.SIMULATOR_APP: {
-      sink.events.onSimulatorPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onSimulatorPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.TRACEROUTE_APP: {
       sink.events.onTraceRoutePacket.dispatch({
         ...packetMetadata,
-        data: fromBinary(Protobuf.Mesh.RouteDiscoverySchema, dataPacket.payload),
+        data: fromBinary(
+          Protobuf.Mesh.RouteDiscoverySchema,
+          dataPacket.payload,
+        ),
       });
       break;
     }
@@ -455,19 +540,31 @@ function handleDecodedPacket(
       break;
     }
     case Protobuf.Portnums.PortNum.ATAK_PLUGIN: {
-      sink.events.onAtakPluginPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onAtakPluginPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.MAP_REPORT_APP: {
-      sink.events.onMapReportPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onMapReportPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.PRIVATE_APP: {
-      sink.events.onPrivatePacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onPrivatePacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     case Protobuf.Portnums.PortNum.ATAK_FORWARDER: {
-      sink.events.onAtakForwarderPacket.dispatch({ ...packetMetadata, data: dataPacket.payload });
+      sink.events.onAtakForwarderPacket.dispatch({
+        ...packetMetadata,
+        data: dataPacket.payload,
+      });
       break;
     }
     default:

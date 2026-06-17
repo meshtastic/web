@@ -1,6 +1,12 @@
-import { type UserValidation, UserValidationSchema } from "@app/validation/config/user.ts";
+import {
+  type UserValidation,
+  UserValidationSchema,
+} from "@app/validation/config/user.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -55,7 +61,9 @@ export const User = ({ onFormInit }: UserConfigProps) => {
     editor.setOwner(merged);
   };
 
-  const hwName = Protobuf.Mesh.HardwareModel[baselineUser.hwModel] ?? String(baselineUser.hwModel);
+  const hwName =
+    Protobuf.Mesh.HardwareModel[baselineUser.hwModel] ??
+    String(baselineUser.hwModel);
 
   return (
     <DynamicForm<UserValidation>

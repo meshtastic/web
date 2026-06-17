@@ -23,7 +23,9 @@ export function useFavoriteNode() {
       const node = meshClient.nodes.byNum(nodeNum);
       if (!node) return;
 
-      void (isFavorite ? meshClient.nodes.favorite(nodeNum) : meshClient.nodes.unfavorite(nodeNum));
+      void (isFavorite
+        ? meshClient.nodes.favorite(nodeNum)
+        : meshClient.nodes.unfavorite(nodeNum));
 
       toast({
         title: t("toast.favoriteNode.title", {

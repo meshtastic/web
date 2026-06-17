@@ -17,7 +17,10 @@ export interface RefreshKeysDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const RefreshKeysDialog = ({ open, onOpenChange }: RefreshKeysDialogProps) => {
+export const RefreshKeysDialog = ({
+  open,
+  onOpenChange,
+}: RefreshKeysDialogProps) => {
   const { t } = useTranslation("dialog");
   const nodeError = useNodeErrors()[0];
   const nodeWithError = useNodeAsProto(nodeError?.node ?? 0);
@@ -42,7 +45,10 @@ export const RefreshKeysDialog = ({ open, onOpenChange }: RefreshKeysDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-8 flex flex-col gap-2" aria-describedby={undefined}>
+      <DialogContent
+        className="max-w-8 flex flex-col gap-2"
+        aria-describedby={undefined}
+      >
         <DialogClose onClick={handleCloseDialog} />
         <DialogHeader>
           <DialogTitle>{text.title}</DialogTitle>
@@ -51,17 +57,30 @@ export const RefreshKeysDialog = ({ open, onOpenChange }: RefreshKeysDialogProps
         <ul className="mt-2">
           <li className="flex place-items-center gap-2 items-start">
             <div className="p-2 bg-slate-500 rounded-lg mt-1">
-              <LockKeyholeOpenIcon size={30} className="text-white justify-center" />
+              <LockKeyholeOpenIcon
+                size={30}
+                className="text-white justify-center"
+              />
             </div>
             <div className="flex flex-col gap-2">
               <div>
-                <p className="font-bold mb-0.5">{t("refreshKeys.label.acceptNewKeys")}</p>
+                <p className="font-bold mb-0.5">
+                  {t("refreshKeys.label.acceptNewKeys")}
+                </p>
                 <p>{t("refreshKeys.description.acceptNewKeys")}</p>
               </div>
-              <Button variant="default" name="requestNewKeys" onClick={handleNodeRemove}>
+              <Button
+                variant="default"
+                name="requestNewKeys"
+                onClick={handleNodeRemove}
+              >
                 {t("button.requestNewKeys")}
               </Button>
-              <Button variant="outline" name="dismiss" onClick={handleCloseDialog}>
+              <Button
+                variant="outline"
+                name="dismiss"
+                onClick={handleCloseDialog}
+              >
                 {t("button.dismiss")}
               </Button>
             </div>

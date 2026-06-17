@@ -18,7 +18,9 @@ function mqttPacket(enabled: boolean): Protobuf.ModuleConfig.ModuleConfig {
   return create(Protobuf.ModuleConfig.ModuleConfigSchema, {
     payloadVariant: {
       case: "mqtt",
-      value: create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, { enabled }),
+      value: create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, {
+        enabled,
+      }),
     },
   });
 }
@@ -43,7 +45,10 @@ describe("ConfigEditor", () => {
     expect(editor.isDirty.value).toBe(false);
     expect(editor.radio.value.lora?.region).toBe(4);
 
-    editor.setRadioSection("lora", create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }));
+    editor.setRadioSection(
+      "lora",
+      create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }),
+    );
     expect(editor.isDirty.value).toBe(true);
     expect(editor.dirtyRadioSections.value).toEqual(["lora"]);
   });
@@ -58,7 +63,9 @@ describe("ConfigEditor", () => {
 
     editor.setModuleSection(
       "mqtt",
-      create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, { enabled: true }),
+      create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, {
+        enabled: true,
+      }),
     );
     expect(editor.dirtyModuleSections.value).toEqual(["mqtt"]);
 
@@ -73,7 +80,10 @@ describe("ConfigEditor", () => {
     const editor = client.config.editor;
 
     client.events.onConfigPacket.dispatch(loraPacket(4));
-    editor.setRadioSection("lora", create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }));
+    editor.setRadioSection(
+      "lora",
+      create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }),
+    );
     expect(editor.isDirty.value).toBe(true);
 
     editor.reset();
@@ -88,7 +98,10 @@ describe("ConfigEditor", () => {
 
     // User edits lora region
     client.events.onConfigPacket.dispatch(loraPacket(4));
-    editor.setRadioSection("lora", create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }));
+    editor.setRadioSection(
+      "lora",
+      create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }),
+    );
 
     // Device pushes a baseline change for the same section while user is editing
     client.events.onConfigPacket.dispatch(loraPacket(8));
@@ -104,7 +117,10 @@ describe("ConfigEditor", () => {
     const editor = client.config.editor;
 
     client.events.onConfigPacket.dispatch(loraPacket(4));
-    editor.setRadioSection("lora", create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }));
+    editor.setRadioSection(
+      "lora",
+      create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }),
+    );
     expect(editor.isDirty.value).toBe(true);
 
     client.events.onDeviceStatus.dispatch(DeviceStatusEnum.DeviceDisconnected);

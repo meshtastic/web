@@ -4,7 +4,13 @@ import { ChannelNumber, MeshRegistry } from "@meshtastic/sdk";
 import { createFakeTransport } from "@meshtastic/sdk/testing";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { MeshRegistryProvider, useChannels, useMeshDevice, useNode, useNodes } from "../mod.ts";
+import {
+  MeshRegistryProvider,
+  useChannels,
+  useMeshDevice,
+  useNode,
+  useNodes,
+} from "../mod.ts";
 
 function makeRegistry(deviceCount: number) {
   const registry = new MeshRegistry();
@@ -21,7 +27,9 @@ describe("sdk-react under MeshRegistryProvider", () => {
   it("useMeshDevice resolves through the registry's active client", async () => {
     const { registry, handles } = makeRegistry(1);
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <MeshRegistryProvider registry={registry}>{children}</MeshRegistryProvider>
+      <MeshRegistryProvider registry={registry}>
+        {children}
+      </MeshRegistryProvider>
     );
     const { result } = renderHook(() => useMeshDevice(), { wrapper });
     expect(result.current.myNodeNum).toBeUndefined();
@@ -36,7 +44,9 @@ describe("sdk-react under MeshRegistryProvider", () => {
   it("useNodes lists nodes from the active client and updates on packets", async () => {
     const { registry, handles } = makeRegistry(1);
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <MeshRegistryProvider registry={registry}>{children}</MeshRegistryProvider>
+      <MeshRegistryProvider registry={registry}>
+        {children}
+      </MeshRegistryProvider>
     );
     const { result } = renderHook(() => useNodes(), { wrapper });
     expect(result.current).toEqual([]);
@@ -53,7 +63,9 @@ describe("sdk-react under MeshRegistryProvider", () => {
   it("useNode selects by node number and re-renders on update", async () => {
     const { registry, handles } = makeRegistry(1);
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <MeshRegistryProvider registry={registry}>{children}</MeshRegistryProvider>
+      <MeshRegistryProvider registry={registry}>
+        {children}
+      </MeshRegistryProvider>
     );
     const { result } = renderHook(() => useNode(11), { wrapper });
     expect(result.current).toBeUndefined();
@@ -73,7 +85,9 @@ describe("sdk-react under MeshRegistryProvider", () => {
     if (!client) throw new Error("expected an active client");
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <MeshRegistryProvider registry={registry}>{children}</MeshRegistryProvider>
+      <MeshRegistryProvider registry={registry}>
+        {children}
+      </MeshRegistryProvider>
     );
     const { result } = renderHook(() => useChannels(), { wrapper });
     expect(result.current).toEqual([]);
@@ -95,7 +109,9 @@ describe("sdk-react under MeshRegistryProvider", () => {
     const { registry, handles } = makeRegistry(2);
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <MeshRegistryProvider registry={registry}>{children}</MeshRegistryProvider>
+      <MeshRegistryProvider registry={registry}>
+        {children}
+      </MeshRegistryProvider>
     );
     const { result } = renderHook(() => useMeshDevice(), { wrapper });
 

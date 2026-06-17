@@ -97,7 +97,8 @@ export const Table = ({ headings, rows }: TableProps) => {
               scope="col"
               className={cn(
                 "py-2 pr-3 text-left",
-                heading.sortable && "cursor-pointer hover:brightness-hover active:brightness-press",
+                heading.sortable &&
+                  "cursor-pointer hover:brightness-hover active:brightness-press",
               )}
               onClick={() => heading.sortable && handleSort(heading.title)}
               onKeyUp={(e) => {

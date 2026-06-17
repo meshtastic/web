@@ -1,8 +1,14 @@
-import { type ChannelValidation, makeChannelSchema } from "@app/validation/channel.ts";
+import {
+  type ChannelValidation,
+  makeChannelSchema,
+} from "@app/validation/channel.ts";
 import { create } from "@bufbuild/protobuf";
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -23,7 +29,10 @@ const EMPTY_CHANNELS_SIGNAL = {
     Protobuf.Channel.Channel
   >,
   peek: () =>
-    new Map<number, Protobuf.Channel.Channel>() as ReadonlyMap<number, Protobuf.Channel.Channel>,
+    new Map<number, Protobuf.Channel.Channel>() as ReadonlyMap<
+      number,
+      Protobuf.Channel.Channel
+    >,
   subscribe: () => () => {},
 } as const;
 
@@ -43,7 +52,8 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
         moduleSettings: {
           ...defaultConfig?.settings?.moduleSettings,
           positionPrecision:
-            defaultConfig?.settings?.moduleSettings?.positionPrecision === undefined
+            defaultConfig?.settings?.moduleSettings?.positionPrecision ===
+            undefined
               ? 10
               : defaultConfig?.settings?.moduleSettings?.positionPrecision,
         },
@@ -62,7 +72,8 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
         moduleSettings: {
           ...effectiveConfig?.settings?.moduleSettings,
           positionPrecision:
-            effectiveConfig?.settings?.moduleSettings?.positionPrecision === undefined
+            effectiveConfig?.settings?.moduleSettings?.positionPrecision ===
+            undefined
               ? 10
               : effectiveConfig?.settings?.moduleSettings?.positionPrecision,
         },
@@ -70,8 +81,11 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
     },
   };
 
-  const [preSharedDialogOpen, setPreSharedDialogOpen] = useState<boolean>(false);
-  const [byteCount, setBytes] = useState<number>(effectiveConfig?.settings?.psk.length ?? 16);
+  const [preSharedDialogOpen, setPreSharedDialogOpen] =
+    useState<boolean>(false);
+  const [byteCount, setBytes] = useState<number>(
+    effectiveConfig?.settings?.psk.length ?? 16,
+  );
   const ChannelValidationSchema = useMemo(() => {
     return makeChannelSchema(byteCount);
   }, [byteCount]);

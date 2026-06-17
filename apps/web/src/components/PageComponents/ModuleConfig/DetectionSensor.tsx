@@ -3,7 +3,10 @@ import {
   type DetectionSensorValidation,
   DetectionSensorValidationSchema,
 } from "@app/validation/moduleConfig/detectionSensor.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -14,13 +17,19 @@ interface DetectionSensorModuleConfigProps {
 }
 
 const EMPTY_MODULES_SIGNAL = {
-  value: {} as { detectionSensor?: Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig },
+  value: {} as {
+    detectionSensor?: Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig;
+  },
   peek: () =>
-    ({}) as { detectionSensor?: Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig },
+    ({}) as {
+      detectionSensor?: Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig;
+    },
   subscribe: () => () => {},
 } as const;
 
-export const DetectionSensor = ({ onFormInit }: DetectionSensorModuleConfigProps) => {
+export const DetectionSensor = ({
+  onFormInit,
+}: DetectionSensorModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "detectionSensor" });
 
   const { moduleConfig, getEffectiveModuleConfig } = useDevice();
@@ -64,7 +73,9 @@ export const DetectionSensor = ({ onFormInit }: DetectionSensorModuleConfigProps
               type: "number",
               name: "minimumBroadcastSecs",
               label: t("detectionSensor.minimumBroadcastSecs.label"),
-              description: t("detectionSensor.minimumBroadcastSecs.description"),
+              description: t(
+                "detectionSensor.minimumBroadcastSecs.description",
+              ),
               properties: { suffix: t("unit.second.plural") },
             },
             {
@@ -96,9 +107,13 @@ export const DetectionSensor = ({ onFormInit }: DetectionSensorModuleConfigProps
               type: "select",
               name: "detectionTriggerType",
               label: t("detectionSensor.detectionTriggerType.label"),
-              description: t("detectionSensor.detectionTriggerType.description"),
+              description: t(
+                "detectionSensor.detectionTriggerType.description",
+              ),
               properties: {
-                enumValue: Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig_TriggerType,
+                enumValue:
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_DetectionSensorConfig_TriggerType,
                 formatEnumName: true,
               },
             },

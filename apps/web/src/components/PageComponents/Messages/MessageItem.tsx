@@ -6,7 +6,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { useMyNodeAsProto, useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
+import {
+  useMyNodeAsProto,
+  useNodeAsProto,
+} from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice } from "@core/stores";
 import { type Message, MessageState } from "@core/stores/messageStore";
 import { cn } from "@core/utils/cn.ts";
@@ -151,7 +154,8 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     const longName = messageUser?.user?.longName;
     const derivedShortName = messageUser?.user?.shortName || fallbackName;
     const derivedDisplayName = longName || derivedShortName;
-    const isFavorite = messageUser?.num !== myNodeNum && messageUser?.isFavorite;
+    const isFavorite =
+      messageUser?.num !== myNodeNum && messageUser?.isFavorite;
     return {
       displayName: derivedDisplayName,
       shortName: derivedShortName,
@@ -163,7 +167,10 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const messageStatusInfo = getMessageStatusInfo(message.state);
   const StatusIconComponent = messageStatusInfo.icon;
 
-  const messageDate = useMemo(() => (message.date ? new Date(message.date) : null), [message.date]);
+  const messageDate = useMemo(
+    () => (message.date ? new Date(message.date) : null),
+    [message.date],
+  );
   const locale = i18n.language;
 
   const formattedTime = useMemo(
@@ -200,7 +207,12 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   return (
     <li className={messageItemWrapperClass}>
       <div className="grid grid-cols-[auto_1fr] gap-x-2">
-        <Avatar size="sm" nodeNum={nodeNum} className="pt-0.5" showFavorite={isFavorite} />
+        <Avatar
+          size="sm"
+          nodeNum={nodeNum}
+          className="pt-0.5"
+          showFavorite={isFavorite}
+        />
 
         <div className="flex flex-col gap-0.5 min-w-0">
           <div className="flex items-center gap-1.5">
@@ -208,7 +220,10 @@ export const MessageItem = ({ message }: MessageItemProps) => {
               {displayName}
             </span>
             {messageDate && (
-              <time dateTime={messageDate.toISOString()} className={dateTextStyle}>
+              <time
+                dateTime={messageDate.toISOString()}
+                className={dateTextStyle}
+              >
                 <span aria-hidden="true">{formattedTime}</span>
                 <span className="sr-only">{fullDateTime}</span>
               </time>
@@ -217,7 +232,10 @@ export const MessageItem = ({ message }: MessageItemProps) => {
               <StatusTooltip statusInfo={messageStatusInfo}>
                 <span aria-label={messageStatusInfo.ariaLabel} role="img">
                   <StatusIconComponent
-                    className={cn("size-4 shrink-0", messageStatusInfo.iconClassName)}
+                    className={cn(
+                      "size-4 shrink-0",
+                      messageStatusInfo.iconClassName,
+                    )}
                     aria-hidden="true"
                   />
                 </span>

@@ -4,9 +4,15 @@ import {
   PositionValidationSchema,
 } from "@app/validation/config/position.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import { type FlagName, usePositionFlags } from "@core/hooks/usePositionFlags.ts";
+import {
+  type FlagName,
+  usePositionFlags,
+} from "@core/hooks/usePositionFlags.ts";
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
@@ -41,16 +47,28 @@ function UseBrowserLocationButton() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setBusy(false);
-        setValue("latitude", Number(pos.coords.latitude.toFixed(7)), { shouldDirty: true });
-        setValue("longitude", Number(pos.coords.longitude.toFixed(7)), { shouldDirty: true });
-        if (pos.coords.altitude !== null && !Number.isNaN(pos.coords.altitude)) {
-          setValue("altitude", Math.round(pos.coords.altitude), { shouldDirty: true });
+        setValue("latitude", Number(pos.coords.latitude.toFixed(7)), {
+          shouldDirty: true,
+        });
+        setValue("longitude", Number(pos.coords.longitude.toFixed(7)), {
+          shouldDirty: true,
+        });
+        if (
+          pos.coords.altitude !== null &&
+          !Number.isNaN(pos.coords.altitude)
+        ) {
+          setValue("altitude", Math.round(pos.coords.altitude), {
+            shouldDirty: true,
+          });
         }
       },
       (err) => {
         setBusy(false);
         toast({
-          title: t("position.useBrowserLocation.failed", "Could not read browser location"),
+          title: t(
+            "position.useBrowserLocation.failed",
+            "Could not read browser location",
+          ),
           description: err.message,
         });
       },
@@ -84,7 +102,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
 
   const effectivePosition =
     radio.position ??
-    (getEffectiveConfig("position") as Protobuf.Config.Config_PositionConfig | undefined);
+    (getEffectiveConfig("position") as
+      | Protobuf.Config.Config_PositionConfig
+      | undefined);
 
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     effectivePosition?.positionFlags ?? 0,
@@ -98,14 +118,23 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
     return {
       ...config.position,
       ...effectivePosition,
-      latitude: currentPosition?.latitudeI ? currentPosition.latitudeI / 1e7 : undefined,
-      longitude: currentPosition?.longitudeI ? currentPosition.longitudeI / 1e7 : undefined,
+      latitude: currentPosition?.latitudeI
+        ? currentPosition.latitudeI / 1e7
+        : undefined,
+      longitude: currentPosition?.longitudeI
+        ? currentPosition.longitudeI / 1e7
+        : undefined,
       altitude: currentPosition?.altitude ?? 0,
     } as PositionValidation;
   }, [config.position, effectivePosition, currentPosition]);
 
   const onSubmit = (data: PositionValidation) => {
-    const { latitude: _latitude, longitude: _longitude, altitude: _altitude, ...configData } = data;
+    const {
+      latitude: _latitude,
+      longitude: _longitude,
+      altitude: _altitude,
+      ...configData
+    } = data;
     const payload = { ...configData, positionFlags: flagsValue };
 
     if (editor) {
@@ -115,7 +144,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       );
     }
 
-    if (data.fixedPosition && data.latitude !== undefined && data.longitude !== undefined) {
+    if (
+      data.fixedPosition &&
+      data.latitude !== undefined &&
+      data.longitude !== undefined
+    ) {
       const message = create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
           case: "setFixedPosition",
@@ -225,14 +258,16 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               label: t("position.fixedPosition.altitude.label"),
               description: t("position.fixedPosition.altitude.description", {
                 unit:
-                  displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+                  displayUnits ===
+                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
                     ? "Feet"
                     : "Meters",
               }),
               properties: {
                 step: 0.0000001,
                 suffix:
-                  displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+                  displayUnits ===
+                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
                     ? "Feet"
                     : "Meters",
               },
@@ -266,7 +301,8 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               type: "multiSelect",
               name: "positionFlags",
               value: activeFlags,
-              isChecked: (name: string) => activeFlags?.includes(name as FlagName) ?? false,
+              isChecked: (name: string) =>
+                activeFlags?.includes(name as FlagName) ?? false,
               onValueChange: onPositonFlagChange,
               label: t("position.positionFlags.label"),
               placeholder: t("position.flags.placeholder"),

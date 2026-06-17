@@ -58,8 +58,12 @@ export interface SubItem {
 }
 
 export const CommandPalette = () => {
-  const { commandPaletteOpen, setCommandPaletteOpen, setConnectDialogOpen, setSelectedDevice } =
-    useAppStore();
+  const {
+    commandPaletteOpen,
+    setCommandPaletteOpen,
+    setConnectDialogOpen,
+    setSelectedDevice,
+  } = useAppStore();
   const { getDevices } = useDeviceStore();
   const { setDialogOpen, connection } = useDevice();
   const allNodes = useNodesAsProto();
@@ -116,7 +120,9 @@ export const CommandPalette = () => {
           label: t("manage.command.switchNode"),
           icon: ArrowLeftRightIcon,
           subItems: getDevices().map((device) => ({
-            label: getNode(device.hardware.myNodeNum)?.user?.longName ?? t("unknown.shortName"),
+            label:
+              getNode(device.hardware.myNodeNum)?.user?.longName ??
+              t("unknown.shortName"),
             icon: <Avatar nodeNum={device.hardware.myNodeNum} />,
             action() {
               setSelectedDevice(device.id);
@@ -259,7 +265,10 @@ export const CommandPalette = () => {
   }, [setCommandPaletteOpen]);
 
   return (
-    <CommandDialog open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen}>
+    <CommandDialog
+      open={commandPaletteOpen}
+      onOpenChange={setCommandPaletteOpen}
+    >
       <CommandInput placeholder={t("search.commandPalette")} />
       <CommandList>
         <CommandEmpty>{t("emptyState")}</CommandEmpty>

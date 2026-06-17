@@ -10,8 +10,14 @@ export interface UseTelemetryResult {
 
 export function useTelemetry(nodeNum: number): UseTelemetryResult {
   const client = useClient();
-  const latestSig = useMemo(() => client.telemetry.latest(nodeNum), [client, nodeNum]);
-  const historySig = useMemo(() => client.telemetry.history(nodeNum), [client, nodeNum]);
+  const latestSig = useMemo(
+    () => client.telemetry.latest(nodeNum),
+    [client, nodeNum],
+  );
+  const historySig = useMemo(
+    () => client.telemetry.history(nodeNum),
+    [client, nodeNum],
+  );
   const latest = useSignal(latestSig);
   const history = useSignal(historySig);
   return { latest, history };

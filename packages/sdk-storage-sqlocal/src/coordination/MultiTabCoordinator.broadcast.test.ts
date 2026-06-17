@@ -20,7 +20,11 @@ describe("MultiTabCoordinator broadcast", () => {
       });
       a.broadcast({ kind: "messages-changed", deviceId: 1, key: "channel:0" });
       const event = await received;
-      expect(event).toEqual({ kind: "messages-changed", deviceId: 1, key: "channel:0" });
+      expect(event).toEqual({
+        kind: "messages-changed",
+        deviceId: 1,
+        key: "channel:0",
+      });
     } finally {
       a.close();
       b.close();

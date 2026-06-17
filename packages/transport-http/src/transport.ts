@@ -1,4 +1,8 @@
-import { DeviceStatusEnum, type DeviceOutput, type Transport } from "@meshtastic/sdk";
+import {
+  DeviceStatusEnum,
+  type DeviceOutput,
+  type Transport,
+} from "@meshtastic/sdk";
 
 const FETCH_INTERVAL_MS = 3000;
 const READ_TIMEOUT_MS = 7000;
@@ -43,7 +47,10 @@ export class TransportHTTP implements Transport {
    * @param address Hostname or IP address (with optional port).
    * @param tls Use HTTPS if true, HTTP otherwise.
    */
-  public static async create(address: string, tls?: boolean): Promise<TransportHTTP> {
+  public static async create(
+    address: string,
+    tls?: boolean,
+  ): Promise<TransportHTTP> {
     const connectionUrl = `${tls ? "https" : "http"}://${address}`;
     await fetch(`${connectionUrl}/api/v1/toradio`, {
       method: "OPTIONS",
@@ -86,7 +93,10 @@ export class TransportHTTP implements Transport {
 
         // Start polling immediately
         void this.safePoll();
-        this.interval = setInterval(() => void this.safePoll(), this.fetchInterval);
+        this.interval = setInterval(
+          () => void this.safePoll(),
+          this.fetchInterval,
+        );
       },
       cancel: () => {
         if (this.interval) {
@@ -105,7 +115,10 @@ export class TransportHTTP implements Transport {
       const inflight = new AbortController();
       this.inflightReadController = inflight;
 
-      const signal = AbortSignal.any([inflight.signal, AbortSignal.timeout(READ_TIMEOUT_MS)]);
+      const signal = AbortSignal.any([
+        inflight.signal,
+        AbortSignal.timeout(READ_TIMEOUT_MS),
+      ]);
 
       try {
         const response = await fetch(
@@ -117,7 +130,9 @@ export class TransportHTTP implements Transport {
           },
         );
         if (!response.ok) {
-          throw new Error(`fromradio ${response.status} ${response.statusText}`);
+          throw new Error(
+            `fromradio ${response.status} ${response.statusText}`,
+          );
         }
 
         this.emitStatus(DeviceStatusEnum.DeviceConnected);
@@ -205,8 +220,10 @@ export class TransportHTTP implements Transport {
 
   private isTimeoutOrAbort(err: unknown): boolean {
     return (
-      (err instanceof DOMException && (err.name === "AbortError" || err.name === "TimeoutError")) ||
-      (err instanceof Error && (err.name === "AbortError" || err.name === "TimeoutError"))
+      (err instanceof DOMException &&
+        (err.name === "AbortError" || err.name === "TimeoutError")) ||
+      (err instanceof Error &&
+        (err.name === "AbortError" || err.name === "TimeoutError"))
     );
   }
 

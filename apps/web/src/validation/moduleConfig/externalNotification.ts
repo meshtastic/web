@@ -18,4 +18,6 @@ export const ExternalNotificationValidationSchema = z.object({
   useI2sAsBuzzer: z.boolean(),
 });
 
-export type ExternalNotificationValidation = z.infer<typeof ExternalNotificationValidationSchema>;
+export type ExternalNotificationValidation = z.infer<
+  typeof ExternalNotificationValidationSchema
+>;

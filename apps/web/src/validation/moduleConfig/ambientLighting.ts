@@ -8,4 +8,6 @@ export const AmbientLightingValidationSchema = z.object({
   blue: z.coerce.number().int().min(0).max(255),
 });
 
-export type AmbientLightingValidation = z.infer<typeof AmbientLightingValidationSchema>;
+export type AmbientLightingValidation = z.infer<
+  typeof AmbientLightingValidationSchema
+>;

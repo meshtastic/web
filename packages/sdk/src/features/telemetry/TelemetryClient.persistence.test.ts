@@ -6,7 +6,12 @@ import { createFakeTransport } from "../../core/testing/createFakeTransport.ts";
 import { ChannelNumber } from "../../core/types.ts";
 import { InMemoryTelemetryRepository } from "./infrastructure/repositories/InMemoryTelemetryRepository.ts";
 
-const dispatch = (client: MeshClient, from: number, ms: number, battery = 80): void => {
+const dispatch = (
+  client: MeshClient,
+  from: number,
+  ms: number,
+  battery = 80,
+): void => {
   client.events.onTelemetryPacket.dispatch({
     id: ms,
     from,
@@ -18,7 +23,9 @@ const dispatch = (client: MeshClient, from: number, ms: number, battery = 80): v
       time: ms,
       variant: {
         case: "deviceMetrics",
-        value: create(Protobuf.Telemetry.DeviceMetricsSchema, { batteryLevel: battery }),
+        value: create(Protobuf.Telemetry.DeviceMetricsSchema, {
+          batteryLevel: battery,
+        }),
       },
     }),
   });
@@ -46,7 +53,9 @@ describe("TelemetryClient persistence", () => {
       nodeNum: 200,
       time: new Date(500),
       kind: "deviceMetrics",
-      value: create(Protobuf.Telemetry.DeviceMetricsSchema, { batteryLevel: 60 }),
+      value: create(Protobuf.Telemetry.DeviceMetricsSchema, {
+        batteryLevel: 60,
+      }),
     });
 
     const { transport } = createFakeTransport();

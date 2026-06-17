@@ -23,7 +23,11 @@ describe("ChannelsClient", () => {
     );
 
     expect(client.channels.list.value.length).toBe(2);
-    expect(client.channels.get(0)?.role).toBe(Protobuf.Channel.Channel_Role.PRIMARY);
-    expect(client.channels.get(1)?.role).toBe(Protobuf.Channel.Channel_Role.SECONDARY);
+    expect(client.channels.get(0)?.role).toBe(
+      Protobuf.Channel.Channel_Role.PRIMARY,
+    );
+    expect(client.channels.get(1)?.role).toBe(
+      Protobuf.Channel.Channel_Role.SECONDARY,
+    );
   });
 });

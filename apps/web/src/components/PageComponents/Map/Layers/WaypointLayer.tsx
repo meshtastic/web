@@ -82,7 +82,11 @@ export const WaypointLayer = ({
         offset={[0, 25]}
         onClose={() => setPopupState(undefined)}
       >
-        <WaypointDetail waypoint={popupState.waypoint} myNode={myNode} onEdit={() => {}} />
+        <WaypointDetail
+          waypoint={popupState.waypoint}
+          myNode={myNode}
+          onEdit={() => {}}
+        />
       </PopupWrapper>,
     );
   }

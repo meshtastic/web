@@ -8,7 +8,10 @@ import type { RadioConfig } from "../domain/RadioConfig.ts";
  * with no code change, exactly like the SDK mapper in PR #1050.
  */
 export const ConfigMapper = {
-  mergeRadio(existing: RadioConfig, incoming: Protobuf.Config.Config): RadioConfig {
+  mergeRadio(
+    existing: RadioConfig,
+    incoming: Protobuf.Config.Config,
+  ): RadioConfig {
     const variant = incoming.payloadVariant;
     if (!variant.case) {
       return existing;
@@ -16,7 +19,10 @@ export const ConfigMapper = {
     return { ...existing, [variant.case]: variant.value };
   },
 
-  mergeModule(existing: ModuleConfig, incoming: Protobuf.ModuleConfig.ModuleConfig): ModuleConfig {
+  mergeModule(
+    existing: ModuleConfig,
+    incoming: Protobuf.ModuleConfig.ModuleConfig,
+  ): ModuleConfig {
     const variant = incoming.payloadVariant;
     if (!variant.case) {
       return existing;

@@ -56,7 +56,11 @@ export class TelemetryClient {
    * repository. Caller is responsible for merging with the in-memory store
    * if it wants the result reflected in the `history(nodeNum)` signal.
    */
-  public loadBefore(nodeNum: number, cursor: Date, limit: number): Promise<TelemetryReading[]> {
+  public loadBefore(
+    nodeNum: number,
+    cursor: Date,
+    limit: number,
+  ): Promise<TelemetryReading[]> {
     return this.repository.loadBefore(nodeNum, cursor, limit);
   }
 

@@ -18,7 +18,14 @@ describe("MeshClient.progress", () => {
     expect(client.progress.value.phase).toBe("configuring");
     expect(client.progress.value).toEqual({
       phase: "configuring",
-      received: { config: 0, modules: 0, channels: 0, nodes: 0, myInfo: false, metadata: false },
+      received: {
+        config: 0,
+        modules: 0,
+        channels: 0,
+        nodes: 0,
+        myInfo: false,
+        metadata: false,
+      },
     });
   });
 
@@ -27,14 +34,25 @@ describe("MeshClient.progress", () => {
     const client = new MeshClient({ transport });
     void client.configure();
 
-    client.events.onConfigPacket.dispatch(create(Protobuf.Config.ConfigSchema, {}));
-    client.events.onConfigPacket.dispatch(create(Protobuf.Config.ConfigSchema, {}));
-    client.events.onChannelPacket.dispatch(create(Protobuf.Channel.ChannelSchema, {}));
-    client.events.onNodeInfoPacket.dispatch(create(Protobuf.Mesh.NodeInfoSchema, {}));
-    client.events.onMyNodeInfo.dispatch(create(Protobuf.Mesh.MyNodeInfoSchema, {}));
+    client.events.onConfigPacket.dispatch(
+      create(Protobuf.Config.ConfigSchema, {}),
+    );
+    client.events.onConfigPacket.dispatch(
+      create(Protobuf.Config.ConfigSchema, {}),
+    );
+    client.events.onChannelPacket.dispatch(
+      create(Protobuf.Channel.ChannelSchema, {}),
+    );
+    client.events.onNodeInfoPacket.dispatch(
+      create(Protobuf.Mesh.NodeInfoSchema, {}),
+    );
+    client.events.onMyNodeInfo.dispatch(
+      create(Protobuf.Mesh.MyNodeInfoSchema, {}),
+    );
 
     const cur = client.progress.value;
-    if (cur.phase !== "configuring") throw new Error("expected configuring phase");
+    if (cur.phase !== "configuring")
+      throw new Error("expected configuring phase");
     expect(cur.received.config).toBe(2);
     expect(cur.received.channels).toBe(1);
     expect(cur.received.nodes).toBe(1);
@@ -46,7 +64,9 @@ describe("MeshClient.progress", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
     void client.configure();
-    client.events.onConfigPacket.dispatch(create(Protobuf.Config.ConfigSchema, {}));
+    client.events.onConfigPacket.dispatch(
+      create(Protobuf.Config.ConfigSchema, {}),
+    );
     client.events.onConfigComplete.dispatch(0);
 
     const cur = client.progress.value;
@@ -59,7 +79,9 @@ describe("MeshClient.progress", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
     // not calling configure() — phase is idle
-    client.events.onConfigPacket.dispatch(create(Protobuf.Config.ConfigSchema, {}));
+    client.events.onConfigPacket.dispatch(
+      create(Protobuf.Config.ConfigSchema, {}),
+    );
     expect(client.progress.value.phase).toBe("idle");
   });
 
@@ -67,12 +89,21 @@ describe("MeshClient.progress", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
     void client.configure();
-    client.events.onConfigPacket.dispatch(create(Protobuf.Config.ConfigSchema, {}));
+    client.events.onConfigPacket.dispatch(
+      create(Protobuf.Config.ConfigSchema, {}),
+    );
     client.events.onConfigComplete.dispatch(0);
     void client.configure();
     expect(client.progress.value).toEqual({
       phase: "configuring",
-      received: { config: 0, modules: 0, channels: 0, nodes: 0, myInfo: false, metadata: false },
+      received: {
+        config: 0,
+        modules: 0,
+        channels: 0,
+        nodes: 0,
+        myInfo: false,
+        metadata: false,
+      },
     });
   });
 });

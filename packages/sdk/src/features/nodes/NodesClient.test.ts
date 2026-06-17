@@ -11,7 +11,9 @@ describe("NodesClient", () => {
 
     expect(client.nodes.list.value).toEqual([]);
 
-    client.events.onNodeInfoPacket.dispatch(create(Protobuf.Mesh.NodeInfoSchema, { num: 1 }));
+    client.events.onNodeInfoPacket.dispatch(
+      create(Protobuf.Mesh.NodeInfoSchema, { num: 1 }),
+    );
     client.events.onNodeInfoPacket.dispatch(
       create(Protobuf.Mesh.NodeInfoSchema, { num: 2, isFavorite: true }),
     );

@@ -8,4 +8,6 @@ export const RemoteHardwareValidationSchema = z.object({
   availablePins: z.array(z.any()),
 });
 
-export type RemoteHardwareValidation = z.infer<typeof RemoteHardwareValidationSchema>;
+export type RemoteHardwareValidation = z.infer<
+  typeof RemoteHardwareValidationSchema
+>;

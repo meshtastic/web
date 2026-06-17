@@ -3,7 +3,10 @@ import type { Message } from "../domain/Message.ts";
 import { MessageState } from "../domain/MessageState.ts";
 
 export const MessageMapper = {
-  fromPacket(packet: PacketMetadata<string>, state: MessageState = MessageState.Ack): Message {
+  fromPacket(
+    packet: PacketMetadata<string>,
+    state: MessageState = MessageState.Ack,
+  ): Message {
     return {
       id: packet.id,
       from: packet.from,

@@ -4,7 +4,11 @@ import { Result } from "better-result";
 import type { ResultType } from "better-result";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
 import { generatePacketId } from "../../../core/identifiers/PacketId.ts";
-import { ChannelNumber, type Destination, Emitter } from "../../../core/types.ts";
+import {
+  ChannelNumber,
+  type Destination,
+  Emitter,
+} from "../../../core/types.ts";
 
 export async function sendWaypoint(
   client: MeshClient,

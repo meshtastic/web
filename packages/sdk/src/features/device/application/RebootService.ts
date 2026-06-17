@@ -9,7 +9,10 @@ export function reboot(client: MeshClient, seconds: number): Promise<number> {
   return sendAdminMessage(client, { case: "rebootSeconds", value: seconds });
 }
 
-export function rebootOta(client: MeshClient, seconds: number): Promise<number> {
+export function rebootOta(
+  client: MeshClient,
+  seconds: number,
+): Promise<number> {
   return sendAdminMessage(client, { case: "rebootOtaSeconds", value: seconds });
 }
 

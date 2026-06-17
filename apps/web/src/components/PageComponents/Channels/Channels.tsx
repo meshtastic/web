@@ -2,7 +2,12 @@ import { Channel } from "@app/components/PageComponents/Channels/Channel";
 import { create } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@components/UI/Tabs.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useChannels, useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -16,7 +21,10 @@ interface ConfigProps {
   onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
 }
 
-export const getChannelName = (channel: { index: number; settings?: { name?: string } }) => {
+export const getChannelName = (channel: {
+  index: number;
+  settings?: { name?: string };
+}) => {
   return channel.settings?.name?.length
     ? channel.settings.name
     : channel.index === 0
@@ -37,7 +45,9 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
   const { setDialogOpen } = useDevice();
   const editor = useConfigEditor();
   const channels = useChannels();
-  const dirtyChannels = useSignal(editor?.dirtyChannels ?? EMPTY_DIRTY_CHANNELS_SIGNAL);
+  const dirtyChannels = useSignal(
+    editor?.dirtyChannels ?? EMPTY_DIRTY_CHANNELS_SIGNAL,
+  );
   const { t } = useTranslation("channels");
 
   const allChannels = useMemo(
@@ -53,7 +63,12 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
   );
   const flags = useMemo(
     () =>
-      new Map(allChannels.map((channel) => [channel.index, dirtyChannels.includes(channel.index)])),
+      new Map(
+        allChannels.map((channel) => [
+          channel.index,
+          dirtyChannels.includes(channel.index),
+        ]),
+      ),
     [allChannels, dirtyChannels],
   );
 
@@ -75,7 +90,10 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
             )}
           </TabsTrigger>
         ))}
-        <Button className="ml-auto mr-1 h-8" onClick={() => setDialogOpen("import", true)}>
+        <Button
+          className="ml-auto mr-1 h-8"
+          onClick={() => setDialogOpen("import", true)}
+        >
           <UploadIcon className="mr-2" size={14} />
           {t("page.import")}
         </Button>
@@ -85,9 +103,16 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
         </Button>
       </TabsList>
       {allChannels.map((channel) => (
-        <TabsContent key={`channel_${channel.index}`} value={`channel_${channel.index}`}>
+        <TabsContent
+          key={`channel_${channel.index}`}
+          value={`channel_${channel.index}`}
+        >
           <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <Channel key={channel.index} onFormInit={onFormInit} channel={channel} />
+            <Channel
+              key={channel.index}
+              onFormInit={onFormInit}
+              channel={channel}
+            />
           </Suspense>
         </TabsContent>
       ))}

@@ -113,9 +113,11 @@ export class MeshRegistry {
   }
 
   private snapshot(): void {
-    this.backing.value = Array.from(this.clients.entries()).map(([id, client]) => ({
-      id,
-      client,
-    }));
+    this.backing.value = Array.from(this.clients.entries()).map(
+      ([id, client]) => ({
+        id,
+        client,
+      }),
+    );
   }
 }

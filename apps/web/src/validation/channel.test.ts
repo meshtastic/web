@@ -42,7 +42,9 @@ describe("makeChannelSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some((i) => i.path.includes("settings") && i.path.includes("psk")),
+        result.error.issues.some(
+          (i) => i.path.includes("settings") && i.path.includes("psk"),
+        ),
       ).toBe(true);
     }
   });
@@ -57,7 +59,9 @@ describe("makeChannelSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some((i) => i.path.includes("settings") && i.path.includes("psk")),
+        result.error.issues.some(
+          (i) => i.path.includes("settings") && i.path.includes("psk"),
+        ),
       ).toBe(true);
     }
   });
@@ -72,7 +76,9 @@ describe("makeChannelSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some((i) => i.path.includes("settings") && i.path.includes("name")),
+        result.error.issues.some(
+          (i) => i.path.includes("settings") && i.path.includes("name"),
+        ),
       ).toBe(true);
     }
   });

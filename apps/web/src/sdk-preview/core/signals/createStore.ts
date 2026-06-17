@@ -33,7 +33,9 @@ export function createStore<T>(initial: T): {
   return { write, read: toReadonly(write) };
 }
 
-export function toReadonly<T>(s: Signal<T> | PreactReadonlySignal<T>): ReadonlySignal<T> {
+export function toReadonly<T>(
+  s: Signal<T> | PreactReadonlySignal<T>,
+): ReadonlySignal<T> {
   return {
     get value() {
       return s.value;

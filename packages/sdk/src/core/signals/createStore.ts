@@ -21,12 +21,17 @@ export interface ReadonlySignal<T> {
  * is invoked asynchronously on every change. Returns both the writable signal
  * (for slice-internal use) and the readable facade (for external consumption).
  */
-export function createStore<T>(initial: T): { write: Signal<T>; read: ReadonlySignal<T> } {
+export function createStore<T>(initial: T): {
+  write: Signal<T>;
+  read: ReadonlySignal<T>;
+} {
   const write = signal(initial);
   return { write, read: toReadonly(write) };
 }
 
-export function toReadonly<T>(s: Signal<T> | PreactReadonlySignal<T>): ReadonlySignal<T> {
+export function toReadonly<T>(
+  s: Signal<T> | PreactReadonlySignal<T>,
+): ReadonlySignal<T> {
   return {
     get value() {
       return s.value;

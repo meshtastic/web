@@ -9,7 +9,9 @@ export async function runTraceRoute(
   destination: number,
 ): Promise<ResultType<number, Error>> {
   try {
-    const routeDiscovery = create(Protobuf.Mesh.RouteDiscoverySchema, { route: [] });
+    const routeDiscovery = create(Protobuf.Mesh.RouteDiscoverySchema, {
+      route: [],
+    });
     const id = await client.sendPacket(
       toBinary(Protobuf.Mesh.RouteDiscoverySchema, routeDiscovery),
       Protobuf.Portnums.PortNum.TRACEROUTE_APP,

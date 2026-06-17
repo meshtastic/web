@@ -3,7 +3,10 @@ import {
   type AmbientLightingValidation,
   AmbientLightingValidationSchema,
 } from "@app/validation/moduleConfig/ambientLighting.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -14,13 +17,19 @@ interface AmbientLightingModuleConfigProps {
 }
 
 const EMPTY_MODULES_SIGNAL = {
-  value: {} as { ambientLighting?: Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig },
+  value: {} as {
+    ambientLighting?: Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig;
+  },
   peek: () =>
-    ({}) as { ambientLighting?: Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig },
+    ({}) as {
+      ambientLighting?: Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig;
+    },
   subscribe: () => () => {},
 } as const;
 
-export const AmbientLighting = ({ onFormInit }: AmbientLightingModuleConfigProps) => {
+export const AmbientLighting = ({
+  onFormInit,
+}: AmbientLightingModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "ambientLighting" });
 
   const { moduleConfig, getEffectiveModuleConfig } = useDevice();

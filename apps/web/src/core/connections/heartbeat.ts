@@ -21,7 +21,10 @@ export function stopHeartbeat(id: ConnectionId): void {
  * Fast-cadence heartbeat used while the device is in `configuring`. Replaced
  * by the maintenance heartbeat once the device fires onConfigComplete.
  */
-export function startConfigHeartbeat(id: ConnectionId, meshDevice: MeshDevice): void {
+export function startConfigHeartbeat(
+  id: ConnectionId,
+  meshDevice: MeshDevice,
+): void {
   stopHeartbeat(id);
   const intervalId = setInterval(() => {
     meshDevice.heartbeat().catch((error) => {
@@ -34,7 +37,10 @@ export function startConfigHeartbeat(id: ConnectionId, meshDevice: MeshDevice): 
 /**
  * Slow-cadence keep-alive used after configuration completes.
  */
-export function startMaintenanceHeartbeat(id: ConnectionId, meshDevice: MeshDevice): void {
+export function startMaintenanceHeartbeat(
+  id: ConnectionId,
+  meshDevice: MeshDevice,
+): void {
   stopHeartbeat(id);
   const intervalId = setInterval(() => {
     meshDevice.heartbeat().catch((error) => {

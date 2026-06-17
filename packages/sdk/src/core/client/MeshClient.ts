@@ -11,7 +11,12 @@ import { Queue } from "../queue/Queue.ts";
 import { createStore, type ReadonlySignal } from "../signals/createStore.ts";
 import type { Transport } from "../transport/Transport.ts";
 import { DeviceStatusEnum } from "../transport/Transport.ts";
-import { ChannelNumber, type Destination, Emitter, type PacketMetadata } from "../types.ts";
+import {
+  ChannelNumber,
+  type Destination,
+  Emitter,
+  type PacketMetadata,
+} from "../types.ts";
 import { Xmodem } from "../xmodem/Xmodem.ts";
 import { ChatClient } from "../../features/chat/index.ts";
 import { ChannelsClient } from "../../features/channels/index.ts";
@@ -101,7 +106,9 @@ export class MeshClient {
    * sends `configCompleteId`.
    */
   public readonly progress: ReadonlySignal<ConnectionProgress>;
-  private readonly progressStore = createStore<ConnectionProgress>({ phase: "idle" });
+  private readonly progressStore = createStore<ConnectionProgress>({
+    phase: "idle",
+  });
 
   private _heartbeatIntervalId: ReturnType<typeof setInterval> | undefined;
 
@@ -153,7 +160,10 @@ export class MeshClient {
   }
 
   public configure(): Promise<number> {
-    this.log.debug(Emitter[Emitter.Configure], "⚙️ Requesting device configuration");
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      "⚙️ Requesting device configuration",
+    );
     this.updateDeviceStatus(DeviceStatusEnum.DeviceConfiguring);
     this.progressStore.write.value = {
       phase: "configuring",
@@ -164,12 +174,14 @@ export class MeshClient {
       payloadVariant: { case: "wantConfigId", value: this.configId },
     });
 
-    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio)).catch((e) => {
-      if (this.device.status.value === DeviceStatusEnum.DeviceDisconnected) {
-        throw new Error("Device connection lost");
-      }
-      throw e;
-    });
+    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio)).catch(
+      (e) => {
+        if (this.device.status.value === DeviceStatusEnum.DeviceDisconnected) {
+          throw new Error("Device connection lost");
+        }
+        throw e;
+      },
+    );
   }
 
   /**
@@ -186,7 +198,10 @@ export class MeshClient {
       if (cur.phase !== "configuring") return;
       const next: ConnectionProgressCounters = {
         ...cur.received,
-        [field]: typeof cur.received[field] === "number" ? cur.received[field] + 1 : true,
+        [field]:
+          typeof cur.received[field] === "number"
+            ? cur.received[field] + 1
+            : true,
       } as ConnectionProgressCounters;
       this.progressStore.write.value = { phase: "configuring", received: next };
     };
@@ -200,7 +215,8 @@ export class MeshClient {
 
     this.events.onConfigComplete.subscribe(() => {
       const cur = this.progressStore.read.value;
-      const received = cur.phase === "configuring" ? cur.received : { ...EMPTY_COUNTERS };
+      const received =
+        cur.phase === "configuring" ? cur.received : { ...EMPTY_COUNTERS };
       this.progressStore.write.value = { phase: "configured", received };
     });
   }
@@ -219,7 +235,10 @@ export class MeshClient {
     }
     this._heartbeatIntervalId = setInterval(() => {
       this.heartbeat().catch((err: Error) => {
-        this.log.error(Emitter[Emitter.Ping], `⚠️ Unable to send heartbeat: ${err.message}`);
+        this.log.error(
+          Emitter[Emitter.Ping],
+          `⚠️ Unable to send heartbeat: ${err.message}`,
+        );
       });
     }, interval);
   }
@@ -286,10 +305,16 @@ export class MeshClient {
       meshPacket.rxTime = Math.trunc(Date.now() / 1000);
       this.events.onMeshPacket.dispatch(meshPacket);
     }
-    return await this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadioMessage), meshPacket.id);
+    return await this.sendRaw(
+      toBinary(Protobuf.Mesh.ToRadioSchema, toRadioMessage),
+      meshPacket.id,
+    );
   }
 
-  public async sendRaw(toRadio: Uint8Array, id: number = generatePacketId()): Promise<number> {
+  public async sendRaw(
+    toRadio: Uint8Array,
+    id: number = generatePacketId(),
+  ): Promise<number> {
     if (toRadio.length > 512) {
       throw new PacketTooLargeError(toRadio.length);
     }

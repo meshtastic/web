@@ -6,7 +6,12 @@ import { Position } from "@components/PageComponents/Settings/Position.tsx";
 import { Power } from "@components/PageComponents/Settings/Power.tsx";
 import { User } from "@components/PageComponents/Settings/User.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@components/UI/Tabs.tsx";
 import type { ValidConfigType } from "@core/stores";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, Suspense, useMemo } from "react";
@@ -38,8 +43,12 @@ const EMPTY_OWNER_DIRTY_SIGNAL = {
 
 export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
   const editor = useConfigEditor();
-  const dirtyRadio = useSignal(editor?.dirtyRadioSections ?? EMPTY_DIRTY_RADIO_SIGNAL);
-  const isOwnerDirty = useSignal(editor?.isOwnerDirty ?? EMPTY_OWNER_DIRTY_SIGNAL);
+  const dirtyRadio = useSignal(
+    editor?.dirtyRadioSections ?? EMPTY_DIRTY_RADIO_SIGNAL,
+  );
+  const isOwnerDirty = useSignal(
+    editor?.isOwnerDirty ?? EMPTY_OWNER_DIRTY_SIGNAL,
+  );
   const { t } = useTranslation("config");
   const tabs: TabItem[] = useMemo(
     () => [
@@ -87,7 +96,9 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
       new Map(
         tabs.map((tab) => [
           tab.case,
-          tab.case === "user" ? isOwnerDirty : dirtyRadio.includes(tab.case as ValidConfigType),
+          tab.case === "user"
+            ? isOwnerDirty
+            : dirtyRadio.includes(tab.case as ValidConfigType),
         ]),
       ),
     [tabs, dirtyRadio, isOwnerDirty],
@@ -97,7 +108,11 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
     <Tabs defaultValue={t("page.tabUser")}>
       <TabsList className="w-full dark:bg-slate-700">
         {tabs.map((tab) => (
-          <TabsTrigger key={tab.label} value={tab.label} className="dark:text-white relative">
+          <TabsTrigger
+            key={tab.label}
+            value={tab.label}
+            className="dark:text-white relative"
+          >
             {tab.label}
             {flags.get(tab.case) && (
               <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">

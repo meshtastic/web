@@ -15,7 +15,12 @@ import { Tak } from "@components/PageComponents/ModuleConfig/Tak.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
 import { TrafficManagement } from "@components/PageComponents/ModuleConfig/TrafficManagement.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/UI/Tabs.tsx";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@components/UI/Tabs.tsx";
 import type { ValidModuleConfigType } from "@core/stores";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, Suspense, useMemo } from "react";
@@ -41,7 +46,9 @@ const EMPTY_DIRTY_MODULE_SIGNAL = {
 
 export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   const editor = useConfigEditor();
-  const dirtyModule = useSignal(editor?.dirtyModuleSections ?? EMPTY_DIRTY_MODULE_SIGNAL);
+  const dirtyModule = useSignal(
+    editor?.dirtyModuleSections ?? EMPTY_DIRTY_MODULE_SIGNAL,
+  );
   const { t } = useTranslation("moduleConfig");
   const tabs: TabItem[] = useMemo(
     () => [
@@ -100,7 +107,11 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
         label: t("page.tabDetectionSensor"),
         element: DetectionSensor,
       },
-      { case: "paxcounter", label: t("page.tabPaxcounter"), element: Paxcounter },
+      {
+        case: "paxcounter",
+        label: t("page.tabPaxcounter"),
+        element: Paxcounter,
+      },
       {
         case: "remoteHardware",
         label: t("page.tabRemoteHardware"),
@@ -122,7 +133,8 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   );
 
   const flags = useMemo(
-    () => new Map(tabs.map((tab) => [tab.case, dirtyModule.includes(tab.case)])),
+    () =>
+      new Map(tabs.map((tab) => [tab.case, dirtyModule.includes(tab.case)])),
     [tabs, dirtyModule],
   );
 
@@ -130,7 +142,11 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
     <Tabs defaultValue={t("page.tabMqtt")}>
       <TabsList className="w-full dark:bg-slate-800">
         {tabs.map((tab) => (
-          <TabsTrigger key={tab.label} value={tab.label} className="dark:text-white relative">
+          <TabsTrigger
+            key={tab.label}
+            value={tab.label}
+            className="dark:text-white relative"
+          >
             {tab.label}
             {flags.get(tab.case) && (
               <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">

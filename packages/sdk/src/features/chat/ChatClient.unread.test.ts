@@ -41,7 +41,10 @@ describe("ChatClient unread counts", () => {
     const client = new MeshClient({ transport });
     expect(client.chat.unread.total.value).toBe(0);
     expect(
-      client.chat.unread.count({ kind: "channel", channel: ChannelNumber.Primary }).value,
+      client.chat.unread.count({
+        kind: "channel",
+        channel: ChannelNumber.Primary,
+      }).value,
     ).toBe(0);
   });
 
@@ -54,11 +57,17 @@ describe("ChatClient unread counts", () => {
     dispatchInbound(client, { from: 200, ms: 2000 });
 
     expect(
-      client.chat.unread.count({ kind: "channel", channel: ChannelNumber.Primary }).value,
+      client.chat.unread.count({
+        kind: "channel",
+        channel: ChannelNumber.Primary,
+      }).value,
     ).toBe(2);
     expect(client.chat.unread.total.value).toBe(2);
 
-    client.chat.unread.markRead({ kind: "channel", channel: ChannelNumber.Primary });
+    client.chat.unread.markRead({
+      kind: "channel",
+      channel: ChannelNumber.Primary,
+    });
     expect(client.chat.unread.total.value).toBe(0);
   });
 
@@ -76,10 +85,20 @@ describe("ChatClient unread counts", () => {
     const client = new MeshClient({ transport });
     setMyNode(client);
 
-    dispatchInbound(client, { from: 50, to: MY_NODE, type: "direct", ms: 1000 });
-    expect(client.chat.unread.count({ kind: "direct", peer: 50 }).value).toBe(1);
+    dispatchInbound(client, {
+      from: 50,
+      to: MY_NODE,
+      type: "direct",
+      ms: 1000,
+    });
+    expect(client.chat.unread.count({ kind: "direct", peer: 50 }).value).toBe(
+      1,
+    );
     expect(
-      client.chat.unread.count({ kind: "channel", channel: ChannelNumber.Primary }).value,
+      client.chat.unread.count({
+        kind: "channel",
+        channel: ChannelNumber.Primary,
+      }).value,
     ).toBe(0);
   });
 });

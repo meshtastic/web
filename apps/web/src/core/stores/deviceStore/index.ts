@@ -4,7 +4,11 @@ import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { type MeshDevice, Protobuf, Types } from "@meshtastic/sdk";
 import { type Draft, produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
-import { type PersistOptions, persist, subscribeWithSelector } from "zustand/middleware";
+import {
+  type PersistOptions,
+  persist,
+  subscribeWithSelector,
+} from "zustand/middleware";
 import type {
   Connection,
   ConnectionId,
@@ -26,11 +30,18 @@ type DeviceData = {
   // Persisted data
   id: number;
   myNodeNum: number | undefined;
-  traceroutes: Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>;
+  traceroutes: Map<
+    number,
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
+  >;
   waypoints: WaypointWithMetadata[];
   neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
 };
-export type ConnectionPhase = "disconnected" | "connecting" | "configuring" | "configured";
+export type ConnectionPhase =
+  | "disconnected"
+  | "connecting"
+  | "configuring"
+  | "configured";
 
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
@@ -73,16 +84,25 @@ export interface Device extends DeviceData {
   removeWaypoint: (waypointId: number, toMesh: boolean) => Promise<void>;
   getWaypoint: (waypointId: number) => WaypointWithMetadata | undefined;
   addConnection: (connection: MeshDevice) => void;
-  addTraceRoute: (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => void;
+  addTraceRoute: (
+    traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
+  ) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   getDialogOpen: (dialog: DialogVariant) => boolean;
   setMessageDraft: (message: string) => void;
   sendAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
-  addClientNotification: (clientNotificationPacket: Protobuf.Mesh.ClientNotification) => void;
+  addClientNotification: (
+    clientNotificationPacket: Protobuf.Mesh.ClientNotification,
+  ) => void;
   removeClientNotification: (index: number) => void;
-  getClientNotification: (index: number) => Protobuf.Mesh.ClientNotification | undefined;
-  addNeighborInfo: (nodeNum: number, neighborInfo: Protobuf.Mesh.NeighborInfo) => void;
+  getClientNotification: (
+    index: number,
+  ) => Protobuf.Mesh.ClientNotification | undefined;
+  addNeighborInfo: (
+    nodeNum: number,
+    neighborInfo: Protobuf.Mesh.NeighborInfo,
+  ) => void;
   getNeighborInfo: (nodeNum: number) => Protobuf.Mesh.NeighborInfo | undefined;
 }
 
@@ -95,7 +115,10 @@ export interface deviceState {
   // Saved connections management
   savedConnections: Connection[];
   addSavedConnection: (connection: Connection) => void;
-  updateSavedConnection: (id: ConnectionId, updates: Partial<Connection>) => void;
+  updateSavedConnection: (
+    id: ConnectionId,
+    updates: Partial<Connection>,
+  ) => void;
   removeSavedConnection: (id: ConnectionId) => void;
   getSavedConnections: () => Connection[];
 
@@ -127,9 +150,11 @@ function deviceFactory(
 ): Device {
   const myNodeNum = data?.myNodeNum;
   const traceroutes =
-    data?.traceroutes ?? new Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>();
+    data?.traceroutes ??
+    new Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>();
   const waypoints = data?.waypoints ?? [];
-  const neighborInfo = data?.neighborInfo ?? new Map<number, Protobuf.Mesh.NeighborInfo>();
+  const neighborInfo =
+    data?.neighborInfo ?? new Map<number, Protobuf.Mesh.NeighborInfo>();
   return {
     id,
     myNodeNum,
@@ -257,7 +282,8 @@ function deviceFactory(
                 break;
               }
               case "externalNotification": {
-                device.moduleConfig.externalNotification = config.payloadVariant.value;
+                device.moduleConfig.externalNotification =
+                  config.payloadVariant.value;
                 break;
               }
               case "storeForward": {
@@ -285,11 +311,13 @@ function deviceFactory(
                 break;
               }
               case "ambientLighting": {
-                device.moduleConfig.ambientLighting = config.payloadVariant.value;
+                device.moduleConfig.ambientLighting =
+                  config.payloadVariant.value;
                 break;
               }
               case "detectionSensor": {
-                device.moduleConfig.detectionSensor = config.payloadVariant.value;
+                device.moduleConfig.detectionSensor =
+                  config.payloadVariant.value;
                 break;
               }
               case "paxcounter": {
@@ -297,7 +325,8 @@ function deviceFactory(
                 break;
               }
               case "remoteHardware": {
-                device.moduleConfig.remoteHardware = config.payloadVariant.value;
+                device.moduleConfig.remoteHardware =
+                  config.payloadVariant.value;
                 break;
               }
               case "statusmessage": {
@@ -305,7 +334,8 @@ function deviceFactory(
                 break;
               }
               case "trafficManagement": {
-                device.moduleConfig.trafficManagement = config.payloadVariant.value;
+                device.moduleConfig.trafficManagement =
+                  config.payloadVariant.value;
                 break;
               }
               case "tak": {
@@ -390,10 +420,13 @@ function deviceFactory(
             return undefined;
           }
 
-          const index = device.waypoints.findIndex((wp) => wp.id === waypoint.id);
+          const index = device.waypoints.findIndex(
+            (wp) => wp.id === waypoint.id,
+          );
 
           if (index !== -1) {
-            const created = device.waypoints[index]?.metadata.created ?? new Date();
+            const created =
+              device.waypoints[index]?.metadata.created ?? new Date();
             const updatedWaypoint = {
               ...waypoint,
               metadata: { created, updated: rxTime, from, channel },
@@ -462,7 +495,9 @@ function deviceFactory(
             return;
           }
 
-          const idx = device.waypoints.findIndex((waypoint) => waypoint.id === waypointId);
+          const idx = device.waypoints.findIndex(
+            (waypoint) => waypoint.id === waypointId,
+          );
           if (idx >= 0) {
             device.waypoints.splice(idx, 1);
           }
@@ -520,7 +555,10 @@ function deviceFactory(
 
           // Enforce retention limit, both in terms of targets (device.traceroutes) and routes per target (routes)
           evictOldestEntries(routes, TRACEROUTE_ROUTE_RETENTION_NUM);
-          evictOldestEntries(device.traceroutes, TRACEROUTE_TARGET_RETENTION_NUM);
+          evictOldestEntries(
+            device.traceroutes,
+            TRACEROUTE_TARGET_RETENTION_NUM,
+          );
         }),
       );
     },
@@ -565,7 +603,9 @@ function deviceFactory(
       );
     },
 
-    addClientNotification: (clientNotificationPacket: Protobuf.Mesh.ClientNotification) => {
+    addClientNotification: (
+      clientNotificationPacket: Protobuf.Mesh.ClientNotification,
+    ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
           const device = draft.devices.get(id);
@@ -594,7 +634,10 @@ function deviceFactory(
       }
       return device.clientNotifications[index];
     },
-    addNeighborInfo: (nodeId: number, neighborInfo: Protobuf.Mesh.NeighborInfo) => {
+    addNeighborInfo: (
+      nodeId: number,
+      neighborInfo: Protobuf.Mesh.NeighborInfo,
+    ) => {
       set(
         produce<PrivateDeviceState>((draft) => {
           const device = draft.devices.get(id);
@@ -618,7 +661,10 @@ function deviceFactory(
   };
 }
 
-export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (set, get) => ({
+export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
+  set,
+  get,
+) => ({
   devices: new Map(),
   savedConnections: [],
   activeConnectionId: null,
@@ -632,7 +678,10 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (set, ge
     const device = deviceFactory(id, get, set);
     set(
       produce<PrivateDeviceState>((draft) => {
-        draft.devices = new Map(draft.devices).set(id, device as unknown as Draft<Device>);
+        draft.devices = new Map(draft.devices).set(
+          id,
+          device as unknown as Draft<Device>,
+        );
 
         // Enforce retention limit
         evictOldestEntries(draft.devices, DEVICESTORE_RETENTION_NUM);
@@ -663,11 +712,14 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (set, ge
   updateSavedConnection: (id, updates) => {
     set(
       produce<PrivateDeviceState>((draft) => {
-        const conn = draft.savedConnections.find((c: Connection) => c.id === id);
+        const conn = draft.savedConnections.find(
+          (c: Connection) => c.id === id,
+        );
         if (conn) {
           for (const key in updates) {
             if (Object.hasOwn(updates, key)) {
-              (conn as Record<string, unknown>)[key] = updates[key as keyof typeof updates];
+              (conn as Record<string, unknown>)[key] =
+                updates[key as keyof typeof updates];
             }
           }
         }
@@ -677,7 +729,9 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (set, ge
   removeSavedConnection: (id) => {
     set(
       produce<PrivateDeviceState>((draft) => {
-        draft.savedConnections = draft.savedConnections.filter((c: Connection) => c.id !== id);
+        draft.savedConnections = draft.savedConnections.filter(
+          (c: Connection) => c.id !== id,
+        );
       }),
     );
   },
@@ -744,12 +798,19 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
     useDeviceStore.setState(
       produce<PrivateDeviceState>((draft) => {
         const rebuilt = new Map<number, Device>();
-        for (const [id, data] of (draft.devices as unknown as Map<number, DeviceData>).entries()) {
+        for (const [id, data] of (
+          draft.devices as unknown as Map<number, DeviceData>
+        ).entries()) {
           if (data.myNodeNum !== undefined) {
             // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
             rebuilt.set(
               id,
-              deviceFactory(id, useDeviceStore.getState, useDeviceStore.setState, data),
+              deviceFactory(
+                id,
+                useDeviceStore.getState,
+                useDeviceStore.setState,
+                data,
+              ),
             );
           }
         }

@@ -65,17 +65,24 @@ export class SqlocalDraftRepository implements DraftRepository {
       );
   }
 
-  async loadAll(): Promise<ReadonlyArray<{ key: ConversationKey; text: string }>> {
+  async loadAll(): Promise<
+    ReadonlyArray<{ key: ConversationKey; text: string }>
+  > {
     const rows = await this.db
       .select({ conversationKey: drafts.conversationKey, text: drafts.text })
       .from(drafts)
       .where(eq(drafts.deviceId, this.deviceId));
-    return rows.map((r) => ({ key: parseKey(r.conversationKey), text: r.text }));
+    return rows.map((r) => ({
+      key: parseKey(r.conversationKey),
+      text: r.text,
+    }));
   }
 }
 
 function parseKey(s: string): ConversationKey {
-  if (s.startsWith("channel:")) return { kind: "channel", channel: Number(s.slice(8)) };
-  if (s.startsWith("direct:")) return { kind: "direct", peer: Number(s.slice(7)) };
+  if (s.startsWith("channel:"))
+    return { kind: "channel", channel: Number(s.slice(8)) };
+  if (s.startsWith("direct:"))
+    return { kind: "direct", peer: Number(s.slice(7)) };
   throw new Error(`Unknown conversation key format: ${s}`);
 }

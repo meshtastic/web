@@ -4,14 +4,20 @@ import { Result } from "better-result";
 import type { ResultType } from "better-result";
 import type { MeshClientPort } from "../../../core/client/MeshClientPort.ts";
 import type { MeshError } from "../../../core/errors/MeshError.ts";
-import { type ReadonlySignal, toReadonly } from "../../../core/signals/index.ts";
+import {
+  type ReadonlySignal,
+  toReadonly,
+} from "../../../core/signals/index.ts";
 import {
   beginEditSettings,
   commitEditSettings,
   setConfig,
   setModuleConfig,
 } from "../application/ConfigUseCases.ts";
-import { buildModuleConfig, buildRadioConfig } from "../infrastructure/configBuilders.ts";
+import {
+  buildModuleConfig,
+  buildRadioConfig,
+} from "../infrastructure/configBuilders.ts";
 import { ConfigMapper } from "../infrastructure/ConfigMapper.ts";
 import type { ModuleConfig, ModuleConfigSection } from "./ModuleConfig.ts";
 import type { RadioConfig, RadioConfigSection } from "./RadioConfig.ts";
@@ -36,18 +42,26 @@ export class ConfigEditor {
   private readonly baselineModules = signal<ModuleConfig>({});
   private readonly workingRadio = signal<RadioConfig>({});
   private readonly workingModules = signal<ModuleConfig>({});
-  private readonly _dirtyRadioSections = signal<readonly RadioConfigSection[]>([]);
-  private readonly _dirtyModuleSections = signal<readonly ModuleConfigSection[]>([]);
+  private readonly _dirtyRadioSections = signal<readonly RadioConfigSection[]>(
+    [],
+  );
+  private readonly _dirtyModuleSections = signal<
+    readonly ModuleConfigSection[]
+  >([]);
   private readonly _isDirty = signal<boolean>(false);
 
-  public readonly radio: ReadonlySignal<RadioConfig> = toReadonly(this.workingRadio);
-  public readonly modules: ReadonlySignal<ModuleConfig> = toReadonly(this.workingModules);
-  public readonly dirtyRadioSections: ReadonlySignal<readonly RadioConfigSection[]> = toReadonly(
-    this._dirtyRadioSections,
+  public readonly radio: ReadonlySignal<RadioConfig> = toReadonly(
+    this.workingRadio,
   );
-  public readonly dirtyModuleSections: ReadonlySignal<readonly ModuleConfigSection[]> = toReadonly(
-    this._dirtyModuleSections,
+  public readonly modules: ReadonlySignal<ModuleConfig> = toReadonly(
+    this.workingModules,
   );
+  public readonly dirtyRadioSections: ReadonlySignal<
+    readonly RadioConfigSection[]
+  > = toReadonly(this._dirtyRadioSections);
+  public readonly dirtyModuleSections: ReadonlySignal<
+    readonly ModuleConfigSection[]
+  > = toReadonly(this._dirtyModuleSections);
   public readonly isDirty: ReadonlySignal<boolean> = toReadonly(this._isDirty);
 
   constructor(client: MeshClientPort) {
@@ -61,19 +75,28 @@ export class ConfigEditor {
         // Apply the baseline update to the working copy only if the user hasn't
         // already edited this section — their in-flight edit wins.
         if (!this._dirtyRadioSections.peek().includes(variant)) {
-          this.workingRadio.value = { ...this.workingRadio.peek(), [variant]: next[variant] };
+          this.workingRadio.value = {
+            ...this.workingRadio.peek(),
+            [variant]: next[variant],
+          };
         }
       }
       this.recomputeDirty();
     });
 
     client.events.onModuleConfigPacket.subscribe((moduleConfig) => {
-      const next = ConfigMapper.mergeModule(this.baselineModules.peek(), moduleConfig);
+      const next = ConfigMapper.mergeModule(
+        this.baselineModules.peek(),
+        moduleConfig,
+      );
       this.baselineModules.value = next;
       const variant = moduleConfig.payloadVariant.case;
       if (variant) {
         if (!this._dirtyModuleSections.peek().includes(variant)) {
-          this.workingModules.value = { ...this.workingModules.peek(), [variant]: next[variant] };
+          this.workingModules.value = {
+            ...this.workingModules.peek(),
+            [variant]: next[variant],
+          };
         }
       }
       this.recomputeDirty();
@@ -137,7 +160,10 @@ export class ConfigEditor {
       if (value === undefined) {
         continue;
       }
-      const result = await setConfig(this.client, buildRadioConfig(section, value));
+      const result = await setConfig(
+        this.client,
+        buildRadioConfig(section, value),
+      );
       if (Result.isError(result)) {
         return Result.err(result.error);
       }
@@ -149,7 +175,10 @@ export class ConfigEditor {
       if (value === undefined) {
         continue;
       }
-      const result = await setModuleConfig(this.client, buildModuleConfig(section, value));
+      const result = await setModuleConfig(
+        this.client,
+        buildModuleConfig(section, value),
+      );
       if (Result.isError(result)) {
         return Result.err(result.error);
       }
@@ -172,7 +201,10 @@ export class ConfigEditor {
     const radioBase = this.baselineRadio.peek();
     const radioWorking = this.workingRadio.peek();
     const radioDirty: RadioConfigSection[] = [];
-    for (const key of new Set<string>([...Object.keys(radioBase), ...Object.keys(radioWorking)])) {
+    for (const key of new Set<string>([
+      ...Object.keys(radioBase),
+      ...Object.keys(radioWorking),
+    ])) {
       const section = key as RadioConfigSection;
       if (!shallowEqual(radioBase[section], radioWorking[section])) {
         radioDirty.push(section);

@@ -4,7 +4,10 @@ import type { DeviceOutput } from "../transport/Transport.ts";
  * Transforms a raw byte stream from the device into typed DeviceOutput chunks
  * by parsing the 0x94 0xC3 framing header and length prefix.
  */
-export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> = () => {
+export const fromDeviceStream: () => TransformStream<
+  Uint8Array,
+  DeviceOutput
+> = () => {
   let byteBuffer = new Uint8Array([]);
   const textDecoder = new TextDecoder();
   return new TransformStream<Uint8Array, DeviceOutput>({
@@ -26,11 +29,18 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
           const msb = byteBuffer[2];
           const lsb = byteBuffer[3];
 
-          if (msb !== undefined && lsb !== undefined && byteBuffer.length >= 4 + (msb << 8) + lsb) {
+          if (
+            msb !== undefined &&
+            lsb !== undefined &&
+            byteBuffer.length >= 4 + (msb << 8) + lsb
+          ) {
             const packet = byteBuffer.subarray(4, 4 + (msb << 8) + lsb);
 
             const malformedDetectorIndex = packet.indexOf(0x94);
-            if (malformedDetectorIndex !== -1 && packet[malformedDetectorIndex + 1] === 0xc3) {
+            if (
+              malformedDetectorIndex !== -1 &&
+              packet[malformedDetectorIndex + 1] === 0xc3
+            ) {
               console.warn(
                 `⚠️ Malformed packet found, discarding: ${byteBuffer
                   .subarray(0, malformedDetectorIndex - 1)

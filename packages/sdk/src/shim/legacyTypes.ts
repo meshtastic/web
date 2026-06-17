@@ -17,4 +17,9 @@ export type {
   QueueItem,
   Transport,
 } from "../core/types.ts";
-export { ChannelNumber, DeviceStatusEnum, Emitter, EmitterScope } from "../core/types.ts";
+export {
+  ChannelNumber,
+  DeviceStatusEnum,
+  Emitter,
+  EmitterScope,
+} from "../core/types.ts";

@@ -1,4 +1,8 @@
-import { DeviceStatusEnum, type DeviceOutput, type Transport } from "@meshtastic/sdk";
+import {
+  DeviceStatusEnum,
+  type DeviceOutput,
+  type Transport,
+} from "@meshtastic/sdk";
 
 /**
  * Typed error thrown when establishing the GATT connection fails. `kind`
@@ -96,7 +100,9 @@ export class TransportWebBluetooth implements Transport {
   /**
    * Creates a transport from an existing, user-provided {@link BluetoothDevice}.
    */
-  public static async createFromDevice(device: BluetoothDevice): Promise<TransportWebBluetooth> {
+  public static async createFromDevice(
+    device: BluetoothDevice,
+  ): Promise<TransportWebBluetooth> {
     return await TransportWebBluetooth.prepareConnection(device);
   }
 
@@ -112,12 +118,16 @@ export class TransportWebBluetooth implements Transport {
    *   fails, the BluetoothDevice has no `gatt`, or the Meshtastic GATT
    *   service / characteristics aren't found on the device.
    */
-  public static async prepareConnection(device: BluetoothDevice): Promise<TransportWebBluetooth> {
+  public static async prepareConnection(
+    device: BluetoothDevice,
+  ): Promise<TransportWebBluetooth> {
     const gattServer = await TransportWebBluetooth.connectGatt(device);
 
     let service: BluetoothRemoteGATTService;
     try {
-      service = await gattServer.getPrimaryService(TransportWebBluetooth.ServiceUuid);
+      service = await gattServer.getPrimaryService(
+        TransportWebBluetooth.ServiceUuid,
+      );
     } catch (cause) {
       throw new BluetoothConnectError(
         "missing-service",
@@ -136,7 +146,11 @@ export class TransportWebBluetooth implements Transport {
       TransportWebBluetooth.FromNumUuid,
     );
 
-    if (!toRadioCharacteristic || !fromRadioCharacteristic || !fromNumCharacteristic) {
+    if (
+      !toRadioCharacteristic ||
+      !fromRadioCharacteristic ||
+      !fromNumCharacteristic
+    ) {
       throw new BluetoothConnectError(
         "missing-service",
         "Meshtastic GATT characteristics not found on this device.",
@@ -151,7 +165,9 @@ export class TransportWebBluetooth implements Transport {
     );
   }
 
-  private static async connectGatt(device: BluetoothDevice): Promise<BluetoothRemoteGATTServer> {
+  private static async connectGatt(
+    device: BluetoothDevice,
+  ): Promise<BluetoothRemoteGATTServer> {
     if (!device.gatt) {
       throw new BluetoothConnectError(
         "unavailable",
@@ -205,7 +221,10 @@ export class TransportWebBluetooth implements Transport {
         this.fromDeviceController = ctrl;
         this.emitStatus(DeviceStatusEnum.DeviceConnecting);
 
-        this.gattServer.device.addEventListener("gattserverdisconnected", this.onGattDisconnected);
+        this.gattServer.device.addEventListener(
+          "gattserverdisconnected",
+          this.onGattDisconnected,
+        );
 
         try {
           await this.fromNumCharacteristic.startNotifications();
@@ -264,7 +283,10 @@ export class TransportWebBluetooth implements Transport {
         "characteristicvaluechanged",
         this.onFromNumChanged,
       );
-      this.gattServer.device.removeEventListener("gattserverdisconnected", this.onGattDisconnected);
+      this.gattServer.device.removeEventListener(
+        "gattserverdisconnected",
+        this.onGattDisconnected,
+      );
 
       this.gattServer.disconnect();
     } finally {

@@ -2,43 +2,20 @@
   "name": "@meshtastic/transport-web-serial",
   "version": "1.0.0",
   "description": "A transport layer for Meshtastic applications using Web Serial API.",
-  "exports": {
-    ".": "./mod.ts"
-  },
-  "type": "module",
-  "main": "./dist/mod.js",
-  "module": "./dist/mod.js",
-  "types": "./dist/mod.d.ts",
+  "license": "GPL-3.0-only",
   "files": [
     "package.json",
     "README.md",
     "LICENSE",
     "dist"
   ],
-  "license": "GPL-3.0-only",
-  "tsdown": {
-    "entry": "mod.ts",
-    "target": "esnext",
-    "dts": true,
-    "format": [
-      "esm"
-    ],
-    "splitting": false,
-    "sourcemap": false,
-    "minify": false,
-    "treeshake": true,
-    "report": false,
-    "clean": true
+  "type": "module",
+  "main": "./dist/mod.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/mod.d.ts",
+  "exports": {
+    ".": "./mod.ts"
   },
-  "jsrInclude": [
-    "mod.ts",
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
-  "jsrExclude": [
-    "src/**/*.test.ts"
-  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
@@ -49,8 +26,31 @@
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
   },
   "dependencies": {
-    "@types/w3c-web-serial": "npm:@types/w3c-web-serial@^1.0.7",
     "@meshtastic/sdk": "workspace:*",
+    "@types/w3c-web-serial": "npm:@types/w3c-web-serial@^1.0.7",
     "better-result": "^2.9.2"
-  }
+  },
+  "tsdown": {
+    "clean": true,
+    "dts": true,
+    "entry": "mod.ts",
+    "format": [
+      "esm"
+    ],
+    "minify": false,
+    "report": false,
+    "sourcemap": false,
+    "splitting": false,
+    "target": "esnext",
+    "treeshake": true
+  },
+  "jsrExclude": [
+    "src/**/*.test.ts"
+  ],
+  "jsrInclude": [
+    "mod.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
 }

@@ -4,5 +4,7 @@ import { useSignalValue } from "../adapters/useSignalValue.ts";
 
 export function usePosition(nodeNum: number): Position | undefined {
   const client = useClient();
-  return useSignalValue(client.position.list, (list) => list.find((p) => p.nodeNum === nodeNum));
+  return useSignalValue(client.position.list, (list) =>
+    list.find((p) => p.nodeNum === nodeNum),
+  );
 }

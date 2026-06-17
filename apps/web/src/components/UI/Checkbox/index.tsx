@@ -82,7 +82,11 @@ export function Checkbox({
           </div>
         )}
       </div>
-      {children && <span className="text-sm text-gray-900 dark:text-gray-100">{children}</span>}
+      {children && (
+        <span className="text-sm text-gray-900 dark:text-gray-100">
+          {children}
+        </span>
+      )}
     </label>
   );
 }

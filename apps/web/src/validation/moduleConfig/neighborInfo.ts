@@ -6,4 +6,6 @@ export const NeighborInfoValidationSchema = z.object({
   transmitOverLora: z.boolean(),
 });
 
-export type NeighborInfoValidation = z.infer<typeof NeighborInfoValidationSchema>;
+export type NeighborInfoValidation = z.infer<
+  typeof NeighborInfoValidationSchema
+>;

@@ -44,12 +44,16 @@ export const QRDialog = ({ open, onOpenChange, loraConfig }: QRDialogProps) => {
         settings: channelsToEncode,
       }),
     );
-    const base64 = fromByteArray(toBinary(Protobuf.AppOnly.ChannelSetSchema, encoded))
+    const base64 = fromByteArray(
+      toBinary(Protobuf.AppOnly.ChannelSetSchema, encoded),
+    )
       .replace(/=/g, "")
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
-    setQrCodeUrl(`https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`);
+    setQrCodeUrl(
+      `https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`,
+    );
   }, [allChannels, selectedChannels, qrCodeAdd, loraConfig]);
 
   return (
@@ -80,9 +84,14 @@ export const QRDialog = ({ open, onOpenChange, loraConfig }: QRDialogProps) => {
                     checked={selectedChannels.includes(channel.index)}
                     onChange={() => {
                       if (selectedChannels.includes(channel.index)) {
-                        setSelectedChannels(selectedChannels.filter((c) => c !== channel.index));
+                        setSelectedChannels(
+                          selectedChannels.filter((c) => c !== channel.index),
+                        );
                       } else {
-                        setSelectedChannels([...selectedChannels, channel.index]);
+                        setSelectedChannels([
+                          ...selectedChannels,
+                          channel.index,
+                        ]);
                       }
                     }}
                   />

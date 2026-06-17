@@ -3,7 +3,10 @@ import {
   type BluetoothValidation,
   BluetoothValidationSchema,
 } from "@app/validation/config/bluetooth.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -27,13 +30,18 @@ export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
     radio.bluetooth ??
-    (getEffectiveConfig("bluetooth") as Protobuf.Config.Config_BluetoothConfig | undefined);
+    (getEffectiveConfig("bluetooth") as
+      | Protobuf.Config.Config_BluetoothConfig
+      | undefined);
 
   const { t } = useTranslation("config");
 
   const onSubmit = (data: BluetoothValidation) => {
     if (!editor) return;
-    editor.setRadioSection("bluetooth", data as unknown as Protobuf.Config.Config_BluetoothConfig);
+    editor.setRadioSection(
+      "bluetooth",
+      data as unknown as Protobuf.Config.Config_BluetoothConfig,
+    );
   };
 
   return (

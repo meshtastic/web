@@ -8,7 +8,10 @@ export interface FactoryResetConfigDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const FactoryResetConfigDialog = ({ open, onOpenChange }: FactoryResetConfigDialogProps) => {
+export const FactoryResetConfigDialog = ({
+  open,
+  onOpenChange,
+}: FactoryResetConfigDialogProps) => {
   const { t } = useTranslation("dialog");
   const { connection } = useDevice();
 

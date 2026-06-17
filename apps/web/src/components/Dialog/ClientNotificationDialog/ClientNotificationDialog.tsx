@@ -21,9 +21,13 @@ export interface ClientNotificationDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificationDialogProps) => {
+export const ClientNotificationDialog = ({
+  open,
+  onOpenChange,
+}: ClientNotificationDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection, getClientNotification, removeClientNotification } = useDevice();
+  const { connection, getClientNotification, removeClientNotification } =
+    useDevice();
   const [securityNumber, setSecurityNumber] = useState("");
 
   const notification = getClientNotification(0);
@@ -42,9 +46,11 @@ export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificat
     nonce: bigint,
     secNum?: number,
   ) => {
-    connection?.sendKeyVerification(messageType, 0, nonce, secNum).catch((error) => {
-      console.error("Failed to send key verification message:", error);
-    });
+    connection
+      ?.sendKeyVerification(messageType, 0, nonce, secNum)
+      .catch((error) => {
+        console.error("Failed to send key verification message:", error);
+      });
     dismiss();
   };
 
@@ -62,7 +68,9 @@ export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificat
             <DialogHeader>
               <DialogTitle>{t("keyVerification.inform.title")}</DialogTitle>
               <DialogDescription>
-                {t("keyVerification.inform.description", { name: value.remoteLongname })}
+                {t("keyVerification.inform.description", {
+                  name: value.remoteLongname,
+                })}
               </DialogDescription>
             </DialogHeader>
             <p className="py-4 text-center font-mono text-4xl tracking-widest">
@@ -84,7 +92,9 @@ export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificat
             <DialogHeader>
               <DialogTitle>{t("keyVerification.request.title")}</DialogTitle>
               <DialogDescription>
-                {t("keyVerification.request.description", { name: value.remoteLongname })}
+                {t("keyVerification.request.description", {
+                  name: value.remoteLongname,
+                })}
               </DialogDescription>
             </DialogHeader>
             <Input
@@ -102,7 +112,11 @@ export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificat
                 variant="default"
                 disabled={securityNumber === ""}
                 onClick={() =>
-                  respond(MessageType.PROVIDE_SECURITY_NUMBER, value.nonce, Number(securityNumber))
+                  respond(
+                    MessageType.PROVIDE_SECURITY_NUMBER,
+                    value.nonce,
+                    Number(securityNumber),
+                  )
                 }
               >
                 {t("keyVerification.request.submit")}
@@ -119,7 +133,9 @@ export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificat
             <DialogHeader>
               <DialogTitle>{t("keyVerification.final.title")}</DialogTitle>
               <DialogDescription>
-                {t("keyVerification.final.description", { name: value.remoteLongname })}
+                {t("keyVerification.final.description", {
+                  name: value.remoteLongname,
+                })}
               </DialogDescription>
             </DialogHeader>
             <p className="py-4 text-center font-mono text-4xl tracking-widest">
@@ -132,7 +148,10 @@ export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificat
               >
                 {t("keyVerification.final.reject")}
               </Button>
-              <Button variant="default" onClick={() => respond(MessageType.DO_VERIFY, value.nonce)}>
+              <Button
+                variant="default"
+                onClick={() => respond(MessageType.DO_VERIFY, value.nonce)}
+              >
                 {t("keyVerification.final.verify")}
               </Button>
             </DialogFooter>
@@ -145,7 +164,10 @@ export const ClientNotificationDialog = ({ open, onOpenChange }: ClientNotificat
           <DialogHeader>
             <DialogTitle>{t("clientNotification.title")}</DialogTitle>
             <DialogDescription>
-              {t([`clientNotification.${notification?.message}`, notification?.message ?? ""])}
+              {t([
+                `clientNotification.${notification?.message}`,
+                notification?.message ?? "",
+              ])}
             </DialogDescription>
           </DialogHeader>
         );

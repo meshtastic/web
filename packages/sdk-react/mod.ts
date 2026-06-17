@@ -8,7 +8,10 @@ export { MeshRegistryContext } from "./src/provider/MeshRegistryContext.ts";
 export { useClient } from "./src/adapters/useClient.ts";
 export { useClientById } from "./src/adapters/useClientById.ts";
 export { useActiveClient } from "./src/adapters/useActiveClient.ts";
-export { useMeshRegistry, useOptionalMeshRegistry } from "./src/adapters/useMeshRegistry.ts";
+export {
+  useMeshRegistry,
+  useOptionalMeshRegistry,
+} from "./src/adapters/useMeshRegistry.ts";
 export { useSignal } from "./src/adapters/useSignal.ts";
 export { useSignalValue } from "./src/adapters/useSignalValue.ts";
 
@@ -22,14 +25,26 @@ export { useDirectChat } from "./src/hooks/useDirectChat.ts";
 export type { UseDirectChatResult } from "./src/hooks/useDirectChat.ts";
 export { useDraft } from "./src/hooks/useDraft.ts";
 export type { UseDraftResult } from "./src/hooks/useDraft.ts";
-export { useHasNodeError, useNodeError, useNodeErrors } from "./src/hooks/useNodeError.ts";
+export {
+  useHasNodeError,
+  useNodeError,
+  useNodeErrors,
+} from "./src/hooks/useNodeError.ts";
 export { useNodes } from "./src/hooks/useNodes.ts";
 export { useNode } from "./src/hooks/useNode.ts";
 export { useChannels, useChannel } from "./src/hooks/useChannels.ts";
-export { useConfig, useIsRegionUnset, useModuleConfig } from "./src/hooks/useConfig.ts";
+export {
+  useConfig,
+  useIsRegionUnset,
+  useModuleConfig,
+} from "./src/hooks/useConfig.ts";
 export { useConfigEditor } from "./src/hooks/useConfigEditor.ts";
 export { useConnectionProgress } from "./src/hooks/useConnectionProgress.ts";
-export { useTotalUnread, useUnreadByKey, useUnreadCount } from "./src/hooks/useUnread.ts";
+export {
+  useTotalUnread,
+  useUnreadByKey,
+  useUnreadCount,
+} from "./src/hooks/useUnread.ts";
 export { useTelemetry } from "./src/hooks/useTelemetry.ts";
 export type { UseTelemetryResult } from "./src/hooks/useTelemetry.ts";
 export { usePosition } from "./src/hooks/usePosition.ts";
