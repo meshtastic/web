@@ -1,6 +1,6 @@
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import type { Protobuf } from "@meshtastic/sdk";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { useTranslation } from "react-i18next";
 
 type NodeUser = Pick<Protobuf.Mesh.NodeInfo, "user">;

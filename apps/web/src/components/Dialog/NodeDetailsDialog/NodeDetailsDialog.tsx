@@ -31,7 +31,7 @@ import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@meshtastic/sdk";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { useNavigate } from "@tanstack/react-router";
 import { fromByteArray } from "base64-js";
 import {

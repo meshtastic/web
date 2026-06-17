@@ -1,5 +1,5 @@
 import { Protobuf } from "@meshtastic/sdk";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { useCallback, useMemo } from "react";
 
 export type FilterState = {
