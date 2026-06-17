@@ -32,7 +32,7 @@ import {
 import { cn } from "@core/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/sdk";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
   useCallback,
