@@ -63,6 +63,14 @@ export class NodesClient {
       this.patch(packet.from, { position: packet.data });
     });
 
+    client.events.onTelemetryPacket.subscribe((packet) => {
+      // Fold live device-metrics telemetry into the node so battery / channel
+      // utilisation / voltage stay current between NodeInfo broadcasts.
+      if (packet.data.variant.case === "deviceMetrics") {
+        this.patch(packet.from, { deviceMetrics: packet.data.variant.value });
+      }
+    });
+
     client.events.onMeshPacket.subscribe((packet) => {
       // Every inbound mesh packet refreshes lastHeard / snr for the
       // originating node — same semantics as the legacy nodeDB

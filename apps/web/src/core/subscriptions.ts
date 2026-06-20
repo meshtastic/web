@@ -39,17 +39,6 @@ export const subscribeAll = (device: Device, connection: MeshDevice) => {
     }
   });
 
-  connection.events.onTelemetryPacket.subscribe((telemetryPacket) => {
-    // Fold live device-metrics telemetry into the node so battery / channel
-    // utilisation / voltage stay current between NodeInfo broadcasts.
-    if (telemetryPacket.data.variant.case === "deviceMetrics") {
-      nodeDB.addDeviceMetrics({
-        ...telemetryPacket,
-        data: telemetryPacket.data.variant.value,
-      });
-    }
-  });
-
   connection.events.onDeviceStatus.subscribe((status) => {
     device.setStatus(status);
   });
@@ -63,8 +52,9 @@ export const subscribeAll = (device: Device, connection: MeshDevice) => {
     useNewNodeNum(device.id, nodeInfo);
   });
 
-  // onUserPacket / onPositionPacket / onNodeInfoPacket are handled by the
-  // SDK NodesClient (see packages/sdk/src/features/nodes/NodesClient.ts).
+  // onUserPacket / onPositionPacket / onNodeInfoPacket and device-metrics
+  // telemetry (battery / channel utilisation / voltage) are folded into nodes by
+  // the SDK NodesClient (see packages/sdk/src/features/nodes/NodesClient.ts).
 
   connection.events.onChannelPacket.subscribe((channel) => {
     device.addChannel(channel);

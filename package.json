@@ -24,6 +24,9 @@
     "clean:all": "pnpm run --filter '*' clean",
     "publish:packages": "pnpm run build --filter 'packages/transport-*'",
     "test": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report e2e/.report",
     "prepare": "husky"
   },
   "dependencies": {
@@ -35,6 +38,7 @@
   "devDependencies": {
     "@meshtastic/core": "jsr:^2.6.6",
     "@meshtastic/sdk": "workspace:*",
+    "@playwright/test": "^1.49.0",
     "@types/node": "^25.9.3",
     "husky": "^9.1.0",
     "lint-staged": "^17.0.7",

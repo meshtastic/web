@@ -1,0 +1,19 @@
+# Node A — the device-under-test the BROWSER connects to over the HTTPS phone API.
+# Simulated radio + UDP-multicast LAN mesh so it can hear Node B with no MQTT.
+# The webserver (ulfius) is TLS-only with a self-signed cert generated on first
+# boot, so the browser connects via https:// with cert errors ignored.
+---
+Lora:
+  Module: sim
+Config:
+  # Enables the firmware's UDP-multicast LAN mesh (224.0.0.69:4403).
+  # See firmware/src/platform/portduino/PortduinoGlue.cpp (EnableUDP) and
+  # firmware/src/mesh/udp/UdpMulticastHandler.h.
+  EnableUDP: true
+Webserver:
+  Port: 9443
+General:
+  # Distinct MAC => distinct node number from Node B.
+  MACAddress: AA:BB:CC:DD:EE:01
+Logging:
+  LogLevel: info
