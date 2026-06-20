@@ -10,7 +10,10 @@ export async function setChannel(
   channel: Protobuf.Channel.Channel,
 ): Promise<ResultType<number, Error>> {
   try {
-    const id = await sendAdminMessage(client, { case: "setChannel", value: channel });
+    const id = await sendAdminMessage(client, {
+      case: "setChannel",
+      value: channel,
+    });
     return Result.ok(id);
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)));
@@ -22,7 +25,10 @@ export async function getChannel(
   index: number,
 ): Promise<ResultType<number, Error>> {
   try {
-    const id = await sendAdminMessage(client, { case: "getChannelRequest", value: index + 1 });
+    const id = await sendAdminMessage(client, {
+      case: "getChannelRequest",
+      value: index + 1,
+    });
     return Result.ok(id);
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)));

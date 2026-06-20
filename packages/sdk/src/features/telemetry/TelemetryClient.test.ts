@@ -21,7 +21,9 @@ describe("TelemetryClient", () => {
         time: 1000,
         variant: {
           case: "deviceMetrics",
-          value: create(Protobuf.Telemetry.DeviceMetricsSchema, { batteryLevel: 80 }),
+          value: create(Protobuf.Telemetry.DeviceMetricsSchema, {
+            batteryLevel: 80,
+          }),
         },
       }),
     });
@@ -36,7 +38,9 @@ describe("TelemetryClient", () => {
         time: 2000,
         variant: {
           case: "deviceMetrics",
-          value: create(Protobuf.Telemetry.DeviceMetricsSchema, { batteryLevel: 70 }),
+          value: create(Protobuf.Telemetry.DeviceMetricsSchema, {
+            batteryLevel: 70,
+          }),
         },
       }),
     });

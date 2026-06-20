@@ -36,10 +36,16 @@ describe("ChatClient drafts", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport, chat: { draftRepository } });
 
-    client.chat.drafts.set({ kind: "channel", channel: ChannelNumber.Primary }, "hello");
-    await new Promise((r) => setTimeout(r, 5));
-    expect(await draftRepository.load({ kind: "channel", channel: ChannelNumber.Primary })).toBe(
+    client.chat.drafts.set(
+      { kind: "channel", channel: ChannelNumber.Primary },
       "hello",
     );
+    await new Promise((r) => setTimeout(r, 5));
+    expect(
+      await draftRepository.load({
+        kind: "channel",
+        channel: ChannelNumber.Primary,
+      }),
+    ).toBe("hello");
   });
 });

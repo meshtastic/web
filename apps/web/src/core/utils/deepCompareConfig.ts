@@ -18,7 +18,11 @@ function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
   return true;
 }
 
-export function deepCompareConfig(a: unknown, b: unknown, allowUndefined = false): boolean {
+export function deepCompareConfig(
+  a: unknown,
+  b: unknown,
+  allowUndefined = false,
+): boolean {
   if (a === b) {
     return true;
   }

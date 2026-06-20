@@ -2,5 +2,5 @@
   "editor.formatOnSave": true,
   "search.exclude": {
     "**/i18n/locales/*-*/**": true
-  },
+  }
 }

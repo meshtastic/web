@@ -8,7 +8,10 @@ export async function ignoreNode(
   nodeNum: number,
 ): Promise<ResultType<number, Error>> {
   try {
-    const id = await sendAdminMessage(client, { case: "setIgnoredNode", value: nodeNum });
+    const id = await sendAdminMessage(client, {
+      case: "setIgnoredNode",
+      value: nodeNum,
+    });
     return Result.ok(id);
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)));
@@ -20,7 +23,10 @@ export async function removeIgnoredNode(
   nodeNum: number,
 ): Promise<ResultType<number, Error>> {
   try {
-    const id = await sendAdminMessage(client, { case: "removeIgnoredNode", value: nodeNum });
+    const id = await sendAdminMessage(client, {
+      case: "removeIgnoredNode",
+      value: nodeNum,
+    });
     return Result.ok(id);
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)));

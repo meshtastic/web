@@ -1,5 +1,9 @@
 import { del, get, set } from "idb-keyval";
-import type { PersistStorage, StateStorage, StorageValue } from "zustand/middleware";
+import type {
+  PersistStorage,
+  StateStorage,
+  StorageValue,
+} from "zustand/middleware";
 
 export const zustandIndexDBStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -53,7 +57,9 @@ const uint8ArrayHandler: Handler<Uint8Array, "Uint8Array", number[]> = {
 
 const defaultHandlers = [mapHandler, uint8ArrayHandler] as const;
 
-function makeJson<H extends Handler<unknown, string, unknown>>(handlers: readonly H[]) {
+function makeJson<H extends Handler<unknown, string, unknown>>(
+  handlers: readonly H[],
+) {
   const byTag = new Map<H["tag"], H>();
   for (const handler of handlers) {
     byTag.set(handler.tag, handler);
@@ -77,7 +83,9 @@ function makeJson<H extends Handler<unknown, string, unknown>>(handlers: readonl
     if (isEnvelope(value)) {
       const handler = byTag.get(value.__datatype);
       if (handler) {
-        return handler.revive((value as Envelope<H["tag"], unknown>).value as never);
+        return handler.revive(
+          (value as Envelope<H["tag"], unknown>).value as never,
+        );
       }
     }
     return value;
@@ -86,10 +94,14 @@ function makeJson<H extends Handler<unknown, string, unknown>>(handlers: readonl
   return { replacer, reviver };
 }
 
-export function createStorage<T, H extends Handler<unknown, string, unknown> = never>(
-  extraHandlers: readonly H[] = [] as const,
-): PersistStorage<T> {
-  const { replacer, reviver } = makeJson([...defaultHandlers, ...extraHandlers]);
+export function createStorage<
+  T,
+  H extends Handler<unknown, string, unknown> = never,
+>(extraHandlers: readonly H[] = [] as const): PersistStorage<T> {
+  const { replacer, reviver } = makeJson([
+    ...defaultHandlers,
+    ...extraHandlers,
+  ]);
   return {
     getItem: async (name): Promise<StorageValue<T> | null> => {
       const str = await zustandIndexDBStorage.getItem(name);
@@ -109,7 +121,10 @@ export function createStorage<T, H extends Handler<unknown, string, unknown> = n
         const str = JSON.stringify(newValue, replacer);
         await zustandIndexDBStorage.setItem(name, str);
       } catch (error) {
-        console.error(`Error stringifying or setting persisted state (${name}):`, error);
+        console.error(
+          `Error stringifying or setting persisted state (${name}):`,
+          error,
+        );
       }
     },
     removeItem: async (name): Promise<void> => {

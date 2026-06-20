@@ -2,33 +2,19 @@
   "name": "@meshtastic/transport-deno",
   "version": "1.0.0",
   "description": "Deno-specific transport layer for Meshtastic web applications.",
-  "exports": {
-    ".": "./mod.ts"
-  },
-  "main": "./dist/mod.js",
-  "module": "./dist/mod.js",
-  "types": "./dist/mod.d.ts",
   "license": "GPL-3.0-only",
-  "tsdown": {
-    "entry": "mod.ts",
-    "target": "esnext",
-    "dts": true,
-    "format": [
-      "esm"
-    ],
-    "splitting": false,
-    "sourcemap": false,
-    "minify": false,
-    "treeshake": true,
-    "report": false,
-    "clean": true
-  },
   "files": [
     "package.json",
     "README.md",
     "LICENSE",
     "dist"
   ],
+  "main": "./dist/mod.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/mod.d.ts",
+  "exports": {
+    ".": "./mod.ts"
+  },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
@@ -40,5 +26,19 @@
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*"
+  },
+  "tsdown": {
+    "clean": true,
+    "dts": true,
+    "entry": "mod.ts",
+    "format": [
+      "esm"
+    ],
+    "minify": false,
+    "report": false,
+    "sourcemap": false,
+    "splitting": false,
+    "target": "esnext",
+    "treeshake": true
   }
 }

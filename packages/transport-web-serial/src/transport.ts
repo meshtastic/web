@@ -39,7 +39,9 @@ const POST_CLOSE_DELAY_MS = 200;
 function isPortBusyError(err: unknown): boolean {
   if (!(err instanceof Error)) return false;
   if ((err as DOMException).name === "InvalidStateError") return true;
-  return /already open|failed to open serial port|access is denied/i.test(err.message);
+  return /already open|failed to open serial port|access is denied/i.test(
+    err.message,
+  );
 }
 
 /**
@@ -74,7 +76,9 @@ export class TransportWebSerial implements Transport {
       port = await navigator.serial.requestPort();
     } catch (cause) {
       return Result.err(
-        new SerialConnectError("unavailable", "Serial port not selected.", { cause }),
+        new SerialConnectError("unavailable", "Serial port not selected.", {
+          cause,
+        }),
       );
     }
     return TransportWebSerial.createFromPort(port, baudRate);
@@ -130,7 +134,10 @@ export class TransportWebSerial implements Transport {
         log.debug("preparePort: close() ok");
       } catch (cause) {
         const err = cause as Error;
-        log.warn("preparePort: close() threw", { name: err?.name, message: err?.message });
+        log.warn("preparePort: close() threw", {
+          name: err?.name,
+          message: err?.message,
+        });
         return Result.err(
           new SerialConnectError(
             "in-use",
@@ -143,7 +150,11 @@ export class TransportWebSerial implements Transport {
     }
 
     let lastErr: unknown;
-    for (let attempt = 0; attempt <= PORT_OPEN_RETRY_DELAYS_MS.length; attempt++) {
+    for (
+      let attempt = 0;
+      attempt <= PORT_OPEN_RETRY_DELAYS_MS.length;
+      attempt++
+    ) {
       try {
         log.debug("preparePort: open() attempt", { attempt });
         await port.open({ baudRate });
@@ -156,10 +167,17 @@ export class TransportWebSerial implements Transport {
           attempt,
           name: e?.name,
           message: e?.message,
-          willRetry: isPortBusyError(err) && attempt < PORT_OPEN_RETRY_DELAYS_MS.length,
+          willRetry:
+            isPortBusyError(err) && attempt < PORT_OPEN_RETRY_DELAYS_MS.length,
         });
-        if (!isPortBusyError(err) || attempt === PORT_OPEN_RETRY_DELAYS_MS.length) break;
-        await new Promise((r) => setTimeout(r, PORT_OPEN_RETRY_DELAYS_MS[attempt]));
+        if (
+          !isPortBusyError(err) ||
+          attempt === PORT_OPEN_RETRY_DELAYS_MS.length
+        )
+          break;
+        await new Promise((r) =>
+          setTimeout(r, PORT_OPEN_RETRY_DELAYS_MS[attempt]),
+        );
       }
     }
 
@@ -211,7 +229,10 @@ export class TransportWebSerial implements Transport {
           return;
         }
         const e = err as Error;
-        log.error("toDevice pipe rejected", { name: e?.name, message: e?.message });
+        log.error("toDevice pipe rejected", {
+          name: e?.name,
+          message: e?.message,
+        });
         this.connection.close().catch(() => {});
         this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "write-error");
       });
@@ -232,7 +253,10 @@ export class TransportWebSerial implements Transport {
           const { port } = ev as unknown as { port?: SerialPort };
           if (port && port === this.connection) {
             log.warn("OS-level disconnect event");
-            this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "serial-disconnected");
+            this.emitStatus(
+              DeviceStatusEnum.DeviceDisconnected,
+              "serial-disconnected",
+            );
           }
         };
         navigator.serial.addEventListener("disconnect", onOsDisconnect);
@@ -328,7 +352,10 @@ export class TransportWebSerial implements Transport {
       log.debug("disconnect: connection.close() ok");
     } catch (error) {
       const e = error as Error;
-      log.warn("disconnect: cleanup failed", { name: e?.name, message: e?.message });
+      log.warn("disconnect: cleanup failed", {
+        name: e?.name,
+        message: e?.message,
+      });
     } finally {
       this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "user");
       this.closingByUser = false;

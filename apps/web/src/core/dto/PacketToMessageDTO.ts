@@ -17,9 +17,11 @@ class PacketToMessageDTO {
     this.to = data.to;
     this.from = data.from;
     this.messageId = data.id;
-    this.state = data.from !== nodeNum ? MessageState.Ack : MessageState.Waiting;
+    this.state =
+      data.from !== nodeNum ? MessageState.Ack : MessageState.Waiting;
     this.message = data.data;
-    this.type = data.type === "direct" ? MessageType.Direct : MessageType.Broadcast;
+    this.type =
+      data.type === "direct" ? MessageType.Direct : MessageType.Broadcast;
 
     let dateTimestamp = Date.now();
     if (data.rxTime instanceof Date) {

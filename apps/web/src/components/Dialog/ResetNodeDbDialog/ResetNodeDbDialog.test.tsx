@@ -25,7 +25,9 @@ describe("ResetNodeDbDialog", () => {
   });
 
   it("calls reset({ keepMyNode: true }) then clears chat after resolve", async () => {
-    let resolveReset: ((value: { status: "ok"; value: number }) => void) | undefined;
+    let resolveReset:
+      | ((value: { status: "ok"; value: number }) => void)
+      | undefined;
     mockResetNodes.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -35,7 +37,9 @@ describe("ResetNodeDbDialog", () => {
     mockClearAll.mockResolvedValue(undefined);
 
     render(<ResetNodeDbDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Reset Node Database" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Reset Node Database" }),
+    );
 
     expect(mockResetNodes).toHaveBeenCalledWith({ keepMyNode: true });
 

@@ -41,7 +41,9 @@ describe("MeshRegistry", () => {
     const reg = new MeshRegistry();
     const { transport } = createFakeTransport();
     reg.create(1, { transport });
-    expect(() => reg.create(1, { transport: createFakeTransport().transport })).toThrow();
+    expect(() =>
+      reg.create(1, { transport: createFakeTransport().transport }),
+    ).toThrow();
   });
 
   it("remove disconnects the client and falls back to another active id", async () => {

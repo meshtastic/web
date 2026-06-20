@@ -1,8 +1,14 @@
-import { type ConversationKey, conversationKeyString } from "../../domain/MessageRepository.ts";
+import {
+  type ConversationKey,
+  conversationKeyString,
+} from "../../domain/MessageRepository.ts";
 import type { DraftRepository } from "../../domain/DraftRepository.ts";
 
 export class InMemoryDraftRepository implements DraftRepository {
-  private readonly map = new Map<string, { key: ConversationKey; text: string }>();
+  private readonly map = new Map<
+    string,
+    { key: ConversationKey; text: string }
+  >();
 
   async load(key: ConversationKey): Promise<string> {
     return this.map.get(conversationKeyString(key))?.text ?? "";
@@ -20,7 +26,9 @@ export class InMemoryDraftRepository implements DraftRepository {
     this.map.delete(conversationKeyString(key));
   }
 
-  async loadAll(): Promise<ReadonlyArray<{ key: ConversationKey; text: string }>> {
+  async loadAll(): Promise<
+    ReadonlyArray<{ key: ConversationKey; text: string }>
+  > {
     return Array.from(this.map.values());
   }
 }

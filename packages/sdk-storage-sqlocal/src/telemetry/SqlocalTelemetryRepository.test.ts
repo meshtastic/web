@@ -11,7 +11,9 @@ function reading(nodeNum: number, ms: number, battery = 80): TelemetryReading {
     nodeNum,
     time: new Date(ms),
     kind: "deviceMetrics",
-    value: create(Protobuf.Telemetry.DeviceMetricsSchema, { batteryLevel: battery }),
+    value: create(Protobuf.Telemetry.DeviceMetricsSchema, {
+      batteryLevel: battery,
+    }),
   };
 }
 
@@ -31,7 +33,9 @@ describe("SqlocalTelemetryRepository", () => {
 
     const out = await repo.loadRecent(100, 10);
     expect(out.map((r) => r.time.getTime())).toEqual([1000, 2000, 3000]);
-    expect((out[2]?.value as { batteryLevel?: number } | undefined)?.batteryLevel).toBe(70);
+    expect(
+      (out[2]?.value as { batteryLevel?: number } | undefined)?.batteryLevel,
+    ).toBe(70);
   });
 
   it("loadBefore returns rows older than the cursor in ascending order", async () => {
@@ -90,7 +94,9 @@ describe("SqlocalTelemetryRepository", () => {
       value,
     });
     const out = await repo.loadRecent(9, 1);
-    const v = out[0]?.value as { batteryLevel?: number; voltage?: number } | undefined;
+    const v = out[0]?.value as
+      | { batteryLevel?: number; voltage?: number }
+      | undefined;
     expect(v?.batteryLevel).toBe(73);
     expect(v?.voltage).toBeCloseTo(4.1);
   });

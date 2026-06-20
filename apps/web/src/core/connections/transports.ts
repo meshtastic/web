@@ -2,8 +2,14 @@ import type { Connection } from "@core/stores/deviceStore/types";
 import { testHttpReachable } from "@pages/Connections/utils";
 import { createLogger } from "@meshtastic/sdk";
 import { TransportHTTP } from "@meshtastic/transport-http";
-import { BluetoothConnectError, TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
-import { SerialConnectError, TransportWebSerial } from "@meshtastic/transport-web-serial";
+import {
+  BluetoothConnectError,
+  TransportWebBluetooth,
+} from "@meshtastic/transport-web-bluetooth";
+import {
+  SerialConnectError,
+  TransportWebSerial,
+} from "@meshtastic/transport-web-serial";
 import { Result } from "better-result";
 import type { AnyTransport } from "./sdkClient.ts";
 
@@ -46,7 +52,9 @@ export async function openTransport(
     default: {
       const _exhaustive: never = conn;
       void _exhaustive;
-      throw new Error(`Unknown transport type: ${(conn as { type?: string }).type}`);
+      throw new Error(
+        `Unknown transport type: ${(conn as { type?: string }).type}`,
+      );
     }
   }
 }
@@ -97,8 +105,12 @@ async function openBluetooth(
   if (!device && opts.allowPrompt) {
     device = await navigator.bluetooth.requestDevice({
       acceptAllDevices: !conn.gattServiceUUID,
-      optionalServices: conn.gattServiceUUID ? [conn.gattServiceUUID] : undefined,
-      filters: conn.gattServiceUUID ? [{ services: [conn.gattServiceUUID] }] : undefined,
+      optionalServices: conn.gattServiceUUID
+        ? [conn.gattServiceUUID]
+        : undefined,
+      filters: conn.gattServiceUUID
+        ? [{ services: [conn.gattServiceUUID] }]
+        : undefined,
     });
   }
   if (!device) {
@@ -155,7 +167,10 @@ async function openSerial(
               getInfo?: () => { usbVendorId?: number; usbProductId?: number };
             }
           ).getInfo?.() ?? {};
-        return info.usbVendorId === conn.usbVendorId && info.usbProductId === conn.usbProductId;
+        return (
+          info.usbVendorId === conn.usbVendorId &&
+          info.usbProductId === conn.usbProductId
+        );
       });
     }
   }
@@ -208,7 +223,9 @@ export async function probeConnection(
             getDevices?: () => Promise<BluetoothDevice[]>;
           }
         ).getDevices?.();
-        const hasPermission = known?.some((d: BluetoothDevice) => d.id === conn.deviceId);
+        const hasPermission = known?.some(
+          (d: BluetoothDevice) => d.id === conn.deviceId,
+        );
         // Permission granted ≠ device configured. The card surfaces "online"
         // (i.e. "available, click to connect") so the user explicitly opts
         // into the configure handshake. "configured" is reserved for when
@@ -233,7 +250,10 @@ export async function probeConnection(
                 getInfo?: () => { usbVendorId?: number; usbProductId?: number };
               }
             ).getInfo?.() ?? {};
-          return info.usbVendorId === conn.usbVendorId && info.usbProductId === conn.usbProductId;
+          return (
+            info.usbVendorId === conn.usbVendorId &&
+            info.usbProductId === conn.usbProductId
+          );
         });
         return hasPermission ? "online" : "disconnected";
       } catch {
@@ -246,7 +266,9 @@ export async function probeConnection(
 /**
  * Best-effort cleanup for a held-onto BT device or serial port. Safe on either.
  */
-export function closeTransport(handle: BluetoothDevice | SerialPort | undefined): void {
+export function closeTransport(
+  handle: BluetoothDevice | SerialPort | undefined,
+): void {
   if (!handle) return;
   const bt = handle as BluetoothDevice;
   if (bt.gatt?.connected) {

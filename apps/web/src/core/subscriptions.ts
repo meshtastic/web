@@ -20,7 +20,9 @@ export const subscribeAll = (device: Device, connection: MeshDevice) => {
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     switch (routingPacket.data.variant.case) {
       case "errorReason": {
-        if (routingPacket.data.variant.value === Protobuf.Mesh.Routing_Error.NONE) {
+        if (
+          routingPacket.data.variant.value === Protobuf.Mesh.Routing_Error.NONE
+        ) {
           return;
         }
         console.info(`Routing Error: ${routingPacket.data.variant.value}`);
@@ -80,10 +82,12 @@ export const subscribeAll = (device: Device, connection: MeshDevice) => {
   // onMeshPacket → lastHeard / snr per-node updates are handled by the SDK
   // NodesClient.
 
-  connection.events.onClientNotificationPacket.subscribe((clientNotificationPacket) => {
-    device.addClientNotification(clientNotificationPacket);
-    device.setDialogOpen("clientNotification", true);
-  });
+  connection.events.onClientNotificationPacket.subscribe(
+    (clientNotificationPacket) => {
+      device.addClientNotification(clientNotificationPacket);
+      device.setDialogOpen("clientNotification", true);
+    },
+  );
 
   connection.events.onNeighborInfoPacket.subscribe((neighborInfo) => {
     device.addNeighborInfo(neighborInfo.from, neighborInfo.data);

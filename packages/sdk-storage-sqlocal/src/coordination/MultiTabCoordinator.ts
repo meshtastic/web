@@ -12,7 +12,10 @@
  * so the chat slice in another tab can re-query after a write.
  */
 
-export type ChangeKind = "messages-changed" | "nodes-changed" | "telemetry-changed";
+export type ChangeKind =
+  | "messages-changed"
+  | "nodes-changed"
+  | "telemetry-changed";
 
 export interface ChangeEvent {
   kind: ChangeKind;
@@ -63,10 +66,14 @@ export class MultiTabCoordinator {
     if (typeof navigator === "undefined" || !navigator.locks) {
       return handler();
     }
-    const result = await navigator.locks.request(resource, options ?? {}, async (lock) => {
-      if (lock === null) return undefined;
-      return handler();
-    });
+    const result = await navigator.locks.request(
+      resource,
+      options ?? {},
+      async (lock) => {
+        if (lock === null) return undefined;
+        return handler();
+      },
+    );
     return result as T;
   }
 

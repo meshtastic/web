@@ -12,14 +12,20 @@ export interface MessageInputProps {
   maxBytes: number;
 }
 
-export const MessageInput = ({ onSend, conversation, maxBytes }: MessageInputProps) => {
+export const MessageInput = ({
+  onSend,
+  conversation,
+  maxBytes,
+}: MessageInputProps) => {
   const { text: persistedDraft, setText, clear } = useDraft(conversation);
   const { t } = useTranslation("messages");
 
   const calculateBytes = (value: string) => new Blob([value]).size;
 
   const [localDraft, setLocalDraft] = useState(persistedDraft);
-  const [messageBytes, setMessageBytes] = useState(() => calculateBytes(persistedDraft));
+  const [messageBytes, setMessageBytes] = useState(() =>
+    calculateBytes(persistedDraft),
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;

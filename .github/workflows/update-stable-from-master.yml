@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          fetch-tags: true  # IMPORTANT: we need tags to resolve the release commit
+          fetch-tags: true # IMPORTANT: we need tags to resolve the release commit
 
       - name: Configure Git author
         run: |

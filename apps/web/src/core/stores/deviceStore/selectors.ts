@@ -50,7 +50,9 @@ export function useSetActiveConnectionId() {
  * Hook to get a specific connection's status
  */
 export function useConnectionStatus(id: ConnectionId): string | undefined {
-  return useDeviceStore((s) => s.savedConnections.find((c) => c.id === id)?.status);
+  return useDeviceStore(
+    (s) => s.savedConnections.find((c) => c.id === id)?.status,
+  );
 }
 
 /**
@@ -63,7 +65,9 @@ export function useDeviceForConnection(id: ConnectionId): Device | undefined {
 /**
  * Hook to get a connection for a specific device
  */
-export function useConnectionForDevice(deviceId: number): Connection | undefined {
+export function useConnectionForDevice(
+  deviceId: number,
+): Connection | undefined {
   return useDeviceStore((s) => s.getConnectionForDevice(deviceId));
 }
 
@@ -72,7 +76,9 @@ export function useConnectionForDevice(deviceId: number): Connection | undefined
  */
 export function useIsConnecting(): boolean {
   return useDeviceStore((s) =>
-    s.savedConnections.some((c) => c.status === "connecting" || c.status === "configuring"),
+    s.savedConnections.some(
+      (c) => c.status === "connecting" || c.status === "configuring",
+    ),
   );
 }
 
@@ -80,7 +86,9 @@ export function useIsConnecting(): boolean {
  * Hook to get error message for a specific connection
  */
 export function useConnectionError(id: ConnectionId): string | null {
-  return useDeviceStore((s) => s.savedConnections.find((c) => c.id === id)?.error ?? null);
+  return useDeviceStore(
+    (s) => s.savedConnections.find((c) => c.id === id)?.error ?? null,
+  );
 }
 
 /**

@@ -3,7 +3,10 @@ import {
   type TelemetryValidation,
   TelemetryValidationSchema,
 } from "@app/validation/moduleConfig/telemetry.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -14,8 +17,11 @@ interface TelemetryModuleConfigProps {
 }
 
 const EMPTY_MODULES_SIGNAL = {
-  value: {} as { telemetry?: Protobuf.ModuleConfig.ModuleConfig_TelemetryConfig },
-  peek: () => ({}) as { telemetry?: Protobuf.ModuleConfig.ModuleConfig_TelemetryConfig },
+  value: {} as {
+    telemetry?: Protobuf.ModuleConfig.ModuleConfig_TelemetryConfig;
+  },
+  peek: () =>
+    ({}) as { telemetry?: Protobuf.ModuleConfig.ModuleConfig_TelemetryConfig },
   subscribe: () => () => {},
 } as const;
 
@@ -56,7 +62,12 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
   // device_telemetry_enabled is only writable on firmware ≥ v2.7.12. Hide
   // the toggle on older firmware so we don't push a value the device will
   // ignore.
-  const canToggleTelemetry = firmwareAtLeast(metadata.get(0)?.firmwareVersion, 2, 7, 12);
+  const canToggleTelemetry = firmwareAtLeast(
+    metadata.get(0)?.firmwareVersion,
+    2,
+    7,
+    12,
+  );
 
   const { t } = useTranslation("moduleConfig");
 
@@ -86,7 +97,9 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
                     type: "toggle" as const,
                     name: "deviceTelemetryEnabled" as const,
                     label: t("telemetry.deviceTelemetryEnabled.label"),
-                    description: t("telemetry.deviceTelemetryEnabled.description"),
+                    description: t(
+                      "telemetry.deviceTelemetryEnabled.description",
+                    ),
                   },
                 ]
               : []),
@@ -101,7 +114,9 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
               type: "toggle",
               name: "environmentMeasurementEnabled",
               label: t("telemetry.environmentMeasurementEnabled.label"),
-              description: t("telemetry.environmentMeasurementEnabled.description"),
+              description: t(
+                "telemetry.environmentMeasurementEnabled.description",
+              ),
             },
             {
               type: "number",
@@ -120,7 +135,9 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
               type: "toggle",
               name: "environmentDisplayFahrenheit",
               label: t("telemetry.environmentDisplayFahrenheit.label"),
-              description: t("telemetry.environmentDisplayFahrenheit.description"),
+              description: t(
+                "telemetry.environmentDisplayFahrenheit.description",
+              ),
             },
             {
               type: "toggle",

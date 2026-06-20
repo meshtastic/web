@@ -2,51 +2,25 @@
   "name": "@meshtastic/sdk-react",
   "version": "1.0.0",
   "description": "React hooks + provider for @meshtastic/sdk. Signal-backed reactive state exposed as idiomatic hooks.",
-  "exports": {
-    ".": "./mod.ts"
-  },
-  "type": "module",
-  "main": "./dist/mod.js",
-  "module": "./dist/mod.js",
-  "types": "./dist/mod.d.ts",
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git",
     "directory": "packages/sdk-react"
   },
-  "tsdown": {
-    "entry": "mod.ts",
-    "platform": "neutral",
-    "target": "esnext",
-    "dts": true,
-    "format": [
-      "esm"
-    ],
-    "splitting": false,
-    "sourcemap": false,
-    "minify": false,
-    "treeshake": true,
-    "report": false,
-    "clean": true
-  },
-  "jsrInclude": [
-    "mod.ts",
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
-  "jsrExclude": [
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "tests"
-  ],
   "files": [
     "package.json",
     "README.md",
     "LICENSE",
     "dist"
   ],
+  "type": "module",
+  "main": "./dist/mod.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/mod.d.ts",
+  "exports": {
+    ".": "./mod.ts"
+  },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
@@ -57,16 +31,42 @@
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
-    "better-result": "^1.0.0"
+    "better-result": "^2.9.2"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.0.0",
+    "@types/react": "^19.2.17",
+    "jsdom": "^29.1.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "peerDependencies": {
     "react": "^18 || ^19"
   },
-  "devDependencies": {
-    "@testing-library/react": "^16.0.0",
-    "@types/react": "^19.0.0",
-    "jsdom": "^25.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  }
+  "tsdown": {
+    "clean": true,
+    "dts": true,
+    "entry": "mod.ts",
+    "format": [
+      "esm"
+    ],
+    "minify": false,
+    "platform": "neutral",
+    "report": false,
+    "sourcemap": false,
+    "splitting": false,
+    "target": "esnext",
+    "treeshake": true
+  },
+  "jsrExclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "tests"
+  ],
+  "jsrInclude": [
+    "mod.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
 }

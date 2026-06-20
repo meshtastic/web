@@ -64,7 +64,11 @@ type Pair = {
   ba?: number; // SNR b->a
 };
 
-function arcSegment(aLngLat: LngLat, bLngLat: LngLat, curved: boolean): LngLat[] | undefined {
+function arcSegment(
+  aLngLat: LngLat,
+  bLngLat: LngLat,
+  curved: boolean,
+): LngLat[] | undefined {
   if (!curved && distanceMeters(aLngLat, bLngLat) < MIN_LEN) {
     // Straight line
     return [aLngLat, bLngLat];
@@ -176,7 +180,9 @@ function pushIfFeature(
   }
 }
 
-function generateNeighborLines(neighborInfos: NeighborInfos[]): FeatureCollection {
+function generateNeighborLines(
+  neighborInfos: NeighborInfos[],
+): FeatureCollection {
   // Collect positions for all referenced nodes, discard pairs with missing positions
   const idToLngLat = new Map<number, LngLat>();
   const ensure = (node?: Protobuf.Mesh.NodeInfo | NeighborPlus) => {
@@ -240,7 +246,12 @@ function generateNeighborLines(neighborInfos: NeighborInfos[]): FeatureCollectio
   return { type: "FeatureCollection", features };
 }
 
-export const SNRTooltip = ({ pos, snr, from, to }: Partial<SNRTooltipProps> = {}) => {
+export const SNRTooltip = ({
+  pos,
+  snr,
+  from,
+  to,
+}: Partial<SNRTooltipProps> = {}) => {
   const { t } = useTranslation();
 
   if (!pos) {
@@ -290,7 +301,9 @@ export const SNRLayer = ({
                 neighborInfo: {
                   ...neighborInfo,
                   neighbors: neighborInfo.neighbors.map((n) => {
-                    const node = filteredNodes.find((node) => node.num === n.nodeId);
+                    const node = filteredNodes.find(
+                      (node) => node.num === n.nodeId,
+                    );
                     return { ...n, num: node?.num, position: node?.position };
                   }),
                 },
@@ -312,7 +325,10 @@ export const SNRLayer = ({
           }))
       : [];
 
-  const featureCollection = generateNeighborLines([...remotePairs, ...directPairs]);
+  const featureCollection = generateNeighborLines([
+    ...remotePairs,
+    ...directPairs,
+  ]);
 
   return (
     <Source type="geojson" data={featureCollection}>

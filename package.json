@@ -1,23 +1,17 @@
 {
   "name": "@meshtastic/web",
   "version": "2.7.0-0",
-  "type": "module",
   "description": "Meshtastic web client monorepo",
+  "homepage": "https://meshtastic.org",
+  "bugs": {
+    "url": "https://github.com/meshtastic/web/issues"
+  },
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git"
   },
-  "bugs": {
-    "url": "https://github.com/meshtastic/web/issues"
-  },
-  "homepage": "https://meshtastic.org",
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "oxlint",
-      "oxfmt"
-    ]
-  },
+  "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "lint": "oxlint",
@@ -45,14 +39,20 @@
     "@meshtastic/core": "jsr:^2.6.6",
     "@meshtastic/sdk": "workspace:*",
     "@playwright/test": "^1.49.0",
-    "@types/node": "^24.3.1",
+    "@types/node": "^25.9.3",
     "husky": "^9.1.0",
-    "lint-staged": "^16.0.0",
-    "oxfmt": "^0.16.0",
-    "oxlint": "^1.69.0",
-    "tsdown": "^0.15.0",
-    "typescript": "^5.9.2",
-    "vitest": "^4.1.8"
+    "lint-staged": "^17.0.7",
+    "oxfmt": "^0.55.0",
+    "oxlint": "^1.70.0",
+    "tsdown": "^0.22.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "oxlint",
+      "oxfmt"
+    ]
   },
   "packageManager": "pnpm@11.5.2"
 }

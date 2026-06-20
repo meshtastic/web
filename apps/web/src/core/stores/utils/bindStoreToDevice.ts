@@ -29,7 +29,10 @@ export function bindStoreToDevice<S, DB>(
   function useBound<T>(selector: (db: DB) => T, opts?: DebounceOpts<T>): T;
 
   // Implementation:
-  function useBound<T>(selector?: (db: DB) => T, opts?: DebounceOpts<T>): DB | T {
+  function useBound<T>(
+    selector?: (db: DB) => T,
+    opts?: DebounceOpts<T>,
+  ): DB | T {
     const { deviceId } = useDeviceContext();
 
     // Build the store-level selector
@@ -53,7 +56,9 @@ export function bindStoreToDevice<S, DB>(
     const snapRef = useRef<Selected>(storeSelector(store.getState()));
     snapRef.current = storeSelector(store.getState()); // this ensures rerenders with a new selector (new deviceId) see the right initial value
 
-    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+      undefined,
+    );
 
     const subscribe = useMemo(() => {
       return (onChange: () => void) => {

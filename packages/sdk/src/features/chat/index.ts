@@ -1,5 +1,9 @@
 export { ChatClient } from "./ChatClient.ts";
-export type { ChatClientOptions, ChatDrafts, ChatUnread } from "./ChatClient.ts";
+export type {
+  ChatClientOptions,
+  ChatDrafts,
+  ChatUnread,
+} from "./ChatClient.ts";
 export type { DraftRepository } from "./domain/DraftRepository.ts";
 export { InMemoryDraftRepository } from "./infrastructure/repositories/InMemoryDraftRepository.ts";
 export type { Message } from "./domain/Message.ts";

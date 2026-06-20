@@ -17,7 +17,11 @@ export interface TelemetryRetentionPolicy {
  */
 export interface TelemetryRepository {
   loadRecent(nodeNum: number, limit: number): Promise<TelemetryReading[]>;
-  loadBefore(nodeNum: number, cursor: Date, limit: number): Promise<TelemetryReading[]>;
+  loadBefore(
+    nodeNum: number,
+    cursor: Date,
+    limit: number,
+  ): Promise<TelemetryReading[]>;
   append(reading: TelemetryReading): Promise<void>;
   appendBatch(readings: ReadonlyArray<TelemetryReading>): Promise<void>;
   prune(policy: TelemetryRetentionPolicy): Promise<void>;

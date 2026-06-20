@@ -9,12 +9,20 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import type { Logger } from "tslog";
-import { MeshClient, type MeshClientOptions } from "../core/client/MeshClient.ts";
+import {
+  MeshClient,
+  type MeshClientOptions,
+} from "../core/client/MeshClient.ts";
 import type { EventBus } from "../core/event-bus/EventBus.ts";
 import type { Queue } from "../core/queue/Queue.ts";
 import type { Transport } from "../core/transport/Transport.ts";
 import { DeviceStatusEnum } from "../core/transport/Transport.ts";
-import { ChannelNumber, type Destination, Emitter, type PacketMetadata } from "../core/types.ts";
+import {
+  ChannelNumber,
+  type Destination,
+  Emitter,
+  type PacketMetadata,
+} from "../core/types.ts";
 import type { Xmodem } from "../core/xmodem/Xmodem.ts";
 import { sendAdminMessage } from "../features/device/infrastructure/AdminMessageSender.ts";
 
@@ -36,7 +44,10 @@ export class MeshDevice {
   protected pendingSettingsChanges: boolean;
   private myNodeInfo: Protobuf.Mesh.MyNodeInfo;
 
-  constructor(transport: Transport, configIdOrOptions?: number | MeshDeviceOptions) {
+  constructor(
+    transport: Transport,
+    configIdOrOptions?: number | MeshDeviceOptions,
+  ) {
     const options: MeshClientOptions =
       typeof configIdOrOptions === "number"
         ? { transport, configId: configIdOrOptions }
@@ -56,8 +67,10 @@ export class MeshDevice {
 
     this.client.events.onDeviceStatus.subscribe((status) => {
       this.deviceStatus = status;
-      if (status === DeviceStatusEnum.DeviceConfigured) this.isConfigured = true;
-      else if (status === DeviceStatusEnum.DeviceConfiguring) this.isConfigured = false;
+      if (status === DeviceStatusEnum.DeviceConfigured)
+        this.isConfigured = true;
+      else if (status === DeviceStatusEnum.DeviceConfiguring)
+        this.isConfigured = false;
     });
     this.client.events.onMyNodeInfo.subscribe((info) => {
       this.myNodeInfo = info;
@@ -164,8 +177,13 @@ export class MeshDevice {
     return sendAdminMessage(this.client, { case: "setConfig", value: config });
   }
 
-  public setModuleConfig(config: Protobuf.ModuleConfig.ModuleConfig): Promise<number> {
-    return sendAdminMessage(this.client, { case: "setModuleConfig", value: config });
+  public setModuleConfig(
+    config: Protobuf.ModuleConfig.ModuleConfig,
+  ): Promise<number> {
+    return sendAdminMessage(this.client, {
+      case: "setModuleConfig",
+      value: config,
+    });
   }
 
   public setCannedMessages(
@@ -182,11 +200,17 @@ export class MeshDevice {
   }
 
   public setChannel(channel: Protobuf.Channel.Channel): Promise<number> {
-    return sendAdminMessage(this.client, { case: "setChannel", value: channel });
+    return sendAdminMessage(this.client, {
+      case: "setChannel",
+      value: channel,
+    });
   }
 
   public enterDfuMode(): Promise<number> {
-    return sendAdminMessage(this.client, { case: "enterDfuModeRequest", value: true });
+    return sendAdminMessage(this.client, {
+      case: "enterDfuModeRequest",
+      value: true,
+    });
   }
 
   public setPosition(position: Protobuf.Mesh.Position): Promise<number> {
@@ -197,7 +221,10 @@ export class MeshDevice {
     );
   }
 
-  public setFixedPosition(latitude: number, longitude: number): Promise<number> {
+  public setFixedPosition(
+    latitude: number,
+    longitude: number,
+  ): Promise<number> {
     const position = create(Protobuf.Mesh.PositionSchema, {
       latitudeI: Math.floor(latitude / 1e-7),
       longitudeI: Math.floor(longitude / 1e-7),
@@ -224,19 +251,35 @@ export class MeshDevice {
   }
 
   public getChannel(index: number): Promise<number> {
-    return sendAdminMessage(this.client, { case: "getChannelRequest", value: index + 1 });
+    return sendAdminMessage(this.client, {
+      case: "getChannelRequest",
+      value: index + 1,
+    });
   }
 
-  public getConfig(type: Protobuf.Admin.AdminMessage_ConfigType): Promise<number> {
-    return sendAdminMessage(this.client, { case: "getConfigRequest", value: type });
+  public getConfig(
+    type: Protobuf.Admin.AdminMessage_ConfigType,
+  ): Promise<number> {
+    return sendAdminMessage(this.client, {
+      case: "getConfigRequest",
+      value: type,
+    });
   }
 
-  public getModuleConfig(type: Protobuf.Admin.AdminMessage_ModuleConfigType): Promise<number> {
-    return sendAdminMessage(this.client, { case: "getModuleConfigRequest", value: type });
+  public getModuleConfig(
+    type: Protobuf.Admin.AdminMessage_ModuleConfigType,
+  ): Promise<number> {
+    return sendAdminMessage(this.client, {
+      case: "getModuleConfigRequest",
+      value: type,
+    });
   }
 
   public getOwner(): Promise<number> {
-    return sendAdminMessage(this.client, { case: "getOwnerRequest", value: true });
+    return sendAdminMessage(this.client, {
+      case: "getOwnerRequest",
+      value: true,
+    });
   }
 
   public getMetadata(nodeNum: number): Promise<number> {
@@ -253,12 +296,18 @@ export class MeshDevice {
       index,
       role: Protobuf.Channel.Channel_Role.DISABLED,
     });
-    return sendAdminMessage(this.client, { case: "setChannel", value: channel });
+    return sendAdminMessage(this.client, {
+      case: "setChannel",
+      value: channel,
+    });
   }
 
   public commitEditSettings(): Promise<number> {
     this.events.onPendingSettingsChange.dispatch(false);
-    return sendAdminMessage(this.client, { case: "commitEditSettings", value: true });
+    return sendAdminMessage(this.client, {
+      case: "commitEditSettings",
+      value: true,
+    });
   }
 
   public resetNodes(): Promise<number> {
@@ -266,27 +315,45 @@ export class MeshDevice {
   }
 
   public removeNodeByNum(nodeNum: number): Promise<number> {
-    return sendAdminMessage(this.client, { case: "removeByNodenum", value: nodeNum });
+    return sendAdminMessage(this.client, {
+      case: "removeByNodenum",
+      value: nodeNum,
+    });
   }
 
   public shutdown(time: number): Promise<number> {
-    return sendAdminMessage(this.client, { case: "shutdownSeconds", value: time });
+    return sendAdminMessage(this.client, {
+      case: "shutdownSeconds",
+      value: time,
+    });
   }
 
   public reboot(time: number): Promise<number> {
-    return sendAdminMessage(this.client, { case: "rebootSeconds", value: time });
+    return sendAdminMessage(this.client, {
+      case: "rebootSeconds",
+      value: time,
+    });
   }
 
   public rebootOta(time: number): Promise<number> {
-    return sendAdminMessage(this.client, { case: "rebootOtaSeconds", value: time });
+    return sendAdminMessage(this.client, {
+      case: "rebootOtaSeconds",
+      value: time,
+    });
   }
 
   public factoryResetDevice(): Promise<number> {
-    return sendAdminMessage(this.client, { case: "factoryResetDevice", value: 1 });
+    return sendAdminMessage(this.client, {
+      case: "factoryResetDevice",
+      value: 1,
+    });
   }
 
   public factoryResetConfig(): Promise<number> {
-    return sendAdminMessage(this.client, { case: "factoryResetConfig", value: 1 });
+    return sendAdminMessage(this.client, {
+      case: "factoryResetConfig",
+      value: 1,
+    });
   }
 
   public traceRoute(destination: number): Promise<number> {
@@ -318,7 +385,10 @@ export class MeshDevice {
   }
 
   /** Exposes an optimistic packet echo (was called by sendPacket echoResponse). */
-  public echoLocalPacket<T>(metadata: Omit<PacketMetadata<T>, "data">, data: T): void {
+  public echoLocalPacket<T>(
+    metadata: Omit<PacketMetadata<T>, "data">,
+    data: T,
+  ): void {
     void metadata;
     void data;
   }

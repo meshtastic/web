@@ -24,7 +24,10 @@ export class SqlocalNodesRepository implements NodesRepository {
   }
 
   async loadAll(): Promise<Node[]> {
-    const rows = await this.db.select().from(nodes).where(eq(nodes.deviceId, this.deviceId));
+    const rows = await this.db
+      .select()
+      .from(nodes)
+      .where(eq(nodes.deviceId, this.deviceId));
     return rows.map(rowToNode);
   }
 
@@ -96,7 +99,10 @@ function rowToNode(row: NodeRow): Node {
       ? fromBinary(Protobuf.Mesh.PositionSchema, base64Decode(row.positionJson))
       : undefined,
     deviceMetrics: row.metricsJson
-      ? fromBinary(Protobuf.Telemetry.DeviceMetricsSchema, base64Decode(row.metricsJson))
+      ? fromBinary(
+          Protobuf.Telemetry.DeviceMetricsSchema,
+          base64Decode(row.metricsJson),
+        )
       : undefined,
     lastHeard: row.lastHeard ?? undefined,
     snr: row.snr ?? undefined,
@@ -113,12 +119,16 @@ function nodeToRow(deviceId: number, node: Node): NodeRow {
     snr: node.snr ?? null,
     isFavorite: node.isFavorite,
     isIgnored: node.isIgnored,
-    userJson: node.user ? base64Encode(toBinary(Protobuf.Mesh.UserSchema, node.user)) : null,
+    userJson: node.user
+      ? base64Encode(toBinary(Protobuf.Mesh.UserSchema, node.user))
+      : null,
     positionJson: node.position
       ? base64Encode(toBinary(Protobuf.Mesh.PositionSchema, node.position))
       : null,
     metricsJson: node.deviceMetrics
-      ? base64Encode(toBinary(Protobuf.Telemetry.DeviceMetricsSchema, node.deviceMetrics))
+      ? base64Encode(
+          toBinary(Protobuf.Telemetry.DeviceMetricsSchema, node.deviceMetrics),
+        )
       : null,
   };
 }

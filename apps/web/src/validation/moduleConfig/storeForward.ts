@@ -9,4 +9,6 @@ export const StoreForwardValidationSchema = z.object({
   isServer: z.boolean(),
 });
 
-export type StoreForwardValidation = z.infer<typeof StoreForwardValidationSchema>;
+export type StoreForwardValidation = z.infer<
+  typeof StoreForwardValidationSchema
+>;

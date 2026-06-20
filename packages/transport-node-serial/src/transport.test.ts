@@ -1,6 +1,10 @@
 import { Duplex } from "node:stream";
 import * as MeshSDK from "@meshtastic/sdk";
-import { DeviceStatusEnum, type DeviceOutput, toDeviceStream } from "@meshtastic/sdk";
+import {
+  DeviceStatusEnum,
+  type DeviceOutput,
+  toDeviceStream,
+} from "@meshtastic/sdk";
 import type { SerialPort } from "serialport";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract.ts";
@@ -21,8 +25,16 @@ class FakeSerialPort extends Duplex {
 
   _read() {}
 
-  _write(chunk: Buffer, _encoding: BufferEncoding, callback: (error?: Error | null) => void) {
-    this.lastWritten = new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+  _write(
+    chunk: Buffer,
+    _encoding: BufferEncoding,
+    callback: (error?: Error | null) => void,
+  ) {
+    this.lastWritten = new Uint8Array(
+      chunk.buffer,
+      chunk.byteOffset,
+      chunk.byteLength,
+    );
     callback();
   }
 
@@ -64,10 +76,16 @@ function stubCoreTransforms() {
   const transform = toDeviceStream;
   // biome-ignore lint/suspicious/noExplicitAny: vi.spyOn overloads don't match re-exported module bindings
   const sdk = MeshSDK as any;
-  vi.spyOn(sdk, "toDeviceStream", "get").mockReturnValue(toDevice as unknown as typeof transform);
+  vi.spyOn(sdk, "toDeviceStream", "get").mockReturnValue(
+    toDevice as unknown as typeof transform,
+  );
 
   vi.spyOn(sdk, "fromDeviceStream").mockImplementation(
-    () => fromDeviceFactory() as unknown as TransformStream<Uint8Array, DeviceOutput>,
+    () =>
+      fromDeviceFactory() as unknown as TransformStream<
+        Uint8Array,
+        DeviceOutput
+      >,
   );
 
   return {
@@ -94,24 +112,30 @@ describe("TransportNodeSerial (contract)", () => {
     },
     create: async () => {
       const fakePort = new FakeSerialPort();
-      const transport = new TransportNodeSerial(fakePort as unknown as SerialPort);
+      const transport = new TransportNodeSerial(
+        fakePort as unknown as SerialPort,
+      );
       await Promise.resolve();
-      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort = fakePort;
+      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort =
+        fakePort;
       return transport;
     },
     pushIncoming: async (bytes) => {
-      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort.pushIncoming(bytes);
+      (
+        globalThis as unknown as { __fakePort: FakeSerialPort }
+      ).__fakePort.pushIncoming(bytes);
       await Promise.resolve();
     },
     assertLastWritten: (bytes) => {
-      const port = (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort;
+      const port = (globalThis as unknown as { __fakePort: FakeSerialPort })
+        .__fakePort;
       expect(port.lastWritten).toBeDefined();
       expect(port.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort.emitErrorOnce(
-        "test-disconnect",
-      );
+      (
+        globalThis as unknown as { __fakePort: FakeSerialPort }
+      ).__fakePort.emitErrorOnce("test-disconnect");
       await Promise.resolve();
     },
   });
@@ -130,7 +154,9 @@ describe("TransportNodeSerial (extras)", () => {
 
   it("emits DeviceDisconnected with reason 'port-closed' on close event", async () => {
     const fakePort = new FakeSerialPort();
-    const transport = new TransportNodeSerial(fakePort as unknown as SerialPort);
+    const transport = new TransportNodeSerial(
+      fakePort as unknown as SerialPort,
+    );
     const reader = transport.fromDevice.getReader();
 
     await Promise.resolve();

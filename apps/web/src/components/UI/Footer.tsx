@@ -21,12 +21,19 @@ const Footer = ({ className, ...props }: FooterProps) => {
 
   return (
     <footer
-      className={cn("flex mt-auto justify-center py-2 px-4 text-sm lg:text-md", className)}
+      className={cn(
+        "flex mt-auto justify-center py-2 px-4 text-sm lg:text-md",
+        className,
+      )}
       {...props}
     >
       <div className="px-2">
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">{version}</span>
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40 mx-2">-</span>
+        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
+          {version}
+        </span>
+        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40 mx-2">
+          -
+        </span>
         <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
           {`#${commitHash}`}
         </span>

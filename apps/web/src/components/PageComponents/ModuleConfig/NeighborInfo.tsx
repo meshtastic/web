@@ -3,7 +3,10 @@ import {
   type NeighborInfoValidation,
   NeighborInfoValidationSchema,
 } from "@app/validation/moduleConfig/neighborInfo.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -14,8 +17,13 @@ interface NeighborInfoModuleConfigProps {
 }
 
 const EMPTY_MODULES_SIGNAL = {
-  value: {} as { neighborInfo?: Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig },
-  peek: () => ({}) as { neighborInfo?: Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig },
+  value: {} as {
+    neighborInfo?: Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig;
+  },
+  peek: () =>
+    ({}) as {
+      neighborInfo?: Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig;
+    },
   subscribe: () => () => {},
 } as const;
 

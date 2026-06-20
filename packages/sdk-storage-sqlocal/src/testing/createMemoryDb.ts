@@ -17,8 +17,13 @@ export async function createMemoryDb(): Promise<SqlocalDb> {
     for (const statement of migration.sql) {
       sqlite.run(statement);
     }
-    sqlite.run("INSERT OR IGNORE INTO _schema (version) VALUES (?)", [migration.version]);
+    sqlite.run("INSERT OR IGNORE INTO _schema (version) VALUES (?)", [
+      migration.version,
+    ]);
   }
 
-  return drizzle(sqlite, { schema, casing: "snake_case" }) as unknown as SqlocalDb;
+  return drizzle(sqlite, {
+    schema,
+    casing: "snake_case",
+  }) as unknown as SqlocalDb;
 }

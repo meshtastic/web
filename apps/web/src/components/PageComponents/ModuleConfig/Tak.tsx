@@ -1,6 +1,12 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import { type TakValidation, TakValidationSchema } from "@app/validation/moduleConfig/tak.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  type TakValidation,
+  TakValidationSchema,
+} from "@app/validation/moduleConfig/tak.ts";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -13,7 +19,8 @@ interface TakModuleConfigProps {
 export const Tak = ({ onFormInit }: TakModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "tak" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: TakValidation) => {

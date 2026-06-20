@@ -1,6 +1,9 @@
 export { TelemetryClient } from "./TelemetryClient.ts";
 export type { TelemetryClientOptions } from "./TelemetryClient.ts";
-export type { TelemetryKind, TelemetryReading } from "./domain/TelemetryReading.ts";
+export type {
+  TelemetryKind,
+  TelemetryReading,
+} from "./domain/TelemetryReading.ts";
 export type {
   TelemetryRepository,
   TelemetryRetentionPolicy,

@@ -22,7 +22,10 @@ function seedMessage(id: number, ms: number, text: string): Message {
 describe("ChatClient persistence", () => {
   it("hydrates messages from the repository on first subscription", async () => {
     const repository = new InMemoryMessageRepository();
-    await repository.appendBatch([seedMessage(1, 1000, "first"), seedMessage(2, 2000, "second")]);
+    await repository.appendBatch([
+      seedMessage(1, 1000, "first"),
+      seedMessage(2, 2000, "second"),
+    ]);
 
     const { transport } = createFakeTransport();
     const client = new MeshClient({
@@ -60,7 +63,11 @@ describe("ChatClient persistence", () => {
       new Date(3000),
       50,
     );
-    expect(sig.value.map((m) => m.text)).toEqual(["oldest", "middle", "newest"]);
+    expect(sig.value.map((m) => m.text)).toEqual([
+      "oldest",
+      "middle",
+      "newest",
+    ]);
   });
 
   it("persists inbound messages through the repository", async () => {

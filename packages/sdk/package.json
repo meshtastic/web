@@ -2,6 +2,22 @@
   "name": "@meshtastic/sdk",
   "version": "1.0.0",
   "description": "Domain-driven SDK for Meshtastic devices. Feature slices (device/chat/nodes/channels/config/telemetry/position/traceroute/files) with signals-backed reactive state. Replaces @meshtastic/core.",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meshtastic/web.git",
+    "directory": "packages/sdk"
+  },
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/mod.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/mod.d.ts",
   "exports": {
     ".": {
       "types": "./dist/mod.d.ts",
@@ -20,37 +36,6 @@
       "default": "./src/core/testing/index.ts"
     }
   },
-  "type": "module",
-  "main": "./dist/mod.js",
-  "module": "./dist/mod.js",
-  "types": "./dist/mod.d.ts",
-  "license": "GPL-3.0-only",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/meshtastic/web.git",
-    "directory": "packages/sdk"
-  },
-  "tsdown": {
-    "entry": {
-      "mod": "mod.ts",
-      "transport": "src/core/transport/index.ts",
-      "protobuf": "src/core/protobuf/index.ts",
-      "testing": "src/core/testing/index.ts"
-    },
-    "platform": "browser",
-    "target": "esnext",
-    "dts": true,
-    "format": ["esm"],
-    "splitting": false,
-    "sourcemap": false,
-    "minify": false,
-    "treeshake": true,
-    "report": false,
-    "clean": true
-  },
-  "jsrInclude": ["mod.ts", "src", "README.md", "LICENSE"],
-  "jsrExclude": ["src/**/*.test.ts", "tests"],
-  "files": ["package.json", "README.md", "LICENSE", "dist"],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
@@ -65,9 +50,39 @@
     "@bufbuild/protobuf": "^2.9.0",
     "@meshtastic/protobufs": "jsr:^2.7.18",
     "@preact/signals-core": "^1.8.0",
-    "better-result": "^1.0.0",
+    "better-result": "^2.9.2",
     "crc": "npm:crc@^4.3.2",
     "ste-simple-events": "^3.0.11",
     "tslog": "^4.9.3"
-  }
+  },
+  "tsdown": {
+    "clean": true,
+    "dts": true,
+    "entry": {
+      "mod": "mod.ts",
+      "protobuf": "src/core/protobuf/index.ts",
+      "testing": "src/core/testing/index.ts",
+      "transport": "src/core/transport/index.ts"
+    },
+    "format": [
+      "esm"
+    ],
+    "minify": false,
+    "platform": "browser",
+    "report": false,
+    "sourcemap": false,
+    "splitting": false,
+    "target": "esnext",
+    "treeshake": true
+  },
+  "jsrExclude": [
+    "src/**/*.test.ts",
+    "tests"
+  ],
+  "jsrInclude": [
+    "mod.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
 }

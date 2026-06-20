@@ -108,7 +108,9 @@ describe("DeviceStore – metadata, dialogs, unread counts, message draft", () =
     });
     device.addMetadata(123, metadata);
 
-    expect(useDeviceStore.getState().devices.get(1)?.metadata.get(123)).toEqual(metadata);
+    expect(useDeviceStore.getState().devices.get(1)?.metadata.get(123)).toEqual(
+      metadata,
+    );
   });
 
   it("dialogs set/get work and throw if device missing", async () => {
@@ -131,7 +133,9 @@ describe("DeviceStore – metadata, dialogs, unread counts, message draft", () =
     const device = useDeviceStore.getState().addDevice(3);
     device.setMessageDraft("hello");
 
-    expect(useDeviceStore.getState().devices.get(3)?.messageDraft).toBe("hello");
+    expect(useDeviceStore.getState().devices.get(3)?.messageDraft).toBe(
+      "hello",
+    );
   });
 });
 
@@ -151,7 +155,10 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
       device.addTraceRoute(makeRoute(7, i));
     }
 
-    const routesFor7 = useDeviceStore.getState().devices.get(100)?.traceroutes.get(7)!;
+    const routesFor7 = useDeviceStore
+      .getState()
+      .devices.get(100)
+      ?.traceroutes.get(7)!;
     expect(routesFor7.length).toBe(100);
     expect(routesFor7[0]?.rxTime).toBe(1); // first (0) evicted
 
@@ -160,7 +167,9 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
       device.addTraceRoute(makeRoute(1000 + from));
     }
 
-    const keys = Array.from(useDeviceStore.getState().devices.get(100)!.traceroutes.keys());
+    const keys = Array.from(
+      useDeviceStore.getState().devices.get(100)!.traceroutes.keys(),
+    );
     expect(keys.length).toBe(100);
   });
 
@@ -182,23 +191,37 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
       new Date(),
     ); // expired
     oldDevice.addWaypoint(makeWaypoint(2, 0), 0, 0, new Date()); // no expire
-    oldDevice.addWaypoint(makeWaypoint(3, Date.parse("2026-01-01T00:00:00Z")), 0, 0, new Date()); // ok
+    oldDevice.addWaypoint(
+      makeWaypoint(3, Date.parse("2026-01-01T00:00:00Z")),
+      0,
+      0,
+      new Date(),
+    ); // ok
     oldDevice.addTraceRoute(makeRoute(55));
     oldDevice.addTraceRoute(makeRoute(56));
 
     // Upsert waypoint by id
-    oldDevice.addWaypoint(makeWaypoint(2, Date.parse("2027-01-01T00:00:00Z")), 0, 0, new Date());
+    oldDevice.addWaypoint(
+      makeWaypoint(2, Date.parse("2027-01-01T00:00:00Z")),
+      0,
+      0,
+      new Date(),
+    );
 
     const wps = useDeviceStore.getState().devices.get(1)!.waypoints;
     expect(wps.length).toBe(2);
-    expect(wps.find((w) => w.id === 2)?.expire).toBe(Date.parse("2027-01-01T00:00:00Z"));
+    expect(wps.find((w) => w.id === 2)?.expire).toBe(
+      Date.parse("2027-01-01T00:00:00Z"),
+    );
 
     // Retention: push 102 total waypoints -> capped at 100. Oldest evicted
     for (let i = 3; i <= 102; i++) {
       oldDevice.addWaypoint(makeWaypoint(i), 0, 0, new Date());
     }
 
-    expect(useDeviceStore.getState().devices.get(1)!.waypoints.length).toBe(100);
+    expect(useDeviceStore.getState().devices.get(1)!.waypoints.length).toBe(
+      100,
+    );
 
     // Remove waypoint
     oldDevice.removeWaypoint(102, false);
@@ -265,10 +288,14 @@ describe("DeviceStore – persistence partialize & rehydrate", () => {
 
       // methods should work
       device.addWaypoint(makeWaypoint(2), 0, 0, new Date());
-      expect(useDeviceStore.getState().devices.get(501)!.waypoints.length).toBeGreaterThan(0);
+      expect(
+        useDeviceStore.getState().devices.get(501)!.waypoints.length,
+      ).toBeGreaterThan(0);
 
       // traceroutes survived
-      expect(useDeviceStore.getState().devices.get(501)!.traceroutes.size).toBeGreaterThan(0);
+      expect(
+        useDeviceStore.getState().devices.get(501)!.traceroutes.size,
+      ).toBeGreaterThan(0);
     }
   });
 

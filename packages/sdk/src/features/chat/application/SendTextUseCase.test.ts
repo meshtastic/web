@@ -1,6 +1,10 @@
 import { Result } from "better-result";
 import { describe, expect, it, vi } from "vitest";
-import { EmptyMessageError, MessageTooLongError, sendText } from "./SendTextUseCase.ts";
+import {
+  EmptyMessageError,
+  MessageTooLongError,
+  sendText,
+} from "./SendTextUseCase.ts";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
 
 function makeClient(sendPacket = vi.fn().mockResolvedValue(123)) {

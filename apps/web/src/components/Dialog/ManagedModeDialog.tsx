@@ -18,7 +18,11 @@ export interface ManagedModeDialogProps {
   onSubmit: () => void;
 }
 
-export const ManagedModeDialog = ({ open, onOpenChange, onSubmit }: ManagedModeDialogProps) => {
+export const ManagedModeDialog = ({
+  open,
+  onOpenChange,
+  onSubmit,
+}: ManagedModeDialogProps) => {
   const { t } = useTranslation("dialog");
   const [confirmState, setConfirmState] = useState(false);
 
@@ -43,7 +47,9 @@ export const ManagedModeDialog = ({ open, onOpenChange, onSubmit }: ManagedModeD
             onChange={() => setConfirmState(!confirmState)}
             name="confirmUnderstanding"
           >
-            <p className="dark:text-white pt-1">{t("managedMode.confirmUnderstanding")}</p>
+            <p className="dark:text-white pt-1">
+              {t("managedMode.confirmUnderstanding")}
+            </p>
           </Checkbox>
         </div>
         <DialogFooter>

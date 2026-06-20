@@ -1,4 +1,9 @@
-import type { ConversationKey, Message, SendTextError, SendTextInput } from "@meshtastic/sdk";
+import type {
+  ConversationKey,
+  Message,
+  SendTextError,
+  SendTextInput,
+} from "@meshtastic/sdk";
 import type { ResultType } from "better-result";
 import { useCallback, useMemo } from "react";
 import { useClient } from "../adapters/useClient.ts";
@@ -20,7 +25,10 @@ export function useDirectChat(peer: number): UseDirectChatResult {
   const client = useClient();
   const sig = useMemo(() => client.chat.direct(peer), [client, peer]);
   const messages = useSignal(sig);
-  const send = useCallback((input: SendTextInput) => client.chat.send(input), [client]);
+  const send = useCallback(
+    (input: SendTextInput) => client.chat.send(input),
+    [client],
+  );
   const loadOlder = useCallback(
     (before: Date, limit?: number) => {
       const conv: ConversationKey = { kind: "direct", peer };

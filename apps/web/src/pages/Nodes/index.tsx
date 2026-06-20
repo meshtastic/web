@@ -1,9 +1,16 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
-import { type FilterState, useFilterNode } from "@components/generic/Filter/useFilterNode.ts";
+import {
+  type FilterState,
+  useFilterNode,
+} from "@components/generic/Filter/useFilterNode.ts";
 import { Mono } from "@components/generic/Mono.tsx";
-import { type DataRow, type Heading, Table } from "@components/generic/Table/index.tsx";
+import {
+  type DataRow,
+  type Heading,
+  Table,
+} from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -14,9 +21,16 @@ import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice } from "@core/stores";
 import { Protobuf, type Types } from "@meshtastic/sdk";
 import { useNodeErrors } from "@meshtastic/sdk-react";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { type JSX, useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
+import {
+  type JSX,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { base16 } from "rfc4648";
 
@@ -40,7 +54,9 @@ const NodesPage = (): JSX.Element => {
     Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
   >();
 
-  const [filterState, setFilterState] = useState<FilterState>(() => defaultFilterValues);
+  const [filterState, setFilterState] = useState<FilterState>(
+    () => defaultFilterValues,
+  );
   const deferredFilterState = useDeferredValue(filterState);
 
   // stable predicate so the selector identity doesn’t thrash
@@ -52,10 +68,16 @@ const NodesPage = (): JSX.Element => {
   // Nodes come from the SDK NodesClient (signals + sqlocal-backed history).
   // PKI / node-error tracking lives on the SDK NodesClient too.
   const allSdkNodes = useNodesAsProto();
-  const filteredNodes = useMemo(() => allSdkNodes.filter(predicate), [allSdkNodes, predicate]);
+  const filteredNodes = useMemo(
+    () => allSdkNodes.filter(predicate),
+    [allSdkNodes, predicate],
+  );
   const errors = useNodeErrors();
   const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
-  const hasNodeError = useCallback((num: number) => errorSet.has(num), [errorSet]);
+  const hasNodeError = useCallback(
+    (num: number) => errorSet.has(num),
+    [errorSet],
+  );
   const handleTraceroute = useCallback(
     (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
       setSelectedTraceroute(traceroute);
@@ -119,7 +141,9 @@ const NodesPage = (): JSX.Element => {
         .match(/.{1,2}/g)
         ?.join(":") ?? t("unknown.shortName");
 
-    const shortName = node.user?.shortName ?? numberToHexUnpadded(node.num).slice(-4).toUpperCase();
+    const shortName =
+      node.user?.shortName ??
+      numberToHexUnpadded(node.num).slice(-4).toUpperCase();
     const longName =
       node.user?.longName ??
       t("fallbackName", {
@@ -131,7 +155,11 @@ const NodesPage = (): JSX.Element => {
     const snr = node.snr ?? 0;
     const snrQuality = Math.min(Math.max(Math.round((snr + 10) * 5), 0), 100);
     const snrTone =
-      snrQuality >= 67 ? "text-green-500" : snrQuality >= 34 ? "text-yellow-500" : "text-red-500";
+      snrQuality >= 67
+        ? "text-green-500"
+        : snrQuality >= 34
+          ? "text-yellow-500"
+          : "text-red-500";
 
     return {
       id: node.num,
@@ -170,10 +198,14 @@ const NodesPage = (): JSX.Element => {
                 ? node?.viaMqtt === false && node.hopsAway === 0
                   ? t("nodesTable.connectionStatus.direct")
                   : `${node.hopsAway?.toString()} ${
-                      (node.hopsAway ?? 0) > 1 ? t("unit.hop.plural") : t("unit.hop.one")
+                      (node.hopsAway ?? 0) > 1
+                        ? t("unit.hop.plural")
+                        : t("unit.hop.one")
                     } ${t("nodesTable.connectionStatus.away")}`
                 : t("unknown.longName")}
-              {node?.viaMqtt === true ? t("nodesTable.connectionStatus.viaMqtt") : ""}
+              {node?.viaMqtt === true
+                ? t("nodesTable.connectionStatus.viaMqtt")
+                : ""}
             </Mono>
           ),
           sortValue: node.hopsAway ?? Number.MAX_SAFE_INTEGER,
@@ -184,7 +216,10 @@ const NodesPage = (): JSX.Element => {
               {node.lastHeard === 0 ? (
                 t("unknown.longName")
               ) : (
-                <TimeAgo timestamp={node.lastHeard * 1000} locale={current?.code} />
+                <TimeAgo
+                  timestamp={node.lastHeard * 1000}
+                  locale={current?.code}
+                />
               )}
             </Mono>
           ),
@@ -208,14 +243,19 @@ const NodesPage = (): JSX.Element => {
               <span className={snrTone}>
                 {Number(snr.toFixed(1))} {t("unit.db")}
               </span>
-              <span className="text-gray-500 dark:text-gray-400/70">{snrQuality}%</span>
+              <span className="text-gray-500 dark:text-gray-400/70">
+                {snrQuality}%
+              </span>
             </Mono>
           ),
           sortValue: node.snr,
         },
         {
-          content: <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>,
-          sortValue: Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ?? "UNSET",
+          content: (
+            <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>
+          ),
+          sortValue:
+            Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ?? "UNSET",
         },
         {
           content: <Mono>{macAddress}</Mono>,

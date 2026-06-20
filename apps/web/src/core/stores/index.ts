@@ -42,6 +42,8 @@ export { clear as clearAllStores } from "idb-keyval";
 export const useDevice = (): Device => {
   const { deviceId } = useDeviceContext();
 
-  const device = useDeviceStore((s) => s.getDevice(deviceId) ?? s.addDevice(deviceId));
+  const device = useDeviceStore(
+    (s) => s.getDevice(deviceId) ?? s.addDevice(deviceId),
+  );
   return device;
 };

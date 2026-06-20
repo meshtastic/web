@@ -3,12 +3,5 @@
   "useTabs": false,
   "tabWidth": 2,
   "printWidth": 80,
-  "ignorePatterns": [
-    "node_modules",
-    "dist",
-    "protobufs",
-    "**/locales/*-*/*.json",
-    "**/packages/ui/",
-    "*.md"
-  ]
+  "ignorePatterns": ["*.md"]
 }

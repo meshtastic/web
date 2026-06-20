@@ -7,6 +7,9 @@ export type {
   RadioConfig,
   RadioConfigSection,
 } from "./features/config/index.ts";
-export { getConfigEditor, meshDeviceToPort } from "./adapters/fromMeshDevice.ts";
+export {
+  getConfigEditor,
+  meshDeviceToPort,
+} from "./adapters/fromMeshDevice.ts";
 export { useConfigEditor } from "./react/useConfigEditor.ts";
 export { useSignal } from "./react/useSignal.ts";

@@ -12,6 +12,13 @@ export interface MeshRegistryProviderProps {
  * more than one connected device at a time. For single-client apps, prefer
  * `<MeshProvider client={...}>`.
  */
-export function MeshRegistryProvider({ registry, children }: MeshRegistryProviderProps) {
-  return <MeshRegistryContext.Provider value={registry}>{children}</MeshRegistryContext.Provider>;
+export function MeshRegistryProvider({
+  registry,
+  children,
+}: MeshRegistryProviderProps) {
+  return (
+    <MeshRegistryContext.Provider value={registry}>
+      {children}
+    </MeshRegistryContext.Provider>
+  );
 }

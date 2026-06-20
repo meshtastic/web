@@ -1,7 +1,7 @@
 allowBuilds:
-  '@serialport/bindings-cpp': false
-  '@tailwindcss/oxide': false
-  'core-js': false
+  "@serialport/bindings-cpp": false
+  "@tailwindcss/oxide": false
+  "core-js": false
   esbuild: false
 minimumReleaseAge: 2880 # package dependency library must be at least 2 days old
 packages:

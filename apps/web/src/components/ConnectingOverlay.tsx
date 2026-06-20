@@ -64,12 +64,21 @@ export const ConnectingOverlay = (): ReactElement | null => {
   const counters =
     progress.phase === "configuring" || progress.phase === "configured"
       ? progress.received
-      : { config: 0, modules: 0, channels: 0, nodes: 0, myInfo: false, metadata: false };
+      : {
+          config: 0,
+          modules: 0,
+          channels: 0,
+          nodes: 0,
+          myInfo: false,
+          metadata: false,
+        };
 
   const isConnecting = active.status === "connecting";
   const phaseLabel = isConnecting
     ? t("overlay.phase.connecting", { defaultValue: "Opening transport…" })
-    : t("overlay.phase.configuring", { defaultValue: "Streaming configuration…" });
+    : t("overlay.phase.configuring", {
+        defaultValue: "Streaming configuration…",
+      });
 
   return (
     <Dialog open>
@@ -133,7 +142,11 @@ export const ConnectingOverlay = (): ReactElement | null => {
                     "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
                 })}
               </p>
-              <Button type="button" variant="outline" onClick={() => void disconnect(active.id)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void disconnect(active.id)}
+              >
                 {t("overlay.cancel", { defaultValue: "Cancel" })}
               </Button>
             </div>

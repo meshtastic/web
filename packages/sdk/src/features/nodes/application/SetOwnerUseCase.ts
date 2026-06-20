@@ -9,7 +9,10 @@ export async function setOwner(
   owner: Protobuf.Mesh.User,
 ): Promise<ResultType<number, Error>> {
   try {
-    const id = await sendAdminMessage(client, { case: "setOwner", value: owner });
+    const id = await sendAdminMessage(client, {
+      case: "setOwner",
+      value: owner,
+    });
     return Result.ok(id);
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)));

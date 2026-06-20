@@ -29,7 +29,9 @@ export async function setFixedPosition(
   }
 }
 
-export async function removeFixedPosition(client: MeshClient): Promise<ResultType<number, Error>> {
+export async function removeFixedPosition(
+  client: MeshClient,
+): Promise<ResultType<number, Error>> {
   try {
     const id = await sendAdminMessage(
       client,

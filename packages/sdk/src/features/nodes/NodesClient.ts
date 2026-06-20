@@ -11,9 +11,18 @@ import { InMemoryNodesRepository } from "./infrastructure/repositories/InMemoryN
 import { validateIncomingNode } from "./infrastructure/nodeValidation.ts";
 import { NodeErrorsStore } from "./state/nodeErrorsStore.ts";
 import { NodesStore } from "./state/nodesStore.ts";
-import { favoriteNode, removeFavoriteNode } from "./application/FavoriteNodeUseCase.ts";
-import { ignoreNode, removeIgnoredNode } from "./application/IgnoreNodeUseCase.ts";
-import { removeNodeByNum, resetNodes } from "./application/RemoveNodeUseCase.ts";
+import {
+  favoriteNode,
+  removeFavoriteNode,
+} from "./application/FavoriteNodeUseCase.ts";
+import {
+  ignoreNode,
+  removeIgnoredNode,
+} from "./application/IgnoreNodeUseCase.ts";
+import {
+  removeNodeByNum,
+  resetNodes,
+} from "./application/RemoveNodeUseCase.ts";
 
 export interface NodesClientOptions {
   repository?: NodesRepository;
@@ -42,7 +51,9 @@ export class NodesClient {
     this.list = this.store.read;
     this.errors = this.errorsStore.read;
 
-    client.events.onNodeInfoPacket.subscribe((info) => this.handleIncoming(info));
+    client.events.onNodeInfoPacket.subscribe((info) =>
+      this.handleIncoming(info),
+    );
 
     client.events.onUserPacket.subscribe((packet) => {
       this.patch(packet.from, { user: packet.data });
@@ -199,7 +210,9 @@ export class NodesClient {
    * removeAllNodes(true) + resetNodes flow that the ResetNodeDb dialog
    * relied on.
    */
-  public async reset(options: { keepMyNode?: boolean } = {}): Promise<ResultType<number, Error>> {
+  public async reset(
+    options: { keepMyNode?: boolean } = {},
+  ): Promise<ResultType<number, Error>> {
     const myNodeNum = this.client.device.myNodeNum.value;
     if (options.keepMyNode && myNodeNum !== undefined) {
       const me = this.store.get(myNodeNum);

@@ -13,10 +13,21 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { MessageType, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf, Types } from "@meshtastic/sdk";
-import { useActiveClient, useChannels, useNodeErrors, useUnreadByKey } from "@meshtastic/sdk-react";
+import {
+  useActiveClient,
+  useChannels,
+  useNodeErrors,
+  useUnreadByKey,
+} from "@meshtastic/sdk-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { getChannelName } from "../components/PageComponents/Channels/Channels.tsx";
 
@@ -35,8 +46,10 @@ export const MessagesPage = () => {
   const channels = useChannels();
   const unreadByKey = useUnreadByKey();
   const meshClient = useActiveClient();
-  const directUnread = (peer: number): number => unreadByKey.get(`direct:${peer}`) ?? 0;
-  const channelUnread = (idx: number): number => unreadByKey.get(`channel:${idx}`) ?? 0;
+  const directUnread = (peer: number): number =>
+    unreadByKey.get(`direct:${peer}`) ?? 0;
+  const channelUnread = (idx: number): number =>
+    unreadByKey.get(`channel:${idx}`) ?? 0;
   const markChannelRead = useCallback(
     (idx: number) =>
       meshClient?.chat.unread.markRead({
@@ -46,14 +59,18 @@ export const MessagesPage = () => {
     [meshClient],
   );
   const markDirectRead = useCallback(
-    (peer: number) => meshClient?.chat.unread.markRead({ kind: "direct", peer }),
+    (peer: number) =>
+      meshClient?.chat.unread.markRead({ kind: "direct", peer }),
     [meshClient],
   );
   const allNodes = useNodesAsProto();
   const getNode = (n: number) => allNodes.find((node) => node.num === n);
   const errors = useNodeErrors();
   const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
-  const hasNodeError = useCallback((num: number) => errorSet.has(num), [errorSet]);
+  const hasNodeError = useCallback(
+    (num: number) => errorSet.has(num),
+    [errorSet],
+  );
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
 
@@ -72,18 +89,25 @@ export const MessagesPage = () => {
     [navigate],
   );
 
-  const chatType = type === "direct" ? MessageType.Direct : MessageType.Broadcast;
+  const chatType =
+    type === "direct" ? MessageType.Direct : MessageType.Broadcast;
   const numericChatId = Number(chatId);
 
   const filteredChannels = useMemo(
-    () => channels.filter((ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED),
+    () =>
+      channels.filter(
+        (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
+      ),
     [channels],
   );
 
   useEffect(() => {
     if (!type && !chatId && filteredChannels.length > 0) {
       const defaultChannel = filteredChannels[0];
-      navigateToChat(MessageType.Broadcast, defaultChannel?.index.toString() ?? "0");
+      navigateToChat(
+        MessageType.Broadcast,
+        defaultChannel?.index.toString() ?? "0",
+      );
     }
   }, [type, chatId, filteredChannels, navigateToChat]);
 
@@ -100,7 +124,10 @@ export const MessagesPage = () => {
       .filter((node: Protobuf.Mesh.NodeInfo) => {
         const longName = node.user?.longName?.toLowerCase() ?? "";
         const shortName = node.user?.shortName?.toLowerCase() ?? "";
-        return longName.includes(lowerCaseSearchTerm) || shortName.includes(lowerCaseSearchTerm);
+        return (
+          longName.includes(lowerCaseSearchTerm) ||
+          shortName.includes(lowerCaseSearchTerm)
+        );
       })
       .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
@@ -121,9 +148,15 @@ export const MessagesPage = () => {
         console.warn("[MessagesPage] no active mesh client; send dropped");
         return;
       }
-      const destination: Types.Destination = isDirect ? numericChatId : "broadcast";
+      const destination: Types.Destination = isDirect
+        ? numericChatId
+        : "broadcast";
       const channel = isDirect ? Types.ChannelNumber.Primary : numericChatId;
-      const result = await meshClient.chat.send({ text: message, destination, channel });
+      const result = await meshClient.chat.send({
+        text: message,
+        destination,
+        channel,
+      });
       if (result.status === "error") {
         console.error("Failed to send message:", result.error);
       }
@@ -170,13 +203,19 @@ export const MessagesPage = () => {
                       ns: "channels",
                     }))
               }
-              active={numericChatId === channel.index && chatType === MessageType.Broadcast}
+              active={
+                numericChatId === channel.index &&
+                chatType === MessageType.Broadcast
+              }
               onClick={() => {
                 navigateToChat(MessageType.Broadcast, channel.index.toString());
                 markChannelRead(channel.index);
               }}
             >
-              <HashIcon size={16} className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")} />
+              <HashIcon
+                size={16}
+                className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")}
+              />
             </SidebarButton>
           ))}
         </SidebarSection>
@@ -195,7 +234,10 @@ export const MessagesPage = () => {
   );
 
   const rightSidebar = (
-    <SidebarSection label="" className="px-0 flex flex-col h-full overflow-y-auto">
+    <SidebarSection
+      label=""
+      className="px-0 flex flex-col h-full overflow-y-auto"
+    >
       <label className="p-2 block" htmlFor="nodeSearch">
         <Input
           type="text"
@@ -207,7 +249,9 @@ export const MessagesPage = () => {
         />
       </label>
       <div
-        className={cn("flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1 ")}
+        className={cn(
+          "flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1 ",
+        )}
         style={{ contentVisibility: "auto", containIntrinsicSize: "100px" }}
       >
         {filteredNodes()?.map((node) => (
@@ -216,7 +260,9 @@ export const MessagesPage = () => {
             preventCollapse
             label={node.user?.longName ?? t("unknown.shortName")}
             count={node.unreadCount > 0 ? node.unreadCount : undefined}
-            active={numericChatId === node.num && chatType === MessageType.Direct}
+            active={
+              numericChatId === node.num && chatType === MessageType.Direct
+            }
             onClick={() => {
               navigateToChat(MessageType.Direct, node.num.toString());
               markDirectRead(node.num);
@@ -254,7 +300,9 @@ export const MessagesPage = () => {
           ? [
               {
                 key: "encryption",
-                icon: otherNode.user?.publicKey?.length ? LockIcon : LockOpenIcon,
+                icon: otherNode.user?.publicKey?.length
+                  ? LockIcon
+                  : LockOpenIcon,
                 iconClasses: otherNode.user?.publicKey?.length
                   ? "text-green-600"
                   : "text-yellow-300",

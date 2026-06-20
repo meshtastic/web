@@ -76,18 +76,20 @@ describe("AppStore – basic state & actions", () => {
     const c = makeRaster({ title: "c" });
 
     state.setRasterSources([a, b]);
-    expect(useAppStore.getState().rasterSources.map((raster) => raster.title)).toEqual(["a", "b"]);
+    expect(
+      useAppStore.getState().rasterSources.map((raster) => raster.title),
+    ).toEqual(["a", "b"]);
 
     state.addRasterSource(c);
-    expect(useAppStore.getState().rasterSources.map((raster) => raster.title)).toEqual([
-      "a",
-      "b",
-      "c",
-    ]);
+    expect(
+      useAppStore.getState().rasterSources.map((raster) => raster.title),
+    ).toEqual(["a", "b", "c"]);
 
     // "b"
     state.removeRasterSource(1);
-    expect(useAppStore.getState().rasterSources.map((raster) => raster.title)).toEqual(["a", "c"]);
+    expect(
+      useAppStore.getState().rasterSources.map((raster) => raster.title),
+    ).toEqual(["a", "c"]);
   });
 });
 
@@ -103,7 +105,10 @@ describe("AppStore – persistence: partialize + rehydrate", () => {
       const { useAppStore } = await freshStore(true);
       const state = useAppStore.getState();
 
-      state.setRasterSources([makeRaster({ title: "x" }), makeRaster({ title: "y" })]);
+      state.setRasterSources([
+        makeRaster({ title: "x" }),
+        makeRaster({ title: "y" }),
+      ]);
       state.setSelectedDevice(99);
       state.setCommandPaletteOpen(true);
       // Only rasterSources should persist by partialize
@@ -116,7 +121,10 @@ describe("AppStore – persistence: partialize + rehydrate", () => {
       const state = useAppStore.getState();
 
       // persisted slice:
-      expect(state.rasterSources.map((raster) => raster.title)).toEqual(["x", "y"]);
+      expect(state.rasterSources.map((raster) => raster.title)).toEqual([
+        "x",
+        "y",
+      ]);
 
       // ephemeral fields reset to defaults:
       expect(state.selectedDeviceId).toBe(0);
@@ -127,16 +135,13 @@ describe("AppStore – persistence: partialize + rehydrate", () => {
 
       // methods still work post-rehydrate:
       state.addRasterSource(makeRaster({ title: "z" }));
-      expect(useAppStore.getState().rasterSources.map((raster) => raster.title)).toEqual([
-        "x",
-        "y",
-        "z",
-      ]);
+      expect(
+        useAppStore.getState().rasterSources.map((raster) => raster.title),
+      ).toEqual(["x", "y", "z"]);
       state.removeRasterSource(0);
-      expect(useAppStore.getState().rasterSources.map((raster) => raster.title)).toEqual([
-        "y",
-        "z",
-      ]);
+      expect(
+        useAppStore.getState().rasterSources.map((raster) => raster.title),
+      ).toEqual(["y", "z"]);
     }
   });
 
@@ -144,14 +149,21 @@ describe("AppStore – persistence: partialize + rehydrate", () => {
     {
       const { useAppStore } = await freshStore(true);
       const state = useAppStore.getState();
-      state.setRasterSources([makeRaster({ title: "keep" }), makeRaster({ title: "drop" })]);
+      state.setRasterSources([
+        makeRaster({ title: "keep" }),
+        makeRaster({ title: "drop" }),
+      ]);
       state.removeRasterSource(1); // drop "drop"
-      expect(useAppStore.getState().rasterSources.map((raster) => raster.title)).toEqual(["keep"]);
+      expect(
+        useAppStore.getState().rasterSources.map((raster) => raster.title),
+      ).toEqual(["keep"]);
     }
     {
       const { useAppStore } = await freshStore(true);
       const state = useAppStore.getState();
-      expect(state.rasterSources.map((raster) => raster.title)).toEqual(["keep"]);
+      expect(state.rasterSources.map((raster) => raster.title)).toEqual([
+        "keep",
+      ]);
 
       // Now replace entirely
       state.setRasterSources([]);

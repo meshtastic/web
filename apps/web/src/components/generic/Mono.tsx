@@ -6,7 +6,10 @@ interface MonoProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 export const Mono = ({ children, className, ...rest }: MonoProps) => {
   return (
-    <span className={cn("font-mono text-sm text-text-secondary", className)} {...rest}>
+    <span
+      className={cn("font-mono text-sm text-text-secondary", className)}
+      {...rest}
+    >
       {children}
     </span>
   );

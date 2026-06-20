@@ -3,7 +3,10 @@ import {
   type StoreForwardValidation,
   StoreForwardValidationSchema,
 } from "@app/validation/moduleConfig/storeForward.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -14,8 +17,13 @@ interface StoreForwardModuleConfigProps {
 }
 
 const EMPTY_MODULES_SIGNAL = {
-  value: {} as { storeForward?: Protobuf.ModuleConfig.ModuleConfig_StoreForwardConfig },
-  peek: () => ({}) as { storeForward?: Protobuf.ModuleConfig.ModuleConfig_StoreForwardConfig },
+  value: {} as {
+    storeForward?: Protobuf.ModuleConfig.ModuleConfig_StoreForwardConfig;
+  },
+  peek: () =>
+    ({}) as {
+      storeForward?: Protobuf.ModuleConfig.ModuleConfig_StoreForwardConfig;
+    },
   subscribe: () => () => {},
 } as const;
 

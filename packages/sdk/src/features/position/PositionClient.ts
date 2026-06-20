@@ -31,7 +31,10 @@ export class PositionClient {
     return this.store.get(nodeNum);
   }
 
-  public setFixed(latitude: number, longitude: number): Promise<ResultType<number, Error>> {
+  public setFixed(
+    latitude: number,
+    longitude: number,
+  ): Promise<ResultType<number, Error>> {
     return setFixedPosition(this.client, latitude, longitude);
   }
 
@@ -39,7 +42,9 @@ export class PositionClient {
     return removeFixedPosition(this.client);
   }
 
-  public set(position: Protobuf.Mesh.Position): Promise<ResultType<number, Error>> {
+  public set(
+    position: Protobuf.Mesh.Position,
+  ): Promise<ResultType<number, Error>> {
     return setPosition(this.client, position);
   }
 

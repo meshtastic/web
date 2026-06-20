@@ -53,7 +53,9 @@ export class Queue {
               return;
             }
 
-            console.warn(`Packet ${item.id} of type ${decoded.payloadVariant.case} timed out`);
+            console.warn(
+              `Packet ${item.id} of type ${decoded.payloadVariant.case} timed out`,
+            );
 
             reject({
               id: item.id,
@@ -79,7 +81,9 @@ export class Queue {
   }
 
   public processError(e: PacketError): void {
-    console.error(`Error received for packet ${e.id}: ${Protobuf.Mesh.Routing_Error[e.error]}`);
+    console.error(
+      `Error received for packet ${e.id}: ${Protobuf.Mesh.Routing_Error[e.error]}`,
+    );
     this.errorNotifier.dispatch(e);
   }
 
@@ -91,7 +95,9 @@ export class Queue {
     return queueItem.promise;
   }
 
-  public async processQueue(outputStream: WritableStream<Uint8Array>): Promise<void> {
+  public async processQueue(
+    outputStream: WritableStream<Uint8Array>,
+  ): Promise<void> {
     if (this.lock) {
       return;
     }
@@ -109,7 +115,10 @@ export class Queue {
             item.sent = true;
           } catch (error) {
             const err = error as { code?: string };
-            if (err?.code === "ECONNRESET" || err?.code === "ERR_INVALID_STATE") {
+            if (
+              err?.code === "ECONNRESET" ||
+              err?.code === "ERR_INVALID_STATE"
+            ) {
               writer.releaseLock();
               this.lock = false;
               throw error;

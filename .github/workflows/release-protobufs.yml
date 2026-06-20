@@ -16,14 +16,14 @@ on:
 permissions: write-all
 
 env:
-  PROTOBUF_DIR: ./packages/protobufs 
+  PROTOBUF_DIR: ./packages/protobufs
 
 jobs:
   codegen:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -70,7 +70,7 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
-      
+
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
 

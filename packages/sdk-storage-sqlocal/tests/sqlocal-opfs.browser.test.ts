@@ -24,16 +24,22 @@ function msg(id: number, ms: number, text = "t"): Message {
   };
 }
 
-describe.runIf(typeof navigator !== "undefined")("sqlocal OPFS round-trip", () => {
-  it("persists messages across DB instances", async () => {
-    const dbPath = `meshtastic-test-${Date.now()}.db`;
-    const dbA = await createSqlocalDb({ databasePath: dbPath });
-    const repoA = new SqlocalMessageRepository(dbA, { deviceId: 1 });
-    await repoA.appendBatch([msg(1, 1000), msg(2, 2000)]);
+describe.runIf(typeof navigator !== "undefined")(
+  "sqlocal OPFS round-trip",
+  () => {
+    it("persists messages across DB instances", async () => {
+      const dbPath = `meshtastic-test-${Date.now()}.db`;
+      const dbA = await createSqlocalDb({ databasePath: dbPath });
+      const repoA = new SqlocalMessageRepository(dbA, { deviceId: 1 });
+      await repoA.appendBatch([msg(1, 1000), msg(2, 2000)]);
 
-    const dbB = await createSqlocalDb({ databasePath: dbPath });
-    const repoB = new SqlocalMessageRepository(dbB, { deviceId: 1 });
-    const out = await repoB.loadRecent({ kind: "channel", channel: ChannelNumber.Primary }, 10);
-    expect(out.map((m) => m.id)).toEqual([1, 2]);
-  });
-});
+      const dbB = await createSqlocalDb({ databasePath: dbPath });
+      const repoB = new SqlocalMessageRepository(dbB, { deviceId: 1 });
+      const out = await repoB.loadRecent(
+        { kind: "channel", channel: ChannelNumber.Primary },
+        10,
+      );
+      expect(out.map((m) => m.id)).toEqual([1, 2]);
+    });
+  },
+);

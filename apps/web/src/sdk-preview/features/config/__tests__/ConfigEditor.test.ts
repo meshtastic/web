@@ -56,13 +56,19 @@ const loraConfig = (hopLimit: number): Protobuf.Config.Config =>
     },
   });
 
-const lora = (hopLimit: number) => create(Protobuf.Config.Config_LoRaConfigSchema, { hopLimit });
+const lora = (hopLimit: number) =>
+  create(Protobuf.Config.Config_LoRaConfigSchema, { hopLimit });
 
-const trafficModuleConfig = (enabled: boolean): Protobuf.ModuleConfig.ModuleConfig =>
+const trafficModuleConfig = (
+  enabled: boolean,
+): Protobuf.ModuleConfig.ModuleConfig =>
   create(Protobuf.ModuleConfig.ModuleConfigSchema, {
     payloadVariant: {
       case: "trafficManagement",
-      value: create(Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfigSchema, { enabled }),
+      value: create(
+        Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfigSchema,
+        { enabled },
+      ),
     },
   });
 
@@ -122,13 +128,19 @@ describe("ConfigEditor (sdk-preview)", () => {
     onModuleConfigPacket.emit(trafficModuleConfig(false));
     editor.setModuleSection(
       "trafficManagement",
-      create(Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfigSchema, { enabled: true }),
+      create(Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfigSchema, {
+        enabled: true,
+      }),
     );
 
     expect(editor.dirtyModuleSections.peek()).toEqual(["trafficManagement"]);
     const result = await editor.commit();
     expect(Result.isError(result)).toBe(false);
-    expect(calls).toEqual(["begin", "setModuleConfig:trafficManagement", "commit"]);
+    expect(calls).toEqual([
+      "begin",
+      "setModuleConfig:trafficManagement",
+      "commit",
+    ]);
   });
 
   it("reset() discards working edits back to baseline", () => {

@@ -49,8 +49,13 @@ export function SelectInput<T extends FieldValues>({
     control,
   });
 
-  const { enumValue, formatEnumName, defaultValue, className, ...remainingProperties } =
-    field.properties;
+  const {
+    enumValue,
+    formatEnumName,
+    defaultValue,
+    className,
+    ...remainingProperties
+  } = field.properties;
   const valueToKeyMap: Record<string, string> = {};
   const optionsEnumValues: [string, number][] = [];
 
@@ -95,7 +100,9 @@ export function SelectInput<T extends FieldValues>({
         className={cn([
           className,
           isDirty ? "focus:ring-sky-500 ring-sky-500 ring-2 ring-offset-2" : "",
-          invalid ? "focus:ring-red-500 ring-red-500 ring-2 outline-offset-2" : "",
+          invalid
+            ? "focus:ring-red-500 ring-red-500 ring-2 outline-offset-2"
+            : "",
         ])}
         ref={ref}
         onBlur={onBlur}

@@ -8,7 +8,10 @@ export async function favoriteNode(
   nodeNum: number,
 ): Promise<ResultType<number, Error>> {
   try {
-    const id = await sendAdminMessage(client, { case: "setFavoriteNode", value: nodeNum });
+    const id = await sendAdminMessage(client, {
+      case: "setFavoriteNode",
+      value: nodeNum,
+    });
     return Result.ok(id);
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)));
@@ -20,7 +23,10 @@ export async function removeFavoriteNode(
   nodeNum: number,
 ): Promise<ResultType<number, Error>> {
   try {
-    const id = await sendAdminMessage(client, { case: "removeFavoriteNode", value: nodeNum });
+    const id = await sendAdminMessage(client, {
+      case: "removeFavoriteNode",
+      value: nodeNum,
+    });
     return Result.ok(id);
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)));

@@ -20,7 +20,10 @@ export function useChat(channel: ChannelNumber): UseChatResult {
   const client = useClient();
   const sig = useMemo(() => client.chat.messages(channel), [client, channel]);
   const messages = useSignal(sig);
-  const send = useCallback((input: SendTextInput) => client.chat.send(input), [client]);
+  const send = useCallback(
+    (input: SendTextInput) => client.chat.send(input),
+    [client],
+  );
   const loadOlder = useCallback(
     (before: Date, limit?: number) => {
       const conv: ConversationKey = { kind: "channel", channel };

@@ -5,7 +5,9 @@ import { MeshRegistryContext } from "../provider/MeshRegistryContext.ts";
 export function useMeshRegistry(): MeshRegistry {
   const registry = useContext(MeshRegistryContext);
   if (!registry) {
-    throw new Error("useMeshRegistry must be called inside a <MeshRegistryProvider>.");
+    throw new Error(
+      "useMeshRegistry must be called inside a <MeshRegistryProvider>.",
+    );
   }
   return registry;
 }

@@ -35,7 +35,9 @@ export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
   const addSavedConnection = useDeviceStore((s) => s.addSavedConnection);
   const updateSavedConnection = useDeviceStore((s) => s.updateSavedConnection);
-  const removeSavedConnectionFromStore = useDeviceStore((s) => s.removeSavedConnection);
+  const removeSavedConnectionFromStore = useDeviceStore(
+    (s) => s.removeSavedConnection,
+  );
   const setActiveConnectionId = useDeviceStore((s) => s.setActiveConnectionId);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
@@ -168,15 +170,21 @@ export function useConnections() {
         startMaintenanceHeartbeat(id, meshDevice);
       };
 
-      const unsubConfigComplete = meshDevice.events.onConfigComplete.subscribe(() =>
-        markConfigured("onConfigComplete"),
+      const unsubConfigComplete = meshDevice.events.onConfigComplete.subscribe(
+        () => markConfigured("onConfigComplete"),
       );
-      const unsubStatusSignal = meshDevice.meshClient.device.status.subscribe((s) => {
-        if (s === DeviceStatusEnum.DeviceConfigured) markConfigured("device.status");
-      });
+      const unsubStatusSignal = meshDevice.meshClient.device.status.subscribe(
+        (s) => {
+          if (s === DeviceStatusEnum.DeviceConfigured)
+            markConfigured("device.status");
+        },
+      );
       // Catch-up: signal subscribe doesn't fire for the current value, so
       // check synchronously if the device is already past the gate.
-      if (meshDevice.meshClient.device.status.value === DeviceStatusEnum.DeviceConfigured) {
+      if (
+        meshDevice.meshClient.device.status.value ===
+        DeviceStatusEnum.DeviceConfigured
+      ) {
         markConfigured("initial-check");
       }
 
@@ -205,8 +213,13 @@ export function useConnections() {
       meshDevice
         .configure()
         .then(() => {
-          log.debug("setupMeshDevice: configure() resolved, sending heartbeat", { id });
-          return meshDevice.heartbeat().then(() => startConfigHeartbeat(id, meshDevice));
+          log.debug(
+            "setupMeshDevice: configure() resolved, sending heartbeat",
+            { id },
+          );
+          return meshDevice
+            .heartbeat()
+            .then(() => startConfigHeartbeat(id, meshDevice));
         })
         .catch((error) => {
           const e = error as Error;
@@ -246,29 +259,53 @@ export function useConnections() {
         return true;
       }
 
-      log.info("connect: enter", { id, type: conn.type, allowPrompt: !!opts?.allowPrompt });
+      log.info("connect: enter", {
+        id,
+        type: conn.type,
+        allowPrompt: !!opts?.allowPrompt,
+      });
       updateStatus(id, "connecting");
       try {
         const cached = cachedTransports.get(id);
         const result = await openTransport(conn, {
           allowPrompt: opts?.allowPrompt,
           cachedBluetoothDevice:
-            conn.type === "bluetooth" ? (cached as BluetoothDevice | undefined) : undefined,
-          cachedSerialPort: conn.type === "serial" ? (cached as SerialPort | undefined) : undefined,
+            conn.type === "bluetooth"
+              ? (cached as BluetoothDevice | undefined)
+              : undefined,
+          cachedSerialPort:
+            conn.type === "serial"
+              ? (cached as SerialPort | undefined)
+              : undefined,
         });
         log.debug("connect: openTransport ok", { id });
-        await setupMeshDevice(id, result.transport, result.bluetoothDevice, result.serialPort);
-        log.info("connect: setupMeshDevice resolved, awaiting onConfigComplete", { id });
+        await setupMeshDevice(
+          id,
+          result.transport,
+          result.bluetoothDevice,
+          result.serialPort,
+        );
+        log.info(
+          "connect: setupMeshDevice resolved, awaiting onConfigComplete",
+          { id },
+        );
 
         // BT-specific: catch device-side disconnect to flip status.
-        result.bluetoothDevice?.addEventListener("gattserverdisconnected", () => {
-          log.warn("BT gattserverdisconnected", { id });
-          updateStatus(id, "disconnected");
-        });
+        result.bluetoothDevice?.addEventListener(
+          "gattserverdisconnected",
+          () => {
+            log.warn("BT gattserverdisconnected", { id });
+            updateStatus(id, "disconnected");
+          },
+        );
         return true;
       } catch (err) {
         const e = err as Error;
-        log.error("connect: failed", { id, name: e?.name, message: e?.message });
+        log.error("connect: failed", {
+          id,
+          name: e?.name,
+          message: e?.message,
+        });
         const message = err instanceof Error ? err.message : String(err);
         updateStatus(id, "error", message);
         return false;
@@ -309,7 +346,8 @@ export function useConnections() {
   const addConnectionAndConnect = useCallback(
     async (input: NewConnection, btDevice?: BluetoothDevice) => {
       const conn = addConnection(input);
-      if (btDevice && conn.type === "bluetooth") cachedTransports.set(conn.id, btDevice);
+      if (btDevice && conn.type === "bluetooth")
+        cachedTransports.set(conn.id, btDevice);
       await connect(conn.id, { allowPrompt: true });
       return conn;
     },
@@ -318,7 +356,10 @@ export function useConnections() {
 
   const refreshStatuses = useCallback(async () => {
     const candidates = connections.filter(
-      (c) => c.status !== "connected" && c.status !== "configured" && c.status !== "configuring",
+      (c) =>
+        c.status !== "connected" &&
+        c.status !== "configured" &&
+        c.status !== "configuring",
     );
     await Promise.all(
       candidates.map(async (c) => {
@@ -329,7 +370,9 @@ export function useConnections() {
   }, [connections, updateSavedConnection]);
 
   const syncConnectionStatuses = useCallback(() => {
-    const activeConnection = connections.find((c) => c.meshDeviceId === selectedDeviceId);
+    const activeConnection = connections.find(
+      (c) => c.meshDeviceId === selectedDeviceId,
+    );
     connections.forEach((conn) => {
       const shouldBeConnected = activeConnection?.id === conn.id;
       const isConnectedState =

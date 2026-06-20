@@ -80,7 +80,8 @@ function renameEntries() {
 }
 
 // Match: import { i as Transport, n as DeviceStatusEnum, ... } from "./Foo-hash.js";
-const CHUNK_IMPORT_RE = /^import\s*\{([^}]+)\}\s*from\s*"\.\/([A-Za-z]+-[A-Za-z0-9_-]+)\.js";\s*$/m;
+const CHUNK_IMPORT_RE =
+  /^import\s*\{([^}]+)\}\s*from\s*"\.\/([A-Za-z]+-[A-Za-z0-9_-]+)\.js";\s*$/m;
 
 function inlineChunks(entryPath) {
   if (!existsSync(entryPath)) return;
@@ -150,7 +151,9 @@ function deleteOrphanedChunks() {
     for (const entry of KNOWN_ENTRIES) {
       const p = join(distDir, `${entry}.d.ts`);
       if (!existsSync(p)) continue;
-      if (readFileSync(p, "utf8").includes(`./${f.replace(/\.d\.ts$/, ".js")}`)) {
+      if (
+        readFileSync(p, "utf8").includes(`./${f.replace(/\.d\.ts$/, ".js")}`)
+      ) {
         referenced = true;
         break;
       }

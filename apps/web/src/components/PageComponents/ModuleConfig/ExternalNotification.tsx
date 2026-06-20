@@ -3,7 +3,10 @@ import {
   type ExternalNotificationValidation,
   ExternalNotificationValidationSchema,
 } from "@app/validation/moduleConfig/externalNotification.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -24,7 +27,9 @@ const EMPTY_MODULES_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
-export const ExternalNotification = ({ onFormInit }: ExternalNotificationModuleConfigProps) => {
+export const ExternalNotification = ({
+  onFormInit,
+}: ExternalNotificationModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "externalNotification" });
 
   const { moduleConfig, getEffectiveModuleConfig } = useDevice();
@@ -56,7 +61,9 @@ export const ExternalNotification = ({ onFormInit }: ExternalNotificationModuleC
       fieldGroups={[
         {
           label: t("externalNotification.externalNotificationConfig.label"),
-          description: t("externalNotification.externalNotificationConfig.description"),
+          description: t(
+            "externalNotification.externalNotificationConfig.description",
+          ),
           fields: [
             {
               type: "toggle",
@@ -68,7 +75,9 @@ export const ExternalNotification = ({ onFormInit }: ExternalNotificationModuleC
         },
         {
           label: t("externalNotification.notificationsOnMessage.label"),
-          description: t("externalNotification.notificationsOnMessage.description"),
+          description: t(
+            "externalNotification.notificationsOnMessage.description",
+          ),
           fields: [
             {
               type: "toggle",
@@ -80,19 +89,25 @@ export const ExternalNotification = ({ onFormInit }: ExternalNotificationModuleC
               type: "toggle",
               name: "alertMessageBuzzer",
               label: t("externalNotification.alertMessageBuzzer.label"),
-              description: t("externalNotification.alertMessageBuzzer.description"),
+              description: t(
+                "externalNotification.alertMessageBuzzer.description",
+              ),
             },
             {
               type: "toggle",
               name: "alertMessageVibra",
               label: t("externalNotification.alertMessageVibra.label"),
-              description: t("externalNotification.alertMessageVibra.description"),
+              description: t(
+                "externalNotification.alertMessageVibra.description",
+              ),
             },
           ],
         },
         {
           label: t("externalNotification.notificationsOnAlert.label"),
-          description: t("externalNotification.notificationsOnAlert.description"),
+          description: t(
+            "externalNotification.notificationsOnAlert.description",
+          ),
           fields: [
             {
               type: "toggle",
@@ -104,7 +119,9 @@ export const ExternalNotification = ({ onFormInit }: ExternalNotificationModuleC
               type: "toggle",
               name: "alertBellBuzzer",
               label: t("externalNotification.alertBellBuzzer.label"),
-              description: t("externalNotification.alertBellBuzzer.description"),
+              description: t(
+                "externalNotification.alertBellBuzzer.description",
+              ),
             },
             {
               type: "toggle",

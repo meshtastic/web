@@ -1,7 +1,7 @@
-import { x25519 } from "@noble/curves/ed25519";
+import { x25519 } from "@noble/curves/ed25519.js";
 
 export function getX25519PrivateKey(): Uint8Array {
-  const key = x25519.utils.randomPrivateKey();
+  const key = x25519.utils.randomSecretKey();
 
   // scalar clamping for curve25519, according to
   // https://www.rfc-editor.org/rfc/rfc7748#section-5

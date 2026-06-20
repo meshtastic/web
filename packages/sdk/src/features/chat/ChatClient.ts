@@ -3,7 +3,10 @@ import type { ResultType } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
 import { generatePacketId } from "../../core/identifiers/PacketId.ts";
-import { type ReadonlySignal, toReadonly } from "../../core/signals/createStore.ts";
+import {
+  type ReadonlySignal,
+  toReadonly,
+} from "../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../core/types.ts";
 import type { DraftRepository } from "./domain/DraftRepository.ts";
 import type { Message } from "./domain/Message.ts";
@@ -16,7 +19,11 @@ import { MessageState } from "./domain/MessageState.ts";
 import { MessageMapper } from "./infrastructure/MessageMapper.ts";
 import { InMemoryDraftRepository } from "./infrastructure/repositories/InMemoryDraftRepository.ts";
 import { InMemoryMessageRepository } from "./infrastructure/repositories/InMemoryMessageRepository.ts";
-import { type SendTextError, type SendTextInput, sendText } from "./application/SendTextUseCase.ts";
+import {
+  type SendTextError,
+  type SendTextInput,
+  sendText,
+} from "./application/SendTextUseCase.ts";
 import { ChatStore } from "./state/chatStore.ts";
 import { DraftStore } from "./state/draftStore.ts";
 
@@ -80,7 +87,8 @@ export class ChatClient {
     this.store = new ChatStore();
     this.draftStore = new DraftStore();
     this.repository = options.repository ?? new InMemoryMessageRepository();
-    this.draftRepository = options.draftRepository ?? new InMemoryDraftRepository();
+    this.draftRepository =
+      options.draftRepository ?? new InMemoryDraftRepository();
     this.retention = options.retention;
     this.initialLoadLimit = options.initialLoadLimit ?? 50;
 
@@ -101,7 +109,10 @@ export class ChatClient {
       const message = MessageMapper.fromPacket(packet);
       const conv: ConversationKey =
         packet.type === "direct" && packet.to !== Constants.broadcastNum
-          ? { kind: "direct", peer: packet.from === client.myNodeNum ? packet.to : packet.from }
+          ? {
+              kind: "direct",
+              peer: packet.from === client.myNodeNum ? packet.to : packet.from,
+            }
           : { kind: "channel", channel: packet.channel };
       const key = this.keyFor(conv);
 
@@ -121,7 +132,10 @@ export class ChatClient {
 
     client.events.onRoutingPacket.subscribe((packet) => {
       if (packet.data.variant.case === "errorReason") {
-        const state = packet.data.variant.value === 0 ? MessageState.Ack : MessageState.Failed;
+        const state =
+          packet.data.variant.value === 0
+            ? MessageState.Ack
+            : MessageState.Failed;
         this.store.updateState(packet.id, state);
         void this.repository.updateState(packet.id, state).catch(() => {});
       }
@@ -138,10 +152,15 @@ export class ChatClient {
     return this.store.messagesForDirect(peer);
   }
 
-  public async loadOlder(conv: ConversationKey, before: Date, limit = 50): Promise<Message[]> {
+  public async loadOlder(
+    conv: ConversationKey,
+    before: Date,
+    limit = 50,
+  ): Promise<Message[]> {
     const older = await this.repository.loadBefore(conv, before, limit);
     const key = this.keyFor(conv);
-    for (let i = older.length - 1; i >= 0; i--) this.store.prepend(key, older[i]!);
+    for (let i = older.length - 1; i >= 0; i--)
+      this.store.prepend(key, older[i]!);
     return older;
   }
 
@@ -174,7 +193,9 @@ export class ChatClient {
     }
   }
 
-  public async send(input: SendTextInput): Promise<ResultType<number, SendTextError>> {
+  public async send(
+    input: SendTextInput,
+  ): Promise<ResultType<number, SendTextError>> {
     const conv: ConversationKey =
       typeof input.destination === "number"
         ? { kind: "direct", peer: input.destination }
@@ -196,7 +217,10 @@ export class ChatClient {
     const message: Message = {
       id: packetId,
       from: this.client.myNodeNum,
-      to: typeof input.destination === "number" ? input.destination : Constants.broadcastNum,
+      to:
+        typeof input.destination === "number"
+          ? input.destination
+          : Constants.broadcastNum,
       channel: input.channel ?? 0,
       rxTime: new Date(),
       type: typeof input.destination === "number" ? "direct" : "broadcast",
@@ -216,7 +240,9 @@ export class ChatClient {
       // the optimistic message visible but mark it Failed so the user
       // sees the error state next to their bubble.
       this.store.updateState(packetId, MessageState.Failed);
-      void this.repository.updateState(packetId, MessageState.Failed).catch(() => {});
+      void this.repository
+        .updateState(packetId, MessageState.Failed)
+        .catch(() => {});
     }
     return result;
   }
@@ -227,7 +253,10 @@ export class ChatClient {
     this.hydrated.add(key);
     void (async () => {
       try {
-        const recent = await this.repository.loadRecent(conv, this.initialLoadLimit);
+        const recent = await this.repository.loadRecent(
+          conv,
+          this.initialLoadLimit,
+        );
         for (const m of recent) this.store.append(key, m);
       } catch {
         // adapter may not have history yet; safe to ignore

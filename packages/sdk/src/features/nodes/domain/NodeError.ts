@@ -7,7 +7,10 @@ import type * as Protobuf from "@meshtastic/protobufs";
  * stored public-key history. Routing errors come straight off the wire
  * via `Routing_Error`.
  */
-export type NodeErrorType = Protobuf.Mesh.Routing_Error | "MISMATCH_PKI" | "DUPLICATE_PKI";
+export type NodeErrorType =
+  | Protobuf.Mesh.Routing_Error
+  | "MISMATCH_PKI"
+  | "DUPLICATE_PKI";
 
 export interface NodeError {
   readonly node: number;

@@ -81,7 +81,9 @@ describe("NodesClient PKI error tracking", () => {
       }),
     });
 
-    expect(client.nodes.errorFor(99)?.error).toBe(Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY);
+    expect(client.nodes.errorFor(99)?.error).toBe(
+      Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY,
+    );
   });
 
   it("clearError / clearAllErrors", () => {

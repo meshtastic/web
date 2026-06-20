@@ -3,7 +3,10 @@ import {
   type SerialValidation,
   SerialValidationSchema,
 } from "@app/validation/moduleConfig/serial.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -15,7 +18,8 @@ interface SerialModuleConfigProps {
 
 const EMPTY_MODULES_SIGNAL = {
   value: {} as { serial?: Protobuf.ModuleConfig.ModuleConfig_SerialConfig },
-  peek: () => ({}) as { serial?: Protobuf.ModuleConfig.ModuleConfig_SerialConfig },
+  peek: () =>
+    ({}) as { serial?: Protobuf.ModuleConfig.ModuleConfig_SerialConfig },
   subscribe: () => () => {},
 } as const;
 
@@ -83,7 +87,8 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
               label: t("serial.baud.label"),
               description: t("serial.baud.description"),
               properties: {
-                enumValue: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud,
+                enumValue:
+                  Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud,
               },
             },
             {
@@ -99,7 +104,8 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
               label: t("serial.mode.label"),
               description: t("serial.mode.description"),
               properties: {
-                enumValue: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode,
+                enumValue:
+                  Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode,
                 formatEnumName: true,
               },
             },

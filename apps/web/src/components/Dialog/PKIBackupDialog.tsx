@@ -20,19 +20,25 @@ export interface PkiBackupDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const PkiBackupDialog = ({ open, onOpenChange }: PkiBackupDialogProps) => {
+export const PkiBackupDialog = ({
+  open,
+  onOpenChange,
+}: PkiBackupDialogProps) => {
   const { t } = useTranslation("dialog");
   const { config, setDialogOpen } = useDevice();
   const myNode = useMyNodeAsProto();
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;
 
-  const decodeKeyData = React.useCallback((key: Uint8Array<ArrayBufferLike>) => {
-    if (!key) {
-      return "";
-    }
-    return fromByteArray(key ?? new Uint8Array(0));
-  }, []);
+  const decodeKeyData = React.useCallback(
+    (key: Uint8Array<ArrayBufferLike>) => {
+      if (!key) {
+        return "";
+      }
+      return fromByteArray(key ?? new Uint8Array(0));
+    },
+    [],
+  );
 
   const closeDialog = React.useCallback(() => {
     setDialogOpen("pkiBackup", false);
@@ -128,7 +134,9 @@ export const PkiBackupDialog = ({ open, onOpenChange }: PkiBackupDialogProps) =>
           <DialogTitle>{t("pkiBackup.title")}</DialogTitle>
           <DialogDescription>{t("pkiBackup.secureBackup")}</DialogDescription>
           <DialogDescription>
-            <span className="font-bold break-before-auto">{t("pkiBackup.loseKeysWarning")}</span>
+            <span className="font-bold break-before-auto">
+              {t("pkiBackup.loseKeysWarning")}
+            </span>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-6">

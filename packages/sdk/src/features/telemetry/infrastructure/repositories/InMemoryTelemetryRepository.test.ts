@@ -36,7 +36,10 @@ describe("InMemoryTelemetryRepository", () => {
 
   it("prune drops readings older than olderThanMs", async () => {
     const repo = new InMemoryTelemetryRepository();
-    await repo.appendBatch([reading(1, Date.now() - 10_000_000), reading(1, Date.now() - 1_000)]);
+    await repo.appendBatch([
+      reading(1, Date.now() - 10_000_000),
+      reading(1, Date.now() - 1_000),
+    ]);
     await repo.prune({ olderThanMs: 5_000_000 });
     const remaining = await repo.loadRecent(1, 10);
     expect(remaining).toHaveLength(1);

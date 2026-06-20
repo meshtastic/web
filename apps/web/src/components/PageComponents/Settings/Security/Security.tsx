@@ -7,7 +7,10 @@ import {
 import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@meshtastic/sdk";
@@ -27,7 +30,9 @@ const EMPTY_RADIO_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
-const toFormShape = (cfg: Protobuf.Config.Config_SecurityConfig | undefined) => ({
+const toFormShape = (
+  cfg: Protobuf.Config.Config_SecurityConfig | undefined,
+) => ({
   ...cfg,
   privateKey: fromByteArray(cfg?.privateKey ?? new Uint8Array(0)),
   publicKey: fromByteArray(cfg?.publicKey ?? new Uint8Array(0)),
@@ -46,7 +51,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
     radio.security ??
-    (getEffectiveConfig("security") as Protobuf.Config.Config_SecurityConfig | undefined);
+    (getEffectiveConfig("security") as
+      | Protobuf.Config.Config_SecurityConfig
+      | undefined);
 
   const { t } = useTranslation("config");
 
@@ -64,8 +71,10 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     onFormInit?.(formMethods);
   }, [onFormInit, formMethods]);
 
-  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] = useState<boolean>(false);
-  const [managedModeDialogOpen, setManagedModeDialogOpen] = useState<boolean>(false);
+  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] =
+    useState<boolean>(false);
+  const [managedModeDialogOpen, setManagedModeDialogOpen] =
+    useState<boolean>(false);
 
   const onSubmit = (data: RawSecurity) => {
     if (!formState.isReady || !editor) return;
@@ -80,7 +89,10 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
         toByteArray(data.adminKey.at(2) ?? ""),
       ],
     };
-    editor.setRadioSection("security", payload as unknown as Protobuf.Config.Config_SecurityConfig);
+    editor.setRadioSection(
+      "security",
+      payload as unknown as Protobuf.Config.Config_SecurityConfig,
+    );
   };
 
   const pkiRegenerate = () => {
@@ -90,7 +102,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
 
   const updatePublicKey = async (privateKey: string) => {
     try {
-      const publicKey = fromByteArray(getX25519PublicKey(toByteArray(privateKey)));
+      const publicKey = fromByteArray(
+        getX25519PublicKey(toByteArray(privateKey)),
+      );
       setValue("privateKey", privateKey, { shouldDirty: true });
       setValue("publicKey", publicKey, { shouldDirty: true });
 
@@ -176,7 +190,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
+                disabledBy: [
+                  { fieldName: "adminChannelEnabled", invert: true },
+                ],
                 properties: { showCopyButton: true },
               },
               {
@@ -188,7 +204,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
+                disabledBy: [
+                  { fieldName: "adminChannelEnabled", invert: true },
+                ],
                 properties: { showCopyButton: true },
               },
               {
@@ -200,7 +218,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
+                disabledBy: [
+                  { fieldName: "adminChannelEnabled", invert: true },
+                ],
                 properties: { showCopyButton: true },
               },
             ],

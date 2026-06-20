@@ -42,7 +42,13 @@ describe("dotPaths", () => {
       a: [{ b: 1, c: [2, 3] }, { d: { e: 4 } }],
       f: 5,
     };
-    expect(dotPaths(obj)).toEqual(["a.0.b", "a.0.c.0", "a.0.c.1", "a.1.d.e", "f"]);
+    expect(dotPaths(obj)).toEqual([
+      "a.0.b",
+      "a.0.c.0",
+      "a.0.c.1",
+      "a.1.d.e",
+      "f",
+    ]);
   });
 
   it("handles prefix argument", () => {

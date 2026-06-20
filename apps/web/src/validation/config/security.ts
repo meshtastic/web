@@ -5,7 +5,9 @@ const { stringSchema, bytesSchema, isValidKey } = makePskHelpers([32]); // 256-b
 
 const isManagedRequiredMsg = "formValidation.required.managed";
 
-function makeSecuritySchema<KeyT>(keyMaker: (optional: boolean) => ZodType<KeyT>) {
+function makeSecuritySchema<KeyT>(
+  keyMaker: (optional: boolean) => ZodType<KeyT>,
+) {
   return z
     .object({
       isManaged: z.boolean(),

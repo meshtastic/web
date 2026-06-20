@@ -1,6 +1,12 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
-import { type DisplayValidation, DisplayValidationSchema } from "@app/validation/config/display.ts";
-import { DynamicForm, type DynamicFormFormInit } from "@components/Form/DynamicForm.tsx";
+import {
+  type DisplayValidation,
+  DisplayValidationSchema,
+} from "@app/validation/config/display.ts";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -23,13 +29,18 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
     radio.display ??
-    (getEffectiveConfig("display") as Protobuf.Config.Config_DisplayConfig | undefined);
+    (getEffectiveConfig("display") as
+      | Protobuf.Config.Config_DisplayConfig
+      | undefined);
 
   const { t } = useTranslation("config");
 
   const onSubmit = (data: DisplayValidation) => {
     if (!editor) return;
-    editor.setRadioSection("display", data as unknown as Protobuf.Config.Config_DisplayConfig);
+    editor.setRadioSection(
+      "display",
+      data as unknown as Protobuf.Config.Config_DisplayConfig,
+    );
   };
 
   return (
@@ -129,7 +140,8 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
               label: t("display.compassOrientation.label"),
               description: t("display.compassOrientation.description"),
               properties: {
-                enumValue: Protobuf.Config.Config_DisplayConfig_CompassOrientation,
+                enumValue:
+                  Protobuf.Config.Config_DisplayConfig_CompassOrientation,
                 formatEnumName: true,
               },
             },

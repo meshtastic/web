@@ -2,7 +2,11 @@ import type { LucideIcon } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import type * as React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Sidebar,
   SidebarContent,
@@ -65,11 +69,17 @@ const AppSidebar = ({
   return (
     <Sidebar collapsible="icon" variant="sidebar" {...props}>
       <SidebarHeader
-        className={cn("h-14 mt-2 flex-shrink-0 transition-all duration-300 ease-in-out")}
+        className={cn(
+          "h-14 mt-2 flex-shrink-0 transition-all duration-300 ease-in-out",
+        )}
       >
         <div className="flex items-center">
           {logo && (
-            <img src={logo.src} alt={logo.alt} className="size-10 flex-shrink-0 rounded-xl" />
+            <img
+              src={logo.src}
+              alt={logo.alt}
+              className="size-10 flex-shrink-0 rounded-xl"
+            />
           )}
           {title && (
             <h2
@@ -140,16 +150,19 @@ const AppSidebar = ({
                                   onClick={subLink.onClick}
                                   isActive={subLink.active}
                                 >
-                                  {subLink.icon && <subLink.icon className="size-4" />}
-                                  <span>{subLink.name}</span>
-                                  {subLink.count !== undefined && subLink.count > 0 && (
-                                    <Badge
-                                      variant="default"
-                                      className="ml-auto bg-blue-500 text-white text-xs"
-                                    >
-                                      {subLink.count}
-                                    </Badge>
+                                  {subLink.icon && (
+                                    <subLink.icon className="size-4" />
                                   )}
+                                  <span>{subLink.name}</span>
+                                  {subLink.count !== undefined &&
+                                    subLink.count > 0 && (
+                                      <Badge
+                                        variant="default"
+                                        className="ml-auto bg-blue-500 text-white text-xs"
+                                      >
+                                        {subLink.count}
+                                      </Badge>
+                                    )}
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
                             ))}
@@ -171,7 +184,10 @@ const AppSidebar = ({
                       {link.icon && <link.icon className="size-5" />}
                       <span>{link.name}</span>
                       {link.count !== undefined && link.count > 0 && (
-                        <Badge variant="default" className="ml-auto bg-blue-500 text-white text-xs">
+                        <Badge
+                          variant="default"
+                          className="ml-auto bg-blue-500 text-white text-xs"
+                        >
                           {link.count}
                         </Badge>
                       )}
@@ -184,7 +200,11 @@ const AppSidebar = ({
         </SidebarGroup>
 
         {children && (
-          <div className={cn("flex-1 min-h-0", isCollapsed && "overflow-hidden")}>{children}</div>
+          <div
+            className={cn("flex-1 min-h-0", isCollapsed && "overflow-hidden")}
+          >
+            {children}
+          </div>
         )}
       </SidebarContent>
 

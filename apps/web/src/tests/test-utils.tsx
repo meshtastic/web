@@ -1,4 +1,8 @@
-import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
+import {
+  createMemoryHistory,
+  createRouter,
+  RouterProvider,
+} from "@tanstack/react-router";
 import { type RenderOptions, render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import "@app/i18n-config.ts";
@@ -27,8 +31,10 @@ const Providers = () => {
   );
 };
 
-const renderWithProviders = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
-  render(ui, { wrapper: Providers, ...options });
+const renderWithProviders = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, "wrapper">,
+) => render(ui, { wrapper: Providers, ...options });
 
 export * from "@testing-library/react";
 

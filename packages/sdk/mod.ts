@@ -6,7 +6,10 @@ export type {
   MeshClientOptions,
 } from "./src/core/client/MeshClient.ts";
 export { MeshRegistry } from "./src/core/registry/MeshRegistry.ts";
-export type { ConnectionId, RegistryEntry } from "./src/core/registry/MeshRegistry.ts";
+export type {
+  ConnectionId,
+  RegistryEntry,
+} from "./src/core/registry/MeshRegistry.ts";
 
 // Constants & errors
 export { Constants } from "./src/core/constants/index.ts";
@@ -17,7 +20,11 @@ export {
 } from "./src/core/errors/MeshError.ts";
 
 // Shared signal primitives
-export { createStore, SignalMap, toReadonly } from "./src/core/signals/createStore.ts";
+export {
+  createStore,
+  SignalMap,
+  toReadonly,
+} from "./src/core/signals/createStore.ts";
 export type { ReadonlySignal } from "./src/core/signals/createStore.ts";
 
 // Logging
@@ -38,7 +45,11 @@ export { Queue } from "./src/core/queue/Queue.ts";
 export { Xmodem } from "./src/core/xmodem/Xmodem.ts";
 
 // Transport interface
-export type { DeviceOutput, HttpRetryConfig, Transport } from "./src/core/transport/Transport.ts";
+export type {
+  DeviceOutput,
+  HttpRetryConfig,
+  Transport,
+} from "./src/core/transport/Transport.ts";
 export { DeviceStatusEnum } from "./src/core/transport/Transport.ts";
 
 // Commonly-used runtime enums exported directly for ergonomic access.
@@ -109,7 +120,10 @@ export type {
   RadioConfigSection,
 } from "./src/features/config/index.ts";
 
-export { InMemoryTelemetryRepository, TelemetryClient } from "./src/features/telemetry/index.ts";
+export {
+  InMemoryTelemetryRepository,
+  TelemetryClient,
+} from "./src/features/telemetry/index.ts";
 export type {
   TelemetryClientOptions,
   TelemetryKind,
@@ -125,7 +139,10 @@ export { TraceRouteClient } from "./src/features/traceroute/index.ts";
 export type { TraceRoute } from "./src/features/traceroute/index.ts";
 
 export { FilesClient } from "./src/features/files/index.ts";
-export type { FileTransfer, TransferStatus } from "./src/features/files/index.ts";
+export type {
+  FileTransfer,
+  TransferStatus,
+} from "./src/features/files/index.ts";
 
 // Phase-A legacy shims (removed in Phase C)
 export { MeshDevice } from "./src/shim/legacyMeshDevice.ts";

@@ -1,6 +1,9 @@
 import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/core";
-import type { ModuleConfig, ModuleConfigSection } from "../domain/ModuleConfig.ts";
+import type {
+  ModuleConfig,
+  ModuleConfigSection,
+} from "../domain/ModuleConfig.ts";
 import type { RadioConfig, RadioConfigSection } from "../domain/RadioConfig.ts";
 
 /** Wrap a single radio-config section value back into a `Config` message. */
@@ -9,7 +12,10 @@ export function buildRadioConfig<K extends RadioConfigSection>(
   value: NonNullable<RadioConfig[K]>,
 ): Protobuf.Config.Config {
   return create(Protobuf.Config.ConfigSchema, {
-    payloadVariant: { case: section, value } as Protobuf.Config.Config["payloadVariant"],
+    payloadVariant: {
+      case: section,
+      value,
+    } as Protobuf.Config.Config["payloadVariant"],
   });
 }
 

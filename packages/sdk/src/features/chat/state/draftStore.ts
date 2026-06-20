@@ -1,6 +1,12 @@
 import { type Signal, signal } from "@preact/signals-core";
-import { type ReadonlySignal, toReadonly } from "../../../core/signals/createStore.ts";
-import { type ConversationKey, conversationKeyString } from "../domain/MessageRepository.ts";
+import {
+  type ReadonlySignal,
+  toReadonly,
+} from "../../../core/signals/createStore.ts";
+import {
+  type ConversationKey,
+  conversationKeyString,
+} from "../domain/MessageRepository.ts";
 
 /**
  * Per-conversation draft text exposed as readonly signals. Lazy creation:

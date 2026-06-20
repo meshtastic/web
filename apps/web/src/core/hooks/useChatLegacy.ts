@@ -30,17 +30,32 @@ export type UseChatAsLegacyMessagesParams =
   | UseChatAsLegacyMessagesBroadcast
   | UseChatAsLegacyMessagesDirect;
 
-export function useChatAsLegacyMessages(params: UseChatAsLegacyMessagesParams): LegacyMessage[] {
+export function useChatAsLegacyMessages(
+  params: UseChatAsLegacyMessagesParams,
+): LegacyMessage[] {
   const broadcast = useChat(
-    params.type === MessageType.Broadcast ? params.channelId : (0 as Types.ChannelNumber),
+    params.type === MessageType.Broadcast
+      ? params.channelId
+      : (0 as Types.ChannelNumber),
   );
-  const direct = useDirectChat(params.type === MessageType.Direct ? params.peer : 0);
-  const sdkMessages = params.type === MessageType.Broadcast ? broadcast.messages : direct.messages;
+  const direct = useDirectChat(
+    params.type === MessageType.Direct ? params.peer : 0,
+  );
+  const sdkMessages =
+    params.type === MessageType.Broadcast
+      ? broadcast.messages
+      : direct.messages;
 
-  return useMemo(() => sdkMessages.map((m) => toLegacy(m, params)), [sdkMessages, params]);
+  return useMemo(
+    () => sdkMessages.map((m) => toLegacy(m, params)),
+    [sdkMessages, params],
+  );
 }
 
-function toLegacy(message: SdkMessage, params: UseChatAsLegacyMessagesParams): LegacyMessage {
+function toLegacy(
+  message: SdkMessage,
+  params: UseChatAsLegacyMessagesParams,
+): LegacyMessage {
   return {
     type: params.type,
     channel: message.channel,
