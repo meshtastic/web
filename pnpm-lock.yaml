@@ -124,8 +124,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@radix-ui/react-tabs':
-        specifier: ^1.1.14
-        version: 1.1.14(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^1.1.15
+        version: 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@radix-ui/react-toast':
         specifier: ^1.2.16
         version: 1.2.16(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -2220,8 +2220,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-tabs@1.1.14':
-    resolution: {integrity: sha512-D5jwp9JNuwDeCw3CYD2Fz+sSHo0droQjC8u75dJHe4aWr5q6yBiXZU+hurXnKudRgEpUkD5TsI6bjHPo5ThUxA==}
+  '@radix-ui/react-tabs@1.1.15':
+    resolution: {integrity: sha512-kxc9gI6/HfcU4nfMMVS3AmQK414kbU1IE6UCJmMmxjhO3cRPXOyYnmvyKD+ODt7q56nRq9l7Wovi6uaGwKgMlg==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -8187,15 +8187,15 @@ snapshots:
       '@types/react': 19.2.17
       '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
-  '@radix-ui/react-tabs@1.1.14(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-tabs@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@radix-ui/primitive': 1.1.4
       '@radix-ui/react-context': 1.1.4(@types/react@19.2.17)(react@19.2.7)
       '@radix-ui/react-direction': 1.1.2(@types/react@19.2.17)(react@19.2.7)
       '@radix-ui/react-id': 1.1.2(@types/react@19.2.17)(react@19.2.7)
       '@radix-ui/react-presence': 1.1.6(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-primitive': 2.1.5(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-roving-focus': 1.1.12(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-primitive': 2.1.6(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-roving-focus': 1.1.13(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@radix-ui/react-use-controllable-state': 1.2.3(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
