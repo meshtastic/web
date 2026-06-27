@@ -76,7 +76,9 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
               name: "enabled",
               label: t("rangeTest.enabled.label"),
               description: t("rangeTest.enabled.description"),
-              disabled: isPrimaryChannelPublic,
+              disabled:
+                isPrimaryChannelPublic &&
+                !(effective?.enabled ?? moduleConfig.rangeTest?.enabled ?? false),
             },
             {
               type: "number",
