@@ -1,4 +1,13 @@
 version: 2
+
+registries:
+  # Workaround https://github.com/dependabot/dependabot-core/issues/15415
+  public:
+    type: npm-registry
+    url: https://registry.npmjs.org/
+    token: ${{ secrets.DEPENDABOT_NULL_TOKEN }}
+    replaces-base: true
+
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
