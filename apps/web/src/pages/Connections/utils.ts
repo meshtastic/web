@@ -42,12 +42,12 @@ export function createConnectionFromInput(input: NewConnection): Connection {
 
 export async function testHttpReachable(
   url: string,
-  timeoutMs = 2500,
-): Promise<boolean> {
+  timeoutMs = 10000,
+): Promise<{ reachable: boolean; certError: boolean }> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
-    // Use no-cors to avoid CORS failure; opaque responses resolve but status is 0
+    // no-cors: opaque responses resolve fine; CORS failures and cert rejections both throw TypeError
     await fetch(url, {
       method: "GET",
       mode: "no-cors",
@@ -55,10 +55,26 @@ export async function testHttpReachable(
       signal: controller.signal,
     });
     clearTimeout(timer);
-    return true;
-  } catch {
-    return false;
+    return { reachable: true, certError: false };
+  } catch (err) {
+    const wasAborted = err instanceof DOMException && err.name === "AbortError";
+    // For HTTPS: any non-timeout failure is a cert rejection — the browser throws the same TypeError
+    // for untrusted certs as for network errors, but a true timeout always comes through as AbortError.
+    const certError = !wasAborted && url.startsWith("https:");
+    return { reachable: false, certError };
   }
+}
+
+export function httpErrorMessage(url: string, certError: boolean): string {
+  if (certError) {
+    return `Self-signed certificate not trusted. Open ${url} in a new tab, accept the security warning, then return here and try again.`;
+  }
+  try {
+    if (new URL(url).protocol === "https:") {
+      return "HTTPS endpoint not reachable. Check that the device is online.";
+    }
+  } catch {}
+  return "HTTP endpoint not reachable (may be blocked by CORS or a network issue)";
 }
 
 export function connectionTypeIcon(type: ConnectionType): LucideIcon {

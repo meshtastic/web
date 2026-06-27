@@ -39,6 +39,7 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  ExternalLink,
   LinkIcon,
   MoreHorizontal,
   RotateCw,
@@ -372,9 +373,20 @@ function ConnectionCard({
       </CardHeader>
       <CardContent className="pt-0">
         {connection.error ? (
-          <p className="text-sm text-red-600 dark:text-red-400">
-            {connection.error}
-          </p>
+          <div className="space-y-1">
+            <p className="text-sm text-red-600 dark:text-red-400">{connection.error}</p>
+            {connection.errorKind === "cert" && connection.type === "http" && (
+              <a
+                href={connection.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-red-600 dark:text-red-400 underline hover:no-underline"
+              >
+                <ExternalLink className="size-3" />
+                Open in new tab →
+              </a>
+            )}
+          </div>
         ) : connection.lastConnectedAt ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {t("lastConnectedAt", { date: "" })}{" "}
