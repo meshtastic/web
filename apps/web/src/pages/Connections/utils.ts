@@ -40,9 +40,12 @@ export function createConnectionFromInput(input: NewConnection): Connection {
   };
 }
 
+/** Default probe timeout — some devices (e.g. Heltec) can take several seconds on first request. */
+const HTTP_REACHABILITY_TIMEOUT_MS = 10_000;
+
 export async function testHttpReachable(
   url: string,
-  timeoutMs = 2500,
+  timeoutMs = HTTP_REACHABILITY_TIMEOUT_MS,
 ): Promise<boolean> {
   try {
     const controller = new AbortController();
