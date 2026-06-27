@@ -40,10 +40,19 @@ export function createConnectionFromInput(input: NewConnection): Connection {
   };
 }
 
+// Cert rejection requires a TCP connection + TLS handshake before the browser rejects,
+// so it takes at least ~20ms on a LAN. Failures faster than that are port-closed or
+// ICMP-unreachable (no TLS ever attempted). ARP timeouts for phantom IPs on the same
+// subnet take ~1-3s, so failures slower than 2000ms (but before the AbortController
+// fires) are that — not a cert rejection. True timeouts come through as AbortError.
+const CERT_MIN_MS = 20;
+const CERT_MAX_MS = 2000;
+
 export async function testHttpReachable(
   url: string,
   timeoutMs = 10000,
 ): Promise<{ reachable: boolean; certError: boolean }> {
+  const start = performance.now();
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -57,10 +66,13 @@ export async function testHttpReachable(
     clearTimeout(timer);
     return { reachable: true, certError: false };
   } catch (err) {
+    const elapsed = performance.now() - start;
     const wasAborted = err instanceof DOMException && err.name === "AbortError";
-    // For HTTPS: any non-timeout failure is a cert rejection — the browser throws the same TypeError
-    // for untrusted certs as for network errors, but a true timeout always comes through as AbortError.
-    const certError = !wasAborted && url.startsWith("https:");
+    const certError =
+      !wasAborted &&
+      elapsed >= CERT_MIN_MS &&
+      elapsed < CERT_MAX_MS &&
+      url.startsWith("https:");
     return { reachable: false, certError };
   }
 }
