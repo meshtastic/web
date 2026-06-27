@@ -40,14 +40,23 @@ export function createConnectionFromInput(input: NewConnection): Connection {
   };
 }
 
+// Cert rejection requires a TCP connection + TLS handshake before the browser rejects,
+// so it takes at least ~20ms on a LAN. Failures faster than that are port-closed or
+// ICMP-unreachable (no TLS ever attempted). ARP timeouts for phantom IPs on the same
+// subnet take ~1-3s, so failures slower than 2000ms (but before the AbortController
+// fires) are that — not a cert rejection. True timeouts come through as AbortError.
+const CERT_MIN_MS = 20;
+const CERT_MAX_MS = 2000;
+
 export async function testHttpReachable(
   url: string,
-  timeoutMs = 2500,
-): Promise<boolean> {
+  timeoutMs = 10000,
+): Promise<{ reachable: boolean; certError: boolean }> {
+  const start = performance.now();
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
-    // Use no-cors to avoid CORS failure; opaque responses resolve but status is 0
+    // no-cors: opaque responses resolve fine; CORS failures and cert rejections both throw TypeError
     await fetch(url, {
       method: "GET",
       mode: "no-cors",
@@ -55,10 +64,29 @@ export async function testHttpReachable(
       signal: controller.signal,
     });
     clearTimeout(timer);
-    return true;
-  } catch {
-    return false;
+    return { reachable: true, certError: false };
+  } catch (err) {
+    const elapsed = performance.now() - start;
+    const wasAborted = err instanceof DOMException && err.name === "AbortError";
+    const certError =
+      !wasAborted &&
+      elapsed >= CERT_MIN_MS &&
+      elapsed < CERT_MAX_MS &&
+      url.startsWith("https:");
+    return { reachable: false, certError };
   }
+}
+
+export function httpErrorMessage(url: string, certError: boolean): string {
+  if (certError) {
+    return `Self-signed certificate not trusted. Open ${url} in a new tab, accept the security warning, then return here and try again.`;
+  }
+  try {
+    if (new URL(url).protocol === "https:") {
+      return "HTTPS endpoint not reachable. Check that the device is online.";
+    }
+  } catch {}
+  return "HTTP endpoint not reachable (may be blocked by CORS or a network issue)";
 }
 
 export function connectionTypeIcon(type: ConnectionType): LucideIcon {
