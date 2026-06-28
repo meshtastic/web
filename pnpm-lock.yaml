@@ -82,8 +82,8 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0
       '@preact/signals-core':
-        specifier: ^1.8.0
-        version: 1.14.2
+        specifier: ^1.14.3
+        version: 1.14.3
       '@radix-ui/react-accordion':
         specifier: ^1.2.14
         version: 1.2.14(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -342,8 +342,8 @@ importers:
         specifier: jsr:^2.7.18
         version: '@jsr/meshtastic__protobufs@2.7.20'
       '@preact/signals-core':
-        specifier: ^1.8.0
-        version: 1.14.2
+        specifier: ^1.14.3
+        version: 1.14.3
       better-result:
         specifier: ^2.9.2
         version: 2.9.2
@@ -1728,8 +1728,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@preact/signals-core@1.14.2':
-    resolution: {integrity: sha512-RZHdBj9ZF4n40Rp4jS052EHHjBWf96P9oNdXPfhQTovCuWY9iQn3Gq+gOTJSgBO9A/JBuPfMOWsSX/lIU9Pc/A==}
+  '@preact/signals-core@1.14.3':
+    resolution: {integrity: sha512-m0K3vnbSLC5rHs2ZVfeAMvBtT1zIyq4mxx5OlNncSgMj5Iz6W5Rn3kPrDxAC+iIKmiVe0lSl6U37t5ZkEWoVAw==}
 
   '@publint/pack@0.1.4':
     resolution: {integrity: sha512-HDVTWq3H0uTXiU0eeSQntcVUTPP3GamzeXI41+x7uU9J65JgWQh3qWZHblR1i0npXfFtF+mxBiU2nJH8znxWnQ==}
@@ -7652,7 +7652,7 @@ snapshots:
     dependencies:
       playwright: 1.60.0
 
-  '@preact/signals-core@1.14.2': {}
+  '@preact/signals-core@1.14.3': {}
 
   '@publint/pack@0.1.4': {}
 
