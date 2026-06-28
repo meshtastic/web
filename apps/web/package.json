@@ -112,7 +112,7 @@
     "autoprefixer": "^10.5.2",
     "gzipper": "^8.2.1",
     "happy-dom": "^20.10.6",
-    "oxfmt": "^0.55.0",
+    "oxfmt": "^0.56.0",
     "oxlint": "^1.70.0",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.1",
