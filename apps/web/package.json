@@ -108,7 +108,7 @@
     "@types/serviceworker": "^0.0.197",
     "@types/w3c-web-serial": "^1.0.8",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
-    "@vitejs/plugin-react": "^6.0.2",
+    "@vitejs/plugin-react": "^6.0.3",
     "autoprefixer": "^10.5.0",
     "gzipper": "^8.2.1",
     "happy-dom": "^20.10.6",
