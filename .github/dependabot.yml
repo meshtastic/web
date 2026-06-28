@@ -14,6 +14,9 @@ updates:
       tanstack:
         patterns:
           - "@tanstack/*"
+      radix-ui:
+        patterns:
+          - "@radix-ui/*"
       react-ecosystem:
         patterns:
           - react
