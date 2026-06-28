@@ -38,7 +38,7 @@
   "devDependencies": {
     "@meshtastic/core": "jsr:^2.6.6",
     "@meshtastic/sdk": "workspace:*",
-    "@playwright/test": "^1.49.0",
+    "@playwright/test": "^1.61.1",
     "@types/node": "^25.9.3",
     "husky": "^9.1.0",
     "lint-staged": "^17.0.8",
