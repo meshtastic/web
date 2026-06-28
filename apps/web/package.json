@@ -110,7 +110,7 @@
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^6.0.3",
     "autoprefixer": "^10.5.2",
-    "gzipper": "^8.2.1",
+    "gzipper": "^8.3.0",
     "happy-dom": "^20.10.6",
     "oxfmt": "^0.56.0",
     "oxlint": "^1.71.0",
