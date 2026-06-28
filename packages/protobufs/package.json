@@ -19,10 +19,10 @@
     "build": "pnpm run clean && pnpm run gen"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.9.0"
+    "@bufbuild/protobuf": "^2.12.1"
   },
   "devDependencies": {
-    "@bufbuild/protoc-gen-es": "^2.12.0",
+    "@bufbuild/protoc-gen-es": "^2.12.1",
     "rimraf": "^6.0.0"
   }
 }

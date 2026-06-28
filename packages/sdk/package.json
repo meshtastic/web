@@ -47,9 +47,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.9.0",
+    "@bufbuild/protobuf": "^2.12.1",
     "@meshtastic/protobufs": "jsr:^2.7.18",
-    "@preact/signals-core": "^1.8.0",
+    "@preact/signals-core": "^1.14.3",
     "better-result": "^2.9.2",
     "crc": "npm:crc@^4.3.2",
     "ste-simple-events": "^3.0.11",
