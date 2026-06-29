@@ -150,7 +150,7 @@ const ConfigPage = () => {
           title: t("common:toast.profileImported.title", "Profile Imported"),
           description: t("common:toast.profileImported.description", "Settings staged. Click Save to commit."),
         });
-      } catch (err) {
+      } catch {
         toast({
           title: t("common:toast.profileImportFailed.title", "Import Failed"),
           description: t("common:toast.profileImportFailed.description", "Failed to parse the .cfg file"),
@@ -168,11 +168,11 @@ const ConfigPage = () => {
     if (!editor) return;
     
     // Save unsaved changes if there are any
-    if (editorIsDirty.value || (formMethods && formMethods.formState.isDirty)) {
+    if (editorIsDirty || (formMethods && formMethods.formState.isDirty)) {
       setIsSaving(true);
       try {
         const commitResult = await editor.commit();
-        if (commitResult.isError) {
+        if (commitResult.status === "error") {
           throw commitResult.error;
         }
         if (formMethods) {
@@ -195,7 +195,7 @@ const ConfigPage = () => {
     }
     
     exportProfile(editor);
-  }, [editor, editorIsDirty.value, formMethods, toast, t]);
+  }, [editor, editorIsDirty, formMethods, toast, t]);
 
   const handleSave = useCallback(async () => {
     if (!editor) return;
@@ -337,6 +337,8 @@ const ConfigPage = () => {
       buttonOpacity,
       handleReset,
       handleSave,
+      handleSaveAndExport,
+      handleImportClick,
       t,
     ],
   );

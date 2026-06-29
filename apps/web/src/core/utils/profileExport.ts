@@ -9,6 +9,8 @@ export function exportProfile(editor: ConfigEditor) {
   const profile = create(Protobuf.ClientOnly.DeviceProfileSchema, {
     longName: owner?.longName,
     shortName: owner?.shortName,
+    // @ts-expect-error fixedPosition is mapped dynamically in some contexts
+    fixedPosition: radio.fixedPosition,
     config: {
       device: radio.device,
       position: radio.position,
