@@ -10,16 +10,19 @@ import { DeviceConfig } from "@pages/Settings/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig.tsx";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
+  DownloadIcon,
   LayersIcon,
   RadioTowerIcon,
   RefreshCwIcon,
   RouterIcon,
   SaveIcon,
   SaveOff,
+  UploadIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { exportProfile, importProfile } from "@core/utils/profileExport.ts";
 import { RadioConfig } from "./RadioConfig.tsx";
 
 const EMPTY_DIRTY_STRING_SIGNAL = {
@@ -129,6 +132,71 @@ const ConfigPage = () => {
     return () => unsubRef.current?.();
   }, []);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !editor) return;
+
+      try {
+        const buffer = await file.arrayBuffer();
+        importProfile(new Uint8Array(buffer), editor);
+        toast({
+          title: t("common:toast.profileImported.title", "Profile Imported"),
+          description: t("common:toast.profileImported.description", "Settings staged. Click Save to commit."),
+        });
+      } catch (err) {
+        toast({
+          title: t("common:toast.profileImportFailed.title", "Import Failed"),
+          description: t("common:toast.profileImportFailed.description", "Failed to parse the .cfg file"),
+        });
+      }
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    },
+    [editor, toast, t],
+  );
+
+  const handleSaveAndExport = useCallback(async () => {
+    if (!editor) return;
+    
+    // Save unsaved changes if there are any
+    if (editorIsDirty.value || (formMethods && formMethods.formState.isDirty)) {
+      setIsSaving(true);
+      try {
+        const commitResult = await editor.commit();
+        if (commitResult.isError) {
+          throw commitResult.error;
+        }
+        if (formMethods) {
+          formMethods.reset(undefined, {
+            keepDirty: false,
+            keepTouched: false,
+            keepValues: true,
+          });
+          formMethods.trigger();
+        }
+      } catch {
+        toast({
+          title: t("toast.configSaveError.title"),
+          description: t("toast.configSaveError.description"),
+        });
+        setIsSaving(false);
+        return; // Abort export if save failed
+      }
+      setIsSaving(false);
+    }
+    
+    exportProfile(editor);
+  }, [editor, editorIsDirty.value, formMethods, toast, t]);
+
   const handleSave = useCallback(async () => {
     if (!editor) return;
     setIsSaving(true);
@@ -209,6 +277,30 @@ const ConfigPage = () => {
         ]),
       },
       {
+        key: "import",
+        icon: DownloadIcon,
+        label: t("common:button.importProfile", "Import Profile"),
+        onClick: handleImportClick,
+        className: cn([
+          "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
+          "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer opacity-100",
+        ]),
+      },
+      {
+        key: "saveAndExport",
+        icon: UploadIcon,
+        isLoading: isSaving && hasPending, // Only show loading if it's saving unsaved changes
+        disabled: isSaving,
+        onClick: handleSaveAndExport,
+        label: hasPending 
+          ? t("common:button.saveAndExport", "Save & Export") 
+          : t("common:button.export"),
+        className: cn([
+          "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
+          "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer opacity-100",
+        ]),
+      },
+      {
         key: "reset",
         icon: RefreshCwIcon,
         label: t("common:button.reset"),
@@ -259,6 +351,13 @@ const ConfigPage = () => {
       actions={actions}
     >
       {ActiveComponent && <ActiveComponent onFormInit={onFormInit} />}
+      <input
+        type="file"
+        accept=".cfg"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
     </PageLayout>
   );
 };
