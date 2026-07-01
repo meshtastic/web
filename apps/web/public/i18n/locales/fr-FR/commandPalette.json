@@ -45,7 +45,7 @@
     "command": {
       "reconfigure": "Reconfigurer",
       "clearAllStoredMessages": "Effacer tous les messages stockés",
-      "clearAllStores": "Clear All Local Storage"
+      "clearAllStores": "Effacer l'intégralité du stockage local"
     }
   }
 }
