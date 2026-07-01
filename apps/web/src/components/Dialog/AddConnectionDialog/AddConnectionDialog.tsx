@@ -26,10 +26,12 @@ import {
   Bluetooth,
   Cable,
   CheckCircle2,
+  ExternalLink,
   Globe,
   Loader2,
   type LucideIcon,
   MousePointerClick,
+  ShieldAlert,
   XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
@@ -38,7 +40,7 @@ import { DialogWrapper } from "../DialogWrapper.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
 
 type TabKey = ConnectionType;
-type TestingStatus = "idle" | "testing" | "success" | "failure";
+type TestingStatus = "idle" | "testing" | "success" | "failure" | "cert-error";
 type DialogState = {
   tab: TabKey;
   name: string;
@@ -390,9 +392,11 @@ export default function AddConnectionDialog({
       return;
     }
     dispatch({ type: "SET_TEST_STATUS", payload: "testing" });
-    const reachable = await testHttpReachable(validatedURL.data);
+    const { reachable, certError } = await testHttpReachable(validatedURL.data);
     if (reachable) {
       dispatch({ type: "SET_TEST_STATUS", payload: "success" });
+    } else if (certError) {
+      dispatch({ type: "SET_TEST_STATUS", payload: "cert-error" });
     } else {
       dispatch({ type: "SET_TEST_STATUS", payload: "failure" });
       toast({
@@ -480,6 +484,24 @@ export default function AddConnectionDialog({
                   {t(
                     "addConnection.httpConnection.connectionTest.notReachable",
                   )}
+                </div>
+              )}
+              {state.testStatus === "cert-error" && (
+                <div className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400">
+                  <ShieldAlert className="h-4 w-4 shrink-0" />
+                  <span>
+                    <Trans
+                      i18nKey="connections:httpTest.certNotTrusted"
+                      components={[
+                        <Link
+                          key="open"
+                          href={`${state.protocol}://${state.url}`}
+                          className="inline-flex items-center gap-0.5 underline hover:no-underline"
+                        />,
+                      ]}
+                    />
+                    <ExternalLink className="h-3 w-3 inline-block ml-0.5" />
+                  </span>
                 </div>
               )}
             </div>
