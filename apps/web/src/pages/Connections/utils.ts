@@ -5,6 +5,7 @@ import type {
   NewConnection,
 } from "@app/core/stores/deviceStore/types";
 import { randId } from "@app/core/utils/randId";
+import { t } from "i18next";
 import { Bluetooth, Cable, Globe, type LucideIcon } from "lucide-react";
 
 export function createConnectionFromInput(input: NewConnection): Connection {
@@ -79,14 +80,14 @@ export async function testHttpReachable(
 
 export function httpErrorMessage(url: string, certError: boolean): string {
   if (certError) {
-    return `Self-signed certificate not trusted. Open ${url} in a new tab, accept the security warning, then return here and try again.`;
+    return t("connections:errors.certNotTrusted", { url });
   }
   try {
     if (new URL(url).protocol === "https:") {
-      return "HTTPS endpoint not reachable. Check that the device is online.";
+      return t("connections:errors.httpsNotReachable");
     }
   } catch {}
-  return "HTTP endpoint not reachable (may be blocked by CORS or a network issue)";
+  return t("connections:errors.httpNotReachable");
 }
 
 export function connectionTypeIcon(type: ConnectionType): LucideIcon {

@@ -490,17 +490,17 @@ export default function AddConnectionDialog({
                 <div className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400">
                   <ShieldAlert className="h-4 w-4 shrink-0" />
                   <span>
-                    {"Certificate not trusted. "}
-                    <a
-                      href={`${state.protocol}://${state.url}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-0.5 underline hover:no-underline"
-                    >
-                      Open in new tab
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                    {" and accept the warning, then test again."}
+                    <Trans
+                      i18nKey="connections:httpTest.certNotTrusted"
+                      components={[
+                        <Link
+                          key="open"
+                          href={`${state.protocol}://${state.url}`}
+                          className="inline-flex items-center gap-0.5 underline hover:no-underline"
+                        />,
+                      ]}
+                    />
+                    <ExternalLink className="h-3 w-3 inline-block ml-0.5" />
                   </span>
                 </div>
               )}

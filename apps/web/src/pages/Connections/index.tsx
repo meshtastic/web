@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
 import { Separator } from "@components/UI/Separator.tsx";
+import { Link } from "@components/UI/Typography/Link.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -374,17 +375,17 @@ function ConnectionCard({
       <CardContent className="pt-0">
         {connection.error ? (
           <div className="space-y-1">
-            <p className="text-sm text-red-600 dark:text-red-400">{connection.error}</p>
+            <p className="text-sm text-red-600 dark:text-red-400">
+              {connection.error}
+            </p>
             {connection.errorKind === "cert" && connection.type === "http" && (
-              <a
+              <Link
                 href={connection.url}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-sm text-red-600 dark:text-red-400 underline hover:no-underline"
               >
                 <ExternalLink className="size-3" />
-                Open in new tab →
-              </a>
+                {t("errors.openInNewTab")}
+              </Link>
             )}
           </div>
         ) : connection.lastConnectedAt ? (
