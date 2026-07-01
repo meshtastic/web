@@ -21,9 +21,7 @@ const EMPTY_MODULES_SIGNAL = {
     rangeTest?: Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig;
   },
   peek: () =>
-    ({}) as {
-      rangeTest?: Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig;
-    },
+    ({}) as { rangeTest?: Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig },
   subscribe: () => () => {},
 } as const;
 
