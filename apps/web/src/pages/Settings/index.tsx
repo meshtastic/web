@@ -147,13 +147,19 @@ const ConfigPage = () => {
         const buffer = await file.arrayBuffer();
         importProfile(new Uint8Array(buffer), editor);
         toast({
-          title: t("common:toast.profileImported.title", "Profile Imported"),
-          description: t("common:toast.profileImported.description", "Settings staged. Click Save to commit."),
+          title: t("toast.profileImported.title", "Profile Imported"),
+          description: t(
+            "toast.profileImported.description",
+            "Settings staged. Click Save to commit.",
+          ),
         });
       } catch {
         toast({
-          title: t("common:toast.profileImportFailed.title", "Import Failed"),
-          description: t("common:toast.profileImportFailed.description", "Failed to parse the .cfg file"),
+          title: t("toast.profileImportFailed.title", "Import Failed"),
+          description: t(
+            "toast.profileImportFailed.description",
+            "Failed to parse the .cfg file",
+          ),
         });
       }
 
@@ -166,7 +172,7 @@ const ConfigPage = () => {
 
   const handleSaveAndExport = useCallback(async () => {
     if (!editor) return;
-    
+
     // Save unsaved changes if there are any
     if (editorIsDirty || (formMethods && formMethods.formState.isDirty)) {
       setIsSaving(true);
@@ -188,12 +194,12 @@ const ConfigPage = () => {
           title: t("toast.configSaveError.title"),
           description: t("toast.configSaveError.description"),
         });
-        setIsSaving(false);
         return; // Abort export if save failed
+      } finally {
+        setIsSaving(false);
       }
-      setIsSaving(false);
     }
-    
+
     exportProfile(editor);
   }, [editor, editorIsDirty, formMethods, toast, t]);
 
@@ -292,8 +298,8 @@ const ConfigPage = () => {
         isLoading: isSaving && hasPending, // Only show loading if it's saving unsaved changes
         disabled: isSaving,
         onClick: handleSaveAndExport,
-        label: hasPending 
-          ? t("common:button.saveAndExport", "Save & Export") 
+        label: hasPending
+          ? t("common:button.saveAndExport", "Save & Export")
           : t("common:button.export"),
         className: cn([
           "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",

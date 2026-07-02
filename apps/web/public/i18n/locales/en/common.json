@@ -36,16 +36,6 @@
     "saveAndExport": "Save & Export",
     "importProfile": "Import Profile"
   },
-  "toast": {
-    "profileImported": {
-      "title": "Profile Imported",
-      "description": "Settings staged. Click Save to commit."
-    },
-    "profileImportFailed": {
-      "title": "Import Failed",
-      "description": "Failed to parse the .cfg file."
-    }
-  },
   "app": {
     "title": "Meshtastic",
     "fullTitle": "Meshtastic Web Client"
