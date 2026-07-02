@@ -65,6 +65,12 @@ describe("AppStore – basic state & actions", () => {
 
     state.setNodeNumDetails(777);
     expect(useAppStore.getState().nodeNumDetails).toBe(777);
+
+    expect(useAppStore.getState().focusWaypointId).toBeUndefined();
+    state.setFocusWaypointId(555);
+    expect(useAppStore.getState().focusWaypointId).toBe(555);
+    state.setFocusWaypointId(undefined);
+    expect(useAppStore.getState().focusWaypointId).toBeUndefined();
   });
 
   it("setRasterSources replaces; addRasterSource appends; removeRasterSource splices by index", async () => {

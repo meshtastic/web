@@ -14,6 +14,7 @@ export interface WaypointLayerProps {
   isVisible: boolean;
   popupState: PopupState | undefined;
   setPopupState: (state: PopupState | undefined) => void;
+  onEditWaypoint: (waypoint: WaypointWithMetadata) => void;
 }
 
 import { toLngLat } from "@core/utils/geo.ts";
@@ -24,6 +25,7 @@ export const WaypointLayer = ({
   isVisible,
   popupState,
   setPopupState,
+  onEditWaypoint,
 }: WaypointLayerProps): React.ReactNode[] => {
   const { waypoints } = useDevice();
   const { focusLngLat } = useMapFitting(mapRef);
@@ -82,9 +84,14 @@ export const WaypointLayer = ({
         offset={[0, 25]}
         onClose={() => setPopupState(undefined)}
       >
-        <WaypointDetail waypoint={popupState.waypoint} myNode={myNode} onEdit={() => {}} />
+        <WaypointDetail
+          waypoint={popupState.waypoint}
+          myNode={myNode}
+          onEdit={() => onEditWaypoint(popupState.waypoint)}
+        />
       </PopupWrapper>,
     );
   }
+
   return rendered;
 };

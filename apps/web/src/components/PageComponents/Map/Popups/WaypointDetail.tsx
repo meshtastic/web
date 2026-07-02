@@ -1,17 +1,22 @@
 import { TimeAgo } from "@components/generic/TimeAgo";
+import { Button } from "@components/UI/Button.tsx";
 import { Separator } from "@components/UI/Separator.tsx";
 import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import type { WaypointWithMetadata } from "@core/stores";
 import { bearingDegrees, distanceMeters, hasPos, toLngLat } from "@core/utils/geo";
+import { hasGeofence } from "@core/utils/geofence.ts";
 import type { Protobuf } from "@meshtastic/sdk";
 import {
+  BellIcon,
   ClockFadingIcon,
   ClockPlusIcon,
   CompassIcon,
   MapPinnedIcon,
   MoveHorizontalIcon,
   NavigationIcon,
+  PencilIcon,
   RotateCwIcon,
+  ShieldIcon,
   UserLockIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -22,7 +27,7 @@ interface WaypointDetailProps {
   onEdit: () => void;
 }
 
-export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
+export const WaypointDetail = ({ waypoint, myNode, onEdit }: WaypointDetailProps) => {
   const { t } = useTranslation("map");
   const lockedToNode = useNodeAsProto(waypoint.lockedTo ?? 0);
 
@@ -170,8 +175,50 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
               </dd>
             </div>
           )}
+
+          {/* Geofence radius */}
+          {waypoint.geofenceRadius > 0 && (
+            <div className="flex flex-wrap items-start gap-x-3">
+              <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
+                <ShieldIcon size={14} aria-hidden />
+                <span className="truncate">{t("waypointDetail.geofenceRadius")}</span>
+              </dt>
+              <dd className="ms-auto text-right">
+                {waypoint.geofenceRadius}{" "}
+                {waypoint.geofenceRadius === 1 ? t("unit.meter.one") : t("unit.meter.plural")}
+              </dd>
+            </div>
+          )}
+
+          {/* Alert flags */}
+          {(waypoint.notifyOnEnter || waypoint.notifyOnExit) && (
+            <div className="flex flex-wrap items-start gap-x-3">
+              <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
+                <BellIcon size={14} aria-hidden />
+                <span className="truncate">{t("waypointDetail.notifications")}</span>
+              </dt>
+              <dd className="ms-auto text-right text-xs">
+                {[
+                  waypoint.notifyOnEnter ? t("waypointDetail.enter") : undefined,
+                  waypoint.notifyOnExit ? t("waypointDetail.exit") : undefined,
+                  waypoint.notifyFavoritesOnly ? t("waypointDetail.favoritesOnly") : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </dd>
+            </div>
+          )}
         </dl>
       </section>
+
+      <footer className="mt-2 flex items-center justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={onEdit}>
+          <PencilIcon size={12} className="mr-1" />
+          {hasGeofence(waypoint)
+            ? t("waypointDetail.editGeofence")
+            : t("waypointDetail.addGeofence")}
+        </Button>
+      </footer>
     </article>
   );
 };
