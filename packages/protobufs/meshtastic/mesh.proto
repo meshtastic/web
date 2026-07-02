@@ -1475,6 +1475,59 @@ message Waypoint {
    * Designator icon for the waypoint in the form of a unicode emoji
    */
   fixed32 icon = 8;
+
+  /*
+   * Geofence circle radius in meters around (latitude_i, longitude_i).
+   * 0 disables the circular geofence.
+   */
+  uint32 geofence_radius = 9;
+
+  /*
+   * Optional axis-aligned rectangular geofence (WSEN order).
+   * A point is inside the geofence if it falls inside the circle OR the box.
+   */
+  optional BoundingBox bounding_box = 10;
+
+  /*
+   * When true, receivers alert on nodes crossing outside -> inside.
+   */
+  bool notify_on_enter = 11;
+
+  /*
+   * When true, receivers alert on nodes crossing inside -> outside.
+   */
+  bool notify_on_exit = 12;
+
+  /*
+   * When true, suppress alerts for nodes not marked as favorite locally.
+   */
+  bool notify_favorites_only = 13;
+}
+
+/*
+ * Axis-aligned rectangular region in the same 1e-7 degree encoding as
+ * Position.  Field order matches GeoJSON bbox (west, south, east, north).
+ */
+message BoundingBox {
+  /*
+   * West edge longitude (1e-7 degrees).
+   */
+  sfixed32 longitude_west_i = 1;
+
+  /*
+   * South edge latitude (1e-7 degrees).
+   */
+  sfixed32 latitude_south_i = 2;
+
+  /*
+   * East edge longitude (1e-7 degrees).
+   */
+  sfixed32 longitude_east_i = 3;
+
+  /*
+   * North edge latitude (1e-7 degrees).
+   */
+  sfixed32 latitude_north_i = 4;
 }
 
 /*

@@ -24,6 +24,7 @@ export interface AppState extends AppData {
   connectDialogOpen: boolean;
   nodeNumDetails: number;
   commandPaletteOpen: boolean;
+  focusWaypointId: number | undefined;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -33,6 +34,7 @@ export interface AppState extends AppData {
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setConnectDialogOpen: (open: boolean) => void;
   setNodeNumDetails: (nodeNum: number) => void;
+  setFocusWaypointId: (id: number | undefined) => void;
 }
 
 export const deviceStoreInitializer: StateCreator<AppState> = (set, _get) => ({
@@ -42,6 +44,7 @@ export const deviceStoreInitializer: StateCreator<AppState> = (set, _get) => ({
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
+  focusWaypointId: undefined,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -89,6 +92,10 @@ export const deviceStoreInitializer: StateCreator<AppState> = (set, _get) => ({
   setNodeNumDetails: (nodeNum) =>
     set(() => ({
       nodeNumDetails: nodeNum,
+    })),
+  setFocusWaypointId: (id) =>
+    set(() => ({
+      focusWaypointId: id,
     })),
 });
 

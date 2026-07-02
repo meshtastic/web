@@ -1,4 +1,5 @@
 allowBuilds:
+  "@bufbuild/buf": true
   "@serialport/bindings-cpp": false
   "@tailwindcss/oxide": false
   "core-js": false
@@ -7,3 +8,5 @@ minimumReleaseAge: 2880 # package dependency library must be at least 2 days old
 packages:
   - "packages/*"
   - "apps/*"
+overrides:
+  "@meshtastic/protobufs": "workspace:*"

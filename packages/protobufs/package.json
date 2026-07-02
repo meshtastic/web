@@ -16,12 +16,14 @@
   "scripts": {
     "gen": "buf generate",
     "clean": "rimraf packages/ts/dist",
-    "build": "pnpm run clean && pnpm run gen"
+    "build": "pnpm run clean && pnpm run gen",
+    "postinstall": "pnpm run gen"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.1"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.71.0",
     "@bufbuild/protoc-gen-es": "^2.12.1",
     "rimraf": "^6.0.0"
   }
