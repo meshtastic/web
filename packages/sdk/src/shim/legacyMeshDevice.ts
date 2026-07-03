@@ -310,6 +310,24 @@ export class MeshDevice {
     });
   }
 
+  public sendKeyVerification(
+    messageType: Protobuf.Admin.KeyVerificationAdmin_MessageType,
+    remoteNodenum: number,
+    nonce: bigint,
+    securityNumber?: number,
+  ): Promise<number> {
+    const keyVerification = create(Protobuf.Admin.KeyVerificationAdminSchema, {
+      messageType,
+      remoteNodenum,
+      nonce,
+      securityNumber,
+    });
+    return sendAdminMessage(this.client, {
+      case: "keyVerification",
+      value: keyVerification,
+    });
+  }
+
   public resetNodes(): Promise<number> {
     return sendAdminMessage(this.client, { case: "nodedbReset", value: true });
   }
