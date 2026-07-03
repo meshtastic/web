@@ -13,13 +13,17 @@ test.describe("broadcast messaging over a real two-node mesh", () => {
     await messagesPage.waitReady();
   });
 
-  test("renders a broadcast received from a mesh peer (mesh -> web)", async ({ messagesPage }) => {
+  test("renders a broadcast received from a mesh peer (mesh -> web)", async ({
+    messagesPage,
+  }) => {
     const nonce = `pong-${Date.now()}`;
     await peerSend(nonce);
     await messagesPage.expectMessage(nonce);
   });
 
-  test("delivers a typed broadcast to the mesh (web -> mesh)", async ({ messagesPage }) => {
+  test("delivers a typed broadcast to the mesh (web -> mesh)", async ({
+    messagesPage,
+  }) => {
     const nonce = `ping-${Date.now()}`;
     // Listen on the peer node before sending, then type+send from the browser.
     const recv = await startPeerRecv(nonce, { timeout: 60 });
