@@ -8,32 +8,46 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import type { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface TrafficManagementModuleConfigProps {
   onFormInit: DynamicFormFormInit<TrafficManagementValidation>;
 }
 
+const EMPTY_MODULES_SIGNAL = {
+  value: {} as {
+    trafficManagement?: Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfig;
+  },
+  peek: () =>
+    ({}) as {
+      trafficManagement?: Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfig;
+    },
+  subscribe: () => () => {},
+} as const;
+
 export const TrafficManagement = ({
   onFormInit,
 }: TrafficManagementModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "trafficManagement" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const editor = useConfigEditor();
+  const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
+  const effective =
+    modules.trafficManagement ??
+    (getEffectiveModuleConfig("trafficManagement") as
+      | Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfig
+      | undefined);
+
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: TrafficManagementValidation) => {
-    if (deepCompareConfig(moduleConfig.trafficManagement, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "trafficManagement" });
-      return;
-    }
-
-    setChange(
-      { type: "moduleConfig", variant: "trafficManagement" },
-      data,
-      moduleConfig.trafficManagement,
+    if (!editor) return;
+    editor.setModuleSection(
+      "trafficManagement",
+      data as unknown as Protobuf.ModuleConfig.ModuleConfig_TrafficManagementConfig,
     );
   };
 
@@ -43,7 +57,7 @@ export const TrafficManagement = ({
       onFormInit={onFormInit}
       validationSchema={TrafficManagementValidationSchema}
       defaultValues={moduleConfig.trafficManagement}
-      values={getEffectiveModuleConfig("trafficManagement")}
+      values={effective}
       fieldGroups={[
         {
           label: t("trafficManagement.title"),
