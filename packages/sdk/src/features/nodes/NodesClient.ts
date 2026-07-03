@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import type { Node } from "./domain/Node.ts";
@@ -173,31 +173,31 @@ export class NodesClient {
     this.errorsStore.clear();
   }
 
-  public async favorite(nodeNum: number): Promise<ResultType<number, Error>> {
+  public async favorite(nodeNum: number): Promise<Result<number, Error>> {
     const result = await favoriteNode(this.client, nodeNum);
     if (result.status === "ok") this.patch(nodeNum, { isFavorite: true });
     return result;
   }
 
-  public async unfavorite(nodeNum: number): Promise<ResultType<number, Error>> {
+  public async unfavorite(nodeNum: number): Promise<Result<number, Error>> {
     const result = await removeFavoriteNode(this.client, nodeNum);
     if (result.status === "ok") this.patch(nodeNum, { isFavorite: false });
     return result;
   }
 
-  public async ignore(nodeNum: number): Promise<ResultType<number, Error>> {
+  public async ignore(nodeNum: number): Promise<Result<number, Error>> {
     const result = await ignoreNode(this.client, nodeNum);
     if (result.status === "ok") this.patch(nodeNum, { isIgnored: true });
     return result;
   }
 
-  public async unignore(nodeNum: number): Promise<ResultType<number, Error>> {
+  public async unignore(nodeNum: number): Promise<Result<number, Error>> {
     const result = await removeIgnoredNode(this.client, nodeNum);
     if (result.status === "ok") this.patch(nodeNum, { isIgnored: false });
     return result;
   }
 
-  public remove(nodeNum: number): Promise<ResultType<number, Error>> {
+  public remove(nodeNum: number): Promise<Result<number, Error>> {
     void this.repository.remove(nodeNum).catch(() => {});
     this.store.delete(nodeNum);
     this.errorsStore.delete(nodeNum);
@@ -212,7 +212,7 @@ export class NodesClient {
    */
   public async reset(
     options: { keepMyNode?: boolean } = {},
-  ): Promise<ResultType<number, Error>> {
+  ): Promise<Result<number, Error>> {
     const myNodeNum = this.client.device.myNodeNum.value;
     if (options.keepMyNode && myNodeNum !== undefined) {
       const me = this.store.get(myNodeNum);

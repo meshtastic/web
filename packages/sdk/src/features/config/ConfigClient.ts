@@ -1,6 +1,6 @@
 import * as Protobuf from "@meshtastic/protobufs";
 import { computed } from "@preact/signals-core";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import {
   type ReadonlySignal,
@@ -68,35 +68,35 @@ export class ConfigClient {
     });
   }
 
-  public beginEdit(): Promise<ResultType<number, Error>> {
+  public beginEdit(): Promise<Result<number, Error>> {
     return beginEditSettings(this.client);
   }
 
-  public commitEdit(): Promise<ResultType<number, Error>> {
+  public commitEdit(): Promise<Result<number, Error>> {
     return commitEditSettings(this.client);
   }
 
   public setRadio(
     config: Protobuf.Config.Config,
-  ): Promise<ResultType<number, Error>> {
+  ): Promise<Result<number, Error>> {
     return setConfig(this.client, config);
   }
 
   public getRadio(
     type: Protobuf.Admin.AdminMessage_ConfigType,
-  ): Promise<ResultType<number, Error>> {
+  ): Promise<Result<number, Error>> {
     return getConfig(this.client, type);
   }
 
   public setModule(
     moduleConfig: Protobuf.ModuleConfig.ModuleConfig,
-  ): Promise<ResultType<number, Error>> {
+  ): Promise<Result<number, Error>> {
     return setModuleConfig(this.client, moduleConfig);
   }
 
   public getModule(
     type: Protobuf.Admin.AdminMessage_ModuleConfigType,
-  ): Promise<ResultType<number, Error>> {
+  ): Promise<Result<number, Error>> {
     return getModuleConfig(this.client, type);
   }
 }

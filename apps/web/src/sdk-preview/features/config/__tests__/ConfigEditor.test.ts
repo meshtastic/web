@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf, Types } from "@meshtastic/core";
+import { Protobuf, Types } from "@meshtastic/sdk";
 import { Result } from "better-result";
 import { describe, expect, it } from "vitest";
 import type { MeshClientPort, Subscribable } from "../../../core/index.ts";

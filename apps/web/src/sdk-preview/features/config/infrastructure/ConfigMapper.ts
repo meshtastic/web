@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import type { ModuleConfig } from "../domain/ModuleConfig.ts";
 import type { RadioConfig } from "../domain/RadioConfig.ts";
 

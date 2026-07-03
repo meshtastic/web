@@ -1,5 +1,5 @@
 import type * as Protobuf from "@meshtastic/protobufs";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import {
@@ -32,15 +32,15 @@ export class ChannelsClient {
 
   public set(
     channel: Protobuf.Channel.Channel,
-  ): Promise<ResultType<number, Error>> {
+  ): Promise<Result<number, Error>> {
     return setChannel(this.client, channel);
   }
 
-  public requestChannel(index: number): Promise<ResultType<number, Error>> {
+  public requestChannel(index: number): Promise<Result<number, Error>> {
     return getChannel(this.client, index);
   }
 
-  public clear(index: number): Promise<ResultType<number, Error>> {
+  public clear(index: number): Promise<Result<number, Error>> {
     return clearChannel(this.client, index);
   }
 }

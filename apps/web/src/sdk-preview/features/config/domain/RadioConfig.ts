@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 
 /**
  * The radio-config sections keyed by their protobuf variant case (excluding the

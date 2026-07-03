@@ -1,4 +1,4 @@
-import type { MeshDevice } from "@meshtastic/core";
+import type { MeshDevice } from "@meshtastic/sdk";
 import type { MeshClientPort } from "../core/index.ts";
 import { ConfigEditor } from "../features/config/index.ts";
 
