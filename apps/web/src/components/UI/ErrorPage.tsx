@@ -5,12 +5,15 @@ import newGithubIssueUrl from "@core/utils/github.ts";
 import { ExternalLink } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
 
-export function ErrorPage({ error }: { error: Error }) {
+// react-error-boundary types the caught value as `unknown` — anything can be
+// thrown, so normalize non-Error values before rendering.
+export function ErrorPage({ error: caught }: { error: unknown }) {
   const { t } = useTranslation();
 
-  if (!error) {
+  if (!caught) {
     return null;
   }
+  const error = caught instanceof Error ? caught : new Error(String(caught));
 
   return (
     <article className="w-full h-screen overflow-y-auto bg-background-primary text-text-primary">
