@@ -87,7 +87,8 @@ function initialForm(
   if (wp) {
     const box = wp.boundingBox;
     const radiusMeters = wp.geofenceRadius ?? 0;
-    const useLargeUnit = system === "imperial" ? radiusMeters >= 1609.344 : radiusMeters >= 1000;
+    const useLargeUnit =
+      system === "imperial" ? radiusMeters >= 0.5 * 1609.344 : radiusMeters >= 1000;
     const displayed = radiusMeters > 0 ? metersToDisplay(radiusMeters, system) : 0;
     return {
       name: wp.name,
