@@ -190,8 +190,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       idb-keyval:
-        specifier: ^6.2.5
-        version: 6.2.5
+        specifier: ^6.2.6
+        version: 6.2.6
       immer:
         specifier: ^11.1.8
         version: 11.1.8
@@ -4452,8 +4452,8 @@ packages:
       typescript:
         optional: true
 
-  idb-keyval@6.2.5:
-    resolution: {integrity: sha512-eKQkTnS0relYsSOYomx8ozIbmdsQCKUdhyuIaQ2DZgKuaxtyQQMkyD/wlnQN32pO3yutN1b1L8uqwcDKaJd7/Q==}
+  idb-keyval@6.2.6:
+    resolution: {integrity: sha512-FY64UEhw+5liMzMQ1R9Mw6AF0+wyBrg1CIA1z4CjI/EvT5ty/SvQcWZgd8s9sgaNhX10Y8UzScTh89tEAls5nA==}
 
   idb@7.1.1:
     resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
@@ -10870,7 +10870,7 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  idb-keyval@6.2.5: {}
+  idb-keyval@6.2.6: {}
 
   idb@7.1.1: {}
 
