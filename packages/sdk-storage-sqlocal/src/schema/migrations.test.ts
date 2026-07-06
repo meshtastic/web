@@ -46,6 +46,19 @@ describe("MIGRATIONS", () => {
     );
   });
 
+  it("latest migration adds a unique message id index", async () => {
+    const db = await freshSqlite();
+    for (const migration of MIGRATIONS) {
+      for (const stmt of migration.sql) db.run(stmt);
+    }
+    const indexes = db
+      .exec(
+        "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='messages' ORDER BY name",
+      )[0]
+      ?.values.flat() as string[];
+    expect(indexes).toContain("idx_messages_device_id_id_unique");
+  });
+
   it("re-applying v1 statements is idempotent (CREATE IF NOT EXISTS)", async () => {
     const db = await freshSqlite();
     for (const stmt of MIGRATIONS[0]!.sql) db.run(stmt);

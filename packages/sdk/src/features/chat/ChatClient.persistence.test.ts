@@ -1,9 +1,11 @@
+import * as Protobuf from "@meshtastic/protobufs";
 import { describe, expect, it } from "vitest";
 import { MeshClient } from "../../core/client/MeshClient.ts";
 import { createFakeTransport } from "../../core/testing/createFakeTransport.ts";
 import { ChannelNumber } from "../../core/types.ts";
 import { InMemoryMessageRepository } from "./infrastructure/repositories/InMemoryMessageRepository.ts";
 import type { Message } from "./domain/Message.ts";
+import type { ConversationKey } from "./domain/MessageRepository.ts";
 import { MessageState } from "./domain/MessageState.ts";
 
 function seedMessage(id: number, ms: number, text: string): Message {
@@ -17,6 +19,37 @@ function seedMessage(id: number, ms: number, text: string): Message {
     text,
     state: MessageState.Ack,
   };
+}
+
+class DeferredAppendRepository extends InMemoryMessageRepository {
+  private releaseAppend: (() => void) | undefined;
+
+  override async append(
+    message: Message,
+    key?: ConversationKey,
+  ): Promise<void> {
+    await new Promise<void>((resolve) => {
+      this.releaseAppend = resolve;
+    });
+    await super.append(message, key);
+  }
+
+  releasePendingAppend(): void {
+    this.releaseAppend?.();
+  }
+}
+
+async function waitForPersistedState(
+  repository: InMemoryMessageRepository,
+  key: ConversationKey,
+  state: MessageState,
+): Promise<Message> {
+  for (let i = 0; i < 20; i++) {
+    const [persisted] = await repository.loadRecent(key, 1);
+    if (persisted?.state === state) return persisted;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error(`Timed out waiting for persisted state ${state}`);
 }
 
 describe("ChatClient persistence", () => {
@@ -94,5 +127,34 @@ describe("ChatClient persistence", () => {
       10,
     );
     expect(persisted.map((m) => m.text)).toEqual(["hi"]);
+  });
+
+  it("persists the final failed state when validation beats async append", async () => {
+    const repository = new DeferredAppendRepository();
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({
+      transport,
+      chat: { repository },
+    });
+    const conv: ConversationKey = {
+      kind: "channel",
+      channel: ChannelNumber.Primary,
+    };
+
+    const result = await client.chat.send({
+      text: "x".repeat(229),
+      destination: "broadcast",
+      channel: ChannelNumber.Primary,
+    });
+
+    expect(result.status).toBe("error");
+    repository.releasePendingAppend();
+
+    const persisted = await waitForPersistedState(
+      repository,
+      conv,
+      MessageState.Failed,
+    );
+    expect(persisted.routingError).toBe(Protobuf.Mesh.Routing_Error.TOO_LARGE);
   });
 });

@@ -9,6 +9,9 @@ import type { SqlocalDb } from "../db.ts";
 import { createMemoryDb } from "../testing/createMemoryDb.ts";
 import { SqlocalMessageRepository } from "./SqlocalMessageRepository.ts";
 
+const LOCAL_NODE = 100;
+const PEER_NODE = 200;
+
 function msg(id: number, ms: number, text = "t"): Message {
   return {
     id,
@@ -22,13 +25,36 @@ function msg(id: number, ms: number, text = "t"): Message {
   };
 }
 
+function directMsg(
+  id: number,
+  from: number,
+  to: number,
+  state = MessageState.Ack,
+  routingError?: Protobuf.Mesh.Routing_Error,
+): Message {
+  return {
+    id,
+    from,
+    to,
+    channel: ChannelNumber.Primary,
+    rxTime: new Date(1000),
+    type: "direct",
+    text: "dm",
+    state,
+    routingError,
+  };
+}
+
 describe("SqlocalMessageRepository (sql.js test driver)", () => {
   let db: SqlocalDb;
   let repo: SqlocalMessageRepository;
 
   beforeEach(async () => {
     db = await createMemoryDb();
-    repo = new SqlocalMessageRepository(db, { deviceId: 1 });
+    repo = new SqlocalMessageRepository(db, {
+      deviceId: 1,
+      localNodeNum: LOCAL_NODE,
+    });
   });
 
   it("loadRecent returns the tail in chronological order", async () => {
@@ -68,6 +94,50 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     );
     expect(found?.state).toBe(MessageState.Failed);
     expect(found?.routingError).toBe(Protobuf.Mesh.Routing_Error.NO_CHANNEL);
+  });
+
+  it("reloads outbound direct messages from the recipient conversation", async () => {
+    await repo.append(
+      directMsg(7, LOCAL_NODE, PEER_NODE, MessageState.Pending),
+    );
+    await repo.updateState(
+      7,
+      MessageState.Failed,
+      Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+    );
+
+    const out = await repo.loadRecent({ kind: "direct", peer: PEER_NODE }, 10);
+    expect(out).toHaveLength(1);
+    expect(out[0]?.state).toBe(MessageState.Failed);
+    expect(out[0]?.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+    );
+  });
+
+  it("reloads inbound direct messages from the sender conversation", async () => {
+    await repo.append(directMsg(8, PEER_NODE, LOCAL_NODE));
+
+    const out = await repo.loadRecent({ kind: "direct", peer: PEER_NODE }, 10);
+    expect(out.map((m) => m.id)).toEqual([8]);
+  });
+
+  it("keeps final status when a stale duplicate append arrives later", async () => {
+    const pending = msg(9, 1000, "stale");
+    await repo.append(pending);
+    await repo.updateState(
+      pending.id,
+      MessageState.Failed,
+      Protobuf.Mesh.Routing_Error.NO_CHANNEL,
+    );
+    await repo.append(pending);
+
+    const out = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      10,
+    );
+    expect(out).toHaveLength(1);
+    expect(out[0]?.state).toBe(MessageState.Failed);
+    expect(out[0]?.routingError).toBe(Protobuf.Mesh.Routing_Error.NO_CHANNEL);
   });
 
   it("prune enforces maxPerBucket", async () => {

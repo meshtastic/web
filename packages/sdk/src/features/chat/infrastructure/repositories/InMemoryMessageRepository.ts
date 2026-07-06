@@ -8,12 +8,21 @@ import {
   type RetentionPolicy,
 } from "../../domain/MessageRepository.ts";
 
+export interface InMemoryMessageRepositoryOptions {
+  localNodeNum?: number | (() => number | undefined);
+}
+
 /**
  * Default in-memory MessageRepository. No persistence across reloads; useful
  * for tests and for single-session apps that do not need history.
  */
 export class InMemoryMessageRepository implements MessageRepository {
   private readonly buckets = new Map<string, Message[]>();
+  private readonly localNodeNum: InMemoryMessageRepositoryOptions["localNodeNum"];
+
+  constructor(options: InMemoryMessageRepositoryOptions = {}) {
+    this.localNodeNum = options.localNodeNum;
+  }
 
   async loadRecent(key: ConversationKey, limit: number): Promise<Message[]> {
     const bucket = this.buckets.get(conversationKeyString(key)) ?? [];
@@ -32,17 +41,13 @@ export class InMemoryMessageRepository implements MessageRepository {
     return bucket.slice(start, end);
   }
 
-  async append(message: Message): Promise<void> {
-    await this.appendBatch([message]);
+  async append(message: Message, key?: ConversationKey): Promise<void> {
+    this.appendToBucket(message, key);
   }
 
   async appendBatch(messages: ReadonlyArray<Message>): Promise<void> {
     for (const message of messages) {
-      const k = this.inferKey(message);
-      const bucket = this.buckets.get(k) ?? [];
-      bucket.push(message);
-      bucket.sort((a, b) => a.rxTime.getTime() - b.rxTime.getTime());
-      this.buckets.set(k, bucket);
+      this.appendToBucket(message);
     }
   }
 
@@ -89,9 +94,32 @@ export class InMemoryMessageRepository implements MessageRepository {
     this.buckets.clear();
   }
 
-  private inferKey(message: Message): string {
-    return message.type === "direct"
-      ? conversationKeyString({ kind: "direct", peer: message.from })
-      : conversationKeyString({ kind: "channel", channel: message.channel });
+  private appendToBucket(message: Message, key?: ConversationKey): void {
+    const k = conversationKeyString(key ?? this.inferConversationKey(message));
+    const bucket = this.buckets.get(k) ?? [];
+    bucket.push(message);
+    bucket.sort((a, b) => a.rxTime.getTime() - b.rxTime.getTime());
+    this.buckets.set(k, bucket);
+  }
+
+  private inferConversationKey(message: Message): ConversationKey {
+    if (message.type !== "direct") {
+      return { kind: "channel", channel: message.channel };
+    }
+
+    const localNodeNum = this.resolveLocalNodeNum();
+    return {
+      kind: "direct",
+      peer:
+        localNodeNum !== undefined && message.from === localNodeNum
+          ? message.to
+          : message.from,
+    };
+  }
+
+  private resolveLocalNodeNum(): number | undefined {
+    return typeof this.localNodeNum === "function"
+      ? this.localNodeNum()
+      : this.localNodeNum;
   }
 }

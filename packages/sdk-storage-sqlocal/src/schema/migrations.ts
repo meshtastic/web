@@ -69,4 +69,32 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
     version: 3,
     sql: [`ALTER TABLE messages ADD COLUMN routing_error INTEGER`],
   },
+  {
+    version: 4,
+    sql: [
+      `DELETE FROM messages
+        WHERE rowid NOT IN (
+          SELECT rowid FROM (
+            SELECT
+              rowid,
+              row_number() OVER (
+                PARTITION BY device_id, id
+                ORDER BY
+                  CASE state
+                    WHEN 'ack' THEN 4
+                    WHEN 'relayed' THEN 3
+                    WHEN 'failed' THEN 2
+                    ELSE 1
+                  END DESC,
+                  CASE WHEN routing_error IS NULL THEN 0 ELSE 1 END DESC,
+                  rx_time DESC,
+                  rowid DESC
+              ) AS rn
+            FROM messages
+          )
+          WHERE rn = 1
+        )`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_messages_device_id_id_unique ON messages(device_id, id)`,
+    ],
+  },
 ];

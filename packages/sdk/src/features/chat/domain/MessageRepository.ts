@@ -32,7 +32,7 @@ export interface MessageRepository {
     cursor: Date,
     limit: number,
   ): Promise<Message[]>;
-  append(message: Message): Promise<void>;
+  append(message: Message, key?: ConversationKey): Promise<void>;
   appendBatch(messages: ReadonlyArray<Message>): Promise<void>;
   updateState(
     id: number,

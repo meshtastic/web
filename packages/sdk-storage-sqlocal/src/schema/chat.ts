@@ -1,4 +1,10 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
 export const messages = sqliteTable(
   "messages",
@@ -25,6 +31,10 @@ export const messages = sqliteTable(
   },
   (t) => ({
     pk: index("messages_pk").on(t.deviceId, t.id),
+    deviceMessageUnique: uniqueIndex("idx_messages_device_id_id_unique").on(
+      t.deviceId,
+      t.id,
+    ),
     convRxTime: index("idx_messages_conv_rxtime").on(
       t.deviceId,
       t.conversationKey,

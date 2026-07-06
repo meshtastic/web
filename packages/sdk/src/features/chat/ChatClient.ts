@@ -79,6 +79,7 @@ export class ChatClient {
   private readonly initialLoadLimit: number;
   private readonly hydrated = new Set<string>();
   private readonly draftsHydrated = new Set<string>();
+  private readonly pendingMessagePersistence = new Map<number, Promise<void>>();
   private readonly unreadByKey = signal<ReadonlyMap<string, number>>(new Map());
 
   public readonly drafts: ChatDrafts;
@@ -88,7 +89,11 @@ export class ChatClient {
     this.client = client;
     this.store = new ChatStore();
     this.draftStore = new DraftStore();
-    this.repository = options.repository ?? new InMemoryMessageRepository();
+    this.repository =
+      options.repository ??
+      new InMemoryMessageRepository({
+        localNodeNum: () => this.client.myNodeNum,
+      });
     this.draftRepository =
       options.draftRepository ?? new InMemoryDraftRepository();
     this.retention = options.retention;
@@ -123,7 +128,7 @@ export class ChatClient {
       if (this.store.hasMessage(key, message.id)) return;
 
       this.store.append(key, message);
-      void this.persistAppend(message);
+      void this.persistAppend(message, conv);
 
       // Increment unread count when the message is inbound (not from us). The
       // outbound echo of our own send doesn't count as unread.
@@ -146,9 +151,7 @@ export class ChatClient {
         const routingError =
           reason === Protobuf.Mesh.Routing_Error.NONE ? undefined : reason;
         this.store.updateState(messageId, state, routingError);
-        void this.repository
-          .updateState(messageId, state, routingError)
-          .catch(() => {});
+        void this.persistStateUpdate(messageId, state, routingError);
       }
     });
   }
@@ -240,7 +243,7 @@ export class ChatClient {
     };
     if (!this.store.hasMessage(key, packetId)) {
       this.store.append(key, message);
-      void this.persistAppend(message);
+      void this.persistAppend(message, conv);
     }
     this.draftStore.clear(conv);
     void this.draftRepository.clear(conv).catch(() => {});
@@ -256,9 +259,7 @@ export class ChatClient {
           ? Protobuf.Mesh.Routing_Error.TOO_LARGE
           : existing?.routingError;
       this.store.updateState(packetId, MessageState.Failed, routingError);
-      void this.repository
-        .updateState(packetId, MessageState.Failed, routingError)
-        .catch(() => {});
+      void this.persistStateUpdate(packetId, MessageState.Failed, routingError);
     }
     return result;
   }
@@ -304,10 +305,35 @@ export class ChatClient {
     });
   }
 
-  private async persistAppend(message: Message): Promise<void> {
+  private persistAppend(
+    message: Message,
+    conv: ConversationKey,
+  ): Promise<void> {
+    const op = (async () => {
+      try {
+        await this.repository.append(message, conv);
+        if (this.retention) await this.repository.prune(this.retention);
+      } catch {
+        // persistence failure must not break reactive flow
+      }
+    })();
+    this.pendingMessagePersistence.set(message.id, op);
+    void op.finally(() => {
+      if (this.pendingMessagePersistence.get(message.id) === op) {
+        this.pendingMessagePersistence.delete(message.id);
+      }
+    });
+    return op;
+  }
+
+  private async persistStateUpdate(
+    messageId: number,
+    state: MessageState,
+    routingError?: Protobuf.Mesh.Routing_Error,
+  ): Promise<void> {
     try {
-      await this.repository.append(message);
-      if (this.retention) await this.repository.prune(this.retention);
+      await this.pendingMessagePersistence.get(messageId);
+      await this.repository.updateState(messageId, state, routingError);
     } catch {
       // persistence failure must not break reactive flow
     }

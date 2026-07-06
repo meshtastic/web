@@ -5,6 +5,9 @@ import type { Message } from "../../domain/Message.ts";
 import { MessageState } from "../../domain/MessageState.ts";
 import { InMemoryMessageRepository } from "./InMemoryMessageRepository.ts";
 
+const LOCAL_NODE = 100;
+const PEER_NODE = 200;
+
 function msg(id: number, ms: number, text = "t"): Message {
   return {
     id,
@@ -15,6 +18,26 @@ function msg(id: number, ms: number, text = "t"): Message {
     type: "broadcast",
     text,
     state: MessageState.Ack,
+  };
+}
+
+function directMsg(
+  id: number,
+  from: number,
+  to: number,
+  state = MessageState.Ack,
+  routingError?: Protobuf.Mesh.Routing_Error,
+): Message {
+  return {
+    id,
+    from,
+    to,
+    channel: ChannelNumber.Primary,
+    rxTime: new Date(1000),
+    type: "direct",
+    text: "dm",
+    state,
+    routingError,
   };
 }
 
@@ -61,6 +84,33 @@ describe("InMemoryMessageRepository", () => {
     expect(found?.routingError).toBe(
       Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
     );
+  });
+
+  it("keys outbound direct messages by recipient peer", async () => {
+    const repo = new InMemoryMessageRepository({ localNodeNum: LOCAL_NODE });
+    await repo.append(
+      directMsg(7, LOCAL_NODE, PEER_NODE, MessageState.Pending),
+    );
+    await repo.updateState(
+      7,
+      MessageState.Failed,
+      Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+    );
+
+    const out = await repo.loadRecent({ kind: "direct", peer: PEER_NODE }, 10);
+    expect(out).toHaveLength(1);
+    expect(out[0]?.state).toBe(MessageState.Failed);
+    expect(out[0]?.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+    );
+  });
+
+  it("keys inbound direct messages by sender peer", async () => {
+    const repo = new InMemoryMessageRepository({ localNodeNum: LOCAL_NODE });
+    await repo.append(directMsg(8, PEER_NODE, LOCAL_NODE));
+
+    const out = await repo.loadRecent({ kind: "direct", peer: PEER_NODE }, 10);
+    expect(out.map((m) => m.id)).toEqual([8]);
   });
 
   it("prune enforces maxPerBucket", async () => {
