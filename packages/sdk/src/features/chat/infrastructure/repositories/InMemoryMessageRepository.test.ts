@@ -8,7 +8,12 @@ import { InMemoryMessageRepository } from "./InMemoryMessageRepository.ts";
 const LOCAL_NODE = 100;
 const PEER_NODE = 200;
 
-function msg(id: number, ms: number, text = "t"): Message {
+function msg(
+  id: number,
+  ms: number,
+  text = "t",
+  state = MessageState.Ack,
+): Message {
   return {
     id,
     from: 1,
@@ -17,7 +22,7 @@ function msg(id: number, ms: number, text = "t"): Message {
     rxTime: new Date(ms),
     type: "broadcast",
     text,
-    state: MessageState.Ack,
+    state,
   };
 }
 
@@ -70,7 +75,7 @@ describe("InMemoryMessageRepository", () => {
 
   it("updateState mutates the matching message", async () => {
     const repo = new InMemoryMessageRepository();
-    await repo.append(msg(42, 1000));
+    await repo.append(msg(42, 1000, "t", MessageState.Pending));
     await repo.updateState(
       42,
       MessageState.Failed,
@@ -84,6 +89,18 @@ describe("InMemoryMessageRepository", () => {
     expect(found?.routingError).toBe(
       Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
     );
+  });
+
+  it("does not downgrade an ack state", async () => {
+    const repo = new InMemoryMessageRepository();
+    await repo.append(msg(43, 1000));
+    await repo.updateState(43, MessageState.Relayed);
+
+    const [found] = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      1,
+    );
+    expect(found?.state).toBe(MessageState.Ack);
   });
 
   it("keys outbound direct messages by recipient peer", async () => {

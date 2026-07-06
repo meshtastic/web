@@ -1,6 +1,9 @@
 import type * as Protobuf from "@meshtastic/protobufs";
 import type { Message } from "../../domain/Message.ts";
-import type { MessageState } from "../../domain/MessageState.ts";
+import {
+  type MessageState,
+  shouldApplyMessageStateUpdate,
+} from "../../domain/MessageState.ts";
 import {
   type ConversationKey,
   conversationKeyString,
@@ -61,6 +64,13 @@ export class InMemoryMessageRepository implements MessageRepository {
       if (idx !== -1) {
         const existing = bucket[idx];
         if (!existing) continue;
+        if (!shouldApplyMessageStateUpdate(existing.state, state)) return;
+        if (
+          existing.state === state &&
+          existing.routingError === routingError
+        ) {
+          return;
+        }
         bucket[idx] = { ...existing, state, routingError };
         return;
       }

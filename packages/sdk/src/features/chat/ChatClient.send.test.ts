@@ -229,6 +229,51 @@ describe("ChatClient.send optimistic append", () => {
     expect(direct.value[0]!.state).toBe(MessageState.Ack);
   });
 
+  it("does not downgrade recipient-delivered direct messages on later relayer confirmations", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const peer = 12345;
+    const direct = client.chat.direct(peer);
+
+    const result: SendResult = await withAckFlush(client, () =>
+      client.chat.send({ text: "hi peer", destination: peer }),
+    );
+    if (result.status !== "ok") throw new Error("send failed");
+
+    client.events.onRoutingPacket.dispatch({
+      id: 789,
+      requestId: result.value,
+      from: peer,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NONE,
+        },
+      },
+    } as never);
+    client.events.onRoutingPacket.dispatch({
+      id: 790,
+      requestId: result.value,
+      from: 999,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NONE,
+        },
+      },
+    } as never);
+
+    expect(direct.value[0]!.state).toBe(MessageState.Ack);
+  });
+
   it("preserves routing error reason on failed delivery", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });

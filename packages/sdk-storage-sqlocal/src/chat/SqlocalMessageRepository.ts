@@ -5,7 +5,11 @@ import type {
   MessageRepository,
   RetentionPolicy,
 } from "@meshtastic/sdk";
-import { conversationKeyString, MessageState } from "@meshtastic/sdk";
+import {
+  conversationKeyString,
+  getMessageStatePrecedence,
+  MessageState,
+} from "@meshtastic/sdk";
 import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { type MultiTabCoordinator } from "../coordination/MultiTabCoordinator.ts";
 import type { SqlocalDb } from "../db.ts";
@@ -80,7 +84,15 @@ export class SqlocalMessageRepository implements MessageRepository {
     await this.db
       .update(messages)
       .set({ state, routingError: routingError ?? null })
-      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
+      .where(
+        and(
+          eq(messages.deviceId, this.deviceId),
+          eq(messages.id, id),
+          sql`${storedMessageStatePrecedence()} <= ${getMessageStatePrecedence(
+            state,
+          )}`,
+        )!,
+      );
   }
 
   async prune(policy: RetentionPolicy): Promise<void> {
@@ -236,4 +248,17 @@ function messageToRow(
     state: message.state,
     routingError: message.routingError ?? null,
   };
+}
+
+function storedMessageStatePrecedence() {
+  return sql<number>`CASE ${messages.state}
+    WHEN ${MessageState.Ack} THEN ${getMessageStatePrecedence(MessageState.Ack)}
+    WHEN ${MessageState.Relayed} THEN ${getMessageStatePrecedence(
+      MessageState.Relayed,
+    )}
+    WHEN ${MessageState.Failed} THEN ${getMessageStatePrecedence(
+      MessageState.Failed,
+    )}
+    ELSE ${getMessageStatePrecedence(MessageState.Pending)}
+  END`;
 }

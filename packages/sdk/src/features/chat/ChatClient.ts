@@ -80,6 +80,7 @@ export class ChatClient {
   private readonly hydrated = new Set<string>();
   private readonly draftsHydrated = new Set<string>();
   private readonly pendingMessagePersistence = new Map<number, Promise<void>>();
+  private readonly pendingStatePersistence = new Map<number, Promise<void>>();
   private readonly unreadByKey = signal<ReadonlyMap<string, number>>(new Map());
 
   public readonly drafts: ChatDrafts;
@@ -150,8 +151,9 @@ export class ChatClient {
             : MessageState.Failed;
         const routingError =
           reason === Protobuf.Mesh.Routing_Error.NONE ? undefined : reason;
-        this.store.updateState(messageId, state, routingError);
-        void this.persistStateUpdate(messageId, state, routingError);
+        if (this.store.updateState(messageId, state, routingError)) {
+          void this.persistStateUpdate(messageId, state, routingError);
+        }
       }
     });
   }
@@ -258,8 +260,13 @@ export class ChatClient {
         result.error instanceof MessageTooLongError
           ? Protobuf.Mesh.Routing_Error.TOO_LARGE
           : existing?.routingError;
-      this.store.updateState(packetId, MessageState.Failed, routingError);
-      void this.persistStateUpdate(packetId, MessageState.Failed, routingError);
+      if (this.store.updateState(packetId, MessageState.Failed, routingError)) {
+        void this.persistStateUpdate(
+          packetId,
+          MessageState.Failed,
+          routingError,
+        );
+      }
     }
     return result;
   }
@@ -331,12 +338,25 @@ export class ChatClient {
     state: MessageState,
     routingError?: Protobuf.Mesh.Routing_Error,
   ): Promise<void> {
-    try {
-      await this.pendingMessagePersistence.get(messageId);
-      await this.repository.updateState(messageId, state, routingError);
-    } catch {
-      // persistence failure must not break reactive flow
-    }
+    const prior =
+      this.pendingStatePersistence.get(messageId) ??
+      this.pendingMessagePersistence.get(messageId) ??
+      Promise.resolve();
+    const op = (async () => {
+      try {
+        await prior;
+        await this.repository.updateState(messageId, state, routingError);
+      } catch {
+        // persistence failure must not break reactive flow
+      }
+    })();
+    this.pendingStatePersistence.set(messageId, op);
+    void op.finally(() => {
+      if (this.pendingStatePersistence.get(messageId) === op) {
+        this.pendingStatePersistence.delete(messageId);
+      }
+    });
+    return op;
   }
 
   private keyFor(conv: ConversationKey): string {

@@ -59,6 +59,48 @@ describe("MIGRATIONS", () => {
     expect(indexes).toContain("idx_messages_device_id_id_unique");
   });
 
+  it("latest migration rekeys legacy outbound direct rows to recipient conversations", async () => {
+    const db = await freshSqlite();
+    for (const migration of MIGRATIONS.filter((m) => m.version < 5)) {
+      for (const stmt of migration.sql) db.run(stmt);
+    }
+
+    db.run(
+      `INSERT INTO messages (
+        id, device_id, conversation_key, from_node, to_node, channel, rx_time,
+        type, text, state, routing_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [1, 1, "direct:100", 100, 200, 0, 1000, "direct", "out", "relayed", null],
+    );
+    db.run(
+      `INSERT INTO messages (
+        id, device_id, conversation_key, from_node, to_node, channel, rx_time,
+        type, text, state, routing_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [2, 1, "direct:100", 100, 300, 0, 2000, "direct", "out-2", "ack", null],
+    );
+    db.run(
+      `INSERT INTO messages (
+        id, device_id, conversation_key, from_node, to_node, channel, rx_time,
+        type, text, state, routing_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [3, 1, "direct:200", 200, 100, 0, 3000, "direct", "in", "ack", null],
+    );
+
+    const latest = MIGRATIONS.at(-1)!;
+    expect(latest.version).toBe(5);
+    for (const stmt of latest.sql) db.run(stmt);
+
+    const rows = db.exec(
+      "SELECT id, conversation_key FROM messages ORDER BY id",
+    )[0]?.values;
+    expect(rows).toEqual([
+      [1, "direct:200"],
+      [2, "direct:300"],
+      [3, "direct:200"],
+    ]);
+  });
+
   it("re-applying v1 statements is idempotent (CREATE IF NOT EXISTS)", async () => {
     const db = await freshSqlite();
     for (const stmt of MIGRATIONS[0]!.sql) db.run(stmt);

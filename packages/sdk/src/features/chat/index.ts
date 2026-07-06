@@ -7,7 +7,11 @@ export type {
 export type { DraftRepository } from "./domain/DraftRepository.ts";
 export { InMemoryDraftRepository } from "./infrastructure/repositories/InMemoryDraftRepository.ts";
 export type { Message } from "./domain/Message.ts";
-export { MessageState } from "./domain/MessageState.ts";
+export {
+  getMessageStatePrecedence,
+  MessageState,
+  shouldApplyMessageStateUpdate,
+} from "./domain/MessageState.ts";
 export type {
   ConversationKey,
   MessageRepository,

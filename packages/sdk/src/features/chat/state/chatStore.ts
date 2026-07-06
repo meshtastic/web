@@ -4,7 +4,10 @@ import type { ReadonlySignal } from "../../../core/signals/createStore.ts";
 import { toReadonly } from "../../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../../core/types.ts";
 import type { Message } from "../domain/Message.ts";
-import { MessageState } from "../domain/MessageState.ts";
+import {
+  MessageState,
+  shouldApplyMessageStateUpdate,
+} from "../domain/MessageState.ts";
 
 /**
  * Messages grouped by conversation bucket. Direct messages are keyed by
@@ -86,18 +89,26 @@ export class ChatStore {
     id: number,
     state: MessageState,
     routingError?: Protobuf.Mesh.Routing_Error,
-  ): void {
+  ): boolean {
     for (const [, bucket] of this.buckets) {
       const idx = bucket.value.findIndex((m) => m.id === id);
       if (idx !== -1) {
         const next = bucket.value.slice();
         const existing = next[idx];
         if (!existing) continue;
+        if (!shouldApplyMessageStateUpdate(existing.state, state)) return false;
+        if (
+          existing.state === state &&
+          existing.routingError === routingError
+        ) {
+          return false;
+        }
         next[idx] = { ...existing, state, routingError };
         bucket.value = next;
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   private writeBucket(key: string): Signal<Message[]> {

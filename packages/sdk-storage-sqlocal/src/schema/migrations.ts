@@ -97,4 +97,36 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
       `CREATE UNIQUE INDEX IF NOT EXISTS idx_messages_device_id_id_unique ON messages(device_id, id)`,
     ],
   },
+  {
+    version: 5,
+    sql: [
+      `WITH legacy_outbound_buckets AS (
+        SELECT
+          device_id,
+          conversation_key,
+          from_node
+        FROM messages
+        WHERE type = 'direct'
+          AND conversation_key = 'direct:' || from_node
+          AND from_node <> to_node
+        GROUP BY device_id, conversation_key, from_node
+        HAVING COUNT(DISTINCT to_node) > 1
+          OR SUM(CASE
+            WHEN state <> 'ack' OR routing_error IS NOT NULL THEN 1
+            ELSE 0
+          END) > 0
+      )
+      UPDATE messages
+      SET conversation_key = 'direct:' || to_node
+      WHERE type = 'direct'
+        AND from_node <> to_node
+        AND EXISTS (
+          SELECT 1
+          FROM legacy_outbound_buckets legacy
+          WHERE legacy.device_id = messages.device_id
+            AND legacy.conversation_key = messages.conversation_key
+            AND legacy.from_node = messages.from_node
+        )`,
+    ],
+  },
 ];
