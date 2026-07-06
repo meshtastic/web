@@ -1,6 +1,7 @@
+import { create, toBinary } from "@bufbuild/protobuf";
 import type { ResultType } from "better-result";
 import * as Protobuf from "@meshtastic/protobufs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MeshClient } from "../../core/client/MeshClient.ts";
 import { createFakeTransport } from "../../core/testing/createFakeTransport.ts";
 import { ChannelNumber } from "../../core/types.ts";
@@ -256,5 +257,65 @@ describe("ChatClient.send optimistic append", () => {
     expect(messages.value[0]!.routingError).toBe(
       Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
     );
+  });
+
+  it("preserves routing error when decoder rejects the queued send afterward", async () => {
+    const { transport, respond } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const messages = client.chat.messages(ChannelNumber.Primary);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    try {
+      const sendPromise = client.chat.send({
+        text: "missing channel",
+        destination: "broadcast",
+        channel: ChannelNumber.Primary,
+      });
+      const packetId = messages.value[0]?.id;
+      if (packetId === undefined) {
+        throw new Error("optimistic message was not appended");
+      }
+      const queued = client.queue
+        .getState()
+        .find((item) => item.id === packetId);
+      if (queued === undefined) {
+        throw new Error("send was not queued");
+      }
+      void queued.promise.catch(() => {});
+
+      const routingPacket = create(Protobuf.Mesh.RoutingSchema, {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NO_CHANNEL,
+        },
+      });
+      respond.withMeshPacket(
+        create(Protobuf.Mesh.MeshPacketSchema, {
+          id: 654,
+          from: 0,
+          to: client.myNodeNum,
+          channel: ChannelNumber.Primary,
+          rxTime: Math.trunc(Date.now() / 1000),
+          payloadVariant: {
+            case: "decoded",
+            value: {
+              portnum: Protobuf.Portnums.PortNum.ROUTING_APP,
+              requestId: packetId,
+              payload: toBinary(Protobuf.Mesh.RoutingSchema, routingPacket),
+            },
+          },
+        }),
+      );
+
+      const result = await sendPromise;
+      expect(result.status).toBe("error");
+      expect(messages.value).toHaveLength(1);
+      expect(messages.value[0]!.state).toBe(MessageState.Failed);
+      expect(messages.value[0]!.routingError).toBe(
+        Protobuf.Mesh.Routing_Error.NO_CHANNEL,
+      );
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 });

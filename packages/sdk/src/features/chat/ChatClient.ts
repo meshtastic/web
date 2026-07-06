@@ -250,10 +250,11 @@ export class ChatClient {
       // Send pipeline failed (transport closed, validation, etc.). Keep
       // the optimistic message visible but mark it Failed so the user
       // sees the error state next to their bubble.
+      const existing = this.store.findMessage(packetId);
       const routingError =
         result.error instanceof MessageTooLongError
           ? Protobuf.Mesh.Routing_Error.TOO_LARGE
-          : undefined;
+          : existing?.routingError;
       this.store.updateState(packetId, MessageState.Failed, routingError);
       void this.repository
         .updateState(packetId, MessageState.Failed, routingError)
