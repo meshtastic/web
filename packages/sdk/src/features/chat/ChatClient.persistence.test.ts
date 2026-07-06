@@ -261,4 +261,69 @@ describe("ChatClient persistence", () => {
     );
     expect(persisted.routingError).toBeUndefined();
   });
+
+  it("persists actionable failure after an earlier relayed write resolves later", async () => {
+    const repository = new DelayedFirstUpdateRepository();
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({
+      transport,
+      chat: { repository },
+    });
+    const peer = 12345;
+    const conv: ConversationKey = { kind: "direct", peer };
+    const direct = client.chat.direct(peer);
+
+    const result = await withAckFlush(client, () =>
+      client.chat.send({ text: "needs key", destination: peer }),
+    );
+    if (result.status !== "ok") throw new Error("send failed");
+
+    client.events.onRoutingPacket.dispatch({
+      id: 3,
+      requestId: result.value,
+      from: 999,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NONE,
+        },
+      },
+    } as never);
+    await repository.firstUpdateStartedPromise;
+
+    client.events.onRoutingPacket.dispatch({
+      id: 4,
+      requestId: result.value,
+      from: peer,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY,
+        },
+      },
+    } as never);
+
+    expect(direct.value[0]?.state).toBe(MessageState.Failed);
+    expect(direct.value[0]?.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY,
+    );
+
+    repository.releaseDelayedUpdate();
+    const persisted = await waitForPersistedState(
+      repository,
+      conv,
+      MessageState.Failed,
+    );
+    expect(persisted.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY,
+    );
+  });
 });

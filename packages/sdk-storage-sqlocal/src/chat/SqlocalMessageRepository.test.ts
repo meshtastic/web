@@ -112,6 +112,24 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     expect(found?.state).toBe(MessageState.Ack);
   });
 
+  it("allows actionable failures to replace a relayed state", async () => {
+    await repo.append(msg(44, 1000, "t", MessageState.Relayed));
+    await repo.updateState(
+      44,
+      MessageState.Failed,
+      Protobuf.Mesh.Routing_Error.PKI_SEND_FAIL_PUBLIC_KEY,
+    );
+
+    const [found] = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      1,
+    );
+    expect(found?.state).toBe(MessageState.Failed);
+    expect(found?.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.PKI_SEND_FAIL_PUBLIC_KEY,
+    );
+  });
+
   it("reloads outbound direct messages from the recipient conversation", async () => {
     await repo.append(
       directMsg(7, LOCAL_NODE, PEER_NODE, MessageState.Pending),

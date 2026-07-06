@@ -103,6 +103,25 @@ describe("InMemoryMessageRepository", () => {
     expect(found?.state).toBe(MessageState.Ack);
   });
 
+  it("allows actionable failures to replace a relayed state", async () => {
+    const repo = new InMemoryMessageRepository();
+    await repo.append(msg(44, 1000, "t", MessageState.Relayed));
+    await repo.updateState(
+      44,
+      MessageState.Failed,
+      Protobuf.Mesh.Routing_Error.PKI_SEND_FAIL_PUBLIC_KEY,
+    );
+
+    const [found] = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      1,
+    );
+    expect(found?.state).toBe(MessageState.Failed);
+    expect(found?.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.PKI_SEND_FAIL_PUBLIC_KEY,
+    );
+  });
+
   it("keys outbound direct messages by recipient peer", async () => {
     const repo = new InMemoryMessageRepository({ localNodeNum: LOCAL_NODE });
     await repo.append(

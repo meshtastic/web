@@ -82,8 +82,8 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
                 ORDER BY
                   CASE state
                     WHEN 'ack' THEN 4
-                    WHEN 'relayed' THEN 3
-                    WHEN 'failed' THEN 2
+                    WHEN 'failed' THEN 3
+                    WHEN 'relayed' THEN 2
                     ELSE 1
                   END DESC,
                   CASE WHEN routing_error IS NULL THEN 0 ELSE 1 END DESC,
@@ -100,21 +100,52 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
   {
     version: 5,
     sql: [
-      `WITH legacy_outbound_buckets AS (
+      `WITH direct_buckets AS (
         SELECT
           device_id,
           conversation_key,
-          from_node
+          from_node,
+          COUNT(DISTINCT to_node) AS recipient_count,
+          SUM(CASE
+            WHEN state <> 'ack' OR routing_error IS NOT NULL THEN 1
+            ELSE 0
+          END) AS actionable_count
         FROM messages
         WHERE type = 'direct'
           AND conversation_key = 'direct:' || from_node
           AND from_node <> to_node
         GROUP BY device_id, conversation_key, from_node
-        HAVING COUNT(DISTINCT to_node) > 1
-          OR SUM(CASE
-            WHEN state <> 'ack' OR routing_error IS NOT NULL THEN 1
-            ELSE 0
-          END) > 0
+      ),
+      inferred_local_nodes AS (
+        SELECT DISTINCT
+          device_id,
+          from_node
+        FROM direct_buckets
+        WHERE recipient_count > 1
+          OR actionable_count > 0
+      ),
+      singleton_legacy_devices AS (
+        SELECT device_id
+        FROM direct_buckets
+        GROUP BY device_id
+        HAVING COUNT(*) = 1
+      ),
+      legacy_outbound_buckets AS (
+        SELECT direct_buckets.device_id,
+               direct_buckets.conversation_key,
+               direct_buckets.from_node
+        FROM direct_buckets
+        WHERE EXISTS (
+          SELECT 1
+          FROM inferred_local_nodes local
+          WHERE local.device_id = direct_buckets.device_id
+            AND local.from_node = direct_buckets.from_node
+        )
+          OR EXISTS (
+            SELECT 1
+            FROM singleton_legacy_devices singleton
+            WHERE singleton.device_id = direct_buckets.device_id
+          )
       )
       UPDATE messages
       SET conversation_key = 'direct:' || to_node

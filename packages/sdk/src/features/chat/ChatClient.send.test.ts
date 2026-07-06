@@ -274,6 +274,100 @@ describe("ChatClient.send optimistic append", () => {
     expect(direct.value[0]!.state).toBe(MessageState.Ack);
   });
 
+  it("promotes relayed direct messages to failed on later PKI errors", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const peer = 12345;
+    const direct = client.chat.direct(peer);
+
+    const result: SendResult = await withAckFlush(client, () =>
+      client.chat.send({ text: "needs key", destination: peer }),
+    );
+    if (result.status !== "ok") throw new Error("send failed");
+
+    client.events.onRoutingPacket.dispatch({
+      id: 791,
+      requestId: result.value,
+      from: 999,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NONE,
+        },
+      },
+    } as never);
+    client.events.onRoutingPacket.dispatch({
+      id: 792,
+      requestId: result.value,
+      from: peer,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY,
+        },
+      },
+    } as never);
+
+    expect(direct.value[0]!.state).toBe(MessageState.Failed);
+    expect(direct.value[0]!.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY,
+    );
+  });
+
+  it("preserves recipient-delivered direct messages on later PKI errors", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const peer = 12345;
+    const direct = client.chat.direct(peer);
+
+    const result: SendResult = await withAckFlush(client, () =>
+      client.chat.send({ text: "already acked", destination: peer }),
+    );
+    if (result.status !== "ok") throw new Error("send failed");
+
+    client.events.onRoutingPacket.dispatch({
+      id: 793,
+      requestId: result.value,
+      from: peer,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NONE,
+        },
+      },
+    } as never);
+    client.events.onRoutingPacket.dispatch({
+      id: 794,
+      requestId: result.value,
+      from: peer,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.PKI_SEND_FAIL_PUBLIC_KEY,
+        },
+      },
+    } as never);
+
+    expect(direct.value[0]!.state).toBe(MessageState.Ack);
+    expect(direct.value[0]!.routingError).toBeUndefined();
+  });
+
   it("preserves routing error reason on failed delivery", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });

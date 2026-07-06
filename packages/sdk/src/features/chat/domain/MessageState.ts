@@ -7,8 +7,8 @@ export enum MessageState {
 
 const messageStatePrecedence: Record<MessageState, number> = {
   [MessageState.Pending]: 1,
-  [MessageState.Failed]: 2,
-  [MessageState.Relayed]: 3,
+  [MessageState.Relayed]: 2,
+  [MessageState.Failed]: 3,
   [MessageState.Ack]: 4,
 };
 
