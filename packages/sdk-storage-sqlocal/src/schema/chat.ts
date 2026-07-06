@@ -18,7 +18,10 @@ export const messages = sqliteTable(
     rxTime: integer("rx_time").notNull(),
     type: text("type", { enum: ["broadcast", "direct"] }).notNull(),
     text: text("text").notNull(),
-    state: text("state", { enum: ["pending", "ack", "failed"] }).notNull(),
+    state: text("state", {
+      enum: ["pending", "ack", "relayed", "failed"],
+    }).notNull(),
+    routingError: integer("routing_error"),
   },
   (t) => ({
     pk: index("messages_pk").on(t.deviceId, t.id),

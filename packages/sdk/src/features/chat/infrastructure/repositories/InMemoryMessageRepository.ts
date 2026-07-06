@@ -1,3 +1,4 @@
+import type * as Protobuf from "@meshtastic/protobufs";
 import type { Message } from "../../domain/Message.ts";
 import type { MessageState } from "../../domain/MessageState.ts";
 import {
@@ -45,13 +46,17 @@ export class InMemoryMessageRepository implements MessageRepository {
     }
   }
 
-  async updateState(id: number, state: MessageState): Promise<void> {
+  async updateState(
+    id: number,
+    state: MessageState,
+    routingError?: Protobuf.Mesh.Routing_Error,
+  ): Promise<void> {
     for (const bucket of this.buckets.values()) {
       const idx = bucket.findIndex((m) => m.id === id);
       if (idx !== -1) {
         const existing = bucket[idx];
         if (!existing) continue;
-        bucket[idx] = { ...existing, state };
+        bucket[idx] = { ...existing, state, routingError };
         return;
       }
     }

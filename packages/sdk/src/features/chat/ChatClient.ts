@@ -1,3 +1,4 @@
+import * as Protobuf from "@meshtastic/protobufs";
 import { signal } from "@preact/signals-core";
 import type { ResultType } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
@@ -22,6 +23,7 @@ import { InMemoryMessageRepository } from "./infrastructure/repositories/InMemor
 import {
   type SendTextError,
   type SendTextInput,
+  MessageTooLongError,
   sendText,
 } from "./application/SendTextUseCase.ts";
 import { ChatStore } from "./state/chatStore.ts";
@@ -132,12 +134,21 @@ export class ChatClient {
 
     client.events.onRoutingPacket.subscribe((packet) => {
       if (packet.data.variant.case === "errorReason") {
+        const messageId = packet.requestId ?? packet.id;
+        const reason = packet.data.variant.value;
+        const existing = this.store.findMessage(messageId);
         const state =
-          packet.data.variant.value === 0
-            ? MessageState.Ack
+          reason === Protobuf.Mesh.Routing_Error.NONE
+            ? existing?.type === "direct" && packet.from !== existing.to
+              ? MessageState.Relayed
+              : MessageState.Ack
             : MessageState.Failed;
-        this.store.updateState(packet.id, state);
-        void this.repository.updateState(packet.id, state).catch(() => {});
+        const routingError =
+          reason === Protobuf.Mesh.Routing_Error.NONE ? undefined : reason;
+        this.store.updateState(messageId, state, routingError);
+        void this.repository
+          .updateState(messageId, state, routingError)
+          .catch(() => {});
       }
     });
   }
@@ -239,9 +250,13 @@ export class ChatClient {
       // Send pipeline failed (transport closed, validation, etc.). Keep
       // the optimistic message visible but mark it Failed so the user
       // sees the error state next to their bubble.
-      this.store.updateState(packetId, MessageState.Failed);
+      const routingError =
+        result.error instanceof MessageTooLongError
+          ? Protobuf.Mesh.Routing_Error.TOO_LARGE
+          : undefined;
+      this.store.updateState(packetId, MessageState.Failed, routingError);
       void this.repository
-        .updateState(packetId, MessageState.Failed)
+        .updateState(packetId, MessageState.Failed, routingError)
         .catch(() => {});
     }
     return result;

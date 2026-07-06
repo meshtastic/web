@@ -5,10 +5,11 @@
  * persistence is owned by the SDK ChatClient + SqlocalMessageRepository.
  */
 
-import type { Types } from "@meshtastic/sdk";
+import type { Protobuf, Types } from "@meshtastic/sdk";
 
 export enum MessageState {
   Ack = "ack",
+  Relayed = "relayed",
   Waiting = "waiting",
   Failed = "failed",
 }
@@ -30,6 +31,7 @@ interface MessageBase {
   date: number;
   messageId: number;
   state: MessageState;
+  routingError?: Protobuf.Mesh.Routing_Error;
   message: string;
 }
 

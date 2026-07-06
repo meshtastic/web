@@ -11,6 +11,7 @@ import { useChatAsLegacyMessages } from "@core/hooks/useChatAsLegacyMessages.ts"
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { MessageType, useSidebar } from "@core/stores";
+import type { Message } from "@core/stores/messageStore";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf, Types } from "@meshtastic/sdk";
 import {
@@ -166,6 +167,26 @@ export const MessagesPage = () => {
     [meshClient, numericChatId, isDirect],
   );
 
+  const retryMessage = useCallback(
+    async (message: Message) => {
+      if (!meshClient) {
+        console.warn("[MessagesPage] no active mesh client; retry dropped");
+        return;
+      }
+      const destination: Types.Destination =
+        message.type === MessageType.Direct ? message.to : "broadcast";
+      const result = await meshClient.chat.send({
+        text: message.message,
+        destination,
+        channel: message.channel,
+      });
+      if (result.status === "error") {
+        console.error("Failed to retry message:", result.error);
+      }
+    },
+    [meshClient],
+  );
+
   const broadcastMessages = useChatAsLegacyMessages({
     type: MessageType.Broadcast,
     channelId: numericChatId,
@@ -178,9 +199,19 @@ export const MessagesPage = () => {
   const renderChatContent = () => {
     switch (chatType) {
       case MessageType.Broadcast:
-        return <ChannelChat messages={[...broadcastMessages].reverse()} />;
+        return (
+          <ChannelChat
+            messages={[...broadcastMessages].reverse()}
+            onRetryMessage={retryMessage}
+          />
+        );
       case MessageType.Direct:
-        return <ChannelChat messages={[...directMessages].reverse()} />;
+        return (
+          <ChannelChat
+            messages={[...directMessages].reverse()}
+            onRetryMessage={retryMessage}
+          />
+        );
       default:
         return <SelectMessageChat />;
     }

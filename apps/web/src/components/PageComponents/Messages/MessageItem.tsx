@@ -6,18 +6,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
+import { Button } from "@components/UI/Button.tsx";
 import {
   useMyNodeAsProto,
   useNodeAsProto,
 } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice } from "@core/stores";
-import { type Message, MessageState } from "@core/stores/messageStore";
+import { type Message } from "@core/stores/messageStore";
 import { cn } from "@core/utils/cn.ts";
-import { type Protobuf, Types } from "@meshtastic/sdk";
-import type { LucideIcon } from "lucide-react";
-import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
+import { type Protobuf } from "@meshtastic/sdk";
+import { RotateCcw } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  getMessageDeliveryStatusInfo,
+  type MessageDeliveryStatusInfo,
+} from "./messageDeliveryStatus.ts";
 
 // Cache for pending promises
 const myNodePromises = new Map<string, Promise<Protobuf.Mesh.NodeInfo>>();
@@ -65,25 +69,18 @@ function useSuspendingMyNode() {
 
 // import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx"; // TODO: Uncomment when actions menu is implemented
 
-interface MessageStatusInfo {
-  displayText: string;
-  icon: LucideIcon;
-  ariaLabel: string;
-  iconClassName?: string;
-}
-
 const StatusTooltip = ({
   statusInfo,
   children,
 }: {
-  statusInfo: MessageStatusInfo;
+  statusInfo: MessageDeliveryStatusInfo;
   children: ReactNode;
 }) => (
   <TooltipProvider delayDuration={300}>
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-        {statusInfo.displayText}
+        {statusInfo.detailText}
         <TooltipArrow className="fill-slate-800" />
       </TooltipContent>
     </Tooltip>
@@ -92,9 +89,10 @@ const StatusTooltip = ({
 
 interface MessageItemProps {
   message: Message;
+  onRetry?: (message: Message) => void;
 }
 
-export const MessageItem = ({ message }: MessageItemProps) => {
+export const MessageItem = ({ message, onRetry }: MessageItemProps) => {
   const { config } = useDevice();
   const { t, i18n } = useTranslation("messages");
   const messageUserNode = useNodeAsProto(message.from ?? 0);
@@ -102,47 +100,6 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   // This will suspend if myNode is not available yet
   const myNode = useSuspendingMyNode();
   const myNodeNum = myNode.num;
-
-  const MESSAGE_STATUS_MAP = useMemo(
-    (): Record<MessageState, MessageStatusInfo> => ({
-      [MessageState.Ack]: {
-        displayText: t("deliveryStatus.delivered.displayText"),
-        icon: CheckCircle2,
-        ariaLabel: t("deliveryStatus.delivered.label"),
-        iconClassName: "text-green-500",
-      },
-      [MessageState.Waiting]: {
-        displayText: t("deliveryStatus.waiting.displayText"),
-        icon: CircleEllipsis,
-        ariaLabel: t("deliveryStatus.waiting.label"),
-        iconClassName: "text-slate-400",
-      },
-      [MessageState.Failed]: {
-        displayText: t("deliveryStatus.failed.displayText"),
-        icon: AlertCircle,
-        ariaLabel: t("deliveryStatus.failed.label"),
-        iconClassName: "text-red-500 dark:text-red-400",
-      },
-    }),
-    [t],
-  );
-
-  const UNKNOWN_STATUS = useMemo(
-    (): MessageStatusInfo => ({
-      displayText: t("deliveryStatus.unknown.displayText"),
-      icon: AlertCircle,
-      ariaLabel: t("deliveryStatus.unknown.label"),
-      iconClassName: "text-red-500 dark:text-red-400",
-    }),
-    [t],
-  );
-
-  const getMessageStatusInfo = useMemo(
-    () =>
-      (state: MessageState): MessageStatusInfo =>
-        MESSAGE_STATUS_MAP[state] ?? UNKNOWN_STATUS,
-    [MESSAGE_STATUS_MAP, UNKNOWN_STATUS],
-  );
 
   const messageUser: Protobuf.Mesh.NodeInfo | null | undefined =
     message.from != null ? (messageUserNode ?? null) : null;
@@ -164,7 +121,10 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     };
   }, [messageUser, message.from, t, myNodeNum]);
 
-  const messageStatusInfo = getMessageStatusInfo(message.state);
+  const messageStatusInfo = useMemo(
+    () => getMessageDeliveryStatusInfo(message, t),
+    [message, t],
+  );
   const StatusIconComponent = messageStatusInfo.icon;
 
   const messageDate = useMemo(
@@ -193,8 +153,8 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   );
 
   const isSender = myNodeNum !== undefined && message.from === myNodeNum;
-  const isOnPrimaryChannel = message.channel === Types.ChannelNumber.Primary; // Use the enum
-  const shouldShowStatusIcon = isSender && isOnPrimaryChannel;
+  const shouldShowStatus = isSender;
+  const canRetry = shouldShowStatus && messageStatusInfo.canRetry && onRetry;
 
   const messageItemWrapperClass = cn(
     "group w-full py-2 relative list-none",
@@ -228,24 +188,49 @@ export const MessageItem = ({ message }: MessageItemProps) => {
                 <span className="sr-only">{fullDateTime}</span>
               </time>
             )}
-            {shouldShowStatusIcon && (
-              <StatusTooltip statusInfo={messageStatusInfo}>
-                <span aria-label={messageStatusInfo.ariaLabel} role="img">
-                  <StatusIconComponent
-                    className={cn(
-                      "size-4 shrink-0",
-                      messageStatusInfo.iconClassName,
-                    )}
-                    aria-hidden="true"
-                  />
-                </span>
-              </StatusTooltip>
-            )}
           </div>
 
           {message?.message && (
             <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">
               {message.message}
+            </div>
+          )}
+
+          {shouldShowStatus && (
+            <div className="flex min-h-5 flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+              <StatusTooltip statusInfo={messageStatusInfo}>
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1",
+                    messageStatusInfo.textClassName,
+                  )}
+                  aria-label={messageStatusInfo.ariaLabel}
+                >
+                  <StatusIconComponent
+                    className={cn(
+                      "size-3.5 shrink-0",
+                      messageStatusInfo.iconClassName,
+                    )}
+                    aria-hidden="true"
+                  />
+                  <span>{messageStatusInfo.displayText}</span>
+                </span>
+              </StatusTooltip>
+              {canRetry && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 px-1.5 text-xs text-slate-600 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
+                  onClick={() => onRetry(message)}
+                  aria-label={t("deliveryStatus.retryAriaLabel", {
+                    status: messageStatusInfo.displayText,
+                  })}
+                >
+                  <RotateCcw className="size-3" aria-hidden="true" />
+                  {t("deliveryStatus.retry")}
+                </Button>
+              )}
             </div>
           )}
         </div>

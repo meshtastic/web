@@ -20,21 +20,51 @@
   },
 
   "deliveryStatus": {
-    "delivered": {
-      "label": "Message delivered",
-      "displayText": "Message delivered"
+    "retry": "Retry",
+    "retryAriaLabel": "Retry message: {{status}}",
+    "deliveredToMesh": {
+      "displayText": "Delivered to mesh",
+      "detailText": "This channel message was acknowledged by the mesh."
     },
-    "failed": {
-      "label": "Message delivery failed",
-      "displayText": "Delivery failed"
+    "deliveredToRecipient": {
+      "displayText": "Delivered to recipient",
+      "detailText": "The recipient confirmed this message."
+    },
+    "encryptedSendFailed": {
+      "displayText": "Could not send encrypted message",
+      "detailText": "Key exchange or contact information may be out of date. Wait for node info to sync, then try again."
+    },
+    "failedToMesh": {
+      "displayText": "Failed to deliver to mesh",
+      "detailText": "No node confirmed this message. Try again when you have better signal or more mesh coverage."
+    },
+    "messageTooLarge": {
+      "displayText": "Message is too large to send",
+      "detailText": "Shorten the message and send it again."
+    },
+    "noChannel": {
+      "displayText": "No channel selected",
+      "detailText": "Select a channel before sending."
+    },
+    "recipientKeyUnavailable": {
+      "displayText": "Recipient key unavailable",
+      "detailText": "Your node does not have the recipient's public key yet. Wait for node info to sync, then try again."
+    },
+    "recipientNeedsYourKey": {
+      "displayText": "Recipient needs your key",
+      "detailText": "The recipient does not know your public key yet. Your node may share its info automatically; try again after it syncs."
+    },
+    "relayed": {
+      "displayText": "Relayed, not confirmed by recipient",
+      "detailText": "A node relayed this message, but the recipient has not confirmed it."
+    },
+    "sending": {
+      "displayText": "Sending...",
+      "detailText": "This message is being sent."
     },
     "unknown": {
-      "label": "Message status unknown",
-      "displayText": "Unknown state"
-    },
-    "waiting": {
-      "label": "Sending message",
-      "displayText": "Waiting for delivery"
+      "displayText": "Message status unknown",
+      "detailText": "The message status is not available."
     }
   }
 }

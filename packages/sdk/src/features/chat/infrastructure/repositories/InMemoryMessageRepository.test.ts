@@ -1,3 +1,4 @@
+import * as Protobuf from "@meshtastic/protobufs";
 import { describe, expect, it } from "vitest";
 import { ChannelNumber } from "../../../../core/types.ts";
 import type { Message } from "../../domain/Message.ts";
@@ -47,12 +48,19 @@ describe("InMemoryMessageRepository", () => {
   it("updateState mutates the matching message", async () => {
     const repo = new InMemoryMessageRepository();
     await repo.append(msg(42, 1000));
-    await repo.updateState(42, MessageState.Failed);
+    await repo.updateState(
+      42,
+      MessageState.Failed,
+      Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+    );
     const [found] = await repo.loadRecent(
       { kind: "channel", channel: ChannelNumber.Primary },
       1,
     );
     expect(found?.state).toBe(MessageState.Failed);
+    expect(found?.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+    );
   });
 
   it("prune enforces maxPerBucket", async () => {

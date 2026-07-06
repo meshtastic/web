@@ -65,4 +65,8 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
       )`,
     ],
   },
+  {
+    version: 3,
+    sql: [`ALTER TABLE messages ADD COLUMN routing_error INTEGER`],
+  },
 ];

@@ -1,3 +1,4 @@
+import type * as Protobuf from "@meshtastic/protobufs";
 import type {
   ConversationKey,
   Message,
@@ -63,10 +64,14 @@ export class SqlocalMessageRepository implements MessageRepository {
     this.notify(input);
   }
 
-  async updateState(id: number, state: MessageState): Promise<void> {
+  async updateState(
+    id: number,
+    state: MessageState,
+    routingError?: Protobuf.Mesh.Routing_Error,
+  ): Promise<void> {
     await this.db
       .update(messages)
-      .set({ state })
+      .set({ state, routingError: routingError ?? null })
       .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
   }
 
@@ -149,7 +154,8 @@ interface MessageRow {
   rxTime: number;
   type: "broadcast" | "direct";
   text: string;
-  state: "pending" | "ack" | "failed";
+  state: "pending" | "ack" | "relayed" | "failed";
+  routingError: number | null;
 }
 
 function rowToMessage(row: MessageRow): Message {
@@ -162,6 +168,7 @@ function rowToMessage(row: MessageRow): Message {
     type: row.type,
     text: row.text,
     state: row.state as MessageState,
+    routingError: row.routingError ?? undefined,
   };
 }
 
@@ -181,5 +188,6 @@ function messageToRow(deviceId: number, message: Message): MessageRow {
     type: message.type,
     text: message.text,
     state: message.state,
+    routingError: message.routingError ?? null,
   };
 }

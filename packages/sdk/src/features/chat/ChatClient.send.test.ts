@@ -1,4 +1,5 @@
 import type { ResultType } from "better-result";
+import * as Protobuf from "@meshtastic/protobufs";
 import { describe, expect, it } from "vitest";
 import { MeshClient } from "../../core/client/MeshClient.ts";
 import { createFakeTransport } from "../../core/testing/createFakeTransport.ts";
@@ -140,7 +141,7 @@ describe("ChatClient.send optimistic append", () => {
     expect(messages.value[0]!.state).toBe(MessageState.Failed);
   });
 
-  it("flips outbound state to Ack on a routing-error=NONE packet matching the id", async () => {
+  it("flips outbound channel state to Ack on a routing-error=NONE packet matching the request id", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
     const messages = client.chat.messages(ChannelNumber.Primary);
@@ -149,15 +150,111 @@ describe("ChatClient.send optimistic append", () => {
     if (result.status !== "ok") throw new Error("send failed");
 
     client.events.onRoutingPacket.dispatch({
-      id: result.value,
+      id: 987,
+      requestId: result.value,
       from: 0,
       to: 0,
       channel: 0,
       type: "broadcast",
       rxTime: new Date(),
-      data: { variant: { case: "errorReason", value: 0 } },
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NONE,
+        },
+      },
     } as never);
 
     expect(messages.value[0]!.state).toBe(MessageState.Ack);
+  });
+
+  it("marks direct NONE from a relayer as relayed instead of recipient-delivered", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const peer = 12345;
+    const direct = client.chat.direct(peer);
+
+    const result: SendResult = await withAckFlush(client, () =>
+      client.chat.send({ text: "hi peer", destination: peer }),
+    );
+    if (result.status !== "ok") throw new Error("send failed");
+
+    client.events.onRoutingPacket.dispatch({
+      id: 456,
+      requestId: result.value,
+      from: 999,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NONE,
+        },
+      },
+    } as never);
+
+    expect(direct.value[0]!.state).toBe(MessageState.Relayed);
+  });
+
+  it("marks direct NONE from the recipient as recipient-delivered", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const peer = 12345;
+    const direct = client.chat.direct(peer);
+
+    const result: SendResult = await withAckFlush(client, () =>
+      client.chat.send({ text: "hi peer", destination: peer }),
+    );
+    if (result.status !== "ok") throw new Error("send failed");
+
+    client.events.onRoutingPacket.dispatch({
+      id: 789,
+      requestId: result.value,
+      from: peer,
+      to: client.myNodeNum,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.NONE,
+        },
+      },
+    } as never);
+
+    expect(direct.value[0]!.state).toBe(MessageState.Ack);
+  });
+
+  it("preserves routing error reason on failed delivery", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const messages = client.chat.messages(ChannelNumber.Primary);
+
+    const result = await sendBroadcast(client, "no ack");
+    if (result.status !== "ok") throw new Error("send failed");
+
+    client.events.onRoutingPacket.dispatch({
+      id: 321,
+      requestId: result.value,
+      from: 0,
+      to: 0,
+      channel: 0,
+      type: "broadcast",
+      rxTime: new Date(),
+      data: {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+        },
+      },
+    } as never);
+
+    expect(messages.value[0]!.state).toBe(MessageState.Failed);
+    expect(messages.value[0]!.routingError).toBe(
+      Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+    );
   });
 });

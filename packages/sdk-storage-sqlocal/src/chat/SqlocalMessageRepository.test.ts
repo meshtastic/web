@@ -1,4 +1,9 @@
-import { ChannelNumber, type Message, MessageState } from "@meshtastic/sdk";
+import {
+  ChannelNumber,
+  type Message,
+  MessageState,
+  Protobuf,
+} from "@meshtastic/sdk";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { SqlocalDb } from "../db.ts";
 import { createMemoryDb } from "../testing/createMemoryDb.ts";
@@ -52,12 +57,17 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
 
   it("updateState mutates the matching row", async () => {
     await repo.append(msg(42, 1000));
-    await repo.updateState(42, MessageState.Failed);
+    await repo.updateState(
+      42,
+      MessageState.Failed,
+      Protobuf.Mesh.Routing_Error.NO_CHANNEL,
+    );
     const [found] = await repo.loadRecent(
       { kind: "channel", channel: ChannelNumber.Primary },
       1,
     );
     expect(found?.state).toBe(MessageState.Failed);
+    expect(found?.routingError).toBe(Protobuf.Mesh.Routing_Error.NO_CHANNEL);
   });
 
   it("prune enforces maxPerBucket", async () => {

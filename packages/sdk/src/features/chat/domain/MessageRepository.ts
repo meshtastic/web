@@ -1,3 +1,4 @@
+import type * as Protobuf from "@meshtastic/protobufs";
 import type { ChannelNumber } from "../../../core/types.ts";
 import type { Message } from "./Message.ts";
 import type { MessageState } from "./MessageState.ts";
@@ -33,7 +34,11 @@ export interface MessageRepository {
   ): Promise<Message[]>;
   append(message: Message): Promise<void>;
   appendBatch(messages: ReadonlyArray<Message>): Promise<void>;
-  updateState(id: number, state: MessageState): Promise<void>;
+  updateState(
+    id: number,
+    state: MessageState,
+    routingError?: Protobuf.Mesh.Routing_Error,
+  ): Promise<void>;
   prune(policy: RetentionPolicy): Promise<void>;
   /** Deletes every message in a single conversation. */
   clearConversation(key: ConversationKey): Promise<void>;

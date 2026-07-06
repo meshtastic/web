@@ -21,6 +21,7 @@ export type PacketDestination = "broadcast" | "direct";
 
 export interface PacketMetadata<T> {
   id: number;
+  requestId?: number;
   rxTime: Date;
   type: PacketDestination;
   from: number;

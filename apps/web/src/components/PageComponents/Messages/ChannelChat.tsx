@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 
 export interface ChannelChatProps {
   messages?: Message[];
+  onRetryMessage?: (message: Message) => void;
 }
 
 function toTs(d: Message["date"]): number {
@@ -104,7 +105,10 @@ const EmptyState = () => {
   );
 };
 
-export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
+export const ChannelChat = ({
+  messages = [],
+  onRetryMessage,
+}: ChannelChatProps) => {
   const { i18n, t } = useTranslation();
 
   const locale = useMemo(
@@ -153,7 +157,7 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
               key={message.messageId ?? `${message.from}-${message.date}`}
               fallback={<MessageSkeleton />}
             >
-              <MessageItem message={message} />
+              <MessageItem message={message} onRetry={onRetryMessage} />
             </Suspense>
           ))}
           <DateDelimiter label={label} />
