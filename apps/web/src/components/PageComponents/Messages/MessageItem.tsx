@@ -81,7 +81,7 @@ const StatusTooltip = ({
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
         {statusInfo.detailText}
-        <TooltipArrow className="fill-slate-800" />
+        <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
       </TooltipContent>
     </Tooltip>
   </TooltipProvider>
@@ -154,7 +154,8 @@ export const MessageItem = ({ message, onRetry }: MessageItemProps) => {
 
   const isSender = myNodeNum !== undefined && message.from === myNodeNum;
   const shouldShowStatus = isSender;
-  const canRetry = shouldShowStatus && messageStatusInfo.canRetry && onRetry;
+  const canRetry =
+    shouldShowStatus && messageStatusInfo.canRetry && Boolean(onRetry);
 
   const messageItemWrapperClass = cn(
     "group w-full py-2 relative list-none",
@@ -222,7 +223,7 @@ export const MessageItem = ({ message, onRetry }: MessageItemProps) => {
                   variant="ghost"
                   size="sm"
                   className="h-5 px-1.5 text-xs text-slate-600 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
-                  onClick={() => onRetry(message)}
+                  onClick={() => onRetry?.(message)}
                   aria-label={t("deliveryStatus.retryAriaLabel", {
                     status: messageStatusInfo.displayText,
                   })}
