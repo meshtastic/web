@@ -386,7 +386,7 @@ const MapPage = () => {
             </button>
           </div>
           <div
-            className="fixed inset-0 z-40 cursor-crosshair"
+            className="fixed inset-0 z-40 cursor-crosshair touch-none"
             onPointerDown={boxDraw.onPointerDown}
             onPointerMove={boxDraw.onPointerMove}
             onPointerUp={boxDraw.onPointerUp}
