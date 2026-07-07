@@ -105,6 +105,8 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
           device_id,
           conversation_key,
           from_node,
+          MIN(to_node) AS peer_node,
+          COUNT(*) AS message_count,
           COUNT(DISTINCT to_node) AS recipient_count,
           SUM(CASE
             WHEN state <> 'ack' OR routing_error IS NOT NULL THEN 1
@@ -124,11 +126,20 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
         WHERE recipient_count > 1
           OR actionable_count > 0
       ),
-      singleton_legacy_devices AS (
-        SELECT device_id
-        FROM direct_buckets
-        GROUP BY device_id
-        HAVING COUNT(*) = 1
+      reciprocal_single_peer_buckets AS (
+        SELECT outbound.device_id,
+               outbound.conversation_key,
+               outbound.from_node
+        FROM direct_buckets outbound
+        JOIN direct_buckets inbound
+          ON inbound.device_id = outbound.device_id
+          AND outbound.recipient_count = 1
+          AND inbound.recipient_count = 1
+          AND inbound.from_node = outbound.peer_node
+          AND inbound.peer_node = outbound.from_node
+        WHERE outbound.actionable_count = 0
+          AND inbound.actionable_count = 0
+          AND outbound.message_count > inbound.message_count
       ),
       legacy_outbound_buckets AS (
         SELECT direct_buckets.device_id,
@@ -143,8 +154,10 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
         )
           OR EXISTS (
             SELECT 1
-            FROM singleton_legacy_devices singleton
-            WHERE singleton.device_id = direct_buckets.device_id
+            FROM reciprocal_single_peer_buckets reciprocal
+            WHERE reciprocal.device_id = direct_buckets.device_id
+              AND reciprocal.conversation_key = direct_buckets.conversation_key
+              AND reciprocal.from_node = direct_buckets.from_node
           )
       )
       UPDATE messages
