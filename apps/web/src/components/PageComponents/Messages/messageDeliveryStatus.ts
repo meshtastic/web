@@ -56,8 +56,8 @@ export function getMessageDeliveryStatusInfo(
             detailText: t("deliveryStatus.deliveredToMesh.detailText"),
             icon: CheckCircle2,
             ariaLabel: t("deliveryStatus.deliveredToMesh.displayText"),
-            iconClassName: "text-slate-500 dark:text-slate-400",
-            textClassName: "text-slate-500 dark:text-slate-400",
+            iconClassName: "text-green-600 dark:text-green-400",
+            textClassName: "text-green-700 dark:text-green-300",
             canRetry: false,
           };
     case MessageState.Relayed:
@@ -113,6 +113,12 @@ function failureTranslationKey(
   switch (routingError) {
     case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
       return "noChannel";
+    case Protobuf.Mesh.Routing_Error.NO_INTERFACE:
+      return "noRadioInterface";
+    case Protobuf.Mesh.Routing_Error.DUTY_CYCLE_LIMIT:
+      return "dutyCycleLimit";
+    case Protobuf.Mesh.Routing_Error.RATE_LIMIT_EXCEEDED:
+      return "rateLimited";
     case Protobuf.Mesh.Routing_Error.PKI_FAILED:
       return "encryptedSendFailed";
     case Protobuf.Mesh.Routing_Error.PKI_SEND_FAIL_PUBLIC_KEY:
@@ -121,6 +127,16 @@ function failureTranslationKey(
       return "recipientNeedsYourKey";
     case Protobuf.Mesh.Routing_Error.TOO_LARGE:
       return "messageTooLarge";
+    case Protobuf.Mesh.Routing_Error.NO_RESPONSE:
+      return "noAppResponse";
+    case Protobuf.Mesh.Routing_Error.BAD_REQUEST:
+      return "invalidRequest";
+    case Protobuf.Mesh.Routing_Error.NOT_AUTHORIZED:
+      return "notAuthorized";
+    case Protobuf.Mesh.Routing_Error.ADMIN_BAD_SESSION_KEY:
+      return "adminSessionExpired";
+    case Protobuf.Mesh.Routing_Error.ADMIN_PUBLIC_KEY_UNAUTHORIZED:
+      return "adminKeyNotAuthorized";
     case Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT:
     case Protobuf.Mesh.Routing_Error.TIMEOUT:
     default:

@@ -126,21 +126,6 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
         WHERE recipient_count > 1
           OR actionable_count > 0
       ),
-      reciprocal_single_peer_buckets AS (
-        SELECT outbound.device_id,
-               outbound.conversation_key,
-               outbound.from_node
-        FROM direct_buckets outbound
-        JOIN direct_buckets inbound
-          ON inbound.device_id = outbound.device_id
-          AND outbound.recipient_count = 1
-          AND inbound.recipient_count = 1
-          AND inbound.from_node = outbound.peer_node
-          AND inbound.peer_node = outbound.from_node
-        WHERE outbound.actionable_count = 0
-          AND inbound.actionable_count = 0
-          AND outbound.message_count > inbound.message_count
-      ),
       legacy_outbound_buckets AS (
         SELECT direct_buckets.device_id,
                direct_buckets.conversation_key,
@@ -152,13 +137,6 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
           WHERE local.device_id = direct_buckets.device_id
             AND local.from_node = direct_buckets.from_node
         )
-          OR EXISTS (
-            SELECT 1
-            FROM reciprocal_single_peer_buckets reciprocal
-            WHERE reciprocal.device_id = direct_buckets.device_id
-              AND reciprocal.conversation_key = direct_buckets.conversation_key
-              AND reciprocal.from_node = direct_buckets.from_node
-          )
       )
       UPDATE messages
       SET conversation_key = 'direct:' || to_node

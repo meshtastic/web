@@ -125,7 +125,7 @@ describe("MIGRATIONS", () => {
     expect(rows).toEqual([[1, "direct:200"]]);
   });
 
-  it("rekeys ack-only outbound rows in mixed single-peer direct history", async () => {
+  it("leaves ambiguous local-more ack-only reciprocal direct history unchanged", async () => {
     const db = await freshSqlite();
     for (const migration of MIGRATIONS.filter((m) => m.version < 5)) {
       for (const stmt of migration.sql) db.run(stmt);
@@ -161,9 +161,85 @@ describe("MIGRATIONS", () => {
       "SELECT id, conversation_key FROM messages ORDER BY id",
     )[0]?.values;
     expect(rows).toEqual([
-      [1, "direct:200"],
+      [1, "direct:100"],
+      [2, "direct:100"],
+      [3, "direct:200"],
+    ]);
+  });
+
+  it("leaves ambiguous peer-more ack-only reciprocal direct history unchanged", async () => {
+    const db = await freshSqlite();
+    for (const migration of MIGRATIONS.filter((m) => m.version < 5)) {
+      for (const stmt of migration.sql) db.run(stmt);
+    }
+
+    db.run(
+      `INSERT INTO messages (
+        id, device_id, conversation_key, from_node, to_node, channel, rx_time,
+        type, text, state, routing_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [1, 1, "direct:100", 100, 200, 0, 1000, "direct", "out", "ack", null],
+    );
+    db.run(
+      `INSERT INTO messages (
+        id, device_id, conversation_key, from_node, to_node, channel, rx_time,
+        type, text, state, routing_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [2, 1, "direct:200", 200, 100, 0, 2000, "direct", "in", "ack", null],
+    );
+    db.run(
+      `INSERT INTO messages (
+        id, device_id, conversation_key, from_node, to_node, channel, rx_time,
+        type, text, state, routing_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [3, 1, "direct:200", 200, 100, 0, 3000, "direct", "in-2", "ack", null],
+    );
+
+    const latest = MIGRATIONS.at(-1)!;
+    expect(latest.version).toBe(5);
+    for (const stmt of latest.sql) db.run(stmt);
+
+    const rows = db.exec(
+      "SELECT id, conversation_key FROM messages ORDER BY id",
+    )[0]?.values;
+    expect(rows).toEqual([
+      [1, "direct:100"],
       [2, "direct:200"],
       [3, "direct:200"],
+    ]);
+  });
+
+  it("leaves ambiguous equal-count ack-only reciprocal direct history unchanged", async () => {
+    const db = await freshSqlite();
+    for (const migration of MIGRATIONS.filter((m) => m.version < 5)) {
+      for (const stmt of migration.sql) db.run(stmt);
+    }
+
+    db.run(
+      `INSERT INTO messages (
+        id, device_id, conversation_key, from_node, to_node, channel, rx_time,
+        type, text, state, routing_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [1, 1, "direct:100", 100, 200, 0, 1000, "direct", "out", "ack", null],
+    );
+    db.run(
+      `INSERT INTO messages (
+        id, device_id, conversation_key, from_node, to_node, channel, rx_time,
+        type, text, state, routing_error
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [2, 1, "direct:200", 200, 100, 0, 2000, "direct", "in", "ack", null],
+    );
+
+    const latest = MIGRATIONS.at(-1)!;
+    expect(latest.version).toBe(5);
+    for (const stmt of latest.sql) db.run(stmt);
+
+    const rows = db.exec(
+      "SELECT id, conversation_key FROM messages ORDER BY id",
+    )[0]?.values;
+    expect(rows).toEqual([
+      [1, "direct:100"],
+      [2, "direct:200"],
     ]);
   });
 

@@ -6,23 +6,48 @@ import { getMessageDeliveryStatusInfo } from "./messageDeliveryStatus.ts";
 const strings: Record<string, string> = {
   "deliveryStatus.deliveredToMesh.displayText": "Delivered to mesh",
   "deliveryStatus.deliveredToMesh.detailText":
-    "This channel message was acknowledged by the mesh.",
+    "At least one node heard this channel message.",
   "deliveryStatus.deliveredToRecipient.displayText": "Delivered to recipient",
   "deliveryStatus.deliveredToRecipient.detailText":
-    "The recipient confirmed this message.",
+    "The recipient confirmed this direct message.",
   "deliveryStatus.encryptedSendFailed.displayText":
     "Could not send encrypted message",
   "deliveryStatus.encryptedSendFailed.detailText":
-    "Key exchange or contact information may be out of date. Wait for node info to sync, then try again.",
+    "The radio could not create the encrypted path for this message. Let node info sync, then try again.",
+  "deliveryStatus.adminKeyNotAuthorized.displayText":
+    "Admin key not authorized",
+  "deliveryStatus.adminKeyNotAuthorized.detailText":
+    "The admin public key is not authorized on the destination.",
+  "deliveryStatus.adminSessionExpired.displayText": "Admin session expired",
+  "deliveryStatus.adminSessionExpired.detailText":
+    "The admin session key is missing, invalid, or expired. Start a new admin session, then try again.",
+  "deliveryStatus.dutyCycleLimit.displayText": "Duty cycle limit",
+  "deliveryStatus.dutyCycleLimit.detailText":
+    "The radio is temporarily blocked by the regional airtime limit. Try again later.",
   "deliveryStatus.failedToMesh.displayText": "Failed to deliver to mesh",
   "deliveryStatus.failedToMesh.detailText":
     "No node confirmed this message. Try again when you have better signal or more mesh coverage.",
+  "deliveryStatus.invalidRequest.displayText": "Invalid request",
+  "deliveryStatus.invalidRequest.detailText":
+    "The receiving app rejected the request. Check the message or command and try again.",
   "deliveryStatus.messageTooLarge.displayText": "Message is too large to send",
   "deliveryStatus.messageTooLarge.detailText":
     "Shorten the message and send it again.",
+  "deliveryStatus.noAppResponse.displayText": "No app response",
+  "deliveryStatus.noAppResponse.detailText":
+    "The destination received the request, but no app or module responded.",
   "deliveryStatus.noChannel.displayText": "Channel/key mismatch",
   "deliveryStatus.noChannel.detailText":
     "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again.",
+  "deliveryStatus.noRadioInterface.displayText": "No radio interface",
+  "deliveryStatus.noRadioInterface.detailText":
+    "The radio does not have a usable interface for this send.",
+  "deliveryStatus.notAuthorized.displayText": "Not authorized",
+  "deliveryStatus.notAuthorized.detailText":
+    "The destination refused permission for this request.",
+  "deliveryStatus.rateLimited.displayText": "Rate limited",
+  "deliveryStatus.rateLimited.detailText":
+    "Messages are being sent too quickly. Wait a moment, then try again.",
   "deliveryStatus.recipientKeyUnavailable.displayText":
     "Recipient key unavailable",
   "deliveryStatus.recipientKeyUnavailable.detailText":
@@ -35,7 +60,8 @@ const strings: Record<string, string> = {
   "deliveryStatus.relayed.detailText":
     "A node relayed this message, but the recipient has not confirmed it.",
   "deliveryStatus.sending.displayText": "Sending...",
-  "deliveryStatus.sending.detailText": "This message is being sent.",
+  "deliveryStatus.sending.detailText":
+    "The radio is still trying to send this message.",
   "deliveryStatus.unknown.displayText": "Message status unknown",
   "deliveryStatus.unknown.detailText": "The message status is not available.",
 };
@@ -88,6 +114,27 @@ describe("getMessageDeliveryStatusInfo", () => {
     ],
     [
       MessageState.Failed,
+      MessageType.Broadcast,
+      Protobuf.Mesh.Routing_Error.NO_INTERFACE,
+      "No radio interface",
+      true,
+    ],
+    [
+      MessageState.Failed,
+      MessageType.Broadcast,
+      Protobuf.Mesh.Routing_Error.DUTY_CYCLE_LIMIT,
+      "Duty cycle limit",
+      true,
+    ],
+    [
+      MessageState.Failed,
+      MessageType.Broadcast,
+      Protobuf.Mesh.Routing_Error.RATE_LIMIT_EXCEEDED,
+      "Rate limited",
+      true,
+    ],
+    [
+      MessageState.Failed,
       MessageType.Direct,
       Protobuf.Mesh.Routing_Error.PKI_FAILED,
       "Could not send encrypted message",
@@ -113,6 +160,41 @@ describe("getMessageDeliveryStatusInfo", () => {
       Protobuf.Mesh.Routing_Error.TOO_LARGE,
       "Message is too large to send",
       false,
+    ],
+    [
+      MessageState.Failed,
+      MessageType.Direct,
+      Protobuf.Mesh.Routing_Error.NO_RESPONSE,
+      "No app response",
+      true,
+    ],
+    [
+      MessageState.Failed,
+      MessageType.Direct,
+      Protobuf.Mesh.Routing_Error.BAD_REQUEST,
+      "Invalid request",
+      true,
+    ],
+    [
+      MessageState.Failed,
+      MessageType.Direct,
+      Protobuf.Mesh.Routing_Error.NOT_AUTHORIZED,
+      "Not authorized",
+      true,
+    ],
+    [
+      MessageState.Failed,
+      MessageType.Direct,
+      Protobuf.Mesh.Routing_Error.ADMIN_BAD_SESSION_KEY,
+      "Admin session expired",
+      true,
+    ],
+    [
+      MessageState.Failed,
+      MessageType.Direct,
+      Protobuf.Mesh.Routing_Error.ADMIN_PUBLIC_KEY_UNAUTHORIZED,
+      "Admin key not authorized",
+      true,
     ],
   ])(
     "maps %s/%s/%s to %s",
