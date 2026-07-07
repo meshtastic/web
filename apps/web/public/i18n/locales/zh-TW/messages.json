@@ -19,83 +19,83 @@
     "replyLabel": "回覆"
   },
   "deliveryStatus": {
-    "retry": "Retry",
-    "retryAriaLabel": "Retry message: {{status}}",
+    "retry": "重試",
+    "retryAriaLabel": "重試訊息：{{status}}",
     "deliveredToMesh": {
-      "displayText": "Delivered to mesh",
-      "detailText": "At least one node heard this channel message."
+      "displayText": "已傳遞至 mesh 網路",
+      "detailText": "至少一個節點已收到此頻道訊息。"
     },
     "deliveredToRecipient": {
-      "displayText": "Delivered to recipient",
-      "detailText": "The recipient confirmed this direct message."
+      "displayText": "已傳遞給收件者",
+      "detailText": "收件者已確認此直接訊息。"
     },
     "encryptedSendFailed": {
-      "displayText": "Could not send encrypted message",
-      "detailText": "The radio could not create the encrypted path for this message. Let node info sync, then try again."
+      "displayText": "無法傳送加密訊息",
+      "detailText": "無線電無法為此訊息建立加密路徑。請等待節點資訊同步後再試一次。"
     },
     "adminKeyNotAuthorized": {
-      "displayText": "Admin key not authorized",
-      "detailText": "The admin public key is not authorized on the destination."
+      "displayText": "管理員金鑰未授權",
+      "detailText": "目的端未授權此管理員公開金鑰。"
     },
     "adminSessionExpired": {
-      "displayText": "Admin session expired",
-      "detailText": "The admin session key is missing, invalid, or expired. Start a new admin session, then try again."
+      "displayText": "管理員工作階段已過期",
+      "detailText": "管理員工作階段金鑰遺失、無效或已過期。請開始新的管理員工作階段後再試一次。"
     },
     "dutyCycleLimit": {
-      "displayText": "Duty cycle limit",
-      "detailText": "The radio is temporarily blocked by the regional airtime limit. Try again later."
+      "displayText": "工作週期限制",
+      "detailText": "無線電暫時受到區域空中時間限制阻擋。請稍後再試。"
     },
     "failedToMesh": {
-      "displayText": "Failed to deliver to mesh",
-      "detailText": "No node confirmed this message. Try again when you have better signal or more mesh coverage."
+      "displayText": "無法傳遞至 mesh 網路",
+      "detailText": "沒有節點確認此訊息。請在訊號較好或 mesh 覆蓋較佳時再試一次。"
     },
     "invalidRequest": {
-      "displayText": "Invalid request",
-      "detailText": "The receiving app rejected the request. Check the message or command and try again."
+      "displayText": "無效的請求",
+      "detailText": "接收端應用程式拒絕了請求。請檢查訊息或指令後再試一次。"
     },
     "messageTooLarge": {
-      "displayText": "Message is too large to send",
-      "detailText": "Shorten the message and send it again."
+      "displayText": "訊息太大，無法傳送",
+      "detailText": "請縮短訊息後重新傳送。"
     },
     "noAppResponse": {
-      "displayText": "No app response",
-      "detailText": "The destination received the request, but no app or module responded."
+      "displayText": "沒有應用程式回應",
+      "detailText": "目的端已收到請求，但沒有應用程式或模組回應。"
     },
     "noChannel": {
-      "displayText": "Channel/key mismatch",
-      "detailText": "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again."
+      "displayText": "頻道/金鑰不相符",
+      "detailText": "此訊息無法使用相符的頻道/金鑰進行編碼或解碼。請檢查頻道和金鑰後再試一次。"
     },
     "noRadioInterface": {
-      "displayText": "No radio interface",
-      "detailText": "The radio does not have a usable interface for this send."
+      "displayText": "沒有無線電介面",
+      "detailText": "無線電沒有可用於此次傳送的介面。"
     },
     "notAuthorized": {
-      "displayText": "Not authorized",
-      "detailText": "The destination refused permission for this request."
+      "displayText": "未授權",
+      "detailText": "目的端拒絕了此請求的權限。"
     },
     "rateLimited": {
-      "displayText": "Rate limited",
-      "detailText": "Messages are being sent too quickly. Wait a moment, then try again."
+      "displayText": "已達速率限制",
+      "detailText": "訊息傳送得太快。請稍候再試。"
     },
     "recipientKeyUnavailable": {
-      "displayText": "Recipient key unavailable",
-      "detailText": "Your node does not have the recipient's public key yet. Wait for node info to sync, then try again."
+      "displayText": "收件者金鑰無法使用",
+      "detailText": "你的節點尚未取得收件者的公開金鑰。請等待節點資訊同步後再試一次。"
     },
     "recipientNeedsYourKey": {
-      "displayText": "Recipient needs your key",
-      "detailText": "The recipient does not know your public key yet. Your node may share its info automatically; try again after it syncs."
+      "displayText": "收件者需要你的金鑰",
+      "detailText": "收件者尚不知道你的公開金鑰。你的節點可能會自動分享其資訊；同步後請再試一次。"
     },
     "relayed": {
-      "displayText": "Relayed, not confirmed by recipient",
-      "detailText": "A node relayed this message, but the recipient has not confirmed it."
+      "displayText": "已中繼，收件者未確認",
+      "detailText": "某個節點已中繼此訊息，但收件者尚未確認。"
     },
     "sending": {
-      "displayText": "Sending...",
-      "detailText": "The radio is still trying to send this message."
+      "displayText": "傳送中...",
+      "detailText": "無線電仍在嘗試傳送此訊息。"
     },
     "unknown": {
-      "displayText": "Message status unknown",
-      "detailText": "The message status is not available."
+      "displayText": "訊息狀態未知",
+      "detailText": "訊息狀態無法使用。"
     }
   }
 }

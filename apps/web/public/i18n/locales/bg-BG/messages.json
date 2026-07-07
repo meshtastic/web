@@ -19,83 +19,83 @@
     "replyLabel": "Отговор"
   },
   "deliveryStatus": {
-    "retry": "Retry",
-    "retryAriaLabel": "Retry message: {{status}}",
+    "retry": "Повторен опит",
+    "retryAriaLabel": "Повторен опит за съобщение: {{status}}",
     "deliveredToMesh": {
-      "displayText": "Delivered to mesh",
-      "detailText": "At least one node heard this channel message."
+      "displayText": "Доставено до mesh мрежата",
+      "detailText": "Поне един възел получи това съобщение в канала."
     },
     "deliveredToRecipient": {
-      "displayText": "Delivered to recipient",
-      "detailText": "The recipient confirmed this direct message."
+      "displayText": "Доставено до получателя",
+      "detailText": "Получателят потвърди това директно съобщение."
     },
     "encryptedSendFailed": {
-      "displayText": "Could not send encrypted message",
-      "detailText": "The radio could not create the encrypted path for this message. Let node info sync, then try again."
+      "displayText": "Шифрованото съобщение не можа да бъде изпратено",
+      "detailText": "Радиото не можа да създаде шифрован път за това съобщение. Изчакайте информацията за възлите да се синхронизира, след което опитайте отново."
     },
     "adminKeyNotAuthorized": {
-      "displayText": "Admin key not authorized",
-      "detailText": "The admin public key is not authorized on the destination."
+      "displayText": "Администраторският ключ не е упълномощен",
+      "detailText": "Публичният администраторски ключ не е упълномощен на получателя."
     },
     "adminSessionExpired": {
-      "displayText": "Admin session expired",
-      "detailText": "The admin session key is missing, invalid, or expired. Start a new admin session, then try again."
+      "displayText": "Администраторската сесия е изтекла",
+      "detailText": "Ключът за администраторска сесия липсва, невалиден е или е изтекъл. Започнете нова администраторска сесия и опитайте отново."
     },
     "dutyCycleLimit": {
-      "displayText": "Duty cycle limit",
-      "detailText": "The radio is temporarily blocked by the regional airtime limit. Try again later."
+      "displayText": "Ограничение на работния цикъл",
+      "detailText": "Радиото е временно блокирано от регионалното ограничение за ефирно време. Опитайте отново по-късно."
     },
     "failedToMesh": {
-      "displayText": "Failed to deliver to mesh",
-      "detailText": "No node confirmed this message. Try again when you have better signal or more mesh coverage."
+      "displayText": "Неуспешна доставка до mesh мрежата",
+      "detailText": "Нито един възел не потвърди това съобщение. Опитайте отново при по-добър сигнал или по-добро mesh покритие."
     },
     "invalidRequest": {
-      "displayText": "Invalid request",
-      "detailText": "The receiving app rejected the request. Check the message or command and try again."
+      "displayText": "Невалидна заявка",
+      "detailText": "Получаващото приложение отхвърли заявката. Проверете съобщението или командата и опитайте отново."
     },
     "messageTooLarge": {
-      "displayText": "Message is too large to send",
-      "detailText": "Shorten the message and send it again."
+      "displayText": "Съобщението е твърде голямо за изпращане",
+      "detailText": "Съкратете съобщението и го изпратете отново."
     },
     "noAppResponse": {
-      "displayText": "No app response",
-      "detailText": "The destination received the request, but no app or module responded."
+      "displayText": "Няма отговор от приложението",
+      "detailText": "Получателят получи заявката, но нито едно приложение или модул не отговори."
     },
     "noChannel": {
-      "displayText": "Channel/key mismatch",
-      "detailText": "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again."
+      "displayText": "Несъответствие на канал/ключ",
+      "detailText": "Това съобщение не можа да бъде кодирано или декодирано със съвпадащ канал/ключ. Проверете канала и ключа, след което опитайте отново."
     },
     "noRadioInterface": {
-      "displayText": "No radio interface",
-      "detailText": "The radio does not have a usable interface for this send."
+      "displayText": "Няма радио интерфейс",
+      "detailText": "Радиото няма използваем интерфейс за това изпращане."
     },
     "notAuthorized": {
-      "displayText": "Not authorized",
-      "detailText": "The destination refused permission for this request."
+      "displayText": "Не е упълномощено",
+      "detailText": "Получателят отказа разрешение за тази заявка."
     },
     "rateLimited": {
-      "displayText": "Rate limited",
-      "detailText": "Messages are being sent too quickly. Wait a moment, then try again."
+      "displayText": "Ограничена честота",
+      "detailText": "Съобщенията се изпращат твърде бързо. Изчакайте малко и опитайте отново."
     },
     "recipientKeyUnavailable": {
-      "displayText": "Recipient key unavailable",
-      "detailText": "Your node does not have the recipient's public key yet. Wait for node info to sync, then try again."
+      "displayText": "Ключът на получателя не е наличен",
+      "detailText": "Вашият възел все още няма публичния ключ на получателя. Изчакайте информацията за възлите да се синхронизира, след което опитайте отново."
     },
     "recipientNeedsYourKey": {
-      "displayText": "Recipient needs your key",
-      "detailText": "The recipient does not know your public key yet. Your node may share its info automatically; try again after it syncs."
+      "displayText": "Получателят се нуждае от вашия ключ",
+      "detailText": "Получателят все още не знае вашия публичен ключ. Вашият възел може да сподели информацията си автоматично; опитайте отново след синхронизиране."
     },
     "relayed": {
-      "displayText": "Relayed, not confirmed by recipient",
-      "detailText": "A node relayed this message, but the recipient has not confirmed it."
+      "displayText": "Препредадено, но не е потвърдено от получателя",
+      "detailText": "Възел препредаде това съобщение, но получателят не го е потвърдил."
     },
     "sending": {
-      "displayText": "Sending...",
-      "detailText": "The radio is still trying to send this message."
+      "displayText": "Изпращане...",
+      "detailText": "Радиото все още се опитва да изпрати това съобщение."
     },
     "unknown": {
-      "displayText": "Message status unknown",
-      "detailText": "The message status is not available."
+      "displayText": "Статусът на съобщението е неизвестен",
+      "detailText": "Статусът на съобщението не е наличен."
     }
   }
 }

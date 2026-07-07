@@ -19,83 +19,83 @@
     "replyLabel": "Rispondi"
   },
   "deliveryStatus": {
-    "retry": "Retry",
-    "retryAriaLabel": "Retry message: {{status}}",
+    "retry": "Riprova",
+    "retryAriaLabel": "Riprova messaggio: {{status}}",
     "deliveredToMesh": {
-      "displayText": "Delivered to mesh",
-      "detailText": "At least one node heard this channel message."
+      "displayText": "Consegnato alla rete mesh",
+      "detailText": "Almeno un nodo ha ricevuto questo messaggio del canale."
     },
     "deliveredToRecipient": {
-      "displayText": "Delivered to recipient",
-      "detailText": "The recipient confirmed this direct message."
+      "displayText": "Consegnato al destinatario",
+      "detailText": "Il destinatario ha confermato questo messaggio diretto."
     },
     "encryptedSendFailed": {
-      "displayText": "Could not send encrypted message",
-      "detailText": "The radio could not create the encrypted path for this message. Let node info sync, then try again."
+      "displayText": "Impossibile inviare il messaggio crittografato",
+      "detailText": "La radio non è riuscita a creare il percorso crittografato per questo messaggio. Attendi la sincronizzazione delle informazioni dei nodi, poi riprova."
     },
     "adminKeyNotAuthorized": {
-      "displayText": "Admin key not authorized",
-      "detailText": "The admin public key is not authorized on the destination."
+      "displayText": "Chiave admin non autorizzata",
+      "detailText": "La chiave pubblica admin non è autorizzata sulla destinazione."
     },
     "adminSessionExpired": {
-      "displayText": "Admin session expired",
-      "detailText": "The admin session key is missing, invalid, or expired. Start a new admin session, then try again."
+      "displayText": "Sessione admin scaduta",
+      "detailText": "La chiave della sessione admin è mancante, non valida o scaduta. Avvia una nuova sessione admin, poi riprova."
     },
     "dutyCycleLimit": {
-      "displayText": "Duty cycle limit",
-      "detailText": "The radio is temporarily blocked by the regional airtime limit. Try again later."
+      "displayText": "Limite del duty cycle",
+      "detailText": "La radio è temporaneamente bloccata dal limite regionale di tempo in trasmissione. Riprova più tardi."
     },
     "failedToMesh": {
-      "displayText": "Failed to deliver to mesh",
-      "detailText": "No node confirmed this message. Try again when you have better signal or more mesh coverage."
+      "displayText": "Consegna alla rete mesh non riuscita",
+      "detailText": "Nessun nodo ha confermato questo messaggio. Riprova quando hai un segnale migliore o una copertura mesh più ampia."
     },
     "invalidRequest": {
-      "displayText": "Invalid request",
-      "detailText": "The receiving app rejected the request. Check the message or command and try again."
+      "displayText": "Richiesta non valida",
+      "detailText": "L'app ricevente ha rifiutato la richiesta. Controlla il messaggio o il comando e riprova."
     },
     "messageTooLarge": {
-      "displayText": "Message is too large to send",
-      "detailText": "Shorten the message and send it again."
+      "displayText": "Messaggio troppo grande da inviare",
+      "detailText": "Accorcia il messaggio e invialo di nuovo."
     },
     "noAppResponse": {
-      "displayText": "No app response",
-      "detailText": "The destination received the request, but no app or module responded."
+      "displayText": "Nessuna risposta dall'app",
+      "detailText": "La destinazione ha ricevuto la richiesta, ma nessuna app o modulo ha risposto."
     },
     "noChannel": {
-      "displayText": "Channel/key mismatch",
-      "detailText": "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again."
+      "displayText": "Mancata corrispondenza canale/chiave",
+      "detailText": "Questo messaggio non può essere codificato o decodificato con un canale/chiave corrispondente. Controlla il canale e la chiave, poi riprova."
     },
     "noRadioInterface": {
-      "displayText": "No radio interface",
-      "detailText": "The radio does not have a usable interface for this send."
+      "displayText": "Nessuna interfaccia radio",
+      "detailText": "La radio non ha un'interfaccia utilizzabile per questo invio."
     },
     "notAuthorized": {
-      "displayText": "Not authorized",
-      "detailText": "The destination refused permission for this request."
+      "displayText": "Non autorizzato",
+      "detailText": "La destinazione ha rifiutato il permesso per questa richiesta."
     },
     "rateLimited": {
-      "displayText": "Rate limited",
-      "detailText": "Messages are being sent too quickly. Wait a moment, then try again."
+      "displayText": "Limite di frequenza raggiunto",
+      "detailText": "I messaggi vengono inviati troppo rapidamente. Attendi un momento, poi riprova."
     },
     "recipientKeyUnavailable": {
-      "displayText": "Recipient key unavailable",
-      "detailText": "Your node does not have the recipient's public key yet. Wait for node info to sync, then try again."
+      "displayText": "Chiave del destinatario non disponibile",
+      "detailText": "Il tuo nodo non ha ancora la chiave pubblica del destinatario. Attendi la sincronizzazione delle informazioni dei nodi, poi riprova."
     },
     "recipientNeedsYourKey": {
-      "displayText": "Recipient needs your key",
-      "detailText": "The recipient does not know your public key yet. Your node may share its info automatically; try again after it syncs."
+      "displayText": "Il destinatario ha bisogno della tua chiave",
+      "detailText": "Il destinatario non conosce ancora la tua chiave pubblica. Il tuo nodo potrebbe condividere automaticamente le sue informazioni; riprova dopo la sincronizzazione."
     },
     "relayed": {
-      "displayText": "Relayed, not confirmed by recipient",
-      "detailText": "A node relayed this message, but the recipient has not confirmed it."
+      "displayText": "Inoltrato, non confermato dal destinatario",
+      "detailText": "Un nodo ha inoltrato questo messaggio, ma il destinatario non lo ha confermato."
     },
     "sending": {
-      "displayText": "Sending...",
-      "detailText": "The radio is still trying to send this message."
+      "displayText": "Invio in corso...",
+      "detailText": "La radio sta ancora tentando di inviare questo messaggio."
     },
     "unknown": {
-      "displayText": "Message status unknown",
-      "detailText": "The message status is not available."
+      "displayText": "Stato del messaggio sconosciuto",
+      "detailText": "Lo stato del messaggio non è disponibile."
     }
   }
 }

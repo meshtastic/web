@@ -19,83 +19,83 @@
     "replyLabel": "Svara"
   },
   "deliveryStatus": {
-    "retry": "Retry",
-    "retryAriaLabel": "Retry message: {{status}}",
+    "retry": "Försök igen",
+    "retryAriaLabel": "Försök skicka meddelandet igen: {{status}}",
     "deliveredToMesh": {
-      "displayText": "Delivered to mesh",
-      "detailText": "At least one node heard this channel message."
+      "displayText": "Levererat till meshnätet",
+      "detailText": "Minst en nod hörde detta kanalmeddelande."
     },
     "deliveredToRecipient": {
-      "displayText": "Delivered to recipient",
-      "detailText": "The recipient confirmed this direct message."
+      "displayText": "Levererat till mottagaren",
+      "detailText": "Mottagaren bekräftade detta direktmeddelande."
     },
     "encryptedSendFailed": {
-      "displayText": "Could not send encrypted message",
-      "detailText": "The radio could not create the encrypted path for this message. Let node info sync, then try again."
+      "displayText": "Kunde inte skicka krypterat meddelande",
+      "detailText": "Radion kunde inte skapa den krypterade vägen för detta meddelande. Låt nodinformationen synkroniseras och försök sedan igen."
     },
     "adminKeyNotAuthorized": {
-      "displayText": "Admin key not authorized",
-      "detailText": "The admin public key is not authorized on the destination."
+      "displayText": "Administratörsnyckeln är inte auktoriserad",
+      "detailText": "Den offentliga administratörsnyckeln är inte auktoriserad på destinationen."
     },
     "adminSessionExpired": {
-      "displayText": "Admin session expired",
-      "detailText": "The admin session key is missing, invalid, or expired. Start a new admin session, then try again."
+      "displayText": "Administratörssessionen har gått ut",
+      "detailText": "Administratörssessionsnyckeln saknas, är ogiltig eller har gått ut. Starta en ny administratörssession och försök igen."
     },
     "dutyCycleLimit": {
-      "displayText": "Duty cycle limit",
-      "detailText": "The radio is temporarily blocked by the regional airtime limit. Try again later."
+      "displayText": "Duty cycle-gräns",
+      "detailText": "Radion är tillfälligt blockerad av den regionala sändningstidsgränsen. Försök igen senare."
     },
     "failedToMesh": {
-      "displayText": "Failed to deliver to mesh",
-      "detailText": "No node confirmed this message. Try again when you have better signal or more mesh coverage."
+      "displayText": "Misslyckades att leverera till meshnätet",
+      "detailText": "Ingen nod bekräftade detta meddelande. Försök igen när du har bättre signal eller bättre meshtäckning."
     },
     "invalidRequest": {
-      "displayText": "Invalid request",
-      "detailText": "The receiving app rejected the request. Check the message or command and try again."
+      "displayText": "Ogiltig begäran",
+      "detailText": "Den mottagande appen avvisade begäran. Kontrollera meddelandet eller kommandot och försök igen."
     },
     "messageTooLarge": {
-      "displayText": "Message is too large to send",
-      "detailText": "Shorten the message and send it again."
+      "displayText": "Meddelandet är för stort för att skickas",
+      "detailText": "Korta meddelandet och skicka det igen."
     },
     "noAppResponse": {
-      "displayText": "No app response",
-      "detailText": "The destination received the request, but no app or module responded."
+      "displayText": "Inget appsvar",
+      "detailText": "Destinationen tog emot begäran, men ingen app eller modul svarade."
     },
     "noChannel": {
-      "displayText": "Channel/key mismatch",
-      "detailText": "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again."
+      "displayText": "Kanal/nyckel matchar inte",
+      "detailText": "Detta meddelande kunde inte kodas eller avkodas med en matchande kanal/nyckel. Kontrollera kanalen och nyckeln och försök igen."
     },
     "noRadioInterface": {
-      "displayText": "No radio interface",
-      "detailText": "The radio does not have a usable interface for this send."
+      "displayText": "Inget radiogränssnitt",
+      "detailText": "Radion har inget användbart gränssnitt för denna sändning."
     },
     "notAuthorized": {
-      "displayText": "Not authorized",
-      "detailText": "The destination refused permission for this request."
+      "displayText": "Inte auktoriserad",
+      "detailText": "Destinationen nekade behörighet för denna begäran."
     },
     "rateLimited": {
-      "displayText": "Rate limited",
-      "detailText": "Messages are being sent too quickly. Wait a moment, then try again."
+      "displayText": "Hastighetsbegränsad",
+      "detailText": "Meddelanden skickas för snabbt. Vänta en stund och försök igen."
     },
     "recipientKeyUnavailable": {
-      "displayText": "Recipient key unavailable",
-      "detailText": "Your node does not have the recipient's public key yet. Wait for node info to sync, then try again."
+      "displayText": "Mottagarens nyckel är inte tillgänglig",
+      "detailText": "Din nod har inte mottagarens offentliga nyckel ännu. Låt nodinformationen synkroniseras och försök sedan igen."
     },
     "recipientNeedsYourKey": {
-      "displayText": "Recipient needs your key",
-      "detailText": "The recipient does not know your public key yet. Your node may share its info automatically; try again after it syncs."
+      "displayText": "Mottagaren behöver din nyckel",
+      "detailText": "Mottagaren känner inte till din offentliga nyckel ännu. Din nod kan dela sin information automatiskt; försök igen efter synkronisering."
     },
     "relayed": {
-      "displayText": "Relayed, not confirmed by recipient",
-      "detailText": "A node relayed this message, but the recipient has not confirmed it."
+      "displayText": "Vidarebefordrat, inte bekräftat av mottagaren",
+      "detailText": "En nod vidarebefordrade detta meddelande, men mottagaren har inte bekräftat det."
     },
     "sending": {
-      "displayText": "Sending...",
-      "detailText": "The radio is still trying to send this message."
+      "displayText": "Skickar...",
+      "detailText": "Radion försöker fortfarande skicka detta meddelande."
     },
     "unknown": {
-      "displayText": "Message status unknown",
-      "detailText": "The message status is not available."
+      "displayText": "Meddelandestatus okänd",
+      "detailText": "Meddelandestatusen är inte tillgänglig."
     }
   }
 }
