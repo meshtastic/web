@@ -9,7 +9,7 @@ import {
   metersToDisplay,
   pointInBoundingBox,
   pointInGeofence,
-  unitSystemFromLocale,
+  unitSystemFromDisplayUnits,
 } from "./geofence.ts";
 
 const bbox = (west: number, south: number, east: number, north: number) =>
@@ -23,15 +23,21 @@ const bbox = (west: number, south: number, east: number, north: number) =>
 const waypoint = (fields: Record<string, unknown>) =>
   create(Protobuf.Mesh.WaypointSchema, fields as never);
 
-describe("geofence – locale units", () => {
-  it("infers imperial from US English", () => {
-    expect(unitSystemFromLocale("en-US")).toBe("imperial");
-    expect(unitSystemFromLocale("en-us")).toBe("imperial");
+describe("geofence – device unit system", () => {
+  it("maps DisplayUnits.IMPERIAL to imperial", () => {
+    expect(
+      unitSystemFromDisplayUnits(
+        Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL,
+      ),
+    ).toBe("imperial");
   });
-  it("defaults metric for other locales", () => {
-    expect(unitSystemFromLocale("en-GB")).toBe("metric");
-    expect(unitSystemFromLocale("de-DE")).toBe("metric");
-    expect(unitSystemFromLocale(undefined)).toBe("metric");
+  it("maps DisplayUnits.METRIC and undefined to metric", () => {
+    expect(
+      unitSystemFromDisplayUnits(
+        Protobuf.Config.Config_DisplayConfig_DisplayUnits.METRIC,
+      ),
+    ).toBe("metric");
+    expect(unitSystemFromDisplayUnits(undefined)).toBe("metric");
   });
 
   it("round-trips display <-> meters", () => {

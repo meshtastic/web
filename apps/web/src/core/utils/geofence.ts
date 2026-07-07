@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@meshtastic/sdk";
 import { distanceMeters, type LngLat } from "./geo.ts";
 
 const INT_DEG = 1e7;
@@ -7,30 +7,44 @@ const METERS_PER_MILE = 1609.344;
 
 export type UnitSystem = "metric" | "imperial";
 
-const IMPERIAL_LOCALES = new Set(["en-US", "en-us", "en-LR", "en-MM"]);
-
-export function unitSystemFromLocale(locale: string | undefined): UnitSystem {
-  if (!locale) return "metric";
-  if (IMPERIAL_LOCALES.has(locale)) return "imperial";
-  if (locale.toLowerCase().startsWith("en-us")) return "imperial";
-  return "metric";
+/**
+ * Waypoint UI reads the unit preference from the connected device's
+ * DisplayConfig (matches existing patterns like the position-precision
+ * selector in Channels/Channel.tsx). Falls back to metric when the config
+ * isn't loaded yet.
+ */
+export function unitSystemFromDisplayUnits(
+  units: Protobuf.Config.Config_DisplayConfig_DisplayUnits | undefined,
+): UnitSystem {
+  return units === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+    ? "imperial"
+    : "metric";
 }
 
 export function metersToDisplay(meters: number, system: UnitSystem): number {
   if (system === "imperial") {
-    return meters >= METERS_PER_MILE ? meters / METERS_PER_MILE : meters / METERS_PER_FOOT;
+    return meters >= METERS_PER_MILE
+      ? meters / METERS_PER_MILE
+      : meters / METERS_PER_FOOT;
   }
   return meters >= 1000 ? meters / 1000 : meters;
 }
 
-export function displayToMeters(value: number, system: UnitSystem, useLarge: boolean): number {
+export function displayToMeters(
+  value: number,
+  system: UnitSystem,
+  useLarge: boolean,
+): number {
   if (system === "imperial") {
     return useLarge ? value * METERS_PER_MILE : value * METERS_PER_FOOT;
   }
   return useLarge ? value * 1000 : value;
 }
 
-export function pointInBoundingBox(point: LngLat, bbox: Protobuf.Mesh.BoundingBox): boolean {
+export function pointInBoundingBox(
+  point: LngLat,
+  bbox: Protobuf.Mesh.BoundingBox,
+): boolean {
   const [lng, lat] = point;
   const west = bbox.longitudeWestI / INT_DEG;
   const east = bbox.longitudeEastI / INT_DEG;
@@ -46,7 +60,10 @@ export function pointInBoundingBox(point: LngLat, bbox: Protobuf.Mesh.BoundingBo
   return lng >= west || lng <= east;
 }
 
-export function pointInGeofence(point: LngLat, waypoint: Protobuf.Mesh.Waypoint): boolean {
+export function pointInGeofence(
+  point: LngLat,
+  waypoint: Protobuf.Mesh.Waypoint,
+): boolean {
   const center: LngLat = [
     (waypoint.longitudeI ?? 0) / INT_DEG,
     (waypoint.latitudeI ?? 0) / INT_DEG,

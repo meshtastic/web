@@ -20,7 +20,7 @@ import {
   degToCoordI,
   displayToMeters,
   metersToDisplay,
-  unitSystemFromLocale,
+  unitSystemFromDisplayUnits,
 } from "@core/utils/geofence.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -88,8 +88,11 @@ function initialForm(
     const box = wp.boundingBox;
     const radiusMeters = wp.geofenceRadius ?? 0;
     const useLargeUnit =
-      system === "imperial" ? radiusMeters >= 0.5 * 1609.344 : radiusMeters >= 1000;
-    const displayed = radiusMeters > 0 ? metersToDisplay(radiusMeters, system) : 0;
+      system === "imperial"
+        ? radiusMeters >= 0.5 * 1609.344
+        : radiusMeters >= 1000;
+    const displayed =
+      radiusMeters > 0 ? metersToDisplay(radiusMeters, system) : 0;
     return {
       name: wp.name,
       description: wp.description,
@@ -148,10 +151,14 @@ export const WaypointEditDialog = ({
   mapRef,
   onRequestBoundingBoxDraw,
 }: WaypointEditDialogProps) => {
-  const { t, i18n } = useTranslation("map");
+  const { t } = useTranslation("map");
   const { toast } = useToast();
   const device = useDevice();
-  const unitSystem = useMemo(() => unitSystemFromLocale(i18n.language), [i18n.language]);
+  const displayUnits = device.config.display?.units;
+  const unitSystem = useMemo(
+    () => unitSystemFromDisplayUnits(displayUnits),
+    [displayUnits],
+  );
   const [form, setForm] = useState<FormState>(() =>
     initialForm(waypoint, initialLngLat, unitSystem),
   );
@@ -171,7 +178,9 @@ export const WaypointEditDialog = ({
   }, [form.radiusValue, form.useLargeUnit, unitSystem]);
 
   const radiusPresets =
-    unitSystem === "imperial" ? IMPERIAL_RADIUS_PRESETS_M : METRIC_RADIUS_PRESETS_M;
+    unitSystem === "imperial"
+      ? IMPERIAL_RADIUS_PRESETS_M
+      : METRIC_RADIUS_PRESETS_M;
 
   const applyRadiusPreset = useCallback(
     (meters: number) => {
@@ -179,7 +188,8 @@ export const WaypointEditDialog = ({
         setForm((s) => ({ ...s, radiusValue: "", useLargeUnit: false }));
         return;
       }
-      const useLargeUnit = unitSystem === "imperial" ? meters >= 1609.344 : meters >= 1000;
+      const useLargeUnit =
+        unitSystem === "imperial" ? meters >= 1609.344 : meters >= 1000;
       const displayed = metersToDisplay(meters, unitSystem);
       setForm((s) => ({
         ...s,
@@ -247,13 +257,18 @@ export const WaypointEditDialog = ({
       const parsedRadius = Number.parseFloat(form.radiusValue);
       base.geofenceRadius =
         Number.isFinite(parsedRadius) && parsedRadius > 0
-          ? Math.round(displayToMeters(parsedRadius, unitSystem, form.useLargeUnit))
+          ? Math.round(
+              displayToMeters(parsedRadius, unitSystem, form.useLargeUnit),
+            )
           : 0;
 
       if (form.hasBox) {
-        const [west, south, east, north] = [form.west, form.south, form.east, form.north].map((v) =>
-          Number.parseFloat(v),
-        );
+        const [west, south, east, north] = [
+          form.west,
+          form.south,
+          form.east,
+          form.north,
+        ].map((v) => Number.parseFloat(v));
         if ([west, south, east, north].every((n) => Number.isFinite(n))) {
           base.boundingBox = create(Protobuf.Mesh.BoundingBoxSchema, {
             longitudeWestI: degToCoordI(west!),
@@ -293,7 +308,17 @@ export const WaypointEditDialog = ({
     } finally {
       setSaving(false);
     }
-  }, [channel, device, form, isCreating, onOpenChange, t, toast, unitSystem, waypoint]);
+  }, [
+    channel,
+    device,
+    form,
+    isCreating,
+    onOpenChange,
+    t,
+    toast,
+    unitSystem,
+    waypoint,
+  ]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -316,7 +341,9 @@ export const WaypointEditDialog = ({
                 type="text"
                 maxLength={WAYPOINT_NAME_MAX}
                 value={form.name}
-                onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((s) => ({ ...s, name: e.target.value }))
+                }
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -326,7 +353,9 @@ export const WaypointEditDialog = ({
                 type="text"
                 maxLength={WAYPOINT_DESC_MAX}
                 value={form.description}
-                onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
+                onChange={(e) =>
+                  setForm((s) => ({ ...s, description: e.target.value }))
+                }
               />
             </div>
             <div className="grid grid-cols-[4rem_1fr_1fr] gap-2">
@@ -336,7 +365,9 @@ export const WaypointEditDialog = ({
                   type="text"
                   maxLength={2}
                   value={form.icon}
-                  onChange={(e) => setForm((s) => ({ ...s, icon: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((s) => ({ ...s, icon: e.target.value }))
+                  }
                 />
               </label>
               <label className="text-xs flex flex-col gap-1 min-w-0">
@@ -346,7 +377,9 @@ export const WaypointEditDialog = ({
                   step="0.000001"
                   className="w-full"
                   value={form.latitude}
-                  onChange={(e) => setForm((s) => ({ ...s, latitude: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((s) => ({ ...s, latitude: e.target.value }))
+                  }
                 />
               </label>
               <label className="text-xs flex flex-col gap-1 min-w-0">
@@ -356,7 +389,9 @@ export const WaypointEditDialog = ({
                   step="0.000001"
                   className="w-full"
                   value={form.longitude}
-                  onChange={(e) => setForm((s) => ({ ...s, longitude: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((s) => ({ ...s, longitude: e.target.value }))
+                  }
                 />
               </label>
             </div>
@@ -366,14 +401,18 @@ export const WaypointEditDialog = ({
                 <Switch
                   id="wp-expire"
                   checked={form.expireEnabled}
-                  onCheckedChange={(v) => setForm((s) => ({ ...s, expireEnabled: v }))}
+                  onCheckedChange={(v) =>
+                    setForm((s) => ({ ...s, expireEnabled: v }))
+                  }
                 />
               </div>
               {form.expireEnabled && (
                 <Input
                   type="datetime-local"
                   value={form.expireIso}
-                  onChange={(e) => setForm((s) => ({ ...s, expireIso: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((s) => ({ ...s, expireIso: e.target.value }))
+                  }
                 />
               )}
             </div>
@@ -424,7 +463,9 @@ export const WaypointEditDialog = ({
                   onClick={requestDraw}
                   disabled={!mapRef}
                 >
-                  {form.hasBox ? t("waypointEdit.editBox") : t("waypointEdit.drawBox")}
+                  {form.hasBox
+                    ? t("waypointEdit.editBox")
+                    : t("waypointEdit.drawBox")}
                 </Button>
                 {form.hasBox && (
                   <Button
@@ -438,34 +479,48 @@ export const WaypointEditDialog = ({
                 )}
               </div>
             </div>
-            {form.hasBox && <p className="text-xs text-slate-500 truncate">{boxSummary}</p>}
+            {form.hasBox && (
+              <p className="text-xs text-slate-500 truncate">{boxSummary}</p>
+            )}
           </section>
 
           {hasAnyGeofence && (
             <section className="flex flex-col gap-3 border-t border-slate-200 dark:border-slate-600 pt-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="wp-notify-enter">{t("waypointEdit.notifyOnEnter")}</Label>
+                <Label htmlFor="wp-notify-enter">
+                  {t("waypointEdit.notifyOnEnter")}
+                </Label>
                 <Switch
                   id="wp-notify-enter"
                   checked={form.notifyOnEnter}
-                  onCheckedChange={(v) => setForm((s) => ({ ...s, notifyOnEnter: v }))}
+                  onCheckedChange={(v) =>
+                    setForm((s) => ({ ...s, notifyOnEnter: v }))
+                  }
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="wp-notify-exit">{t("waypointEdit.notifyOnExit")}</Label>
+                <Label htmlFor="wp-notify-exit">
+                  {t("waypointEdit.notifyOnExit")}
+                </Label>
                 <Switch
                   id="wp-notify-exit"
                   checked={form.notifyOnExit}
-                  onCheckedChange={(v) => setForm((s) => ({ ...s, notifyOnExit: v }))}
+                  onCheckedChange={(v) =>
+                    setForm((s) => ({ ...s, notifyOnExit: v }))
+                  }
                 />
               </div>
               {hasAnyNotifyOn && (
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="wp-notify-fav">{t("waypointEdit.notifyFavoritesOnly")}</Label>
+                  <Label htmlFor="wp-notify-fav">
+                    {t("waypointEdit.notifyFavoritesOnly")}
+                  </Label>
                   <Switch
                     id="wp-notify-fav"
                     checked={form.notifyFavoritesOnly}
-                    onCheckedChange={(v) => setForm((s) => ({ ...s, notifyFavoritesOnly: v }))}
+                    onCheckedChange={(v) =>
+                      setForm((s) => ({ ...s, notifyFavoritesOnly: v }))
+                    }
                   />
                 </div>
               )}
@@ -474,7 +529,11 @@ export const WaypointEditDialog = ({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={saving}
+          >
             {t("waypointEdit.cancel")}
           </Button>
           <Button onClick={handleSave} disabled={saving}>

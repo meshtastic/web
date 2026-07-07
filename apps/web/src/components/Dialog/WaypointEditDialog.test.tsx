@@ -2,7 +2,11 @@ import { create } from "@bufbuild/protobuf";
 import type { WaypointWithMetadata } from "@core/stores";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { Protobuf } from "@meshtastic/sdk";
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import type {
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+} from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WaypointEditDialog } from "./WaypointEditDialog.tsx";
 
@@ -18,6 +22,8 @@ vi.mock("@core/stores", () => ({
     hardware: { myNodeNum: 1 },
     connection: { sendWaypoint },
     addWaypoint,
+    // Metric device — matches the presets asserted below.
+    config: { display: { units: 0 } },
   }),
 }));
 
@@ -25,23 +31,32 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       opts ? `${key} ${JSON.stringify(opts)}` : key,
-    i18n: { language: "en-GB" },
   }),
 }));
 
 vi.mock("@components/UI/Dialog.tsx", () => ({
   Dialog: ({ open, children }: { open: boolean; children: ReactNode }) =>
     open ? <div>{children}</div> : null,
-  DialogContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-  DialogHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  DialogContent: ({ children }: { children: ReactNode }) => (
+    <div>{children}</div>
+  ),
+  DialogHeader: ({ children }: { children: ReactNode }) => (
+    <div>{children}</div>
+  ),
   DialogTitle: ({ children }: { children: ReactNode }) => <h1>{children}</h1>,
-  DialogDescription: ({ children }: { children: ReactNode }) => <p>{children}</p>,
+  DialogDescription: ({ children }: { children: ReactNode }) => (
+    <p>{children}</p>
+  ),
   DialogClose: () => null,
-  DialogFooter: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  DialogFooter: ({ children }: { children: ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock("@components/UI/Button.tsx", () => ({
-  Button: (props: ButtonHTMLAttributes<HTMLButtonElement>) => <button {...props} />,
+  Button: (props: ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <button {...props} />
+  ),
 }));
 
 vi.mock("@components/UI/Input.tsx", () => ({
@@ -49,7 +64,9 @@ vi.mock("@components/UI/Input.tsx", () => ({
 }));
 
 vi.mock("@components/UI/Label.tsx", () => ({
-  Label: ({ children, ...rest }: { children: ReactNode }) => <label {...rest}>{children}</label>,
+  Label: ({ children, ...rest }: { children: ReactNode }) => (
+    <label {...rest}>{children}</label>
+  ),
 }));
 
 vi.mock("@components/UI/Switch.tsx", () => ({
@@ -73,7 +90,9 @@ vi.mock("@components/UI/Switch.tsx", () => ({
   ),
 }));
 
-function makeWaypoint(fields: Record<string, unknown> = {}): WaypointWithMetadata {
+function makeWaypoint(
+  fields: Record<string, unknown> = {},
+): WaypointWithMetadata {
   const wp = create(Protobuf.Mesh.WaypointSchema, fields as never);
   return Object.assign(wp, {
     metadata: { channel: 0, created: new Date(), from: 1 },
@@ -117,7 +136,9 @@ describe("WaypointEditDialog – geofence controls (design#114 compliance)", () 
       />,
     );
     // Metric locale (en-GB) → "500 meters"
-    const preset500 = screen.getByRole("button", { name: /500 unit\.meter\.plural/i });
+    const preset500 = screen.getByRole("button", {
+      name: /500 unit\.meter\.plural/i,
+    });
     act(() => {
       fireEvent.click(preset500);
     });
@@ -153,11 +174,17 @@ describe("WaypointEditDialog – geofence controls (design#114 compliance)", () 
     );
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /waypointEdit\.drawBox/i }));
+      fireEvent.click(
+        screen.getByRole("button", { name: /waypointEdit\.drawBox/i }),
+      );
     });
     expect(drawFn).toHaveBeenCalledOnce();
-    expect(screen.getByRole("button", { name: /waypointEdit\.editBox/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /waypointEdit\.removeBox/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /waypointEdit\.editBox/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /waypointEdit\.removeBox/i }),
+    ).toBeInTheDocument();
   });
 
   it("save persists geofence fields on the outbound waypoint", async () => {
@@ -175,7 +202,9 @@ describe("WaypointEditDialog – geofence controls (design#114 compliance)", () 
 
     // Pick 1 km preset (metric locale)
     act(() => {
-      fireEvent.click(screen.getByRole("button", { name: /1 unit\.kilometer\.plural/i }));
+      fireEvent.click(
+        screen.getByRole("button", { name: /1 unit\.kilometer\.plural/i }),
+      );
     });
     // Turn on enter alert
     act(() => {
@@ -187,7 +216,9 @@ describe("WaypointEditDialog – geofence controls (design#114 compliance)", () 
     });
 
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /waypointEdit\.save/i }));
+      fireEvent.click(
+        screen.getByRole("button", { name: /waypointEdit\.save/i }),
+      );
     });
 
     expect(addWaypoint).toHaveBeenCalledOnce();
