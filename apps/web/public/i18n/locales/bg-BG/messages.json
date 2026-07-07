@@ -19,21 +19,83 @@
     "replyLabel": "Отговор"
   },
   "deliveryStatus": {
-    "delivered": {
-      "label": "Съобщението е доставено",
-      "displayText": "Съобщението е доставено"
+    "retry": "Retry",
+    "retryAriaLabel": "Retry message: {{status}}",
+    "deliveredToMesh": {
+      "displayText": "Delivered to mesh",
+      "detailText": "At least one node heard this channel message."
     },
-    "failed": {
-      "label": "Доставката на съобщението не е успешна",
-      "displayText": "Неуспешна доставка"
+    "deliveredToRecipient": {
+      "displayText": "Delivered to recipient",
+      "detailText": "The recipient confirmed this direct message."
+    },
+    "encryptedSendFailed": {
+      "displayText": "Could not send encrypted message",
+      "detailText": "The radio could not create the encrypted path for this message. Let node info sync, then try again."
+    },
+    "adminKeyNotAuthorized": {
+      "displayText": "Admin key not authorized",
+      "detailText": "The admin public key is not authorized on the destination."
+    },
+    "adminSessionExpired": {
+      "displayText": "Admin session expired",
+      "detailText": "The admin session key is missing, invalid, or expired. Start a new admin session, then try again."
+    },
+    "dutyCycleLimit": {
+      "displayText": "Duty cycle limit",
+      "detailText": "The radio is temporarily blocked by the regional airtime limit. Try again later."
+    },
+    "failedToMesh": {
+      "displayText": "Failed to deliver to mesh",
+      "detailText": "No node confirmed this message. Try again when you have better signal or more mesh coverage."
+    },
+    "invalidRequest": {
+      "displayText": "Invalid request",
+      "detailText": "The receiving app rejected the request. Check the message or command and try again."
+    },
+    "messageTooLarge": {
+      "displayText": "Message is too large to send",
+      "detailText": "Shorten the message and send it again."
+    },
+    "noAppResponse": {
+      "displayText": "No app response",
+      "detailText": "The destination received the request, but no app or module responded."
+    },
+    "noChannel": {
+      "displayText": "Channel/key mismatch",
+      "detailText": "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again."
+    },
+    "noRadioInterface": {
+      "displayText": "No radio interface",
+      "detailText": "The radio does not have a usable interface for this send."
+    },
+    "notAuthorized": {
+      "displayText": "Not authorized",
+      "detailText": "The destination refused permission for this request."
+    },
+    "rateLimited": {
+      "displayText": "Rate limited",
+      "detailText": "Messages are being sent too quickly. Wait a moment, then try again."
+    },
+    "recipientKeyUnavailable": {
+      "displayText": "Recipient key unavailable",
+      "detailText": "Your node does not have the recipient's public key yet. Wait for node info to sync, then try again."
+    },
+    "recipientNeedsYourKey": {
+      "displayText": "Recipient needs your key",
+      "detailText": "The recipient does not know your public key yet. Your node may share its info automatically; try again after it syncs."
+    },
+    "relayed": {
+      "displayText": "Relayed, not confirmed by recipient",
+      "detailText": "A node relayed this message, but the recipient has not confirmed it."
+    },
+    "sending": {
+      "displayText": "Sending...",
+      "detailText": "The radio is still trying to send this message."
     },
     "unknown": {
-      "label": "Статусът на съобщението е неизвестен",
-      "displayText": "Неизвестно състояние"
-    },
-    "waiting": {
-      "label": "Изпращане на съобщение",
-      "displayText": "Чака доставка"
+      "displayText": "Message status unknown",
+      "detailText": "The message status is not available."
     }
   }
 }
