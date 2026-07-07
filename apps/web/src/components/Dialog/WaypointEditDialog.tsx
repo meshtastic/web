@@ -22,7 +22,7 @@ import {
   metersToDisplay,
   unitSystemFromDisplayUnits,
 } from "@core/utils/geofence.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { generatePacketId, Protobuf } from "@meshtastic/sdk";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { MapRef } from "react-map-gl/maplibre";
@@ -285,7 +285,10 @@ export const WaypointEditDialog = ({
       base.notifyFavoritesOnly = form.notifyFavoritesOnly;
 
       if (isCreating && base.id === 0) {
-        base.id = Math.floor(Math.random() * 0xffffffff);
+        // Reuse the SDK's CSPRNG packet-id generator so the local id we
+        // store matches the id `sendWaypoint` will broadcast — otherwise
+        // `addWaypoint`'s per-id dedup can collide with an existing entry.
+        base.id = generatePacketId();
       }
 
       const targetChannel = waypoint?.metadata.channel ?? channel;
