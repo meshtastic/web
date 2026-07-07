@@ -43,8 +43,8 @@
       "detailText": "Shorten the message and send it again."
     },
     "noChannel": {
-      "displayText": "No channel selected",
-      "detailText": "Select a channel before sending."
+      "displayText": "Channel/key mismatch",
+      "detailText": "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again."
     },
     "recipientKeyUnavailable": {
       "displayText": "Recipient key unavailable",

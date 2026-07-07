@@ -20,8 +20,9 @@ const strings: Record<string, string> = {
   "deliveryStatus.messageTooLarge.displayText": "Message is too large to send",
   "deliveryStatus.messageTooLarge.detailText":
     "Shorten the message and send it again.",
-  "deliveryStatus.noChannel.displayText": "No channel selected",
-  "deliveryStatus.noChannel.detailText": "Select a channel before sending.",
+  "deliveryStatus.noChannel.displayText": "Channel/key mismatch",
+  "deliveryStatus.noChannel.detailText":
+    "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again.",
   "deliveryStatus.recipientKeyUnavailable.displayText":
     "Recipient key unavailable",
   "deliveryStatus.recipientKeyUnavailable.detailText":
@@ -82,7 +83,7 @@ describe("getMessageDeliveryStatusInfo", () => {
       MessageState.Failed,
       MessageType.Broadcast,
       Protobuf.Mesh.Routing_Error.NO_CHANNEL,
-      "No channel selected",
+      "Channel/key mismatch",
       true,
     ],
     [
@@ -126,4 +127,19 @@ describe("getMessageDeliveryStatusInfo", () => {
       expect(info.canRetry).toBe(canRetry);
     },
   );
+
+  it("maps NO_CHANNEL to channel/key mismatch detail", () => {
+    const info = getMessageDeliveryStatusInfo(
+      {
+        state: MessageState.Failed,
+        type: MessageType.Broadcast,
+        routingError: Protobuf.Mesh.Routing_Error.NO_CHANNEL,
+      },
+      t,
+    );
+
+    expect(info.detailText).toBe(
+      "This message could not be encoded or decoded with a matching channel/key. Check the channel and key, then try again.",
+    );
+  });
 });
