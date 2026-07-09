@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.1",
-    "@meshtastic/protobufs": "jsr:^2.7.18",
+    "@meshtastic/protobufs": "workspace:*",
     "@preact/signals-core": "^1.14.3",
     "better-result": "^2.9.2",
     "crc": "npm:crc@^4.3.2",

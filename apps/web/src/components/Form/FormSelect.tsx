@@ -22,6 +22,7 @@ export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
     enumValue: {
       [s: string]: string | number;
     };
+    optionLabels?: Record<string, string>;
     formatEnumName?: boolean;
   };
 }
@@ -51,6 +52,7 @@ export function SelectInput<T extends FieldValues>({
 
   const {
     enumValue,
+    optionLabels,
     formatEnumName,
     defaultValue,
     className,
@@ -113,7 +115,8 @@ export function SelectInput<T extends FieldValues>({
       <SelectContent>
         {optionsEnumValues.map(([name, val]) => (
           <SelectItem key={name} value={val.toString()}>
-            {formatEnumName ? formatEnumDisplay(name) : name}
+            {optionLabels?.[name] ??
+              (formatEnumName ? formatEnumDisplay(name) : name)}
           </SelectItem>
         ))}
       </SelectContent>
