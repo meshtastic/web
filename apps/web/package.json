@@ -100,7 +100,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/chrome": "^0.2.0",
+    "@types/chrome": "^0.2.2",
     "@types/geojson": "^7946.0.16",
     "@types/js-cookie": "^3.0.6",
     "@types/react": "^19.2.17",
