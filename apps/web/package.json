@@ -120,6 +120,6 @@
     "tar": "^7.5.19",
     "testing-library": "^0.0.2",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   }
 }
