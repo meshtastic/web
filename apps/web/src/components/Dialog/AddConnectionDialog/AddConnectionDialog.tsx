@@ -103,6 +103,14 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
     return null;
   }
 
+  if (tabId === "serial" && !missingFeatures.includes("Web Serial")) {
+    return null;
+  }
+
+  if (tabId === "bluetooth" && !missingFeatures.includes("Web Bluetooth")) {
+    return null;
+  }
+
   const browserFeatures = missingFeatures.filter(
     (feature) => feature !== "Secure Context",
   );
