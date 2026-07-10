@@ -103,14 +103,6 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
     return null;
   }
 
-  if (tabId === "serial" && !missingFeatures.includes("Web Serial")) {
-    return null;
-  }
-
-  if (tabId === "bluetooth" && !missingFeatures.includes("Web Bluetooth")) {
-    return null;
-  }
-
   const browserFeatures = missingFeatures.filter(
     (feature) => feature !== "Secure Context",
   );
@@ -122,6 +114,10 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
       : tabId === "serial" && browserFeatures.includes("Web Serial")
         ? "Web Serial"
         : undefined;
+
+  if (!needsFeature && !needsSecureContext) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-start gap-2 bg-red-500 p-4 rounded-md text-sm mt-4">
