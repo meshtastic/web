@@ -31,14 +31,17 @@ const DEFAULT_ICON_CODEPOINT = 0x1f4cd; // 📍
 const WAYPOINT_NAME_MAX = 30;
 const WAYPOINT_DESC_MAX = 100;
 
+const METERS_PER_MILE = 1609.344;
+const METERS_PER_FOOT = 0.3048;
+const IMPERIAL_MILES_THRESHOLD_METERS = METERS_PER_MILE / 2;
 const METRIC_RADIUS_PRESETS_M = [0, 100, 500, 1_000, 5_000];
 const IMPERIAL_RADIUS_PRESETS_M = [
   0,
-  Math.round(0.1 * 1609.344),
-  Math.round(0.5 * 1609.344),
-  Math.round(1 * 1609.344),
-  Math.round(5 * 1609.344),
-  Math.round(10 * 1609.344),
+  Math.round(0.1 * METERS_PER_MILE),
+  Math.round(0.5 * METERS_PER_MILE),
+  Math.round(1 * METERS_PER_MILE),
+  Math.round(5 * METERS_PER_MILE),
+  Math.round(10 * METERS_PER_MILE),
 ];
 
 interface WaypointEditDialogProps {
@@ -89,7 +92,7 @@ function initialForm(
     const radiusMeters = wp.geofenceRadius ?? 0;
     const useLargeUnit =
       system === "imperial"
-        ? radiusMeters >= 0.5 * 1609.344
+        ? radiusMeters >= IMPERIAL_MILES_THRESHOLD_METERS
         : radiusMeters >= 1000;
     const displayed =
       radiusMeters > 0 ? metersToDisplay(radiusMeters, system) : 0;
@@ -166,10 +169,8 @@ export const WaypointEditDialog = ({
   const isCreating = waypoint === undefined;
 
   useEffect(() => {
-    if (open) {
-      setForm(initialForm(waypoint, initialLngLat, unitSystem));
-    }
-  }, [open, waypoint, initialLngLat, unitSystem]);
+    setForm(initialForm(waypoint, initialLngLat, unitSystem));
+  }, [waypoint, initialLngLat, unitSystem]);
 
   const currentRadiusMeters = useMemo(() => {
     const parsed = Number.parseFloat(form.radiusValue);
@@ -189,7 +190,9 @@ export const WaypointEditDialog = ({
         return;
       }
       const useLargeUnit =
-        unitSystem === "imperial" ? meters >= 1609.344 : meters >= 1000;
+        unitSystem === "imperial"
+          ? meters >= IMPERIAL_MILES_THRESHOLD_METERS
+          : meters >= 1000;
       const displayed = metersToDisplay(meters, unitSystem);
       setForm((s) => ({
         ...s,
@@ -280,9 +283,9 @@ export const WaypointEditDialog = ({
       } else {
         base.boundingBox = undefined;
       }
-      base.notifyOnEnter = form.notifyOnEnter;
-      base.notifyOnExit = form.notifyOnExit;
-      base.notifyFavoritesOnly = form.notifyFavoritesOnly;
+      base.notifyOnEnter = hasAnyGeofence && form.notifyOnEnter;
+      base.notifyOnExit = hasAnyGeofence && form.notifyOnExit;
+      base.notifyFavoritesOnly = hasAnyGeofence && form.notifyFavoritesOnly;
 
       if (isCreating && base.id === 0) {
         // Reuse the SDK's CSPRNG packet-id generator so the local id we
@@ -293,10 +296,10 @@ export const WaypointEditDialog = ({
 
       const targetChannel = waypoint?.metadata.channel ?? channel;
       const fromNode = waypoint?.metadata.from ?? device.hardware.myNodeNum;
-      device.addWaypoint(base, targetChannel, fromNode, new Date());
       if (device.connection) {
         await device.connection.sendWaypoint(base, "broadcast", targetChannel);
       }
+      device.addWaypoint(base, targetChannel, fromNode, new Date());
       toast({
         title: isCreating
           ? t("waypointEdit.createdToast", { name: base.name })
@@ -429,9 +432,9 @@ export const WaypointEditDialog = ({
                   meters === 0
                     ? t("waypointEdit.radiusOff")
                     : unitSystem === "imperial"
-                      ? meters >= 1609.344
-                        ? `${(meters / 1609.344).toFixed(meters === 1609 ? 1 : 0)} ${t("unit.mile.plural")}`
-                        : `${Math.round(meters / 0.3048)} ${t("unit.foot.plural")}`
+                      ? meters >= IMPERIAL_MILES_THRESHOLD_METERS
+                        ? `${Number((meters / METERS_PER_MILE).toFixed(1))} ${t("unit.mile.plural")}`
+                        : `${Math.round(meters / METERS_PER_FOOT)} ${t("unit.foot.plural")}`
                       : meters >= 1000
                         ? `${meters / 1000} ${t("unit.kilometer.plural")}`
                         : `${meters} ${t("unit.meter.plural")}`;

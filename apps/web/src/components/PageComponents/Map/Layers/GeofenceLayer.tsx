@@ -24,7 +24,10 @@ export function generateGeofenceFeatures(
   for (const wp of waypoints) {
     if (!hasGeofence(wp)) continue;
     if (wp.geofenceRadius > 0) {
-      const [lng, lat] = toLngLat({ latitudeI: wp.latitudeI, longitudeI: wp.longitudeI });
+      const [lng, lat] = toLngLat({
+        latitudeI: wp.latitudeI,
+        longitudeI: wp.longitudeI,
+      });
       const feat = circle([lng, lat], wp.geofenceRadius, {
         steps: 64,
         units: "meters",
@@ -37,28 +40,41 @@ export function generateGeofenceFeatures(
       const east = coordToDeg(wp.boundingBox.longitudeEastI);
       const south = coordToDeg(wp.boundingBox.latitudeSouthI);
       const north = coordToDeg(wp.boundingBox.latitudeNorthI);
-      features.push({
-        type: "Feature",
-        properties: { waypointId: wp.id, kind: "box" },
-        geometry: {
-          type: "Polygon",
-          coordinates: [
-            [
-              [west, south],
-              [east, south],
-              [east, north],
-              [west, north],
-              [west, south],
-            ],
+      const rectangle = (w: number, e: number): Polygon => ({
+        type: "Polygon",
+        coordinates: [
+          [
+            [w, south],
+            [e, south],
+            [e, north],
+            [w, north],
+            [w, south],
           ],
-        },
+        ],
       });
+      // Anti-meridian: split into two polygons so we don't render a
+      // huge polygon wrapping around the globe.
+      const geometries =
+        west <= east
+          ? [rectangle(west, east)]
+          : [rectangle(west, 180), rectangle(-180, east)];
+      for (const geometry of geometries) {
+        features.push({
+          type: "Feature",
+          properties: { waypointId: wp.id, kind: "box" },
+          geometry,
+        });
+      }
     }
   }
   return { type: "FeatureCollection", features };
 }
 
-export const GeofenceLayer = ({ id, waypoints, isVisible }: GeofenceLayerProps) => {
+export const GeofenceLayer = ({
+  id,
+  waypoints,
+  isVisible,
+}: GeofenceLayerProps) => {
   const data = useMemo(() => generateGeofenceFeatures(waypoints), [waypoints]);
   return (
     <Source id={id} type="geojson" data={data}>

@@ -4,6 +4,7 @@ import { distanceMeters, type LngLat } from "./geo.ts";
 const INT_DEG = 1e7;
 const METERS_PER_FOOT = 0.3048;
 const METERS_PER_MILE = 1609.344;
+const IMPERIAL_MILES_THRESHOLD_METERS = METERS_PER_MILE / 2;
 
 export type UnitSystem = "metric" | "imperial";
 
@@ -23,7 +24,7 @@ export function unitSystemFromDisplayUnits(
 
 export function metersToDisplay(meters: number, system: UnitSystem): number {
   if (system === "imperial") {
-    return meters >= METERS_PER_MILE
+    return meters >= IMPERIAL_MILES_THRESHOLD_METERS
       ? meters / METERS_PER_MILE
       : meters / METERS_PER_FOOT;
   }
