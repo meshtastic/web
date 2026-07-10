@@ -233,7 +233,6 @@ export const WaypointEditDialog = ({
       const trimmedName = form.name.trim().slice(0, WAYPOINT_NAME_MAX);
       if (!trimmedName) {
         toast({ title: t("waypointEdit.errorMissingName") });
-        setSaving(false);
         return;
       }
       base.name = trimmedName;
