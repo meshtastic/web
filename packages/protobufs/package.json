@@ -16,8 +16,7 @@
   "scripts": {
     "gen": "buf generate",
     "clean": "rimraf packages/ts/dist",
-    "build": "pnpm run clean && pnpm run gen",
-    "postinstall": "pnpm run gen"
+    "build": "pnpm run clean && pnpm run gen"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.1"
