@@ -1,6 +1,7 @@
 import { execSync } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
+import { contentSecurityPolicy } from "./src/contentSecurityPolicy.ts";
 import tailwindcss from "@tailwindcss/vite";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
@@ -24,9 +25,6 @@ try {
 } catch (error) {
   console.error("Error getting git version:", error);
 }
-
-const CONTENT_SECURITY_POLICY =
-  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data: https://rsms.me https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data: https://rsms.me https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self';";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
@@ -84,7 +82,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       headers: {
-        "Content-Security-Policy": CONTENT_SECURITY_POLICY,
+        "Content-Security-Policy": contentSecurityPolicy,
         "Cross-Origin-Opener-Policy": "same-origin",
         "Cross-Origin-Embedder-Policy": "credentialless",
         "X-Content-Type-Options": "nosniff",
