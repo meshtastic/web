@@ -8,28 +8,40 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface TakModuleConfigProps {
   onFormInit: DynamicFormFormInit<TakValidation>;
 }
 
+const EMPTY_MODULES_SIGNAL = {
+  value: {} as { tak?: Protobuf.ModuleConfig.ModuleConfig_TAKConfig },
+  peek: () => ({}) as { tak?: Protobuf.ModuleConfig.ModuleConfig_TAKConfig },
+  subscribe: () => () => {},
+} as const;
+
 export const Tak = ({ onFormInit }: TakModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "tak" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const editor = useConfigEditor();
+  const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
+  const effective =
+    modules.tak ??
+    (getEffectiveModuleConfig("tak") as
+      | Protobuf.ModuleConfig.ModuleConfig_TAKConfig
+      | undefined);
+
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: TakValidation) => {
-    if (deepCompareConfig(moduleConfig.tak, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "tak" });
-      return;
-    }
-
-    setChange({ type: "moduleConfig", variant: "tak" }, data, moduleConfig.tak);
+    if (!editor) return;
+    editor.setModuleSection(
+      "tak",
+      data as unknown as Protobuf.ModuleConfig.ModuleConfig_TAKConfig,
+    );
   };
 
   return (
@@ -38,7 +50,7 @@ export const Tak = ({ onFormInit }: TakModuleConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={TakValidationSchema}
       defaultValues={moduleConfig.tak}
-      values={getEffectiveModuleConfig("tak")}
+      values={effective}
       fieldGroups={[
         {
           label: t("tak.title"),

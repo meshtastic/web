@@ -1,6 +1,5 @@
-import type { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/sdk";
 import { Result } from "better-result";
-import type { ResultType } from "better-result";
 import type { MeshClientPort } from "../../../core/client/MeshClientPort.ts";
 import { type MeshError, toMeshError } from "../../../core/errors/MeshError.ts";
 
@@ -12,7 +11,7 @@ import { type MeshError, toMeshError } from "../../../core/errors/MeshError.ts";
 
 export async function beginEditSettings(
   client: MeshClientPort,
-): Promise<ResultType<number, MeshError>> {
+): Promise<Result<number, MeshError>> {
   try {
     return Result.ok(await client.beginEditSettings());
   } catch (error) {
@@ -22,7 +21,7 @@ export async function beginEditSettings(
 
 export async function commitEditSettings(
   client: MeshClientPort,
-): Promise<ResultType<number, MeshError>> {
+): Promise<Result<number, MeshError>> {
   try {
     return Result.ok(await client.commitEditSettings());
   } catch (error) {
@@ -33,7 +32,7 @@ export async function commitEditSettings(
 export async function setConfig(
   client: MeshClientPort,
   config: Protobuf.Config.Config,
-): Promise<ResultType<number, MeshError>> {
+): Promise<Result<number, MeshError>> {
   try {
     return Result.ok(await client.setConfig(config));
   } catch (error) {
@@ -44,7 +43,7 @@ export async function setConfig(
 export async function setModuleConfig(
   client: MeshClientPort,
   moduleConfig: Protobuf.ModuleConfig.ModuleConfig,
-): Promise<ResultType<number, MeshError>> {
+): Promise<Result<number, MeshError>> {
   try {
     return Result.ok(await client.setModuleConfig(moduleConfig));
   } catch (error) {

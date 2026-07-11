@@ -1,7 +1,6 @@
-import { Types } from "@meshtastic/core";
+import { Types } from "@meshtastic/sdk";
 import { signal } from "@preact/signals-core";
 import { Result } from "better-result";
-import type { ResultType } from "better-result";
 import type { MeshClientPort } from "../../../core/client/MeshClientPort.ts";
 import type { MeshError } from "../../../core/errors/MeshError.ts";
 import {
@@ -144,7 +143,7 @@ export class ConfigEditor {
    * inbound config packets after commit reconcile. Any failure aborts and
    * returns the error — the baseline is left untouched.
    */
-  public async commit(): Promise<ResultType<void, MeshError>> {
+  public async commit(): Promise<Result<void, MeshError>> {
     if (!this._isDirty.peek()) {
       return Result.ok(undefined);
     }

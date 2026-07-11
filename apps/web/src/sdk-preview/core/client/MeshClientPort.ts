@@ -1,4 +1,4 @@
-import type { Protobuf, Types } from "@meshtastic/core";
+import type { Protobuf, Types } from "@meshtastic/sdk";
 
 /**
  * Minimal subscribe-only view of an event source. `ste-simple-events`'

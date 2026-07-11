@@ -1,5 +1,4 @@
 import { Result } from "better-result";
-import type { ResultType } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { generatePacketId } from "../../core/identifiers/PacketId.ts";
 import type { ReadonlySignal } from "../../core/signals/createStore.ts";
@@ -20,7 +19,7 @@ export class FilesClient {
   public async upload(
     filename: string,
     data: Uint8Array,
-  ): Promise<ResultType<FileTransfer, Error>> {
+  ): Promise<Result<FileTransfer, Error>> {
     const id = generatePacketId();
     const transfer: FileTransfer = {
       id,
@@ -44,7 +43,7 @@ export class FilesClient {
 
   public async download(
     filename: string,
-  ): Promise<ResultType<FileTransfer, Error>> {
+  ): Promise<Result<FileTransfer, Error>> {
     const id = generatePacketId();
     const transfer: FileTransfer = {
       id,

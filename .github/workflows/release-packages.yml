@@ -139,7 +139,7 @@ jobs:
               echo "Publishing $dir to npm…"
               ( cd "$dir"
                 [ -d dist ] || pnpm run build
-                npm publish --access public
+                pnpm publish --access public --no-git-checks
               )
             fi
           done

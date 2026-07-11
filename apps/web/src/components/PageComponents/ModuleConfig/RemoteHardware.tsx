@@ -8,32 +8,46 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import type { Protobuf } from "@meshtastic/sdk";
+import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 
 interface RemoteHardwareModuleConfigProps {
   onFormInit: DynamicFormFormInit<RemoteHardwareValidation>;
 }
 
+const EMPTY_MODULES_SIGNAL = {
+  value: {} as {
+    remoteHardware?: Protobuf.ModuleConfig.ModuleConfig_RemoteHardwareConfig;
+  },
+  peek: () =>
+    ({}) as {
+      remoteHardware?: Protobuf.ModuleConfig.ModuleConfig_RemoteHardwareConfig;
+    },
+  subscribe: () => () => {},
+} as const;
+
 export const RemoteHardware = ({
   onFormInit,
 }: RemoteHardwareModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "remoteHardware" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const editor = useConfigEditor();
+  const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
+  const effective =
+    modules.remoteHardware ??
+    (getEffectiveModuleConfig("remoteHardware") as
+      | Protobuf.ModuleConfig.ModuleConfig_RemoteHardwareConfig
+      | undefined);
+
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: RemoteHardwareValidation) => {
-    if (deepCompareConfig(moduleConfig.remoteHardware, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "remoteHardware" });
-      return;
-    }
-
-    setChange(
-      { type: "moduleConfig", variant: "remoteHardware" },
-      data,
-      moduleConfig.remoteHardware,
+    if (!editor) return;
+    editor.setModuleSection(
+      "remoteHardware",
+      data as unknown as Protobuf.ModuleConfig.ModuleConfig_RemoteHardwareConfig,
     );
   };
 
@@ -43,7 +57,7 @@ export const RemoteHardware = ({
       onFormInit={onFormInit}
       validationSchema={RemoteHardwareValidationSchema}
       defaultValues={moduleConfig.remoteHardware}
-      values={getEffectiveModuleConfig("remoteHardware")}
+      values={effective}
       fieldGroups={[
         {
           label: t("remoteHardware.title"),

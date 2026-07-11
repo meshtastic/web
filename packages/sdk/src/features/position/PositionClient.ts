@@ -1,5 +1,5 @@
 import type * as Protobuf from "@meshtastic/protobufs";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import type { Position } from "./domain/Position.ts";
@@ -34,21 +34,19 @@ export class PositionClient {
   public setFixed(
     latitude: number,
     longitude: number,
-  ): Promise<ResultType<number, Error>> {
+  ): Promise<Result<number, Error>> {
     return setFixedPosition(this.client, latitude, longitude);
   }
 
-  public removeFixed(): Promise<ResultType<number, Error>> {
+  public removeFixed(): Promise<Result<number, Error>> {
     return removeFixedPosition(this.client);
   }
 
-  public set(
-    position: Protobuf.Mesh.Position,
-  ): Promise<ResultType<number, Error>> {
+  public set(position: Protobuf.Mesh.Position): Promise<Result<number, Error>> {
     return setPosition(this.client, position);
   }
 
-  public request(destination: number): Promise<ResultType<number, Error>> {
+  public request(destination: number): Promise<Result<number, Error>> {
     return requestPosition(this.client, destination);
   }
 }

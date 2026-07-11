@@ -1,5 +1,5 @@
 import { signal } from "@preact/signals-core";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
 import { generatePacketId } from "../../core/identifiers/PacketId.ts";
@@ -195,7 +195,7 @@ export class ChatClient {
 
   public async send(
     input: SendTextInput,
-  ): Promise<ResultType<number, SendTextError>> {
+  ): Promise<Result<number, SendTextError>> {
     const conv: ConversationKey =
       typeof input.destination === "number"
         ? { kind: "direct", peer: input.destination }
