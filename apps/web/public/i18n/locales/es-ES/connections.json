@@ -1,34 +1,34 @@
 {
   "page": {
-    "title": "Connect to a Meshtastic device",
-    "description": "Add a device connection via HTTP, Bluetooth, or Serial. Your saved connections will be saved in your browser."
+    "title": "Conectar a un dispositivo Meshtastic",
+    "description": "Añade una conexión de dispositivo a través de HTTP, Bluetooth o Serial. Tus conexiones guardadas se guardarán en tu navegador."
   },
   "connectionType_ble": "BLE",
   "connectionType_serial": "Conexión Serial",
   "connectionType_network": "Conexión Red",
-  "deleteConnection": "Delete connection",
-  "areYouSure": "This will remove {{name}}. You canot undo this action.",
-  "moreActions": "More actions",
+  "deleteConnection": "Borrar conexión",
+  "areYouSure": "Esto eliminará {{name}}. No puedes deshacer esta acción.",
+  "moreActions": "Más acciones",
   "noConnections": {
-    "title": "No connections yet.",
-    "description": "Create your first connection. It will connect immediately and be saved for later."
+    "title": "Todavía no hay conexiones.",
+    "description": "Crea tu primera conexión. Se conectará inmediatamente y se guardará para más tarde."
   },
-  "lastConnectedAt": "Last connected: {{date}}",
-  "neverConnected": "Never connected",
+  "lastConnectedAt": "Última conexión: {{date}}",
+  "neverConnected": "Nunca se conectó",
   "toasts": {
     "connected": "Conectado",
-    "nowConnected": "{{name}} is now connected",
-    "nowDisconnected": "{{name}} are now disconnecte",
+    "nowConnected": "{{name}} está conectado",
+    "nowDisconnected": "{{name}} se han desconectado",
     "disconnected": "Desconectado",
-    "failed": "Failed to connect",
-    "checkConnetion": "Check your device or settings and try again",
-    "defaultSet": "Default set",
-    "defaultConnection": "Default connection is now {{nameisconnected}}",
-    "deleted": "Deleted",
-    "deletedByName": "{{name}} was removed",
-    "pickConnectionAgain": "Could not connect. You may need to reselect the device/port.",
-    "added": "Connection added",
-    "savedByName": "{{name}} saved.",
-    "savedCantConnect": "The connection was saved but could not connect."
+    "failed": "Error al conectar",
+    "checkConnetion": "Compruebe su dispositivo o configuración y vuelva a intentarlo",
+    "defaultSet": "Configuración predeterminada establecida",
+    "defaultConnection": "La conexión predeterminada ahora es {{nameisconnected}}",
+    "deleted": "Eliminado",
+    "deletedByName": "{{name}} ha sido eliminado",
+    "pickConnectionAgain": "No se pudo conectar. Es posible que tenga que volver a seleccionar el dispositivo/puerto.",
+    "added": "Conexión agregada",
+    "savedByName": "{{name}} guardado.",
+    "savedCantConnect": "La conexión fue guardada pero no se pudo conectar."
   }
 }

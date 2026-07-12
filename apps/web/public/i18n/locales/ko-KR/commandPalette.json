@@ -32,7 +32,7 @@
       "qrGenerator": "생성",
       "qrImport": "불러오기",
       "scheduleShutdown": "종료 예약",
-      "scheduleReboot": "Reboot Device",
+      "scheduleReboot": "기기 재시작",
       "resetNodeDb": "노드 목록 초기화",
       "dfuMode": "DFU 모드 진입",
       "factoryResetDevice": "공장 초기화",
@@ -45,7 +45,7 @@
     "command": {
       "reconfigure": "재설정",
       "clearAllStoredMessages": "저장된 모든 메시지 삭제",
-      "clearAllStores": "Clear All Local Storage"
+      "clearAllStores": "내부저장소 삭제"
     }
   }
 }

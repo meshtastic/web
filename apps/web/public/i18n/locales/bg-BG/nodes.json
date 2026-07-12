@@ -37,7 +37,7 @@
   "nodesTable": {
     "headings": {
       "longName": "Дълго име",
-      "connection": "Connection",
+      "connection": "Свързване",
       "lastHeard": "Последно чут",
       "encryption": "Криптиране",
       "model": "Модел",
@@ -54,6 +54,6 @@
     "removed": "Премахнат",
     "ignoreNode": "Игнориране на възела",
     "unignoreNode": "Премахване на игнорирането на възела",
-    "requestPosition": "Request Position"
+    "requestPosition": "Заявка за позиция"
   }
 }
