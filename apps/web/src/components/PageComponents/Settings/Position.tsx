@@ -279,11 +279,15 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "altitude",
               label: t("position.fixedPosition.altitude.label"),
               description: t("position.fixedPosition.altitude.description", {
-                unit: isImperial ? "Feet" : "Meters",
+                unit: isImperial
+                  ? t("unit.foot.plural")
+                  : t("unit.meter.plural"),
               }),
               properties: {
                 step: 0.0000001,
-                suffix: isImperial ? "Feet" : "Meters",
+                suffix: isImperial
+                  ? t("unit.foot.plural")
+                  : t("unit.meter.plural"),
               },
               disabledBy: [{ fieldName: "fixedPosition" }],
             },
