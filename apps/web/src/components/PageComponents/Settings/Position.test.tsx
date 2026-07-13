@@ -216,4 +216,32 @@ describe("Position (altitude unit conversion, issue #1051)", () => {
     await waitFor(() => expect(altitudeInput(container).value).toBe("328"));
     expect(mockGetCurrentPosition).toHaveBeenCalledTimes(1);
   });
+
+  it("clearing the altitude field does not queue a setFixedPosition", async () => {
+    // Regression coverage requested by CodeRabbit. Clearing a number field
+    // yields NaN (FormInput does Number.parseFloat("").toString() === "NaN"),
+    // which fails altitude's `z.coerce.number().optional()` validation. Because
+    // DynamicForm submits via handleSubmit(onSubmit) on change, an invalid form
+    // never calls onSubmit, so nothing is queued. The `Number.isFinite(...) ? ...
+    // : 0` guard in onSubmit is thus defensive and unreachable through the form.
+    setup({ units: METRIC, altitudeMeters: 100 });
+    const { container } = renderPosition();
+
+    // Baseline: a valid edit queues exactly one setFixedPosition, proving the
+    // form is wired up and submits on change.
+    fireEvent.change(altitudeInput(container), { target: { value: "150" } });
+    await waitFor(() => expect(mockQueueAdminMessage).toHaveBeenCalledTimes(1));
+    expect(lastQueuedPosition().altitude).toBe(150);
+
+    // Clear the field -> NaN -> invalid -> must NOT queue anything.
+    fireEvent.change(altitudeInput(container), { target: { value: "" } });
+
+    // Recover with another valid edit and synchronize on its value landing.
+    // Then assert exactly two queues total (150 then 200): if the clear had
+    // queued, the count would be three. Synchronizing on the settled value
+    // (not a bare negative assertion) keeps this non-racy.
+    fireEvent.change(altitudeInput(container), { target: { value: "200" } });
+    await waitFor(() => expect(lastQueuedPosition().altitude).toBe(200));
+    expect(mockQueueAdminMessage).toHaveBeenCalledTimes(2);
+  });
 });
