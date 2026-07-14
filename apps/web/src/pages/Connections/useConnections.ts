@@ -88,7 +88,15 @@ export function useConnections() {
       if (conn?.meshDeviceId) {
         try {
           useDeviceStore.getState().removeDevice(conn.meshDeviceId);
-        } catch {}
+        } catch (e) {
+          const err = e as Error;
+          log.warn("removeDevice failed during removeConnection", {
+            id,
+            meshDeviceId: conn.meshDeviceId,
+            name: err?.name,
+            message: err?.message,
+          });
+        }
       }
       meshRegistry.unregister(id);
       removeSavedConnectionFromStore(id);
@@ -249,7 +257,9 @@ export function useConnections() {
       // Read from the live store, not the memoized `connections` closure: callers
       // such as addConnectionAndConnect() add a connection and connect to it in the
       // same tick, before this hook re-renders, so the closure would be stale.
-      const conn = useDeviceStore.getState().savedConnections.find((c) => c.id === id);
+      const conn = useDeviceStore
+        .getState()
+        .savedConnections.find((c) => c.id === id);
       if (!conn) {
         log.warn("connect: unknown connection id", { id });
         return false;
