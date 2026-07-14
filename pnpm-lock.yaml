@@ -18,8 +18,8 @@ importers:
         specifier: ^3.0.11
         version: 3.0.11
       tslog:
-        specifier: ^4.9.3
-        version: 4.10.2
+        specifier: ^4.11.0
+        version: 4.11.0
     devDependencies:
       '@meshtastic/core':
         specifier: jsr:^2.6.6
@@ -354,8 +354,8 @@ importers:
         specifier: ^3.0.11
         version: 3.0.11
       tslog:
-        specifier: ^4.9.3
-        version: 4.10.2
+        specifier: ^4.11.0
+        version: 4.11.0
 
   packages/sdk-react:
     dependencies:
@@ -5938,8 +5938,8 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  tslog@4.10.2:
-    resolution: {integrity: sha512-XuELoRpMR+sq8fuWwX7P0bcj+PRNiicOKDEb3fGNURhxWVyykCi9BNq7c4uVz7h7P0sj8qgBsr5SWS6yBClq3g==}
+  tslog@4.11.0:
+    resolution: {integrity: sha512-gBe0FTKkRpOv3DenGipjQWQe073jNd1cOLj3nYfVM0/NP29sQzAIx6kfyfTTsQOiWMC+B+tSr289lNXtu7HCmQ==}
     engines: {node: '>=16'}
 
   tsx@4.21.0:
@@ -7378,7 +7378,7 @@ snapshots:
       '@jsr/meshtastic__protobufs': 2.7.20
       crc: 4.3.2
       ste-simple-events: 3.0.11
-      tslog: 4.10.2
+      tslog: 4.11.0
     transitivePeerDependencies:
       - buffer
 
@@ -12487,7 +12487,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tslog@4.10.2: {}
+  tslog@4.11.0: {}
 
   tsx@4.21.0:
     dependencies:
