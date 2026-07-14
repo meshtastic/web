@@ -115,6 +115,10 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
         ? "Web Serial"
         : undefined;
 
+  if (!needsFeature && !needsSecureContext) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col items-start gap-2 bg-red-500 p-4 rounded-md text-sm mt-4">
       <div className="flex items-center gap-2 w-full">
