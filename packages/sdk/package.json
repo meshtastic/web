@@ -49,11 +49,11 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.1",
     "@meshtastic/protobufs": "jsr:^2.7.18",
-    "@preact/signals-core": "^1.14.3",
+    "@preact/signals-core": "^1.14.4",
     "better-result": "^2.9.2",
     "crc": "npm:crc@^4.3.2",
     "ste-simple-events": "^3.0.11",
-    "tslog": "^4.9.3"
+    "tslog": "^4.11.0"
   },
   "tsdown": {
     "clean": true,
