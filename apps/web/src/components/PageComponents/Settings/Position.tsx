@@ -164,10 +164,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       // The altitude field is in feet when Imperial; the protobuf expects
       // integer meters, so convert back and round. Guard against a
       // cleared/NaN field.
-      const altitudeInput = Number.isFinite(data.altitude)
-        ? (data.altitude as number)
-        : 0;
-      const altitudeMeters = isImperial
+      const altitudeInput =
+        typeof data.altitude === "number" && Number.isFinite(data.altitude)
+          ? data.altitude
+          : 0;
+      const altitude = isImperial
         ? Math.round(feetToMeters(altitudeInput))
         : Math.round(altitudeInput);
 
@@ -177,7 +178,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
           value: create(Protobuf.Mesh.PositionSchema, {
             latitudeI: Math.round(data.latitude * 1e7),
             longitudeI: Math.round(data.longitude * 1e7),
-            altitude: altitudeMeters,
+            altitude,
             time: Math.floor(Date.now() / 1000),
           }),
         },
