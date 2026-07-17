@@ -43,7 +43,7 @@
     "husky": "^9.1.0",
     "lint-staged": "^17.0.8",
     "oxfmt": "^0.58.0",
-    "oxlint": "^1.73.0",
+    "oxlint": "^1.74.0",
     "tsdown": "^0.22.7",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
