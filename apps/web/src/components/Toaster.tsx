@@ -13,21 +13,33 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      {toasts.map(({ id, title, description, action, duration, ...props }) => (
-        <Toast
-          key={id}
-          {...props}
-          duration={duration}
-          className="flex flex-col gap-4"
-        >
-          <div className="grid gap-1">
-            {title && <ToastTitle>{title}</ToastTitle>}
-            {description && <ToastDescription>{description}</ToastDescription>}
-          </div>
-          {action}
-          <ToastClose />
-        </Toast>
-      ))}
+      {toasts.map(
+        ({
+          id,
+          title,
+          description,
+          action,
+          duration,
+          dismissible = true,
+          ...props
+        }) => (
+          <Toast
+            key={id}
+            {...props}
+            duration={duration}
+            className="flex flex-col gap-4"
+          >
+            <div className="grid gap-1">
+              {title && <ToastTitle>{title}</ToastTitle>}
+              {description && (
+                <ToastDescription>{description}</ToastDescription>
+              )}
+            </div>
+            {action}
+            {dismissible && <ToastClose />}
+          </Toast>
+        ),
+      )}
       <ToastViewport />
     </ToastProvider>
   );

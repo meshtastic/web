@@ -10,6 +10,7 @@ type ToasterToast = ToastProps & {
   description?: ReactNode;
   action?: ToastActionElement;
   delay?: number;
+  dismissible?: boolean;
 };
 
 const actionTypes = {
