@@ -1,13 +1,24 @@
 const FIRMWARE_FLASHER_URL = "https://flasher.meshtastic.org";
 const FIRMWARE_RELEASES_URL = "https://api.meshtastic.org/github/firmware/list";
 const FIRMWARE_UPDATE_STORAGE_PREFIX = "firmware-update-notified:";
+const inMemoryNotificationKeys = new Set<string>();
 
 type FirmwareRelease = {
   id: string;
+  zip_url: string;
 };
 
 type FirmwareReleaseResponse = {
   releases?: { stable?: FirmwareRelease[] };
+};
+
+type FirmwareReleaseManifest = {
+  targets?: { board?: unknown }[];
+};
+
+type FirmwareReleaseWithTargets = {
+  id: string;
+  targets: string[];
 };
 
 type FirmwareReleaseFetcher = (
@@ -20,6 +31,7 @@ type FirmwareUpdateCandidate = {
   hardwareTarget: string;
   currentVersion: string;
   latestStableVersion: string;
+  releaseTargets: string[];
 };
 
 type FirmwareUpdateNotice = {
@@ -98,11 +110,15 @@ function compareVersions(left: string, right: string): number | undefined {
 
 export function findLatestStableFirmwareRelease(
   releases: FirmwareRelease[],
-): string | undefined {
+): FirmwareRelease | undefined {
   return releases
-    .filter((release) => normalizeVersion(release.id) !== undefined)
+    .filter(
+      (release) =>
+        normalizeVersion(release.id) !== undefined &&
+        typeof release.zip_url === "string",
+    )
     .sort((left, right) => compareVersions(right.id, left.id) ?? 0)
-    .at(0)?.id;
+    .at(0);
 }
 
 function isValidPlatformTarget(target: string): boolean {
@@ -110,20 +126,26 @@ function isValidPlatformTarget(target: string): boolean {
 }
 
 /**
- * The canonical release API intentionally has no per-hardware asset map, so
- * eligibility is limited to a valid PlatformIO target reported by the active
- * device. It must not be inferred from release asset filenames.
+ * The active PlatformIO environment must appear in the selected release's
+ * manifest. This verifies compatibility from released metadata rather than
+ * inferred asset filenames.
  */
 export function resolveFirmwareUpdateDestination(
   hardwareTarget: string,
+  releaseTargets: string[],
 ): FirmwareUpdateDestination | undefined {
-  if (!isValidPlatformTarget(hardwareTarget)) return;
+  if (
+    !isValidPlatformTarget(hardwareTarget) ||
+    !releaseTargets.includes(hardwareTarget)
+  ) {
+    return;
+  }
   return WEB_FIRMWARE_UPDATE_DESTINATION;
 }
 
 export async function fetchLatestStableFirmwareRelease(
   fetcher: FirmwareReleaseFetcher = fetch,
-): Promise<string | undefined> {
+): Promise<FirmwareReleaseWithTargets | undefined> {
   try {
     const response = await fetcher(FIRMWARE_RELEASES_URL, {
       headers: { Accept: "application/vnd.github+json" },
@@ -132,7 +154,24 @@ export async function fetchLatestStableFirmwareRelease(
 
     const releases = (await response.json()) as FirmwareReleaseResponse;
     if (!Array.isArray(releases.releases?.stable)) return;
-    return findLatestStableFirmwareRelease(releases.releases.stable);
+
+    const latestRelease = findLatestStableFirmwareRelease(
+      releases.releases.stable,
+    );
+    if (!latestRelease) return;
+
+    const manifestResponse = await fetcher(latestRelease.zip_url, {
+      headers: { Accept: "application/json" },
+    });
+    if (!manifestResponse.ok) return;
+
+    const manifest = (await manifestResponse.json()) as FirmwareReleaseManifest;
+    if (!Array.isArray(manifest.targets)) return;
+
+    const targets = manifest.targets.flatMap(({ board }) =>
+      typeof board === "string" && isValidPlatformTarget(board) ? [board] : [],
+    );
+    return { id: latestRelease.id, targets };
   } catch {
     return;
   }
@@ -149,6 +188,7 @@ export function buildFirmwareUpdateNotice(
   );
   const updateDestination = resolveFirmwareUpdateDestination(
     candidate.hardwareTarget,
+    candidate.releaseTargets,
   );
 
   if (
@@ -156,6 +196,7 @@ export function buildFirmwareUpdateNotice(
     !candidate.hardwareTarget ||
     !currentVersion ||
     !latestStableVersion ||
+    !candidate.releaseTargets.length ||
     !updateDestination ||
     comparison === undefined ||
     comparison >= 0
@@ -183,8 +224,7 @@ export function notifyFirmwareUpdateIfPermitted(
   if (
     notificationPermission !== "granted" ||
     !notification ||
-    !storage ||
-    storage.getItem(notice.notificationKey)
+    wasFirmwareUpdateNotified(notice.notificationKey, storage)
   ) {
     return false;
   }
@@ -195,12 +235,39 @@ export function notifyFirmwareUpdateIfPermitted(
       tag: notice.notificationKey,
     });
     if (onClick) scheduledNotification.onclick = onClick;
-    storage.setItem(notice.notificationKey, "1");
+    inMemoryNotificationKeys.add(notice.notificationKey);
+    try {
+      storage?.setItem(notice.notificationKey, "1");
+    } catch {
+      // In-memory dedupe still prevents repeat notifications for this tab.
+    }
     return true;
   } catch {
     return false;
   }
 }
 
+function wasFirmwareUpdateNotified(
+  notificationKey: string,
+  storage: NotificationStorage | undefined,
+): boolean {
+  if (inMemoryNotificationKeys.has(notificationKey)) return true;
+
+  try {
+    if (storage?.getItem(notificationKey)) {
+      inMemoryNotificationKeys.add(notificationKey);
+      return true;
+    }
+  } catch {
+    // Storage can be blocked by browser privacy settings; use memory instead.
+  }
+
+  return false;
+}
+
 export { FIRMWARE_FLASHER_URL };
-export type { FirmwareRelease, FirmwareUpdateNotice };
+export type {
+  FirmwareRelease,
+  FirmwareReleaseWithTargets,
+  FirmwareUpdateNotice,
+};

@@ -3,6 +3,7 @@ import {
   buildFirmwareUpdateNotice,
   fetchLatestStableFirmwareRelease,
   notifyFirmwareUpdateIfPermitted,
+  type FirmwareReleaseWithTargets,
   type FirmwareUpdateNotice,
 } from "@core/services/firmwareUpdate.ts";
 import { useDevice } from "@core/stores";
@@ -11,8 +12,8 @@ import { useEffect, useMemo, useState } from "react";
 
 export const FirmwareUpdateReminder = () => {
   const { hardware, metadata, myNodeNum, status } = useDevice();
-  const [latestStableVersion, setLatestStableVersion] = useState<
-    string | undefined
+  const [latestStableRelease, setLatestStableRelease] = useState<
+    FirmwareReleaseWithTargets | undefined
   >(undefined);
 
   const deviceMetadata = metadata.get(0);
@@ -21,14 +22,14 @@ export const FirmwareUpdateReminder = () => {
 
   useEffect(() => {
     let active = true;
-    setLatestStableVersion(undefined);
+    setLatestStableRelease(undefined);
 
     if (!isConnected || !deviceMetadata?.firmwareVersion || !hardwareTarget) {
       return;
     }
 
-    void fetchLatestStableFirmwareRelease().then((version) => {
-      if (active) setLatestStableVersion(version);
+    void fetchLatestStableFirmwareRelease().then((release) => {
+      if (active) setLatestStableRelease(release);
     });
 
     return () => {
@@ -38,7 +39,7 @@ export const FirmwareUpdateReminder = () => {
 
   const notice = useMemo(
     () =>
-      latestStableVersion &&
+      latestStableRelease &&
       hardwareTarget &&
       myNodeNum !== undefined &&
       deviceMetadata?.firmwareVersion
@@ -46,13 +47,14 @@ export const FirmwareUpdateReminder = () => {
             nodeIdentity: myNodeNum.toString(),
             hardwareTarget,
             currentVersion: deviceMetadata.firmwareVersion,
-            latestStableVersion,
+            latestStableVersion: latestStableRelease.id,
+            releaseTargets: latestStableRelease.targets,
           })
         : null,
     [
       deviceMetadata?.firmwareVersion,
       hardwareTarget,
-      latestStableVersion,
+      latestStableRelease,
       myNodeNum,
     ],
   );
@@ -66,7 +68,7 @@ export const FirmwareUpdateReminder = () => {
       notification: BrowserNotification
         ? (title, options) => new BrowserNotification(title, options)
         : undefined,
-      storage: window.localStorage,
+      storage: getBrowserStorage(),
       onClick: () => {
         window.open(notice.actionUrl, "_blank", "noopener,noreferrer");
       },
@@ -89,3 +91,11 @@ const FirmwareUpdateAction = ({ notice }: { notice: FirmwareUpdateNotice }) => (
     />
   </aside>
 );
+
+function getBrowserStorage(): Storage | undefined {
+  try {
+    return window.localStorage;
+  } catch {
+    return;
+  }
+}

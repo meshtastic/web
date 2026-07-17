@@ -3,20 +3,34 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FirmwareUpdateReminder } from "./FirmwareUpdateReminder.tsx";
 
 const { mockUseDevice } = vi.hoisted(() => ({ mockUseDevice: vi.fn() }));
+const mockFetch = vi.fn();
 
 vi.mock("@core/stores", () => ({ useDevice: mockUseDevice }));
 
 describe("FirmwareUpdateReminder", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
+    mockFetch.mockReset();
+    vi.stubGlobal("fetch", mockFetch);
+    mockFetch
+      .mockResolvedValueOnce({
         ok: true,
         json: () =>
-          Promise.resolve({ releases: { stable: [{ id: "v2.8.0" }] } }),
-      }),
-    );
+          Promise.resolve({
+            releases: {
+              stable: [
+                {
+                  id: "v2.8.0",
+                  zip_url: "https://example.test/firmware-2.8.0.json",
+                },
+              ],
+            },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ targets: [{ board: "tbeam-s3-core" }] }),
+      });
     mockUseDevice.mockReturnValue({
       status: 7,
       myNodeNum: 4660,
@@ -38,7 +52,7 @@ describe("FirmwareUpdateReminder", () => {
     await waitFor(() => {
       expect(screen.getByText("Firmware update available")).toBeVisible();
     });
-    expect(fetch).toHaveBeenCalledOnce();
+    expect(mockFetch).toHaveBeenCalledTimes(2);
 
     mockUseDevice.mockReturnValue({
       status: 2,

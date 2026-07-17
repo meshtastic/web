@@ -13,9 +13,10 @@ describe("firmware update policy", () => {
     hardwareTarget: "tbeam-s3-core",
     currentVersion: "2.7.26.54e0d8d",
     latestStableVersion: "v2.8.0",
+    releaseTargets: ["tbeam-s3-core"],
   };
 
-  it("only creates a Flasher notice when a valid platform target runs an older valid version", () => {
+  it("only creates a Flasher notice for targets declared by the stable release manifest", () => {
     const notice = buildFirmwareUpdateNotice(candidate);
 
     expect(notice).toMatchObject({
@@ -36,46 +37,58 @@ describe("firmware update policy", () => {
     expect(
       buildFirmwareUpdateNotice({ ...candidate, hardwareTarget: "unknown?" }),
     ).toBeNull();
+    expect(
+      buildFirmwareUpdateNotice({
+        ...candidate,
+        hardwareTarget: "unsupported-board",
+      }),
+    ).toBeNull();
   });
 
   it("selects the newest stable release from the canonical firmware API", () => {
     expect(
       findLatestStableFirmwareRelease([
-        { id: "v2.7.26.54e0d8d" },
-        { id: "v2.8.0" },
-        { id: "not-a-version" },
+        { id: "v2.7.26.54e0d8d", zip_url: "older-manifest" },
+        { id: "v2.8.0", zip_url: "newer-manifest" },
+        { id: "not-a-version", zip_url: "invalid-manifest" },
       ]),
-    ).toBe("v2.8.0");
+    ).toMatchObject({ id: "v2.8.0", zip_url: "newer-manifest" });
   });
 
-  it("derives the Flasher fallback from Web's current update capability", () => {
-    expect(resolveFirmwareUpdateDestination("tbeam-s3-core")).toMatchObject({
+  it("derives the Flasher fallback only for a manifest-supported target", () => {
+    expect(
+      resolveFirmwareUpdateDestination("tbeam-s3-core", ["tbeam-s3-core"]),
+    ).toMatchObject({
       destination: "flasher",
       actionUrl: "https://flasher.meshtastic.org",
     });
-    expect(resolveFirmwareUpdateDestination("unknown?")).toBeUndefined();
+    expect(
+      resolveFirmwareUpdateDestination("tbeam-s3-core", ["other-board"]),
+    ).toBeUndefined();
   });
 
   it("fails closed when the stable-release refresh does not succeed", async () => {
-    const fetcher = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve([
-          { id: "v2.8.0", draft: false, prerelease: true },
-          { id: "v2.7.26", draft: false, prerelease: false },
-        ]),
-    });
+    const fetcher = vi.fn();
 
     fetcher.mockResolvedValueOnce({
       ok: true,
       json: () =>
         Promise.resolve({
-          releases: { stable: [{ id: "v2.7.26" }] },
+          releases: {
+            stable: [
+              { id: "v2.7.26", zip_url: "https://example.test/manifest" },
+            ],
+          },
         }),
     });
-    await expect(fetchLatestStableFirmwareRelease(fetcher)).resolves.toBe(
-      "v2.7.26",
-    );
+    fetcher.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ targets: [{ board: "tbeam-s3-core" }] }),
+    });
+    await expect(fetchLatestStableFirmwareRelease(fetcher)).resolves.toEqual({
+      id: "v2.7.26",
+      targets: ["tbeam-s3-core"],
+    });
     await expect(
       fetchLatestStableFirmwareRelease(
         vi.fn().mockResolvedValue({ ok: false }),
@@ -129,21 +142,63 @@ describe("firmware update policy", () => {
   });
 
   it("does not record a dedupe key when scheduling fails", () => {
-    const notice = buildFirmwareUpdateNotice(candidate)!;
+    const notice = buildFirmwareUpdateNotice({
+      ...candidate,
+      nodeIdentity: "scheduling-failure",
+    })!;
     const storage = {
       getItem: vi.fn<(key: string) => string | null>(() => null),
       setItem: vi.fn(),
     };
 
+    const notification = vi.fn(() => {
+      throw new Error("notifications unavailable");
+    });
+
     expect(
       notifyFirmwareUpdateIfPermitted(notice, {
         notificationPermission: "granted",
-        notification: vi.fn(() => {
-          throw new Error("notifications unavailable");
-        }),
+        notification,
         storage,
       }),
     ).toBe(false);
+    expect(notification).toHaveBeenCalledOnce();
     expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  it("uses in-memory dedupe when storage access or persistence is unavailable", () => {
+    const notice = buildFirmwareUpdateNotice({
+      ...candidate,
+      nodeIdentity: "in-memory",
+    })!;
+    const notification = vi.fn(() => ({}));
+    const unavailableStorage = {
+      getItem: vi.fn(() => {
+        throw new Error("storage unavailable");
+      }),
+      setItem: vi.fn(() => {
+        throw new Error("storage unavailable");
+      }),
+    };
+
+    expect(
+      notifyFirmwareUpdateIfPermitted(notice, {
+        notificationPermission: "granted",
+        notification,
+        storage: unavailableStorage,
+      }),
+    ).toBe(true);
+    expect(unavailableStorage.setItem).toHaveBeenCalledWith(
+      notice.notificationKey,
+      "1",
+    );
+    expect(
+      notifyFirmwareUpdateIfPermitted(notice, {
+        notificationPermission: "granted",
+        notification,
+        storage: undefined,
+      }),
+    ).toBe(false);
+    expect(notification).toHaveBeenCalledOnce();
   });
 });
