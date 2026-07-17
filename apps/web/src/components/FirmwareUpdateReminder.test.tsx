@@ -1,14 +1,10 @@
-import { render, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FirmwareUpdateReminder } from "./FirmwareUpdateReminder.tsx";
 
-const mockToast = vi.fn();
 const { mockUseDevice } = vi.hoisted(() => ({ mockUseDevice: vi.fn() }));
 
 vi.mock("@core/stores", () => ({ useDevice: mockUseDevice }));
-vi.mock("@core/hooks/useToast.ts", () => ({
-  useToast: () => ({ toast: mockToast }),
-}));
 
 describe("FirmwareUpdateReminder", () => {
   beforeEach(() => {
@@ -18,39 +14,42 @@ describe("FirmwareUpdateReminder", () => {
       vi.fn().mockResolvedValue({
         ok: true,
         json: () =>
-          Promise.resolve([
-            { tag_name: "v2.8.0", draft: false, prerelease: false },
-          ]),
+          Promise.resolve({ releases: { stable: [{ id: "v2.8.0" }] } }),
       }),
     );
-    mockToast.mockReturnValue({ dismiss: vi.fn() });
     mockUseDevice.mockReturnValue({
-      connectionPhase: "configured",
+      status: 7,
       myNodeNum: 4660,
+      hardware: { pioEnv: "tbeam-s3-core" },
       metadata: new Map([
         [
           0,
           {
             firmwareVersion: "2.7.26.54e0d8d",
-            hwModel: 12,
           },
         ],
       ]),
     });
   });
 
-  it("checks the connected local node and creates a persistent update nudge", async () => {
-    render(<FirmwareUpdateReminder />);
+  it("shows a dedicated nudge only while the actual device lifecycle is configured", async () => {
+    const { rerender } = render(<FirmwareUpdateReminder />);
 
     await waitFor(() => {
-      expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Firmware update available",
-          duration: Number.POSITIVE_INFINITY,
-          dismissible: false,
-        }),
-      );
+      expect(screen.getByText("Firmware update available")).toBeVisible();
     });
     expect(fetch).toHaveBeenCalledOnce();
+
+    mockUseDevice.mockReturnValue({
+      status: 2,
+      myNodeNum: 4660,
+      hardware: { pioEnv: "tbeam-s3-core" },
+      metadata: new Map(),
+    });
+    rerender(<FirmwareUpdateReminder />);
+
+    await waitFor(() => {
+      expect(screen.queryByText("Firmware update available")).toBeNull();
+    });
   });
 });

@@ -4,17 +4,18 @@ import {
   fetchLatestStableFirmwareRelease,
   findLatestStableFirmwareRelease,
   notifyFirmwareUpdateIfPermitted,
+  resolveFirmwareUpdateDestination,
 } from "./firmwareUpdate.ts";
 
 describe("firmware update policy", () => {
   const candidate = {
     nodeIdentity: "4660",
-    hardwareTarget: "LILYGO_TBEAM_S3_CORE",
+    hardwareTarget: "tbeam-s3-core",
     currentVersion: "2.7.26.54e0d8d",
     latestStableVersion: "v2.8.0",
   };
 
-  it("only creates a Flasher notice when a known device runs an older valid version", () => {
+  it("only creates a Flasher notice when a valid platform target runs an older valid version", () => {
     const notice = buildFirmwareUpdateNotice(candidate);
 
     expect(notice).toMatchObject({
@@ -33,19 +34,26 @@ describe("firmware update policy", () => {
       buildFirmwareUpdateNotice({ ...candidate, currentVersion: "?.?.?" }),
     ).toBeNull();
     expect(
-      buildFirmwareUpdateNotice({ ...candidate, hardwareTarget: "" }),
+      buildFirmwareUpdateNotice({ ...candidate, hardwareTarget: "unknown?" }),
     ).toBeNull();
   });
 
-  it("selects the newest non-draft, non-prerelease firmware release", () => {
+  it("selects the newest stable release from the canonical firmware API", () => {
     expect(
       findLatestStableFirmwareRelease([
-        { tag_name: "v2.8.0", draft: false, prerelease: true },
-        { tag_name: "v2.7.26.54e0d8d", draft: false, prerelease: false },
-        { tag_name: "v2.8.1", draft: true, prerelease: false },
-        { tag_name: "v2.8.0", draft: false, prerelease: false },
+        { id: "v2.7.26.54e0d8d" },
+        { id: "v2.8.0" },
+        { id: "not-a-version" },
       ]),
     ).toBe("v2.8.0");
+  });
+
+  it("derives the Flasher fallback from Web's current update capability", () => {
+    expect(resolveFirmwareUpdateDestination("tbeam-s3-core")).toMatchObject({
+      destination: "flasher",
+      actionUrl: "https://flasher.meshtastic.org",
+    });
+    expect(resolveFirmwareUpdateDestination("unknown?")).toBeUndefined();
   });
 
   it("fails closed when the stable-release refresh does not succeed", async () => {
@@ -53,11 +61,18 @@ describe("firmware update policy", () => {
       ok: true,
       json: () =>
         Promise.resolve([
-          { tag_name: "v2.8.0", draft: false, prerelease: true },
-          { tag_name: "v2.7.26", draft: false, prerelease: false },
+          { id: "v2.8.0", draft: false, prerelease: true },
+          { id: "v2.7.26", draft: false, prerelease: false },
         ]),
     });
 
+    fetcher.mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          releases: { stable: [{ id: "v2.7.26" }] },
+        }),
+    });
     await expect(fetchLatestStableFirmwareRelease(fetcher)).resolves.toBe(
       "v2.7.26",
     );
@@ -69,7 +84,9 @@ describe("firmware update policy", () => {
   });
 
   it("only schedules a browser notification with existing permission and records its key after success", () => {
-    const notification = vi.fn();
+    const scheduledNotification: { onclick?: (event: Event) => void } = {};
+    const notification = vi.fn(() => scheduledNotification);
+    const onClick = vi.fn();
     const storage = {
       getItem: vi.fn<(key: string) => string | null>(() => null),
       setItem: vi.fn(),
@@ -81,6 +98,7 @@ describe("firmware update policy", () => {
         notificationPermission: "default",
         notification,
         storage,
+        onClick,
       }),
     ).toBe(false);
     expect(notification).not.toHaveBeenCalled();
@@ -90,10 +108,13 @@ describe("firmware update policy", () => {
         notificationPermission: "granted",
         notification,
         storage,
+        onClick,
       }),
     ).toBe(true);
     expect(notification).toHaveBeenCalledOnce();
     expect(storage.setItem).toHaveBeenCalledWith(notice.notificationKey, "1");
+    scheduledNotification.onclick?.(new Event("click"));
+    expect(onClick).toHaveBeenCalledOnce();
 
     storage.getItem.mockReturnValue("1");
     expect(
@@ -101,6 +122,7 @@ describe("firmware update policy", () => {
         notificationPermission: "granted",
         notification,
         storage,
+        onClick,
       }),
     ).toBe(false);
     expect(notification).toHaveBeenCalledOnce();

@@ -1,5 +1,4 @@
 import { FirmwareUpdateNudge } from "@components/FirmwareUpdateNudge.tsx";
-import { useToast } from "@core/hooks/useToast.ts";
 import {
   buildFirmwareUpdateNotice,
   fetchLatestStableFirmwareRelease,
@@ -7,27 +6,18 @@ import {
   type FirmwareUpdateNotice,
 } from "@core/services/firmwareUpdate.ts";
 import { useDevice } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Types } from "@meshtastic/sdk";
+import { useEffect, useMemo, useState } from "react";
 
-export const FirmwareUpdateReminder = (): null => {
-  const { connectionPhase, metadata, myNodeNum } = useDevice();
-  const { toast } = useToast();
-  const { t } = useTranslation("ui");
+export const FirmwareUpdateReminder = () => {
+  const { hardware, metadata, myNodeNum, status } = useDevice();
   const [latestStableVersion, setLatestStableVersion] = useState<
     string | undefined
   >(undefined);
-  const dismissRef = useRef<(() => void) | null>(null);
-  const shownNoticeKeyRef = useRef<string | undefined>(undefined);
 
   const deviceMetadata = metadata.get(0);
-  const hardwareTarget =
-    deviceMetadata?.hwModel === undefined ||
-    deviceMetadata.hwModel === Protobuf.Mesh.HardwareModel.UNSET
-      ? undefined
-      : Protobuf.Mesh.HardwareModel[deviceMetadata.hwModel];
-  const isConnected = connectionPhase === "configured";
+  const hardwareTarget = hardware.pioEnv.trim();
+  const isConnected = status === Types.DeviceStatusEnum.DeviceConfigured;
 
   useEffect(() => {
     let active = true;
@@ -77,45 +67,25 @@ export const FirmwareUpdateReminder = (): null => {
         ? (title, options) => new BrowserNotification(title, options)
         : undefined,
       storage: window.localStorage,
+      onClick: () => {
+        window.open(notice.actionUrl, "_blank", "noopener,noreferrer");
+      },
     });
   }, [notice]);
 
-  useEffect(() => {
-    if (!notice) {
-      dismissRef.current?.();
-      dismissRef.current = null;
-      shownNoticeKeyRef.current = undefined;
-      return;
-    }
-    if (shownNoticeKeyRef.current === notice.notificationKey) return;
+  if (!notice) return null;
 
-    dismissRef.current?.();
-    const { dismiss } = toast({
-      title: t("firmwareUpdate.title"),
-      duration: Number.POSITIVE_INFINITY,
-      dismissible: false,
-      action: <FirmwareUpdateAction notice={notice} />,
-    });
-    dismissRef.current = dismiss;
-    shownNoticeKeyRef.current = notice.notificationKey;
-  }, [notice, t, toast]);
-
-  useEffect(
-    () => () => {
-      dismissRef.current?.();
-    },
-    [],
-  );
-
-  return null;
+  return <FirmwareUpdateAction notice={notice} />;
 };
 
 const FirmwareUpdateAction = ({ notice }: { notice: FirmwareUpdateNotice }) => (
-  <FirmwareUpdateNudge
-    currentVersion={notice.currentVersion}
-    latestStableVersion={notice.latestStableVersion}
-    onOpen={() => {
-      window.open(notice.actionUrl, "_blank", "noopener,noreferrer");
-    }}
-  />
+  <aside className="fixed right-6 bottom-6 z-50 w-[min(100%-3rem,26rem)]">
+    <FirmwareUpdateNudge
+      currentVersion={notice.currentVersion}
+      latestStableVersion={notice.latestStableVersion}
+      onOpen={() => {
+        window.open(notice.actionUrl, "_blank", "noopener,noreferrer");
+      }}
+    />
+  </aside>
 );
