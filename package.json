@@ -40,6 +40,7 @@
     "@meshtastic/sdk": "workspace:*",
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.0",
+    "@typescript/typescript6": "^6.0.2",
     "husky": "^9.1.0",
     "lint-staged": "^17.0.8",
     "oxfmt": "^0.58.0",
