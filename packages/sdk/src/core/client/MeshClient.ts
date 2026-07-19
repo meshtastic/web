@@ -111,6 +111,8 @@ export class MeshClient {
   });
 
   private _heartbeatIntervalId: ReturnType<typeof setInterval> | undefined;
+  private _fromDeviceAc: AbortController | undefined;
+  private _fromDevicePipe: Promise<void> | undefined;
 
   constructor(options: MeshClientOptions) {
     this.log = options.logger ?? createLogger("MeshClient");
@@ -142,7 +144,12 @@ export class MeshClient {
       }
     });
 
-    this.transport.fromDevice.pipeTo(decodePacket(this));
+    this._fromDeviceAc = new AbortController();
+    this._fromDevicePipe = this.transport.fromDevice.pipeTo(decodePacket(this), {
+      signal: this._fromDeviceAc.signal,
+    });
+    // Swallow abort/cancel rejection so an unhandled rejection does not surface.
+    void this._fromDevicePipe.catch(() => {});
   }
 
   public get myNodeNum(): number {
@@ -349,6 +356,14 @@ export class MeshClient {
     }
     this.complete();
     await this.transport.toDevice.close();
+    if (this._fromDeviceAc) {
+      this._fromDeviceAc.abort();
+      try {
+        await this._fromDevicePipe;
+      } catch {
+        // Expected when the pipe is aborted during disconnect.
+      }
+    }
     await this.transport.disconnect();
     this.updateDeviceStatus(DeviceStatusEnum.DeviceDisconnected);
   }
