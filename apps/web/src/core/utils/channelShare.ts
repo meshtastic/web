@@ -32,6 +32,7 @@ export interface ChannelImportPlan {
 }
 
 export interface ChannelImportEditor {
+  isDirty: { value: boolean };
   setChannel(channel: Protobuf.Channel.Channel): void;
   setRadioSection(
     section: "lora",
@@ -241,6 +242,11 @@ export async function applyChannelImport(
 ): Promise<void> {
   if (!plan.canApply) {
     throw new Error("Channel import plan cannot be applied.");
+  }
+  if (editor.isDirty.value) {
+    throw new Error(
+      "Save or discard pending settings changes before importing channels.",
+    );
   }
 
   for (const assignment of plan.assignments) {

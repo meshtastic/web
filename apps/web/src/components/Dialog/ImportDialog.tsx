@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
-import { useDevice } from "@core/stores";
 import { useToast } from "@core/hooks/useToast.ts";
+import { useDevice } from "@core/stores";
 import {
   applyChannelImport,
   createChannelImportPlan,
@@ -28,7 +28,7 @@ import {
   type ParsedChannelShare,
 } from "@core/utils/channelShare.ts";
 import { Protobuf } from "@meshtastic/sdk";
-import { useChannels, useConfigEditor } from "@meshtastic/sdk-react";
+import { useChannels, useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useMemo, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
@@ -37,10 +37,17 @@ export interface ImportDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const CLEAN_EDITOR_SIGNAL = {
+  value: false,
+  peek: () => false,
+  subscribe: () => () => {},
+} as const;
+
 export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
   const { config } = useDevice();
   const editor = useConfigEditor();
   const channels = useChannels();
+  const editorIsDirty = useSignal(editor?.isDirty ?? CLEAN_EDITOR_SIGNAL);
   const { toast } = useToast();
   const { t } = useTranslation("dialog");
   const [input, setInput] = useState("");
@@ -101,7 +108,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
   };
 
   const apply = async () => {
-    if (!editor || !share || !plan || !plan.canApply) return;
+    if (!editor || !share || !plan || !plan.canApply || editorIsDirty) return;
     setIsApplying(true);
     try {
       await applyChannelImport(editor, share, plan, config.lora);
@@ -159,6 +166,11 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
                     : "import.addDescription",
                 )}
               </p>
+              {editorIsDirty && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {t("import.pendingChanges")}
+                </p>
+              )}
               {share.addOnly && (
                 <p className="text-sm text-text-secondary">
                   {t("import.addOnly")}
@@ -245,7 +257,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
         </div>
         <DialogFooter>
           <Button
-            disabled={!plan?.canApply || isApplying}
+            disabled={!plan?.canApply || isApplying || editorIsDirty}
             name="apply"
             onClick={() => void apply()}
           >

@@ -22,6 +22,7 @@
     "replaceDescription": "Replace changes the selected channel slots and applies LoRa settings when included.",
     "addDescription": "Add uses free secondary slots and preserves the current channels and LoRa settings.",
     "addOnly": "This share can only add channels.",
+    "pendingChanges": "Save or discard pending settings changes before importing channels.",
     "loraWillApply": "LoRa settings from this share will be applied.",
     "loraWillNotApply": "LoRa settings will not be changed.",
     "duplicateNames": "Channel names already exist: {{names}}. Resolve the conflict before adding.",

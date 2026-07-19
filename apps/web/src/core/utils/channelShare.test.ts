@@ -203,6 +203,7 @@ describe("channel import plans", () => {
     const plan = createChannelImportPlan(parsed, existing, "replace");
     const calls: string[] = [];
     const editor = {
+      isDirty: { value: false },
       setChannel: (value: Protobuf.Channel.Channel) => {
         calls.push(`channel:${value.index}:${value.role}`);
       },
@@ -236,6 +237,7 @@ describe("channel import plans", () => {
     const plan = createChannelImportPlan(parsed, existing, "replace");
     const error = new Error("device rejected import");
     const editor = {
+      isDirty: { value: false },
       setChannel: () => {},
       setRadioSection: () => {},
       commit: async () => ({ status: "error" as const, error }),
@@ -244,5 +246,29 @@ describe("channel import plans", () => {
     await expect(
       applyChannelImport(editor, parsed, plan, undefined),
     ).rejects.toThrow(error);
+  });
+
+  it("does not commit an import through an editor with unrelated pending changes", async () => {
+    const parsed = parseChannelShare(
+      encodeChannelShare({ mode: "replace", settings: [settings("New")] }),
+    );
+    const plan = createChannelImportPlan(parsed, existing, "replace");
+    const calls: string[] = [];
+    const editor = {
+      isDirty: { value: true },
+      setChannel: () => calls.push("channel"),
+      setRadioSection: () => calls.push("lora"),
+      commit: async () => {
+        calls.push("commit");
+        return { status: "ok" as const };
+      },
+    };
+
+    await expect(
+      applyChannelImport(editor, parsed, plan, undefined),
+    ).rejects.toThrow(
+      "Save or discard pending settings changes before importing channels.",
+    );
+    expect(calls).toEqual([]);
   });
 });
