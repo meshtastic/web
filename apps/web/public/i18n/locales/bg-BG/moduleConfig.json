@@ -306,7 +306,7 @@
     }
   },
   "paxcounter": {
-    "title": "Paxcounter Settings",
+    "title": "Настройки на Paxcounter",
     "description": "Настройки за модула Paxcounter",
     "enabled": {
       "label": "Модулът е активиран",
@@ -330,7 +330,7 @@
     "description": "Настройки на модула за тестване на обхвата",
     "enabled": {
       "label": "Модулът е активиран",
-      "description": "Enable Range Test"
+      "description": "Активиране на теста на обхвата"
     },
     "sender": {
       "label": "Интервал на съобщенията",
@@ -350,7 +350,7 @@
     },
     "echo": {
       "label": "Echo",
-      "description": "Any packets you send will be echoed back to your device"
+      "description": "Всички пакети, които изпращате, ще бъдат върнати обратно към вашето устройство"
     },
     "rxd": {
       "label": "Receive Pin",

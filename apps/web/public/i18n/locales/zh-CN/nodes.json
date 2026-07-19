@@ -1,34 +1,34 @@
 {
   "nodeDetail": {
     "publicKeyEnabled": {
-      "label": "Public Key Enabled"
+      "label": "公钥已更改"
     },
     "noPublicKey": {
-      "label": "No Public Key"
+      "label": "没有公钥"
     },
     "directMessage": {
-      "label": "Direct Message {{shortName}}"
+      "label": "私信{{shortName}}"
     },
     "favorite": {
       "label": "收藏",
-      "tooltip": "Add or remove this node from your favorites"
+      "tooltip": "从您的收藏夹中添加或删除节点"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "不再收藏夹"
     },
     "error": {
       "label": "错误",
-      "text": "An error occurred while fetching node details. Please try again later."
+      "text": "获取节点详细信息时发生错误。请稍后再试。"
     },
     "status": {
       "heard": "收到",
       "mqtt": "MQTT"
     },
     "elevation": {
-      "label": "Elevation"
+      "label": "高度"
     },
     "channelUtil": {
-      "label": "Channel Util"
+      "label": "频道Util"
     },
     "airtimeUtil": {
       "label": "Airtime Util"
@@ -37,23 +37,23 @@
   "nodesTable": {
     "headings": {
       "longName": "长名称",
-      "connection": "Connection",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
+      "connection": "连接",
+      "lastHeard": "最后收到",
+      "encryption": "加密",
       "model": "模型",
-      "macAddress": "MAC Address"
+      "macAddress": "MAC地址"
     },
     "connectionStatus": {
       "direct": "直频",
-      "away": "away",
-      "viaMqtt": ", via MQTT"
+      "away": "离开",
+      "viaMqtt": ", 通过 MQTT"
     }
   },
   "actions": {
-    "added": "Added",
-    "removed": "Removed",
+    "added": "已添加",
+    "removed": "移除",
     "ignoreNode": "忽略节点",
-    "unignoreNode": "Unignore Node",
-    "requestPosition": "Request Position"
+    "unignoreNode": "取消忽略节点",
+    "requestPosition": "请求位置"
   }
 }
