@@ -4,19 +4,24 @@
     "title": "Clear All Messages"
   },
   "import": {
-    "description": "Import a Channel Set from a Meshtastic URL. <br />Valid Meshtasic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
+    "description": "Import a Channel Set from a Meshtastic URL. <br />Valid Meshtastic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
     "error": {
       "invalidUrl": "Invalid Meshtastic URL"
     },
     "channelPrefix": "Channel ",
     "primary": "Primary ",
-    "doNotImport": "No not import",
     "channelName": "Name",
     "channelSlot": "Slot",
     "channelSetUrl": "Channel Set/QR Code URL",
-    "useLoraConfig": "Import LoRa Config",
-    "presetDescription": "The current LoRa Config will be replaced.",
-    "title": "Import Channels"
+    "title": "Import Channels",
+    "mode": "Channel import mode",
+    "replaceDescription": "Replace changes the selected channel slots and applies LoRa settings when included.",
+    "addDescription": "Add uses free secondary slots and preserves the current channels and LoRa settings.",
+    "addOnly": "This share can only add channels.",
+    "loraWillApply": "LoRa settings from this share will be applied.",
+    "loraWillNotApply": "LoRa settings will not be changed.",
+    "duplicateNames": "Channel names already exist: {{names}}. Resolve the conflict before adding.",
+    "capacity": "Not enough free secondary channel slots: {{available}} available for {{needed}} channels."
   },
   "locationResponse": {
     "title": "Location: {{identifier}}",
@@ -160,9 +165,13 @@
   "qr": {
     "addChannels": "Add Channels",
     "replaceChannels": "Replace Channels",
-    "description": "The current LoRa configuration will also be shared.",
     "sharableUrl": "Sharable URL",
-    "title": "Generate QR Code"
+    "title": "Generate QR Code",
+    "mode": "Channel share mode",
+    "replaceDescription": "Replace shares the selected channels and LoRa settings.",
+    "addDescription": "Add shares selected channels only and preserves the receiver's existing channels and LoRa settings.",
+    "share": "Share",
+    "shareText": "Meshtastic channel share"
   },
   "reboot": {
     "title": "Reboot device",
