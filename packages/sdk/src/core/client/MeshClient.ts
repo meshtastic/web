@@ -148,8 +148,16 @@ export class MeshClient {
     this._fromDevicePipe = this.transport.fromDevice.pipeTo(decodePacket(this), {
       signal: this._fromDeviceAc.signal,
     });
-    // Swallow abort/cancel rejection so an unhandled rejection does not surface.
-    void this._fromDevicePipe.catch(() => {});
+    // Swallow abort/cancel rejection so an unhandled rejection does not
+    // surface, but log unexpected transport/stream failures.
+    void this._fromDevicePipe.catch((err) => {
+      if (err instanceof Error && err.name !== "AbortError") {
+        this.log.error(
+          Emitter[Emitter.ConnectionStatus],
+          `Device decoding pipe failed: ${err.message}`,
+        );
+      }
+    });
   }
 
   public get myNodeNum(): number {
@@ -355,15 +363,28 @@ export class MeshClient {
       clearInterval(this._heartbeatIntervalId);
     }
     this.complete();
-    await this.transport.toDevice.close();
-    if (this._fromDeviceAc) {
-      this._fromDeviceAc.abort();
+
+    // Signal the inbound pipe abort before blocking on IO so teardown still
+    // completes when the transport is already gone (e.g. unplugged serial).
+    this._fromDeviceAc?.abort();
+
+    try {
+      await this.transport.toDevice.close();
+    } catch {
+      this.log.debug(
+        Emitter[Emitter.Disconnect],
+        "Writable stream already closed or errored",
+      );
+    }
+
+    if (this._fromDevicePipe) {
       try {
         await this._fromDevicePipe;
       } catch {
         // Expected when the pipe is aborted during disconnect.
       }
     }
+
     await this.transport.disconnect();
     this.updateDeviceStatus(DeviceStatusEnum.DeviceDisconnected);
   }
