@@ -151,10 +151,12 @@ export class MeshClient {
     // Swallow abort/cancel rejection so an unhandled rejection does not
     // surface, but log unexpected transport/stream failures.
     void this._fromDevicePipe.catch((err) => {
-      if (err instanceof Error && err.name !== "AbortError") {
+      // Abort rejections may be DOMException, so do not require instanceof Error.
+      if ((err as { name?: string } | null)?.name !== "AbortError") {
+        const message = err instanceof Error ? err.message : String(err);
         this.log.error(
           Emitter[Emitter.ConnectionStatus],
-          `Device decoding pipe failed: ${err.message}`,
+          `Device decoding pipe failed: ${message}`,
         );
       }
     });
@@ -370,10 +372,10 @@ export class MeshClient {
 
     try {
       await this.transport.toDevice.close();
-    } catch {
+    } catch (err) {
       this.log.debug(
         Emitter[Emitter.Disconnect],
-        "Writable stream already closed or errored",
+        `Writable stream already closed or errored: ${err instanceof Error ? err.message : String(err)}`,
       );
     }
 
