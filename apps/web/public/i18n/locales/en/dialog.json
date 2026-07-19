@@ -6,7 +6,11 @@
   "import": {
     "description": "Import a Channel Set from a Meshtastic URL. <br />Valid Meshtastic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
     "error": {
-      "invalidUrl": "Invalid Meshtastic URL"
+      "invalidUrl": "Invalid Meshtastic URL",
+      "applyFailed": {
+        "title": "Channel import failed",
+        "description": "The device did not accept the channel changes. Please try again."
+      }
     },
     "channelPrefix": "Channel ",
     "primary": "Primary ",

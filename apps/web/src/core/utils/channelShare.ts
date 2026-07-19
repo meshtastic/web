@@ -24,10 +24,20 @@ export interface ChannelImportPlan {
   addOnly: boolean;
   applyLora: boolean;
   assignments: ChannelImportAssignment[];
+  disabledIndexes: number[];
   availableSlots: number[];
   duplicateNames: string[];
   capacityShortfall: number;
   canApply: boolean;
+}
+
+export interface ChannelImportEditor {
+  setChannel(channel: Protobuf.Channel.Channel): void;
+  setRadioSection(
+    section: "lora",
+    config: Protobuf.Config.Config_LoRaConfig,
+  ): void;
+  commit(): Promise<{ status: "ok" } | { status: "error"; error: Error }>;
 }
 
 export function encodeChannelShare({
@@ -67,6 +77,7 @@ export function parseChannelShare(input: string): ParsedChannelShare {
     url.protocol !== "https:" ||
     url.hostname !== CHANNEL_SHARE_HOST ||
     url.pathname !== CHANNEL_SHARE_PATH ||
+    url.port !== "" ||
     url.username ||
     url.password ||
     !url.hash
@@ -153,6 +164,13 @@ export function createChannelImportPlan(
       addOnly: false,
       applyLora: share.channelSet.loraConfig !== undefined,
       assignments,
+      disabledIndexes: Array.from(
+        { length: MAX_CHANNELS - 1 },
+        (_, index) => index + 1,
+      ).filter(
+        (index) =>
+          !assignments.some((assignment) => assignment.targetIndex === index),
+      ),
       availableSlots,
       duplicateNames: [],
       capacityShortfall: 0,
@@ -202,6 +220,7 @@ export function createChannelImportPlan(
     addOnly: true,
     applyLora: false,
     assignments,
+    disabledIndexes: [],
     availableSlots,
     duplicateNames: [...duplicateNames],
     capacityShortfall,
@@ -212,6 +231,51 @@ export function createChannelImportPlan(
       !hasDuplicateTargets &&
       assignments.every((assignment) => assignment.targetIndex >= 0),
   };
+}
+
+export async function applyChannelImport(
+  editor: ChannelImportEditor,
+  share: ParsedChannelShare,
+  plan: ChannelImportPlan,
+  currentLora: Protobuf.Config.Config_LoRaConfig | undefined,
+): Promise<void> {
+  if (!plan.canApply) {
+    throw new Error("Channel import plan cannot be applied.");
+  }
+
+  for (const assignment of plan.assignments) {
+    const settings = share.channelSet.settings[assignment.incomingIndex];
+    if (!settings || assignment.targetIndex < 0) continue;
+    editor.setChannel(
+      create(Protobuf.Channel.ChannelSchema, {
+        index: assignment.targetIndex,
+        role:
+          assignment.targetIndex === 0
+            ? Protobuf.Channel.Channel_Role.PRIMARY
+            : Protobuf.Channel.Channel_Role.SECONDARY,
+        settings,
+      }),
+    );
+  }
+
+  for (const index of plan.disabledIndexes) {
+    editor.setChannel(
+      create(Protobuf.Channel.ChannelSchema, {
+        index,
+        role: Protobuf.Channel.Channel_Role.DISABLED,
+      }),
+    );
+  }
+
+  if (plan.applyLora && share.channelSet.loraConfig) {
+    editor.setRadioSection("lora", {
+      ...currentLora,
+      ...share.channelSet.loraConfig,
+    } as Protobuf.Config.Config_LoRaConfig);
+  }
+
+  const result = await editor.commit();
+  if (result.status === "error") throw result.error;
 }
 
 function parseShareMode(search: URLSearchParams): ChannelShareMode {

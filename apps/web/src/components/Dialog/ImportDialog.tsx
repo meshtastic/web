@@ -19,7 +19,9 @@ import {
   SelectValue,
 } from "@components/UI/Select.tsx";
 import { useDevice } from "@core/stores";
+import { useToast } from "@core/hooks/useToast.ts";
 import {
+  applyChannelImport,
   createChannelImportPlan,
   parseChannelShare,
   type ChannelShareMode,
@@ -39,11 +41,13 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
   const { config } = useDevice();
   const editor = useConfigEditor();
   const channels = useChannels();
+  const { toast } = useToast();
   const { t } = useTranslation("dialog");
   const [input, setInput] = useState("");
   const [share, setShare] = useState<ParsedChannelShare>();
   const [mode, setMode] = useState<ChannelShareMode>("replace");
   const [selectedSlots, setSelectedSlots] = useState<number[]>();
+  const [isApplying, setIsApplying] = useState(false);
 
   const existingChannels = useMemo(
     () =>
@@ -96,30 +100,24 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
     setSelectedSlots(nextSlots);
   };
 
-  const apply = () => {
+  const apply = async () => {
     if (!editor || !share || !plan || !plan.canApply) return;
-    for (const assignment of plan.assignments) {
-      const settings = share.channelSet.settings[assignment.incomingIndex];
-      if (!settings || assignment.targetIndex < 0) continue;
-      editor.setChannel(
-        create(Protobuf.Channel.ChannelSchema, {
-          index: assignment.targetIndex,
-          role:
-            assignment.targetIndex === 0
-              ? Protobuf.Channel.Channel_Role.PRIMARY
-              : Protobuf.Channel.Channel_Role.SECONDARY,
-          settings,
-        }),
-      );
+    setIsApplying(true);
+    try {
+      await applyChannelImport(editor, share, plan, config.lora);
+      parse("");
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: t("import.error.applyFailed.title"),
+        description:
+          error instanceof Error
+            ? error.message
+            : t("import.error.applyFailed.description"),
+      });
+    } finally {
+      setIsApplying(false);
     }
-    if (plan.applyLora && share.channelSet.loraConfig) {
-      editor.setRadioSection("lora", {
-        ...config.lora,
-        ...share.channelSet.loraConfig,
-      } as Protobuf.Config.Config_LoRaConfig);
-    }
-    parse("");
-    onOpenChange(false);
   };
 
   const slotOptions =
@@ -246,7 +244,11 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
           )}
         </div>
         <DialogFooter>
-          <Button disabled={!plan?.canApply} name="apply" onClick={apply}>
+          <Button
+            disabled={!plan?.canApply || isApplying}
+            name="apply"
+            onClick={() => void apply()}
+          >
             {t("button.apply")}
           </Button>
         </DialogFooter>
