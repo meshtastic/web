@@ -495,7 +495,7 @@
         },
         "balanced": {
           "label": "Balanced — Prefer authenticated",
-          "description": "Recommended. Reject unsigned, signable broadcasts from nodes known to sign while keeping legacy unsigned remote traffic."
+          "description": "Reject unsigned, signable broadcasts from nodes known to sign while keeping legacy unsigned remote traffic."
         },
         "strict": {
           "label": "Strict — Require authenticated",

@@ -24,6 +24,12 @@ const rawSecurity = (
   }) satisfies RawSecurity;
 
 describe("Security packet authenticity persistence", () => {
+  it("maps an absent firmware policy to Compatible", () => {
+    const form = toFormShape({} as Protobuf.Config.Config_SecurityConfig);
+
+    expect(form.packetSignaturePolicy).toBe(Policy.COMPATIBLE);
+  });
+
   it.each([Policy.COMPATIBLE, Policy.BALANCED, Policy.STRICT])(
     "preserves policy %s when mapping firmware config into the form",
     (packetSignaturePolicy) => {

@@ -122,10 +122,10 @@ describe("ParsedSecuritySchema", () => {
 });
 
 describe("packet signature policy protobuf", () => {
-  it("defaults an absent policy to Balanced", () => {
+  it("defaults an absent policy to Compatible", () => {
     const security = create(Protobuf.Config.Config_SecurityConfigSchema);
 
-    expect(security.packetSignaturePolicy).toBe(Policy.BALANCED);
+    expect(security.packetSignaturePolicy).toBe(Policy.COMPATIBLE);
   });
 
   it.each([Policy.COMPATIBLE, Policy.BALANCED, Policy.STRICT])(

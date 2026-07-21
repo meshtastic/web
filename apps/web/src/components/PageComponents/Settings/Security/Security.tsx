@@ -52,7 +52,7 @@ export const toFormShape = (
     fromByteArray(cfg?.adminKey?.at(2) ?? new Uint8Array(0)),
   ],
   packetSignaturePolicy:
-    cfg?.packetSignaturePolicy ?? PacketSignaturePolicy.BALANCED,
+    cfg?.packetSignaturePolicy ?? PacketSignaturePolicy.COMPATIBLE,
 });
 
 export const toSecurityPayload = (data: RawSecurity): ParsedSecurity => ({

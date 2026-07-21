@@ -13,7 +13,7 @@ const Policy = Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy;
 
 const Harness = ({ supported }: { supported: boolean }) => {
   const { control } = useForm<RawSecurity>({
-    defaultValues: { packetSignaturePolicy: Policy.BALANCED },
+    defaultValues: { packetSignaturePolicy: Policy.COMPATIBLE },
   });
 
   return (
@@ -60,12 +60,12 @@ describe("PacketAuthenticityPolicyField", () => {
     ]);
   });
 
-  it("shows Balanced downgrade-protection copy by default", () => {
+  it("shows Compatible compatibility copy by default", () => {
     render(<Harness supported />);
 
     expect(
       screen.getByText(
-        /unsigned, signable broadcasts from nodes known to sign/i,
+        /accept unsigned remote packets for maximum compatibility/i,
       ),
     ).toBeInTheDocument();
   });

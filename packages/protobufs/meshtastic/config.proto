@@ -1291,15 +1291,16 @@ message Config {
      */
     enum PacketSignaturePolicy {
       /*
-       * Prefer authenticated packets while retaining compatibility with unsigned packets from nodes not known to sign.
-       * This is the default and rejects unsigned, signable broadcasts from nodes that have previously signed.
+       * Accept unsigned packets for maximum compatibility while still rejecting malformed or invalid signatures.
+       * This is the default to avoid legacy nodes dropping signed packets during rebroadcast.
        */
-      PACKET_SIGNATURE_POLICY_BALANCED = 0;
+      PACKET_SIGNATURE_POLICY_COMPATIBLE = 0;
 
       /*
-       * Accept unsigned packets for maximum compatibility while still rejecting malformed or invalid signatures.
+       * Prefer authenticated packets while retaining compatibility with unsigned packets from nodes not known to sign.
+       * Rejects unsigned, signable broadcasts from nodes that have previously signed.
        */
-      PACKET_SIGNATURE_POLICY_COMPATIBLE = 1;
+      PACKET_SIGNATURE_POLICY_BALANCED = 1;
 
       /*
        * Accept only packets authenticated by a verified XEdDSA signature or successful PKI decryption.
