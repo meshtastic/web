@@ -86,14 +86,15 @@ export class ChatStore {
   }
 
   deleteMessage(id: number): boolean {
-    for (const [, bucket] of this.buckets) {
+    let deleted = false;
+    for (const bucket of this.buckets.values()) {
       const next = bucket.value.filter((message) => message.id !== id);
       if (next.length !== bucket.value.length) {
         bucket.value = next;
-        return true;
+        deleted = true;
       }
     }
-    return false;
+    return deleted;
   }
 
   updateState(
