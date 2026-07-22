@@ -6,7 +6,8 @@ import path from "node:path";
  * that talks to the non-browser node over the TCP phone API. It sends text,
  * blocks until a specific text is received, or reports the node's number.
  */
-const PYTHON = process.env.E2E_PEER_PYTHON ?? path.resolve("e2e/peer/.venv/bin/python");
+const PYTHON =
+  process.env.E2E_PEER_PYTHON ?? path.resolve("e2e/peer/.venv/bin/python");
 const SCRIPT = path.resolve("e2e/peer/peer.py");
 const HOST = process.env.E2E_PEER_HOST ?? "127.0.0.1";
 const PORT = process.env.E2E_PEER_PORT ?? "14404";
@@ -16,7 +17,10 @@ function spawnPeer(args: string[]): ChildProcess {
 }
 
 /** Invoke `onLine` for each complete stdout line. */
-function onStdoutLines(child: ChildProcess, onLine: (line: string) => void): void {
+function onStdoutLines(
+  child: ChildProcess,
+  onLine: (line: string) => void,
+): void {
   let buf = "";
   child.stdout?.on("data", (chunk: Buffer) => {
     buf += chunk.toString();
@@ -44,7 +48,9 @@ export function peerSend(
   });
   return new Promise<void>((resolve, reject) => {
     child.on("exit", (code) =>
-      code === 0 ? resolve() : reject(new Error(`peer send exited ${code}: ${stderr.trim()}`)),
+      code === 0
+        ? resolve()
+        : reject(new Error(`peer send exited ${code}: ${stderr.trim()}`)),
     );
     child.on("error", reject);
   });
