@@ -93,10 +93,12 @@ export type {
 export {
   conversationKeyString,
   EmptyMessageError,
+  getMessageStatePrecedence,
   InMemoryDraftRepository,
   InMemoryMessageRepository,
   MessageState,
   MessageTooLongError,
+  shouldApplyMessageStateUpdate,
 } from "./src/features/chat/index.ts";
 
 export { NodesClient } from "./src/features/nodes/index.ts";

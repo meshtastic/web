@@ -16,6 +16,7 @@ export const MessageMapper = {
       type: packet.type,
       text: packet.data,
       state,
+      routingError: undefined,
     };
   },
 };

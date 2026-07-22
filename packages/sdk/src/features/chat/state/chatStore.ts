@@ -1,9 +1,13 @@
+import type * as Protobuf from "@meshtastic/protobufs";
 import { type Signal, signal } from "@preact/signals-core";
 import type { ReadonlySignal } from "../../../core/signals/createStore.ts";
 import { toReadonly } from "../../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../../core/types.ts";
 import type { Message } from "../domain/Message.ts";
-import { MessageState } from "../domain/MessageState.ts";
+import {
+  MessageState,
+  shouldApplyMessageStateUpdate,
+} from "../domain/MessageState.ts";
 
 /**
  * Messages grouped by conversation bucket. Direct messages are keyed by
@@ -73,18 +77,50 @@ export class ChatStore {
     }
   }
 
-  updateState(id: number, state: MessageState): void {
+  findMessage(id: number): Message | undefined {
+    for (const bucket of this.buckets.values()) {
+      const found = bucket.value.find((m) => m.id === id);
+      if (found) return found;
+    }
+    return undefined;
+  }
+
+  deleteMessage(id: number): boolean {
+    let deleted = false;
+    for (const bucket of this.buckets.values()) {
+      const next = bucket.value.filter((message) => message.id !== id);
+      if (next.length !== bucket.value.length) {
+        bucket.value = next;
+        deleted = true;
+      }
+    }
+    return deleted;
+  }
+
+  updateState(
+    id: number,
+    state: MessageState,
+    routingError?: Protobuf.Mesh.Routing_Error,
+  ): boolean {
     for (const [, bucket] of this.buckets) {
       const idx = bucket.value.findIndex((m) => m.id === id);
       if (idx !== -1) {
         const next = bucket.value.slice();
         const existing = next[idx];
         if (!existing) continue;
-        next[idx] = { ...existing, state };
+        if (!shouldApplyMessageStateUpdate(existing.state, state)) return false;
+        if (
+          existing.state === state &&
+          existing.routingError === routingError
+        ) {
+          return false;
+        }
+        next[idx] = { ...existing, state, routingError };
         bucket.value = next;
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   private writeBucket(key: string): Signal<Message[]> {

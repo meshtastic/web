@@ -19,21 +19,83 @@
     "replyLabel": "回覆"
   },
   "deliveryStatus": {
-    "delivered": {
-      "label": "訊息已送達",
-      "displayText": "訊息已送達"
+    "retry": "重試",
+    "retryAriaLabel": "重試訊息：{{status}}",
+    "deliveredToMesh": {
+      "displayText": "已傳遞至 mesh 網路",
+      "detailText": "至少一個節點已收到此頻道訊息。"
     },
-    "failed": {
-      "label": "訊息傳送失敗",
-      "displayText": "傳送失敗"
+    "deliveredToRecipient": {
+      "displayText": "已傳遞給收件者",
+      "detailText": "收件者已確認此直接訊息。"
+    },
+    "encryptedSendFailed": {
+      "displayText": "無法傳送加密訊息",
+      "detailText": "無線電無法為此訊息建立加密路徑。請等待節點資訊同步後再試一次。"
+    },
+    "adminKeyNotAuthorized": {
+      "displayText": "管理員金鑰未授權",
+      "detailText": "目的端未授權此管理員公開金鑰。"
+    },
+    "adminSessionExpired": {
+      "displayText": "管理員工作階段已過期",
+      "detailText": "管理員工作階段金鑰遺失、無效或已過期。請開始新的管理員工作階段後再試一次。"
+    },
+    "dutyCycleLimit": {
+      "displayText": "工作週期限制",
+      "detailText": "無線電暫時受到區域空中時間限制阻擋。請稍後再試。"
+    },
+    "failedToMesh": {
+      "displayText": "無法傳遞至 mesh 網路",
+      "detailText": "沒有節點確認此訊息。請在訊號較好或 mesh 覆蓋較佳時再試一次。"
+    },
+    "invalidRequest": {
+      "displayText": "無效的請求",
+      "detailText": "接收端應用程式拒絕了請求。請檢查訊息或指令後再試一次。"
+    },
+    "messageTooLarge": {
+      "displayText": "訊息太大，無法傳送",
+      "detailText": "請縮短訊息後重新傳送。"
+    },
+    "noAppResponse": {
+      "displayText": "沒有應用程式回應",
+      "detailText": "目的端已收到請求，但沒有應用程式或模組回應。"
+    },
+    "noChannel": {
+      "displayText": "頻道/金鑰不相符",
+      "detailText": "此訊息無法使用相符的頻道/金鑰進行編碼或解碼。請檢查頻道和金鑰後再試一次。"
+    },
+    "noRadioInterface": {
+      "displayText": "沒有無線電介面",
+      "detailText": "無線電沒有可用於此次傳送的介面。"
+    },
+    "notAuthorized": {
+      "displayText": "未授權",
+      "detailText": "目的端拒絕了此請求的權限。"
+    },
+    "rateLimited": {
+      "displayText": "已達速率限制",
+      "detailText": "訊息傳送得太快。請稍候再試。"
+    },
+    "recipientKeyUnavailable": {
+      "displayText": "收件者金鑰無法使用",
+      "detailText": "你的節點尚未取得收件者的公開金鑰。請等待節點資訊同步後再試一次。"
+    },
+    "recipientNeedsYourKey": {
+      "displayText": "收件者需要你的金鑰",
+      "detailText": "收件者尚不知道你的公開金鑰。你的節點可能會自動分享其資訊；同步後請再試一次。"
+    },
+    "relayed": {
+      "displayText": "已中繼，收件者未確認",
+      "detailText": "某個節點已中繼此訊息，但收件者尚未確認。"
+    },
+    "sending": {
+      "displayText": "傳送中...",
+      "detailText": "無線電仍在嘗試傳送此訊息。"
     },
     "unknown": {
-      "label": "訊息狀態未知",
-      "displayText": "不明狀態"
-    },
-    "waiting": {
-      "label": "訊息傳送中",
-      "displayText": "等待送達"
+      "displayText": "訊息狀態未知",
+      "detailText": "訊息狀態無法使用。"
     }
   }
 }

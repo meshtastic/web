@@ -65,4 +65,90 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
       )`,
     ],
   },
+  {
+    version: 3,
+    sql: [`ALTER TABLE messages ADD COLUMN routing_error INTEGER`],
+  },
+  {
+    version: 4,
+    sql: [
+      `DELETE FROM messages
+        WHERE rowid NOT IN (
+          SELECT rowid FROM (
+            SELECT
+              rowid,
+              row_number() OVER (
+                PARTITION BY device_id, id
+                ORDER BY
+                  CASE state
+                    WHEN 'ack' THEN 4
+                    WHEN 'failed' THEN 3
+                    WHEN 'relayed' THEN 2
+                    ELSE 1
+                  END DESC,
+                  CASE WHEN routing_error IS NULL THEN 0 ELSE 1 END DESC,
+                  rx_time DESC,
+                  rowid DESC
+              ) AS rn
+            FROM messages
+          )
+          WHERE rn = 1
+        )`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_messages_device_id_id_unique ON messages(device_id, id)`,
+    ],
+  },
+  {
+    version: 5,
+    sql: [
+      `WITH direct_buckets AS (
+        SELECT
+          device_id,
+          conversation_key,
+          from_node,
+          MIN(to_node) AS peer_node,
+          COUNT(*) AS message_count,
+          COUNT(DISTINCT to_node) AS recipient_count,
+          SUM(CASE
+            WHEN state <> 'ack' OR routing_error IS NOT NULL THEN 1
+            ELSE 0
+          END) AS actionable_count
+        FROM messages
+        WHERE type = 'direct'
+          AND conversation_key = 'direct:' || from_node
+          AND from_node <> to_node
+        GROUP BY device_id, conversation_key, from_node
+      ),
+      inferred_local_nodes AS (
+        SELECT DISTINCT
+          device_id,
+          from_node
+        FROM direct_buckets
+        WHERE recipient_count > 1
+          OR actionable_count > 0
+      ),
+      legacy_outbound_buckets AS (
+        SELECT direct_buckets.device_id,
+               direct_buckets.conversation_key,
+               direct_buckets.from_node
+        FROM direct_buckets
+        WHERE EXISTS (
+          SELECT 1
+          FROM inferred_local_nodes local
+          WHERE local.device_id = direct_buckets.device_id
+            AND local.from_node = direct_buckets.from_node
+        )
+      )
+      UPDATE messages
+      SET conversation_key = 'direct:' || to_node
+      WHERE type = 'direct'
+        AND from_node <> to_node
+        AND EXISTS (
+          SELECT 1
+          FROM legacy_outbound_buckets legacy
+          WHERE legacy.device_id = messages.device_id
+            AND legacy.conversation_key = messages.conversation_key
+            AND legacy.from_node = messages.from_node
+        )`,
+    ],
+  },
 ];

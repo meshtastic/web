@@ -1,10 +1,15 @@
+import type * as Protobuf from "@meshtastic/protobufs";
 import type {
   ConversationKey,
   Message,
   MessageRepository,
   RetentionPolicy,
 } from "@meshtastic/sdk";
-import { conversationKeyString, MessageState } from "@meshtastic/sdk";
+import {
+  conversationKeyString,
+  getMessageStatePrecedence,
+  MessageState,
+} from "@meshtastic/sdk";
 import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { type MultiTabCoordinator } from "../coordination/MultiTabCoordinator.ts";
 import type { SqlocalDb } from "../db.ts";
@@ -13,6 +18,8 @@ import { messages } from "../schema/chat.ts";
 export interface SqlocalMessageRepositoryOptions {
   /** Identifies the device (matches MeshRegistry ConnectionId). */
   deviceId: number;
+  /** Local node number, used when appending direct messages without a key. */
+  localNodeNum?: number | (() => number | undefined);
   /** Optional cross-tab coordinator. If omitted, mutations are silent. */
   coordinator?: MultiTabCoordinator;
 }
@@ -20,11 +27,13 @@ export interface SqlocalMessageRepositoryOptions {
 export class SqlocalMessageRepository implements MessageRepository {
   private readonly db: SqlocalDb;
   private readonly deviceId: number;
+  private readonly localNodeNum: SqlocalMessageRepositoryOptions["localNodeNum"];
   private readonly coordinator: MultiTabCoordinator | undefined;
 
   constructor(db: SqlocalDb, options: SqlocalMessageRepositoryOptions) {
     this.db = db;
     this.deviceId = options.deviceId;
+    this.localNodeNum = options.localNodeNum;
     this.coordinator = options.coordinator;
   }
 
@@ -52,21 +61,43 @@ export class SqlocalMessageRepository implements MessageRepository {
     return rows.reverse().map(rowToMessage);
   }
 
-  async append(message: Message): Promise<void> {
-    await this.appendBatch([message]);
+  async append(message: Message, key?: ConversationKey): Promise<void> {
+    const conversation = key ?? this.inferConversationKey(message);
+    await this.insertEntries([{ message, conversation }]);
   }
 
   async appendBatch(input: ReadonlyArray<Message>): Promise<void> {
     if (input.length === 0) return;
-    const rows = input.map((m) => messageToRow(this.deviceId, m));
-    await this.db.insert(messages).values(rows).onConflictDoNothing();
-    this.notify(input);
+    await this.insertEntries(
+      input.map((message) => ({
+        message,
+        conversation: this.inferConversationKey(message),
+      })),
+    );
   }
 
-  async updateState(id: number, state: MessageState): Promise<void> {
+  async updateState(
+    id: number,
+    state: MessageState,
+    routingError?: Protobuf.Mesh.Routing_Error,
+  ): Promise<void> {
     await this.db
       .update(messages)
-      .set({ state })
+      .set({ state, routingError: routingError ?? null })
+      .where(
+        and(
+          eq(messages.deviceId, this.deviceId),
+          eq(messages.id, id),
+          sql`${storedMessageStatePrecedence()} <= ${getMessageStatePrecedence(
+            state,
+          )}`,
+        )!,
+      );
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.db
+      .delete(messages)
       .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
   }
 
@@ -119,15 +150,53 @@ export class SqlocalMessageRepository implements MessageRepository {
     )!;
   }
 
-  private notify(input: ReadonlyArray<Message>): void {
+  private async insertEntries(
+    entries: ReadonlyArray<{
+      message: Message;
+      conversation: ConversationKey;
+    }>,
+  ): Promise<void> {
+    if (entries.length === 0) return;
+    const rows = entries.map(({ message, conversation }) =>
+      messageToRow(this.deviceId, message, conversation),
+    );
+    await this.db
+      .insert(messages)
+      .values(rows)
+      .onConflictDoNothing({ target: [messages.deviceId, messages.id] });
+    this.notify(entries);
+  }
+
+  private inferConversationKey(message: Message): ConversationKey {
+    if (message.type !== "direct") {
+      return { kind: "channel", channel: message.channel };
+    }
+
+    const localNodeNum = this.resolveLocalNodeNum();
+    return {
+      kind: "direct",
+      peer:
+        localNodeNum !== undefined && message.from === localNodeNum
+          ? message.to
+          : message.from,
+    };
+  }
+
+  private resolveLocalNodeNum(): number | undefined {
+    return typeof this.localNodeNum === "function"
+      ? this.localNodeNum()
+      : this.localNodeNum;
+  }
+
+  private notify(
+    entries: ReadonlyArray<{
+      conversation: ConversationKey;
+    }>,
+  ): void {
     if (!this.coordinator) return;
     const seen = new Set<string>();
-    for (const m of input) {
-      const conv: ConversationKey =
-        m.type === "direct"
-          ? { kind: "direct", peer: m.from }
-          : { kind: "channel", channel: m.channel };
-      const key = conversationKeyString(conv);
+    for (const entry of entries) {
+      const key = conversationKeyString(entry.conversation);
       if (seen.has(key)) continue;
       seen.add(key);
       this.coordinator.broadcast({
@@ -149,7 +218,8 @@ interface MessageRow {
   rxTime: number;
   type: "broadcast" | "direct";
   text: string;
-  state: "pending" | "ack" | "failed";
+  state: "pending" | "ack" | "relayed" | "failed";
+  routingError: number | null;
 }
 
 function rowToMessage(row: MessageRow): Message {
@@ -162,14 +232,15 @@ function rowToMessage(row: MessageRow): Message {
     type: row.type,
     text: row.text,
     state: row.state as MessageState,
+    routingError: row.routingError ?? undefined,
   };
 }
 
-function messageToRow(deviceId: number, message: Message): MessageRow {
-  const conv: ConversationKey =
-    message.type === "direct"
-      ? { kind: "direct", peer: message.from }
-      : { kind: "channel", channel: message.channel };
+function messageToRow(
+  deviceId: number,
+  message: Message,
+  conv: ConversationKey,
+): MessageRow {
   return {
     id: message.id,
     deviceId,
@@ -181,5 +252,19 @@ function messageToRow(deviceId: number, message: Message): MessageRow {
     type: message.type,
     text: message.text,
     state: message.state,
+    routingError: message.routingError ?? null,
   };
+}
+
+function storedMessageStatePrecedence() {
+  return sql<number>`CASE ${messages.state}
+    WHEN ${MessageState.Ack} THEN ${getMessageStatePrecedence(MessageState.Ack)}
+    WHEN ${MessageState.Relayed} THEN ${getMessageStatePrecedence(
+      MessageState.Relayed,
+    )}
+    WHEN ${MessageState.Failed} THEN ${getMessageStatePrecedence(
+      MessageState.Failed,
+    )}
+    ELSE ${getMessageStatePrecedence(MessageState.Pending)}
+  END`;
 }

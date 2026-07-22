@@ -1,5 +1,7 @@
+import * as Protobuf from "@meshtastic/protobufs";
 import { signal } from "@preact/signals-core";
 import type { ResultType } from "better-result";
+import { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
 import { generatePacketId } from "../../core/identifiers/PacketId.ts";
@@ -22,6 +24,7 @@ import { InMemoryMessageRepository } from "./infrastructure/repositories/InMemor
 import {
   type SendTextError,
   type SendTextInput,
+  MessageTooLongError,
   sendText,
 } from "./application/SendTextUseCase.ts";
 import { ChatStore } from "./state/chatStore.ts";
@@ -77,6 +80,8 @@ export class ChatClient {
   private readonly initialLoadLimit: number;
   private readonly hydrated = new Set<string>();
   private readonly draftsHydrated = new Set<string>();
+  private readonly pendingMessagePersistence = new Map<number, Promise<void>>();
+  private readonly pendingStatePersistence = new Map<number, Promise<void>>();
   private readonly unreadByKey = signal<ReadonlyMap<string, number>>(new Map());
 
   public readonly drafts: ChatDrafts;
@@ -86,7 +91,11 @@ export class ChatClient {
     this.client = client;
     this.store = new ChatStore();
     this.draftStore = new DraftStore();
-    this.repository = options.repository ?? new InMemoryMessageRepository();
+    this.repository =
+      options.repository ??
+      new InMemoryMessageRepository({
+        localNodeNum: () => this.client.myNodeNum,
+      });
     this.draftRepository =
       options.draftRepository ?? new InMemoryDraftRepository();
     this.retention = options.retention;
@@ -121,7 +130,7 @@ export class ChatClient {
       if (this.store.hasMessage(key, message.id)) return;
 
       this.store.append(key, message);
-      void this.persistAppend(message);
+      void this.persistAppend(message, conv);
 
       // Increment unread count when the message is inbound (not from us). The
       // outbound echo of our own send doesn't count as unread.
@@ -132,12 +141,20 @@ export class ChatClient {
 
     client.events.onRoutingPacket.subscribe((packet) => {
       if (packet.data.variant.case === "errorReason") {
+        const messageId = packet.requestId ?? packet.id;
+        const reason = packet.data.variant.value;
+        const existing = this.store.findMessage(messageId);
         const state =
-          packet.data.variant.value === 0
-            ? MessageState.Ack
+          reason === Protobuf.Mesh.Routing_Error.NONE
+            ? existing?.type === "direct" && packet.from !== existing.to
+              ? MessageState.Relayed
+              : MessageState.Ack
             : MessageState.Failed;
-        this.store.updateState(packet.id, state);
-        void this.repository.updateState(packet.id, state).catch(() => {});
+        const routingError =
+          reason === Protobuf.Mesh.Routing_Error.NONE ? undefined : reason;
+        if (this.store.updateState(messageId, state, routingError)) {
+          void this.persistStateUpdate(messageId, state, routingError);
+        }
       }
     });
   }
@@ -229,7 +246,7 @@ export class ChatClient {
     };
     if (!this.store.hasMessage(key, packetId)) {
       this.store.append(key, message);
-      void this.persistAppend(message);
+      void this.persistAppend(message, conv);
     }
     this.draftStore.clear(conv);
     void this.draftRepository.clear(conv).catch(() => {});
@@ -239,12 +256,52 @@ export class ChatClient {
       // Send pipeline failed (transport closed, validation, etc.). Keep
       // the optimistic message visible but mark it Failed so the user
       // sees the error state next to their bubble.
-      this.store.updateState(packetId, MessageState.Failed);
-      void this.repository
-        .updateState(packetId, MessageState.Failed)
-        .catch(() => {});
+      const existing = this.store.findMessage(packetId);
+      const routingError =
+        result.error instanceof MessageTooLongError
+          ? Protobuf.Mesh.Routing_Error.TOO_LARGE
+          : existing?.routingError;
+      if (this.store.updateState(packetId, MessageState.Failed, routingError)) {
+        void this.persistStateUpdate(
+          packetId,
+          MessageState.Failed,
+          routingError,
+        );
+      }
     }
     return result;
+  }
+
+  /**
+   * Removes an existing message and sends its contents again with a fresh
+   * packet id. This matches the retry behavior of the other clients and keeps
+   * a stale failed message from remaining beside the new attempt.
+   */
+  public async retry(
+    messageId: number,
+  ): Promise<ResultType<number, SendTextError>> {
+    const message = this.store.findMessage(messageId);
+    if (!message) {
+      return Result.err(new Error(`Message ${messageId} was not found`));
+    }
+
+    this.store.deleteMessage(messageId);
+
+    const pendingPersistence =
+      this.pendingStatePersistence.get(messageId) ??
+      this.pendingMessagePersistence.get(messageId);
+    try {
+      await pendingPersistence;
+      await this.repository.delete(messageId);
+    } catch {
+      // Persistence failure must not prevent the user from retrying.
+    }
+
+    return this.send({
+      text: message.text,
+      destination: message.type === "direct" ? message.to : "broadcast",
+      channel: message.channel,
+    });
   }
 
   private ensureHydrated(conv: ConversationKey): void {
@@ -288,13 +345,51 @@ export class ChatClient {
     });
   }
 
-  private async persistAppend(message: Message): Promise<void> {
-    try {
-      await this.repository.append(message);
-      if (this.retention) await this.repository.prune(this.retention);
-    } catch {
-      // persistence failure must not break reactive flow
-    }
+  private persistAppend(
+    message: Message,
+    conv: ConversationKey,
+  ): Promise<void> {
+    const op = (async () => {
+      try {
+        await this.repository.append(message, conv);
+        if (this.retention) await this.repository.prune(this.retention);
+      } catch {
+        // persistence failure must not break reactive flow
+      }
+    })();
+    this.pendingMessagePersistence.set(message.id, op);
+    void op.finally(() => {
+      if (this.pendingMessagePersistence.get(message.id) === op) {
+        this.pendingMessagePersistence.delete(message.id);
+      }
+    });
+    return op;
+  }
+
+  private async persistStateUpdate(
+    messageId: number,
+    state: MessageState,
+    routingError?: Protobuf.Mesh.Routing_Error,
+  ): Promise<void> {
+    const prior =
+      this.pendingStatePersistence.get(messageId) ??
+      this.pendingMessagePersistence.get(messageId) ??
+      Promise.resolve();
+    const op = (async () => {
+      try {
+        await prior;
+        await this.repository.updateState(messageId, state, routingError);
+      } catch {
+        // persistence failure must not break reactive flow
+      }
+    })();
+    this.pendingStatePersistence.set(messageId, op);
+    void op.finally(() => {
+      if (this.pendingStatePersistence.get(messageId) === op) {
+        this.pendingStatePersistence.delete(messageId);
+      }
+    });
+    return op;
   }
 
   private keyFor(conv: ConversationKey): string {
