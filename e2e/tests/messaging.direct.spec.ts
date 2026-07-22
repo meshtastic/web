@@ -28,16 +28,15 @@ test.describe("direct messaging over a real two-node mesh", () => {
     await messagesPage.waitReady();
   });
 
-  test.fixme(
-    "delivers a direct message from the browser to the peer node (web -> mesh)",
-    async ({ messagesPage }) => {
-      const peerNum = await peerNodeNum();
-      const nonce = `dm-${Date.now()}`;
-      const recv = await startPeerRecv(nonce, { timeout: 60 });
-      await messagesPage.openDirectMessageByNodeNum(peerNum);
-      await messagesPage.send(nonce);
-      const from = await recv.received;
-      expect(from).toBeGreaterThan(0);
-    },
-  );
+  test.fixme("delivers a direct message from the browser to the peer node (web -> mesh)", async ({
+    messagesPage,
+  }) => {
+    const peerNum = await peerNodeNum();
+    const nonce = `dm-${Date.now()}`;
+    const recv = await startPeerRecv(nonce, { timeout: 60 });
+    await messagesPage.openDirectMessageByNodeNum(peerNum);
+    await messagesPage.send(nonce);
+    const from = await recv.received;
+    expect(from).toBeGreaterThan(0);
+  });
 });
