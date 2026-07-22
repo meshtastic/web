@@ -95,6 +95,12 @@ export class SqlocalMessageRepository implements MessageRepository {
       );
   }
 
+  async delete(id: number): Promise<void> {
+    await this.db
+      .delete(messages)
+      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
+  }
+
   async prune(policy: RetentionPolicy): Promise<void> {
     if (policy.olderThanMs !== undefined) {
       const cutoff = Date.now() - policy.olderThanMs;

@@ -47,6 +47,20 @@ function directMsg(
 }
 
 describe("InMemoryMessageRepository", () => {
+  it("deletes a message by id", async () => {
+    const repo = new InMemoryMessageRepository();
+    await repo.append(msg(1, 1000));
+
+    await repo.delete(1);
+
+    expect(
+      await repo.loadRecent(
+        { kind: "channel", channel: ChannelNumber.Primary },
+        10,
+      ),
+    ).toEqual([]);
+  });
+
   it("loadRecent returns the tail of a bucket", async () => {
     const repo = new InMemoryMessageRepository();
     await repo.appendBatch([msg(1, 1000), msg(2, 2000), msg(3, 3000)]);

@@ -1,6 +1,7 @@
 import * as Protobuf from "@meshtastic/protobufs";
 import { signal } from "@preact/signals-core";
 import type { ResultType } from "better-result";
+import { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
 import { generatePacketId } from "../../core/identifiers/PacketId.ts";
@@ -269,6 +270,38 @@ export class ChatClient {
       }
     }
     return result;
+  }
+
+  /**
+   * Removes an existing message and sends its contents again with a fresh
+   * packet id. This matches the retry behavior of the other clients and keeps
+   * a stale failed message from remaining beside the new attempt.
+   */
+  public async retry(
+    messageId: number,
+  ): Promise<ResultType<number, SendTextError>> {
+    const message = this.store.findMessage(messageId);
+    if (!message) {
+      return Result.err(new Error(`Message ${messageId} was not found`));
+    }
+
+    this.store.deleteMessage(messageId);
+
+    const pendingPersistence =
+      this.pendingStatePersistence.get(messageId) ??
+      this.pendingMessagePersistence.get(messageId);
+    try {
+      await pendingPersistence;
+      await this.repository.delete(messageId);
+    } catch {
+      // Persistence failure must not prevent the user from retrying.
+    }
+
+    return this.send({
+      text: message.text,
+      destination: message.type === "direct" ? message.to : "broadcast",
+      channel: message.channel,
+    });
   }
 
   private ensureHydrated(conv: ConversationKey): void {

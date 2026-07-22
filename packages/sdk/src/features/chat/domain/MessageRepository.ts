@@ -39,6 +39,8 @@ export interface MessageRepository {
     state: MessageState,
     routingError?: Protobuf.Mesh.Routing_Error,
   ): Promise<void>;
+  /** Deletes a single message by its packet id. */
+  delete(id: number): Promise<void>;
   prune(policy: RetentionPolicy): Promise<void>;
   /** Deletes every message in a single conversation. */
   clearConversation(key: ConversationKey): Promise<void>;

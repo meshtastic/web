@@ -42,6 +42,28 @@ function sendBroadcast(client: MeshClient, text: string): Promise<SendResult> {
 }
 
 describe("ChatClient.send optimistic append", () => {
+  it("replaces the original message with a fresh send when retrying", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const messages = client.chat.messages(ChannelNumber.Primary);
+
+    const original = await sendBroadcast(client, "try again");
+    if (original.status !== "ok") throw new Error("send failed");
+
+    const retried = await withAckFlush(client, () =>
+      client.chat.retry(original.value),
+    );
+    if (retried.status !== "ok") throw new Error("retry failed");
+
+    expect(retried.value).not.toBe(original.value);
+    expect(messages.value).toHaveLength(1);
+    expect(messages.value[0]).toMatchObject({
+      id: retried.value,
+      text: "try again",
+      state: MessageState.Pending,
+    });
+  });
+
   it("appends an outbound broadcast to the channel bucket immediately", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });

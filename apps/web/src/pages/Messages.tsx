@@ -173,13 +173,7 @@ export const MessagesPage = () => {
         console.warn("[MessagesPage] no active mesh client; retry dropped");
         return;
       }
-      const destination: Types.Destination =
-        message.type === MessageType.Direct ? message.to : "broadcast";
-      const result = await meshClient.chat.send({
-        text: message.message,
-        destination,
-        channel: message.channel,
-      });
+      const result = await meshClient.chat.retry(message.messageId);
       if (result.status === "error") {
         console.error("Failed to retry message:", result.error);
       }

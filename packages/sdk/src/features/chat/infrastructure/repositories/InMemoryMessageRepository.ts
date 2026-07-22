@@ -77,6 +77,16 @@ export class InMemoryMessageRepository implements MessageRepository {
     }
   }
 
+  async delete(id: number): Promise<void> {
+    for (const [key, bucket] of this.buckets) {
+      const next = bucket.filter((message) => message.id !== id);
+      if (next.length !== bucket.length) {
+        this.buckets.set(key, next);
+        return;
+      }
+    }
+  }
+
   async prune(policy: RetentionPolicy): Promise<void> {
     const nowMs = Date.now();
     for (const [key, bucket] of this.buckets) {

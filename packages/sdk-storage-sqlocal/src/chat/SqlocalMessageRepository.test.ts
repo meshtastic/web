@@ -62,6 +62,25 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     });
   });
 
+  it("deletes only the matching message for the scoped device", async () => {
+    const repoB = new SqlocalMessageRepository(db, { deviceId: 2 });
+    await repo.appendBatch([msg(1, 1000), msg(2, 2000)]);
+    await repoB.append(msg(1, 1000));
+
+    await repo.delete(1);
+
+    const remaining = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      10,
+    );
+    const otherDevice = await repoB.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      10,
+    );
+    expect(remaining.map((message) => message.id)).toEqual([2]);
+    expect(otherDevice.map((message) => message.id)).toEqual([1]);
+  });
+
   it("loadRecent returns the tail in chronological order", async () => {
     await repo.appendBatch([msg(1, 1000), msg(2, 2000), msg(3, 3000)]);
     const out = await repo.loadRecent(
