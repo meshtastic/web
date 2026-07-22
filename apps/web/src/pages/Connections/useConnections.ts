@@ -44,10 +44,11 @@ export function useConnections() {
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
 
   const updateStatus = useCallback(
-    (id: ConnectionId, status: ConnectionStatus, error?: string) => {
+    (id: ConnectionId, status: ConnectionStatus, error?: string, errorKind?: Connection["errorKind"]) => {
       updateSavedConnection(id, {
         status,
         error: error || undefined,
+        errorKind: error ? errorKind : undefined,
         ...(status === "disconnected" ? { lastConnectedAt: Date.now() } : {}),
       });
     },
@@ -365,8 +366,8 @@ export function useConnections() {
     );
     await Promise.all(
       candidates.map(async (c) => {
-        const status = await probeConnection(c);
-        updateSavedConnection(c.id, { status });
+        const { status, error, errorKind } = await probeConnection(c);
+        updateSavedConnection(c.id, { status, error, errorKind });
       }),
     );
   }, [connections, updateSavedConnection]);
