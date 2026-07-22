@@ -68,7 +68,7 @@
     "@types/node": "^26.1.0",
     "@types/web-bluetooth": "^0.0.21",
     "base64-js": "^1.5.1",
-    "better-result": "^2.9.2",
+    "better-result": "^2.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

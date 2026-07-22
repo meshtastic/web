@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
-    "better-result": "^2.9.2"
+    "better-result": "^2.10.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.0.0",
