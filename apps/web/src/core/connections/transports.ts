@@ -160,7 +160,7 @@ async function openSerial(
     const ports = await serial.getPorts();
     log.debug("openSerial: getPorts", { count: ports.length });
     if (ports && conn.usbVendorId && conn.usbProductId) {
-      port = ports.find((p: SerialPort) => {
+      const matchingPorts = ports.filter((p: SerialPort) => {
         const info =
           (
             p as SerialPort & {
@@ -172,6 +172,17 @@ async function openSerial(
           info.usbProductId === conn.usbProductId
         );
       });
+      if (matchingPorts.length === 1) {
+        port = matchingPorts[0];
+      } else if (matchingPorts.length > 1) {
+        log.info(
+          "openSerial: multiple permitted ports share VID/PID; user selection required",
+          { count: matchingPorts.length },
+        );
+        if (opts.allowPrompt) {
+          port = await serial.requestPort({});
+        }
+      }
     }
   }
   if (!port && opts.allowPrompt) {
