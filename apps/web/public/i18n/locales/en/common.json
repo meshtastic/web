@@ -57,6 +57,7 @@
     "kilohertz": "kHz",
     "raw": "raw",
     "meter": { "one": "Meter", "plural": "Meters", "suffix": "m" },
+    "foot": { "one": "Foot", "plural": "Feet", "suffix": "ft" },
     "kilometer": { "one": "Kilometer", "plural": "Kilometers", "suffix": "km" },
     "minute": { "one": "Minute", "plural": "Minutes" },
     "hour": { "one": "Hour", "plural": "Hours" },

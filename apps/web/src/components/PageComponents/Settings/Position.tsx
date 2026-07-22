@@ -16,6 +16,7 @@ import {
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
+import { feetToMeters, metersToFeet } from "@core/utils/geo.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { LocateFixed } from "lucide-react";
@@ -32,7 +33,7 @@ interface PositionConfigProps {
  * via navigator.geolocation and writes lat/lng/altitude into the form.
  * No-op without a geolocation API (e.g. insecure context).
  */
-function UseBrowserLocationButton() {
+function UseBrowserLocationButton({ isImperial }: { isImperial: boolean }) {
   const { setValue } = useFormContext<PositionValidation>();
   const { toast } = useToast();
   const { t } = useTranslation("config");
@@ -57,9 +58,14 @@ function UseBrowserLocationButton() {
           pos.coords.altitude !== null &&
           !Number.isNaN(pos.coords.altitude)
         ) {
-          setValue("altitude", Math.round(pos.coords.altitude), {
-            shouldDirty: true,
-          });
+          // Geolocation altitude is in meters; show feet when Imperial.
+          setValue(
+            "altitude",
+            isImperial
+              ? Math.round(metersToFeet(pos.coords.altitude))
+              : Math.round(pos.coords.altitude),
+            { shouldDirty: true },
+          );
         }
       },
       (err) => {
@@ -113,8 +119,12 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
 
   const currentPosition = myNode?.position;
   const displayUnits = getEffectiveConfig("display")?.units;
+  const isImperial =
+    displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL;
 
   const formValues = useMemo(() => {
+    // Firmware stores altitude in meters; the field shows feet when Imperial.
+    const altitudeMeters = currentPosition?.altitude ?? 0;
     return {
       ...config.position,
       ...effectivePosition,
@@ -124,9 +134,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       longitude: currentPosition?.longitudeI
         ? currentPosition.longitudeI / 1e7
         : undefined,
-      altitude: currentPosition?.altitude ?? 0,
+      altitude: isImperial
+        ? Math.round(metersToFeet(altitudeMeters))
+        : altitudeMeters,
     } as PositionValidation;
-  }, [config.position, effectivePosition, currentPosition]);
+  }, [config.position, effectivePosition, currentPosition, isImperial]);
 
   const onSubmit = (data: PositionValidation) => {
     const {
@@ -149,13 +161,24 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       data.latitude !== undefined &&
       data.longitude !== undefined
     ) {
+      // The altitude field is in feet when Imperial; the protobuf expects
+      // integer meters, so convert back and round. Guard against a
+      // cleared/NaN field.
+      const altitudeInput =
+        typeof data.altitude === "number" && Number.isFinite(data.altitude)
+          ? data.altitude
+          : 0;
+      const altitude = isImperial
+        ? Math.round(feetToMeters(altitudeInput))
+        : Math.round(altitudeInput);
+
       const message = create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
           case: "setFixedPosition",
           value: create(Protobuf.Mesh.PositionSchema, {
             latitudeI: Math.round(data.latitude * 1e7),
             longitudeI: Math.round(data.longitude * 1e7),
-            altitude: data.altitude || 0,
+            altitude,
             time: Math.floor(Date.now() / 1000),
           }),
         },
@@ -220,7 +243,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
         {
           label: t("position.deviceGps.label"),
           description: t("position.deviceGps.description"),
-          footer: <UseBrowserLocationButton />,
+          footer: <UseBrowserLocationButton isImperial={isImperial} />,
           fields: [
             {
               type: "toggle",
@@ -257,19 +280,15 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "altitude",
               label: t("position.fixedPosition.altitude.label"),
               description: t("position.fixedPosition.altitude.description", {
-                unit:
-                  displayUnits ===
-                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
-                    ? "Feet"
-                    : "Meters",
+                unit: isImperial
+                  ? t("unit.foot.plural")
+                  : t("unit.meter.plural"),
               }),
               properties: {
                 step: 0.0000001,
-                suffix:
-                  displayUnits ===
-                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
-                    ? "Feet"
-                    : "Meters",
+                suffix: isImperial
+                  ? t("unit.foot.plural")
+                  : t("unit.meter.plural"),
               },
               disabledBy: [{ fieldName: "fixedPosition" }],
             },

@@ -7,6 +7,19 @@ export type Bounds = [[number, number], [number, number]];
 const INT_DEG = 1e7;
 const EARTH_RADIUS = 6378137;
 
+/**
+ * Firmware/protobuf store altitude as an integer number of meters
+ * (mesh.proto: `optional int32 altitude = 3`). The Position config UI shows
+ * altitude in feet when the display units are set to Imperial, so we convert
+ * at the edges (form load / form submit).
+ */
+export const METERS_PER_FOOT = 0.3048;
+
+export const feetToMeters = (feet: number): number => feet * METERS_PER_FOOT;
+
+export const metersToFeet = (meters: number): number =>
+  meters / METERS_PER_FOOT;
+
 export const toLngLat = (position?: {
   latitudeI?: number;
   longitudeI?: number;
