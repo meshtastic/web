@@ -22,6 +22,7 @@ export interface PacketSink {
   readonly myNodeNum: number;
   updateDeviceStatus(status: DeviceStatusEnum): void;
   configure(): Promise<number>;
+  handleConfigComplete(nonce: number): void;
 }
 
 /**
@@ -151,16 +152,7 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                 Emitter[Emitter.HandleFromRadio],
                 `⚙️ Received config complete id: ${decodedMessage.payloadVariant.value}`,
               );
-              sink.events.onConfigComplete.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              if (decodedMessage.payloadVariant.value === sink.configId) {
-                sink.log.info(
-                  Emitter[Emitter.HandleFromRadio],
-                  `⚙️ Config id matches client.configId: ${sink.configId}`,
-                );
-                sink.updateDeviceStatus(DeviceStatusEnum.DeviceConfigured);
-              }
+              sink.handleConfigComplete(decodedMessage.payloadVariant.value);
               break;
             }
             case "rebooted": {

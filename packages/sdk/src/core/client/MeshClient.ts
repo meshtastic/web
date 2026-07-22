@@ -74,6 +74,10 @@ const EMPTY_COUNTERS: ConnectionProgressCounters = {
   metadata: false,
 };
 
+const CONFIG_ONLY_NONCE = 69420;
+const NODES_ONLY_NONCE = 69421;
+type HandshakeStage = "idle" | "config" | "nodes" | "configured";
+
 /**
  * Orchestrator for a single connected Meshtastic device.
  *
@@ -111,6 +115,7 @@ export class MeshClient {
   });
 
   private _heartbeatIntervalId: ReturnType<typeof setInterval> | undefined;
+  private handshakeStage: HandshakeStage = "idle";
 
   constructor(options: MeshClientOptions) {
     this.log = options.logger ?? createLogger("MeshClient");
@@ -150,16 +155,15 @@ export class MeshClient {
   }
 
   /**
-   * Begin the wantConfigId → config-complete handshake. Resolves when the
-   * device has ack'd the wantConfigId packet (status changes to
-   * DeviceConfigured when the device finishes sending its configuration).
+   * Begin the two-stage config-only → nodes-only handshake. Resolves once
+   * both requests have been written; streamed completion is asynchronous.
    */
   public async connect(): Promise<void> {
     this.updateDeviceStatus(DeviceStatusEnum.DeviceConnecting);
     await this.configure();
   }
 
-  public configure(): Promise<number> {
+  public async configure(): Promise<number> {
     this.log.debug(
       Emitter[Emitter.Configure],
       "⚙️ Requesting device configuration",
@@ -170,17 +174,54 @@ export class MeshClient {
       received: { ...EMPTY_COUNTERS },
     };
 
-    const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
-      payloadVariant: { case: "wantConfigId", value: this.configId },
-    });
+    this.handshakeStage = "config";
 
-    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio)).catch(
-      (e) => {
-        if (this.device.status.value === DeviceStatusEnum.DeviceDisconnected) {
-          throw new Error("Device connection lost");
-        }
-        throw e;
-      },
+    // Match native clients: wake the radio before beginning the two-stage
+    // stream. Neither packet receives a routing acknowledgement.
+    await this.heartbeat();
+
+    return this.requestConfigStage(CONFIG_ONLY_NONCE).catch((e) => {
+      if (this.device.status.value === DeviceStatusEnum.DeviceDisconnected) {
+        throw new Error("Device connection lost");
+      }
+      throw e;
+    });
+  }
+
+  private requestConfigStage(nonce: number): Promise<number> {
+    const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
+      payloadVariant: { case: "wantConfigId", value: nonce },
+    });
+    return this.sendRawUnacknowledged(
+      toBinary(Protobuf.Mesh.ToRadioSchema, toRadio),
+      nonce,
+    );
+  }
+
+  /** Advance only when the completion nonce matches the active stage. */
+  public handleConfigComplete(nonce: number): void {
+    if (this.handshakeStage === "config" && nonce === CONFIG_ONLY_NONCE) {
+      this.handshakeStage = "nodes";
+      void this.requestConfigStage(NODES_ONLY_NONCE).catch((error) => {
+        this.log.error(
+          Emitter[Emitter.Configure],
+          "⚠️ Unable to request node database",
+          error,
+        );
+      });
+      return;
+    }
+
+    if (this.handshakeStage === "nodes" && nonce === NODES_ONLY_NONCE) {
+      this.handshakeStage = "configured";
+      this.events.onConfigComplete.dispatch(nonce);
+      this.updateDeviceStatus(DeviceStatusEnum.DeviceConfigured);
+      return;
+    }
+
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      `Ignoring config completion nonce ${nonce} during ${this.handshakeStage} stage`,
     );
   }
 
@@ -226,7 +267,9 @@ export class MeshClient {
     const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
       payloadVariant: { case: "heartbeat", value: {} },
     });
-    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio));
+    return this.sendRawUnacknowledged(
+      toBinary(Protobuf.Mesh.ToRadioSchema, toRadio),
+    );
   }
 
   public setHeartbeatInterval(interval: number): void {
@@ -323,6 +366,19 @@ export class MeshClient {
     return this.queue.wait(id);
   }
 
+  private async sendRawUnacknowledged(
+    toRadio: Uint8Array,
+    id: number = generatePacketId(),
+  ): Promise<number> {
+    if (toRadio.length > 512) {
+      throw new PacketTooLargeError(toRadio.length);
+    }
+    return this.queue.sendUnacknowledged(
+      { id, data: toRadio },
+      this.transport.toDevice,
+    );
+  }
+
   /**
    * Dispatch a `PacketMetadata` echo for locally-composed messages.
    */
@@ -340,6 +396,7 @@ export class MeshClient {
 
   public complete(): void {
     this.queue.clear();
+    this.handshakeStage = "idle";
   }
 
   public async disconnect(): Promise<void> {

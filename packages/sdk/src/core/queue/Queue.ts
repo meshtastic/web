@@ -95,6 +95,31 @@ export class Queue {
     return queueItem.promise;
   }
 
+  /**
+   * Flush a control packet without waiting for a routing acknowledgement.
+   * Firmware does not acknowledge local heartbeat or configuration requests.
+   */
+  public async sendUnacknowledged(
+    item: Omit<QueueItem, "promise" | "sent" | "added">,
+    outputStream: WritableStream<Uint8Array>,
+  ): Promise<number> {
+    const queuedItem: QueueItem = {
+      ...item,
+      sent: false,
+      added: new Date(),
+      promise: Promise.resolve(item.id),
+    };
+    this.queue.push(queuedItem);
+    while (!queuedItem.sent) {
+      await this.processQueue(outputStream);
+      if (!queuedItem.sent) {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+    }
+    this.remove(item.id);
+    return item.id;
+  }
+
   public async processQueue(
     outputStream: WritableStream<Uint8Array>,
   ): Promise<void> {
