@@ -196,8 +196,8 @@ importers:
         specifier: ^6.3.0
         version: 6.3.0
       immer:
-        specifier: ^11.1.11
-        version: 11.1.11
+        specifier: ^11.1.15
+        version: 11.1.15
       js-cookie:
         specifier: ^3.0.8
         version: 3.0.8
@@ -245,7 +245,7 @@ importers:
         version: 4.4.3
       zustand:
         specifier: 5.0.14
-        version: 5.0.14(@types/react@19.2.17)(immer@11.1.11)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
+        version: 5.0.14(@types/react@19.2.17)(immer@11.1.15)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
     devDependencies:
       '@tanstack/router-plugin':
         specifier: ^1.168.19
@@ -4693,8 +4693,8 @@ packages:
   idb@7.1.1:
     resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
 
-  immer@11.1.11:
-    resolution: {integrity: sha512-qzXuyXAkPySAGYkfsAwodDPWT8Zm7/Uo5BNt4BjhMhG5WlWyZZ4wQqnWwdS8kjlQ1Cwu6gjw3A6+0gTQwlyYtw==}
+  immer@11.1.15:
+    resolution: {integrity: sha512-VrNANlmnWQnh5COXIIOQXM9oOJw7naGKlBT74ZOOR6lpVXc3gFEu9FJLDFcpCJ2j+NWr8TIwtWD//T6ZX6TKiQ==}
 
   import-lazy@4.0.0:
     resolution: {integrity: sha512-rKtvo6a868b5Hu3heneU+L4yEQ4jYKLtjpnPeUdK7h0yzXGmyBTypknlkCvHFBqfX9YlorEiMM6Dnq/5atfHkw==}
@@ -11310,7 +11310,7 @@ snapshots:
 
   idb@7.1.1: {}
 
-  immer@11.1.11: {}
+  immer@11.1.15: {}
 
   import-lazy@4.0.0:
     optional: true
@@ -13259,9 +13259,9 @@ snapshots:
 
   zone.js@0.8.29: {}
 
-  zustand@5.0.14(@types/react@19.2.17)(immer@11.1.11)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)):
+  zustand@5.0.14(@types/react@19.2.17)(immer@11.1.15)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)):
     optionalDependencies:
       '@types/react': 19.2.17
-      immer: 11.1.11
+      immer: 11.1.15
       react: 19.2.7
       use-sync-external-store: 1.6.0(react@19.2.7)
