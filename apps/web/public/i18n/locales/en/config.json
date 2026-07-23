@@ -483,6 +483,26 @@
     "description": "Settings for the Security configuration",
     "title": "Security",
     "button_backupKey": "Backup Key",
+    "packetAuthenticity": {
+      "label": "Packet authenticity",
+      "description": "Configure the radio's receive policy for every remote mesh packet it can decrypt.",
+      "protectionLevel": "Protection level",
+      "unavailable": "Unavailable while disconnected or when the firmware does not report XEdDSA verification support.",
+      "options": {
+        "compatible": {
+          "label": "Compatible — Accept unsigned",
+          "description": "Verify XEdDSA signatures when present, but accept unsigned remote packets for maximum compatibility."
+        },
+        "balanced": {
+          "label": "Balanced — Prefer authenticated",
+          "description": "Reject unsigned, signable broadcasts from nodes known to sign while keeping legacy unsigned remote traffic."
+        },
+        "strict": {
+          "label": "Strict — Require authenticated",
+          "description": "Only show and process remote mesh packets verified by XEdDSA or successfully authenticated by PKI. Sender authentication does not prove coordinates or freshness."
+        }
+      }
+    },
     "adminChannelEnabled": {
       "description": "Allow incoming device control over the insecure legacy admin channel",
       "label": "Legacy Admin channel"

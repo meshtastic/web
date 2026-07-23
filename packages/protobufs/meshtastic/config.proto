@@ -1287,6 +1287,29 @@ message Config {
 
   message SecurityConfig {
     /*
+     * Controls how the device authenticates remotely received mesh packets.
+     */
+    enum PacketSignaturePolicy {
+      /*
+       * Accept unsigned packets for maximum compatibility while still rejecting malformed or invalid signatures.
+       * This is the default to avoid legacy nodes dropping signed packets during rebroadcast.
+       */
+      PACKET_SIGNATURE_POLICY_COMPATIBLE = 0;
+
+      /*
+       * Prefer authenticated packets while retaining compatibility with unsigned packets from nodes not known to sign.
+       * Rejects unsigned, signable broadcasts from nodes that have previously signed.
+       */
+      PACKET_SIGNATURE_POLICY_BALANCED = 1;
+
+      /*
+       * Accept only packets authenticated by a verified XEdDSA signature or successful PKI decryption.
+       * Unsigned, malformed, invalid, or unverifiable packets are ignored.
+       */
+      PACKET_SIGNATURE_POLICY_STRICT = 2;
+    }
+
+    /*
      * The public key of the user's device.
      * Sent out to other nodes on the mesh to allow them to compute a shared secret key.
      */
@@ -1324,6 +1347,11 @@ message Config {
      * Allow incoming device control over the insecure legacy admin channel.
      */
     bool admin_channel_enabled = 8;
+
+    /*
+     * Determines the packet signature policy applied to remotely received mesh packets.
+     */
+    PacketSignaturePolicy packet_signature_policy = 9;
   }
 
   /*

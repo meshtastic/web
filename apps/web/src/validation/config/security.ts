@@ -1,9 +1,13 @@
 import { type ZodType, z } from "zod/v4";
+import { Protobuf } from "@meshtastic/sdk";
 import { makePskHelpers } from "./../pskSchema.ts";
 
 const { stringSchema, bytesSchema, isValidKey } = makePskHelpers([32]); // 256-bit
 
 const isManagedRequiredMsg = "formValidation.required.managed";
+const PacketSignaturePolicyEnum = z.enum(
+  Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy,
+);
 
 function makeSecuritySchema<KeyT>(
   keyMaker: (optional: boolean) => ZodType<KeyT>,
@@ -14,6 +18,7 @@ function makeSecuritySchema<KeyT>(
       adminChannelEnabled: z.boolean(),
       debugLogApiEnabled: z.boolean(),
       serialEnabled: z.boolean(),
+      packetSignaturePolicy: PacketSignaturePolicyEnum,
 
       privateKey: keyMaker(false),
       publicKey: keyMaker(false),
