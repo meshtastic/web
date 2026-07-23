@@ -88,7 +88,15 @@ export function useConnections() {
       if (conn?.meshDeviceId) {
         try {
           useDeviceStore.getState().removeDevice(conn.meshDeviceId);
-        } catch {}
+        } catch (e) {
+          const err = e as Error;
+          log.warn("removeDevice failed during removeConnection", {
+            id,
+            meshDeviceId: conn.meshDeviceId,
+            name: err?.name,
+            message: err?.message,
+          });
+        }
       }
       meshRegistry.unregister(id);
       removeSavedConnectionFromStore(id);
