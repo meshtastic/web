@@ -32,7 +32,9 @@
     "unsetDefault": "Unset default",
     "scanQr": "Scan QR Code",
     "traceRoute": "Trace Route",
-    "submit": "Submit"
+    "submit": "Submit",
+    "saveAndExport": "Save & Export",
+    "importProfile": "Import Profile"
   },
   "app": {
     "title": "Meshtastic",
