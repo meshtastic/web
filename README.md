@@ -83,8 +83,7 @@ Expected domain errors are returned as `Result<T, E>` via [`better-result`](http
 
 ### Prerequisites
 
-You need [pnpm](https://pnpm.io/) installed. If you plan to regenerate
-protobufs, also install the [Buf CLI](https://buf.build/docs/cli/installation/).
+You need [pnpm](https://pnpm.io/) installed. The [Buf CLI](https://buf.build/docs/cli/installation/) is only required if you plan to regenerate protobuf stubs — the generated TypeScript is committed to the repo, so a fresh clone builds without it.
 
 ### Setup
 
@@ -102,8 +101,18 @@ pnpm --filter @meshtastic/web dev
 
 ### Build everything
 
+`@meshtastic/protobufs` has a `build` script that regenerates its stubs with `buf`, so skip it when building the rest of the workspace:
+
 ```bash
-pnpm -r build
+pnpm --filter '!@meshtastic/protobufs' -r build
+```
+
+### Regenerate protobuf stubs
+
+Only needed after bumping the `meshtastic/protobufs` submodule or editing the generator config. Requires the Buf CLI:
+
+```bash
+pnpm --filter @meshtastic/protobufs build
 ```
 
 ### Run tests
