@@ -111,6 +111,8 @@ export class MeshClient {
   });
 
   private _heartbeatIntervalId: ReturnType<typeof setInterval> | undefined;
+  private _fromDeviceAc: AbortController | undefined;
+  private _fromDevicePipe: Promise<void> | undefined;
 
   constructor(options: MeshClientOptions) {
     this.log = options.logger ?? createLogger("MeshClient");
@@ -142,7 +144,22 @@ export class MeshClient {
       }
     });
 
-    this.transport.fromDevice.pipeTo(decodePacket(this));
+    this._fromDeviceAc = new AbortController();
+    this._fromDevicePipe = this.transport.fromDevice.pipeTo(decodePacket(this), {
+      signal: this._fromDeviceAc.signal,
+    });
+    // Swallow abort/cancel rejection so an unhandled rejection does not
+    // surface, but log unexpected transport/stream failures.
+    void this._fromDevicePipe.catch((err) => {
+      // Abort rejections may be DOMException, so do not require instanceof Error.
+      if ((err as { name?: string } | null)?.name !== "AbortError") {
+        const message = err instanceof Error ? err.message : String(err);
+        this.log.error(
+          Emitter[Emitter.ConnectionStatus],
+          `Device decoding pipe failed: ${message}`,
+        );
+      }
+    });
   }
 
   public get myNodeNum(): number {
@@ -348,7 +365,28 @@ export class MeshClient {
       clearInterval(this._heartbeatIntervalId);
     }
     this.complete();
-    await this.transport.toDevice.close();
+
+    // Signal the inbound pipe abort before blocking on IO so teardown still
+    // completes when the transport is already gone (e.g. unplugged serial).
+    this._fromDeviceAc?.abort();
+
+    try {
+      await this.transport.toDevice.close();
+    } catch (err) {
+      this.log.debug(
+        Emitter[Emitter.Disconnect],
+        `Writable stream already closed or errored: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
+    if (this._fromDevicePipe) {
+      try {
+        await this._fromDevicePipe;
+      } catch {
+        // Expected when the pipe is aborted during disconnect.
+      }
+    }
+
     await this.transport.disconnect();
     this.updateDeviceStatus(DeviceStatusEnum.DeviceDisconnected);
   }
