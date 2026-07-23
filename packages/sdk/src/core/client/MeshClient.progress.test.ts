@@ -1,10 +1,13 @@
-import { create } from "@bufbuild/protobuf";
+import { create, fromBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createFakeTransport } from "../testing/createFakeTransport.ts";
 import { MeshClient } from "./MeshClient.ts";
 
 describe("MeshClient.progress", () => {
+  const CONFIG_ONLY_NONCE = 69420;
+  const NODES_ONLY_NONCE = 69421;
+
   it("starts in the idle phase before configure() is called", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
@@ -60,19 +63,61 @@ describe("MeshClient.progress", () => {
     expect(cur.received.modules).toBe(0);
   });
 
-  it("flips to configured when onConfigComplete fires", () => {
-    const { transport } = createFakeTransport();
+  it("requests config and nodes in separate firmware-compatible stages", async () => {
+    const { transport, respond, sent } = createFakeTransport();
     const client = new MeshClient({ transport });
-    void client.configure();
+
+    await client.configure();
+
+    const initialPackets = sent.map(
+      (packet) =>
+        fromBinary(Protobuf.Mesh.ToRadioSchema, packet).payloadVariant,
+    );
+    expect(initialPackets[0]?.case).toBe("heartbeat");
+    expect(initialPackets[1]).toEqual({
+      case: "wantConfigId",
+      value: CONFIG_ONLY_NONCE,
+    });
+
     client.events.onConfigPacket.dispatch(
       create(Protobuf.Config.ConfigSchema, {}),
     );
-    client.events.onConfigComplete.dispatch(0);
+    respond.withConfigCompleteId(CONFIG_ONLY_NONCE);
+
+    await vi.waitFor(() => {
+      expect(sent).toHaveLength(3);
+    });
+    expect(
+      fromBinary(Protobuf.Mesh.ToRadioSchema, sent[2]!).payloadVariant,
+    ).toEqual({ case: "wantConfigId", value: NODES_ONLY_NONCE });
+    expect(client.progress.value.phase).toBe("configuring");
+
+    respond.withConfigCompleteId(NODES_ONLY_NONCE);
+
+    await vi.waitFor(() => {
+      expect(client.progress.value.phase).toBe("configured");
+    });
 
     const cur = client.progress.value;
     expect(cur.phase).toBe("configured");
     if (cur.phase !== "configured") throw new Error("unreachable");
     expect(cur.received.config).toBe(1);
+  });
+
+  it("ignores stale and out-of-order config completion nonces", async () => {
+    const { transport, respond, sent } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const completed: number[] = [];
+    client.events.onConfigComplete.subscribe((id) => completed.push(id));
+
+    await client.configure();
+    respond.withConfigCompleteId(NODES_ONLY_NONCE);
+    respond.withConfigCompleteId(12345);
+
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(sent).toHaveLength(2);
+    expect(client.progress.value.phase).toBe("configuring");
+    expect(completed).toEqual([]);
   });
 
   it("ignores packets that arrive while idle (post-completion)", () => {
@@ -85,14 +130,13 @@ describe("MeshClient.progress", () => {
     expect(client.progress.value.phase).toBe("idle");
   });
 
-  it("resets counters when configure() runs again", () => {
+  it("resets counters when configure() runs again", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
-    void client.configure();
+    await client.configure();
     client.events.onConfigPacket.dispatch(
       create(Protobuf.Config.ConfigSchema, {}),
     );
-    client.events.onConfigComplete.dispatch(0);
     void client.configure();
     expect(client.progress.value).toEqual({
       phase: "configuring",

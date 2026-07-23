@@ -2,6 +2,7 @@ import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type LoRaValidation,
   LoRaValidationSchema,
+  withLoRaDefaults,
 } from "@app/validation/config/lora.ts";
 import {
   DynamicForm,
@@ -29,11 +30,15 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
   const editor = useConfigEditor();
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
 
-  const effectiveLora =
+  const effectiveLoraConfig =
     radio.lora ??
     (getEffectiveConfig("lora") as
       | Protobuf.Config.Config_LoRaConfig
       | undefined);
+  const effectiveLora = effectiveLoraConfig
+    ? withLoRaDefaults(effectiveLoraConfig)
+    : undefined;
+  const defaultLora = config.lora ? withLoRaDefaults(config.lora) : undefined;
 
   const { t } = useTranslation("config");
 
@@ -50,7 +55,7 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={LoRaValidationSchema}
-      defaultValues={config.lora}
+      defaultValues={defaultLora}
       values={effectiveLora}
       fieldGroups={[
         {
