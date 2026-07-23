@@ -14,6 +14,7 @@
     "positionPrecision": "Show position precision",
     "traceroutes": "Show traceroutes",
     "waypoints": "Show waypoints",
+    "geofences": "Show geofences",
     "heatmap": "Show heatmap",
     "density": "Density"
   },
@@ -32,7 +33,71 @@
     "bearing": "Absolute bearing:",
     "lockedTo": "Locked by:",
     "latitude": "Latitude:",
-    "longitude": "Longitude:"
+    "longitude": "Longitude:",
+    "geofenceRadius": "Geofence radius:",
+    "notifications": "Alerts:",
+    "enter": "enter",
+    "exit": "exit",
+    "favoritesOnly": "favorites only",
+    "editGeofence": "Edit geofence",
+    "addGeofence": "Add geofence"
+  },
+  "waypointEdit": {
+    "title": "Edit waypoint – {{name}}",
+    "titleCreate": "New waypoint",
+    "name": "Name",
+    "description": "Description",
+    "icon": "Icon",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "expiresAt": "Expires",
+    "radius": "Geofence radius",
+    "radiusHint": "0 to disable the circular geofence.",
+    "boundingBox": "Bounding box",
+    "west": "West",
+    "south": "South",
+    "east": "East",
+    "north": "North",
+    "captureFromMap": "Use current map view",
+    "notifyOnEnter": "Alert on enter",
+    "notifyOnExit": "Alert on exit",
+    "notifyFavoritesOnly": "Favorites only",
+    "save": "Save & broadcast",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "savedToast": "Waypoint saved: {{name}}",
+    "createdToast": "Waypoint created: {{name}}",
+    "errorToast": "Could not save waypoint",
+    "errorMissingName": "Waypoint needs a name",
+    "errorBadCoords": "Latitude and longitude are required",
+    "enterToast": "{{node}} entered {{waypoint}}",
+    "exitToast": "{{node}} left {{waypoint}}",
+    "viewOnMap": "View on map",
+    "newWaypointAria": "New waypoint",
+    "placementHint": "Click on the map to place your waypoint",
+    "drawHint": "Drag on the map to define the bounding box",
+    "drawBox": "Draw box",
+    "editBox": "Edit box",
+    "removeBox": "Remove box",
+    "radiusOff": "Off"
+  },
+  "unit": {
+    "meter": {
+      "one": "meter",
+      "plural": "meters"
+    },
+    "kilometer": {
+      "plural": "km"
+    },
+    "foot": {
+      "plural": "ft"
+    },
+    "mile": {
+      "plural": "mi"
+    },
+    "degree": {
+      "suffix": "°"
+    }
   },
   "myNode": {
     "tooltip": "This device"

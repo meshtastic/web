@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@meshtastic/protobufs': workspace:*
+
 importers:
 
   .:
@@ -329,6 +332,9 @@ importers:
         specifier: ^2.12.1
         version: 2.12.1
     devDependencies:
+      '@bufbuild/buf':
+        specifier: ^1.71.0
+        version: 1.71.0
       '@bufbuild/protoc-gen-es':
         specifier: ^2.12.1
         version: 2.12.1(@bufbuild/protobuf@2.12.1)
@@ -342,8 +348,8 @@ importers:
         specifier: ^2.12.1
         version: 2.12.1
       '@meshtastic/protobufs':
-        specifier: jsr:^2.7.18
-        version: '@jsr/meshtastic__protobufs@2.7.20'
+        specifier: workspace:*
+        version: link:../protobufs
       '@preact/signals-core':
         specifier: ^1.14.4
         version: 1.14.4
@@ -1079,6 +1085,53 @@ packages:
 
   '@bramus/specificity@2.4.2':
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
+    hasBin: true
+
+  '@bufbuild/buf-darwin-arm64@1.71.0':
+    resolution: {integrity: sha512-qZ7xZQyen/jOKFPVs3dlN9pMA56PI4YEo3r4/9ixtiH9gyFgfowR31axsocUgXGThjiN8mvOA8WfpG2tvaSvsw==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@bufbuild/buf-darwin-x64@1.71.0':
+    resolution: {integrity: sha512-2w95pc3X+z06/J66i6uNzA8QPuVOpbPrwyb6tkK0AcJFNvKPVYr4BxVC2koyImrQ3rxY1n9q8qviWMjSvq9fOA==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@bufbuild/buf-linux-aarch64@1.71.0':
+    resolution: {integrity: sha512-dwxErryMI3MRwtP/IgfdrqEjiAmVpttGhmO3xihiJIV2EAXt9J5yjzHhEDvnSgQ6nmNjEvO5QczcIaQjZEwF6A==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@bufbuild/buf-linux-armv7@1.71.0':
+    resolution: {integrity: sha512-pfc+Qexm5C59VeRUjVmEvxkCXT5QbMR1R/CUtcSlk+spOFVwna0bSpkqIsky3kkHfzxiNSOsz3iki9/pAVX+CA==}
+    engines: {node: '>=12'}
+    cpu: [arm]
+    os: [linux]
+
+  '@bufbuild/buf-linux-x64@1.71.0':
+    resolution: {integrity: sha512-Y7jLxr3wpMkpQSqZU/MrDmDSCkF4GxvhIL7wnNdSRpkhYAY6TPRHN+5nNgV7jp6mQ0zQSYh0MGxBeMgt/UVdmQ==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [linux]
+
+  '@bufbuild/buf-win32-arm64@1.71.0':
+    resolution: {integrity: sha512-UrxtD99zLE1qImtQC/W3a9cuj0/kB53B1bK38kmCMRFow939FhdZtqTRjbnZWauRi/pzAsjDyPCvnTa2XKT8Cg==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@bufbuild/buf-win32-x64@1.71.0':
+    resolution: {integrity: sha512-+npiOimJ7ggeLul3KFwSlOjZnAZYwt3el64dJ3nJQMnui0avyvsRmU02o1bZI5yUnBvhcnTWdEbfRXUnkkVtgQ==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [win32]
+
+  '@bufbuild/buf@1.71.0':
+    resolution: {integrity: sha512-GDcjBCwLgHT/4nX4YSnYatZ7sDZDpHV6dxQvoT2/P6gKvV23O6hl8NryzLIRKmeau0FRXpQKHVy1dMfnBSpy+w==}
+    engines: {node: '>=12'}
     hasBin: true
 
   '@bufbuild/protobuf@2.12.1':
@@ -7362,6 +7415,37 @@ snapshots:
   '@bramus/specificity@2.4.2':
     dependencies:
       css-tree: 3.2.1
+
+  '@bufbuild/buf-darwin-arm64@1.71.0':
+    optional: true
+
+  '@bufbuild/buf-darwin-x64@1.71.0':
+    optional: true
+
+  '@bufbuild/buf-linux-aarch64@1.71.0':
+    optional: true
+
+  '@bufbuild/buf-linux-armv7@1.71.0':
+    optional: true
+
+  '@bufbuild/buf-linux-x64@1.71.0':
+    optional: true
+
+  '@bufbuild/buf-win32-arm64@1.71.0':
+    optional: true
+
+  '@bufbuild/buf-win32-x64@1.71.0':
+    optional: true
+
+  '@bufbuild/buf@1.71.0':
+    optionalDependencies:
+      '@bufbuild/buf-darwin-arm64': 1.71.0
+      '@bufbuild/buf-darwin-x64': 1.71.0
+      '@bufbuild/buf-linux-aarch64': 1.71.0
+      '@bufbuild/buf-linux-armv7': 1.71.0
+      '@bufbuild/buf-linux-x64': 1.71.0
+      '@bufbuild/buf-win32-arm64': 1.71.0
+      '@bufbuild/buf-win32-x64': 1.71.0
 
   '@bufbuild/protobuf@2.12.1': {}
 
