@@ -1,3 +1,5 @@
-export const randId = () => {
-  return Math.floor(Math.random() * 1e9);
+export const randId = (): number => {
+  const buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  return buf[0]!;
 };
