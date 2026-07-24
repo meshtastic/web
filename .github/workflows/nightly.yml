@@ -86,7 +86,7 @@ jobs:
 
       - name: Build Container Image (multi-arch)
         id: build-container
-        uses: redhat-actions/buildah-build@v2
+        uses: redhat-actions/buildah-build@v3
         with:
           containerfiles: |
             ./apps/web/infra/Containerfile
