@@ -33,7 +33,7 @@
     "@bufbuild/protobuf": "^2.12.1",
     "@meshtastic/protobufs": "workspace:*",
     "ste-simple-events": "^3.0.11",
-    "tslog": "^4.11.0"
+    "tslog": "^5.1.0"
   },
   "devDependencies": {
     "@meshtastic/core": "jsr:^2.6.6",
@@ -42,10 +42,10 @@
     "@types/node": "^26.1.0",
     "@typescript/typescript6": "^6.0.2",
     "husky": "^9.1.0",
-    "lint-staged": "^17.0.8",
+    "lint-staged": "^17.1.0",
     "oxfmt": "^0.59.0",
     "oxlint": "^1.74.0",
-    "tsdown": "^0.22.11",
+    "tsdown": "^0.22.13",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },
