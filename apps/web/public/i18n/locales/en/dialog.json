@@ -29,6 +29,11 @@
     "description": "Are you sure you want to regenerate the pre-shared key?",
     "regenerate": "Regenerate"
   },
+  "packetAuthenticityStrict": {
+    "title": "Require authenticated packets?",
+    "description": "Strict accepts only remotely received mesh packets with a verified XEdDSA signature or successful PKI authentication. PKI-authenticated direct messages remain accepted. Older firmware, licensed/ham nodes without signing keys, and oversized unsigned packets may disappear, reducing mesh visibility. Authentication verifies a cryptographic identity; it does not prove that content is truthful or fresh.",
+    "confirm": "Enable Strict"
+  },
   "addConnection": {
     "title": "Add connection",
     "description": "Choose a connection type and fill in the details",

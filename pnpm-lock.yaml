@@ -342,8 +342,8 @@ importers:
         specifier: ^2.12.1
         version: 2.12.1
       '@meshtastic/protobufs':
-        specifier: jsr:^2.7.18
-        version: '@jsr/meshtastic__protobufs@2.7.20'
+        specifier: workspace:*
+        version: link:../protobufs
       '@preact/signals-core':
         specifier: ^1.14.4
         version: 1.14.4

@@ -11,14 +11,21 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
-import { useDevice } from "@core/stores";
+import { useDevice, useIsConnected } from "@core/stores";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@meshtastic/sdk";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import {
+  useConfigEditor,
+  useMeshDevice,
+  useSignal,
+} from "@meshtastic/sdk-react";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { PacketAuthenticityPolicyField } from "./PacketAuthenticityPolicyField.tsx";
+import { PacketAuthenticityStrictDialog } from "./PacketAuthenticityStrictDialog.tsx";
+import { usePacketAuthenticityConfirmation } from "./usePacketAuthenticityConfirmation.ts";
 
 interface SecurityConfigProps {
   onFormInit: DynamicFormFormInit<RawSecurity>;
@@ -30,7 +37,10 @@ const EMPTY_RADIO_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
-const toFormShape = (
+const PacketSignaturePolicy =
+  Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy;
+
+export const toFormShape = (
   cfg: Protobuf.Config.Config_SecurityConfig | undefined,
 ) => ({
   ...cfg,
@@ -41,13 +51,49 @@ const toFormShape = (
     fromByteArray(cfg?.adminKey?.at(1) ?? new Uint8Array(0)),
     fromByteArray(cfg?.adminKey?.at(2) ?? new Uint8Array(0)),
   ],
+  packetSignaturePolicy:
+    cfg?.packetSignaturePolicy ?? PacketSignaturePolicy.COMPATIBLE,
 });
+
+export const toSecurityPayload = (data: RawSecurity): ParsedSecurity => ({
+  ...data,
+  privateKey: toByteArray(data.privateKey),
+  publicKey: toByteArray(data.publicKey),
+  adminKey: [
+    toByteArray(data.adminKey.at(0) ?? ""),
+    toByteArray(data.adminKey.at(1) ?? ""),
+    toByteArray(data.adminKey.at(2) ?? ""),
+  ],
+});
+
+type SetSecuritySection = (
+  section: "security",
+  payload: Protobuf.Config.Config_SecurityConfig,
+) => void;
+
+export const submitSecurityConfig = (
+  setRadioSection: SetSecuritySection,
+  data: RawSecurity,
+) => {
+  setRadioSection(
+    "security",
+    toSecurityPayload(data) as unknown as Protobuf.Config.Config_SecurityConfig,
+  );
+};
 
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
 
-  const { config, setDialogOpen, getEffectiveConfig } = useDevice();
+  const { config, setDialogOpen, getEffectiveConfig, connectionId } =
+    useDevice();
+  const isConnected = useIsConnected(connectionId ?? -1);
   const editor = useConfigEditor();
+  const { metadata } = useMeshDevice();
+  const canConfigurePacketAuthenticity =
+    isConnected && metadata?.hasXeddsa === true;
+  const packetAuthenticityConfirmation = usePacketAuthenticityConfirmation(
+    canConfigurePacketAuthenticity,
+  );
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
     radio.security ??
@@ -79,19 +125,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   const onSubmit = (data: RawSecurity) => {
     if (!formState.isReady || !editor) return;
 
-    const payload: ParsedSecurity = {
-      ...data,
-      privateKey: toByteArray(data.privateKey),
-      publicKey: toByteArray(data.publicKey),
-      adminKey: [
-        toByteArray(data.adminKey.at(0) ?? ""),
-        toByteArray(data.adminKey.at(1) ?? ""),
-        toByteArray(data.adminKey.at(2) ?? ""),
-      ],
-    };
-    editor.setRadioSection(
-      "security",
-      payload as unknown as Protobuf.Config.Config_SecurityConfig,
+    submitSecurityConfig(
+      editor.setRadioSection.bind(editor) as SetSecuritySection,
+      data,
     );
   };
 
@@ -132,6 +168,20 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
         propMethods={formMethods}
         onSubmit={onSubmit}
         fieldGroups={[
+          {
+            label: t("security.packetAuthenticity.label"),
+            description: t("security.packetAuthenticity.description"),
+            fields: [],
+            footer: (
+              <PacketAuthenticityPolicyField
+                control={formMethods.control}
+                supported={canConfigurePacketAuthenticity}
+                validateSelection={
+                  packetAuthenticityConfirmation.validateSelection
+                }
+              />
+            ),
+          },
           {
             label: t("security.directMessageKey.label"),
             description: t("security.directMessageKey.description"),
@@ -287,6 +337,13 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
           setValue("isManaged", true);
           setManagedModeDialogOpen(false);
         }}
+      />
+
+      <PacketAuthenticityStrictDialog
+        open={packetAuthenticityConfirmation.strictDialogOpen}
+        onOpenChange={packetAuthenticityConfirmation.handleDialogOpenChange}
+        onConfirm={packetAuthenticityConfirmation.confirmStrict}
+        onCancel={packetAuthenticityConfirmation.cancelStrict}
       />
     </>
   );

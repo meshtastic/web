@@ -16,6 +16,7 @@ function createMockNode(): Protobuf.Mesh.NodeInfo {
     isMuted: false,
     hopsAway: 2,
     isKeyManuallyVerified: false,
+    hasXeddsaSigned: false,
     user: {
       $typeName: "meshtastic.User",
       id: "!12345678",

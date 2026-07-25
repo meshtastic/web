@@ -2675,6 +2675,12 @@ message DeviceMetadata {
    * (bitwise OR of ExcludedModules)
    */
   uint32 excluded_modules = 12;
+
+  /*
+   * Indicates whether this firmware build includes XEdDSA packet signature verification.
+   * This is a read-only capability and must be false when XEdDSA is not compiled in.
+   */
+  bool has_xeddsa = 14;
 }
 
 /*
