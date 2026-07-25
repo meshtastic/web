@@ -42,7 +42,7 @@
     "@types/node": "^26.1.0",
     "@typescript/typescript6": "^6.0.2",
     "husky": "^9.1.0",
-    "lint-staged": "^17.0.8",
+    "lint-staged": "^17.1.0",
     "oxfmt": "^0.59.0",
     "oxlint": "^1.74.0",
     "tsdown": "^0.22.11",
