@@ -49,6 +49,24 @@ function makeWaypoint(id: number, expire?: number) {
   return create(Protobuf.Mesh.WaypointSchema, { id, expire });
 }
 
+function makeGeofenceWaypoint(id: number) {
+  return create(Protobuf.Mesh.WaypointSchema, {
+    id,
+    latitudeI: 400000000,
+    longitudeI: -740000000,
+    geofenceRadius: 250,
+    boundingBox: create(Protobuf.Mesh.BoundingBoxSchema, {
+      longitudeWestI: -740100000,
+      latitudeSouthI: 399900000,
+      longitudeEastI: -739900000,
+      latitudeNorthI: 400100000,
+    }),
+    notifyOnEnter: true,
+    notifyOnExit: false,
+    notifyFavoritesOnly: true,
+  });
+}
+
 function makeAdminMessage(fields: Record<string, any>) {
   return create(Protobuf.Admin.AdminMessageSchema, fields);
 }
@@ -251,6 +269,31 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
     expect(newDevice.getWaypoint(3)).toBeTruthy();
 
     vi.useRealTimers();
+  });
+});
+
+describe("DeviceStore – geofence field persistence", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("addWaypoint carries geofence fields through the store", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(1);
+    device.addWaypoint(makeGeofenceWaypoint(42), 0, 5, new Date());
+
+    const stored = useDeviceStore
+      .getState()
+      .devices.get(1)!
+      .waypoints.find((w) => w.id === 42)!;
+    expect(stored.geofenceRadius).toBe(250);
+    expect(stored.notifyOnEnter).toBe(true);
+    expect(stored.notifyOnExit).toBe(false);
+    expect(stored.notifyFavoritesOnly).toBe(true);
+    expect(stored.boundingBox?.latitudeNorthI).toBe(400100000);
+    expect(stored.boundingBox?.longitudeWestI).toBe(-740100000);
   });
 });
 

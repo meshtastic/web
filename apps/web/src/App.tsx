@@ -7,6 +7,7 @@ import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
+import { useGeofenceAlerts } from "@core/hooks/useGeofenceAlerts.ts";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
 import { Connections } from "@pages/Connections/index.tsx";
@@ -14,6 +15,11 @@ import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ErrorBoundary } from "react-error-boundary";
 import { MapProvider } from "react-map-gl/maplibre";
+
+const GeofenceAlertsBridge = () => {
+  useGeofenceAlerts();
+  return null;
+};
 
 export function App() {
   useTheme();
@@ -41,6 +47,7 @@ export function App() {
               {device ? (
                 <div className="h-full flex w-full">
                   <DialogManager />
+                  <GeofenceAlertsBridge />
                   <KeyBackupReminder />
                   <RegionSetupReminder />
                   <CommandPalette />

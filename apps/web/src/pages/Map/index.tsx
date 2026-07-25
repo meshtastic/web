@@ -14,6 +14,7 @@ import {
   type HeatmapMode,
 } from "@components/PageComponents/Map/Layers/HeatmapLayer.tsx";
 import { NodesLayer } from "@components/PageComponents/Map/Layers/NodesLayer.tsx";
+import { GeofenceLayer } from "@components/PageComponents/Map/Layers/GeofenceLayer.tsx";
 import { PrecisionLayer } from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
 import {
   SNRLayer,
@@ -22,21 +23,26 @@ import {
 } from "@components/PageComponents/Map/Layers/SNRLayer.tsx";
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
+import { WaypointEditDialog } from "@components/Dialog/WaypointEditDialog.tsx";
+import { BoundingBoxOverlay } from "@components/PageComponents/Map/BoundingBoxOverlay.tsx";
+import { useAppStore, useDevice, type WaypointWithMetadata } from "@core/stores";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
+import { useBoundingBoxDraw } from "@core/hooks/useBoundingBoxDraw.ts";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import {
   useMyNodeAsProto,
   useNodesAsProto,
 } from "@core/hooks/useNodesAsProto.ts";
 import { cn } from "@core/utils/cn.ts";
-import { hasPos, toLngLat } from "@core/utils/geo.ts";
+import { hasPos, type LngLat, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
-import { FunnelIcon, LocateFixedIcon } from "lucide-react";
+import { FunnelIcon, LocateFixedIcon, MapPinPlusIcon } from "lucide-react";
 import {
   useCallback,
   useDeferredValue,
+  useEffect,
   useId,
   useMemo,
   useRef,
@@ -68,6 +74,44 @@ const MapPage = () => {
   const [snrHover, setSnrHover] = useState<SNRTooltipProps>();
   const [expandedCluster, setExpandedCluster] = useState<string | undefined>();
   const [popupState, setPopupState] = useState<PopupState | undefined>();
+
+  // Waypoint editor state
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorWaypoint, setEditorWaypoint] = useState<WaypointWithMetadata | undefined>();
+  const [editorInitialLngLat, setEditorInitialLngLat] = useState<LngLat | undefined>();
+  const [placementMode, setPlacementMode] = useState(false);
+  const boxDraw = useBoundingBoxDraw(mapRef);
+
+  const openEditor = useCallback((wp: WaypointWithMetadata) => {
+    setEditorWaypoint(wp);
+    setEditorInitialLngLat(undefined);
+    setEditorOpen(true);
+  }, []);
+
+  const openCreator = useCallback((lngLat: LngLat) => {
+    setEditorWaypoint(undefined);
+    setEditorInitialLngLat(lngLat);
+    setEditorOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (!placementMode) return;
+    const map = mapRef?.getMap();
+    if (!map) return;
+    const canvas = map.getCanvas();
+    const prev = canvas.style.cursor;
+    // Matches the `MapPinPlus` lucide icon used on the placement toggle button
+    // so the cursor advertises the same affordance while positioning a waypoint.
+    const pinSvg =
+      "data:image/svg+xml;utf8," +
+      encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.914 11.105A7.298 7.298 0 0 0 20 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32 32 0 0 0 .824-.738"/><circle cx="12" cy="10" r="3"/><path d="M16 18h6"/><path d="M19 15v6"/></svg>',
+      );
+    canvas.style.cursor = `url("${pinSvg}") 16 29, auto`;
+    return () => {
+      canvas.style.cursor = prev;
+    };
+  }, [mapRef, placementMode]);
 
   const [visibilityState, setVisibilityState] = useState<VisibilityState>(
     () => defaultVisibilityState,
@@ -178,10 +222,17 @@ const MapPage = () => {
     [getNode, t, heatmapLayerElementId],
   );
 
-  // Node markers & clusters
-  const onMapBackgroundClick = useCallback(() => {
-    setExpandedCluster(undefined);
-  }, []);
+  // Node markers & clusters + placement-mode capture
+  const onMapBackgroundClick = useCallback(
+    (event: MapLayerMouseEvent) => {
+      setExpandedCluster(undefined);
+      if (placementMode) {
+        openCreator([event.lngLat.lng, event.lngLat.lat]);
+        setPlacementMode(false);
+      }
+    },
+    [openCreator, placementMode],
+  );
 
   const markerElements = useMemo(
     () => (
@@ -232,9 +283,37 @@ const MapPage = () => {
         isVisible={visibilityState.waypoints}
         popupState={popupState}
         setPopupState={setPopupState}
+        onEditWaypoint={openEditor}
       />
     ),
-    [mapRef, myNode, visibilityState.waypoints, popupState],
+    [mapRef, myNode, visibilityState.waypoints, popupState, openEditor],
+  );
+
+  // Geofence overlays
+  const { waypoints } = useDevice();
+
+  // Deep-link focus from geofence alert toasts.
+  const focusWaypointId = useAppStore((s) => s.focusWaypointId);
+  const setFocusWaypointId = useAppStore((s) => s.setFocusWaypointId);
+  useEffect(() => {
+    if (focusWaypointId === undefined || !mapRef) return;
+    const wp = waypoints.find((w) => w.id === focusWaypointId);
+    if (!wp) return;
+    focusLngLat(toLngLat({ latitudeI: wp.latitudeI, longitudeI: wp.longitudeI }));
+    setPopupState({ type: "waypoint", waypoint: wp });
+    setFocusWaypointId(undefined);
+  }, [focusWaypointId, focusLngLat, mapRef, setFocusWaypointId, waypoints]);
+
+  const geofenceLayerElementId = useId();
+  const geofenceLayerElement = useMemo(
+    () => (
+      <GeofenceLayer
+        id={geofenceLayerElementId}
+        waypoints={waypoints}
+        isVisible={visibilityState.geofences}
+      />
+    ),
+    [waypoints, visibilityState.geofences, geofenceLayerElementId],
   );
 
   return (
@@ -252,6 +331,7 @@ const MapPage = () => {
         {markerElements}
         {snrLayerElement}
         {precisionCirclesElement}
+        {geofenceLayerElement}
         {waypointLayerElement}
 
         {snrHover && (
@@ -263,6 +343,65 @@ const MapPage = () => {
           />
         )}
       </BaseMap>
+
+      {placementMode && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 rounded-full bg-slate-900/90 text-white text-xs px-4 py-2 shadow-md flex items-center gap-3">
+          <span>{t("waypointEdit.placementHint")}</span>
+          <button
+            type="button"
+            className="text-slate-300 hover:text-white underline"
+            onClick={() => setPlacementMode(false)}
+          >
+            {t("waypointEdit.cancel")}
+          </button>
+        </div>
+      )}
+
+      <WaypointEditDialog
+        open={editorOpen && !boxDraw.active}
+        onOpenChange={(open) => {
+          setEditorOpen(open);
+          if (!open) {
+            setEditorWaypoint(undefined);
+            setEditorInitialLngLat(undefined);
+          }
+        }}
+        waypoint={editorWaypoint}
+        initialLngLat={editorInitialLngLat}
+        channel={0}
+        mapRef={mapRef}
+        onRequestBoundingBoxDraw={boxDraw.beginDraw}
+      />
+
+      {boxDraw.active && (
+        <>
+          <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 rounded-full bg-slate-900/90 text-white text-xs px-4 py-2 shadow-md flex items-center gap-3">
+            <span>{t("waypointEdit.drawHint")}</span>
+            <button
+              type="button"
+              className="text-slate-300 hover:text-white underline"
+              onClick={() => boxDraw.cancelDraw()}
+            >
+              {t("waypointEdit.cancel")}
+            </button>
+          </div>
+          <div
+            className="fixed inset-0 z-40 cursor-crosshair touch-none"
+            onPointerDown={boxDraw.onPointerDown}
+            onPointerMove={boxDraw.onPointerMove}
+            onPointerUp={boxDraw.onPointerUp}
+          >
+            {boxDraw.overlay?.start && boxDraw.overlay.current && mapRef && (
+              <BoundingBoxOverlay
+                mapRef={mapRef}
+                start={boxDraw.overlay.start}
+                current={boxDraw.overlay.current}
+              />
+            )}
+          </div>
+        </>
+      )}
+
       <div className="flex flex-col space-y-1 fixed top-35 right-2.5">
         {myNode && hasPos(myNode?.position) && (
           <button
@@ -311,6 +450,24 @@ const MapPage = () => {
           heatmapMode={heatmapMode}
           setHeatmapMode={setHeatmapMode}
         />
+
+        <button
+          type="button"
+          className={cn(
+            "rounded align-center",
+            "w-[29px] px-1 py-1 shadow-l outline-[2px] outline-stone-600/20",
+            "bg-stone-50 hover:bg-stone-200 dark:bg-stone-200 dark:hover:bg-stone-300 ",
+            "text-slate-600 hover:text-slate-700",
+            "dark:text-slate-600 hover:dark:text-slate-700",
+            placementMode &&
+              "bg-amber-500 text-white dark:bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-600",
+          )}
+          aria-label={t("waypointEdit.newWaypointAria")}
+          title={t("waypointEdit.newWaypointAria")}
+          onClick={() => setPlacementMode((v) => !v)}
+        >
+          <MapPinPlusIcon className="w-[21px]" />
+        </button>
       </div>
     </PageLayout>
   );

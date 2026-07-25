@@ -17,6 +17,7 @@ export interface VisibilityState {
   positionPrecision: boolean;
   traceroutes: boolean;
   waypoints: boolean;
+  geofences: boolean;
   heatmap: boolean;
 }
 
@@ -27,6 +28,7 @@ export const defaultVisibilityState: VisibilityState = {
   positionPrecision: false,
   traceroutes: false,
   waypoints: true,
+  geofences: true,
   heatmap: false,
 };
 
@@ -83,6 +85,7 @@ export function MapLayerTool({
         positionPrecision: false,
         traceroutes: false,
         waypoints: false,
+        geofences: false,
         heatmap: true,
       });
     } else {
@@ -97,6 +100,7 @@ export function MapLayerTool({
     () => [
       { key: "nodeMarkers", label: t("layerTool.nodeMarkers") },
       { key: "waypoints", label: t("layerTool.waypoints") },
+      { key: "geofences", label: t("layerTool.geofences") },
       { key: "directNeighbors", label: t("layerTool.directNeighbors") },
       { key: "remoteNeighbors", label: t("layerTool.remoteNeighbors") },
       { key: "positionPrecision", label: t("layerTool.positionPrecision") },
