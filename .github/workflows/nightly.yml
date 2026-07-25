@@ -103,7 +103,7 @@ jobs:
 
       - name: Push To GHCR
         id: push-to-registry
-        uses: redhat-actions/push-to-registry@v2
+        uses: redhat-actions/push-to-registry@v3
         with:
           image: ${{ steps.build-container.outputs.image }}
           # Push the same tags used at build time:
