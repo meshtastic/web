@@ -1,8 +1,8 @@
 {
   "button": {
     "apply": "적용",
-    "addConnection": "Add Connection",
-    "saveConnection": "Save connection",
+    "addConnection": "연결 추가",
+    "saveConnection": "연결 저장",
     "backupKey": "백업 키",
     "cancel": "취소",
     "connect": "연결",
@@ -25,10 +25,10 @@
     "requestNewKeys": "새로운 키 요청",
     "requestPosition": "위치 요청",
     "reset": "초기화",
-    "retry": "Retry",
+    "retry": "재시도",
     "save": "저장",
-    "setDefault": "Set as default",
-    "unsetDefault": "Unset default",
+    "setDefault": "초기화 설정",
+    "unsetDefault": "초기화 해제",
     "scanQr": " QR코드 스캔",
     "traceRoute": "추적 루트",
     "submit": "제출"
@@ -52,7 +52,6 @@
       "unknown": "알 수 없는 hops 떨어짐"
     },
     "megahertz": "MHz",
-    "kilohertz": "kHz",
     "raw": "raw",
     "meter": {
       "one": "미터",
@@ -60,8 +59,8 @@
       "suffix": "m"
     },
     "kilometer": {
-      "one": "Kilometer",
-      "plural": "Kilometers",
+      "one": "킬로미터",
+      "plural": "킬로미터",
       "suffix": "km"
     },
     "minute": {
@@ -84,8 +83,8 @@
     "day": {
       "one": "일",
       "plural": "일",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "today": "오늘",
+      "yesterday": "어제"
     },
     "month": {
       "one": "월",
@@ -106,8 +105,8 @@
       "plural": "레코드"
     },
     "degree": {
-      "one": "Degree",
-      "plural": "Degrees",
+      "one": "도",
+      "plural": "도",
       "suffix": "°"
     }
   },
@@ -157,7 +156,7 @@
       "key": "키가 필요합니다."
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+      "number": "형식이 잘못되었습니다. 410-930MHz 범위의 값 또는 0 을 입력(기본값)."
     }
   },
   "yes": "Yes",

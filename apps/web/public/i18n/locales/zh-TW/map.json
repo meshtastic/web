@@ -28,7 +28,7 @@
     "expires": "到期時間：",
     "distance": "距離：",
     "bearing": "絕對方位：",
-    "lockedTo": "Locked by:",
+    "lockedTo": "鎖定者：",
     "latitude": "緯度：",
     "longitude": "經度："
   },
