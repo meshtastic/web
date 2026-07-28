@@ -10,3 +10,9 @@ export { SqlocalNodesRepository } from "./src/nodes/index.ts";
 export type { SqlocalNodesRepositoryOptions } from "./src/nodes/index.ts";
 export { SqlocalTelemetryRepository } from "./src/telemetry/index.ts";
 export type { SqlocalTelemetryRepositoryOptions } from "./src/telemetry/index.ts";
+export { SqlocalNodeMetricsRepository } from "./src/nodeMetrics/index.ts";
+export type {
+  SqlocalNodeMetricsRepositoryOptions,
+  NodeMetricSample,
+  NodeMetricsRetentionPolicy,
+} from "./src/nodeMetrics/index.ts";

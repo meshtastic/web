@@ -1,12 +1,14 @@
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
 import type { ConnectionId } from "@core/stores/deviceStore/types";
-import { createLogger, MeshDevice } from "@meshtastic/sdk";
+import { createLogger, DeviceStatusEnum, MeshDevice } from "@meshtastic/sdk";
 import {
   SqlocalDraftRepository,
   SqlocalMessageRepository,
 } from "@meshtastic/sdk-storage-sqlocal/chat";
 import { SqlocalNodesRepository } from "@meshtastic/sdk-storage-sqlocal/nodes";
 import { SqlocalTelemetryRepository } from "@meshtastic/sdk-storage-sqlocal/telemetry";
+import { SqlocalNodeMetricsRepository } from "@meshtastic/sdk-storage-sqlocal/nodeMetrics";
+import { attachNodeMetricsRecorder } from "./nodeMetricsRecorder.ts";
 import type { TransportHTTP } from "@meshtastic/transport-http";
 import type { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import type { TransportWebSerial } from "@meshtastic/transport-web-serial";
@@ -24,6 +26,10 @@ const CHAT_RETENTION = {
 } as const;
 const TELEMETRY_RETENTION = {
   maxPerNode: 500,
+  olderThanMs: 1000 * 60 * 60 * 24 * 30,
+} as const;
+const NODE_METRICS_RETENTION = {
+  maxPerMetric: 1000,
   olderThanMs: 1000 * 60 * 60 * 24 * 30,
 } as const;
 const STORAGE_OPEN_TIMEOUT_MS = 5000;
@@ -45,6 +51,7 @@ export async function buildMeshDevice(
   let draftRepository: SqlocalDraftRepository | undefined;
   let nodesRepository: SqlocalNodesRepository | undefined;
   let telemetryRepository: SqlocalTelemetryRepository | undefined;
+  let nodeMetricsRepository: SqlocalNodeMetricsRepository | undefined;
   try {
     const t0 = Date.now();
     const db = await Promise.race([
@@ -75,6 +82,9 @@ export async function buildMeshDevice(
     telemetryRepository = new SqlocalTelemetryRepository(db, {
       deviceId: connectionId,
     });
+    nodeMetricsRepository = new SqlocalNodeMetricsRepository(db, {
+      deviceId: connectionId,
+    });
     log.debug("buildMeshDevice: repositories opened");
   } catch (err) {
     const e = err as Error;
@@ -87,7 +97,7 @@ export async function buildMeshDevice(
     );
   }
 
-  return new MeshDevice(transport, {
+  const meshDevice = new MeshDevice(transport, {
     configId: deviceId,
     chat:
       chatRepository || draftRepository
@@ -102,4 +112,19 @@ export async function buildMeshDevice(
       ? { repository: telemetryRepository, retention: TELEMETRY_RETENTION }
       : undefined,
   });
+
+  // The node-metrics recorder has no SDK client of its own — it subscribes to
+  // the mesh client's event bus and persists directly. Detached on disconnect.
+  if (nodeMetricsRepository) {
+    const detach = attachNodeMetricsRecorder(
+      meshDevice.meshClient,
+      nodeMetricsRepository,
+      { retention: NODE_METRICS_RETENTION },
+    );
+    meshDevice.meshClient.events.onDeviceStatus.subscribe((status) => {
+      if (status === DeviceStatusEnum.DeviceDisconnected) detach();
+    });
+  }
+
+  return meshDevice;
 }

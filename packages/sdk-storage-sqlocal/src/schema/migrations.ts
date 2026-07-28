@@ -65,4 +65,18 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
       )`,
     ],
   },
+  {
+    version: 3,
+    sql: [
+      `CREATE TABLE IF NOT EXISTS node_metrics (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        device_id INTEGER NOT NULL,
+        node_num INTEGER NOT NULL,
+        metric TEXT NOT NULL,
+        ts INTEGER NOT NULL,
+        value REAL NOT NULL
+      )`,
+      `CREATE INDEX IF NOT EXISTS idx_node_metrics_node_metric_ts ON node_metrics(device_id, node_num, metric, ts)`,
+    ],
+  },
 ];

@@ -53,4 +53,27 @@ describe("MIGRATIONS", () => {
       for (const stmt of MIGRATIONS[0]!.sql) db.run(stmt);
     }).not.toThrow();
   });
+
+  it("applying the full chain creates the node_metrics table + index", async () => {
+    const db = await freshSqlite();
+    for (const migration of MIGRATIONS) {
+      for (const stmt of migration.sql) db.run(stmt);
+    }
+
+    const tables = db
+      .exec(
+        "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name",
+      )[0]
+      ?.values.flat() as string[];
+    expect(tables).toEqual(expect.arrayContaining(["node_metrics"]));
+
+    const indexes = db
+      .exec(
+        "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='node_metrics'",
+      )[0]
+      ?.values.flat() as string[];
+    expect(indexes).toEqual(
+      expect.arrayContaining(["idx_node_metrics_node_metric_ts"]),
+    );
+  });
 });
