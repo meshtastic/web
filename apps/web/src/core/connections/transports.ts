@@ -154,6 +154,17 @@ async function openSerial(
       };
     }
   ).serial;
+  const requestPortOptions =
+    conn.usbVendorId !== undefined && conn.usbProductId !== undefined
+      ? {
+          filters: [
+            {
+              usbVendorId: conn.usbVendorId,
+              usbProductId: conn.usbProductId,
+            },
+          ],
+        }
+      : {};
 
   let port = opts.cachedSerialPort;
   if (!port) {
@@ -180,14 +191,14 @@ async function openSerial(
           { count: matchingPorts.length },
         );
         if (opts.allowPrompt) {
-          port = await serial.requestPort({});
+          port = await serial.requestPort(requestPortOptions);
         }
       }
     }
   }
   if (!port && opts.allowPrompt) {
     log.debug("openSerial: requesting port via picker");
-    port = await serial.requestPort({});
+    port = await serial.requestPort(requestPortOptions);
   }
   if (!port) {
     log.warn("openSerial: no port resolved");

@@ -44,6 +44,14 @@ describe("openTransport serial selection", () => {
     );
 
     expect(requestPort).toHaveBeenCalledOnce();
+    expect(requestPort).toHaveBeenCalledWith({
+      filters: [
+        {
+          usbVendorId: info.usbVendorId,
+          usbProductId: info.usbProductId,
+        },
+      ],
+    });
     expect(TransportWebSerial.createFromPort).toHaveBeenCalledWith(
       selectedPort,
     );
