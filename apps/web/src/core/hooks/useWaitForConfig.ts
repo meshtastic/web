@@ -9,6 +9,8 @@ type UseWaitForConfigProps =
   | { configCase: ValidConfigType; moduleConfigCase?: never }
   | { configCase?: never; moduleConfigCase: ValidModuleConfigType };
 
+const pendingConfigWaiters = new Map<string, Promise<void>>();
+
 export function useWaitForConfig({
   configCase,
   moduleConfigCase,
@@ -21,10 +23,17 @@ export function useWaitForConfig({
     : moduleConfig[moduleConfigCase as ValidModuleConfigType] !== undefined;
 
   if (!isDataDefined) {
-    throw new Promise<void>((resolve) => {
-      const hasRequestedConfig = (): boolean => {
+    const configKey = configCase ?? `module:${moduleConfigCase}`;
+    const waiterKey = `${device.id}:${configKey}`;
+    const existingWaiter = pendingConfigWaiters.get(waiterKey);
+    if (existingWaiter) {
+      throw existingWaiter;
+    }
+
+    const waiter = new Promise<void>((resolve) => {
+      const isWaitComplete = (): boolean => {
         const current = useDeviceStore.getState().getDevice(device.id);
-        if (!current) return false;
+        if (!current) return true;
         return configCase
           ? current.config[configCase] !== undefined
           : current.moduleConfig[moduleConfigCase as ValidModuleConfigType] !==
@@ -33,7 +42,7 @@ export function useWaitForConfig({
 
       let unsubscribe = (): void => {};
       const check = (): void => {
-        if (hasRequestedConfig()) {
+        if (isWaitComplete()) {
           unsubscribe();
           resolve();
         }
@@ -41,5 +50,8 @@ export function useWaitForConfig({
       unsubscribe = useDeviceStore.subscribe(check);
       check();
     });
+    pendingConfigWaiters.set(waiterKey, waiter);
+    void waiter.finally(() => pendingConfigWaiters.delete(waiterKey));
+    throw waiter;
   }
 }

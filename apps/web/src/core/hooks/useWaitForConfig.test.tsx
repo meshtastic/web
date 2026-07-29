@@ -4,7 +4,7 @@ import { useDeviceStore } from "@core/stores/deviceStore/index.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { act, renderHook } from "@testing-library/react";
 import type { PropsWithChildren } from "react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useWaitForConfig } from "./useWaitForConfig.ts";
 
 const DEVICE_ID = 4242;
@@ -55,5 +55,40 @@ describe("useWaitForConfig", () => {
       ),
     ]);
     expect(outcome).toBe("resolved");
+  });
+
+  it("reuses one store subscription across repeated pending renders", async () => {
+    const device = useDeviceStore.getState().addDevice(DEVICE_ID);
+    const subscribe = vi.spyOn(useDeviceStore, "subscribe");
+    const { result, rerender } = renderHook(
+      () => {
+        try {
+          useWaitForConfig({ configCase: "lora" });
+          return "ready" as const;
+        } catch (pending) {
+          return pending as Promise<void>;
+        }
+      },
+      { wrapper },
+    );
+
+    const pending = result.current;
+    rerender();
+    rerender();
+
+    expect(result.current).toBe(pending);
+    expect(subscribe).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      device.setConfig(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: "lora",
+            value: create(Protobuf.Config.Config_LoRaConfigSchema, {}),
+          },
+        }),
+      );
+    });
+    await pending;
   });
 });

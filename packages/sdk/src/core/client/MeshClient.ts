@@ -155,8 +155,9 @@ export class MeshClient {
   }
 
   /**
-   * Begin the two-stage config-only → nodes-only handshake. Resolves once
-   * both requests have been written; streamed completion is asynchronous.
+   * Begin the two-stage config-only → nodes-only handshake. Resolves once the
+   * config-only request is written; handleConfigComplete() sends the nodes-only
+   * request after the device finishes streaming configuration.
    */
   public async connect(): Promise<void> {
     this.updateDeviceStatus(DeviceStatusEnum.DeviceConnecting);

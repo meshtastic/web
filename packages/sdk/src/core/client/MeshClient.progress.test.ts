@@ -109,12 +109,15 @@ describe("MeshClient.progress", () => {
     const client = new MeshClient({ transport });
     const completed: number[] = [];
     client.events.onConfigComplete.subscribe((id) => completed.push(id));
+    const handleConfigComplete = vi.spyOn(client, "handleConfigComplete");
 
     await client.configure();
     respond.withConfigCompleteId(NODES_ONLY_NONCE);
     respond.withConfigCompleteId(12345);
 
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await vi.waitFor(() => {
+      expect(handleConfigComplete).toHaveBeenCalledTimes(2);
+    });
     expect(sent).toHaveLength(2);
     expect(client.progress.value.phase).toBe("configuring");
     expect(completed).toEqual([]);

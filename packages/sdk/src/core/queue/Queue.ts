@@ -112,6 +112,9 @@ export class Queue {
     this.queue.push(queuedItem);
     while (!queuedItem.sent) {
       await this.processQueue(outputStream);
+      if (!queuedItem.sent && !this.queue.includes(queuedItem)) {
+        throw new Error(`Packet ${item.id} was cancelled before being sent`);
+      }
       if (!queuedItem.sent) {
         await new Promise((resolve) => setTimeout(resolve, 10));
       }
