@@ -30,7 +30,6 @@ export const messages = sqliteTable(
     routingError: integer("routing_error"),
   },
   (t) => ({
-    pk: index("messages_pk").on(t.deviceId, t.id),
     deviceMessageUnique: uniqueIndex("idx_messages_device_id_id_unique").on(
       t.deviceId,
       t.id,

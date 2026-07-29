@@ -105,8 +105,6 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
           device_id,
           conversation_key,
           from_node,
-          MIN(to_node) AS peer_node,
-          COUNT(*) AS message_count,
           COUNT(DISTINCT to_node) AS recipient_count,
           SUM(CASE
             WHEN state <> 'ack' OR routing_error IS NOT NULL THEN 1
@@ -149,6 +147,7 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
             AND legacy.conversation_key = messages.conversation_key
             AND legacy.from_node = messages.from_node
         )`,
+      `DROP INDEX IF EXISTS messages_pk`,
     ],
   },
 ];

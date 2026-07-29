@@ -353,7 +353,12 @@ export class ChatClient {
       try {
         await this.repository.append(message, conv);
         if (this.retention) await this.repository.prune(this.retention);
-      } catch {
+      } catch (error) {
+        this.client.log.error(
+          "ChatClient",
+          `Unable to append message ${message.id} in ${this.keyFor(conv)}`,
+          error,
+        );
         // persistence failure must not break reactive flow
       }
     })();
@@ -379,7 +384,12 @@ export class ChatClient {
       try {
         await prior;
         await this.repository.updateState(messageId, state, routingError);
-      } catch {
+      } catch (error) {
+        this.client.log.error(
+          "ChatClient",
+          `Unable to update message ${messageId} to ${state}`,
+          error,
+        );
         // persistence failure must not break reactive flow
       }
     })();

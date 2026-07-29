@@ -13,7 +13,7 @@ import {
 import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { type MultiTabCoordinator } from "../coordination/MultiTabCoordinator.ts";
 import type { SqlocalDb } from "../db.ts";
-import { messages } from "../schema/chat.ts";
+import { messages, type MessageRow } from "../schema/chat.ts";
 
 export interface SqlocalMessageRepositoryOptions {
   /** Identifies the device (matches MeshRegistry ConnectionId). */
@@ -206,20 +206,6 @@ export class SqlocalMessageRepository implements MessageRepository {
       });
     }
   }
-}
-
-interface MessageRow {
-  id: number;
-  deviceId: number;
-  conversationKey: string;
-  fromNode: number;
-  toNode: number;
-  channel: number;
-  rxTime: number;
-  type: "broadcast" | "direct";
-  text: string;
-  state: "pending" | "ack" | "relayed" | "failed";
-  routingError: number | null;
 }
 
 function rowToMessage(row: MessageRow): Message {

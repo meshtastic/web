@@ -5,6 +5,8 @@ export enum MessageState {
   Failed = "failed",
 }
 
+// These values deliberately allow Failed to replace Relayed while Ack remains
+// terminal: Pending < Relayed < Failed < Ack.
 const messageStatePrecedence: Record<MessageState, number> = {
   [MessageState.Pending]: 1,
   [MessageState.Relayed]: 2,

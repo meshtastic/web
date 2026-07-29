@@ -1,5 +1,5 @@
 import * as Protobuf from "@meshtastic/protobufs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MeshClient } from "../../core/client/MeshClient.ts";
 import { createFakeTransport } from "../../core/testing/createFakeTransport.ts";
 import { ChannelNumber } from "../../core/types.ts";
@@ -68,6 +68,18 @@ class DelayedFirstUpdateRepository extends InMemoryMessageRepository {
   }
 }
 
+class FailingAppendRepository extends InMemoryMessageRepository {
+  override async append(): Promise<void> {
+    throw new Error("append failed");
+  }
+}
+
+class FailingUpdateRepository extends InMemoryMessageRepository {
+  override async updateState(): Promise<void> {
+    throw new Error("update failed");
+  }
+}
+
 async function withAckFlush<T>(
   client: MeshClient,
   run: () => Promise<T>,
@@ -97,6 +109,61 @@ async function waitForPersistedState(
 }
 
 describe("ChatClient persistence", () => {
+  it("logs append failures without breaking reactive updates", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({
+      transport,
+      chat: { repository: new FailingAppendRepository() },
+    });
+    const error = vi.spyOn(client.log, "error").mockImplementation(() => {});
+
+    client.events.onMessagePacket.dispatch({
+      id: 42,
+      from: 7,
+      to: 0xffffffff,
+      channel: ChannelNumber.Primary,
+      type: "broadcast",
+      rxTime: new Date(),
+      data: "hi",
+    });
+
+    await vi.waitFor(() => {
+      expect(error).toHaveBeenCalledWith(
+        "ChatClient",
+        expect.stringContaining("append message 42"),
+        expect.any(Error),
+      );
+    });
+    expect(client.chat.messages(ChannelNumber.Primary).value).toHaveLength(1);
+  });
+
+  it("logs state persistence failures without changing the reactive state", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({
+      transport,
+      chat: { repository: new FailingUpdateRepository() },
+    });
+    const error = vi.spyOn(client.log, "error").mockImplementation(() => {});
+
+    const result = await client.chat.send({
+      text: "x".repeat(229),
+      destination: "broadcast",
+      channel: ChannelNumber.Primary,
+    });
+
+    expect(result.status).toBe("error");
+    await vi.waitFor(() => {
+      expect(error).toHaveBeenCalledWith(
+        "ChatClient",
+        expect.stringContaining("update message"),
+        expect.any(Error),
+      );
+    });
+    expect(client.chat.messages(ChannelNumber.Primary).value[0]?.state).toBe(
+      MessageState.Failed,
+    );
+  });
+
   it("hydrates messages from the repository on first subscription", async () => {
     const repository = new InMemoryMessageRepository();
     await repository.appendBatch([

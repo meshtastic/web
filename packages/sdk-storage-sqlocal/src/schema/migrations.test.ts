@@ -46,7 +46,7 @@ describe("MIGRATIONS", () => {
     );
   });
 
-  it("latest migration adds a unique message id index", async () => {
+  it("latest migration replaces the legacy message id index with a unique index", async () => {
     const db = await freshSqlite();
     for (const migration of MIGRATIONS) {
       for (const stmt of migration.sql) db.run(stmt);
@@ -57,6 +57,7 @@ describe("MIGRATIONS", () => {
       )[0]
       ?.values.flat() as string[];
     expect(indexes).toContain("idx_messages_device_id_id_unique");
+    expect(indexes).not.toContain("messages_pk");
   });
 
   it("latest migration rekeys legacy outbound direct rows to recipient conversations", async () => {
