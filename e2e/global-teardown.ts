@@ -17,6 +17,8 @@ export default async function globalTeardown(): Promise<void> {
     console.log("[e2e] tearing down meshtasticd mesh ...");
     execSync(`docker compose -f ${COMPOSE_FILE} down -v`, { stdio: "inherit" });
   } else {
-    console.log("[e2e] leaving meshtasticd mesh running (set E2E_DOCKER_DOWN=1 to stop).");
+    console.log(
+      "[e2e] leaving meshtasticd mesh running (set E2E_DOCKER_DOWN=1 to stop).",
+    );
   }
 }

@@ -77,7 +77,6 @@ const DateDelimiter = ({ label }: { label: string }) => (
 );
 
 const MessageSkeleton = () => {
-  console.log("[ChannelChat] Showing MessageSkeleton (Suspense fallback)");
   return (
     <li className="group w-full py-2 relative list-none rounded-md">
       <div className="grid grid-cols-[auto_1fr] gap-x-2">

@@ -31,14 +31,14 @@
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
-    "better-result": "^2.9.2"
+    "better-result": "^2.10.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.0.0",
     "@types/react": "^19.2.17",
     "jsdom": "^29.1.1",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "peerDependencies": {
     "react": "^18 || ^19"
