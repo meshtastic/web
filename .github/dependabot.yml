@@ -3,11 +3,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     cooldown:
       default-days: 3 # 1 day after pnpm's cutoff, prevent a race
     open-pull-requests-limit: 10 # Increase PR limit
