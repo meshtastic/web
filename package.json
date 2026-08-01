@@ -39,7 +39,7 @@
     "@meshtastic/core": "jsr:^2.6.6",
     "@meshtastic/sdk": "workspace:*",
     "@playwright/test": "^1.62.0",
-    "@types/node": "^26.1.0",
+    "@types/node": "^26.1.2",
     "@typescript/typescript6": "^6.0.2",
     "husky": "^9.1.0",
     "lint-staged": "^17.2.0",
