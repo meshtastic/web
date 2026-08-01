@@ -5,13 +5,18 @@ on:
     branches:
       - main
 
+# This workflow only builds; it publishes nothing.
 permissions:
-  contents: write
-  packages: write
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-package:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
