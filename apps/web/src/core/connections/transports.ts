@@ -154,13 +154,24 @@ async function openSerial(
       };
     }
   ).serial;
+  const requestPortOptions =
+    conn.usbVendorId !== undefined && conn.usbProductId !== undefined
+      ? {
+          filters: [
+            {
+              usbVendorId: conn.usbVendorId,
+              usbProductId: conn.usbProductId,
+            },
+          ],
+        }
+      : {};
 
   let port = opts.cachedSerialPort;
   if (!port) {
     const ports = await serial.getPorts();
     log.debug("openSerial: getPorts", { count: ports.length });
     if (ports && conn.usbVendorId && conn.usbProductId) {
-      port = ports.find((p: SerialPort) => {
+      const matchingPorts = ports.filter((p: SerialPort) => {
         const info =
           (
             p as SerialPort & {
@@ -172,11 +183,22 @@ async function openSerial(
           info.usbProductId === conn.usbProductId
         );
       });
+      if (matchingPorts.length === 1) {
+        port = matchingPorts[0];
+      } else if (matchingPorts.length > 1) {
+        log.info(
+          "openSerial: multiple permitted ports share VID/PID; user selection required",
+          { count: matchingPorts.length },
+        );
+        if (opts.allowPrompt) {
+          port = await serial.requestPort(requestPortOptions);
+        }
+      }
     }
   }
   if (!port && opts.allowPrompt) {
     log.debug("openSerial: requesting port via picker");
-    port = await serial.requestPort({});
+    port = await serial.requestPort(requestPortOptions);
   }
   if (!port) {
     log.warn("openSerial: no port resolved");
