@@ -50,7 +50,7 @@ importers:
         version: 1.76.0
       tsdown:
         specifier: ^0.22.14
-        version: 0.22.14(@volar/typescript@2.4.28)(publint@0.3.21)(tsx@4.21.0)(typescript@7.0.2)
+        version: 0.22.14(@volar/typescript@2.4.28)(publint@0.3.22)(tsx@4.21.0)(typescript@7.0.2)
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -510,8 +510,8 @@ importers:
         specifier: ^6.0.4
         version: 6.0.4(vite@8.1.5(@types/node@26.1.1)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.49.0)(tsx@4.21.0)(yaml@2.9.0))
       publint:
-        specifier: ^0.3.21
-        version: 0.3.21
+        specifier: ^0.3.22
+        version: 0.3.22
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -5478,8 +5478,8 @@ packages:
   proxy-target@3.0.2:
     resolution: {integrity: sha512-FFE1XNwXX/FNC3/P8HiKaJSy/Qk68RitG/QEcLy/bVnTAPlgTAWPZKh0pARLAnpfXQPKyalBhk009NRTgsk8vQ==}
 
-  publint@0.3.21:
-    resolution: {integrity: sha512-OqejcnMV6E9zel2oCrUOJEiiFkGiAAni0A6ibfQNh1k9Gu5z4F+Yso8lllam7AzmV6Do0vp7u3UpZNRBwuXaHQ==}
+  publint@0.3.22:
+    resolution: {integrity: sha512-6Z/scsr5CA7APdwyF35EY88CqgDj1textWuY788DVTJYPCWVv/Wn9G6KmLnrVRnStgYcahqN4wCDLZGSbQJ69w==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -12050,7 +12050,7 @@ snapshots:
 
   proxy-target@3.0.2: {}
 
-  publint@0.3.21:
+  publint@0.3.22:
     dependencies:
       '@publint/pack': 0.1.6
       package-manager-detector: 1.8.0
@@ -12732,7 +12732,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tsdown@0.22.14(@volar/typescript@2.4.28)(publint@0.3.21)(tsx@4.21.0)(typescript@7.0.2):
+  tsdown@0.22.14(@volar/typescript@2.4.28)(publint@0.3.22)(tsx@4.21.0)(typescript@7.0.2):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
@@ -12750,7 +12750,7 @@ snapshots:
       unconfig-core: 7.5.0
       verkit: 0.3.0
     optionalDependencies:
-      publint: 0.3.21
+      publint: 0.3.22
       tsx: 4.21.0
       typescript: 7.0.2
     transitivePeerDependencies:
