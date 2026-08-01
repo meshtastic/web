@@ -31,7 +31,6 @@ export const DialogManager = () => {
         onOpenChange={(open) => {
           setDialogOpen("import", open);
         }}
-        loraConfig={config.lora}
       />
       <ShutdownDialog
         open={dialog.shutdown}
