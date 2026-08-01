@@ -228,7 +228,12 @@ export class ConfigEditor {
     this.workingModules.value = this.baselineModules.peek();
     this.workingChannels.value = new Map(this.baselineChannels.peek());
     this.workingOwner.value = this.baselineOwner.peek();
-    this.recomputeDirty();
+    this.queuedAdminMessages.value = [];
+    this._dirtyRadioSections.value = [];
+    this._dirtyModuleSections.value = [];
+    this._dirtyChannels.value = [];
+    this._isOwnerDirty.value = false;
+    this._isDirty.value = false;
   }
 
   /**
@@ -403,8 +408,8 @@ function shallowEqual(a: unknown, b: unknown): boolean {
   if (typeof a !== "object" || typeof b !== "object") return false;
   const ao = a as Record<string, unknown>;
   const bo = b as Record<string, unknown>;
-  const aKeys = Object.keys(ao);
-  const bKeys = Object.keys(bo);
+  const aKeys = Object.keys(ao).filter((key) => key !== "$typeName");
+  const bKeys = Object.keys(bo).filter((key) => key !== "$typeName");
   if (aKeys.length !== bKeys.length) return false;
   for (const k of aKeys) {
     const av = ao[k];
