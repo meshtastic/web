@@ -14,14 +14,14 @@
       "tooltip": "將此節點加入/移除收藏"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "非最愛"
     },
     "error": {
       "label": "錯誤",
       "text": "無法取得節點詳細資料，請稍後重試。"
     },
     "status": {
-      "heard": "Heard",
+      "heard": "已收到",
       "mqtt": "MQTT"
     },
     "elevation": {
@@ -40,12 +40,12 @@
       "connection": "連線",
       "lastHeard": "最後接收時間",
       "encryption": "加密",
-      "model": "Model",
+      "model": "型號",
       "macAddress": "MAC 地址"
     },
     "connectionStatus": {
       "direct": "直線",
-      "away": "away",
+      "away": "離線",
       "viaMqtt": "，透過 MQTT"
     }
   },
