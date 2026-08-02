@@ -1,51 +1,51 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "Nic nie znaleziono.",
   "page": {
-    "title": "Command Menu"
+    "title": "Menu poleceń"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "Przypnij grupę poleceń"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "Odepnij grupę poleceń"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Idź do",
     "command": {
       "messages": "Wiadomości",
       "map": "Mapa",
-      "config": "Config",
-      "nodes": "Nodes"
+      "config": "Konfiguracja",
+      "nodes": "Węzeł"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Zarządzaj",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "Zmień węzeł",
+      "connectNewNode": "Podłącz nowe urządzenie"
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "Kontekstowy",
     "command": {
-      "qrCode": "QR Code",
+      "qrCode": "Kod QR",
       "qrGenerator": "Generator",
-      "qrImport": "Import",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Reboot Device",
-      "resetNodeDb": "Reset Node DB",
+      "qrImport": "Zaimportuj",
+      "scheduleShutdown": "Zaplanowane wyłączenie",
+      "scheduleReboot": "Zrestartuj urządzenie",
+      "resetNodeDb": "Usuń bazę węzłów",
       "dfuMode": "Wejdź w tryb DFU",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config",
+      "factoryResetDevice": "Przywracanie ustawień fabrycznych urządzenia",
+      "factoryResetConfig": "Przywracanie ustawień fabrycznych konfiguracji",
       "disconnect": "Rozłącz"
     }
   },
   "debug": {
-    "label": "Debug",
+    "label": "Debugowanie",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message",
-      "clearAllStores": "Clear All Local Storage"
+      "reconfigure": "Ponowna konfiguracja",
+      "clearAllStoredMessages": "Wyczyść wszystkie zachowane wiadomości",
+      "clearAllStores": "Wyczyść całą pamięć lokalną"
     }
   }
 }
