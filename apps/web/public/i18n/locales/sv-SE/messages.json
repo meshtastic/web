@@ -19,21 +19,83 @@
     "replyLabel": "Svara"
   },
   "deliveryStatus": {
-    "delivered": {
-      "label": "Meddelandet har levererats",
-      "displayText": "Meddelandet har levererats"
+    "retry": "Försök igen",
+    "retryAriaLabel": "Försök skicka meddelandet igen: {{status}}",
+    "deliveredToMesh": {
+      "displayText": "Levererat till meshnätet",
+      "detailText": "Minst en nod hörde detta kanalmeddelande."
     },
-    "failed": {
-      "label": "Meddelandeleverans misslyckades",
-      "displayText": "Leverans misslyckades"
+    "deliveredToRecipient": {
+      "displayText": "Levererat till mottagaren",
+      "detailText": "Mottagaren bekräftade detta direktmeddelande."
+    },
+    "encryptedSendFailed": {
+      "displayText": "Kunde inte skicka krypterat meddelande",
+      "detailText": "Radion kunde inte skapa den krypterade vägen för detta meddelande. Låt nodinformationen synkroniseras och försök sedan igen."
+    },
+    "adminKeyNotAuthorized": {
+      "displayText": "Administratörsnyckeln är inte auktoriserad",
+      "detailText": "Den offentliga administratörsnyckeln är inte auktoriserad på destinationen."
+    },
+    "adminSessionExpired": {
+      "displayText": "Administratörssessionen har gått ut",
+      "detailText": "Administratörssessionsnyckeln saknas, är ogiltig eller har gått ut. Starta en ny administratörssession och försök igen."
+    },
+    "dutyCycleLimit": {
+      "displayText": "Duty cycle-gräns",
+      "detailText": "Radion är tillfälligt blockerad av den regionala sändningstidsgränsen. Försök igen senare."
+    },
+    "failedToMesh": {
+      "displayText": "Misslyckades att leverera till meshnätet",
+      "detailText": "Ingen nod bekräftade detta meddelande. Försök igen när du har bättre signal eller bättre meshtäckning."
+    },
+    "invalidRequest": {
+      "displayText": "Ogiltig begäran",
+      "detailText": "Den mottagande appen avvisade begäran. Kontrollera meddelandet eller kommandot och försök igen."
+    },
+    "messageTooLarge": {
+      "displayText": "Meddelandet är för stort för att skickas",
+      "detailText": "Korta meddelandet och skicka det igen."
+    },
+    "noAppResponse": {
+      "displayText": "Inget appsvar",
+      "detailText": "Destinationen tog emot begäran, men ingen app eller modul svarade."
+    },
+    "noChannel": {
+      "displayText": "Kanal/nyckel matchar inte",
+      "detailText": "Detta meddelande kunde inte kodas eller avkodas med en matchande kanal/nyckel. Kontrollera kanalen och nyckeln och försök igen."
+    },
+    "noRadioInterface": {
+      "displayText": "Inget radiogränssnitt",
+      "detailText": "Radion har inget användbart gränssnitt för denna sändning."
+    },
+    "notAuthorized": {
+      "displayText": "Inte auktoriserad",
+      "detailText": "Destinationen nekade behörighet för denna begäran."
+    },
+    "rateLimited": {
+      "displayText": "Hastighetsbegränsad",
+      "detailText": "Meddelanden skickas för snabbt. Vänta en stund och försök igen."
+    },
+    "recipientKeyUnavailable": {
+      "displayText": "Mottagarens nyckel är inte tillgänglig",
+      "detailText": "Din nod har inte mottagarens offentliga nyckel ännu. Låt nodinformationen synkroniseras och försök sedan igen."
+    },
+    "recipientNeedsYourKey": {
+      "displayText": "Mottagaren behöver din nyckel",
+      "detailText": "Mottagaren känner inte till din offentliga nyckel ännu. Din nod kan dela sin information automatiskt; försök igen efter synkronisering."
+    },
+    "relayed": {
+      "displayText": "Vidarebefordrat, inte bekräftat av mottagaren",
+      "detailText": "En nod vidarebefordrade detta meddelande, men mottagaren har inte bekräftat det."
+    },
+    "sending": {
+      "displayText": "Skickar...",
+      "detailText": "Radion försöker fortfarande skicka detta meddelande."
     },
     "unknown": {
-      "label": "Okänd meddelandestatus",
-      "displayText": "Okänd status"
-    },
-    "waiting": {
-      "label": "Skickar meddelande",
-      "displayText": "Väntar på leverans"
+      "displayText": "Meddelandestatus okänd",
+      "detailText": "Meddelandestatusen är inte tillgänglig."
     }
   }
 }

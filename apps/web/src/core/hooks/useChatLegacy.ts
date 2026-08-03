@@ -64,6 +64,7 @@ function toLegacy(
     date: message.rxTime.getTime(),
     messageId: message.id,
     state: mapState(message.state),
+    routingError: message.routingError,
     message: message.text,
   } as LegacyMessage;
 }
@@ -72,6 +73,8 @@ function mapState(state: SdkMessageState): LegacyMessageState {
   switch (state) {
     case SdkMessageState.Ack:
       return LegacyMessageState.Ack;
+    case SdkMessageState.Relayed:
+      return LegacyMessageState.Relayed;
     case SdkMessageState.Failed:
       return LegacyMessageState.Failed;
     case SdkMessageState.Pending:
