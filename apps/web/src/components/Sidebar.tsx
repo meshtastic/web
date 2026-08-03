@@ -121,16 +121,20 @@ export const Sidebar = ({ children }: SidebarProps) => {
       page: "messages",
       count: numUnread ? numUnread : undefined,
     },
-    { name: t("navigation.map"), icon: MapIcon, page: "map" },
-    {
-      name: t("navigation.settings"),
-      icon: SettingsIcon,
-      page: "settings",
-    },
     {
       name: `${t("navigation.nodes")} (${displayedNodeCount})`,
       icon: UsersIcon,
       page: "nodes",
+    },
+    {
+      name: t("navigation.map"),
+      icon: MapIcon,
+      page: "map",
+    },
+    {
+      name: t("navigation.settings"),
+      icon: SettingsIcon,
+      page: "settings",
     },
   ];
 

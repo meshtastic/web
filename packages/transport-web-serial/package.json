@@ -28,7 +28,7 @@
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
     "@types/w3c-web-serial": "npm:@types/w3c-web-serial@^1.0.7",
-    "better-result": "^2.9.2"
+    "better-result": "^2.10.0"
   },
   "tsdown": {
     "clean": true,
