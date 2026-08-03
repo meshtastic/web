@@ -28,7 +28,7 @@ const EMPTY_MODULES_SIGNAL = {
 export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "rangeTest" });
 
-  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const { moduleConfig, channels, getEffectiveModuleConfig } = useDevice();
   const editor = useConfigEditor();
   const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
   const effective =
@@ -39,11 +39,28 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
 
   const { t } = useTranslation("moduleConfig");
 
+  // A PSK shorter than 2 bytes means either cleartext (0 bytes) or the
+  // well-known default shortstring code (1 byte). Both are effectively
+  // public — Range Test must not run on them to avoid flooding the shared
+  // mesh. Use the CLI to override if intentional.
+  const primaryPsk = channels.get(0 as Protobuf.Channel.ChannelNumber)?.settings?.psk;
+  const isPrimaryChannelPublic = (primaryPsk?.length ?? 0) < 2;
+  const isRangeTestEnabled =
+    effective?.enabled ?? moduleConfig.rangeTest?.enabled ?? false;
+  // Only block *enabling* Range Test from the UI on a public channel; never
+  // silently disable it if it was already enabled (e.g. via CLI), since the
+  // toggle stays interactive in that case and users may submit without
+  // touching it.
+  const blockEnableFromUi = isPrimaryChannelPublic && !isRangeTestEnabled;
+
   const onSubmit = (data: RangeTestValidation) => {
     if (!editor) return;
     editor.setModuleSection(
       "rangeTest",
-      data as unknown as Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig,
+      {
+        ...data,
+        enabled: blockEnableFromUi ? false : data.enabled,
+      } as unknown as Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig,
     );
   };
 
@@ -64,6 +81,7 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
               name: "enabled",
               label: t("rangeTest.enabled.label"),
               description: t("rangeTest.enabled.description"),
+              disabled: blockEnableFromUi,
             },
             {
               type: "number",
@@ -71,12 +89,14 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
               label: t("rangeTest.sender.label"),
               description: t("rangeTest.sender.description"),
               properties: { suffix: t("unit.second.plural") },
+              disabled: isPrimaryChannelPublic,
             },
             {
               type: "toggle",
               name: "save",
               label: t("rangeTest.save.label"),
               description: t("rangeTest.save.description"),
+              disabled: isPrimaryChannelPublic,
             },
           ],
         },
