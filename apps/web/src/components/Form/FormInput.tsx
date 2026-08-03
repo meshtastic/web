@@ -59,10 +59,20 @@ export function GenericInput<T extends FieldValues>({
       field.inputChange(e);
     }
 
+    if (field.type !== "number") {
+      controllerField.onChange(newValue);
+      return;
+    }
+
+    // Preserve intermediate values while typing negative numbers or decimals.
+    if (newValue === "" || newValue === "-" || newValue.endsWith(".")) {
+      controllerField.onChange(newValue);
+      return;
+    }
+
+    const parsed = Number.parseFloat(newValue);
     controllerField.onChange(
-      field.type === "number"
-        ? Number.parseFloat(newValue).toString()
-        : newValue,
+      Number.isNaN(parsed) ? newValue : parsed.toString(),
     );
   };
 
