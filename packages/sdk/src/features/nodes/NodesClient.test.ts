@@ -33,7 +33,9 @@ describe("NodesClient", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
 
-    client.events.onNodeInfoPacket.dispatch(create(Protobuf.Mesh.NodeInfoSchema, { num: 100 }));
+    client.events.onNodeInfoPacket.dispatch(
+      create(Protobuf.Mesh.NodeInfoSchema, { num: 100 }),
+    );
     client.events.onTelemetryPacket.dispatch({
       id: 1,
       from: 100,
