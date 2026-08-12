@@ -44,11 +44,17 @@ async function waitForHttps(url: string, timeoutMs: number): Promise<void> {
     if (ok) return;
     await sleep(1000);
   }
-  throw new Error(`device webserver not ready at ${url} within ${timeoutMs}ms (last: ${lastErr})`);
+  throw new Error(
+    `device webserver not ready at ${url} within ${timeoutMs}ms (last: ${lastErr})`,
+  );
 }
 
 /** Poll a TCP port until it accepts a connection. */
-async function waitForTcp(host: string, port: number, timeoutMs: number): Promise<void> {
+async function waitForTcp(
+  host: string,
+  port: number,
+  timeoutMs: number,
+): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   let lastErr = "connection refused";
   while (Date.now() < deadline) {
@@ -83,7 +89,9 @@ export default async function globalSetup(): Promise<void> {
     console.log("[e2e] bringing up meshtasticd two-node mesh ...");
     execSync(`docker compose -f ${COMPOSE_FILE} up -d`, { stdio: "inherit" });
   } else {
-    console.log(`[e2e] hardware mode: device=${NODE_A_URL} peer=${PEER_HOST}:${PEER_PORT}`);
+    console.log(
+      `[e2e] hardware mode: device=${NODE_A_URL} peer=${PEER_HOST}:${PEER_PORT}`,
+    );
   }
 
   console.log(`[e2e] waiting for device webserver ${NODE_A_URL} ...`);

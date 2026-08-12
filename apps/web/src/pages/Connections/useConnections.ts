@@ -249,7 +249,9 @@ export function useConnections() {
       // Read from the live store, not the memoized `connections` closure: callers
       // such as addConnectionAndConnect() add a connection and connect to it in the
       // same tick, before this hook re-renders, so the closure would be stale.
-      const conn = useDeviceStore.getState().savedConnections.find((c) => c.id === id);
+      const conn = useDeviceStore
+        .getState()
+        .savedConnections.find((c) => c.id === id);
       if (!conn) {
         log.warn("connect: unknown connection id", { id });
         return false;

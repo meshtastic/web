@@ -21,7 +21,7 @@ export function ErrorPage({ error }: { error: Error }) {
           </Heading>
           <P>{t("errorPage.description1")}</P>
           <P>{t("errorPage.description2")}</P>
-          <P>Please include the following information in your report:</P>
+          <P>{t("errorPage.reportInstructions")}</P>
           <ul className="list-disc list-inside text-sm">
             <li>{t("errorPage.reportSteps.step1")}</li>
             <li>{t("errorPage.reportSteps.step2")}</li>
