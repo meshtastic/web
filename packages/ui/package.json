@@ -22,7 +22,7 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./theme/default.css": "./dist/theme/default.css"
+    "./theme/default.css": "./dist/theme/src/lib/theme/default.css"
   },
   "scripts": {
     "start": "npm run dev",
