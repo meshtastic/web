@@ -106,13 +106,19 @@ pnpm --filter meshtastic-web dev
 
 ### Build everything
 
-`pnpm -r` walks the workspace in topological order, so `@meshtastic/protobufs`
-runs first and every downstream package (including `packages/ui`) sees the
-generated stubs. Requires the Buf CLI (see Prerequisites).
+Requires the Buf CLI (see Prerequisites) — `@meshtastic/protobufs` runs
+`buf generate` as part of its `build` script.
 
 ```bash
 pnpm -r build
 ```
+
+`pnpm -r` sorts packages by their `workspace:` dependencies (dependencies
+before dependents) and runs up to `--workspace-concurrency` packages in
+parallel. Packages linked over other protocols (for example `jsr:`) are
+not sequenced against workspace peers, so run `pnpm --filter
+@meshtastic/protobufs build` first if you are iterating on generated
+stubs consumed via a non-workspace protocol.
 
 If you only need the web client, build it and its dependency graph without
 touching every publishable package:
