@@ -86,6 +86,15 @@
       }
     }
   },
+  "firmwareUpdate": {
+    "title": "Firmware update available",
+    "description": "{{currentVersion}} is behind stable {{latestStableVersion}}. Use Meshtastic Flasher to update this hardware.",
+    "action": {
+      "label": "Open Meshtastic Flasher",
+      "ariaLabel": "Open Meshtastic Flasher to update this hardware",
+      "hint": "Opens Meshtastic Flasher"
+    }
+  },
   "notifications": {
     "copied": {
       "label": "Copied!"
