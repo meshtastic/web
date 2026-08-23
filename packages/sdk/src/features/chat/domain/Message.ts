@@ -1,3 +1,4 @@
+import type * as Protobuf from "@meshtastic/protobufs";
 import type { ChannelNumber, PacketDestination } from "../../../core/types.ts";
 import type { MessageState } from "./MessageState.ts";
 
@@ -13,4 +14,5 @@ export interface Message {
   readonly type: PacketDestination;
   readonly text: string;
   readonly state: MessageState;
+  readonly routingError?: Protobuf.Mesh.Routing_Error;
 }
