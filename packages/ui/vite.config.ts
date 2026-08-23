@@ -20,6 +20,7 @@ export default defineConfig({
         {
           src: "src/lib/theme/default.css",
           dest: "theme",
+          rename: { stripBase: true },
         },
       ],
     }),
