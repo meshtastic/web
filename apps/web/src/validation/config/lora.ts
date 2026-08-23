@@ -32,3 +32,12 @@ export const LoRaValidationSchema = z.object({
 });
 
 export type LoRaValidation = z.infer<typeof LoRaValidationSchema>;
+
+export function withLoRaDefaults<T extends { serialHalOnly?: boolean }>(
+  config: T,
+): T & { serialHalOnly: boolean } {
+  return {
+    ...config,
+    serialHalOnly: config.serialHalOnly ?? false,
+  };
+}

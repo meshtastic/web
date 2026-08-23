@@ -91,6 +91,22 @@ describe("ConfigEditor", () => {
     expect(editor.radio.value.lora?.region).toBe(4);
   });
 
+  it("ignores protobuf metadata when comparing form values", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+
+    client.events.onConfigPacket.dispatch(loraPacket(4));
+    const { $typeName: _, ...formValue } = editor.radio.value.lora!;
+    editor.setRadioSection(
+      "lora",
+      formValue as Protobuf.Config.Config_LoRaConfig,
+    );
+
+    expect(editor.isDirty.value).toBe(false);
+    expect(editor.dirtyRadioSections.value).toEqual([]);
+  });
+
   it("inbound baseline updates do not stomp pending working edits", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
@@ -126,6 +142,26 @@ describe("ConfigEditor", () => {
     client.events.onDeviceStatus.dispatch(DeviceStatusEnum.DeviceDisconnected);
 
     expect(editor.radio.value).toEqual({});
+    expect(editor.isDirty.value).toBe(false);
+  });
+
+  it("reset() discards queued admin messages", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+
+    editor.queueAdminMessage(
+      create(Protobuf.Admin.AdminMessageSchema, {
+        payloadVariant: {
+          case: "rebootSeconds",
+          value: 5,
+        },
+      }),
+    );
+    expect(editor.isDirty.value).toBe(true);
+
+    editor.reset();
+
     expect(editor.isDirty.value).toBe(false);
   });
 });
