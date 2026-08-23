@@ -18,7 +18,7 @@ send commands to a Meshtastic device lives here.
 
 ## Packages
 
-All projects live under `packages/`.
+Libraries live under `packages/`; the reference web client lives under `apps/`.
 
 | Package | Purpose |
 | --- | --- |
@@ -83,8 +83,12 @@ Expected domain errors are returned as `Result<T, E>` via [`better-result`](http
 
 ### Prerequisites
 
-You need [pnpm](https://pnpm.io/) installed. If you plan to regenerate
-protobufs, also install the [Buf CLI](https://buf.build/docs/cli/installation/).
+- [pnpm](https://pnpm.io/) — package manager for the workspace.
+- [Buf CLI](https://buf.build/docs/cli/installation/) — required whenever
+  `@meshtastic/protobufs` needs to build (which happens on a full
+  `pnpm -r build`, since it runs `buf generate`). If you only want to run
+  the web client in dev, `pnpm --filter meshtastic-web dev` does not need
+  Buf as long as the protobuf stubs are already generated.
 
 ### Setup
 
@@ -97,13 +101,30 @@ pnpm install
 ### Run the web client
 
 ```bash
-pnpm --filter @meshtastic/web dev
+pnpm --filter meshtastic-web dev
 ```
 
 ### Build everything
 
+Requires the Buf CLI (see Prerequisites) — `@meshtastic/protobufs` runs
+`buf generate` as part of its `build` script.
+
 ```bash
 pnpm -r build
+```
+
+`pnpm -r` sorts packages by their `workspace:` dependencies (dependencies
+before dependents) and runs up to `--workspace-concurrency` packages in
+parallel. Packages linked over other protocols (for example `jsr:`) are
+not sequenced against workspace peers, so run `pnpm --filter
+@meshtastic/protobufs build` first if you are iterating on generated
+stubs consumed via a non-workspace protocol.
+
+If you only need the web client, build it and its dependency graph without
+touching every publishable package:
+
+```bash
+pnpm --filter meshtastic-web... build
 ```
 
 ### Run tests
