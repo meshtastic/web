@@ -263,7 +263,7 @@ const MapPage = () => {
           />
         )}
       </BaseMap>
-      <div className="flex flex-col space-y-1 fixed top-35 right-2.5">
+      <div className="flex flex-col space-y-1 absolute top-36 right-3.5 z-10">
         {myNode && hasPos(myNode?.position) && (
           <button
             type="button"
