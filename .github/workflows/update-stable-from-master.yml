@@ -7,14 +7,17 @@ on:
 permissions:
   contents: write
 
+# A static group so overlapping releases serialize instead of racing to
+# force-push `stable`. Never cancel: a half-run leaves `stable` inconsistent.
 concurrency:
-  group: update-stable-${{ github.run_id }}
-  cancel-in-progress: true
+  group: update-stable
+  cancel-in-progress: false
 
 jobs:
   update-stable-branch:
     name: Update stable from latest release source
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -30,11 +33,16 @@ jobs:
       - name: Determine source SHA (prefer tag)
         id: meta
         shell: bash
+        # Release metadata is attacker-influenceable text; pass it through env
+        # rather than interpolating it into the script body.
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TARGET: ${{ github.event.release.target_commitish }}
         run: |
           set -euo pipefail
 
-          TAG="${{ github.event.release.tag_name }}"
-          TARGET="${{ github.event.release.target_commitish || '' }}"
+          TAG="${RELEASE_TAG}"
+          TARGET="${RELEASE_TARGET:-}"
 
           # Always ensure we have latest remote heads/tags
           git fetch --tags --prune origin
@@ -73,13 +81,15 @@ jobs:
 
       - name: Create/reset local stable to SHA
         shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.meta.outputs.sha }}
         run: |
           set -euo pipefail
           # Make sure we know if remote stable exists (non-fatal if not)
           git fetch origin stable:refs/remotes/origin/stable || true
 
           # Create or reset local stable in one command
-          git checkout -B stable "${{ steps.meta.outputs.sha }}"
+          git checkout -B stable "${SOURCE_SHA}"
           git status --short --branch
 
       - name: Push stable (force-with-lease)
