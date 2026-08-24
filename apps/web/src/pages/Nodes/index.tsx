@@ -282,6 +282,9 @@ const NodesPage = (): JSX.Element => {
             }
           />
         </div>
+        <div className="flex items-center pr-2 text-sm text-slate-500 dark:text-slate-400 tabular-nums">
+          {filteredNodes.length}/{allSdkNodes.length}
+        </div>
         <div className="flex justify-end">
           <FilterControl
             filterState={filterState}

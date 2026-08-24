@@ -31,12 +31,13 @@ import {
 } from "@core/hooks/useNodesAsProto.ts";
 import { cn } from "@core/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
-import type { Protobuf } from "@meshtastic/sdk";
+import { createLogger, type Protobuf } from "@meshtastic/sdk";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
   useCallback,
   useDeferredValue,
+  useEffect,
   useId,
   useMemo,
   useRef,
@@ -44,6 +45,35 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { type MapLayerMouseEvent, useMap } from "react-map-gl/maplibre";
+
+const log = createLogger("MapPage");
+const MAP_VIEW_STORAGE_KEY = "meshtastic:mapView";
+
+type SavedMapView = { longitude: number; latitude: number; zoom: number };
+
+function loadSavedMapView(): SavedMapView | undefined {
+  if (typeof localStorage === "undefined") return undefined;
+  try {
+    const raw = localStorage.getItem(MAP_VIEW_STORAGE_KEY);
+    if (!raw) return undefined;
+    const parsed = JSON.parse(raw) as Partial<SavedMapView>;
+    if (
+      typeof parsed.longitude === "number" &&
+      typeof parsed.latitude === "number" &&
+      typeof parsed.zoom === "number"
+    ) {
+      return parsed as SavedMapView;
+    }
+    log.warn("saved map view has unexpected shape; ignoring", parsed);
+  } catch (e) {
+    const err = e as Error;
+    log.warn("failed to read saved map view", {
+      name: err?.name,
+      message: err?.message,
+    });
+  }
+  return undefined;
+}
 
 const MapPage = () => {
   const { t } = useTranslation("map");
@@ -64,7 +94,36 @@ const MapPage = () => {
   const { default: mapRef } = useMap();
   const { focusLngLat, fitToNodes } = useMapFitting(mapRef);
 
-  const hasFitBoundsOnce = useRef(false);
+  // Read once so the ref is stable across renders.
+  const savedView = useRef<SavedMapView | undefined>(loadSavedMapView());
+  // Skip auto-fit-to-nodes if a saved view already positioned the map.
+  const hasFitBoundsOnce = useRef<boolean>(!!savedView.current);
+
+  useEffect(() => {
+    const map = mapRef?.getMap();
+    if (!map) return;
+    const handler = () => {
+      const center = map.getCenter();
+      const view: SavedMapView = {
+        longitude: center.lng,
+        latitude: center.lat,
+        zoom: map.getZoom(),
+      };
+      try {
+        localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify(view));
+      } catch (e) {
+        const err = e as Error;
+        log.warn("failed to persist map view", {
+          name: err?.name,
+          message: err?.message,
+        });
+      }
+    };
+    map.on("moveend", handler);
+    return () => {
+      map.off("moveend", handler);
+    };
+  }, [mapRef]);
   const [snrHover, setSnrHover] = useState<SNRTooltipProps>();
   const [expandedCluster, setExpandedCluster] = useState<string | undefined>();
   const [popupState, setPopupState] = useState<PopupState | undefined>();
@@ -240,6 +299,7 @@ const MapPage = () => {
   return (
     <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
       <BaseMap
+        initialViewState={savedView.current}
         onLoad={getMapBounds}
         onMouseMove={onMouseMove}
         onClick={onMapBackgroundClick}
