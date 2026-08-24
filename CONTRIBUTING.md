@@ -35,7 +35,7 @@ pnpm install
 Start the development server:
 
 ```bash
-pnpm --filter @meshtastic/web dev
+pnpm --filter meshtastic-web dev
 ```
 
 Once running, the site will be available at:  
@@ -47,10 +47,14 @@ Once running, the site will be available at:
 Meshtastic Web uses a **monorepo** setup managed with **pnpm workspaces**:
 
 ```
+/apps
+  └─ web          # React reference web client
 /packages
-  ├─ web          # React frontend
-  ├─ core         # Shared types & logic
-  ├─ transport-*  # Transport layer packages
+  ├─ sdk          # Framework-agnostic TypeScript SDK
+  ├─ sdk-react    # React hooks + MeshProvider on top of @meshtastic/sdk
+  ├─ ui           # Shared Radix + Tailwind component library
+  ├─ protobufs    # Generated TypeScript stubs (via buf generate)
+  ├─ transport-*  # Runtime-specific transport packages
   └─ ...other packages
 ```
 
@@ -94,8 +98,8 @@ Meshtastic Web supports multiple languages. If your changes introduce **new user
 - This ensures they can be translated into other languages.  
 
 🔗 See these guides for more details:  
-- [i18n Developer Guide](https://github.com/meshtastic/web/blob/main/packages/web/CONTRIBUTING_I18N_DEVELOPER_GUIDE.md)  
-- [Translation Contribution Guide](https://github.com/meshtastic/web/blob/main/packages/web/CONTRIBUTING_TRANSLATIONS.md)  
+- [i18n Developer Guide](./CONTRIBUTING_I18N_DEVELOPER_GUIDE.md)  
+- [Translation Contribution Guide](./CONTRIBUTING_TRANSLATIONS.md)  
 
 ---
 
@@ -105,7 +109,7 @@ Tests are written with [Vitest](https://vitest.dev/).
 Run all tests locally with:  
 
 ```bash
-pnpm --filter @meshtastic/web test 
+pnpm --filter meshtastic-web test 
 ```
 
 Please include tests for new features and bug fixes whenever possible.
@@ -147,4 +151,4 @@ Join the conversation:
 ---
 
 ## 📜 License
-By contributing, you agree that your contributions will be licensed under the [GPL-3.0-only License](../../LICENSE).  
+By contributing, you agree that your contributions will be licensed under the [GPL-3.0-only License](./LICENSE).  
