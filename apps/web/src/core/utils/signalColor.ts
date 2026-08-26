@@ -1,12 +1,4 @@
-export const SNR_THRESHOLD = {
-  GOOD: -7,
-  FAIR: -15,
-};
-
-export const RSSI_THRESHOLD = {
-  GOOD: -115,
-  FAIR: -126,
-};
+import { rateSignalQuality } from "./signalQuality.ts";
 
 export const LINE_COLOR = {
   GOOD: "#00ff00",
@@ -14,18 +6,15 @@ export const LINE_COLOR = {
   BAD: "#f7931a",
 };
 
-export const getSignalColor = (snr: number, rssi?: number): string => {
-  if (
-    snr > SNR_THRESHOLD.GOOD &&
-    (rssi == null || rssi > RSSI_THRESHOLD.GOOD)
-  ) {
-    return LINE_COLOR.GOOD;
-  }
-  if (
-    snr > SNR_THRESHOLD.FAIR &&
-    (rssi == null || rssi > RSSI_THRESHOLD.FAIR)
-  ) {
-    return LINE_COLOR.FAIR;
-  }
+export const getSignalColor = (
+  snr: number,
+  rssi?: number,
+  preset?: number | string | null,
+): string => {
+  // Preset-relative quality per meshtastic/web#1241; "none" (no chance of
+  // demodulation) renders as BAD on the map.
+  const quality = rateSignalQuality(snr, preset, rssi);
+  if (quality === "good") return LINE_COLOR.GOOD;
+  if (quality === "fair") return LINE_COLOR.FAIR;
   return LINE_COLOR.BAD;
 };

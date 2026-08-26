@@ -18,11 +18,19 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
+import { rateSignalQuality } from "@core/utils/signalQuality.ts";
 import { useAppStore, useDevice } from "@core/stores";
 import { Protobuf, type Types } from "@meshtastic/sdk";
 import { useNodeErrors } from "@meshtastic/sdk-react";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
-import { LockIcon, LockOpenIcon } from "lucide-react";
+import {
+  LockIcon,
+  LockOpenIcon,
+  Signal,
+  SignalHigh,
+  SignalLow,
+  SignalMedium,
+} from "lucide-react";
 import {
   type JSX,
   useCallback,
@@ -42,7 +50,7 @@ export interface DeleteNoteDialogProps {
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { current } = useLang();
-  const { hardware, connection, setDialogOpen } = useDevice();
+  const { hardware, connection, setDialogOpen, config } = useDevice();
 
   const { setNodeNumDetails } = useAppStore();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
@@ -150,16 +158,27 @@ const NodesPage = (): JSX.Element => {
         last4: shortName,
       });
 
-    // SNR is reported in dB. Map it to a 0–100% signal-quality heuristic
-    // (-10 dB → 0%, +10 dB → 100%) for an at-a-glance read, and pick a tone.
+    // SNR rated against the active modem preset's demodulation floor
+    // (meshtastic/web#1241). WCAG 1.4.1: tier encoded in color + icon + text.
     const snr = node.snr ?? 0;
-    const snrQuality = Math.min(Math.max(Math.round((snr + 10) * 5), 0), 100);
+    const quality =
+      node.snr == null
+        ? undefined
+        : rateSignalQuality(node.snr, config.lora?.modemPreset);
     const snrTone =
-      snrQuality >= 67
+      quality === "good"
         ? "text-green-500"
-        : snrQuality >= 34
+        : quality === "fair"
           ? "text-yellow-500"
           : "text-red-500";
+    const SignalIcon =
+      quality === "good"
+        ? SignalHigh
+        : quality === "fair"
+          ? SignalMedium
+          : quality === "bad"
+            ? SignalLow
+            : Signal;
 
     return {
       id: node.num,
@@ -239,12 +258,21 @@ const NodesPage = (): JSX.Element => {
         },
         {
           content: (
-            <Mono className="flex items-baseline gap-1.5">
+            <Mono className="flex items-center gap-1.5">
+              {quality ? (
+                <>
+                  <SignalIcon
+                    size={14}
+                    className={snrTone}
+                    aria-hidden="true"
+                  />
+                  <span className={snrTone}>
+                    {t(`signalQuality.${quality}`)}
+                  </span>
+                </>
+              ) : null}
               <span className={snrTone}>
                 {Number(snr.toFixed(1))} {t("unit.db")}
-              </span>
-              <span className="text-gray-500 dark:text-gray-400/70">
-                {snrQuality}%
               </span>
             </Mono>
           ),
