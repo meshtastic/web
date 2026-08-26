@@ -13,6 +13,7 @@ const heartbeats = new Map<ConnectionId, ReturnType<typeof setInterval>>();
 const failures = new Map<ConnectionId, number>();
 const retryTimers = new Map<ConnectionId, ReturnType<typeof setTimeout>>();
 const meshDevices = new Map<ConnectionId, MeshDevice>();
+const generations = new Map<ConnectionId, number>();
 
 function backoffDelay(attempt: number): number {
   // Full jitter: random(0, min(cap, base * 2^(attempt-1))) — AWS best practice
@@ -37,14 +38,20 @@ export function stopHeartbeat(id: ConnectionId): void {
   }
   failures.delete(id);
   meshDevices.delete(id);
+  // Bump generation so any in-flight heartbeat that settles late is ignored
+  generations.set(id, (generations.get(id) ?? 0) + 1);
 }
 
 function handleHeartbeatResult(
   id: ConnectionId,
+  gen: number,
   success: boolean,
   error?: unknown,
   expectedStatus: "configuring" | "configured" = "configured",
 ): void {
+  // Ignore stale callbacks from a previous start/stop generation
+  if ((generations.get(id) ?? 0) !== gen) return;
+
   if (success) {
     const prevFailures = failures.get(id) ?? 0;
     failures.set(id, 0);
@@ -86,9 +93,13 @@ function handleHeartbeatResult(
   if (!md) return;
   const timer = setTimeout(() => {
     retryTimers.delete(id);
+    // Re-check generation before firing the retry
+    if ((generations.get(id) ?? 0) !== gen) return;
     md.heartbeat()
-      .then(() => handleHeartbeatResult(id, true, undefined, expectedStatus))
-      .catch((e) => handleHeartbeatResult(id, false, e, expectedStatus));
+      .then(() =>
+        handleHeartbeatResult(id, gen, true, undefined, expectedStatus),
+      )
+      .catch((e) => handleHeartbeatResult(id, gen, false, e, expectedStatus));
   }, delay);
   retryTimers.set(id, timer);
 }
@@ -104,11 +115,17 @@ export function startConfigHeartbeat(
   stopHeartbeat(id);
   failures.set(id, 0);
   meshDevices.set(id, meshDevice);
+  const gen = (generations.get(id) ?? 0) + 1;
+  generations.set(id, gen);
   const intervalId = setInterval(() => {
     meshDevice
       .heartbeat()
-      .then(() => handleHeartbeatResult(id, true, undefined, "configuring"))
-      .catch((error) => handleHeartbeatResult(id, false, error, "configuring"));
+      .then(() =>
+        handleHeartbeatResult(id, gen, true, undefined, "configuring"),
+      )
+      .catch((error) =>
+        handleHeartbeatResult(id, gen, false, error, "configuring"),
+      );
   }, CONFIG_HEARTBEAT_INTERVAL_MS);
   heartbeats.set(id, intervalId);
 }
@@ -123,11 +140,15 @@ export function startMaintenanceHeartbeat(
   stopHeartbeat(id);
   failures.set(id, 0);
   meshDevices.set(id, meshDevice);
+  const gen = (generations.get(id) ?? 0) + 1;
+  generations.set(id, gen);
   const intervalId = setInterval(() => {
     meshDevice
       .heartbeat()
-      .then(() => handleHeartbeatResult(id, true, undefined, "configured"))
-      .catch((error) => handleHeartbeatResult(id, false, error, "configured"));
+      .then(() => handleHeartbeatResult(id, gen, true, undefined, "configured"))
+      .catch((error) =>
+        handleHeartbeatResult(id, gen, false, error, "configured"),
+      );
   }, HEARTBEAT_INTERVAL_MS);
   heartbeats.set(id, intervalId);
 }

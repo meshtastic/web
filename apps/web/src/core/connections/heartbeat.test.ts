@@ -91,4 +91,39 @@ describe("heartbeat", () => {
     stopHeartbeat(999);
     vi.useRealTimers();
   });
+
+  it("ignores late failure from stopped session after restart", async () => {
+    let rejectA!: (e: Error) => void;
+    const pendingA = new Promise<number>((_, rej) => {
+      rejectA = rej;
+    });
+    const mdA = { heartbeat: vi.fn(() => pendingA) } as unknown as MeshDevice;
+
+    startMaintenanceHeartbeat(999, mdA);
+    await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+    await vi.advanceTimersByTimeAsync(0);
+    stopHeartbeat(999);
+    const mdB = mockMeshDevice(0);
+    useDeviceStore
+      .getState()
+      .updateSavedConnection(999, { status: "configured", error: undefined });
+    startMaintenanceHeartbeat(999, mdB);
+
+    rejectA(new Error("stale fail"));
+    await vi.advanceTimersByTimeAsync(0);
+
+    let conn = useDeviceStore
+      .getState()
+      .savedConnections.find((c) => c.id === 999);
+    expect(conn?.status).toBe("configured");
+    expect(mdB.heartbeat).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+    await vi.advanceTimersByTimeAsync(0);
+    conn = useDeviceStore.getState().savedConnections.find((c) => c.id === 999);
+    expect(conn?.status).toBe("configured");
+
+    stopHeartbeat(999);
+    vi.useRealTimers();
+  });
 });
