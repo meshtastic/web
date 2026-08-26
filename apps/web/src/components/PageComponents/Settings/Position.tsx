@@ -16,6 +16,7 @@ import {
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
+import { feetToMeters, metersToFeet } from "@core/utils/unitConversion.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { LocateFixed } from "lucide-react";
@@ -36,6 +37,10 @@ function UseBrowserLocationButton() {
   const { setValue } = useFormContext<PositionValidation>();
   const { toast } = useToast();
   const { t } = useTranslation("config");
+  const { getEffectiveConfig } = useDevice();
+  const displayUnits = getEffectiveConfig("display")?.units;
+  const isImperial =
+    displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL;
   const [busy, setBusy] = useState(false);
 
   if (typeof navigator === "undefined" || !navigator.geolocation) {
@@ -57,7 +62,10 @@ function UseBrowserLocationButton() {
           pos.coords.altitude !== null &&
           !Number.isNaN(pos.coords.altitude)
         ) {
-          setValue("altitude", Math.round(pos.coords.altitude), {
+          const altitudeDisplay = isImperial
+            ? Math.round(metersToFeet(pos.coords.altitude))
+            : Math.round(pos.coords.altitude);
+          setValue("altitude", altitudeDisplay, {
             shouldDirty: true,
           });
         }
@@ -113,8 +121,14 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
 
   const currentPosition = myNode?.position;
   const displayUnits = getEffectiveConfig("display")?.units;
+  const isImperial =
+    displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL;
 
   const formValues = useMemo(() => {
+    const altitudeMeters = currentPosition?.altitude ?? 0;
+    const altitudeDisplay = isImperial
+      ? Math.round(metersToFeet(altitudeMeters))
+      : altitudeMeters;
     return {
       ...config.position,
       ...effectivePosition,
@@ -124,9 +138,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       longitude: currentPosition?.longitudeI
         ? currentPosition.longitudeI / 1e7
         : undefined,
-      altitude: currentPosition?.altitude ?? 0,
+      altitude: altitudeDisplay,
     } as PositionValidation;
-  }, [config.position, effectivePosition, currentPosition]);
+  }, [config.position, effectivePosition, currentPosition, isImperial]);
 
   const onSubmit = (data: PositionValidation) => {
     const {
@@ -149,13 +163,17 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       data.latitude !== undefined &&
       data.longitude !== undefined
     ) {
+      const altitudeMeters =
+        data.altitude != null
+          ? Math.round(isImperial ? feetToMeters(data.altitude) : data.altitude)
+          : 0;
       const message = create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
           case: "setFixedPosition",
           value: create(Protobuf.Mesh.PositionSchema, {
             latitudeI: Math.round(data.latitude * 1e7),
             longitudeI: Math.round(data.longitude * 1e7),
-            altitude: data.altitude || 0,
+            altitude: altitudeMeters,
             time: Math.floor(Date.now() / 1000),
           }),
         },
@@ -264,7 +282,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
                     : "Meters",
               }),
               properties: {
-                step: 0.0000001,
+                step: 1,
                 suffix:
                   displayUnits ===
                   Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
