@@ -146,6 +146,7 @@ function makeFeature(
   toPos: LngLat,
   snr: number,
   curved: boolean,
+  preset?: number | string | null,
 ): Feature | undefined {
   const segment = arcSegment(fromPos, toPos, curved);
 
@@ -157,7 +158,7 @@ function makeFeature(
     type: "Feature",
     geometry: { type: "LineString", coordinates: segment },
     properties: {
-      color: getSignalColor(snr),
+      color: getSignalColor(snr, undefined, preset),
       snr,
       from: fromId,
       to: toId,
@@ -173,8 +174,9 @@ function pushIfFeature(
   snr: number,
   curved: boolean,
   features: Feature[],
+  preset?: number | string | null,
 ) {
-  const feat = makeFeature(a, b, aPos, bPos, snr, curved);
+  const feat = makeFeature(a, b, aPos, bPos, snr, curved, preset);
   if (feat) {
     features.push(feat);
   }
@@ -182,6 +184,7 @@ function pushIfFeature(
 
 function generateNeighborLines(
   neighborInfos: NeighborInfos[],
+  preset?: number | string | null,
 ): FeatureCollection {
   // Collect positions for all referenced nodes, discard pairs with missing positions
   const idToLngLat = new Map<number, LngLat>();
@@ -230,15 +233,51 @@ function generateNeighborLines(
 
     if (pair.ab && pair.ba) {
       // both directions → two arcs
-      pushIfFeature(pair.a, pair.b, aPos, bPos, pair.ab, true, features);
-      pushIfFeature(pair.b, pair.a, bPos, aPos, pair.ba, true, features);
+      pushIfFeature(
+        pair.a,
+        pair.b,
+        aPos,
+        bPos,
+        pair.ab,
+        true,
+        features,
+        preset,
+      );
+      pushIfFeature(
+        pair.b,
+        pair.a,
+        bPos,
+        aPos,
+        pair.ba,
+        true,
+        features,
+        preset,
+      );
     } else {
       // only one direction → straight
       if (pair.ab) {
-        pushIfFeature(pair.a, pair.b, aPos, bPos, pair.ab, false, features);
+        pushIfFeature(
+          pair.a,
+          pair.b,
+          aPos,
+          bPos,
+          pair.ab,
+          false,
+          features,
+          preset,
+        );
       }
       if (pair.ba) {
-        pushIfFeature(pair.b, pair.a, bPos, aPos, pair.ba, false, features);
+        pushIfFeature(
+          pair.b,
+          pair.a,
+          bPos,
+          aPos,
+          pair.ba,
+          false,
+          features,
+          preset,
+        );
       }
     }
   }
@@ -288,7 +327,7 @@ export const SNRLayer = ({
   myNode,
   visibilityState,
 }: SNRLayerProps): React.ReactNode => {
-  const { getNeighborInfo } = useDevice();
+  const { getNeighborInfo, config } = useDevice();
 
   const remotePairs = visibilityState.remoteNeighbors
     ? filteredNodes.flatMap((node) => {
@@ -325,10 +364,10 @@ export const SNRLayer = ({
           }))
       : [];
 
-  const featureCollection = generateNeighborLines([
-    ...remotePairs,
-    ...directPairs,
-  ]);
+  const featureCollection = generateNeighborLines(
+    [...remotePairs, ...directPairs],
+    config.lora?.modemPreset,
+  );
 
   return (
     <Source type="geojson" data={featureCollection}>
