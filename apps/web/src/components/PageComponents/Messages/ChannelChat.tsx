@@ -147,9 +147,11 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
       {groups.map(({ dayKey, label, items }) => (
         <Fragment key={dayKey}>
           {/* Render messages first, then delimiter — with flex-col-reverse this shows the delimiter above that day's messages */}
-          {items.map((message) => (
+          {items.map((message, index) => (
             <Suspense
-              key={message.messageId ?? `${message.from}-${message.date}`}
+              key={
+                message.messageId ?? `${message.from}-${message.date}-${index}`
+              }
               fallback={<MessageSkeleton />}
             >
               <MessageItem message={message} />
