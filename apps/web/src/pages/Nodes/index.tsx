@@ -160,7 +160,6 @@ const NodesPage = (): JSX.Element => {
 
     // SNR rated against the active modem preset's demodulation floor
     // (meshtastic/web#1241). WCAG 1.4.1: tier encoded in color + icon + text.
-    const snr = node.snr ?? 0;
     const quality =
       node.snr == null
         ? undefined
@@ -259,7 +258,9 @@ const NodesPage = (): JSX.Element => {
         {
           content: (
             <Mono className="flex items-center gap-1.5">
-              {quality ? (
+              {node.snr == null ? (
+                <span className="text-gray-500">{t("unknown.shortName")}</span>
+              ) : (
                 <>
                   <SignalIcon
                     size={14}
@@ -269,11 +270,11 @@ const NodesPage = (): JSX.Element => {
                   <span className={snrTone}>
                     {t(`signalQuality.${quality}`)}
                   </span>
+                  <span className={snrTone}>
+                    {Number(node.snr.toFixed(1))} {t("unit.db")}
+                  </span>
                 </>
-              ) : null}
-              <span className={snrTone}>
-                {Number(snr.toFixed(1))} {t("unit.db")}
-              </span>
+              )}
             </Mono>
           ),
           sortValue: node.snr,
