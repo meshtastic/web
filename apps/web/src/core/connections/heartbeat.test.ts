@@ -92,6 +92,39 @@ describe("heartbeat", () => {
     vi.useRealTimers();
   });
 
+  it("clears warning when a restarted session succeeds", async () => {
+    const failing = mockMeshDevice(10);
+    startMaintenanceHeartbeat(999, failing);
+
+    await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+    await vi.advanceTimersByTimeAsync(0);
+    await vi.advanceTimersByTimeAsync(5000);
+    await vi.advanceTimersByTimeAsync(0);
+    await vi.advanceTimersByTimeAsync(5000);
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(
+      useDeviceStore.getState().savedConnections.find((c) => c.id === 999)
+        ?.status,
+    ).toBe("warning");
+
+    stopHeartbeat(999);
+    const recovered = mockMeshDevice(0);
+    startMaintenanceHeartbeat(999, recovered);
+
+    await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+    await vi.advanceTimersByTimeAsync(0);
+
+    const conn = useDeviceStore
+      .getState()
+      .savedConnections.find((c) => c.id === 999);
+    expect(conn?.status).toBe("configured");
+    expect(conn?.error).toBeUndefined();
+
+    stopHeartbeat(999);
+    vi.useRealTimers();
+  });
+
   it("ignores late failure from stopped session after restart", async () => {
     let rejectA!: (e: Error) => void;
     const pendingA = new Promise<number>((_, rej) => {

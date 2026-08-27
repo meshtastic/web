@@ -53,19 +53,17 @@ function handleHeartbeatResult(
   if ((generations.get(id) ?? 0) !== gen) return;
 
   if (success) {
-    const prevFailures = failures.get(id) ?? 0;
     failures.set(id, 0);
-    // Clear warning if we recovered
-    if (prevFailures >= MAX_CONSECUTIVE_FAILURES) {
-      const conn = useDeviceStore
-        .getState()
-        .savedConnections.find((c) => c.id === id);
-      if (conn?.status === "warning") {
-        useDeviceStore.getState().updateSavedConnection(id, {
-          status: expectedStatus,
-          error: undefined,
-        });
-      }
+    // Clear warning whenever the current connection recovers, including after
+    // a restart that reset the in-memory failure counter.
+    const conn = useDeviceStore
+      .getState()
+      .savedConnections.find((c) => c.id === id);
+    if (conn?.status === "warning") {
+      useDeviceStore.getState().updateSavedConnection(id, {
+        status: expectedStatus,
+        error: undefined,
+      });
     }
     return;
   }
