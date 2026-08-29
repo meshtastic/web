@@ -6,6 +6,19 @@ import { Input } from "@components/UI/Input.tsx";
 import type { ChangeEventHandler } from "react";
 import { type FieldValues, useController } from "react-hook-form";
 
+export function normalizeNumberInput(value: string): string {
+  // Preserve intermediate values while typing negative numbers or decimals.
+  if (value === "" || value === "-" || value.endsWith(".")) {
+    return value;
+  }
+
+  // Only normalize when the complete string is a finite number, so partial or
+  // invalid entries ("1e", "12abc", "1.2.3", "Infinity") are kept as typed and
+  // surfaced by validation instead of being silently truncated.
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed.toString() : value;
+}
+
 export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "text" | "number" | "password";
   inputChange?: ChangeEventHandler;
@@ -59,11 +72,12 @@ export function GenericInput<T extends FieldValues>({
       field.inputChange(e);
     }
 
-    controllerField.onChange(
-      field.type === "number"
-        ? Number.parseFloat(newValue).toString()
-        : newValue,
-    );
+    if (field.type !== "number") {
+      controllerField.onChange(newValue);
+      return;
+    }
+
+    controllerField.onChange(normalizeNumberInput(newValue));
   };
 
   const currentLength = controllerField.value
