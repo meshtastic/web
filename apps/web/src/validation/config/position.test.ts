@@ -50,19 +50,58 @@ describe("PositionValidationSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects latitude outside the valid range", () => {
+  it("rejects latitude with more than 7 decimal places in exponential notation", () => {
     const result = PositionValidationSchema.safeParse({
       ...validBase,
-      latitude: 91,
+      latitude: 1.2e-7,
     });
     expect(result.success).toBe(false);
   });
 
-  it("rejects longitude outside the valid range", () => {
+  it("accepts latitude with exactly 7 decimal places in exponential notation", () => {
     const result = PositionValidationSchema.safeParse({
       ...validBase,
-      longitude: -181,
+      latitude: 1e-7,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it.each([
+    ["latitude", 91],
+    ["latitude", -91],
+    ["longitude", 181],
+    ["longitude", -181],
+  ])("rejects %s outside the valid range (%d)", (field, value) => {
+    const result = PositionValidationSchema.safeParse({
+      ...validBase,
+      [field]: value,
     });
     expect(result.success).toBe(false);
+  });
+
+  it.each([
+    ["latitude", 90],
+    ["latitude", -90],
+    ["longitude", 180],
+    ["longitude", -180],
+  ])("accepts %s at the inclusive boundary (%d)", (field, value) => {
+    const result = PositionValidationSchema.safeParse({
+      ...validBase,
+      [field]: value,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("treats empty string coordinates as undefined instead of 0", () => {
+    const result = PositionValidationSchema.safeParse({
+      ...validBase,
+      latitude: "",
+      longitude: "",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.latitude).toBeUndefined();
+      expect(result.data.longitude).toBeUndefined();
+    }
   });
 });
