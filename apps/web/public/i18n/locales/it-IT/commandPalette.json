@@ -32,7 +32,7 @@
       "qrGenerator": "Generatore",
       "qrImport": "Importa",
       "scheduleShutdown": "Pianifica Spegnimento",
-      "scheduleReboot": "Reboot Device",
+      "scheduleReboot": "Riavvia il Dispositivo",
       "resetNodeDb": "Resetta DB dei Nodi",
       "dfuMode": "Entra In Modalità DFU",
       "factoryResetDevice": "Factory reset dispositivo",
@@ -45,7 +45,7 @@
     "command": {
       "reconfigure": "Riconfigura",
       "clearAllStoredMessages": "Cancella Tutti i Messaggi Memorizzati",
-      "clearAllStores": "Clear All Local Storage"
+      "clearAllStores": "Elimina tutti i dati locali"
     }
   }
 }
