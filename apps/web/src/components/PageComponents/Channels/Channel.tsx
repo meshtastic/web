@@ -36,6 +36,19 @@ const EMPTY_CHANNELS_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
+/**
+ * The form needs every field it validates to be present. A `Channel` whose
+ * `settings` sub-message is absent (or partially populated) would otherwise
+ * hand the resolver `undefined` for `channelNum` / `id` / `name` / the uplink
+ * flags, which fails validation on fields this form does not even render —
+ * and an invalid form silently stages nothing, so the user's edit never
+ * reaches the radio. Fall back to the protobuf defaults instead.
+ */
+const withSettingsDefaults = (
+  settings: Protobuf.Channel.ChannelSettings | undefined,
+): Protobuf.Channel.ChannelSettings =>
+  create(Protobuf.Channel.ChannelSettingsSchema, settings ?? {});
+
 export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
   const { config } = useDevice();
   const editor = useConfigEditor();
@@ -43,19 +56,19 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
   const { t } = useTranslation(["channels", "ui", "dialog"]);
 
   const defaultConfig = channel;
+  const defaultSettings = withSettingsDefaults(defaultConfig?.settings);
   const defaultValues = {
     ...defaultConfig,
     ...{
       settings: {
-        ...defaultConfig?.settings,
-        psk: fromByteArray(defaultConfig?.settings?.psk ?? new Uint8Array(0)),
+        ...defaultSettings,
+        psk: fromByteArray(defaultSettings.psk ?? new Uint8Array(0)),
         moduleSettings: {
-          ...defaultConfig?.settings?.moduleSettings,
+          ...defaultSettings.moduleSettings,
           positionPrecision:
-            defaultConfig?.settings?.moduleSettings?.positionPrecision ===
-            undefined
+            defaultSettings.moduleSettings?.positionPrecision === undefined
               ? 10
-              : defaultConfig?.settings?.moduleSettings?.positionPrecision,
+              : defaultSettings.moduleSettings.positionPrecision,
         },
       },
     },
@@ -63,19 +76,19 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
 
   const workingChannel = editorChannels.get(channel.index);
   const effectiveConfig = workingChannel ?? channel;
+  const effectiveSettings = withSettingsDefaults(effectiveConfig?.settings);
   const formValues = {
     ...effectiveConfig,
     ...{
       settings: {
-        ...effectiveConfig?.settings,
-        psk: fromByteArray(effectiveConfig?.settings?.psk ?? new Uint8Array(0)),
+        ...effectiveSettings,
+        psk: fromByteArray(effectiveSettings.psk ?? new Uint8Array(0)),
         moduleSettings: {
-          ...effectiveConfig?.settings?.moduleSettings,
+          ...effectiveSettings.moduleSettings,
           positionPrecision:
-            effectiveConfig?.settings?.moduleSettings?.positionPrecision ===
-            undefined
+            effectiveSettings.moduleSettings?.positionPrecision === undefined
               ? 10
-              : effectiveConfig?.settings?.moduleSettings?.positionPrecision,
+              : effectiveSettings.moduleSettings.positionPrecision,
         },
       },
     },
@@ -83,9 +96,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
 
   const [preSharedDialogOpen, setPreSharedDialogOpen] =
     useState<boolean>(false);
-  const [byteCount, setBytes] = useState<number>(
-    effectiveConfig?.settings?.psk.length ?? 16,
-  );
+  const [byteCount, setBytes] = useState<number>(effectiveSettings.psk.length);
   const ChannelValidationSchema = useMemo(() => {
     return makeChannelSchema(byteCount);
   }, [byteCount]);
@@ -106,7 +117,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
 
   // Since byteCount is an independent state, we need to use the effective value
   // from the channel config to ensure the form updates when the setting changes
-  const effectiveByteCount = effectiveConfig.settings?.psk.length ?? 16;
+  const effectiveByteCount = effectiveSettings.psk.length;
   const lastEffectiveRef = useRef<number>(effectiveByteCount);
   useEffect(() => {
     if (effectiveByteCount !== lastEffectiveRef.current) {

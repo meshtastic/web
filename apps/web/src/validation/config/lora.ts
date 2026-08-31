@@ -28,7 +28,17 @@ export const LoRaValidationSchema = z.object({
   ignoreMqtt: z.boolean(),
   configOkToMqtt: z.boolean(),
   femLnaMode: FemLnaModeEnum,
-  serialHalOnly: z.boolean(),
+  // `serial_hal_only` (field 107) only exists in firmware-current protobufs.
+  // The bindings the app actually loads at runtime (`@meshtastic/sdk` ->
+  // `@meshtastic/protobufs`) may predate it, in which case the device's
+  // LoRaConfig has no such key and a required `z.boolean()` fails on *every*
+  // parse. Because `DynamicForm` auto-saves through `handleSubmit`, that one
+  // failing field silently blocks the whole LoRa form: no `setRadioSection`
+  // call, nothing staged, nothing transmitted — the save looks fine and the
+  // radio never changes. Optional keeps the field editable where it exists
+  // without gating the rest of the form where it does not; `ConfigEditor`
+  // merges the omitted key back from the device value before transmitting.
+  serialHalOnly: z.boolean().optional(),
 });
 
 export type LoRaValidation = z.infer<typeof LoRaValidationSchema>;
