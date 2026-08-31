@@ -3,11 +3,12 @@ import {
   DynamicFormField,
   type FieldProps,
 } from "@components/Form/DynamicFormField.tsx";
+import { FormAutoSaveContext } from "@components/Form/formAutoSave.ts";
 import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, useCallback, useEffect } from "react";
 import {
   type Control,
   type DefaultValues,
@@ -108,6 +109,27 @@ export function DynamicForm<T extends FieldValues>({
     }
   }, [onFormInit, propMethods, internalMethods]);
 
+  // `handleSubmit` drops the save on the floor when *any* field fails
+  // validation — including fields this form never renders (a stale schema
+  // constraint, or a protobuf field the running bindings do not have). The
+  // user sees the control move, no error appears next to anything they can
+  // edit, and the value is never staged, so "Save" happily commits a
+  // transaction without it. Make that failure mode visible instead of silent.
+  const reportBlockedSave = useCallback((errors: unknown) => {
+    console.warn(
+      "[DynamicForm] change not saved: the form is invalid. Fields:",
+      Object.keys((errors as Record<string, unknown>) ?? {}),
+      errors,
+    );
+  }, []);
+
+  // Same auto-save the `onChange` form handler runs, exposed imperatively for
+  // fields that are not native DOM form controls and therefore never emit a
+  // bubbling `change` event of their own (see formAutoSave.ts).
+  const autoSave = useCallback(() => {
+    void handleSubmit(onSubmit, reportBlockedSave)();
+  }, [handleSubmit, onSubmit, reportBlockedSave]);
+
   const isDisabled = (
     disabledBy?: DisabledBy<T>[],
     disabled?: boolean,
@@ -138,61 +160,69 @@ export function DynamicForm<T extends FieldValues>({
 
   return (
     <FormProvider {...methods}>
-      <form
-        className="space-y-8"
-        {...(submitType === "onSubmit"
-          ? { onSubmit: handleSubmit(onSubmit) }
-          : { onChange: handleSubmit(onSubmit) })}
+      <FormAutoSaveContext.Provider
+        value={submitType === "onChange" ? autoSave : null}
       >
-        {fieldGroups.map((fieldGroup) => (
-          <div key={fieldGroup.label} className="space-y-8 sm:space-y-5">
-            <div>
-              <Heading as="h4" className="font-medium">
-                {fieldGroup.label}
-              </Heading>
-              <Subtle>{fieldGroup.description}</Subtle>
-              <Subtle className="font-semibold">{fieldGroup?.notes}</Subtle>
-            </div>
+        <form
+          className="space-y-8"
+          {...(submitType === "onSubmit"
+            ? { onSubmit: handleSubmit(onSubmit, reportBlockedSave) }
+            : { onChange: handleSubmit(onSubmit, reportBlockedSave) })}
+        >
+          {fieldGroups.map((fieldGroup) => (
+            <div key={fieldGroup.label} className="space-y-8 sm:space-y-5">
+              <div>
+                <Heading as="h4" className="font-medium">
+                  {fieldGroup.label}
+                </Heading>
+                <Subtle>{fieldGroup.description}</Subtle>
+                <Subtle className="font-semibold">{fieldGroup?.notes}</Subtle>
+              </div>
 
-            {fieldGroup.fields.map((field) => {
-              const error = get(formState.errors, field.name as string);
-              return (
-                <FieldWrapper
-                  key={field.label}
-                  label={field.label}
-                  fieldName={field.name}
-                  description={field.description}
-                  valid={!error}
-                  validationText={
-                    error
-                      ? String(
-                          t([`formValidation.${error.type}`, error.message], {
-                            returnObjects: false,
-                            ...error.params,
-                          }),
-                        )
-                      : ""
-                  }
-                >
-                  <DynamicFormField
-                    field={field}
-                    control={control}
-                    disabled={isDisabled(field.disabledBy, field.disabled)}
-                    isDirty={getFieldState(field.name).isDirty}
-                    invalid={getFieldState(field.name).invalid}
-                  />
-                </FieldWrapper>
-              );
-            })}
-            {fieldGroup.footer}
-          </div>
-        ))}
-        {hasSubmitButton && (
-          <Button type="submit" variant="outline" disabled={!formState.isValid}>
-            {t("button.submit")}
-          </Button>
-        )}
-      </form>
+              {fieldGroup.fields.map((field) => {
+                const error = get(formState.errors, field.name as string);
+                return (
+                  <FieldWrapper
+                    key={field.label}
+                    label={field.label}
+                    fieldName={field.name}
+                    description={field.description}
+                    valid={!error}
+                    validationText={
+                      error
+                        ? String(
+                            t([`formValidation.${error.type}`, error.message], {
+                              returnObjects: false,
+                              ...error.params,
+                            }),
+                          )
+                        : ""
+                    }
+                  >
+                    <DynamicFormField
+                      field={field}
+                      control={control}
+                      disabled={isDisabled(field.disabledBy, field.disabled)}
+                      isDirty={getFieldState(field.name).isDirty}
+                      invalid={getFieldState(field.name).invalid}
+                    />
+                  </FieldWrapper>
+                );
+              })}
+              {fieldGroup.footer}
+            </div>
+          ))}
+          {hasSubmitButton && (
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={!formState.isValid}
+            >
+              {t("button.submit")}
+            </Button>
+          )}
+        </form>
+      </FormAutoSaveContext.Provider>
     </FormProvider>
   );
 }
