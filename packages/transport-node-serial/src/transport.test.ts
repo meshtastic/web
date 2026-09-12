@@ -133,9 +133,10 @@ describe("TransportNodeSerial (contract)", () => {
       expect(port.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (
-        globalThis as unknown as { __fakePort: FakeSerialPort }
-      ).__fakePort.emitErrorOnce("test-disconnect");
+      const fakePort = (globalThis as unknown as { __fakePort: FakeSerialPort })
+        .__fakePort;
+      fakePort.emitErrorOnce("test-disconnect");
+      fakePort.emitClose();
       await Promise.resolve();
     },
   });
