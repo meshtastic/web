@@ -236,7 +236,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               properties: {
                 step: 0.0000001,
                 suffix: "Degrees",
-                fieldLength: { max: 10 },
+                fieldLength: { max: 11 },
               },
               disabledBy: [{ fieldName: "fixedPosition" }],
             },
@@ -248,7 +248,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               properties: {
                 step: 0.0000001,
                 suffix: "Degrees",
-                fieldLength: { max: 10 },
+                fieldLength: { max: 12 },
               },
               disabledBy: [{ fieldName: "fixedPosition" }],
             },
