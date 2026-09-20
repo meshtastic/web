@@ -59,5 +59,11 @@
     "ignoreNode": "Ignore Node",
     "unignoreNode": "Unignore Node",
     "requestPosition": "Request Position"
+  },
+  "signalQuality": {
+    "good": "Good",
+    "fair": "Fair",
+    "bad": "Weak",
+    "none": "No signal"
   }
 }

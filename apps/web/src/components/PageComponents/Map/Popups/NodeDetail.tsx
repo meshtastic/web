@@ -6,6 +6,8 @@ import { Separator } from "@components/UI/Separator.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { formatQuantity } from "@core/utils/string.ts";
+import { rateSignalQuality } from "@core/utils/signalQuality.ts";
+import { useDevice } from "@core/stores";
 import type { Protobuf as ProtobufType } from "@meshtastic/sdk";
 import { Protobuf } from "@meshtastic/sdk";
 import {
@@ -17,11 +19,14 @@ import {
 } from "@radix-ui/react-tooltip";
 import { useNavigate } from "@tanstack/react-router";
 import {
-  Dot,
   LockIcon,
   LockOpenIcon,
   MessageSquareIcon,
   MountainSnow,
+  Signal,
+  SignalHigh,
+  SignalLow,
+  SignalMedium,
   Star,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -32,6 +37,7 @@ export interface NodeDetailProps {
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
   const navigate = useNavigate();
+  const { config } = useDevice();
   const { t } = useTranslation("nodes");
   const name = node.user?.longName ?? t("unknown.shortName");
   const shortName = node.user?.shortName ?? t("unknown.shortName");
@@ -44,17 +50,26 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       ? t("unset")
       : rawHardwareType.replaceAll("_", " ")
     : `${hwModel}`;
-  // SNR is in dB; derive a 0–100% quality heuristic (-10 dB → 0%, +10 dB → 100%).
-  const snrQuality = Math.min(
-    Math.max(Math.round((node.snr + 10) * 5), 0),
-    100,
-  );
+  // SNR rated against the active modem preset's demodulation floor
+  // (meshtastic/web#1241). WCAG 1.4.1: tier encoded in color + icon + text.
+  const quality =
+    node.snr == null
+      ? undefined
+      : rateSignalQuality(node.snr, config.lora?.modemPreset);
   const snrTone =
-    snrQuality >= 67
+    quality === "good"
       ? "text-green-600"
-      : snrQuality >= 34
+      : quality === "fair"
         ? "text-yellow-600"
         : "text-red-600";
+  const SignalIcon =
+    quality === "good"
+      ? SignalHigh
+      : quality === "fair"
+        ? SignalMedium
+        : quality === "bad"
+          ? SignalLow
+          : Signal;
   function handleDirectMessage() {
     navigate({ to: `/messages/direct/${node.num}` });
   }
@@ -208,15 +223,15 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         )}
       </div>
 
-      {node.snr !== 0 && (
+      {node.snr != null && quality && (
         <div className="mt-2">
           <div>{t("unit.snr")}</div>
           <Mono className="flex items-center gap-1 text-xs">
+            <SignalIcon size={14} className={snrTone} aria-hidden="true" />
+            <span className={snrTone}>{t(`signalQuality.${quality}`)}</span>
             <span className={snrTone}>
               {Number(node.snr.toFixed(1))} {t("unit.db")}
             </span>
-            <Dot className="text-gray-400" />
-            <span className="text-gray-500">{snrQuality}%</span>
           </Mono>
         </div>
       )}
