@@ -75,11 +75,7 @@ export function GenericInput<T extends FieldValues>({
       <Input
         type={field.type}
         step={field.properties?.step}
-        value={
-          field.type === "number"
-            ? String(controllerField.value)
-            : controllerField.value
-        }
+        value={controllerField.value ?? ""}
         id={field.name}
         onChange={handleInputChange}
         showCopyButton={field.properties?.showCopyButton}
