@@ -1,8 +1,8 @@
 {
   "maplibre": {
-    "GeolocateControl.FindMyLocation": "Find my location",
-    "NavigationControl.ZoomIn": "Zoom in",
-    "NavigationControl.ZoomOut": "Zoom out",
+    "GeolocateControl.FindMyLocation": "Визначити моє місце розтушування",
+    "NavigationControl.ZoomIn": "Приблизити",
+    "NavigationControl.ZoomOut": "Віддалити",
     "CooperativeGesturesHandler.WindowsHelpText": "Use Ctrl + scroll to zoom the map",
     "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
     "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map"
@@ -17,22 +17,22 @@
   },
   "mapMenu": {
     "locateAria": "Locate my node",
-    "layersAria": "Change map style"
+    "layersAria": "Змінити стиль мапи"
   },
   "waypointDetail": {
     "edit": "Редагувати",
-    "description": "Description:",
-    "createdBy": "Edited by:",
-    "createdDate": "Created:",
-    "updated": "Updated:",
-    "expires": "Expires:",
-    "distance": "Distance:",
+    "description": "Опис:",
+    "createdBy": "Відредаговано:",
+    "createdDate": "Створено:",
+    "updated": "Оновлено:",
+    "expires": "Діє до:",
+    "distance": "Відстань:",
     "bearing": "Absolute bearing:",
-    "lockedTo": "Locked by:",
-    "latitude": "Latitude:",
-    "longitude": "Longitude:"
+    "lockedTo": "Заблоковано:",
+    "latitude": "Широта:",
+    "longitude": "Довгота:"
   },
   "myNode": {
-    "tooltip": "This device"
+    "tooltip": "Цей пристрій"
   }
 }

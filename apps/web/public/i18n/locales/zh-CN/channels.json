@@ -1,71 +1,71 @@
 {
   "page": {
     "sectionLabel": "频道",
-    "channelName": "Channel: {{channelName}}",
+    "channelName": "频道 {{channelName}}",
     "broadcastLabel": "主要",
     "channelIndex": "Ch {{index}}",
     "import": "导入",
-    "export": "Export"
+    "export": "导出"
   },
   "validation": {
-    "pskInvalid": "Please enter a valid {{bits}} bit PSK."
+    "pskInvalid": "请输入有效的 {{bits}} PSK。"
   },
   "settings": {
     "label": "频道设置",
-    "description": "Crypto, MQTT & misc settings"
+    "description": "加密，MQTT & misc 设置"
   },
   "role": {
     "label": "角色",
-    "description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+    "description": "设备遥测数据通过主通道发送。只允许有一个主通道",
     "options": {
-      "primary": "PRIMARY",
-      "disabled": "DISABLED",
+      "primary": "主要的",
+      "disabled": "已关闭",
       "secondary": "SECONDARY"
     }
   },
   "psk": {
-    "label": "Pre-Shared Key",
-    "description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
-    "generate": "Generate"
+    "label": "共享密钥",
+    "description": "支持的 PSK 长度：256-bit, 128-bit, 8-bit, 空(0位)",
+    "generate": "创建"
   },
   "name": {
     "label": "名称",
-    "description": "A unique name for the channel <12 bytes, leave blank for default"
+    "description": "频道的唯一名称 <12字节，留空则使用默认值"
   },
   "uplinkEnabled": {
     "label": "启用上传",
-    "description": "Send messages from the local mesh to MQTT"
+    "description": "将本地MESH网络中的信息发送到MQTT"
   },
   "downlinkEnabled": {
     "label": "启用下载",
-    "description": "Send messages from MQTT to the local mesh"
+    "description": "从MQTT向本地MESH网络发送信息"
   },
   "positionPrecision": {
     "label": "位置",
-    "description": "The precision of the location to share with the channel. Can be disabled.",
+    "description": "与频道共享位置的精度。可以禁用。",
     "options": {
-      "none": "Do not share location",
-      "precise": "Precise Location",
-      "metric_km23": "Within 23 kilometers",
-      "metric_km12": "Within 12 kilometers",
-      "metric_km5_8": "Within 5.8 kilometers",
-      "metric_km2_9": "Within 2.9 kilometers",
-      "metric_km1_5": "Within 1.5 kilometers",
-      "metric_m700": "Within 700 meters",
-      "metric_m350": "Within 350 meters",
-      "metric_m200": "Within 200 meters",
-      "metric_m90": "Within 90 meters",
-      "metric_m50": "Within 50 meters",
-      "imperial_mi15": "Within 15 miles",
-      "imperial_mi7_3": "Within 7.3 miles",
-      "imperial_mi3_6": "Within 3.6 miles",
-      "imperial_mi1_8": "Within 1.8 miles",
-      "imperial_mi0_9": "Within 0.9 miles",
-      "imperial_mi0_5": "Within 0.5 miles",
-      "imperial_mi0_2": "Within 0.2 miles",
-      "imperial_ft600": "Within 600 feet",
-      "imperial_ft300": "Within 300 feet",
-      "imperial_ft150": "Within 150 feet"
+      "none": "不共享位置",
+      "precise": "精确位置",
+      "metric_km23": "23公里以内",
+      "metric_km12": "12公里以内",
+      "metric_km5_8": "5.8公里内",
+      "metric_km2_9": "2.9公里以内",
+      "metric_km1_5": "1.5公里内",
+      "metric_m700": "700米以内",
+      "metric_m350": "350米以内",
+      "metric_m200": "200米内",
+      "metric_m90": "90米以内",
+      "metric_m50": "50米以内",
+      "imperial_mi15": "15英里以内",
+      "imperial_mi7_3": "7.3英里以内",
+      "imperial_mi3_6": "3.6英里以内",
+      "imperial_mi1_8": "1.8英里以内",
+      "imperial_mi0_9": "0.9英里以内",
+      "imperial_mi0_5": "0.5英里以内",
+      "imperial_mi0_2": "0.2英里以内",
+      "imperial_ft600": "600英尺内",
+      "imperial_ft300": "300英尺内",
+      "imperial_ft150": "150英尺内"
     }
   }
 }

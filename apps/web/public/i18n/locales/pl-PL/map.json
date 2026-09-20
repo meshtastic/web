@@ -1,38 +1,38 @@
 {
   "maplibre": {
-    "GeolocateControl.FindMyLocation": "Find my location",
-    "NavigationControl.ZoomIn": "Zoom in",
-    "NavigationControl.ZoomOut": "Zoom out",
-    "CooperativeGesturesHandler.WindowsHelpText": "Use Ctrl + scroll to zoom the map",
-    "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
-    "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map"
+    "GeolocateControl.FindMyLocation": "Znajdź moją lokalizację",
+    "NavigationControl.ZoomIn": "Powiększ",
+    "NavigationControl.ZoomOut": "Oddal",
+    "CooperativeGesturesHandler.WindowsHelpText": "Użyj Ctrl + przewijania, aby powiększyć mapę",
+    "CooperativeGesturesHandler.MacHelpText": "Użyj ⌘ + przewiń, aby powiększyć mapę",
+    "CooperativeGesturesHandler.MobileHelpText": "Użyj dwóch palców, aby przesunąć mapę"
   },
   "layerTool": {
-    "nodeMarkers": "Show nodes",
-    "directNeighbors": "Show direct connections",
-    "remoteNeighbors": "Show remote connections",
-    "positionPrecision": "Show position precision",
-    "traceroutes": "Show traceroutes",
-    "waypoints": "Show waypoints"
+    "nodeMarkers": "Pokaż węzły",
+    "directNeighbors": "Pokaż bezpośrednie połączenia",
+    "remoteNeighbors": "Pokaż zdalne połączenia",
+    "positionPrecision": "Pokaż dokładność położenia",
+    "traceroutes": "Pokaż trasy śledzenia",
+    "waypoints": "Pokaż punkty nawigacji"
   },
   "mapMenu": {
-    "locateAria": "Locate my node",
-    "layersAria": "Change map style"
+    "locateAria": "Zlokalizuj mój węzeł",
+    "layersAria": "Zmień styl mapy"
   },
   "waypointDetail": {
     "edit": "Edytuj",
-    "description": "Description:",
-    "createdBy": "Edited by:",
-    "createdDate": "Created:",
-    "updated": "Updated:",
-    "expires": "Expires:",
-    "distance": "Distance:",
-    "bearing": "Absolute bearing:",
-    "lockedTo": "Locked by:",
-    "latitude": "Latitude:",
-    "longitude": "Longitude:"
+    "description": "Opis:",
+    "createdBy": "Edytowany przez:",
+    "createdDate": "Utworzono:",
+    "updated": "Zaktualizowane:",
+    "expires": "Wygasa:",
+    "distance": "Odległość: ",
+    "bearing": "Bezwzględny kierunek:",
+    "lockedTo": "Zablokowany przez:",
+    "latitude": "Szerokość geograficzna:",
+    "longitude": "Długość geograficzna:"
   },
   "myNode": {
-    "tooltip": "This device"
+    "tooltip": "To urządzenie"
   }
 }

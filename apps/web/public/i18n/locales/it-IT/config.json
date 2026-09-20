@@ -124,7 +124,7 @@
     "title": "Impostazioni Mesh",
     "description": "Impostazioni per la mesh LoRa",
     "bandwidth": {
-      "description": "Larghezza di banda del canale in kHz",
+      "description": "Larghezza di banda del canale in MHz",
       "label": "Larghezza di banda"
     },
     "boostedRxGain": {
@@ -428,31 +428,31 @@
     }
   },
   "user": {
-    "title": "User Settings",
-    "description": "Configure your device name and identity settings",
+    "title": "Impostazioni Utente",
+    "description": "Configura il nome del tuo dispositivo e le impostazioni di identità",
     "longName": {
       "label": "Nome Lungo",
-      "description": "Your full display name (1-40 characters)",
+      "description": "Il tuo nome completo (1-40 caratteri)",
       "validation": {
-        "min": "Long name must be at least 1 character",
-        "max": "Long name must be at most 40 characters"
+        "min": "Il nome completo deve contenere almeno 1 carattere",
+        "max": "Il nome completo può contenere al massimo 40 caratteri"
       }
     },
     "shortName": {
       "label": "Nome Breve",
-      "description": "Your abbreviated name (2-4 characters)",
+      "description": "Il tuo nome breve (2-4 caratteri)",
       "validation": {
-        "min": "Short name must be at least 2 characters",
-        "max": "Short name must be at most 4 characters"
+        "min": "Il nome breve deve contenere almeno 2 caratteri",
+        "max": "Il nome breve può contenere al massimo 4 caratteri"
       }
     },
     "isUnmessageable": {
       "label": "Non messaggabile",
-      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+      "description": "Utilizzato per identificare nodi non monitorati o infrastrutturali, in modo che non sia possibile inviare messaggi a nodi che non risponderanno mai."
     },
     "isLicensed": {
       "label": "Radioamatori con licenza (HAM)",
-      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+      "description": "Abilita se sei un operatore radioamatoriale con licenza, questa opzione disabilita la cifratura e non è compatibile con la rete Meshtastic predefinita."
     }
   }
 }

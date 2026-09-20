@@ -3,39 +3,39 @@
     "apply": "Застосувати",
     "addConnection": "Add Connection",
     "saveConnection": "Save connection",
-    "backupKey": "Backup Key",
+    "backupKey": "Резервний ключ",
     "cancel": "Скасувати",
     "connect": "Connect",
     "clearMessages": "Clear Messages",
     "close": "Закрити",
-    "confirm": "Confirm",
+    "confirm": "Підтвердити",
     "delete": "Видалити",
-    "dismiss": "Dismiss",
+    "dismiss": "Відхилити",
     "download": "Download",
     "disconnect": "Disconnect",
-    "export": "Export",
+    "export": "Експортувати",
     "generate": "Згенерувати",
     "regenerate": "Перегенерувати",
     "import": "Імпортувати",
     "message": "Повідомлення",
     "now": "Зараз",
     "ok": "Гаразд",
-    "print": "Print",
+    "print": "Видрукувати",
     "remove": "Видалити",
-    "requestNewKeys": "Request New Keys",
+    "requestNewKeys": "Запросити нові ключі",
     "requestPosition": "Запитати позицію",
     "reset": "Скинути",
-    "retry": "Retry",
+    "retry": "Повторити",
     "save": "Зберегти",
     "setDefault": "Set as default",
     "unsetDefault": "Unset default",
     "scanQr": "Сканувати QR-код",
     "traceRoute": "Trace Route",
-    "submit": "Submit"
+    "submit": "Надіслати"
   },
   "app": {
     "title": "Meshtastic",
-    "fullTitle": "Meshtastic Web Client"
+    "fullTitle": "Вебклієнт Meshtastic"
   },
   "loading": "Завантаження...",
   "unit": {
@@ -52,7 +52,6 @@
       "unknown": "Unknown hops away"
     },
     "megahertz": "МГц",
-    "kilohertz": "кГц",
     "raw": "raw",
     "meter": {
       "one": "Метр",
@@ -60,9 +59,9 @@
       "suffix": "м"
     },
     "kilometer": {
-      "one": "Kilometer",
+      "one": "Кілометр",
       "plural": "Kilometers",
-      "suffix": "km"
+      "suffix": "км"
     },
     "minute": {
       "one": "Minute",
@@ -84,8 +83,8 @@
     "day": {
       "one": "День",
       "plural": "Днів",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "today": "Сьогодні",
+      "yesterday": "Вчора"
     },
     "month": {
       "one": "Місяць",
@@ -98,8 +97,8 @@
     "snr": "SNR",
     "volt": {
       "one": "Вольт",
-      "plural": "Volts",
-      "suffix": "V"
+      "plural": "Вольт",
+      "suffix": "В"
     },
     "record": {
       "one": "Records",
@@ -113,9 +112,9 @@
   },
   "security": {
     "0bit": "Empty",
-    "8bit": "8 bit",
-    "128bit": "128 bit",
-    "256bit": "256 bit"
+    "8bit": "8 біт",
+    "128bit": "128 біт",
+    "256bit": "256 біт"
   },
   "unknown": {
     "longName": "Unknown",

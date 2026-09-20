@@ -1,25 +1,25 @@
 {
   "navigation": {
-    "title": "Navigation",
+    "title": "导航",
     "messages": "消息",
     "map": "地图",
     "settings": "设置",
     "channels": "频道",
-    "radioConfig": "Radio Config",
+    "radioConfig": "无线电配置",
     "deviceConfig": "设备配置",
-    "moduleConfig": "Module Config",
-    "manageConnections": "Manage Connections",
+    "moduleConfig": "模块配置",
+    "manageConnections": "连接管理",
     "nodes": "节点"
   },
   "app": {
     "title": "Meshtastic",
-    "logo": "Meshtastic Logo"
+    "logo": "Meshtastic标志"
   },
   "sidebar": {
     "collapseToggle": {
       "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
+        "open": "打开侧边栏",
+        "close": "关闭侧边栏"
       }
     },
     "deviceInfo": {
@@ -27,85 +27,85 @@
       "firmware": {
         "title": "固件",
         "version": "v{{version}}",
-        "buildDate": "Build date: {{date}}"
+        "buildDate": "创建时间: {{date}}"
       }
     }
   },
   "batteryStatus": {
     "charging": "{{level}}% charging",
-    "pluggedIn": "Plugged in",
+    "pluggedIn": "接通电源",
     "title": "电池"
   },
   "search": {
-    "nodes": "Search nodes...",
-    "channels": "Search channels...",
-    "commandPalette": "Search commands..."
+    "nodes": "搜索节点...",
+    "channels": "搜索频道……",
+    "commandPalette": "搜索命令……"
   },
   "toast": {
     "positionRequestSent": {
-      "title": "Position request sent."
+      "title": "位置请求已发送。"
     },
     "requestingPosition": {
-      "title": "Requesting position, please wait..."
+      "title": "正在请求位置，请稍候……"
     },
     "sendingTraceroute": {
-      "title": "Sending Traceroute, please wait..."
+      "title": "正在发送追踪路由，请等待……"
     },
     "tracerouteSent": {
-      "title": "Traceroute sent."
+      "title": "已发送追踪路由。"
     },
     "savedChannel": {
-      "title": "Saved Channel: {{channelName}}"
+      "title": "已保存频道：{{channelName}}"
     },
     "messages": {
       "pkiEncryption": {
-        "title": "Chat is using PKI encryption."
+        "title": "聊天正在使用PKI加密。"
       },
       "pskEncryption": {
-        "title": "Chat is using PSK encryption."
+        "title": "聊天正在使用PKI加密。"
       }
     },
     "configSaveError": {
-      "title": "Error Saving Config",
-      "description": "An error occurred while saving the configuration."
+      "title": "保存配置出错",
+      "description": "更新配置时出错。"
     },
     "validationError": {
-      "title": "Config Errors Exist",
-      "description": "Please fix the configuration errors before saving."
+      "title": "存在配置错误",
+      "description": "请在保存之前修复配置错误。"
     },
     "saveSuccess": {
-      "title": "Saving Config",
-      "description": "The configuration change {{case}} has been saved."
+      "title": "保存配置",
+      "description": "配置更改 {{case}} 已保存。"
     },
     "saveAllSuccess": {
-      "title": "Saved",
-      "description": "All configuration changes have been saved."
+      "title": "保存",
+      "description": "配置更改 {} 已保存。"
     },
     "favoriteNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "title": "{{action}} {{nodeName}} {{direction}} favorites",
       "action": {
-        "added": "Added",
-        "removed": "Removed",
-        "to": "to",
-        "from": "from"
+        "added": "已添加",
+        "removed": "移除",
+        "to": "到",
+        "from": "来自"
       }
     },
     "ignoreNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "title": "{{action}} {{nodeName}} {{direction}} favorites",
       "action": {
-        "added": "Added",
-        "removed": "Removed",
-        "to": "to",
-        "from": "from"
+        "added": "已添加",
+        "removed": "移除",
+        "to": "到",
+        "from": "来自"
       }
     }
   },
   "notifications": {
     "copied": {
-      "label": "Copied!"
+      "label": "复制！"
     },
     "copyToClipboard": {
-      "label": "Copy to clipboard"
+      "label": "复制到剪贴板"
     },
     "hidePassword": {
       "label": "隐藏密码"
@@ -114,14 +114,14 @@
       "label": "显示密码"
     },
     "deliveryStatus": {
-      "delivered": "Delivered",
-      "failed": "Delivery Failed",
+      "delivered": "已发送",
+      "failed": "发送失败",
       "waiting": "等待中...",
       "unknown": "未知"
     }
   },
   "general": {
-    "label": "General"
+    "label": "通用"
   },
   "hardware": {
     "label": "硬件"
@@ -139,92 +139,92 @@
     "label": "高级"
   },
   "clearInput": {
-    "label": "Clear input"
+    "label": "清空输入"
   },
   "resetFilters": {
-    "label": "Reset Filters"
+    "label": "重置筛选"
   },
   "nodeName": {
-    "label": "Node name/number",
+    "label": "节点名称/号码",
     "placeholder": "Meshtastic 1234"
   },
   "airtimeUtilization": {
-    "label": "Airtime Utilization (%)",
+    "label": "无线信道利用率 (%)",
     "short": "Airtime Util. (%)"
   },
   "batteryLevel": {
-    "label": "Battery level (%)",
-    "labelText": "Battery level (%): {{value}}"
+    "label": "电池电量 (%)",
+    "labelText": "电池电量（%）：{{value}}"
   },
   "batteryVoltage": {
-    "label": "Battery voltage (V)",
+    "label": "电池电压 (V)",
     "title": "电压"
   },
   "channelUtilization": {
-    "label": "Channel Utilization (%)",
-    "short": "Channel Util. (%)"
+    "label": "频道使用 (%)",
+    "short": "频道Util. (%)"
   },
   "hops": {
     "direct": "直频",
-    "label": "Number of hops",
-    "text": "Number of hops: {{value}}"
+    "label": "节点数",
+    "text": "跳数{{value}}"
   },
   "lastHeard": {
     "label": "最后听到",
-    "labelText": "Last heard: {{value}}",
-    "nowLabel": "Now"
+    "labelText": "最后一次收到：{{value}}",
+    "nowLabel": "当前"
   },
   "snr": {
     "label": "SNR (db)"
   },
   "favorites": {
-    "label": "Favorites"
+    "label": "收藏夹"
   },
   "hide": {
-    "label": "Hide"
+    "label": "隐藏"
   },
   "showOnly": {
-    "label": "Show Only"
+    "label": "仅显示"
   },
   "viaMqtt": {
-    "label": "Connected via MQTT"
+    "label": "通过 MQTT 连接"
   },
   "hopsUnknown": {
-    "label": "Unknown number of hops"
+    "label": "节点跳数未知"
   },
   "showUnheard": {
     "label": "Never heard"
   },
   "language": {
     "label": "语言",
-    "changeLanguage": "Change Language"
+    "changeLanguage": "选择语言"
   },
   "theme": {
     "dark": "深色",
     "light": "浅色",
-    "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
+    "system": "自动",
+    "changeTheme": "更改配色方案"
   },
   "errorPage": {
-    "title": "This is a little embarrassing...",
-    "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
-    "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
-    "reportInstructions": "Please include the following information in your report:",
+    "title": "这个有点尴尬了",
+    "description1": "非常抱歉，网页客户端出现了一个错误，导致其崩溃。<br />这本不应该发生，我们正在努力修复它。",
+    "description2": "防止这种情况再次发生在你或其他人身上的最佳方法是向我们报告这个问题。",
+    "reportInstructions": "请在你的报告中包括以下资料：",
     "reportSteps": {
-      "step1": "What you were doing when the error occurred",
-      "step2": "What you expected to happen",
-      "step3": "What actually happened",
-      "step4": "Any other relevant information"
+      "step1": "发生错误时你正在做什么",
+      "step2": "你预期会发生的情况",
+      "step3": "实际发生的情况",
+      "step4": "任何其他有关信息"
     },
-    "reportLink": "You can report the issue to our <0>GitHub</0>",
-    "connectionsLink": "Return to the <0>connections</0>",
-    "detailsSummary": "Error Details",
-    "errorMessageLabel": "Error message:",
-    "stackTraceLabel": "Stack trace:",
+    "reportLink": "您可以将问题报告给我们的<0>GitHub </0>",
+    "connectionsLink": "返回到<0>连接</0>",
+    "detailsSummary": "错误详情",
+    "errorMessageLabel": "错误信息：",
+    "stackTraceLabel": "堆栈跟踪：",
     "fallbackError": "{{error}}"
   },
   "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
+    "text": "由<0>▲ Vercel</0>提供技术支持 | Meshtastic®是Meshtastic有限责任公司的注册商标。 | <1>法律信息</1>",
     "commitSha": "Commit SHA: {{sha}}"
   }
 }

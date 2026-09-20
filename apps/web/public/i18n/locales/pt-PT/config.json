@@ -124,7 +124,7 @@
     "title": "Mesh Settings",
     "description": "Settings for the LoRa mesh",
     "bandwidth": {
-      "description": "Channel bandwidth in kHz",
+      "description": "Channel bandwidth in MHz",
       "label": "Largura de banda"
     },
     "boostedRxGain": {

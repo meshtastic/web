@@ -1,38 +1,38 @@
 {
   "maplibre": {
-    "GeolocateControl.FindMyLocation": "Find my location",
-    "NavigationControl.ZoomIn": "Zoom in",
-    "NavigationControl.ZoomOut": "Zoom out",
-    "CooperativeGesturesHandler.WindowsHelpText": "Use Ctrl + scroll to zoom the map",
-    "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
-    "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map"
+    "GeolocateControl.FindMyLocation": "Trouver ma position",
+    "NavigationControl.ZoomIn": "Zoom +",
+    "NavigationControl.ZoomOut": "Zoom -",
+    "CooperativeGesturesHandler.WindowsHelpText": "Utiliser Ctrl + défilement pour zoomer sur la carte",
+    "CooperativeGesturesHandler.MacHelpText": "Utiliser ⌘ + défilement pour zoomer sur la carte",
+    "CooperativeGesturesHandler.MobileHelpText": "Utiliser les doigts pour déplacer la carte"
   },
   "layerTool": {
-    "nodeMarkers": "Show nodes",
-    "directNeighbors": "Show direct connections",
-    "remoteNeighbors": "Show remote connections",
-    "positionPrecision": "Show position precision",
-    "traceroutes": "Show traceroutes",
-    "waypoints": "Show waypoints"
+    "nodeMarkers": "Afficher les nœuds",
+    "directNeighbors": "Afficher les connexions directes",
+    "remoteNeighbors": "Afficher les connexions distantes",
+    "positionPrecision": "Afficher la précision des positions",
+    "traceroutes": "Afficher les traceroutes",
+    "waypoints": "Afficher les points de cheminement"
   },
   "mapMenu": {
-    "locateAria": "Locate my node",
-    "layersAria": "Change map style"
+    "locateAria": "Localiser mon nœud",
+    "layersAria": "Changer le style de carte"
   },
   "waypointDetail": {
     "edit": "Modifier",
-    "description": "Description:",
-    "createdBy": "Edited by:",
-    "createdDate": "Created:",
-    "updated": "Updated:",
-    "expires": "Expires:",
-    "distance": "Distance:",
-    "bearing": "Absolute bearing:",
-    "lockedTo": "Locked by:",
-    "latitude": "Latitude:",
-    "longitude": "Longitude:"
+    "description": "Description :",
+    "createdBy": "Édité par :",
+    "createdDate": "Créé :",
+    "updated": "Mis à jour :",
+    "expires": "Expire :",
+    "distance": "Distance :",
+    "bearing": "Orientation absolue :",
+    "lockedTo": "Verrouillé par :",
+    "latitude": "Latitude :",
+    "longitude": "Longitude :"
   },
   "myNode": {
-    "tooltip": "This device"
+    "tooltip": "Cet appareil"
   }
 }
