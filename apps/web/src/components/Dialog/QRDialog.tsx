@@ -1,4 +1,3 @@
-import { create, toBinary } from "@bufbuild/protobuf";
 import {
   Dialog,
   DialogClose,
@@ -8,12 +7,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
+import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
+import { useCopyToClipboard } from "@core/hooks/useCopyToClipboard.ts";
+import {
+  encodeChannelShare,
+  type ChannelShareMode,
+} from "@core/utils/channelShare.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useChannels } from "@meshtastic/sdk-react";
-import { fromByteArray } from "base64-js";
-import { useEffect, useState } from "react";
+import { Share2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QRCode } from "react-qrcode-logo";
 import { Checkbox } from "../UI/Checkbox/index.tsx";
@@ -26,35 +31,46 @@ export interface QRDialogProps {
 
 export const QRDialog = ({ open, onOpenChange, loraConfig }: QRDialogProps) => {
   const { t } = useTranslation("dialog");
+  const { copy } = useCopyToClipboard();
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
-  const [qrCodeAdd, setQrCodeAdd] = useState<boolean>();
-
+  const [mode, setMode] = useState<ChannelShareMode>("replace");
   const allChannels = useChannels();
 
-  useEffect(() => {
-    const channelsToEncode = allChannels
-      .filter((ch) => selectedChannels.includes(ch.index))
+  const qrCodeUrl = useMemo(() => {
+    const settings = allChannels
+      .filter((channel) => selectedChannels.includes(channel.index))
       .map((channel) => channel.settings)
-      .filter((ch): ch is Protobuf.Channel.ChannelSettings => !!ch);
-    const encoded = create(
-      Protobuf.AppOnly.ChannelSetSchema,
-      create(Protobuf.AppOnly.ChannelSetSchema, {
-        loraConfig,
-        settings: channelsToEncode,
-      }),
-    );
-    const base64 = fromByteArray(
-      toBinary(Protobuf.AppOnly.ChannelSetSchema, encoded),
-    )
-      .replace(/=/g, "")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
+      .filter(
+        (channel): channel is Protobuf.Channel.ChannelSettings => !!channel,
+      );
 
-    setQrCodeUrl(
-      `https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`,
-    );
-  }, [allChannels, selectedChannels, qrCodeAdd, loraConfig]);
+    return settings.length > 0
+      ? encodeChannelShare({ mode, settings, loraConfig })
+      : "";
+  }, [allChannels, loraConfig, mode, selectedChannels]);
+
+  const share = async () => {
+    if (!qrCodeUrl) return;
+    if (
+      typeof navigator !== "undefined" &&
+      typeof navigator.share === "function"
+    ) {
+      try {
+        await navigator.share({
+          title: t("qr.title"),
+          text: t("qr.shareText"),
+          url: qrCodeUrl,
+        });
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError")
+          return;
+      }
+    }
+    await copy(qrCodeUrl);
+  };
+
+  const selectMode = (nextMode: ChannelShareMode) => setMode(nextMode);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -62,9 +78,18 @@ export const QRDialog = ({ open, onOpenChange, loraConfig }: QRDialogProps) => {
         <DialogClose />
         <DialogHeader>
           <DialogTitle>{t("qr.title")}</DialogTitle>
-          <DialogDescription>{t("qr.description")}</DialogDescription>
+          <DialogDescription>
+            {t(
+              mode === "replace"
+                ? "qr.replaceDescription"
+                : "qr.addDescription",
+            )}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          <div className="flex justify-center">
+            <ModePicker mode={mode} onChange={selectMode} />
+          </div>
           <div className="flex gap-3 px-4 py-5 sm:p-6">
             <div className="flex w-40 flex-col gap-2">
               {allChannels.map((channel) => (
@@ -80,13 +105,16 @@ export const QRDialog = ({ open, onOpenChange, loraConfig }: QRDialogProps) => {
                           })}`}
                   </Label>
                   <Checkbox
-                    key={channel.index}
                     checked={selectedChannels.includes(channel.index)}
                     onChange={() => {
                       if (selectedChannels.includes(channel.index)) {
-                        setSelectedChannels(
-                          selectedChannels.filter((c) => c !== channel.index),
-                        );
+                        if (selectedChannels.length > 1) {
+                          setSelectedChannels(
+                            selectedChannels.filter(
+                              (selected) => selected !== channel.index,
+                            ),
+                          );
+                        }
                       } else {
                         setSelectedChannels([
                           ...selectedChannels,
@@ -100,38 +128,45 @@ export const QRDialog = ({ open, onOpenChange, loraConfig }: QRDialogProps) => {
             </div>
             <QRCode value={qrCodeUrl} size={200} qrStyle="dots" />
           </div>
-          <div className="flex justify-center">
-            <button
-              type="button"
-              className={`border-slate-900 border-t border-l border-b rounded-l h-10 px-7 py-2 text-sm font-medium focus:outline-hidden focus:ring-2 focus:ring-offset-2 ${
-                qrCodeAdd
-                  ? "focus:ring-green-800 bg-green-800 text-white"
-                  : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
-              }`}
-              name="addChannels"
-              onClick={() => setQrCodeAdd(true)}
-            >
-              {t("qr.addChannels")}
-            </button>
-            <button
-              type="button"
-              className={`border-slate-900 border-t border-r border-b rounded-r h-10 px-4 py-2 text-sm font-medium focus:outline-hidden focus:ring-2 focus:ring-offset-2 ${
-                !qrCodeAdd
-                  ? "focus:ring-green-800 bg-green-800 text-white"
-                  : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
-              }`}
-              name="replaceChannels"
-              onClick={() => setQrCodeAdd(false)}
-            >
-              {t("qr.replaceChannels")}
-            </button>
-          </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <Label>{t("qr.sharableUrl")}</Label>
-          <Input value={qrCodeUrl} disabled />
+          <Input value={qrCodeUrl} disabled showCopyButton />
+          <Button onClick={() => void share()} disabled={!qrCodeUrl}>
+            <Share2 className="mr-2" size={16} />
+            {t("qr.share")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const ModePicker = ({
+  mode,
+  onChange,
+}: {
+  mode: ChannelShareMode;
+  onChange: (mode: ChannelShareMode) => void;
+}) => {
+  const { t } = useTranslation("dialog");
+  return (
+    <fieldset className="flex border-0 p-0" aria-label={t("qr.mode")}>
+      {(["replace", "add"] as const).map((modeOption) => (
+        <button
+          className={`h-10 border-slate-900 border-t border-b px-4 py-2 text-sm font-medium focus:outline-hidden focus:ring-2 focus:ring-offset-2 first:rounded-l last:rounded-r ${
+            mode === modeOption
+              ? "bg-green-800 text-white focus:ring-green-800"
+              : "bg-slate-400 hover:bg-green-600 focus:ring-slate-400"
+          }`}
+          key={modeOption}
+          name={`${modeOption}Channels`}
+          onClick={() => onChange(modeOption)}
+          type="button"
+        >
+          {t(`qr.${modeOption}Channels`)}
+        </button>
+      ))}
+    </fieldset>
   );
 };
