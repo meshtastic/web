@@ -43,7 +43,8 @@ export type ConnectionStatus =
   | "configuring"
   | "configured"
   | "online"
-  | "error";
+  | "error"
+  | "warning";
 
 export type Connection = {
   id: ConnectionId;
