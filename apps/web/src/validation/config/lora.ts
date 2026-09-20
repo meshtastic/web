@@ -15,7 +15,8 @@ export const LoRaValidationSchema = z.object({
   region: RegionCodeEnum,
   hopLimit: z.coerce.number().int().min(0).max(7),
   txEnabled: z.boolean(),
-  txPower: z.coerce.number().int().min(0),
+  // Negative dBm supported for external PA attenuation, floor -18.
+  txPower: z.coerce.number().int().min(-18),
   channelNum: z.coerce.number().int(),
   overrideDutyCycle: z.boolean(),
   sx126xRxBoostedGain: z.boolean(),

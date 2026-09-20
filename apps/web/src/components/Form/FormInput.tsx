@@ -59,11 +59,9 @@ export function GenericInput<T extends FieldValues>({
       field.inputChange(e);
     }
 
-    controllerField.onChange(
-      field.type === "number"
-        ? Number.parseFloat(newValue).toString()
-        : newValue,
-    );
+    // Forward the raw string so partial input like "-" or "0." isn't
+    // mangled mid-type; the schema coerces on submit.
+    controllerField.onChange(newValue);
   };
 
   const currentLength = controllerField.value
@@ -76,9 +74,9 @@ export function GenericInput<T extends FieldValues>({
         type={field.type}
         step={field.properties?.step}
         value={
-          field.type === "number"
-            ? String(controllerField.value)
-            : controllerField.value
+          controllerField.value === undefined || controllerField.value === null
+            ? ""
+            : String(controllerField.value)
         }
         id={field.name}
         onChange={handleInputChange}
