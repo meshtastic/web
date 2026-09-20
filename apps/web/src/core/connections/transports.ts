@@ -1,5 +1,5 @@
 import type { Connection } from "@core/stores/deviceStore/types";
-import { testHttpReachable } from "@pages/Connections/utils";
+import { httpErrorMessage, testHttpReachable } from "@pages/Connections/utils";
 import { createLogger } from "@meshtastic/sdk";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import {
@@ -62,15 +62,9 @@ export async function openTransport(
 async function openHttp(
   conn: Connection & { type: "http"; url: string },
 ): Promise<OpenTransportResult> {
-  const ok = await testHttpReachable(conn.url);
-  if (!ok) {
-    const url = new URL(conn.url);
-    const isHTTPS = url.protocol === "https:";
-    throw new Error(
-      isHTTPS
-        ? `Cannot reach HTTPS endpoint. If using a self-signed certificate, open ${conn.url} in a new tab, accept the certificate warning, then try connecting again.`
-        : "HTTP endpoint not reachable (may be blocked by CORS)",
-    );
+  const { reachable, certError } = await testHttpReachable(conn.url);
+  if (!reachable) {
+    throw new Error(httpErrorMessage(conn.url, certError));
   }
   const url = new URL(conn.url);
   const isTLS = url.protocol === "https:";
@@ -203,20 +197,29 @@ async function openSerial(
   return { transport: result.value, serialPort: port };
 }
 
+export type ProbeResult = {
+  status: "online" | "configured" | "disconnected" | "error";
+  error?: string;
+  errorKind?: Connection["errorKind"];
+};
+
 /**
  * Probes a saved connection for reachability/permission without opening it.
  * Used by refreshStatuses to update the saved-connection status badges.
  */
-export async function probeConnection(
-  conn: Connection,
-): Promise<"online" | "configured" | "disconnected" | "error"> {
+export async function probeConnection(conn: Connection): Promise<ProbeResult> {
   switch (conn.type) {
     case "http": {
-      const ok = await testHttpReachable(conn.url);
-      return ok ? "online" : "error";
+      const { reachable, certError } = await testHttpReachable(conn.url);
+      if (reachable) return { status: "online" };
+      return {
+        status: "error",
+        error: httpErrorMessage(conn.url, certError),
+        errorKind: certError ? "cert" : "network",
+      };
     }
     case "bluetooth": {
-      if (!("bluetooth" in navigator)) return "disconnected";
+      if (!("bluetooth" in navigator)) return { status: "disconnected" };
       try {
         const known = await (
           navigator.bluetooth as Navigator["bluetooth"] & {
@@ -226,17 +229,13 @@ export async function probeConnection(
         const hasPermission = known?.some(
           (d: BluetoothDevice) => d.id === conn.deviceId,
         );
-        // Permission granted ≠ device configured. The card surfaces "online"
-        // (i.e. "available, click to connect") so the user explicitly opts
-        // into the configure handshake. "configured" is reserved for when
-        // the firmware has actually replied with config-complete.
-        return hasPermission ? "online" : "disconnected";
+        return { status: hasPermission ? "online" : "disconnected" };
       } catch {
-        return "disconnected";
+        return { status: "disconnected" };
       }
     }
     case "serial": {
-      if (!("serial" in navigator)) return "disconnected";
+      if (!("serial" in navigator)) return { status: "disconnected" };
       try {
         const ports: SerialPort[] = await (
           navigator as Navigator & {
@@ -255,9 +254,9 @@ export async function probeConnection(
             info.usbProductId === conn.usbProductId
           );
         });
-        return hasPermission ? "online" : "disconnected";
+        return { status: hasPermission ? "online" : "disconnected" };
       } catch {
-        return "disconnected";
+        return { status: "disconnected" };
       }
     }
   }

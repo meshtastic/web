@@ -54,6 +54,7 @@ export type Connection = {
   isDefault?: boolean;
   status: ConnectionStatus;
   error?: string;
+  errorKind?: "cert" | "network";
   meshDeviceId?: number;
 } & NewConnection;
 
