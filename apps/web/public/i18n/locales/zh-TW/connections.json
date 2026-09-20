@@ -1,34 +1,34 @@
 {
   "page": {
-    "title": "Connect to a Meshtastic device",
-    "description": "Add a device connection via HTTP, Bluetooth, or Serial. Your saved connections will be saved in your browser."
+    "title": "連線至 Meshtastic 裝置",
+    "description": "透過 HTTP、藍牙或序列埠新增裝置連線。已儲存的連線將保存於瀏覽器中。"
   },
   "connectionType_ble": "低功耗藍牙",
   "connectionType_serial": "序列埠",
   "connectionType_network": "網路",
-  "deleteConnection": "Delete connection",
-  "areYouSure": "This will remove {{name}}. You canot undo this action.",
-  "moreActions": "More actions",
+  "deleteConnection": "刪除連線",
+  "areYouSure": "此操作將移除 {{name}} ，且無法復原。",
+  "moreActions": "更多操作",
   "noConnections": {
-    "title": "No connections yet.",
-    "description": "Create your first connection. It will connect immediately and be saved for later."
+    "title": "尚無連線。",
+    "description": "建立你的第一個連線，系統將立即連線並儲存以供日後使用。"
   },
-  "lastConnectedAt": "Last connected: {{date}}",
-  "neverConnected": "Never connected",
+  "lastConnectedAt": "上次連線：{{date}}",
+  "neverConnected": "從未連線",
   "toasts": {
     "connected": "已連線",
-    "nowConnected": "{{name}} is now connected",
-    "nowDisconnected": "{{name}} are now disconnecte",
+    "nowConnected": "{{name}} 已連線",
+    "nowDisconnected": "{{name}} 已斷線",
     "disconnected": "已中斷連線",
-    "failed": "Failed to connect",
-    "checkConnetion": "Check your device or settings and try again",
-    "defaultSet": "Default set",
-    "defaultConnection": "Default connection is now {{nameisconnected}}",
-    "deleted": "Deleted",
-    "deletedByName": "{{name}} was removed",
-    "pickConnectionAgain": "Could not connect. You may need to reselect the device/port.",
-    "added": "Connection added",
-    "savedByName": "{{name}} saved.",
-    "savedCantConnect": "The connection was saved but could not connect."
+    "failed": "連線失敗",
+    "checkConnetion": "請檢查裝置或設定後再試一次",
+    "defaultSet": "已設為預設",
+    "defaultConnection": "預設連線已設為 {{nameisconnected}}",
+    "deleted": "已刪除",
+    "deletedByName": "{{name}} 已移除",
+    "pickConnectionAgain": "無法連線，你可能需要重新選擇裝置/連接埠。",
+    "added": "已新增連線",
+    "savedByName": "{{name}} 已儲存。",
+    "savedCantConnect": "連線已儲存，但無法連線。"
   }
 }

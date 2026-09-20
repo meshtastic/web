@@ -2,7 +2,7 @@
   "page": {
     "tabAmbientLighting": "조명",
     "tabAudio": "오디오",
-    "tabCannedMessage": "Canned",
+    "tabCannedMessage": "상용구",
     "tabDetectionSensor": "감지 센서",
     "tabExternalNotification": "Ext Notif",
     "tabMqtt": "MQTT",
@@ -38,7 +38,7 @@
     }
   },
   "audio": {
-    "title": "Audio Settings",
+    "title": "Audio 설정",
     "description": "Settings for the Audio module",
     "codec2Enabled": {
       "label": "Codec 2 Enabled",
@@ -46,11 +46,11 @@
     },
     "pttPin": {
       "label": "PTT Pin",
-      "description": "GPIO pin to use for PTT"
+      "description": "PTT용 GPIO핀"
     },
     "bitrate": {
-      "label": "Bitrate",
-      "description": "Bitrate to use for audio encoding"
+      "label": "비트레이트",
+      "description": "Audio 인코딩용 비트레이트"
     },
     "i2sWs": {
       "label": "i2S WS",
@@ -70,22 +70,22 @@
     }
   },
   "cannedMessage": {
-    "title": "Canned Message Settings",
-    "description": "Settings for the Canned Message module",
+    "title": "상용구 설정",
+    "description": "상용구 모듈 설정",
     "moduleEnabled": {
-      "label": "Module Enabled",
-      "description": "Enable Canned Message"
+      "label": "모듈 활성화",
+      "description": "상용구 활성화"
     },
     "rotary1Enabled": {
       "label": "Rotary Encoder #1 Enabled",
       "description": "Enable the rotary encoder"
     },
     "inputbrokerPinA": {
-      "label": "Encoder Pin A",
+      "label": "엔코더 핀 A",
       "description": "GPIO Pin Value (1-39) For encoder port A"
     },
     "inputbrokerPinB": {
-      "label": "Encoder Pin B",
+      "label": "엔코더 핀 B",
       "description": "GPIO Pin Value (1-39) For encoder port B"
     },
     "inputbrokerPinPress": {
