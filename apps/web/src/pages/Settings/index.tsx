@@ -53,6 +53,7 @@ const ConfigPage = () => {
   );
 
   const [isSaving, setIsSaving] = useState(false);
+  const [formResetKey, setFormResetKey] = useState(0);
   const [rhfState, setRhfState] = useState({ isDirty: false, isValid: true });
   const unsubRef = useRef<(() => void) | null>(null);
   const [formMethods, setFormMethods] = useState<UseFormReturn | null>(null);
@@ -163,10 +164,15 @@ const ConfigPage = () => {
   }, [toast, t, formMethods, editor]);
 
   const handleReset = useCallback(() => {
-    if (formMethods) {
+    if (editor) {
+      // The editor is the source of the controlled `values` passed to each
+      // form. Remount the active form after discarding drafts so a controlled
+      // value update cannot emit a late change and recreate the draft.
+      editor.reset();
+      setFormResetKey((key) => key + 1);
+    } else if (formMethods) {
       formMethods.reset();
     }
-    editor?.reset();
   }, [formMethods, editor]);
 
   const leftSidebar = useMemo(
@@ -258,7 +264,12 @@ const ConfigPage = () => {
       label={activeSection?.label ?? ""}
       actions={actions}
     >
-      {ActiveComponent && <ActiveComponent onFormInit={onFormInit} />}
+      {ActiveComponent && (
+        <ActiveComponent
+          key={`${activeSection.key}:${formResetKey}`}
+          onFormInit={onFormInit}
+        />
+      )}
     </PageLayout>
   );
 };
