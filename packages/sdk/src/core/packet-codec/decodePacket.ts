@@ -295,6 +295,7 @@ function handleDecodedPacket(
 ) {
   const packetMetadata: Omit<PacketMetadata<unknown>, "data"> = {
     id: meshPacket.id,
+    requestId: dataPacket.requestId,
     rxTime: new Date(meshPacket.rxTime * 1000),
     type: meshPacket.to === Constants.broadcastNum ? "broadcast" : "direct",
     from: meshPacket.from,

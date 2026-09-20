@@ -19,21 +19,83 @@
     "replyLabel": "Reply"
   },
   "deliveryStatus": {
-    "delivered": {
-      "label": "Message delivered",
-      "displayText": "Message delivered"
+    "retry": "Opnieuw proberen",
+    "retryAriaLabel": "Bericht opnieuw proberen: {{status}}",
+    "deliveredToMesh": {
+      "displayText": "Afgeleverd aan mesh-netwerk",
+      "detailText": "Minstens één node heeft dit kanaalbericht ontvangen."
     },
-    "failed": {
-      "label": "Message delivery failed",
-      "displayText": "Delivery failed"
+    "deliveredToRecipient": {
+      "displayText": "Afgeleverd bij ontvanger",
+      "detailText": "De ontvanger heeft dit directe bericht bevestigd."
+    },
+    "encryptedSendFailed": {
+      "displayText": "Versleuteld bericht kon niet worden verzonden",
+      "detailText": "De radio kon het versleutelde pad voor dit bericht niet maken. Laat node-informatie synchroniseren en probeer het daarna opnieuw."
+    },
+    "adminKeyNotAuthorized": {
+      "displayText": "Admin-sleutel niet geautoriseerd",
+      "detailText": "De openbare admin-sleutel is niet geautoriseerd op de bestemming."
+    },
+    "adminSessionExpired": {
+      "displayText": "Admin-sessie verlopen",
+      "detailText": "De admin-sessiesleutel ontbreekt, is ongeldig of is verlopen. Start een nieuwe admin-sessie en probeer het opnieuw."
+    },
+    "dutyCycleLimit": {
+      "displayText": "Duty-cyclelimiet",
+      "detailText": "De radio is tijdelijk geblokkeerd door de regionale zendtijdlimiet. Probeer het later opnieuw."
+    },
+    "failedToMesh": {
+      "displayText": "Afleveren aan mesh-netwerk mislukt",
+      "detailText": "Geen enkele node heeft dit bericht bevestigd. Probeer het opnieuw bij beter signaal of betere mesh-dekking."
+    },
+    "invalidRequest": {
+      "displayText": "Ongeldig verzoek",
+      "detailText": "De ontvangende app heeft het verzoek geweigerd. Controleer het bericht of commando en probeer het opnieuw."
+    },
+    "messageTooLarge": {
+      "displayText": "Bericht is te groot om te verzenden",
+      "detailText": "Maak het bericht korter en verzend het opnieuw."
+    },
+    "noAppResponse": {
+      "displayText": "Geen app-reactie",
+      "detailText": "De bestemming heeft het verzoek ontvangen, maar er heeft geen app of module gereageerd."
+    },
+    "noChannel": {
+      "displayText": "Kanaal/sleutel komt niet overeen",
+      "detailText": "Dit bericht kon niet worden gecodeerd of gedecodeerd met een overeenkomend kanaal/sleutel. Controleer het kanaal en de sleutel en probeer het opnieuw."
+    },
+    "noRadioInterface": {
+      "displayText": "Geen radio-interface",
+      "detailText": "De radio heeft geen bruikbare interface voor deze verzending."
+    },
+    "notAuthorized": {
+      "displayText": "Niet geautoriseerd",
+      "detailText": "De bestemming heeft toestemming voor dit verzoek geweigerd."
+    },
+    "rateLimited": {
+      "displayText": "Snelheidslimiet bereikt",
+      "detailText": "Berichten worden te snel verzonden. Wacht even en probeer het opnieuw."
+    },
+    "recipientKeyUnavailable": {
+      "displayText": "Ontvangerssleutel niet beschikbaar",
+      "detailText": "Je node heeft de openbare sleutel van de ontvanger nog niet. Laat node-informatie synchroniseren en probeer het daarna opnieuw."
+    },
+    "recipientNeedsYourKey": {
+      "displayText": "Ontvanger heeft jouw sleutel nodig",
+      "detailText": "De ontvanger kent jouw openbare sleutel nog niet. Je node kan zijn informatie automatisch delen; probeer het opnieuw na synchronisatie."
+    },
+    "relayed": {
+      "displayText": "Doorgestuurd, niet bevestigd door ontvanger",
+      "detailText": "Een node heeft dit bericht doorgestuurd, maar de ontvanger heeft het niet bevestigd."
+    },
+    "sending": {
+      "displayText": "Verzenden...",
+      "detailText": "De radio probeert dit bericht nog steeds te verzenden."
     },
     "unknown": {
-      "label": "Message status unknown",
-      "displayText": "Unknown state"
-    },
-    "waiting": {
-      "label": "Sending message",
-      "displayText": "Waiting for delivery"
+      "displayText": "Berichtstatus onbekend",
+      "detailText": "De berichtstatus is niet beschikbaar."
     }
   }
 }

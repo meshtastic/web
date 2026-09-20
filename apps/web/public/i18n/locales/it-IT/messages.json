@@ -19,21 +19,83 @@
     "replyLabel": "Rispondi"
   },
   "deliveryStatus": {
-    "delivered": {
-      "label": "Messaggio inviato",
-      "displayText": "Messaggio inviato"
+    "retry": "Riprova",
+    "retryAriaLabel": "Riprova messaggio: {{status}}",
+    "deliveredToMesh": {
+      "displayText": "Consegnato alla rete mesh",
+      "detailText": "Almeno un nodo ha ricevuto questo messaggio del canale."
     },
-    "failed": {
-      "label": "Invio messaggio non riuscito",
-      "displayText": "Invio fallito"
+    "deliveredToRecipient": {
+      "displayText": "Consegnato al destinatario",
+      "detailText": "Il destinatario ha confermato questo messaggio diretto."
+    },
+    "encryptedSendFailed": {
+      "displayText": "Impossibile inviare il messaggio crittografato",
+      "detailText": "La radio non è riuscita a creare il percorso crittografato per questo messaggio. Attendi la sincronizzazione delle informazioni dei nodi, poi riprova."
+    },
+    "adminKeyNotAuthorized": {
+      "displayText": "Chiave admin non autorizzata",
+      "detailText": "La chiave pubblica admin non è autorizzata sulla destinazione."
+    },
+    "adminSessionExpired": {
+      "displayText": "Sessione admin scaduta",
+      "detailText": "La chiave della sessione admin è mancante, non valida o scaduta. Avvia una nuova sessione admin, poi riprova."
+    },
+    "dutyCycleLimit": {
+      "displayText": "Limite del duty cycle",
+      "detailText": "La radio è temporaneamente bloccata dal limite regionale di tempo in trasmissione. Riprova più tardi."
+    },
+    "failedToMesh": {
+      "displayText": "Consegna alla rete mesh non riuscita",
+      "detailText": "Nessun nodo ha confermato questo messaggio. Riprova quando hai un segnale migliore o una copertura mesh più ampia."
+    },
+    "invalidRequest": {
+      "displayText": "Richiesta non valida",
+      "detailText": "L'app ricevente ha rifiutato la richiesta. Controlla il messaggio o il comando e riprova."
+    },
+    "messageTooLarge": {
+      "displayText": "Messaggio troppo grande da inviare",
+      "detailText": "Accorcia il messaggio e invialo di nuovo."
+    },
+    "noAppResponse": {
+      "displayText": "Nessuna risposta dall'app",
+      "detailText": "La destinazione ha ricevuto la richiesta, ma nessuna app o modulo ha risposto."
+    },
+    "noChannel": {
+      "displayText": "Mancata corrispondenza canale/chiave",
+      "detailText": "Questo messaggio non può essere codificato o decodificato con un canale/chiave corrispondente. Controlla il canale e la chiave, poi riprova."
+    },
+    "noRadioInterface": {
+      "displayText": "Nessuna interfaccia radio",
+      "detailText": "La radio non ha un'interfaccia utilizzabile per questo invio."
+    },
+    "notAuthorized": {
+      "displayText": "Non autorizzato",
+      "detailText": "La destinazione ha rifiutato il permesso per questa richiesta."
+    },
+    "rateLimited": {
+      "displayText": "Limite di frequenza raggiunto",
+      "detailText": "I messaggi vengono inviati troppo rapidamente. Attendi un momento, poi riprova."
+    },
+    "recipientKeyUnavailable": {
+      "displayText": "Chiave del destinatario non disponibile",
+      "detailText": "Il tuo nodo non ha ancora la chiave pubblica del destinatario. Attendi la sincronizzazione delle informazioni dei nodi, poi riprova."
+    },
+    "recipientNeedsYourKey": {
+      "displayText": "Il destinatario ha bisogno della tua chiave",
+      "detailText": "Il destinatario non conosce ancora la tua chiave pubblica. Il tuo nodo potrebbe condividere automaticamente le sue informazioni; riprova dopo la sincronizzazione."
+    },
+    "relayed": {
+      "displayText": "Inoltrato, non confermato dal destinatario",
+      "detailText": "Un nodo ha inoltrato questo messaggio, ma il destinatario non lo ha confermato."
+    },
+    "sending": {
+      "displayText": "Invio in corso...",
+      "detailText": "La radio sta ancora tentando di inviare questo messaggio."
     },
     "unknown": {
-      "label": "Stato messaggio sconosciuto",
-      "displayText": "Stato sconosciuto"
-    },
-    "waiting": {
-      "label": "Inviando il messaggio...",
-      "displayText": "In attesa della consegna"
+      "displayText": "Stato del messaggio sconosciuto",
+      "detailText": "Lo stato del messaggio non è disponibile."
     }
   }
 }
