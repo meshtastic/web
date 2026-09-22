@@ -60,10 +60,10 @@
     "@radix-ui/react-tooltip": "^1.2.16",
     "@radix-ui/react-visually-hidden": "^1.2.11",
     "@tailwindcss/vite": "^4.3.3",
-    "@tanstack/react-router": "^1.170.18",
-    "@tanstack/react-router-devtools": "^1.167.0",
-    "@tanstack/router-cli": "^1.167.21",
-    "@tanstack/router-devtools": "^1.167.0",
+    "@tanstack/react-router": "^1.170.31",
+    "@tanstack/react-router-devtools": "^1.167.1",
+    "@tanstack/router-cli": "^1.167.32",
+    "@tanstack/router-devtools": "^1.167.1",
     "@turf/turf": "^7.3.5",
     "@types/node": "^26.1.2",
     "@types/web-bluetooth": "^0.0.21",
@@ -96,7 +96,7 @@
     "zustand": "5.0.14"
   },
   "devDependencies": {
-    "@tanstack/router-plugin": "^1.168.22",
+    "@tanstack/router-plugin": "^1.168.34",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.4",
