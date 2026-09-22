@@ -86,17 +86,16 @@ instructions listed on the home page.
 
 ### Development
 
-Install the dependencies.
+Install the dependencies from the repo root (pnpm workspaces installs every package in one pass).
 
 ```bash
-cd packages/web &&
 pnpm install
 ```
 
-Start the development server:
+Start the development server for the web client:
 
 ```bash
-pnpm run dev
+pnpm --filter meshtastic-web dev
 ```
 
 ### Building and Packaging
@@ -104,13 +103,13 @@ pnpm run dev
 Build the project:
 
 ```bash
-pnpm run build
+pnpm --filter meshtastic-web build
 ```
 
 GZip the output:
 
 ```bash
-pnpm run package
+pnpm --filter meshtastic-web run package
 ```
 
 ### Why pnpm?
@@ -151,6 +150,6 @@ requests:
     Meshtastic nodes.
 
 Please review our
-[Contribution Guidelines](https://github.com/meshtastic/web/blob/main/packages/web/CONTRIBUTING.md)
+[Contribution Guidelines](https://github.com/meshtastic/web/blob/main/apps/web/CONTRIBUTING.md)
 before submitting a pull request. We appreciate your help in making the project
 better!
