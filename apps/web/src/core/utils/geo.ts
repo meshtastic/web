@@ -1,5 +1,3 @@
-import { bbox, lineString } from "@turf/turf";
-
 export type LngLat = [number, number];
 export type Mercator = [number, number];
 export type Bounds = [[number, number], [number, number]];
@@ -28,8 +26,28 @@ export const boundsFromLngLat = (coords: LngLat[]): Bounds | undefined => {
     return undefined;
   }
 
-  const turfCoords = coords.map(([lng, lat]) => [lat, lng]);
-  const [minLat, minLng, maxLat, maxLng] = bbox(lineString(turfCoords));
+  let minLng = Infinity;
+  let maxLng = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+
+  for (const [lng, lat] of coords) {
+    if (Number.isFinite(lng) && Number.isFinite(lat)) {
+      if (lng < minLng) minLng = lng;
+      if (lng > maxLng) maxLng = lng;
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+    }
+  }
+
+  if (
+    !Number.isFinite(minLng) ||
+    !Number.isFinite(minLat) ||
+    !Number.isFinite(maxLng) ||
+    !Number.isFinite(maxLat)
+  ) {
+    return undefined;
+  }
 
   return [
     [minLng, minLat],

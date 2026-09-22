@@ -15,6 +15,38 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ErrorBoundary } from "react-error-boundary";
 import { MapProvider } from "react-map-gl/maplibre";
 
+import { useConnections } from "@pages/Connections/useConnections.ts";
+import { useEffect, useRef } from "react";
+
+function AutoConnect() {
+  const savedConnections = useDeviceStore((s) => s.savedConnections);
+  const { connect } = useConnections();
+  const { selectedDeviceId } = useAppStore();
+  const { getDevice } = useDeviceStore();
+  const device = getDevice(selectedDeviceId);
+  const hasAttempted = useRef(false);
+
+  useEffect(() => {
+    if (hasAttempted.current || device || savedConnections.length === 0) {
+      return;
+    }
+
+    const target =
+      savedConnections.find((c) => c.isDefault && c.type === "http") ||
+      savedConnections.find((c) => c.type === "http");
+
+    if (target) {
+      hasAttempted.current = true;
+      useDeviceStore
+        .getState()
+        .updateSavedConnection(target.id, { status: "disconnected" });
+      void connect(target.id);
+    }
+  }, [savedConnections, device, connect]);
+
+  return null;
+}
+
 export function App() {
   useTheme();
 
@@ -26,6 +58,7 @@ export function App() {
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
       <Toaster />
+      <AutoConnect />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>
         {/* Overlay sits outside the device-conditional branch so it shows
