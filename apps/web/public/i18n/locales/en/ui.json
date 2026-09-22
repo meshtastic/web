@@ -42,6 +42,14 @@
     "commandPalette": "Search commands..."
   },
   "toast": {
+    "profileImported": {
+      "title": "Profile Imported",
+      "description": "Settings staged. Click Save to commit."
+    },
+    "profileImportFailed": {
+      "title": "Import Failed",
+      "description": "Failed to parse the .cfg file."
+    },
     "positionRequestSent": { "title": "Position request sent." },
     "requestingPosition": { "title": "Requesting position, please wait..." },
     "sendingTraceroute": { "title": "Sending Traceroute, please wait..." },
