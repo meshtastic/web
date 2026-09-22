@@ -43,8 +43,15 @@ If your changes affect the UI, include screenshots or screencasts showing the be
 Check all that apply. If an item doesn't apply to your PR, you can leave it unchecked or remove it.
 -->
 
-- [ ] Code follows project style guidelines
+- [ ] `pnpm run check` passes (lint + format)
+- [ ] `pnpm --filter ./apps/web run typecheck` passes
+- [ ] `pnpm exec vitest run` passes
 - [ ] Documentation has been updated or added
 - [ ] Tests have been added or updated
-- [ ] All i18n translation labels have been added (read
-      CONTRIBUTING_I18N_DEVELOPER_GUIDE.md for more details)
+- [ ] All i18n translation labels have been added (see the
+      [i18n developer guide](../apps/web/CONTRIBUTING_I18N_DEVELOPER_GUIDE.md))
+
+<!--
+New here? See the [contributing guide](../CONTRIBUTING.md).
+-->
+

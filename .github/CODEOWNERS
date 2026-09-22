@@ -1,0 +1,35 @@
+# Code owners are requested for review automatically when a PR touches their
+# paths. Combined with a branch protection rule requiring code owner review,
+# this is what stops an unreviewed change to the release or publishing
+# workflows from landing.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ACTION REQUIRED: the rules below are commented out because they need real
+# GitHub handles or team slugs. Replace @meshtastic/OWNERS with the actual
+# owner(s) and uncomment. Rules naming a nonexistent user or team are silently
+# ignored by GitHub, so it is better to leave them off than to guess.
+#
+# Later rules win over earlier ones, so keep the catch-all first.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Default owners for everything in the repo
+# *                             @meshtastic/OWNERS
+
+# CI, release, and publishing pipelines — these hold the credentials that push
+# to GHCR, npm, and JSR, so they warrant the tightest review.
+# /.github/workflows/           @meshtastic/OWNERS
+# /.github/dependabot.yml       @meshtastic/OWNERS
+# /.github/CODEOWNERS           @meshtastic/OWNERS
+
+# Container build and deployment
+# /apps/web/infra/              @meshtastic/OWNERS
+
+# Transport layer — device connectivity (BLE / Serial / HTTP)
+# /packages/transport-*/        @meshtastic/OWNERS
+
+# Protocol definitions
+# /packages/protobufs/          @meshtastic/OWNERS
+
+# Translation sources. Crowdin owns the non-English locales; changes to the
+# English source strings should still get a maintainer's eyes.
+# /apps/web/public/i18n/locales/en/   @meshtastic/OWNERS
