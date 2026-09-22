@@ -153,6 +153,44 @@ describe("TransportNodeSerial (extras)", () => {
     transformsStub?.restore();
   });
 
+  it("emits DeviceDisconnected with reason 'port-error' on error event", async () => {
+    const fakePort = new FakeSerialPort();
+    const transport = new TransportNodeSerial(
+      fakePort as unknown as SerialPort,
+    );
+    const reader = transport.fromDevice.getReader();
+
+    await Promise.resolve();
+
+    const first = await reader.read();
+    expect(isStatusEvent(first.value)).toBe(true);
+    if (isStatusEvent(first.value)) {
+      expect(first.value.data.status).toBe(DeviceStatusEnum.DeviceConnecting);
+    }
+
+    const second = await reader.read();
+    expect(isStatusEvent(second.value)).toBe(true);
+    if (isStatusEvent(second.value)) {
+      expect(second.value.data.status).toBe(DeviceStatusEnum.DeviceConnected);
+    }
+
+    fakePort.emitErrorOnce("test-disconnect");
+    await Promise.resolve();
+
+    let sawError = false;
+    for (let i = 0; i < 6; i++) {
+      const { value } = await reader.read();
+      if (isStatusEvent(value) && value.data.reason === "port-error") {
+        sawError = true;
+        break;
+      }
+    }
+    expect(sawError).toBe(true);
+
+    reader.releaseLock();
+    await transport.disconnect();
+  });
+
   it("emits DeviceDisconnected with reason 'port-closed' on close event", async () => {
     const fakePort = new FakeSerialPort();
     const transport = new TransportNodeSerial(
