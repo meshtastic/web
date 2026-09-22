@@ -200,7 +200,7 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
             case "queueStatus": {
               sink.log.trace(
                 Emitter[Emitter.HandleFromRadio],
-                `🚧 Received Queue Status: ${decodedMessage.payloadVariant.value}`,
+                `🚧 Received Queue Status: last status: ${decodedMessage.payloadVariant.value.res}, free entries: ${decodedMessage.payloadVariant.value.free} out of ${decodedMessage.payloadVariant.value.maxlen}`,
               );
               sink.events.onQueueStatus.dispatch(
                 decodedMessage.payloadVariant.value,
