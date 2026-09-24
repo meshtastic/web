@@ -30,5 +30,14 @@
     "added": "Connection added",
     "savedByName": "{{name}} saved.",
     "savedCantConnect": "The connection was saved but could not connect."
+  },
+  "errors": {
+    "certNotTrusted": "Certificado autofirmado no confiable. Abre {{url}} en una pestaña nueva, acepta la advertencia de seguridad, luego vuelve aquí e inténtalo de nuevo.",
+    "httpsNotReachable": "No se pudo conectar al endpoint HTTPS. Verifica que el dispositivo esté en línea.",
+    "httpNotReachable": "No se pudo conectar al endpoint HTTP (puede estar bloqueado por CORS o un problema de red)",
+    "openInNewTab": "Abrir en una pestaña nueva →"
+  },
+  "httpTest": {
+    "certNotTrusted": "Certificado no confiable. <0>Abrir en una pestaña nueva</0>, aceptar la advertencia y volver a intentarlo."
   }
 }
