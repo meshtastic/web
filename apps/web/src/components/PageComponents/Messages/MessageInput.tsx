@@ -70,7 +70,7 @@ export const MessageInput = ({
           <label
             data-testid="byte-counter"
             htmlFor="messageInput"
-            className="flex items-center w-20 p-1 text-sm place-content-end"
+            className="flex items-center w-14 md:w-20 p-1 text-sm place-content-end"
           >
             {messageBytes}/{maxBytes}
           </label>

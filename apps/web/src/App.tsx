@@ -25,7 +25,7 @@ export function App() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <Toaster />
+      <Toaster className={device ? "max-sm:top-16" : undefined} />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>
         {/* Overlay sits outside the device-conditional branch so it shows
@@ -39,7 +39,8 @@ export function App() {
           <SidebarProvider>
             <div className="h-full flex flex-1 flex-col">
               {device ? (
-                <div className="h-full flex w-full">
+                // dvh here only: the shell stays h-screen so the connection screen is untouched.
+                <div className="h-dvh flex w-full">
                   <DialogManager />
                   <KeyBackupReminder />
                   <RegionSetupReminder />

@@ -15,6 +15,7 @@ import {
   useDevice,
   useSidebar,
 } from "@core/stores";
+import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { cn } from "@core/utils/cn.ts";
 import { useTotalUnread } from "@meshtastic/sdk-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
@@ -56,6 +57,7 @@ const CollapseToggleButton = () => {
       onClick={toggleSidebar}
       className={cn(
         "absolute top-20 right-0 z-10 p-0.5 rounded-full transform translate-x-1/2",
+        "max-md:hidden",
         "transition-colors duration-300 ease-in-out",
         "border border-slate-300 dark:border-slate-200",
         "text-slate-500 dark:text-slate-200 hover:text-slate-400 dark:hover:text-slate-400",
@@ -80,7 +82,9 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const { setCommandPaletteOpen } = useAppStore();
   const myNode = useMyNodeAsProto();
   const getNodesLength = () => allNodes.length;
-  const { isCollapsed } = useSidebar();
+  const { isCollapsed: isCollapsedPreference } = useSidebar();
+  const isMobile = useIsMobile();
+  const isCollapsed = isCollapsedPreference && !isMobile;
   const { t } = useTranslation("ui");
   const navigate = useNavigate({ from: "/" });
 
@@ -144,6 +148,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         "relative border-slate-300 dark:border-slate-700",
         "transition-all duration-300 ease-in-out flex-shrink-0",
         isCollapsed ? "w-24" : "w-52 lg:w-64",
+        "max-md:w-full",
       )}
     >
       <CollapseToggleButton />
