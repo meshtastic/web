@@ -1,8 +1,8 @@
 {
   "button": {
     "apply": "套用",
-    "addConnection": "Add Connection",
-    "saveConnection": "Save connection",
+    "addConnection": "新增連線",
+    "saveConnection": "儲存連線",
     "backupKey": "備份金鑰",
     "cancel": "取消",
     "connect": "連線",
@@ -18,17 +18,17 @@
     "regenerate": "重新產生",
     "import": "匯入",
     "message": "訊息:",
-    "now": "Now",
+    "now": "現在",
     "ok": "好的",
-    "print": "Print",
+    "print": "列印",
     "remove": "移除",
     "requestNewKeys": "請求新金鑰",
     "requestPosition": "請求位置",
     "reset": "重設",
-    "retry": "Retry",
+    "retry": "重試",
     "save": "儲存",
-    "setDefault": "Set as default",
-    "unsetDefault": "Unset default",
+    "setDefault": "設為預設",
+    "unsetDefault": "取消預設",
     "scanQr": "掃描QR碼",
     "traceRoute": "追蹤路由",
     "submit": "套用"
@@ -39,11 +39,11 @@
   },
   "loading": "載入中……",
   "unit": {
-    "cps": "CPS",
+    "cps": "字元/秒",
     "dbm": "dBm",
     "hertz": "Hz",
     "hop": {
-      "one": "Hop",
+      "one": "中繼數",
       "plural": "跳數"
     },
     "hopsAway": {
@@ -52,8 +52,7 @@
       "unknown": "跳數未知"
     },
     "megahertz": "MHz",
-    "kilohertz": "kHz",
-    "raw": "raw",
+    "raw": "原始值",
     "meter": {
       "one": "公尺",
       "plural": "公尺",
@@ -112,18 +111,18 @@
     }
   },
   "security": {
-    "0bit": "Empty",
+    "0bit": "空白",
     "8bit": "8 bit",
     "128bit": "128 bit",
     "256bit": "256 bit"
   },
   "unknown": {
     "longName": "不明",
-    "shortName": "UNK",
+    "shortName": "未知",
     "notAvailable": "不適用",
-    "num": "??"
+    "num": "？？"
   },
-  "nodeUnknownPrefix": "!",
+  "nodeUnknownPrefix": "！",
   "unset": "未設定",
   "fallbackName": "Meshtastic {{last4}}",
   "node": "節點",
@@ -143,7 +142,7 @@
       "key": "格式錯誤，須為 Base64 編碼的預共享金鑰 (PSK)。"
     },
     "invalidType": {
-      "number": "Invalid type, expected a number."
+      "number": "類型錯誤，請輸入數字。"
     },
     "pskLength": {
       "0bit": "此金鑰須留空。",

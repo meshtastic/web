@@ -8,12 +8,12 @@
     "radioConfig": "無線電設定",
     "deviceConfig": "設備設置",
     "moduleConfig": "模組設定",
-    "manageConnections": "Manage Connections",
+    "manageConnections": "管理連線",
     "nodes": "節點"
   },
   "app": {
     "title": "Meshtastic",
-    "logo": "Meshtastic Logo"
+    "logo": "Meshtastic 標誌"
   },
   "sidebar": {
     "collapseToggle": {
@@ -82,21 +82,21 @@
       "description": "所有設定已保存。"
     },
     "favoriteNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "title": "{{action}} {{nodeName}} {{direction}} 最愛。",
       "action": {
         "added": "已添加",
         "removed": "已移除",
-        "to": "to",
-        "from": "from"
+        "to": "至",
+        "from": "從"
       }
     },
     "ignoreNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "title": "{{action}} {{nodeName}} {{direction}} 忽略清單",
       "action": {
         "added": "已添加",
         "removed": "已移除",
-        "to": "to",
-        "from": "from"
+        "to": "至",
+        "from": "從"
       }
     }
   },
@@ -127,7 +127,7 @@
     "label": "硬體"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "指標"
   },
   "role": {
     "label": "角色"
@@ -172,13 +172,13 @@
   "lastHeard": {
     "label": "最近一次收到排序",
     "labelText": "最後接收時間：{{value}}",
-    "nowLabel": "Now"
+    "nowLabel": "剛剛"
   },
   "snr": {
-    "label": "SNR (db)"
+    "label": "訊噪比 (db)"
   },
   "favorites": {
-    "label": "Favorites"
+    "label": "最愛"
   },
   "hide": {
     "label": "隱藏"
@@ -193,7 +193,7 @@
     "label": "跳數未知"
   },
   "showUnheard": {
-    "label": "Unknown last heard"
+    "label": "最後收到時間未知"
   },
   "language": {
     "label": "語言",
@@ -217,7 +217,7 @@
       "step4": "其他相關資訊"
     },
     "reportLink": "您可以將此問題回報到我們的 <0>GitHub</0>",
-    "connectionsLink": "Return to the <0>connections</0>",
+    "connectionsLink": "返回 <0> 連線 </0>",
     "detailsSummary": "錯誤詳情",
     "errorMessageLabel": "錯誤訊息：",
     "stackTraceLabel": "Stack trace：",
@@ -225,6 +225,6 @@
   },
   "footer": {
     "text": "技術支援： <0>▲ Vercel</0> | Meshtastic® 是 Meshtastic LLC. 的註冊商標。| <1>法律資訊</1>",
-    "commitSha": "Commit SHA: {{sha}}"
+    "commitSha": "Commit SHA：{{sha}}"
   }
 }

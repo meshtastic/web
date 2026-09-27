@@ -2,399 +2,399 @@
   "page": {
     "tabAmbientLighting": "氛围灯",
     "tabAudio": "音频",
-    "tabCannedMessage": "Canned",
+    "tabCannedMessage": "预设的",
     "tabDetectionSensor": "检测传感器",
-    "tabExternalNotification": "Ext Notif",
+    "tabExternalNotification": "外部通知",
     "tabMqtt": "MQTT",
     "tabNeighborInfo": "邻居信息",
     "tabPaxcounter": "客流计数",
     "tabRangeTest": "拉距测试",
     "tabSerial": "串口",
     "tabStoreAndForward": "S&F",
-    "tabTelemetry": "遥测（传感器）"
+    "tabTelemetry": "遥测传感器"
   },
   "ambientLighting": {
-    "title": "Ambient Lighting Settings",
-    "description": "Settings for the Ambient Lighting module",
+    "title": "氛围灯配置",
+    "description": "模块的定位设置",
     "ledState": {
       "label": "LED 状态",
-      "description": "Sets LED to on or off"
+      "description": "将 LED 设置为开启或关闭"
     },
     "current": {
       "label": "电流",
-      "description": "Sets the current for the LED output. Default is 10"
+      "description": "设置 LED 输出的当前值。默认值是 10"
     },
     "red": {
       "label": "红",
-      "description": "Sets the red LED level. Values are 0-255"
+      "description": "设置红色的 LED 级别。值为0-255"
     },
     "green": {
       "label": "绿",
-      "description": "Sets the green LED level. Values are 0-255"
+      "description": "设置绿色LED级别。值为0-255"
     },
     "blue": {
       "label": "蓝",
-      "description": "Sets the blue LED level. Values are 0-255"
+      "description": "设置蓝色LED级别。值为0-255"
     }
   },
   "audio": {
-    "title": "Audio Settings",
-    "description": "Settings for the Audio module",
+    "title": "音频设置",
+    "description": "音频模块设置",
     "codec2Enabled": {
-      "label": "Codec 2 Enabled",
-      "description": "Enable Codec 2 audio encoding"
+      "label": "启用Codec 2",
+      "description": "启用codec 2 音频编码"
     },
     "pttPin": {
-      "label": "PTT Pin",
-      "description": "GPIO pin to use for PTT"
+      "label": "PTT 引脚",
+      "description": "用于PTT的 GPIO 引脚"
     },
     "bitrate": {
       "label": "Bitrate",
-      "description": "Bitrate to use for audio encoding"
+      "description": "用于音频编码的 Bitrate"
     },
     "i2sWs": {
       "label": "i2S WS",
-      "description": "GPIO pin to use for i2S WS"
+      "description": "用于i2S WS 的 GPIO 引脚"
     },
     "i2sSd": {
-      "label": "i2S SD",
-      "description": "GPIO pin to use for i2S SD"
+      "label": "i2SD",
+      "description": "用于i2S SD的 GPIO 引脚"
     },
     "i2sDin": {
-      "label": "i2S DIN",
-      "description": "GPIO pin to use for i2S DIN"
+      "label": "i2S",
+      "description": "用于i2S DIN 的 GPIO 引脚"
     },
     "i2sSck": {
       "label": "i2S SCK",
-      "description": "GPIO pin to use for i2S SCK"
+      "description": "用于i2S SCK的 GPIO 引脚"
     }
   },
   "cannedMessage": {
-    "title": "Canned Message Settings",
-    "description": "Settings for the Canned Message module",
+    "title": "预设消息配置",
+    "description": "预设消息模块设置",
     "moduleEnabled": {
-      "label": "Module Enabled",
-      "description": "Enable Canned Message"
+      "label": "启用模块",
+      "description": "启用预设信息"
     },
     "rotary1Enabled": {
-      "label": "Rotary Encoder #1 Enabled",
-      "description": "Enable the rotary encoder"
+      "label": "旋钮编码器 #1 启用",
+      "description": "启用旋钮"
     },
     "inputbrokerPinA": {
-      "label": "Encoder Pin A",
-      "description": "GPIO Pin Value (1-39) For encoder port A"
+      "label": "编码器Pin A",
+      "description": "GPIO Pin 值 (1-39) 用于编码器按下"
     },
     "inputbrokerPinB": {
-      "label": "Encoder Pin B",
-      "description": "GPIO Pin Value (1-39) For encoder port B"
+      "label": "编码器Pin B",
+      "description": "GPIO Pin 值(1-39) 用于编码器端口 B"
     },
     "inputbrokerPinPress": {
-      "label": "Encoder Pin Press",
-      "description": "GPIO Pin Value (1-39) For encoder Press"
+      "label": "编码器按下",
+      "description": "GPIO Pin 值 (1-39) 用于编码器按下"
     },
     "inputbrokerEventCw": {
-      "label": "Clockwise event",
-      "description": "Select input event."
+      "label": "顺时针事件",
+      "description": "选择输入事件。"
     },
     "inputbrokerEventCcw": {
-      "label": "Counter Clockwise event",
-      "description": "Select input event."
+      "label": "逆时针事件",
+      "description": "选择输入事件。"
     },
     "inputbrokerEventPress": {
-      "label": "Press event",
-      "description": "Select input event"
+      "label": "新闻事件",
+      "description": "选择输入事件"
     },
     "updown1Enabled": {
-      "label": "Up Down enabled",
-      "description": "Enable the up / down encoder"
+      "label": "启用上传下载",
+      "description": "启用上/下编码程序"
     },
     "allowInputSource": {
-      "label": "Allow Input Source",
-      "description": "Select from: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
+      "label": "允许输入源",
+      "description": "从以下选项中选择：'_any'、'rotEnc1'、'upDownEnc1'、'cardkb'"
     },
     "sendBell": {
       "label": "发送铃声",
-      "description": "Sends a bell character with each message"
+      "description": "每条消息都发送一个响铃字符"
     }
   },
   "detectionSensor": {
-    "title": "Detection Sensor Settings",
-    "description": "Settings for the Detection Sensor module",
+    "title": "检测传感器配置",
+    "description": "模块的定位设置",
     "enabled": {
       "label": "启用",
-      "description": "Enable or disable Detection Sensor Module"
+      "description": "启用或禁用检测传感器模块"
     },
     "minimumBroadcastSecs": {
-      "label": "Minimum Broadcast Seconds",
-      "description": "The interval in seconds of how often we can send a message to the mesh when a state change is detected"
+      "label": "最小广播时间秒",
+      "description": "当检测到状态变化时，我们能够向网络发送消息的时间间隔 以秒为单位"
     },
     "stateBroadcastSecs": {
-      "label": "State Broadcast Seconds",
-      "description": "The interval in seconds of how often we should send a message to the mesh with the current state regardless of changes"
+      "label": "状态广播秒数",
+      "description": "无论状态是否有变化，我们每隔多少秒应该向网络发送一次包含当前状态的消息的时间间隔以秒为单位"
     },
     "sendBell": {
       "label": "发送铃声",
-      "description": "Send ASCII bell with alert message"
+      "description": "发送带有警报消息的 ASCII 响铃"
     },
     "name": {
-      "label": "Friendly Name",
-      "description": "Used to format the message sent to mesh, max 20 Characters"
+      "label": "友好名称",
+      "description": "用于格式化发送到网格的消息，最大20个字符"
     },
     "monitorPin": {
-      "label": "Monitor Pin",
-      "description": "The GPIO pin to monitor for state changes"
+      "label": "监视器",
+      "description": "用于监视状态变化的 GPIO 引脚"
     },
     "detectionTriggerType": {
-      "label": "Detection Triggered Type",
-      "description": "The type of trigger event to be used"
+      "label": "触发类型",
+      "description": "触发事件类型"
     },
     "usePullup": {
-      "label": "Use Pullup",
-      "description": "Whether or not use INPUT_PULLUP mode for GPIO pin"
+      "label": "使用 Pullup",
+      "description": "GPIO 引脚是否使用 INPUT_PULUP 模式"
     }
   },
   "externalNotification": {
-    "title": "External Notification Settings",
-    "description": "Configure the external notification module",
+    "title": "外部通知配置",
+    "description": "配置外部通知模块",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable External Notification"
+      "label": "启用模块",
+      "description": "启用外部通知"
     },
     "outputMs": {
-      "label": "Output MS",
-      "description": "Output MS"
+      "label": "输出MS",
+      "description": "输出MS"
     },
     "output": {
-      "label": "Output",
-      "description": "Output"
+      "label": "输出",
+      "description": "输出"
     },
     "outputVibra": {
-      "label": "Output Vibrate",
-      "description": "Output Vibrate"
+      "label": "输出振动",
+      "description": "输出振动"
     },
     "outputBuzzer": {
-      "label": "Output Buzzer",
-      "description": "Output Buzzer"
+      "label": "输出蜂鸣器",
+      "description": "输出蜂鸣器"
     },
     "active": {
-      "label": "Active",
-      "description": "Active"
+      "label": "启用",
+      "description": "启用"
     },
     "alertMessage": {
-      "label": "Alert Message",
-      "description": "Alert Message"
+      "label": "提醒消息",
+      "description": "提醒消息"
     },
     "alertMessageVibra": {
-      "label": "Alert Message Vibrate",
-      "description": "Alert Message Vibrate"
+      "label": "提醒消息振动",
+      "description": "提醒消息振动"
     },
     "alertMessageBuzzer": {
-      "label": "Alert Message Buzzer",
-      "description": "Alert Message Buzzer"
+      "label": "提醒消息蜂鸣器",
+      "description": "提醒消息蜂鸣器"
     },
     "alertBell": {
-      "label": "Alert Bell",
-      "description": "Should an alert be triggered when receiving an incoming bell?"
+      "label": "提醒铃声",
+      "description": "收到来电铃声时应该触发警报吗？"
     },
     "alertBellVibra": {
-      "label": "Alert Bell Vibrate",
-      "description": "Alert Bell Vibrate"
+      "label": "警报振动",
+      "description": "警报铃振动"
     },
     "alertBellBuzzer": {
-      "label": "Alert Bell Buzzer",
-      "description": "Alert Bell Buzzer"
+      "label": "警报铃蜂鸣器",
+      "description": "警报铃蜂鸣器"
     },
     "usePwm": {
-      "label": "Use PWM",
-      "description": "Use PWM"
+      "label": "使用 PWM",
+      "description": "使用 PWM"
     },
     "nagTimeout": {
-      "label": "Nag Timeout",
-      "description": "Nag Timeout"
+      "label": "超时提醒",
+      "description": "超时提醒"
     },
     "useI2sAsBuzzer": {
-      "label": "Use I²S Pin as Buzzer",
-      "description": "Designate I²S Pin as Buzzer Output"
+      "label": "使用 I2S 作为蜂鸣器",
+      "description": "指定 I2S Pin 为 Buzzer 输出"
     }
   },
   "mqtt": {
-    "title": "MQTT Settings",
-    "description": "Settings for the MQTT module",
+    "title": "Mesh 设置",
+    "description": "MQTT模块的设置",
     "enabled": {
       "label": "启用",
-      "description": "Enable or disable MQTT"
+      "description": "启用或禁用 MQTT"
     },
     "address": {
-      "label": "MQTT Server Address",
-      "description": "MQTT server address to use for default/custom servers"
+      "label": "MQT服务器地址",
+      "description": "用于默认/自定义服务器的 MQTT 服务器地址"
     },
     "username": {
-      "label": "MQTT Username",
-      "description": "MQTT username to use for default/custom servers"
+      "label": "MQTT 用户名",
+      "description": "用于默认服务器/自定义服务器的 MQTT 用户名"
     },
     "password": {
-      "label": "MQTT Password",
-      "description": "MQTT password to use for default/custom servers"
+      "label": "MQTT 密码",
+      "description": "用于默认服务器/自定义服务器的 MQTT 密码"
     },
     "encryptionEnabled": {
       "label": "启用加密",
-      "description": "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data."
+      "description": "启用或禁用MQTT加密。注意：如果未启用此选项，所有消息包括位置数据都将以未加密的方式发送到MQTT代理，即使您的上行链路通道已设置加密密钥也是如此。"
     },
     "jsonEnabled": {
       "label": "启用 JSON",
-      "description": "Whether to send/consume JSON packets on MQTT"
+      "description": "是否在 MQTT 上发送/消耗JSON 数据包"
     },
     "tlsEnabled": {
       "label": "启用 TLS",
-      "description": "Enable or disable TLS"
+      "description": "启用或禁用 TLS"
     },
     "root": {
       "label": "根主题",
-      "description": "MQTT root topic to use for default/custom servers"
+      "description": "用于默认/自定义服务器的 MQTT 根主题topic"
     },
     "proxyToClientEnabled": {
-      "label": "MQTT Client Proxy Enabled",
-      "description": "Utilizes the network connection to proxy MQTT messages to the client."
+      "label": "启用MQT客户端代理",
+      "description": "使用网络连接代理MQTT消息到客户端。"
     },
     "mapReportingEnabled": {
-      "label": "Map Reporting Enabled",
-      "description": "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
+      "label": "启用地图位置报告",
+      "description": "您的节点将定期向配置的 MQTT 服务器发送一个未加密的地图报告包，这包括id、短和长的名称， 大致位置、硬件模型、角色、固件版本、LoRa区域、调制解调器预设和主频道名称。"
     },
     "mapReportSettings": {
       "publishIntervalSecs": {
-        "label": "Map Report Publish Interval (s)",
-        "description": "Interval in seconds to publish map reports"
+        "label": "地图位置报告间隔时间 (s)",
+        "description": "地图位置报告间隔时间"
       },
       "positionPrecision": {
-        "label": "Approximate Location",
-        "description": "Position shared will be accurate within this distance",
+        "label": "大致位置",
+        "description": "共享的位置将在这个距离范围内保持准确",
         "options": {
-          "metric_km23": "Within 23 km",
-          "metric_km12": "Within 12 km",
-          "metric_km5_8": "Within 5.8 km",
-          "metric_km2_9": "Within 2.9 km",
-          "metric_km1_5": "Within 1.5 km",
-          "metric_m700": "Within 700 m",
-          "metric_m350": "Within 350 m",
-          "metric_m200": "Within 200 m",
-          "metric_m90": "Within 90 m",
-          "metric_m50": "Within 50 m",
-          "imperial_mi15": "Within 15 miles",
-          "imperial_mi7_3": "Within 7.3 miles",
-          "imperial_mi3_6": "Within 3.6 miles",
-          "imperial_mi1_8": "Within 1.8 miles",
-          "imperial_mi0_9": "Within 0.9 miles",
-          "imperial_mi0_5": "Within 0.5 miles",
-          "imperial_mi0_2": "Within 0.2 miles",
-          "imperial_ft600": "Within 600 feet",
-          "imperial_ft300": "Within 300 feet",
-          "imperial_ft150": "Within 150 feet"
+          "metric_km23": "23公里以内",
+          "metric_km12": "12公里以内",
+          "metric_km5_8": "5.8公里以内",
+          "metric_km2_9": "2.9公里以内",
+          "metric_km1_5": "1.5公里以内",
+          "metric_m700": "700米以内",
+          "metric_m350": "350米以内",
+          "metric_m200": "200米内",
+          "metric_m90": "在90米内",
+          "metric_m50": "50米以内",
+          "imperial_mi15": "15英里以内",
+          "imperial_mi7_3": "7.3英里内",
+          "imperial_mi3_6": "3.6英里内",
+          "imperial_mi1_8": "1.8英里内",
+          "imperial_mi0_9": "0.9英里内",
+          "imperial_mi0_5": "0.5英里以内",
+          "imperial_mi0_2": "0.2英里以内",
+          "imperial_ft600": "600英尺内",
+          "imperial_ft300": "300英尺内",
+          "imperial_ft150": "150英尺内"
         }
       }
     }
   },
   "neighborInfo": {
-    "title": "Neighbor Info Settings",
-    "description": "Settings for the Neighbor Info module",
+    "title": "邻居信息设置",
+    "description": "邻居信息模块的设置",
     "enabled": {
       "label": "启用",
-      "description": "Enable or disable Neighbor Info Module"
+      "description": "启用或禁用邻居信息模块"
     },
     "updateInterval": {
-      "label": "Update Interval",
-      "description": "Interval in seconds of how often we should try to send our Neighbor Info to the mesh"
+      "label": "更新间隔",
+      "description": "尝试将邻居信息发送到mesh网络的间隔以秒为单位"
     }
   },
   "paxcounter": {
-    "title": "Paxcounter Settings",
-    "description": "Settings for the Paxcounter module",
+    "title": "流量计数器统计设置",
+    "description": "节点流量计数器模块设置",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable Paxcounter"
+      "label": "启用模块",
+      "description": "启用节点流量计数器"
     },
     "paxcounterUpdateInterval": {
-      "label": "Update Interval (seconds)",
-      "description": "How long to wait between sending paxcounter packets"
+      "label": "更新间隔（秒）",
+      "description": "发送节点流量计数器数据包的间隔时间"
     },
     "wifiThreshold": {
-      "label": "WiFi RSSI Threshold",
-      "description": "At what WiFi RSSI level should the counter increase. Defaults to -80."
+      "label": "WiFi RSSI 阈值",
+      "description": "WiFi RSSI级别应增加计数。默认值为 -80。"
     },
     "bleThreshold": {
       "label": "BLE RSSI Threshold",
-      "description": "At what BLE RSSI level should the counter increase. Defaults to -80."
+      "description": "蓝牙低功耗接收信号强度指示 BLE RSSI 达到什么级别时计数器应该增加？默认值为 -80。"
     }
   },
   "rangeTest": {
-    "title": "Range Test Settings",
-    "description": "Settings for the Range Test module",
+    "title": "节点距离测试设置",
+    "description": "节点距离测试模块模式",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable Range Test"
+      "label": "启用模块",
+      "description": "启用距离测试"
     },
     "sender": {
-      "label": "Message Interval",
-      "description": "How long to wait between sending test packets"
+      "label": "消息间隔",
+      "description": "发送测试数据包的时间间隔"
     },
     "save": {
-      "label": "Save CSV to storage",
-      "description": "ESP32 Only"
+      "label": "将CSV保存到存储设备",
+      "description": "仅ESP32"
     }
   },
   "serial": {
-    "title": "Serial Settings",
-    "description": "Settings for the Serial module",
+    "title": "串口设置",
+    "description": "设置串口模块",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable Serial output"
+      "label": "启用模块",
+      "description": "启用串口输出"
     },
     "echo": {
       "label": "回声",
-      "description": "Any packets you send will be echoed back to your device"
+      "description": "如果设置了，您发送的任何数据包都会回传到设备"
     },
     "rxd": {
-      "label": "Receive Pin",
-      "description": "Set the GPIO pin to the RXD pin you have set up."
+      "label": "接收引脚",
+      "description": "将GPIO引脚设置为你已配置的RXD引脚。"
     },
     "txd": {
-      "label": "Transmit Pin",
-      "description": "Set the GPIO pin to the TXD pin you have set up."
+      "label": "发送引脚",
+      "description": "将GPIO引脚设置为你已配置的TXD引脚。"
     },
     "baud": {
-      "label": "Baud Rate",
-      "description": "The serial baud rate"
+      "label": "波特率",
+      "description": "串口波特率"
     },
     "timeout": {
       "label": "超时",
-      "description": "Seconds to wait before we consider your packet as 'done'"
+      "description": "在我们将您的数据包视为“完成”之前需要等待的秒数"
     },
     "mode": {
       "label": "模式",
-      "description": "Select Mode"
+      "description": "选择模式"
     },
     "overrideConsoleSerialPort": {
-      "label": "Override Console Serial Port",
-      "description": "If you have a serial port connected to the console, this will override it."
+      "label": "覆盖控制台串行端口",
+      "description": "如果您有连接到控制台的串行端口，这将覆盖它。"
     }
   },
   "storeForward": {
-    "title": "Store & Forward Settings",
-    "description": "Settings for the Store & Forward module",
+    "title": "储存 & 转发设置",
+    "description": "存储与转发模块的设置",
     "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable Store & Forward"
+      "label": "启用模块",
+      "description": "启用存储和转发"
     },
     "heartbeat": {
-      "label": "Heartbeat Enabled",
-      "description": "Enable Store & Forward heartbeat"
+      "label": "心跳启用",
+      "description": "启用存储和转发心跳"
     },
     "records": {
       "label": "记录数",
-      "description": "Number of records to store"
+      "description": "要存储的记录数量"
     },
     "historyReturnMax": {
       "label": "历史记录最大返回值",
-      "description": "Max number of records to return"
+      "description": "要返回的最大记录数"
     },
     "historyReturnWindow": {
       "label": "历史记录返回窗口",
@@ -402,8 +402,8 @@
     }
   },
   "telemetry": {
-    "title": "Telemetry Settings",
-    "description": "Settings for the Telemetry module",
+    "title": "遥测设置",
+    "description": "遥测模块的设置",
     "deviceUpdateInterval": {
       "label": "设备指标",
       "description": "设备计量更新间隔 (秒)"
@@ -413,36 +413,36 @@
       "description": ""
     },
     "environmentMeasurementEnabled": {
-      "label": "Module Enabled",
-      "description": "Enable the Environment Telemetry"
+      "label": "启用模块",
+      "description": "启用环境遥测器"
     },
     "environmentScreenEnabled": {
-      "label": "Displayed on Screen",
-      "description": "Show the Telemetry Module on the OLED"
+      "label": "在屏幕上显示",
+      "description": "在OLED上显示遥测模块数据"
     },
     "environmentDisplayFahrenheit": {
       "label": "展示华氏度",
-      "description": "Display temp in Fahrenheit"
+      "description": "以华氏度显示温度"
     },
     "airQualityEnabled": {
-      "label": "Air Quality Enabled",
-      "description": "Enable the Air Quality Telemetry"
+      "label": "启用空气质量检测",
+      "description": "启用空气质量遥测"
     },
     "airQualityInterval": {
-      "label": "Air Quality Update Interval",
-      "description": "How often to send Air Quality data over the mesh"
+      "label": "空气质量更新间隔",
+      "description": "多久通过mesh网络发送一次空气质量数据"
     },
     "powerMeasurementEnabled": {
-      "label": "Power Measurement Enabled",
-      "description": "Enable the Power Measurement Telemetry"
+      "label": "功率测量已启用",
+      "description": "启用功率测量"
     },
     "powerUpdateInterval": {
-      "label": "Power Update Interval",
-      "description": "How often to send Power data over the mesh"
+      "label": "电源更新间隔",
+      "description": "在mesh网络中发送电源数据的间隔时间"
     },
     "powerScreenEnabled": {
-      "label": "Power Screen Enabled",
-      "description": "Enable the Power Telemetry Screen"
+      "label": "屏幕显示电源信息已启用",
+      "description": "屏幕显示遥测电源信息已启用"
     }
   }
 }

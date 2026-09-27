@@ -69,7 +69,7 @@
     },
     "pin": {
       "description": "Pin to use when pairing",
-      "label": "Pin"
+      "label": "Контакт"
     }
   },
   "display": {
@@ -96,8 +96,8 @@
       "label": "Display Units"
     },
     "flipScreen": {
-      "description": "Flip display 180 degrees",
-      "label": "Flip Screen"
+      "description": "Перевернути екран на 180 градусів",
+      "label": "Перевернути екран"
     },
     "gpsDisplayUnits": {
       "description": "Coordinate display format",
@@ -105,15 +105,15 @@
     },
     "oledType": {
       "description": "Type of OLED screen attached to the device",
-      "label": "OLED Type"
+      "label": "Тип OLED"
     },
     "screenTimeout": {
       "description": "Turn off the display after this long",
       "label": "Screen Timeout"
     },
     "twelveHourClock": {
-      "description": "Use 12-hour clock format",
-      "label": "12-Hour Clock"
+      "description": "Використовувати 12-г формат часу",
+      "label": "12-годинний формат часу"
     },
     "wakeOnTapOrMotion": {
       "description": "Wake the device on tap or motion",
@@ -124,7 +124,7 @@
     "title": "Mesh Settings",
     "description": "Settings for the LoRa mesh",
     "bandwidth": {
-      "description": "Channel bandwidth in kHz",
+      "description": "Channel bandwidth in MHz",
       "label": "Bandwidth"
     },
     "boostedRxGain": {
@@ -164,8 +164,8 @@
       "label": "Override Duty Cycle"
     },
     "overrideFrequency": {
-      "description": "Override frequency",
-      "label": "Override Frequency"
+      "description": "Перевизначити частоту",
+      "label": "Перевизначити частоту"
     },
     "region": {
       "description": "Sets the region for your node",
@@ -181,7 +181,7 @@
     },
     "transmitPower": {
       "description": "Max transmit power",
-      "label": "Transmit Power"
+      "label": "Потужність передачі"
     },
     "usePreset": {
       "description": "Use one of the predefined modem presets",
@@ -221,7 +221,7 @@
       "label": "Шлюз"
     },
     "ip": {
-      "description": "IP Address",
+      "description": "IP адреса",
       "label": "IP-адреса"
     },
     "psk": {
@@ -229,7 +229,7 @@
       "label": "PSK"
     },
     "ssid": {
-      "description": "Network name",
+      "description": "Назва мережі",
       "label": "SSID"
     },
     "subnet": {
@@ -259,7 +259,7 @@
     },
     "ntpConfigSettings": {
       "description": "Налаштування NTP",
-      "label": "NTP Config"
+      "label": "Налаштування NTP"
     },
     "rsyslogConfigSettings": {
       "description": "Rsyslog configuration",
@@ -287,7 +287,7 @@
     },
     "gpsMode": {
       "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-      "label": "GPS Mode"
+      "label": "Режим GPS"
     },
     "gpsUpdateInterval": {
       "description": "How often a GPS fix should be acquired",
@@ -319,7 +319,7 @@
     },
     "intervalsSettings": {
       "description": "How often to send position updates",
-      "label": "Intervals"
+      "label": "Інтервали"
     },
     "flags": {
       "placeholder": "Select position flags...",
@@ -333,7 +333,7 @@
       "timestamp": "Мітка часу",
       "unset": "Скинути",
       "vehicleHeading": "Vehicle heading",
-      "vehicleSpeed": "Vehicle speed"
+      "vehicleSpeed": "Швидкість транспортного засобу"
     }
   },
   "power": {
@@ -343,7 +343,7 @@
     },
     "ina219Address": {
       "description": "Address of the INA219 battery monitor",
-      "label": "INA219 Address"
+      "label": "Адреса ІНА219"
     },
     "lightSleepDuration": {
       "description": "How long the device will be in light sleep for",
@@ -381,7 +381,7 @@
   "security": {
     "description": "Settings for the Security configuration",
     "title": "Налаштування безпеки",
-    "button_backupKey": "Backup Key",
+    "button_backupKey": "Резервний ключ",
     "adminChannelEnabled": {
       "description": "Allow incoming device control over the insecure legacy admin channel",
       "label": "Allow Legacy Admin"
@@ -396,11 +396,11 @@
     },
     "privateKey": {
       "description": "Used to create a shared key with a remote device",
-      "label": "Private Key"
+      "label": "Приватний ключ"
     },
     "publicKey": {
       "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-      "label": "Public Key"
+      "label": "Відкритий ключ"
     },
     "primaryAdminKey": {
       "description": "The primary public key authorized to send admin messages to this node",

@@ -398,7 +398,7 @@
     },
     "historyReturnWindow": {
       "label": "Finestra di ritorno cronologia",
-      "description": "Return records from this time window (minutes)"
+      "description": "Restituisce i record da questa finestra di tempo (minuti)"
     }
   },
   "telemetry": {
