@@ -8,6 +8,7 @@ import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
+import { cn } from "@core/utils/cn.ts";
 import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
 import { Connections } from "@pages/Connections/index.tsx";
 import { Outlet } from "@tanstack/react-router";
@@ -25,7 +26,7 @@ export function App() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <Toaster className={device ? "max-sm:top-16" : undefined} />
+      <Toaster className={cn(device && "max-sm:top-16")} />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>
         {/* Overlay sits outside the device-conditional branch so it shows
