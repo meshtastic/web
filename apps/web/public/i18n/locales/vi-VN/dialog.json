@@ -1,0 +1,238 @@
+{
+  "deleteMessages": {
+    "description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
+    "title": "Clear All Messages"
+  },
+  "import": {
+    "description": "Import a Channel Set from a Meshtastic URL. <br />Valid Meshtasic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
+    "error": {
+      "invalidUrl": "Invalid Meshtastic URL"
+    },
+    "channelPrefix": "Channel ",
+    "primary": "Primary ",
+    "doNotImport": "No not import",
+    "channelName": "Name",
+    "channelSlot": "Slot",
+    "channelSetUrl": "Channel Set/QR Code URL",
+    "useLoraConfig": "Import LoRa Config",
+    "presetDescription": "The current LoRa Config will be replaced.",
+    "title": "Import Channels"
+  },
+  "locationResponse": {
+    "title": "Location: {{identifier}}",
+    "altitude": "Altitude: ",
+    "coordinates": "Coordinates: ",
+    "noCoordinates": "No Coordinates"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Regenerate Pre-Shared Key?",
+    "description": "Are you sure you want to regenerate the pre-shared key?",
+    "regenerate": "Regenerate"
+  },
+  "addConnection": {
+    "title": "Add connection",
+    "description": "Choose a connection type and fill in the details",
+    "validation": {
+      "requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
+      "requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
+      "requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
+      "additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
+    },
+    "bluetoothConnection": {
+      "namePlaceholder": "My Bluetooth Node",
+      "supported": {
+        "title": "Web Bluetooth supported"
+      },
+      "notSupported": {
+        "title": "Web Bluetooth not supported",
+        "description": "Your browser or device does not support Web Bluetooth"
+      },
+      "short": "BT: {{deviceName}}",
+      "long": "Bluetooth Device",
+      "device": "Device",
+      "selectDevice": "Select device",
+      "selected": "Bluetooth device selected",
+      "notSelected": "No device selected",
+      "helperText": "Uses the Meshtastic Bluetooth service for discovery."
+    },
+    "serialConnection": {
+      "namePlaceholder": "My Serial Node",
+      "helperText": "Selecting a port grants permission so the app can open it to connect.",
+      "supported": {
+        "title": "Web Serial supported"
+      },
+      "notSupported": {
+        "title": "Web Serial not supported",
+        "description": "Your browser or device does not support Web Serial"
+      },
+      "portSelected": {
+        "title": "Serial port selected",
+        "description": "Port permissions granted."
+      },
+      "port": "Port",
+      "selectPort": "Select port",
+      "deviceName": "USB {{vendorId}}:{{productId}}",
+      "notSelected": "No port selected"
+    },
+    "httpConnection": {
+      "namePlaceholder": "My HTTP Node",
+      "inputPlaceholder": "192.168.1.10 or meshtastic.local",
+      "heading": "URL or IP",
+      "useHttps": "Use HTTTPS",
+      "invalidUrl": {
+        "title": "Invalid URL",
+        "description": "Please enter a valid HTTP or HTTPS URL."
+      },
+      "connectionTest": {
+        "description": "Test the connetion before saving to verify the device is reachable.",
+        "button": {
+          "loading": "Testing...",
+          "label": "Test connection"
+        },
+        "reachable": "Reachable",
+        "notReachable": "Not reachable",
+        "success": {
+          "title": "Connection test successful",
+          "description": "The device appears to be reachable."
+        },
+        "failure": {
+          "title": "Connection test failed",
+          "description": "Could not reach the device. Check the URL and try again."
+        }
+      }
+    }
+  },
+  "nodeDetails": {
+    "message": "Message",
+    "requestPosition": "Request Position",
+    "traceRoute": "Trace Route",
+    "airTxUtilization": "Air TX utilization",
+    "allRawMetrics": "All Raw Metrics:",
+    "batteryLevel": "Battery level",
+    "channelUtilization": "Channel utilization",
+    "details": "Details:",
+    "deviceMetrics": "Device Metrics:",
+    "hardware": "Hardware: ",
+    "lastHeard": "Last Heard: ",
+    "nodeHexPrefix": "Node Hex: ",
+    "nodeNumber": "Node Number: ",
+    "position": "Position:",
+    "role": "Role: ",
+    "uptime": "Uptime: ",
+    "voltage": "Voltage",
+    "title": "Node Details for {{identifier}}",
+    "ignoreNode": "Ignore node",
+    "removeNode": "Remove node",
+    "unignoreNode": "Unignore node",
+    "security": "Security:",
+    "publicKey": "Public Key: ",
+    "messageable": "Messageable: ",
+    "KeyManuallyVerifiedTrue": "Public Key has been manually verified",
+    "KeyManuallyVerifiedFalse": "Public Key is not manually verified"
+  },
+  "pkiBackup": {
+    "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
+    "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
+    "footer": "=== END OF KEYS ===",
+    "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
+    "privateKey": "Private Key:",
+    "publicKey": "Public Key:",
+    "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
+    "title": "Backup Keys"
+  },
+  "pkiBackupReminder": {
+    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
+    "title": "Backup Reminder",
+    "remindLaterPrefix": "Remind me in",
+    "remindNever": "Never remind me",
+    "backupNow": "Back up now"
+  },
+  "pkiRegenerate": {
+    "description": "Are you sure you want to regenerate key pair?",
+    "title": "Regenerate Key Pair"
+  },
+  "qr": {
+    "addChannels": "Add Channels",
+    "replaceChannels": "Replace Channels",
+    "description": "The current LoRa configuration will also be shared.",
+    "sharableUrl": "Sharable URL",
+    "title": "Generate QR Code"
+  },
+  "reboot": {
+    "title": "Reboot device",
+    "description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
+    "ota": "Reboot into OTA mode",
+    "enterDelay": "Enter delay",
+    "scheduled": "Reboot has been scheduled",
+    "schedule": "Schedule reboot",
+    "now": "Reboot now",
+    "cancel": "Cancel scheduled reboot"
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "This will remove the node from device and request new keys.",
+      "keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
+      "unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
+    },
+    "acceptNewKeys": "Accept New Keys",
+    "title": "Keys Mismatch - {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Are you sure you want to remove this Node?",
+    "title": "Remove Node?"
+  },
+  "shutdown": {
+    "title": "Schedule Shutdown",
+    "description": "Turn off the connected node after x minutes."
+  },
+  "traceRoute": {
+    "routeToDestination": "Route to destination:",
+    "routeBack": "Route back:"
+  },
+  "tracerouteResponse": {
+    "title": "Traceroute: {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Yes, I know what I'm doing",
+    "conjunction": " and the blog post about ",
+    "postamble": " and understand the implications of changing the role.",
+    "preamble": "I have read the ",
+    "choosingRightDeviceRole": "Choosing The Right Device Role",
+    "deviceRoleDocumentation": "Device Role Documentation",
+    "title": "Are you sure?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Yes, I know what I'm doing",
+    "title": "Are you sure?",
+    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+  },
+  "clientNotification": {
+    "title": "Client Notification",
+    "TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
+    "Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
+  },
+  "resetNodeDb": {
+    "title": "Reset Node Database",
+    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Reset Node Database",
+    "failedTitle": "There was an error resetting the Node DB. Please try again."
+  },
+  "clearAllStores": {
+    "title": "Clear All Local Storage",
+    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
+    "confirm": "Clear all local storage",
+    "failedTitle": "There was an error clearing local storage. Please try again."
+  },
+  "factoryResetDevice": {
+    "title": "Factory Reset Device",
+    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Factory Reset Device",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  },
+  "factoryResetConfig": {
+    "title": "Factory Reset Config",
+    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Factory Reset Config",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  }
+}

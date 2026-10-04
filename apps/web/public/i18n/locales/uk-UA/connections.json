@@ -8,7 +8,7 @@
   "connectionType_network": "Мережа",
   "deleteConnection": "Delete connection",
   "areYouSure": "This will remove {{name}}. You canot undo this action.",
-  "moreActions": "More actions",
+  "moreActions": "Додаткові дії",
   "noConnections": {
     "title": "No connections yet.",
     "description": "Create your first connection. It will connect immediately and be saved for later."
@@ -25,10 +25,10 @@
     "defaultSet": "Default set",
     "defaultConnection": "Default connection is now {{nameisconnected}}",
     "deleted": "Deleted",
-    "deletedByName": "{{name}} was removed",
+    "deletedByName": "{{name}} було видалено",
     "pickConnectionAgain": "Could not connect. You may need to reselect the device/port.",
     "added": "Connection added",
-    "savedByName": "{{name}} saved.",
+    "savedByName": "{{name}} збережено.",
     "savedCantConnect": "The connection was saved but could not connect."
   }
 }

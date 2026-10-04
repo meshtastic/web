@@ -1,0 +1,51 @@
+{
+  "emptyState": "No results found.",
+  "page": {
+    "title": "Command Menu"
+  },
+  "pinGroup": {
+    "label": "Pin command group"
+  },
+  "unpinGroup": {
+    "label": "Unpin command group"
+  },
+  "goto": {
+    "label": "Goto",
+    "command": {
+      "messages": "Messages",
+      "map": "Map",
+      "config": "Config",
+      "nodes": "Nodes"
+    }
+  },
+  "manage": {
+    "label": "Manage",
+    "command": {
+      "switchNode": "Switch Node",
+      "connectNewNode": "Connect New Node"
+    }
+  },
+  "contextual": {
+    "label": "Contextual",
+    "command": {
+      "qrCode": "QR Code",
+      "qrGenerator": "Generator",
+      "qrImport": "Import",
+      "scheduleShutdown": "Schedule Shutdown",
+      "scheduleReboot": "Reboot Device",
+      "resetNodeDb": "Reset Node DB",
+      "dfuMode": "Enter DFU Mode",
+      "factoryResetDevice": "Factory Reset Device",
+      "factoryResetConfig": "Factory Reset Config",
+      "disconnect": "Disconnect"
+    }
+  },
+  "debug": {
+    "label": "Debug",
+    "command": {
+      "reconfigure": "Reconfigure",
+      "clearAllStoredMessages": "Clear All Stored Messages",
+      "clearAllStores": "Clear All Local Storage"
+    }
+  }
+}
