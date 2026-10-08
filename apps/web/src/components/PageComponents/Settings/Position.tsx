@@ -27,12 +27,17 @@ interface PositionConfigProps {
   onFormInit: DynamicFormFormInit<PositionValidation>;
 }
 
+// Firmware stores altitude in meters; form displays user's chosen unit.
+const METERS_PER_FOOT = 0.3048;
+const metersToFeet = (m: number) => m / METERS_PER_FOOT;
+const feetToMeters = (ft: number) => ft * METERS_PER_FOOT;
+
 /**
  * Renders inside the Device GPS card. Pulls the browser's current location
  * via navigator.geolocation and writes lat/lng/altitude into the form.
  * No-op without a geolocation API (e.g. insecure context).
  */
-function UseBrowserLocationButton() {
+function UseBrowserLocationButton({ isImperial }: { isImperial: boolean }) {
   const { setValue } = useFormContext<PositionValidation>();
   const { toast } = useToast();
   const { t } = useTranslation("config");
@@ -57,7 +62,10 @@ function UseBrowserLocationButton() {
           pos.coords.altitude !== null &&
           !Number.isNaN(pos.coords.altitude)
         ) {
-          setValue("altitude", Math.round(pos.coords.altitude), {
+          const altitude = isImperial
+            ? metersToFeet(pos.coords.altitude)
+            : pos.coords.altitude;
+          setValue("altitude", Math.round(altitude), {
             shouldDirty: true,
           });
         }
@@ -113,8 +121,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
 
   const currentPosition = myNode?.position;
   const displayUnits = getEffectiveConfig("display")?.units;
+  const isImperial =
+    displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL;
 
   const formValues = useMemo(() => {
+    const altitudeMeters = currentPosition?.altitude ?? 0;
     return {
       ...config.position,
       ...effectivePosition,
@@ -124,9 +135,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       longitude: currentPosition?.longitudeI
         ? currentPosition.longitudeI / 1e7
         : undefined,
-      altitude: currentPosition?.altitude ?? 0,
+      altitude: isImperial
+        ? Math.round(metersToFeet(altitudeMeters))
+        : altitudeMeters,
     } as PositionValidation;
-  }, [config.position, effectivePosition, currentPosition]);
+  }, [config.position, effectivePosition, currentPosition, isImperial]);
 
   const onSubmit = (data: PositionValidation) => {
     const {
@@ -149,13 +162,16 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       data.latitude !== undefined &&
       data.longitude !== undefined
     ) {
+      const altitudeMeters = isImperial
+        ? Math.round(feetToMeters(data.altitude ?? 0))
+        : Math.round(data.altitude ?? 0);
       const message = create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: {
           case: "setFixedPosition",
           value: create(Protobuf.Mesh.PositionSchema, {
             latitudeI: Math.round(data.latitude * 1e7),
             longitudeI: Math.round(data.longitude * 1e7),
-            altitude: data.altitude || 0,
+            altitude: altitudeMeters,
             time: Math.floor(Date.now() / 1000),
           }),
         },
@@ -220,7 +236,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
         {
           label: t("position.deviceGps.label"),
           description: t("position.deviceGps.description"),
-          footer: <UseBrowserLocationButton />,
+          footer: <UseBrowserLocationButton isImperial={isImperial} />,
           fields: [
             {
               type: "toggle",
@@ -236,7 +252,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               properties: {
                 step: 0.0000001,
                 suffix: "Degrees",
-                fieldLength: { max: 10 },
+                fieldLength: { max: 12 },
               },
               disabledBy: [{ fieldName: "fixedPosition" }],
             },
@@ -248,7 +264,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               properties: {
                 step: 0.0000001,
                 suffix: "Degrees",
-                fieldLength: { max: 10 },
+                fieldLength: { max: 13 },
               },
               disabledBy: [{ fieldName: "fixedPosition" }],
             },
@@ -257,19 +273,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "altitude",
               label: t("position.fixedPosition.altitude.label"),
               description: t("position.fixedPosition.altitude.description", {
-                unit:
-                  displayUnits ===
-                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
-                    ? "Feet"
-                    : "Meters",
+                unit: isImperial ? "Feet" : "Meters",
               }),
               properties: {
-                step: 0.0000001,
-                suffix:
-                  displayUnits ===
-                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
-                    ? "Feet"
-                    : "Meters",
+                step: 1,
+                suffix: isImperial ? "Feet" : "Meters",
               },
               disabledBy: [{ fieldName: "fixedPosition" }],
             },
