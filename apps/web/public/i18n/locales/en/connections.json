@@ -69,5 +69,14 @@
     },
     "stuckHint": "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
     "cancel": "Cancel"
+  },
+  "errors": {
+    "certNotTrusted": "Self-signed certificate not trusted. Open {{url}} in a new tab, accept the security warning, then return here and try again.",
+    "httpsNotReachable": "HTTPS endpoint not reachable. Check that the device is online.",
+    "httpNotReachable": "HTTP endpoint not reachable (may be blocked by CORS or a network issue)",
+    "openInNewTab": "Open in new tab →"
+  },
+  "httpTest": {
+    "certNotTrusted": "Certificate not trusted. <0>Open in new tab</0> and accept the warning, then test again."
   }
 }
