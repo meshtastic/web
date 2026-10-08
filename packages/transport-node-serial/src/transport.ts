@@ -96,14 +96,14 @@ export class TransportNodeSerial implements Transport {
           }
           ctrl.close();
         } catch (error) {
-          if (this.closingByUser) {
-            ctrl.close(); // graceful EOF on user
-          } else {
+          if (!this.closingByUser) {
+            console.error("Error reading from serial port:", error);
             this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
-            ctrl.error(
-              error instanceof Error ? error : new Error(String(error)),
-            );
           }
+          // Close rather than error: ctrl.error() discards queued chunks,
+          // which would drop the DeviceDisconnected status enqueued above
+          // (or by the port "error" listener) before consumers read it.
+          ctrl.close();
           try {
             await transformed.cancel();
           } catch {}
