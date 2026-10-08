@@ -24,6 +24,7 @@ export class TransportNodeSerial implements Transport {
   private abortController: AbortController;
   private lastStatus: DeviceStatusEnum = DeviceStatusEnum.DeviceDisconnected;
   private closingByUser = false;
+  private errored = false;
 
   /**
    * Creates and connects a new TransportNode instance.
@@ -62,8 +63,13 @@ export class TransportNodeSerial implements Transport {
   constructor(port: SerialPort) {
     this.port = port;
     this.port.on("error", (err) => {
+      this.errored = true;
+      this.port?.removeAllListeners();
+      this.port?.destroy();
       console.error("Serial port connection error:", err);
-      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "port-error");
+      if (!this.closingByUser) {
+        this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "port-error");
+      }
     });
     this.port.on("close", () => {
       if (this.closingByUser) {
@@ -96,7 +102,7 @@ export class TransportNodeSerial implements Transport {
           }
           ctrl.close();
         } catch (error) {
-          if (this.closingByUser) {
+          if (this.closingByUser || this.errored) {
             ctrl.close(); // graceful EOF on user
           } else {
             this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
@@ -122,7 +128,7 @@ export class TransportNodeSerial implements Transport {
         signal: controller.signal,
       })
       .catch((error) => {
-        if (controller.signal.aborted || this.closingByUser) {
+        if (controller.signal.aborted || this.closingByUser || this.errored) {
           return;
         }
         console.error("Error piping data to serial port:", error);
@@ -165,6 +171,7 @@ export class TransportNodeSerial implements Transport {
     } finally {
       this.port = undefined;
       this.closingByUser = false;
+      this.errored = false;
     }
   }
 
