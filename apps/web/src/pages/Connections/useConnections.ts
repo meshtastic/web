@@ -44,7 +44,12 @@ export function useConnections() {
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
 
   const updateStatus = useCallback(
-    (id: ConnectionId, status: ConnectionStatus, error?: string, errorKind?: Connection["errorKind"]) => {
+    (
+      id: ConnectionId,
+      status: ConnectionStatus,
+      error?: string,
+      errorKind?: Connection["errorKind"],
+    ) => {
       updateSavedConnection(id, {
         status,
         error: error || undefined,
