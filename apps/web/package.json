@@ -64,7 +64,7 @@
     "@tanstack/react-router-devtools": "^1.167.0",
     "@tanstack/router-cli": "^1.167.21",
     "@tanstack/router-devtools": "^1.167.0",
-    "@turf/turf": "^7.3.5",
+    "@turf/turf": "^7.4.0",
     "@types/node": "^26.1.2",
     "@types/web-bluetooth": "^0.0.21",
     "base64-js": "^1.5.1",
