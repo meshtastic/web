@@ -1,5 +1,6 @@
 import {
   FALLBACK_LANGUAGE_CODE,
+  getLanguagePart,
   type Lang,
   type LangCode,
   supportedLanguages,
@@ -22,12 +23,18 @@ function useLang() {
   );
 
   const currentLanguage = useMemo((): Lang | undefined => {
-    const lang = supportedLanguages.find((l) => l.code === i18n.language);
+    // `i18n.language` can be a regional code that has no picker entry of its
+    // own (e.g. a `fi` browser resolves to the shipped `fi-FI` folder, and
+    // `en-US` resolves to `en`), so match on the language part as well.
+    const active = i18n.resolvedLanguage ?? i18n.language ?? "";
+    const lang =
+      supportedLanguages.find((l) => l.code === active) ??
+      supportedLanguages.find((l) => l.code === getLanguagePart(active));
     if (lang) {
       return lang;
     }
     return supportedLanguages.find((l) => l.code === FALLBACK_LANGUAGE_CODE);
-  }, [i18n.language]);
+  }, [i18n.language, i18n.resolvedLanguage]);
 
   const collator = useMemo(() => {
     return new Intl.Collator(i18n.language, { sensitivity: "base" });
