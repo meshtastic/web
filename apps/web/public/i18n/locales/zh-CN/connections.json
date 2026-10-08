@@ -1,34 +1,34 @@
 {
   "page": {
-    "title": "Connect to a Meshtastic device",
-    "description": "Add a device connection via HTTP, Bluetooth, or Serial. Your saved connections will be saved in your browser."
+    "title": "连接到 Meshtastic 设备",
+    "description": "通过HTTP、蓝牙或串口添加设备连接。您保存的连接将保存在您的浏览器中。"
   },
   "connectionType_ble": "BLE",
   "connectionType_serial": "串口",
   "connectionType_network": "网络",
-  "deleteConnection": "Delete connection",
-  "areYouSure": "This will remove {{name}}. You canot undo this action.",
-  "moreActions": "More actions",
+  "deleteConnection": "删除连接",
+  "areYouSure": "这将删除{{name}}。此操作无法撤销。",
+  "moreActions": "更多操作",
   "noConnections": {
-    "title": "No connections yet.",
-    "description": "Create your first connection. It will connect immediately and be saved for later."
+    "title": "还未有连接",
+    "description": "创建您的第一个连接。它将立即连接并保存到以后的状态。"
   },
-  "lastConnectedAt": "Last connected: {{date}}",
-  "neverConnected": "Never connected",
+  "lastConnectedAt": "最后连接时间：{{date}}",
+  "neverConnected": "从未连接",
   "toasts": {
     "connected": "已连接",
-    "nowConnected": "{{name}} is now connected",
-    "nowDisconnected": "{{name}} are now disconnecte",
+    "nowConnected": "{{name}}现已连接",
+    "nowDisconnected": "{{name}} 现已断开连接",
     "disconnected": "已断开连接",
-    "failed": "Failed to connect",
-    "checkConnetion": "Check your device or settings and try again",
-    "defaultSet": "Default set",
-    "defaultConnection": "Default connection is now {{nameisconnected}}",
-    "deleted": "Deleted",
-    "deletedByName": "{{name}} was removed",
-    "pickConnectionAgain": "Could not connect. You may need to reselect the device/port.",
-    "added": "Connection added",
-    "savedByName": "{{name}} saved.",
-    "savedCantConnect": "The connection was saved but could not connect."
+    "failed": "连接失败",
+    "checkConnetion": "检查您的设备或设置，然后重试",
+    "defaultSet": "默认组数",
+    "defaultConnection": "默认连接现在是 {{nameisconnected}}",
+    "deleted": "删除",
+    "deletedByName": "{{name}}已删除",
+    "pickConnectionAgain": "无法连接。您可能需要重新选择设备/端口。",
+    "added": "连接已添加",
+    "savedByName": "{{name}} 保存",
+    "savedCantConnect": "连接已保存，但无法连接。"
   }
 }

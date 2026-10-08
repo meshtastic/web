@@ -269,16 +269,16 @@
         "label": "Approximate Location",
         "description": "Position shared will be accurate within this distance",
         "options": {
-          "metric_km23": "Within 23 km",
-          "metric_km12": "Within 12 km",
-          "metric_km5_8": "Within 5.8 km",
-          "metric_km2_9": "Within 2.9 km",
-          "metric_km1_5": "Within 1.5 km",
-          "metric_m700": "Within 700 m",
-          "metric_m350": "Within 350 m",
-          "metric_m200": "Within 200 m",
-          "metric_m90": "Within 90 m",
-          "metric_m50": "Within 50 m",
+          "metric_km23": "",
+          "metric_km12": "У межах 12 км",
+          "metric_km5_8": "У межах 5.8 км",
+          "metric_km2_9": "У межах 2.9 км",
+          "metric_km1_5": "У межах 1.5 км",
+          "metric_m700": "У межах 700 м",
+          "metric_m350": "У межах 350 м",
+          "metric_m200": "У межах 200 м",
+          "metric_m90": "У межах 90 м",
+          "metric_m50": "У межах 50 м",
           "imperial_mi15": "У межах 15 миль",
           "imperial_mi7_3": "У межах 7,3 милі",
           "imperial_mi3_6": "У межах 3,6 милі",
@@ -369,7 +369,7 @@
       "description": "Seconds to wait before we consider your packet as 'done'"
     },
     "mode": {
-      "label": "Mode",
+      "label": "Режим",
       "description": "Select Mode"
     },
     "overrideConsoleSerialPort": {

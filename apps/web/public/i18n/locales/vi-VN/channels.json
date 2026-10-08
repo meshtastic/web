@@ -1,0 +1,71 @@
+{
+  "page": {
+    "sectionLabel": "Channels",
+    "channelName": "Channel: {{channelName}}",
+    "broadcastLabel": "Primary",
+    "channelIndex": "Ch {{index}}",
+    "import": "Import",
+    "export": "Export"
+  },
+  "validation": {
+    "pskInvalid": "Please enter a valid {{bits}} bit PSK."
+  },
+  "settings": {
+    "label": "Channel Settings",
+    "description": "Crypto, MQTT & misc settings"
+  },
+  "role": {
+    "label": "Role",
+    "description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+    "options": {
+      "primary": "PRIMARY",
+      "disabled": "DISABLED",
+      "secondary": "SECONDARY"
+    }
+  },
+  "psk": {
+    "label": "Pre-Shared Key",
+    "description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
+    "generate": "Generate"
+  },
+  "name": {
+    "label": "Name",
+    "description": "A unique name for the channel <12 bytes, leave blank for default"
+  },
+  "uplinkEnabled": {
+    "label": "Uplink Enabled",
+    "description": "Send messages from the local mesh to MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Downlink Enabled",
+    "description": "Send messages from MQTT to the local mesh"
+  },
+  "positionPrecision": {
+    "label": "Location",
+    "description": "The precision of the location to share with the channel. Can be disabled.",
+    "options": {
+      "none": "Do not share location",
+      "precise": "Precise Location",
+      "metric_km23": "Within 23 kilometers",
+      "metric_km12": "Within 12 kilometers",
+      "metric_km5_8": "Within 5.8 kilometers",
+      "metric_km2_9": "Within 2.9 kilometers",
+      "metric_km1_5": "Within 1.5 kilometers",
+      "metric_m700": "Within 700 meters",
+      "metric_m350": "Within 350 meters",
+      "metric_m200": "Within 200 meters",
+      "metric_m90": "Within 90 meters",
+      "metric_m50": "Within 50 meters",
+      "imperial_mi15": "Within 15 miles",
+      "imperial_mi7_3": "Within 7.3 miles",
+      "imperial_mi3_6": "Within 3.6 miles",
+      "imperial_mi1_8": "Within 1.8 miles",
+      "imperial_mi0_9": "Within 0.9 miles",
+      "imperial_mi0_5": "Within 0.5 miles",
+      "imperial_mi0_2": "Within 0.2 miles",
+      "imperial_ft600": "Within 600 feet",
+      "imperial_ft300": "Within 300 feet",
+      "imperial_ft150": "Within 150 feet"
+    }
+  }
+}

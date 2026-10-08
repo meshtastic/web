@@ -1,111 +1,111 @@
 {
   "navigation": {
-    "title": "Navigation",
+    "title": "Nawigacja",
     "messages": "Wiadomości",
     "map": "Mapa",
     "settings": "Ustawienia",
     "channels": "Kanały",
-    "radioConfig": "Radio Config",
+    "radioConfig": "Ustawienia radia",
     "deviceConfig": "Konfiguracja urządzenia",
-    "moduleConfig": "Module Config",
-    "manageConnections": "Manage Connections",
-    "nodes": "Nodes"
+    "moduleConfig": "Ustawienia modułu",
+    "manageConnections": "Zarządzaj połączeniami",
+    "nodes": "Węzły"
   },
   "app": {
     "title": "Meshtastic",
-    "logo": "Meshtastic Logo"
+    "logo": "Logo Meshtastic"
   },
   "sidebar": {
     "collapseToggle": {
       "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
+        "open": "Otwórz pasek boczny",
+        "close": "Zamknij pasek boczny"
       }
     },
     "deviceInfo": {
-      "volts": "{{voltage}} volts",
+      "volts": "{{voltage}} V",
       "firmware": {
         "title": "Oprogramowanie",
         "version": "v{{version}}",
-        "buildDate": "Build date: {{date}}"
+        "buildDate": "Data kompilacji: {{date}}"
       }
     }
   },
   "batteryStatus": {
-    "charging": "{{level}}% charging",
-    "pluggedIn": "Plugged in",
+    "charging": "{{level}}% ładowanie",
+    "pluggedIn": "Podłączony",
     "title": "Bateria"
   },
   "search": {
-    "nodes": "Search nodes...",
-    "channels": "Search channels...",
-    "commandPalette": "Search commands..."
+    "nodes": "Szukaj węzłów...",
+    "channels": "Wyszukaj kanały...",
+    "commandPalette": "Wyszukaj polecenia..."
   },
   "toast": {
     "positionRequestSent": {
-      "title": "Position request sent."
+      "title": "Wysłano żądanie lokalizacji."
     },
     "requestingPosition": {
-      "title": "Requesting position, please wait..."
+      "title": "Żądanie pozycji, proszę czekać..."
     },
     "sendingTraceroute": {
-      "title": "Sending Traceroute, please wait..."
+      "title": "Wysyłanie Traceroute, proszę czekać..."
     },
     "tracerouteSent": {
-      "title": "Traceroute sent."
+      "title": "Traceroute wysłany."
     },
     "savedChannel": {
-      "title": "Saved Channel: {{channelName}}"
+      "title": "Zapisano kanał: {{channelName}}"
     },
     "messages": {
       "pkiEncryption": {
-        "title": "Chat is using PKI encryption."
+        "title": "Czat używa szyfrowania PKI."
       },
       "pskEncryption": {
-        "title": "Chat is using PSK encryption."
+        "title": "Czat używa szyfrowania PSK."
       }
     },
     "configSaveError": {
-      "title": "Error Saving Config",
-      "description": "An error occurred while saving the configuration."
+      "title": "Błąd podczas zapisywania konfiguracji",
+      "description": "Wystąpił błąd podczas zapisywania tej konfiguracji."
     },
     "validationError": {
-      "title": "Config Errors Exist",
-      "description": "Please fix the configuration errors before saving."
+      "title": "Występują błędy w konfiguracji",
+      "description": "Proszę poprawić błędy konfiguracji przed zapisaniem."
     },
     "saveSuccess": {
-      "title": "Saving Config",
-      "description": "The configuration change {{case}} has been saved."
+      "title": "Zapisywanie konfiguracji",
+      "description": "Zmiana konfiguracji {{case}} została zapisana."
     },
     "saveAllSuccess": {
-      "title": "Saved",
-      "description": "All configuration changes have been saved."
+      "title": "Zapisano",
+      "description": "Wszystkie zmiany w konfiguracji zostały zapisane."
     },
     "favoriteNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "title": "{{action}} {{nodeName}} {{direction}} ulubione.",
       "action": {
         "added": "Dodano",
         "removed": "Usunięto",
-        "to": "to",
-        "from": "from"
+        "to": "do",
+        "from": "z"
       }
     },
     "ignoreNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "title": "Lista ignorowanych {{action}} {{nodeName}} {{direction}}",
       "action": {
         "added": "Dodano",
         "removed": "Usunięto",
-        "to": "to",
-        "from": "from"
+        "to": "do",
+        "from": "z"
       }
     }
   },
   "notifications": {
     "copied": {
-      "label": "Copied!"
+      "label": "Skopiowano!"
     },
     "copyToClipboard": {
-      "label": "Copy to clipboard"
+      "label": "Kopiuj do schowka"
     },
     "hidePassword": {
       "label": "Ukryj hasło"
@@ -114,20 +114,20 @@
       "label": "Pokaż hasło"
     },
     "deliveryStatus": {
-      "delivered": "Delivered",
-      "failed": "Delivery Failed",
+      "delivered": "Dostarczono",
+      "failed": "Dostarczenie nie powiodło się",
       "waiting": "Czekam. . .",
       "unknown": "Nieznany"
     }
   },
   "general": {
-    "label": "General"
+    "label": "Ogólne"
   },
   "hardware": {
-    "label": "Hardware"
+    "label": "Sprzęt"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "Metryka"
   },
   "role": {
     "label": "Rola"
@@ -136,95 +136,95 @@
     "label": "Filtr"
   },
   "advanced": {
-    "label": "Advanced"
+    "label": "Zaawansowane"
   },
   "clearInput": {
-    "label": "Clear input"
+    "label": "Wyczyść wprowadzone dane"
   },
   "resetFilters": {
-    "label": "Reset Filters"
+    "label": "Zresetuj filtry"
   },
   "nodeName": {
-    "label": "Node name/number",
+    "label": "Nazwa/numer węzła",
     "placeholder": "Meshtastic 1234"
   },
   "airtimeUtilization": {
-    "label": "Airtime Utilization (%)",
-    "short": "Airtime Util. (%)"
+    "label": "Wykorzystanie eteru (%)",
+    "short": "Użycie czasu ant. (%)"
   },
   "batteryLevel": {
-    "label": "Battery level (%)",
-    "labelText": "Battery level (%): {{value}}"
+    "label": "Poziom naładowania baterii (%)",
+    "labelText": "Poziom baterii (%): {{value}}"
   },
   "batteryVoltage": {
-    "label": "Battery voltage (V)",
+    "label": "Napięcie baterii (V)",
     "title": "Napięcie"
   },
   "channelUtilization": {
-    "label": "Channel Utilization (%)",
-    "short": "Channel Util. (%)"
+    "label": "Wykorzystanie kanału (%)",
+    "short": "Użycie kanału. (%)"
   },
   "hops": {
     "direct": "Bezpośrednio",
-    "label": "Number of hops",
-    "text": "Number of hops: {{value}}"
+    "label": "Liczba przeskoków",
+    "text": "Liczba przeskoków: {{value}}"
   },
   "lastHeard": {
     "label": "Aktywność",
-    "labelText": "Last heard: {{value}}",
-    "nowLabel": "Now"
+    "labelText": "Ostatnio widziany: {{value}}",
+    "nowLabel": "Teraz"
   },
   "snr": {
-    "label": "SNR (db)"
+    "label": "SNR (dB)"
   },
   "favorites": {
-    "label": "Favorites"
+    "label": "Ulubione"
   },
   "hide": {
-    "label": "Hide"
+    "label": "Ukryj"
   },
   "showOnly": {
-    "label": "Show Only"
+    "label": "Pokaż tylko"
   },
   "viaMqtt": {
-    "label": "Connected via MQTT"
+    "label": "Połączony przez MQTT"
   },
   "hopsUnknown": {
-    "label": "Unknown number of hops"
+    "label": "Nieznana liczba przeskoków"
   },
   "showUnheard": {
-    "label": "Never heard"
+    "label": "Nieznany status ostatniej widoczności"
   },
   "language": {
     "label": "Język",
-    "changeLanguage": "Change Language"
+    "changeLanguage": "Zmień język"
   },
   "theme": {
     "dark": "Ciemny",
     "light": "Jasny",
-    "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
+    "system": "Automatyczny",
+    "changeTheme": "Zmień schemat kolorów"
   },
   "errorPage": {
-    "title": "This is a little embarrassing...",
-    "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
-    "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
-    "reportInstructions": "Please include the following information in your report:",
+    "title": "To trochę żenujące...",
+    "description1": "Bardzo nam przykro, ale wystąpił błąd w kliencie web'owym, który spowodował jego awarię. <br /> To nie powinno się wydarzyć i ciężko pracujemy, aby to naprawić.",
+    "description2": "Najlepszą drogą do naprawy tego typu problemów jest zgłoszenie ich do nas.",
+    "reportInstructions": "W swoim raporcie proszę podać następujące informacje:",
     "reportSteps": {
-      "step1": "What you were doing when the error occurred",
-      "step2": "What you expected to happen",
-      "step3": "What actually happened",
-      "step4": "Any other relevant information"
+      "step1": "Co robiłeś/aś gdy wystąpił błąd",
+      "step2": "Czego się spodziewałeś",
+      "step3": "Co faktycznie się stało",
+      "step4": "Wszelkie inne istotne informacje"
     },
-    "reportLink": "You can report the issue to our <0>GitHub</0>",
-    "connectionsLink": "Return to the <0>connections</0>",
-    "detailsSummary": "Error Details",
-    "errorMessageLabel": "Error message:",
-    "stackTraceLabel": "Stack trace:",
+    "reportLink": "Możesz zgłosić problem do naszego <0>GitHub</0>",
+    "connectionsLink": "Wróć do <0>połączeń</0>",
+    "detailsSummary": "Szczegóły błędu",
+    "errorMessageLabel": "Komunikat błędu:",
+    "stackTraceLabel": "Zrzut stosu:",
     "fallbackError": "{{error}}"
   },
   "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
-    "commitSha": "Commit SHA: {{sha}}"
+    "text": "Wspierane przez <0>◆ Vercel</0> | Meshtastic®️ jest zarejestrowanym znakiem towarowym Meshtastic LLC. | <1>Informacje prawne</1>",
+    "commitSha": "Zatwierdź SHA: {{sha}}"
   }
 }

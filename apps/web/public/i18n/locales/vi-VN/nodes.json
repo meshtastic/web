@@ -1,0 +1,59 @@
+{
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Public Key Enabled"
+    },
+    "noPublicKey": {
+      "label": "No Public Key"
+    },
+    "directMessage": {
+      "label": "Direct Message {{shortName}}"
+    },
+    "favorite": {
+      "label": "Favorite",
+      "tooltip": "Add or remove this node from your favorites"
+    },
+    "notFavorite": {
+      "label": "Not a Favorite"
+    },
+    "error": {
+      "label": "Error",
+      "text": "An error occurred while fetching node details. Please try again later."
+    },
+    "status": {
+      "heard": "Heard",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Elevation"
+    },
+    "channelUtil": {
+      "label": "Channel Util"
+    },
+    "airtimeUtil": {
+      "label": "Airtime Util"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Long Name",
+      "connection": "Connection",
+      "lastHeard": "Last Heard",
+      "encryption": "Encryption",
+      "model": "Model",
+      "macAddress": "MAC Address"
+    },
+    "connectionStatus": {
+      "direct": "Direct",
+      "away": "away",
+      "viaMqtt": ", via MQTT"
+    }
+  },
+  "actions": {
+    "added": "Added",
+    "removed": "Removed",
+    "ignoreNode": "Ignore Node",
+    "unignoreNode": "Unignore Node",
+    "requestPosition": "Request Position"
+  }
+}

@@ -237,7 +237,7 @@
       "description": "MQTT password to use for default/custom servers"
     },
     "encryptionEnabled": {
-      "label": "Encryption Enabled",
+      "label": "Cifrado habilitado",
       "description": "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data."
     },
     "jsonEnabled": {
