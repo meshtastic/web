@@ -4,6 +4,16 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Action bumps are low-risk and were the single largest source of PR churn;
+    # batch them into one PR per week.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -11,6 +21,8 @@ updates:
     cooldown:
       default-days: 3 # 1 day after pnpm's cutoff, prevent a race
     open-pull-requests-limit: 10 # Increase PR limit
+    labels:
+      - "dependencies"
     groups:
       tanstack:
         patterns:
@@ -22,4 +34,14 @@ updates:
         patterns:
           - react
           - react-dom
+          - "@types/react*"
+      # Catch-all for tooling, so lint/format/test/build bumps land together
+      # instead of one PR per package.
+      dev-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@tanstack/*"
+          - "@radix-ui/*"
           - "@types/react*"

@@ -3,9 +3,17 @@ name: Crowdin Upload Translations Action
 on:
   workflow_dispatch: # Allow manual triggering
 
+permissions:
+  contents: read
+
+concurrency:
+  group: crowdin-upload-translations
+  cancel-in-progress: false
+
 jobs:
   synchronize-with-crowdin:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
