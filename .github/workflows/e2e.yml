@@ -11,6 +11,7 @@ on:
       - "apps/web/**"
       - "packages/**"
       - "playwright.config.ts"
+      - "tsconfig.json"
       - ".github/workflows/e2e.yml"
 
 jobs:
