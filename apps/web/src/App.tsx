@@ -8,6 +8,7 @@ import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
+import { cn } from "@core/utils/cn.ts";
 import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
 import { Connections } from "@pages/Connections/index.tsx";
 import { Outlet } from "@tanstack/react-router";
@@ -25,7 +26,7 @@ export function App() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <Toaster />
+      <Toaster className={cn(device && "max-sm:top-16")} />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>
         {/* Overlay sits outside the device-conditional branch so it shows
@@ -39,7 +40,8 @@ export function App() {
           <SidebarProvider>
             <div className="h-full flex flex-1 flex-col">
               {device ? (
-                <div className="h-full flex w-full">
+                // dvh here only: the shell stays h-screen so the connection screen is untouched.
+                <div className="h-dvh flex w-full">
                   <DialogManager />
                   <KeyBackupReminder />
                   <RegionSetupReminder />

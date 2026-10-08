@@ -96,7 +96,7 @@ export const Connections = () => {
 
   return (
     <div className="space-y-6 p-6">
-      <header className="flex items-start justify-between">
+      <header className="flex items-start justify-between max-md:flex-col max-md:gap-4">
         <div className="flex items-stretch gap-3">
           <button
             type="button"
@@ -115,7 +115,7 @@ export const Connections = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col items-end ml-2 gap-2">
+        <div className="flex flex-col items-end ml-2 gap-2 max-md:w-full max-md:flex-row max-md:flex-wrap max-md:items-center max-md:ml-0">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
             <RouterIcon className="size-5" />
             {t("button.addConnection")}

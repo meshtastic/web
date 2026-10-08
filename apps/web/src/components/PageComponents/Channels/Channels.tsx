@@ -74,12 +74,12 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
 
   return (
     <Tabs defaultValue="channel_0">
-      <TabsList className="w-full dark:bg-slate-700">
+      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-700">
         {allChannels.map((channel) => (
           <TabsTrigger
             key={`channel_${channel.index}`}
             value={`channel_${channel.index}`}
-            className="dark:text-white relative"
+            className="dark:text-white relative max-md:shrink-0"
           >
             {getChannelName(channel)}
             {flags.get(channel.index) && (
@@ -106,6 +106,7 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
         <TabsContent
           key={`channel_${channel.index}`}
           value={`channel_${channel.index}`}
+          className="max-md:px-2"
         >
           <Suspense fallback={<Spinner size="lg" className="my-5" />}>
             <Channel

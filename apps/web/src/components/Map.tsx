@@ -1,3 +1,4 @@
+import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -34,6 +35,7 @@ export const BaseMap = ({
   const { t } = useTranslation("map");
 
   const darkMode = theme === "dark";
+  const isMobile = useIsMobile();
   const mapRef = useRef<MapRef | null>(null);
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export const BaseMap = ({
       renderWorldCopies={false}
       maxPitch={0}
       dragRotate={false}
-      touchZoomRotate={false}
+      touchZoomRotate={isMobile}
       initialViewState={
         initialViewState ?? {
           zoom: 1.8,
