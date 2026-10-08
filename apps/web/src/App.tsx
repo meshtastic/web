@@ -10,14 +10,30 @@ import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { cn } from "@core/utils/cn.ts";
 import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
+import { useTotalUnread } from "@meshtastic/sdk-react";
 import { Connections } from "@pages/Connections/index.tsx";
 import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { useEffect, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { MapProvider } from "react-map-gl/maplibre";
 
+function useUnreadTitleIndicator() {
+  const baseTitleRef = useRef<string>("");
+  const unread = useTotalUnread();
+
+  useEffect(() => {
+    if (!baseTitleRef.current) {
+      baseTitleRef.current = document.title.replace(/^●\s*/, "");
+    }
+    document.title =
+      unread > 0 ? `● ${baseTitleRef.current}` : baseTitleRef.current;
+  }, [unread]);
+}
+
 export function App() {
   useTheme();
+  useUnreadTitleIndicator();
 
   const { getDevice } = useDeviceStore();
   const { selectedDeviceId } = useAppStore();
