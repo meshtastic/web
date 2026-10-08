@@ -77,6 +77,8 @@ export const DeviceInfoPanel = ({
       case "configuring":
       case "disconnecting":
         return "bg-amber-500";
+      case "warning":
+        return "bg-amber-500";
       case "error":
         return "bg-red-500";
       default:
