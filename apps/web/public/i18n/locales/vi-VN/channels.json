@@ -1,0 +1,71 @@
+{
+  "page": {
+    "sectionLabel": "Channels",
+    "channelName": "Kênh: {{channelName}}",
+    "broadcastLabel": "Chính",
+    "channelIndex": "Kênh {{index}}",
+    "import": "Nhập",
+    "export": "Xuất"
+  },
+  "validation": {
+    "pskInvalid": "Please enter a valid {{bits}} bit PSK."
+  },
+  "settings": {
+    "label": "Thiết Đặt Kênh",
+    "description": "Crypto, MQTT & misc settings"
+  },
+  "role": {
+    "label": "Chức",
+    "description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+    "options": {
+      "primary": "CHÍNH",
+      "disabled": "DISABLED",
+      "secondary": "PHỤ"
+    }
+  },
+  "psk": {
+    "label": "Pre-Shared Key",
+    "description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
+    "generate": "Generate"
+  },
+  "name": {
+    "label": "Tên",
+    "description": "A unique name for the channel <12 bytes, leave blank for default"
+  },
+  "uplinkEnabled": {
+    "label": "Uplink Enabled",
+    "description": "Send messages from the local mesh to MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Downlink Enabled",
+    "description": "Send messages from MQTT to the local mesh"
+  },
+  "positionPrecision": {
+    "label": "Location",
+    "description": "The precision of the location to share with the channel. Can be disabled.",
+    "options": {
+      "none": "Do not share location",
+      "precise": "Precise Location",
+      "metric_km23": "Within 23 kilometers",
+      "metric_km12": "Trong phạm vi 12 kilômét",
+      "metric_km5_8": "Within 5.8 kilometers",
+      "metric_km2_9": "Within 2.9 kilometers",
+      "metric_km1_5": "Within 1.5 kilometers",
+      "metric_m700": "Trong phạm vi 700 mét",
+      "metric_m350": "Trong phạm vi 350 mét",
+      "metric_m200": "Trong phạm vi 200 mét",
+      "metric_m90": "Trong phạm vi 90 mét",
+      "metric_m50": "Trong phạm vi 50 mét",
+      "imperial_mi15": "Trong phạm vi 15 dặm",
+      "imperial_mi7_3": "Trong phạm vi 7.3 dặm",
+      "imperial_mi3_6": "Trong phạm vi 3.6 dặm",
+      "imperial_mi1_8": "Trong phạm vi 1.8 dặm",
+      "imperial_mi0_9": "Trong phạm vi 0.9 dặm",
+      "imperial_mi0_5": "Trong phạm vi 0.5 dặm",
+      "imperial_mi0_2": "Trong phạm vi 0.2 dặm",
+      "imperial_ft600": "Trong phạm vi 600 feet",
+      "imperial_ft300": "Trong phạm vi 300 feet",
+      "imperial_ft150": "Trong phạm vi 150 feet"
+    }
+  }
+}

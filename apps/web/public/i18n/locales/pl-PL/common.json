@@ -1,104 +1,103 @@
 {
   "button": {
     "apply": "Zastosuj",
-    "addConnection": "Add Connection",
-    "saveConnection": "Save connection",
-    "backupKey": "Backup Key",
+    "addConnection": "Dodaj połączenie",
+    "saveConnection": "Zapisz połączenie",
+    "backupKey": "Kopia zapasowa",
     "cancel": "Anuluj",
     "connect": "Połącz",
-    "clearMessages": "Clear Messages",
+    "clearMessages": "Wyczyść wiadomości",
     "close": "Zamknij",
-    "confirm": "Confirm",
+    "confirm": "Potwierdź",
     "delete": "Usuń",
     "dismiss": "Zamknij",
-    "download": "Download",
+    "download": "Pobierz",
     "disconnect": "Rozłącz",
-    "export": "Export",
+    "export": "Eksportuj",
     "generate": "Wygeneruj",
-    "regenerate": "Regenerate",
-    "import": "Import",
+    "regenerate": "Wygeneruj ponownie",
+    "import": "Importuj",
     "message": "Wiadomość",
-    "now": "Now",
+    "now": "Teraz",
     "ok": "OK",
-    "print": "Print",
+    "print": "Drukuj",
     "remove": "Usuń",
-    "requestNewKeys": "Request New Keys",
+    "requestNewKeys": "Żądaj nowych kluczy",
     "requestPosition": "Poproś o pozycję",
     "reset": "Zresetuj",
-    "retry": "Retry",
+    "retry": "Ponów",
     "save": "Zapisz",
-    "setDefault": "Set as default",
-    "unsetDefault": "Unset default",
-    "scanQr": "Scan QR Code",
-    "traceRoute": "Trace Route",
-    "submit": "Submit"
+    "setDefault": "Ustaw jako domyślne",
+    "unsetDefault": "Usuń ustawienia domyślne",
+    "scanQr": "Skanuj kod QR",
+    "traceRoute": "Śledź drogę",
+    "submit": "Prześlij"
   },
   "app": {
     "title": "Meshtastic",
-    "fullTitle": "Meshtastic Web Client"
+    "fullTitle": "Klient webowy Meshtastic"
   },
-  "loading": "Loading...",
+  "loading": "Ładowanie...",
   "unit": {
-    "cps": "CPS",
+    "cps": " CPS",
     "dbm": "dBm",
     "hertz": "Hz",
     "hop": {
-      "one": "Hop",
-      "plural": "Hops"
+      "one": "Skok",
+      "plural": "Skoki"
     },
     "hopsAway": {
-      "one": "{{count}} hop away",
-      "plural": "{{count}} hops away",
-      "unknown": "Unknown hops away"
+      "one": "{{count}} przeskoków",
+      "plural": "{{count}} przeskoków",
+      "unknown": "Nieznana ilość przeskoków"
     },
     "megahertz": "MHz",
-    "kilohertz": "kHz",
-    "raw": "raw",
+    "raw": "surowe",
     "meter": {
-      "one": "Meter",
-      "plural": "Meters",
+      "one": "Metr",
+      "plural": "Metrów",
       "suffix": "m"
     },
     "kilometer": {
-      "one": "Kilometer",
-      "plural": "Kilometers",
+      "one": "Kilometry (km)",
+      "plural": "kilometrów",
       "suffix": "km"
     },
     "minute": {
-      "one": "Minute",
-      "plural": "Minutes"
+      "one": "Minuta",
+      "plural": "Minuty"
     },
     "hour": {
-      "one": "Hour",
-      "plural": "Hours"
+      "one": "Godzina",
+      "plural": "Godzin"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
+      "one": "Milisekunda",
+      "plural": "Milisekund",
       "suffix": "ms"
     },
     "second": {
-      "one": "Second",
-      "plural": "Seconds"
+      "one": "Sekunda",
+      "plural": "Sekund"
     },
     "day": {
-      "one": "Day",
-      "plural": "Days",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "one": "Dzień",
+      "plural": "Dni",
+      "today": "Dziś",
+      "yesterday": "Wczoraj"
     },
     "month": {
-      "one": "Month",
-      "plural": "Months"
+      "one": "Miesiąc",
+      "plural": "Miesięcy"
     },
     "year": {
-      "one": "Year",
-      "plural": "Years"
+      "one": "Rok",
+      "plural": "Lata"
     },
     "snr": "SNR:",
     "volt": {
       "one": "Volt",
-      "plural": "Volts",
+      "plural": "Voltów",
       "suffix": "V"
     },
     "record": {
@@ -106,8 +105,8 @@
       "plural": "Rekordy"
     },
     "degree": {
-      "one": "Degree",
-      "plural": "Degrees",
+      "one": "Stopień",
+      "plural": "Stopni",
       "suffix": "°"
     }
   },
@@ -120,36 +119,36 @@
   "unknown": {
     "longName": "Nieznany",
     "shortName": "UNK",
-    "notAvailable": "N/A",
+    "notAvailable": "Brak danych",
     "num": "??"
   },
   "nodeUnknownPrefix": "!",
-  "unset": "UNSET",
+  "unset": "Nieustawione",
   "fallbackName": "Meshtastic {{last4}}",
   "node": "Węzeł",
   "formValidation": {
     "unsavedChanges": "Niezapisane zmiany",
     "tooBig": {
-      "string": "Too long, expected less than or equal to {{maximum}} characters.",
-      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+      "string": "Zbyt długie, oczekiwano maksymalnie {{maximum}} znaków.",
+      "number": "Zbyt duża liczba, oczekiwano maksymalnie {{maximum}}.",
+      "bytes": "Zbyt duża liczba, oczekiwano maksymalnie {{params.maximum}} bajtów."
     },
     "tooSmall": {
-      "string": "Too short, expected more than or equal to {{minimum}} characters.",
-      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+      "string": "Zbyt krótki, oczekiwano przynajmniej {{minimum}} znaków.",
+      "number": "Zbyt małe, oczekiwano liczby większej lub równej {{minimum}}."
     },
     "invalidFormat": {
       "ipv4": "Nieprawidłowy format, oczekiwany adres IPv4.",
-      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+      "key": "Nieprawidłowy format, oczekiwano klucza (PSK) zakodowanego w Base64."
     },
     "invalidType": {
       "number": "Nieprawidłowy typ, oczekiwana liczba."
     },
     "pskLength": {
       "0bit": "Klucz musi być pusty.",
-      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+      "8bit": "Klucz musi być 8-bitowym kluczem (PSK).",
+      "128bit": "Klucz musi być 128-bitowym kluczem (PSK).",
+      "256bit": "Klucz musi być 256-bitowym kluczem (PSK)."
     },
     "required": {
       "generic": "To pole jest wymagane.",
@@ -157,9 +156,9 @@
       "key": "Klucz jest wymagany."
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+      "number": "Nieprawidłowy format, oczekiwano wartości w zakresie 410–930 MHz lub 0 (użyj wartości domyślnej)."
     }
   },
-  "yes": "Yes",
-  "no": "No"
+  "yes": "Tak",
+  "no": "Nie"
 }
