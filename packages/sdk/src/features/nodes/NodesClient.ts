@@ -6,6 +6,7 @@ import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import type { Node } from "./domain/Node.ts";
 import type { NodeError, NodeErrorType } from "./domain/NodeError.ts";
 import type { NodesRepository } from "./domain/NodesRepository.ts";
+import { firmwareAtLeast } from "../device/domain/FirmwareVersion.ts";
 import { NodeMapper } from "./infrastructure/NodeMapper.ts";
 import { InMemoryNodesRepository } from "./infrastructure/repositories/InMemoryNodesRepository.ts";
 import { validateIncomingNode } from "./infrastructure/nodeValidation.ts";
@@ -71,6 +72,10 @@ export class NodesClient {
       }
     });
 
+    client.events.onNodeStatusPacket.subscribe((packet) => {
+      this.patch(packet.from, { status: packet.data.status });
+    });
+
     client.events.onMeshPacket.subscribe((packet) => {
       // Every inbound mesh packet refreshes lastHeard / snr for the
       // originating node. Since firmware 2.8 the device also replays each
@@ -112,10 +117,27 @@ export class NodesClient {
     }
     if (!verdict.accepted) return;
 
-    const node = NodeMapper.fromProto(verdict.accepted);
+    const existing = this.store.get(info.num);
+    const mapped = NodeMapper.fromProto(verdict.accepted);
+    const node: Node = {
+      ...mapped,
+      // Firmware 2.8 sends NodeInfo without position or metrics and replays
+      // those separately, so keep what we already know.
+      position: mapped.position ?? existing?.position,
+      deviceMetrics: mapped.deviceMetrics ?? existing?.deviceMetrics,
+      status: existing?.status,
+      heardOnCurrentLora:
+        mapped.heardOnCurrentLora || !this.firmwareReportsHeard(),
+    };
     this.store.set(node.num, node);
     if (this.errorsStore.has(node.num)) this.errorsStore.delete(node.num);
     void this.repository.upsert(node).catch(() => {});
+  }
+
+  /** heard_on_current_lora exists from firmware 2.8.1. */
+  private firmwareReportsHeard(): boolean {
+    const version = this.client.device.metadata.value?.firmwareVersion;
+    return !!version && firmwareAtLeast(version, "2.8.1");
   }
 
   /**

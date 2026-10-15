@@ -109,7 +109,10 @@ export {
   MessageTooLongError,
 } from "./src/features/chat/index.ts";
 
-export { NodesClient } from "./src/features/nodes/index.ts";
+export {
+  isUnheardOnCurrentLora,
+  NodesClient,
+} from "./src/features/nodes/index.ts";
 export type {
   Node,
   NodeError,
@@ -120,7 +123,16 @@ export type {
 export { InMemoryNodesRepository } from "./src/features/nodes/index.ts";
 
 export { ChannelsClient } from "./src/features/channels/index.ts";
-export type { Channel } from "./src/features/channels/index.ts";
+export type {
+  BeaconJoinOption,
+  Channel,
+  MeshBeaconOffer,
+} from "./src/features/channels/index.ts";
+export {
+  beaconJoinChannelSet,
+  beaconJoinOption,
+  isBeaconAlreadyJoined,
+} from "./src/features/channels/index.ts";
 
 export { ConfigClient, ConfigEditor } from "./src/features/config/index.ts";
 export type {
