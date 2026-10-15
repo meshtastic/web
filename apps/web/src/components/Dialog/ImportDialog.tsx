@@ -24,6 +24,7 @@ import type { BeaconJoinPlan } from "@core/utils/beaconJoin.ts";
 import { channelSetFromUrl } from "@core/utils/channelUrl.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor } from "@meshtastic/sdk-react";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
@@ -43,6 +44,7 @@ export const ImportDialog = ({
   const { config } = useDevice();
   const editor = useConfigEditor();
   const { t } = useTranslation("dialog");
+  const navigate = useNavigate();
   // Undefined until the user types, so a beacon join shows its own URL.
   const [typedInput, setImportDialogInput] = useState<string>();
   const importDialogInput = typedInput ?? beaconJoin?.url ?? "";
@@ -118,6 +120,8 @@ export const ImportDialog = ({
       editor.setRadioSection("lora", payload);
     }
     handleOpenChange(false);
+    // Apply only stages the change; take a beacon join to where it's saved.
+    if (joining) navigate({ to: "/settings/radio" });
   };
 
   const onSelectChange = (value: string, index: number) => {
@@ -209,6 +213,7 @@ export const ImportDialog = ({
                     </Label>
                     <Select
                       onValueChange={(value) => onSelectChange(value, index)}
+                      disabled={joining?.option === "switch"}
                       value={importIndex[index]?.toString()}
                     >
                       <SelectTrigger className="flex-1">
@@ -240,7 +245,14 @@ export const ImportDialog = ({
           )}
         </div>
         <DialogFooter>
-          <Button onClick={apply} disabled={!validUrl} name="apply">
+          <Button
+            onClick={apply}
+            disabled={
+              !validUrl ||
+              (joining !== undefined && importIndex.every((i) => i === -1))
+            }
+            name="apply"
+          >
             {t("button.apply")}
           </Button>
         </DialogFooter>
