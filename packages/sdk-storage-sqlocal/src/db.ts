@@ -36,6 +36,9 @@ type RawSql = (
   ...values: ReadonlyArray<unknown>
 ) => Promise<unknown>;
 
+export const isDuplicateColumn = (e: unknown): boolean =>
+  /duplicate column name/i.test(e instanceof Error ? e.message : String(e));
+
 async function applyMigrations(sql: RawSql): Promise<void> {
   await sql`CREATE TABLE IF NOT EXISTS _schema (version INTEGER PRIMARY KEY)`;
   const rows =
@@ -46,8 +49,14 @@ async function applyMigrations(sql: RawSql): Promise<void> {
   for (const migration of MIGRATIONS) {
     if (migration.version <= current) continue;
     for (const statement of migration.sql) {
-      await sql([statement] as unknown as TemplateStringsArray);
+      try {
+        await sql([statement] as unknown as TemplateStringsArray);
+      } catch (e) {
+        // Another tab opening the same database can apply an ALTER TABLE
+        // first; the column it adds is the one we wanted.
+        if (!isDuplicateColumn(e)) throw e;
+      }
     }
-    await sql`INSERT INTO _schema (version) VALUES (${migration.version})`;
+    await sql`INSERT OR IGNORE INTO _schema (version) VALUES (${migration.version})`;
   }
 }

@@ -1,3 +1,4 @@
+import type * as Protobuf from "@meshtastic/protobufs";
 import type { Message } from "../../domain/Message.ts";
 import type { MessageState } from "../../domain/MessageState.ts";
 import {
@@ -42,6 +43,20 @@ export class InMemoryMessageRepository implements MessageRepository {
       bucket.push(message);
       bucket.sort((a, b) => a.rxTime.getTime() - b.rxTime.getTime());
       this.buckets.set(k, bucket);
+    }
+  }
+
+  async updateAckProof(
+    id: number,
+    ackProof: Protobuf.Mesh.MeshPacket_AckProofStatus,
+  ): Promise<void> {
+    for (const bucket of this.buckets.values()) {
+      const idx = bucket.findIndex((m) => m.id === id);
+      const existing = bucket[idx];
+      if (existing) {
+        bucket[idx] = { ...existing, ackProof };
+        return;
+      }
     }
   }
 

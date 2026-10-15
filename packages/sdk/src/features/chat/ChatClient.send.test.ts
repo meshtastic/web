@@ -1,3 +1,5 @@
+import { create } from "@bufbuild/protobuf";
+import * as Protobuf from "@meshtastic/protobufs";
 import type { ResultType } from "better-result";
 import { describe, expect, it } from "vitest";
 import { MeshClient } from "../../core/client/MeshClient.ts";
@@ -159,5 +161,65 @@ describe("ChatClient.send optimistic append", () => {
     } as never);
 
     expect(messages.value[0]!.state).toBe(MessageState.Ack);
+  });
+
+  it("matches a routing ack to the message by request_id", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const messages = client.chat.messages(ChannelNumber.Primary);
+
+    const result = await sendBroadcast(client, "ack me");
+    if (result.status !== "ok") throw new Error("send failed");
+
+    client.events.onRoutingPacket.dispatch({
+      id: 123456,
+      requestId: result.value,
+      from: 5,
+      to: 0,
+      channel: 0,
+      type: "direct",
+      rxTime: new Date(),
+      data: create(Protobuf.Mesh.RoutingSchema, {
+        variant: {
+          case: "errorReason",
+          value: Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+        },
+      }),
+    });
+
+    expect(messages.value[0]!.state).toBe(MessageState.Failed);
+  });
+
+  it("keeps the strongest ack proof verdict", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const messages = client.chat.messages(ChannelNumber.Primary);
+    const Proof = Protobuf.Mesh.MeshPacket_AckProofStatus;
+
+    const result = await sendBroadcast(client, "prove it");
+    if (result.status !== "ok") throw new Error("send failed");
+    const ack = (ackProofStatus: Protobuf.Mesh.MeshPacket_AckProofStatus) =>
+      client.events.onRoutingPacket.dispatch({
+        id: Math.floor(Math.random() * 1e6),
+        requestId: result.value,
+        from: 5,
+        to: 0,
+        channel: 0,
+        type: "direct",
+        rxTime: new Date(),
+        ackProofStatus,
+        data: create(Protobuf.Mesh.RoutingSchema, {
+          variant: { case: "errorReason", value: 0 },
+        }),
+      });
+
+    ack(Proof.ACK_PROOF_INVALID);
+    expect(messages.value[0]!.ackProof).toBe(Proof.ACK_PROOF_INVALID);
+    ack(Proof.ACK_PROOF_ABSENT);
+    expect(messages.value[0]!.ackProof).toBe(Proof.ACK_PROOF_INVALID);
+    ack(Proof.ACK_PROOF_VALID);
+    expect(messages.value[0]!.ackProof).toBe(Proof.ACK_PROOF_VALID);
+    ack(Proof.ACK_PROOF_INVALID);
+    expect(messages.value[0]!.ackProof).toBe(Proof.ACK_PROOF_VALID);
   });
 });

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import initSqlJs from "sql.js";
+import { isDuplicateColumn } from "../db.ts";
 import { MIGRATIONS } from "./migrations.ts";
 
 async function freshSqlite() {
@@ -52,5 +53,30 @@ describe("MIGRATIONS", () => {
     expect(() => {
       for (const stmt of MIGRATIONS[0]!.sql) db.run(stmt);
     }).not.toThrow();
+  });
+
+  it("v3 adds the signed and ack_proof message columns", async () => {
+    const db = await freshSqlite();
+    for (const migration of MIGRATIONS) {
+      for (const stmt of migration.sql) db.run(stmt);
+    }
+    const columns = db
+      .exec("PRAGMA table_info(messages)")[0]
+      ?.values.map((row) => row[1]) as string[];
+    expect(columns).toEqual(expect.arrayContaining(["signed", "ack_proof"]));
+  });
+
+  it("a second ALTER TABLE fails with an error isDuplicateColumn recognises", async () => {
+    const db = await freshSqlite();
+    for (const migration of MIGRATIONS) {
+      for (const stmt of migration.sql) db.run(stmt);
+    }
+    let error: unknown;
+    try {
+      db.run(MIGRATIONS.at(-1)!.sql[0]!);
+    } catch (e) {
+      error = e;
+    }
+    expect(isDuplicateColumn(error)).toBe(true);
   });
 });

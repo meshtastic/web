@@ -65,4 +65,12 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
       )`,
     ],
   },
+  {
+    // Firmware 2.8: XEdDSA-signed messages and ack proof of delivery.
+    version: 3,
+    sql: [
+      `ALTER TABLE messages ADD COLUMN signed INTEGER`,
+      `ALTER TABLE messages ADD COLUMN ack_proof INTEGER`,
+    ],
+  },
 ];

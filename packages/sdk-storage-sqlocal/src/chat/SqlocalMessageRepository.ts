@@ -2,6 +2,7 @@ import type {
   ConversationKey,
   Message,
   MessageRepository,
+  Protobuf,
   RetentionPolicy,
 } from "@meshtastic/sdk";
 import { conversationKeyString, MessageState } from "@meshtastic/sdk";
@@ -61,6 +62,16 @@ export class SqlocalMessageRepository implements MessageRepository {
     const rows = input.map((m) => messageToRow(this.deviceId, m));
     await this.db.insert(messages).values(rows).onConflictDoNothing();
     this.notify(input);
+  }
+
+  async updateAckProof(
+    id: number,
+    ackProof: Protobuf.Mesh.MeshPacket_AckProofStatus,
+  ): Promise<void> {
+    await this.db
+      .update(messages)
+      .set({ ackProof })
+      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
   }
 
   async updateState(id: number, state: MessageState): Promise<void> {
@@ -150,6 +161,8 @@ interface MessageRow {
   type: "broadcast" | "direct";
   text: string;
   state: "pending" | "ack" | "failed";
+  signed?: boolean | null;
+  ackProof?: number | null;
 }
 
 function rowToMessage(row: MessageRow): Message {
@@ -162,6 +175,10 @@ function rowToMessage(row: MessageRow): Message {
     type: row.type,
     text: row.text,
     state: row.state as MessageState,
+    signed: row.signed ?? undefined,
+    ackProof:
+      (row.ackProof as Protobuf.Mesh.MeshPacket_AckProofStatus | null) ??
+      undefined,
   };
 }
 
@@ -181,5 +198,7 @@ function messageToRow(deviceId: number, message: Message): MessageRow {
     type: message.type,
     text: message.text,
     state: message.state,
+    signed: message.signed ?? null,
+    ackProof: message.ackProof ?? null,
   };
 }

@@ -19,6 +19,8 @@ export const messages = sqliteTable(
     type: text("type", { enum: ["broadcast", "direct"] }).notNull(),
     text: text("text").notNull(),
     state: text("state", { enum: ["pending", "ack", "failed"] }).notNull(),
+    signed: integer("signed", { mode: "boolean" }),
+    ackProof: integer("ack_proof"),
   },
   (t) => ({
     pk: index("messages_pk").on(t.deviceId, t.id),

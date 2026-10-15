@@ -358,6 +358,9 @@ function handleDecodedPacket(
     from: meshPacket.from,
     to: meshPacket.to,
     channel: meshPacket.channel,
+    requestId: dataPacket.requestId || undefined,
+    xeddsaSigned: meshPacket.xeddsaSigned,
+    ackProofStatus: meshPacket.ackProofStatus,
   };
 
   sink.log.trace(

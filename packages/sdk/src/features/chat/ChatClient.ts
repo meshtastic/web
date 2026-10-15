@@ -1,3 +1,4 @@
+import * as Protobuf from "@meshtastic/protobufs";
 import { signal } from "@preact/signals-core";
 import type { ResultType } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
@@ -131,15 +132,41 @@ export class ChatClient {
     });
 
     client.events.onRoutingPacket.subscribe((packet) => {
-      if (packet.data.variant.case === "errorReason") {
-        const state =
-          packet.data.variant.value === 0
-            ? MessageState.Ack
-            : MessageState.Failed;
-        this.store.updateState(packet.id, state);
-        void this.repository.updateState(packet.id, state).catch(() => {});
-      }
+      if (packet.data.variant.case !== "errorReason") return;
+      // A routing ack names the message it acks in Data.request_id; its own
+      // id is unrelated.
+      const id = packet.requestId ?? packet.id;
+      const state =
+        packet.data.variant.value === Protobuf.Mesh.Routing_Error.NONE
+          ? MessageState.Ack
+          : MessageState.Failed;
+      this.store.updateState(id, state);
+      void this.repository.updateState(id, state).catch(() => {});
+      this.recordAckProof(id, packet.ackProofStatus);
     });
+  }
+
+  /**
+   * Keep the strongest proof-of-delivery verdict, as the Android app does:
+   * a later ack without proof never clears an earlier verdict, and a VALID
+   * proof is still recorded after a forged ack settled the message.
+   */
+  private recordAckProof(
+    id: number,
+    status: Protobuf.Mesh.MeshPacket_AckProofStatus | undefined,
+  ): void {
+    const Status = Protobuf.Mesh.MeshPacket_AckProofStatus;
+    if (status === undefined || status === Status.ACK_PROOF_ABSENT) return;
+    const current = this.store.getMessage(id)?.ackProof;
+    if (current === Status.ACK_PROOF_VALID) return;
+    if (
+      current === Status.ACK_PROOF_INVALID &&
+      status !== Status.ACK_PROOF_VALID
+    ) {
+      return;
+    }
+    this.store.updateAckProof(id, status);
+    void this.repository.updateAckProof(id, status).catch(() => {});
   }
 
   public messages(channel: ChannelNumber): ReadonlySignal<Message[]> {

@@ -32,6 +32,12 @@ export interface PacketMetadata<T> {
   to: number;
   channel: ChannelNumber;
   data: T;
+  /** Data.request_id: the packet this one answers or acks. */
+  requestId?: number;
+  /** The sender signed the packet with XEdDSA and the device verified it. */
+  xeddsaSigned?: boolean;
+  /** Firmware's verdict on an ack's proof of delivery (2.8.1+). */
+  ackProofStatus?: Protobuf.Mesh.MeshPacket_AckProofStatus;
 }
 
 export enum EmitterScope {
