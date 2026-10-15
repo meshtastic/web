@@ -542,6 +542,17 @@
     "administration": {
       "label": "Administration",
       "description": "Managed-mode and legacy admin channel"
+    },
+    "packetSignaturesCard": {
+      "label": "Packet Signatures",
+      "description": "How the device treats signed and unsigned packets it receives (firmware 2.8+)"
+    },
+    "packetSignaturePolicy": {
+      "label": "Packet Signature Policy",
+      "description": "Compatible accepts unsigned packets but drops any with a wrong signature. Balanced also rejects unsigned broadcasts from nodes that have signed before. Strict accepts only packets with a verified signature or successful PKI decryption, so packets from older nodes may be ignored.",
+      "compatible": "Compatible - Accept Unsigned",
+      "balanced": "Balanced - Prefer Authenticated",
+      "strict": "Strict - Require Authentication"
     }
   },
   "user": {

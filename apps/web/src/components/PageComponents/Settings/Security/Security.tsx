@@ -118,6 +118,18 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     }
   };
 
+  // Option text keyed to the enum value, so the select shows translated
+  // labels rather than the raw enum names.
+  const PacketSignaturePolicy =
+    Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy;
+  const packetSignaturePolicyOptions = {
+    [t("security.packetSignaturePolicy.compatible")]:
+      PacketSignaturePolicy.COMPATIBLE,
+    [t("security.packetSignaturePolicy.balanced")]:
+      PacketSignaturePolicy.BALANCED,
+    [t("security.packetSignaturePolicy.strict")]: PacketSignaturePolicy.STRICT,
+  };
+
   const bits = [
     {
       text: t("security.256bit"),
@@ -222,6 +234,21 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: { showCopyButton: true },
+              },
+            ],
+          },
+          {
+            label: t("security.packetSignaturesCard.label"),
+            description: t("security.packetSignaturesCard.description"),
+            fields: [
+              {
+                type: "select",
+                name: "packetSignaturePolicy",
+                label: t("security.packetSignaturePolicy.label"),
+                description: t("security.packetSignaturePolicy.description"),
+                properties: {
+                  enumValue: packetSignaturePolicyOptions,
+                },
               },
             ],
           },
