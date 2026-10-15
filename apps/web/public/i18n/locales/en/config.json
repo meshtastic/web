@@ -563,7 +563,7 @@
     "description": "Configure your device name and identity settings",
     "longName": {
       "label": "Long Name",
-      "description": "Your full display name (1-40 characters)",
+      "description": "Your full display name, up to 24 bytes. Emoji and accented letters use more than one byte each.",
       "validation": {
         "min": "Long name must be at least 1 character",
         "max": "Long name must be at most 40 characters"

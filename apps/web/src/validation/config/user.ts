@@ -1,5 +1,13 @@
+import { validateMaxByteLength } from "@core/utils/string.ts";
 import { t } from "i18next";
 import { z } from "zod/v4";
+
+/**
+ * Firmware 2.8 truncates User.long_name to 24 bytes of UTF-8. Emoji and
+ * accented letters take more than one byte each, so this is not 24
+ * characters.
+ */
+export const LONG_NAME_MAX_BYTES = 24;
 
 export const UserValidationSchema = z.object({
   // Read-only display fields (preserved on submit).
@@ -8,7 +16,19 @@ export const UserValidationSchema = z.object({
   longName: z
     .string()
     .min(1, t("user.longName.validation.min"))
-    .max(40, t("user.longName.validation.max")),
+    .superRefine((value, ctx) => {
+      const { isValid, currentLength } = validateMaxByteLength(
+        value,
+        LONG_NAME_MAX_BYTES,
+      );
+      if (!isValid) {
+        ctx.addIssue({
+          code: "custom",
+          message: "formValidation.longNameTooManyBytes",
+          params: { maximum: LONG_NAME_MAX_BYTES, current: currentLength },
+        });
+      }
+    }),
   shortName: z
     .string()
     .min(1, t("user.shortName.validation.min"))

@@ -129,6 +129,7 @@
     },
     "presetNotAllowedInRegion": "This preset is not allowed in the selected region. Pick one of the listed presets.",
     "presetNeedsFirmware28": "This preset needs firmware 2.8 or newer. Older firmware falls back to Long Fast.",
+    "longNameTooManyBytes": "Too long: {{params.current}} of {{params.maximum}} bytes. Emoji and accented letters use more than one byte each, and longer names are cut off by the firmware.",
     "regionNeedsFirmware28": "This region needs firmware 2.8 or newer. Update the node's firmware to use it."
   },
   "yes": "Yes",
