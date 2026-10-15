@@ -57,4 +57,23 @@ describe("NodesClient", () => {
     expect(client.nodes.byNum(100)?.deviceMetrics?.batteryLevel).toBe(80);
     expect(client.nodes.byNum(100)?.deviceMetrics?.voltage).toBeCloseTo(4.1);
   });
+
+  it("updates lastHeard only from packets that carry rx_time", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    client.events.onNodeInfoPacket.dispatch(
+      create(Protobuf.Mesh.NodeInfoSchema, { num: 5, lastHeard: 1_000 }),
+    );
+
+    // A replayed packet with no rx_time leaves lastHeard alone.
+    client.events.onMeshPacket.dispatch(
+      create(Protobuf.Mesh.MeshPacketSchema, { from: 5, id: 1 }),
+    );
+    expect(client.nodes.byNum(5)?.lastHeard).toBe(1_000);
+
+    client.events.onMeshPacket.dispatch(
+      create(Protobuf.Mesh.MeshPacketSchema, { from: 5, id: 2, rxTime: 2_000 }),
+    );
+    expect(client.nodes.byNum(5)?.lastHeard).toBe(2_000);
+  });
 });

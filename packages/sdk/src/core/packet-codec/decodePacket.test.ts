@@ -15,11 +15,18 @@ function setup() {
   return { ...fake, client };
 }
 
-function dataPacket(portnum: Protobuf.Portnums.PortNum, payload: Uint8Array) {
+let nextId = 1;
+
+function dataPacket(
+  portnum: Protobuf.Portnums.PortNum,
+  payload: Uint8Array,
+  init: { id?: number; rxTime?: number } = {},
+) {
   return create(Protobuf.Mesh.MeshPacketSchema, {
     from: 0x10,
     to: 0xffffffff,
-    id: 7,
+    id: init.id ?? nextId++,
+    rxTime: init.rxTime,
     payloadVariant: { case: "decoded", value: { portnum, payload } },
   });
 }
@@ -93,5 +100,45 @@ describe("decodePacket", () => {
     respond.withMeshPacket(dataPacket(unknownPort, new Uint8Array([3])));
     await flush();
     expect(seen).toEqual([Protobuf.Portnums.PortNum.PAGING_APP, unknownPort]);
+  });
+
+  it("drops a packet it has already delivered", async () => {
+    const { client, respond } = setup();
+    const alerts: string[] = [];
+    client.events.onAlertPacket.subscribe((p) => alerts.push(p.data));
+    const payload = new TextEncoder().encode("smoke");
+
+    respond.withMeshPacket(
+      dataPacket(Protobuf.Portnums.PortNum.ALERT_APP, payload, { id: 99 }),
+    );
+    respond.withMeshPacket(
+      dataPacket(Protobuf.Portnums.PortNum.ALERT_APP, payload, { id: 99 }),
+    );
+    respond.withMeshPacket(
+      dataPacket(Protobuf.Portnums.PortNum.ALERT_APP, payload, { id: 100 }),
+    );
+    await flush();
+    expect(alerts).toEqual(["smoke", "smoke"]);
+  });
+
+  it("stamps packets without rx_time with the time they arrived", async () => {
+    const { client, respond } = setup();
+    const times: number[] = [];
+    client.events.onAlertPacket.subscribe((p) =>
+      times.push(p.rxTime.getTime()),
+    );
+    const before = Date.now();
+
+    respond.withMeshPacket(
+      dataPacket(Protobuf.Portnums.PortNum.ALERT_APP, new Uint8Array()),
+    );
+    respond.withMeshPacket(
+      dataPacket(Protobuf.Portnums.PortNum.ALERT_APP, new Uint8Array(), {
+        rxTime: 1_700_000_000,
+      }),
+    );
+    await flush();
+    expect(times[0]).toBeGreaterThanOrEqual(before);
+    expect(times[1]).toBe(1_700_000_000_000);
   });
 });

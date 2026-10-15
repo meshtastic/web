@@ -24,13 +24,41 @@ export interface PacketSink {
   configure(): Promise<number>;
 }
 
+/** How many recent packet keys are remembered for duplicate detection. */
+const RECENT_PACKET_CAPACITY = 256;
+
+/**
+ * Remembers the most recent `(from, to, channel, id)` keys. Firmware 2.8
+ * replays each node's cached packets with a stable id after every handshake,
+ * so a reconnect would otherwise deliver the same packets again.
+ */
+class RecentPackets {
+  private readonly keys = new Set<string>();
+
+  /** True if the packet was already seen; records it otherwise. */
+  public seen(packet: Protobuf.Mesh.MeshPacket): boolean {
+    if (packet.id === 0) return false;
+    const key = `${packet.from}:${packet.to}:${packet.channel}:${packet.id}`;
+    if (this.keys.has(key)) return true;
+    this.keys.add(key);
+    if (this.keys.size > RECENT_PACKET_CAPACITY) {
+      const oldest = this.keys.values().next().value;
+      if (oldest !== undefined) this.keys.delete(oldest);
+    }
+    return false;
+  }
+}
+
 /**
  * Writable stream that consumes framed DeviceOutput chunks, decodes FromRadio
  * protobufs, routes MeshPackets through their portnums, and dispatches typed
  * events on the provided EventBus.
  */
-export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
-  new WritableStream<DeviceOutput>({
+export const decodePacket = (
+  sink: PacketSink,
+): WritableStream<DeviceOutput> => {
+  const recent = new RecentPackets();
+  return new WritableStream<DeviceOutput>({
     write(chunk) {
       switch (chunk.type) {
         case "status": {
@@ -64,6 +92,13 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
 
           switch (decodedMessage.payloadVariant.case) {
             case "packet": {
+              if (recent.seen(decodedMessage.payloadVariant.value)) {
+                sink.log.trace(
+                  Emitter[Emitter.HandleFromRadio],
+                  `Dropping duplicate packet ${decodedMessage.payloadVariant.value.id}`,
+                );
+                break;
+              }
               try {
                 handleMeshPacket(sink, decodedMessage.payloadVariant.value);
               } catch (e) {
@@ -291,6 +326,7 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
       }
     },
   });
+};
 
 function handleMeshPacket(
   sink: PacketSink,
@@ -325,8 +361,9 @@ function handleDecodedPacket(
 ) {
   const packetMetadata: Omit<PacketMetadata<unknown>, "data"> = {
     id: meshPacket.id,
-    // rx_time is optional since protobufs 2.8.0; unset reads as 0 as before.
-    rxTime: new Date((meshPacket.rxTime ?? 0) * 1000),
+    // rx_time is optional since protobufs 2.8.0. Unset means the device had
+    // no wall-clock time, so the time it reached us is the best estimate.
+    rxTime: meshPacket.rxTime ? new Date(meshPacket.rxTime * 1000) : new Date(),
     type: meshPacket.to === Constants.broadcastNum ? "broadcast" : "direct",
     from: meshPacket.from,
     to: meshPacket.to,

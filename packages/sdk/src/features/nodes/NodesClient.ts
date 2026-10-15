@@ -73,11 +73,14 @@ export class NodesClient {
 
     client.events.onMeshPacket.subscribe((packet) => {
       // Every inbound mesh packet refreshes lastHeard / snr for the
-      // originating node — same semantics as the legacy nodeDB
-      // processPacket but routed through the SDK signal layer.
-      const nowSec = Math.floor(Date.now() / 1000);
+      // originating node. Since firmware 2.8 the device also replays each
+      // node's cached position and telemetry after the handshake, with
+      // rx_time set to when it last heard the node, or unset when it had no
+      // wall-clock time then. A packet without rx_time says nothing about
+      // when the node was heard, so it must not mark the node as heard now.
+      if (!packet.rxTime) return;
       this.patch(packet.from, {
-        lastHeard: packet.rxTime || nowSec,
+        lastHeard: packet.rxTime,
         snr: packet.rxSnr,
       });
     });
