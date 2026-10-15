@@ -72,6 +72,12 @@ export function toLegacy(
   if (message.ackProof !== undefined) {
     legacy.ackProof = message.ackProof;
   }
+  if (message.routingError !== undefined) {
+    legacy.routingError = message.routingError;
+  }
+  if (message.relays !== undefined) {
+    legacy.relays = message.relays;
+  }
   return legacy;
 }
 
@@ -79,6 +85,8 @@ function mapState(state: SdkMessageState): LegacyMessageState {
   switch (state) {
     case SdkMessageState.Ack:
       return LegacyMessageState.Ack;
+    case SdkMessageState.Delivered:
+      return LegacyMessageState.Delivered;
     case SdkMessageState.Failed:
       return LegacyMessageState.Failed;
     case SdkMessageState.Pending:

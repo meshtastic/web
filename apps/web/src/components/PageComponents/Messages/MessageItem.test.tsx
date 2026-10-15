@@ -4,7 +4,7 @@ import {
   MessageType,
 } from "@core/stores/messageStore";
 import { Protobuf, type Types } from "@meshtastic/sdk";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { MessageItem } from "./MessageItem.tsx";
 
@@ -27,6 +27,11 @@ vi.mock("@core/hooks/useNodesAsProto.ts", () => ({
 }));
 
 vi.mock("@components/UI/Avatar.tsx", () => ({ Avatar: () => null }));
+
+const resend = vi.fn(() => Promise.resolve({ status: "ok", value: 2 }));
+vi.mock("@meshtastic/sdk-react", () => ({
+  useActiveClient: () => ({ chat: { resend } }),
+}));
 
 const AckProof = Protobuf.Mesh.MeshPacket_AckProofStatus;
 
@@ -65,35 +70,80 @@ describe("MessageItem trust indicators", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("shows delivery proven for a VALID ack proof", () => {
+  it("shows the recipient's proven delivery in the status line", () => {
     renderItem(makeMessage({ ackProof: AckProof.ACK_PROOF_VALID }));
     expect(
-      screen.getByRole("button", { name: "Delivery proven" }),
+      screen.getByRole("button", {
+        name: /Delivered to recipient · proven/,
+      }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByText(/Forged acknowledgement/),
-    ).not.toBeInTheDocument();
   });
 
-  it("warns about a forged ack for an INVALID ack proof", () => {
+  it("puts a forged ack in the status line instead of delivered", () => {
     renderItem(makeMessage({ ackProof: AckProof.ACK_PROOF_INVALID }));
-    expect(screen.getByText(/Forged acknowledgement/)).toBeInTheDocument();
-    expect(screen.getByText(/failed its proof check/)).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Delivery proven" }),
+      screen.getByRole("button", { name: /Delivery proof failed/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Delivered to recipient"),
     ).not.toBeInTheDocument();
   });
 
   it.each([AckProof.ACK_PROOF_ABSENT, AckProof.ACK_PROOF_NO_KEY])(
-    "shows nothing extra for ack proof %s",
+    "shows plain delivery for ack proof %s",
     (ackProof) => {
       renderItem(makeMessage({ ackProof }));
-      expect(
-        screen.queryByRole("button", { name: "Delivery proven" }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByText(/Forged acknowledgement/),
-      ).not.toBeInTheDocument();
+      expect(screen.getByText("Delivered to recipient")).toBeInTheDocument();
     },
   );
+});
+
+describe("MessageItem delivery status", () => {
+  it("shows a direct message that was only relayed as unconfirmed", () => {
+    renderItem(makeMessage({ state: MessageState.Delivered }));
+    expect(
+      screen.getByText("Relayed, not confirmed by recipient"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a broadcast acked by the mesh as delivered", () => {
+    renderItem(
+      makeMessage({
+        type: MessageType.Broadcast,
+        to: 0xffffffff,
+        state: MessageState.Delivered,
+      }),
+    );
+    expect(screen.getByText("Delivered to mesh")).toBeInTheDocument();
+  });
+
+  it("names the failure, explains it, and offers resend", () => {
+    renderItem(
+      makeMessage({
+        state: MessageState.Failed,
+        routingError: Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT,
+      }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /Failed to deliver to mesh/ }),
+    );
+    expect(
+      screen.getByText(/No node confirmed this message/),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Resend" }));
+    expect(resend).toHaveBeenCalledWith({
+      id: 1,
+      text: "hello",
+      to: PEER,
+      channel: 0,
+      type: "direct",
+    });
+  });
+
+  it("does not show a status on received messages", () => {
+    renderItem(makeMessage({ from: PEER, to: MY_NODE }));
+    expect(
+      screen.queryByText("Delivered to recipient"),
+    ).not.toBeInTheDocument();
+  });
 });

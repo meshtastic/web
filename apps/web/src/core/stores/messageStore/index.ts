@@ -8,7 +8,10 @@
 import type { Protobuf, Types } from "@meshtastic/sdk";
 
 export enum MessageState {
+  /** The addressed node acked it (and every inbound message). */
   Ack = "ack",
+  /** Acked by a relay, or heard rebroadcast: on the mesh, not confirmed. */
+  Delivered = "delivered",
   Waiting = "waiting",
   Failed = "failed",
 }
@@ -35,6 +38,10 @@ interface MessageBase {
   signed?: boolean;
   /** Proof-of-delivery verdict from the ack of an outbound message. */
   ackProof?: Protobuf.Mesh.MeshPacket_AckProofStatus;
+  /** Why an outbound message failed. */
+  routingError?: Protobuf.Mesh.Routing_Error;
+  /** How many acks (relays and the recipient) came back. */
+  relays?: number;
 }
 
 interface GenericMessage<T extends MessageType> extends MessageBase {

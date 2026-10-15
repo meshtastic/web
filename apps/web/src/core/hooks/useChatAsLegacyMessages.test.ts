@@ -54,4 +54,19 @@ describe("toLegacy", () => {
       Protobuf.Mesh.MeshPacket_AckProofStatus.ACK_PROOF_INVALID,
     );
   });
+
+  it("carries the delivery state, failure reason and relay count", () => {
+    const legacy = toLegacy(
+      {
+        ...sdkMessage,
+        state: SdkMessageState.Delivered,
+        routingError: Protobuf.Mesh.Routing_Error.NO_ROUTE,
+        relays: 3,
+      },
+      params,
+    );
+    expect(legacy.state).toBe(MessageState.Delivered);
+    expect(legacy.routingError).toBe(Protobuf.Mesh.Routing_Error.NO_ROUTE);
+    expect(legacy.relays).toBe(3);
+  });
 });

@@ -1,30 +1,16 @@
 import { IndicatorIcon } from "@components/generic/NodeTrustIndicators.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import {
-  Tooltip,
-  TooltipArrow,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@components/UI/Tooltip.tsx";
-import {
   useMyNodeAsProto,
   useNodeAsProto,
 } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice } from "@core/stores";
-import { type Message, MessageState } from "@core/stores/messageStore";
+import type { Message } from "@core/stores/messageStore";
 import { cn } from "@core/utils/cn.ts";
-import { Protobuf, Types } from "@meshtastic/sdk";
-import type { LucideIcon } from "lucide-react";
-import {
-  AlertCircle,
-  CheckCircle2,
-  CircleEllipsis,
-  ShieldAlertIcon,
-  ShieldCheckIcon,
-  SignatureIcon,
-} from "lucide-react";
-import { type ReactNode, useMemo } from "react";
+import type { Protobuf } from "@meshtastic/sdk";
+import { SignatureIcon } from "lucide-react";
+import { useMemo } from "react";
+import { MessageStatus } from "./MessageStatus.tsx";
 import { useTranslation } from "react-i18next";
 
 const myNodePromises = new Map<string, Promise<void>>();
@@ -71,31 +57,6 @@ function useSuspendingMyNode() {
 
 // import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx"; // TODO: Uncomment when actions menu is implemented
 
-interface MessageStatusInfo {
-  displayText: string;
-  icon: LucideIcon;
-  ariaLabel: string;
-  iconClassName?: string;
-}
-
-const StatusTooltip = ({
-  statusInfo,
-  children,
-}: {
-  statusInfo: MessageStatusInfo;
-  children: ReactNode;
-}) => (
-  <TooltipProvider delayDuration={300}>
-    <Tooltip>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-        {statusInfo.displayText}
-        <TooltipArrow className="fill-slate-800" />
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-);
-
 interface MessageItemProps {
   message: Message;
 }
@@ -108,47 +69,6 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   // This will suspend if myNode is not available yet
   const myNode = useSuspendingMyNode();
   const myNodeNum = myNode.num;
-
-  const MESSAGE_STATUS_MAP = useMemo(
-    (): Record<MessageState, MessageStatusInfo> => ({
-      [MessageState.Ack]: {
-        displayText: t("deliveryStatus.delivered.displayText"),
-        icon: CheckCircle2,
-        ariaLabel: t("deliveryStatus.delivered.label"),
-        iconClassName: "text-green-500",
-      },
-      [MessageState.Waiting]: {
-        displayText: t("deliveryStatus.waiting.displayText"),
-        icon: CircleEllipsis,
-        ariaLabel: t("deliveryStatus.waiting.label"),
-        iconClassName: "text-slate-400",
-      },
-      [MessageState.Failed]: {
-        displayText: t("deliveryStatus.failed.displayText"),
-        icon: AlertCircle,
-        ariaLabel: t("deliveryStatus.failed.label"),
-        iconClassName: "text-red-500 dark:text-red-400",
-      },
-    }),
-    [t],
-  );
-
-  const UNKNOWN_STATUS = useMemo(
-    (): MessageStatusInfo => ({
-      displayText: t("deliveryStatus.unknown.displayText"),
-      icon: AlertCircle,
-      ariaLabel: t("deliveryStatus.unknown.label"),
-      iconClassName: "text-red-500 dark:text-red-400",
-    }),
-    [t],
-  );
-
-  const getMessageStatusInfo = useMemo(
-    () =>
-      (state: MessageState): MessageStatusInfo =>
-        MESSAGE_STATUS_MAP[state] ?? UNKNOWN_STATUS,
-    [MESSAGE_STATUS_MAP, UNKNOWN_STATUS],
-  );
 
   const messageUser: Protobuf.Mesh.NodeInfo | null | undefined =
     message.from != null ? (messageUserNode ?? null) : null;
@@ -170,9 +90,6 @@ export const MessageItem = ({ message }: MessageItemProps) => {
       nodeNum: fromNum,
     };
   }, [messageUser, message.from, t, myNodeNum]);
-
-  const messageStatusInfo = getMessageStatusInfo(message.state);
-  const StatusIconComponent = messageStatusInfo.icon;
 
   const messageDate = useMemo(
     () => (message.date ? new Date(message.date) : null),
@@ -200,12 +117,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   );
 
   const isSender = myNodeNum !== undefined && message.from === myNodeNum;
-  const isOnPrimaryChannel = message.channel === Types.ChannelNumber.Primary; // Use the enum
-  const shouldShowStatusIcon = isSender && isOnPrimaryChannel;
   const showSigned = !isSender && message.signed === true;
-  // ABSENT and NO_KEY carry no verdict, so they add nothing to the status.
-  const ackProof = isSender ? message.ackProof : undefined;
-  const AckProof = Protobuf.Mesh.MeshPacket_AckProofStatus;
 
   const messageItemWrapperClass = cn(
     "group w-full py-2 relative list-none",
@@ -239,19 +151,6 @@ export const MessageItem = ({ message }: MessageItemProps) => {
                 <span className="sr-only">{fullDateTime}</span>
               </time>
             )}
-            {shouldShowStatusIcon && (
-              <StatusTooltip statusInfo={messageStatusInfo}>
-                <span aria-label={messageStatusInfo.ariaLabel} role="img">
-                  <StatusIconComponent
-                    className={cn(
-                      "size-4 shrink-0",
-                      messageStatusInfo.iconClassName,
-                    )}
-                    aria-hidden="true"
-                  />
-                </span>
-              </StatusTooltip>
-            )}
             {showSigned && (
               <IndicatorIcon
                 icon={SignatureIcon}
@@ -261,32 +160,15 @@ export const MessageItem = ({ message }: MessageItemProps) => {
                 className="text-green-600 dark:text-green-500"
               />
             )}
-            {ackProof === AckProof.ACK_PROOF_VALID && (
-              <IndicatorIcon
-                icon={ShieldCheckIcon}
-                size={16}
-                label={t("ackProof.valid.label")}
-                tooltip={t("ackProof.valid.tooltip")}
-                className="text-green-600 dark:text-green-500"
-              />
-            )}
           </div>
-
-          {ackProof === AckProof.ACK_PROOF_INVALID && (
-            <div className="flex items-start gap-1 text-xs text-red-600 dark:text-red-400">
-              <ShieldAlertIcon className="size-4 shrink-0" aria-hidden="true" />
-              <p>
-                <strong>{t("ackProof.invalid.label")}:</strong>{" "}
-                {t("ackProof.invalid.description")}
-              </p>
-            </div>
-          )}
 
           {message?.message && (
             <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">
               {message.message}
             </div>
           )}
+
+          {isSender && <MessageStatus message={message} />}
         </div>
       </div>
       {/* Actions Menu Placeholder */}

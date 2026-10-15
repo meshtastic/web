@@ -19,6 +19,10 @@ interface MessageBase {
   signed?: boolean;
   /** Proof-of-delivery verdict from the ack of an outbound message. */
   ackProof?: Protobuf.Mesh.MeshPacket_AckProofStatus;
+  /** Why an outbound message failed. */
+  routingError?: Protobuf.Mesh.Routing_Error;
+  /** How many acks (relays and the recipient) came back. */
+  relays?: number;
 }
 
 interface GenericMessage<T extends MessageType> extends MessageBase {
