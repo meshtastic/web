@@ -1,3 +1,4 @@
+import { BeaconOffers } from "@app/components/PageComponents/Channels/BeaconOffers.tsx";
 import { Channel } from "@app/components/PageComponents/Channels/Channel";
 import { create } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
@@ -73,50 +74,53 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
   );
 
   return (
-    <Tabs defaultValue="channel_0">
-      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-700">
+    <>
+      <BeaconOffers />
+      <Tabs defaultValue="channel_0">
+        <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-700">
+          {allChannels.map((channel) => (
+            <TabsTrigger
+              key={`channel_${channel.index}`}
+              value={`channel_${channel.index}`}
+              className="dark:text-white relative max-md:shrink-0"
+            >
+              {getChannelName(channel)}
+              {flags.get(channel.index) && (
+                <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
+                  <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
+                </span>
+              )}
+            </TabsTrigger>
+          ))}
+          <Button
+            className="ml-auto mr-1 h-8"
+            onClick={() => setDialogOpen("import", true)}
+          >
+            <UploadIcon className="mr-2" size={14} />
+            {t("page.import")}
+          </Button>
+          <Button className=" h-8" onClick={() => setDialogOpen("QR", true)}>
+            <QrCodeIcon className="mr-2" size={14} />
+            {t("page.export")}
+          </Button>
+        </TabsList>
         {allChannels.map((channel) => (
-          <TabsTrigger
+          <TabsContent
             key={`channel_${channel.index}`}
             value={`channel_${channel.index}`}
-            className="dark:text-white relative max-md:shrink-0"
+            className="max-md:px-2"
           >
-            {getChannelName(channel)}
-            {flags.get(channel.index) && (
-              <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
-                <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
-              </span>
-            )}
-          </TabsTrigger>
+            <Suspense fallback={<Spinner size="lg" className="my-5" />}>
+              <Channel
+                key={channel.index}
+                onFormInit={onFormInit}
+                channel={channel}
+              />
+            </Suspense>
+          </TabsContent>
         ))}
-        <Button
-          className="ml-auto mr-1 h-8"
-          onClick={() => setDialogOpen("import", true)}
-        >
-          <UploadIcon className="mr-2" size={14} />
-          {t("page.import")}
-        </Button>
-        <Button className=" h-8" onClick={() => setDialogOpen("QR", true)}>
-          <QrCodeIcon className="mr-2" size={14} />
-          {t("page.export")}
-        </Button>
-      </TabsList>
-      {allChannels.map((channel) => (
-        <TabsContent
-          key={`channel_${channel.index}`}
-          value={`channel_${channel.index}`}
-          className="max-md:px-2"
-        >
-          <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <Channel
-              key={channel.index}
-              onFormInit={onFormInit}
-              channel={channel}
-            />
-          </Suspense>
-        </TabsContent>
-      ))}
-    </Tabs>
+      </Tabs>
+    </>
   );
 };

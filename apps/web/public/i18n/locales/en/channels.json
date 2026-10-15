@@ -71,5 +71,15 @@
       "imperial_ft300": "Within 300 feet",
       "imperial_ft150": "Within 150 feet"
     }
+  },
+  "beaconOffers": {
+    "title": "Mesh Beacon offers",
+    "from": "Invitation from {{sender}}",
+    "defaultChannel": "Default channel",
+    "addHint": "Joining adds this channel. The radio stays on its current settings.",
+    "switchHint": "Joining replaces your primary channel and LoRa settings. The radio retunes and reboots.",
+    "join": "Join",
+    "switch": "Switch",
+    "dismiss": "Dismiss"
   }
 }

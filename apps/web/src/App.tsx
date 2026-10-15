@@ -1,4 +1,5 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
+import { BeaconOfferNotifier } from "@components/BeaconOfferNotifier.tsx";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { ConnectingOverlay } from "@components/ConnectingOverlay.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
@@ -63,6 +64,7 @@ export function App() {
                   <LockdownGate />
                   <KeyBackupReminder />
                   <RegionSetupReminder />
+                  <BeaconOfferNotifier />
                   <CommandPalette />
                   <MapProvider>
                     <Outlet />

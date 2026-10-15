@@ -14,9 +14,12 @@ import { ResetNodeDbDialog } from "@components/Dialog/ResetNodeDbDialog/ResetNod
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 import { useDevice } from "@core/stores";
+import { useBeaconJoinStore } from "@core/stores/beaconJoinStore.ts";
 
 export const DialogManager = () => {
   const { config, dialog, setDialogOpen } = useDevice();
+  const beaconJoin = useBeaconJoinStore((s) => s.pending);
+  const clearBeaconJoin = useBeaconJoinStore((s) => s.clearJoin);
   return (
     <>
       <QRDialog
@@ -27,11 +30,13 @@ export const DialogManager = () => {
         loraConfig={config.lora}
       />
       <ImportDialog
-        open={dialog.import}
+        open={dialog.import || beaconJoin !== undefined}
         onOpenChange={(open) => {
           setDialogOpen("import", open);
+          if (!open) clearBeaconJoin();
         }}
         loraConfig={config.lora}
+        beaconJoin={beaconJoin}
       />
       <ShutdownDialog
         open={dialog.shutdown}

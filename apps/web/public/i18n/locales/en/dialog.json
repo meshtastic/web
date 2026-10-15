@@ -16,7 +16,14 @@
     "channelSetUrl": "Channel Set/QR Code URL",
     "useLoraConfig": "Import LoRa Config",
     "presetDescription": "The current LoRa Config will be replaced.",
-    "title": "Import Channels"
+    "title": "Import Channels",
+    "beacon": {
+      "addTitle": "Joining a Mesh Beacon offer",
+      "addDescription": "The offered channel goes into a free secondary slot. Your radio stays on its current settings.",
+      "noFreeSlot": "Every secondary slot is in use. Pick a slot below; the channel in it will be replaced.",
+      "switchTitle": "Switching to another mesh",
+      "switchDescription": "The offered channel replaces your primary channel and the LoRa settings change to the offered mesh. When you save, the radio retunes and reboots, and you leave your current mesh."
+    }
   },
   "locationResponse": {
     "title": "Location: {{identifier}}",
