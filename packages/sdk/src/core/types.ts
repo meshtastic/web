@@ -19,6 +19,11 @@ export type LogEventPacket = LogEvent & { date: Date };
 
 export type PacketDestination = "broadcast" | "direct";
 
+export interface UnhandledPayload {
+  portnum: Protobuf.Portnums.PortNum;
+  payload: Uint8Array;
+}
+
 export interface PacketMetadata<T> {
   id: number;
   rxTime: Date;

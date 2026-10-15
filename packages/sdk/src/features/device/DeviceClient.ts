@@ -24,6 +24,18 @@ export class DeviceClient {
   public readonly myNodeInfo: ReadonlySignal<
     Protobuf.Mesh.MyNodeInfo | undefined
   >;
+  /**
+   * Latest lockdown status, on firmware built with lockdown support. While
+   * the state is LOCKED, NEEDS_PROVISION or UNLOCK_FAILED the device withholds
+   * its channels and NodeDB.
+   */
+  public readonly lockdownStatus: ReadonlySignal<
+    Protobuf.Mesh.LockdownStatus | undefined
+  >;
+  /** Per-region allowed presets and defaults (firmware 2.8+). */
+  public readonly regionPresets: ReadonlySignal<
+    Protobuf.Mesh.LoRaRegionPresetMap | undefined
+  >;
 
   constructor(client: MeshClient) {
     this.client = client;
@@ -34,6 +46,8 @@ export class DeviceClient {
     this.myNodeNum = this.store.myNodeNum.read;
     this.metadata = this.store.metadata.read;
     this.myNodeInfo = this.store.myNodeInfo.read;
+    this.lockdownStatus = this.store.lockdownStatus.read;
+    this.regionPresets = this.store.regionPresets.read;
 
     client.events.onDeviceStatus.subscribe((status) => {
       this.store.status.write.value = status;
@@ -51,6 +65,14 @@ export class DeviceClient {
 
     client.events.onDeviceMetadataPacket.subscribe((pkt) => {
       this.store.metadata.write.value = pkt.data;
+    });
+
+    client.events.onLockdownStatus.subscribe((status) => {
+      this.store.lockdownStatus.write.value = status;
+    });
+
+    client.events.onRegionPresets.subscribe((presets) => {
+      this.store.regionPresets.write.value = presets;
     });
 
     client.events.onPendingSettingsChange.subscribe((pending) => {

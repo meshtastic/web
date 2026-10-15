@@ -8,6 +8,7 @@ export * as Config from "./dist/meshtastic/config_pb.ts";
 export * as ConnectionStatus from "./dist/meshtastic/connection_status_pb.ts";
 export * as LocalOnly from "./dist/meshtastic/localonly_pb.ts";
 export * as Mesh from "./dist/meshtastic/mesh_pb.ts";
+export * as MeshBeacon from "./dist/meshtastic/mesh_beacon_pb.ts";
 export * as ModuleConfig from "./dist/meshtastic/module_config_pb.ts";
 export * as Mqtt from "./dist/meshtastic/mqtt_pb.ts";
 export * as PaxCount from "./dist/meshtastic/paxcount_pb.ts";

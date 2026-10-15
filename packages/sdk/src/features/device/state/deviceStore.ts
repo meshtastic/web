@@ -20,6 +20,12 @@ export function createDeviceStore() {
   const myNodeInfo = createStore<Protobuf.Mesh.MyNodeInfo | undefined>(
     undefined,
   );
+  const lockdownStatus = createStore<Protobuf.Mesh.LockdownStatus | undefined>(
+    undefined,
+  );
+  const regionPresets = createStore<
+    Protobuf.Mesh.LoRaRegionPresetMap | undefined
+  >(undefined);
 
   return {
     status,
@@ -28,6 +34,8 @@ export function createDeviceStore() {
     myNodeNum,
     metadata,
     myNodeInfo,
+    lockdownStatus,
+    regionPresets,
   };
 }
 

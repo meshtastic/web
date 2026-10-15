@@ -249,6 +249,37 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
               );
               break;
             }
+            case "lockdownStatus": {
+              // Arrives right after config_complete_id on lockdown builds.
+              // While locked, metadata is zeroed and channels and NodeDB are
+              // withheld until the client unlocks and re-runs the handshake.
+              sink.log.info(
+                Emitter[Emitter.HandleFromRadio],
+                `🔒 Received lockdown status: ${Protobuf.Mesh.LockdownStatus_State[decodedMessage.payloadVariant.value.state]}`,
+              );
+              sink.events.onLockdownStatus.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
+            case "regionPresets": {
+              sink.events.onRegionPresets.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
+            case "deviceuiConfig": {
+              sink.events.onDeviceUiConfig.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
+            case "fileInfo": {
+              sink.events.onFileInfo.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
             default: {
               sink.log.warn(
                 Emitter[Emitter.HandleFromRadio],
@@ -366,7 +397,10 @@ function handleDecodedPacket(
         case "routeRequest":
           break;
         default:
-          throw new Error(`Unhandled case ${routingPacket.variant.case}`);
+          sink.log.warn(
+            Emitter[Emitter.HandleMeshPacket],
+            `⚠️ Routing packet ${meshPacket.id} has no variant set`,
+          );
       }
       break;
     }
@@ -567,7 +601,46 @@ function handleDecodedPacket(
       });
       break;
     }
+    case Protobuf.Portnums.PortNum.NODE_STATUS_APP: {
+      sink.events.onNodeStatusPacket.dispatch({
+        ...packetMetadata,
+        data: fromBinary(Protobuf.Mesh.StatusMessageSchema, dataPacket.payload),
+      });
+      break;
+    }
+    case Protobuf.Portnums.PortNum.MESH_BEACON_APP: {
+      sink.events.onMeshBeaconPacket.dispatch({
+        ...packetMetadata,
+        data: fromBinary(
+          Protobuf.MeshBeacon.MeshBeaconSchema,
+          dataPacket.payload,
+        ),
+      });
+      break;
+    }
+    case Protobuf.Portnums.PortNum.KEY_VERIFICATION_APP: {
+      sink.events.onKeyVerificationPacket.dispatch({
+        ...packetMetadata,
+        data: fromBinary(
+          Protobuf.Mesh.KeyVerificationSchema,
+          dataPacket.payload,
+        ),
+      });
+      break;
+    }
+    case Protobuf.Portnums.PortNum.ALERT_APP: {
+      sink.events.onAlertPacket.dispatch({
+        ...packetMetadata,
+        data: new TextDecoder().decode(dataPacket.payload),
+      });
+      break;
+    }
     default:
-      throw new Error(`Unhandled case ${dataPacket.portnum}`);
+      // Newer firmware adds portnums faster than clients learn them; hand
+      // the raw payload on rather than dropping the packet.
+      sink.events.onUnhandledPacket.dispatch({
+        ...packetMetadata,
+        data: { portnum: dataPacket.portnum, payload: dataPacket.payload },
+      });
   }
 }
