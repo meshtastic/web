@@ -3,6 +3,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { useDeviceStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useConnections } from "@app/pages/Connections/useConnections";
+import { useLockdown } from "@core/hooks/useLockdown.ts";
 import { useConnectionProgress } from "@meshtastic/sdk-react";
 import { Bluetooth, Cable, CheckCircle2, Globe, Loader2 } from "lucide-react";
 import type { ComponentType, ReactElement } from "react";
@@ -38,6 +39,8 @@ export const ConnectingOverlay = (): ReactElement | null => {
   const progress = useConnectionProgress();
   const { disconnect } = useConnections();
   const { t } = useTranslation("connections");
+  // A locked radio waits for its passphrase; LockdownGate asks for it.
+  const { isLocked } = useLockdown();
 
   const active = savedConnections.find(
     (c) => c.status === "connecting" || c.status === "configuring",
@@ -58,7 +61,7 @@ export const ConnectingOverlay = (): ReactElement | null => {
     return () => clearTimeout(t);
   }, [active?.id]);
 
-  if (!active) return null;
+  if (!active || isLocked) return null;
 
   const Icon = TRANSPORT_ICON[active.type];
   const counters =

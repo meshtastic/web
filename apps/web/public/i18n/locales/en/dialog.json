@@ -394,5 +394,62 @@
       "verify": "Verify",
       "reject": "Don't Verify"
     }
+  },
+  "lockdown": {
+    "title": "Radio locked",
+    "description": "This radio is in lockdown. Enter its passphrase to unlock it. Its channels and nodes stay hidden until you do.",
+    "provision": {
+      "title": "Set a lockdown passphrase",
+      "description": "This radio needs a lockdown passphrase before you can use it. The passphrase you set here encrypts its stored settings, and you will enter it to unlock the radio from now on.",
+      "warning": "A lost passphrase can't be recovered. Lockdown also permanently locks the radio's debug port, even if you disable lockdown later.",
+      "submit": "Set passphrase and unlock"
+    },
+    "failed": {
+      "title": "Unlock failed",
+      "description": "The radio rejected the passphrase.",
+      "backoff": "Too many attempts. You can try again in {{seconds}}s."
+    },
+    "reason": {
+      "label": "Reason: {{reason}}",
+      "needs_auth": "This connection needs the passphrase",
+      "token_missing": "No unlock is stored on the radio",
+      "token_expired": "The previous unlock has expired",
+      "token_boots_zero": "The previous unlock ran out of reboots",
+      "token_hmac_fail": "The stored unlock is invalid",
+      "token_dek_fail": "The stored unlock is invalid",
+      "token_wrong_size": "The stored unlock is damaged",
+      "token_bad_magic": "The stored unlock is damaged",
+      "not_provisioned": "No passphrase has been set yet"
+    },
+    "passphrase": {
+      "label": "Passphrase",
+      "confirmLabel": "Confirm passphrase",
+      "length": "Use 1 to 32 bytes.",
+      "mismatch": "The passphrases don't match."
+    },
+    "advanced": {
+      "label": "Advanced",
+      "boots": {
+        "label": "Reboots before it locks again",
+        "description": "The radio stays unlocked for this many reboots."
+      },
+      "validFor": {
+        "label": "Expires after (hours)",
+        "description": "0 means no time limit."
+      },
+      "maxSession": {
+        "label": "Session limit (seconds)",
+        "description": "Longest a session can last after each boot. 0 means unlimited."
+      }
+    },
+    "unlock": "Unlock",
+    "waiting": "Waiting for the radio…",
+    "disconnect": "Disconnect",
+    "disable": {
+      "title": "Disable lockdown?",
+      "description": "The radio decrypts its stored settings, removes the passphrase and reboots out of lockdown. This can't be undone: to use lockdown again you have to set it up from scratch. The radio's debug port stays locked.",
+      "confirmUnderstanding": "I understand that this can't be undone",
+      "submit": "Disable lockdown"
+    }
   }
 }

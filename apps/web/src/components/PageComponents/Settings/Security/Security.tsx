@@ -12,6 +12,7 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
+import { LockdownSection } from "./LockdownSection.tsx";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -296,6 +297,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
           },
         ]}
       />
+      <LockdownSection />
       <PkiRegenerateDialog
         text={{
           button: t("button.regenerate"),

@@ -556,6 +556,24 @@
       "compatible": "Compatible - Accept Unsigned",
       "balanced": "Balanced - Prefer Authenticated",
       "strict": "Strict - Require Authentication"
+    },
+    "lockdown": {
+      "label": "Lockdown",
+      "description": "Encrypts the radio's stored settings and withholds them from clients until they unlock it with a passphrase.",
+      "status": "Status",
+      "state": {
+        "off": "Off",
+        "unlocked": "Unlocked",
+        "locked": "Locked",
+        "needsProvision": "Not set up",
+        "unlockFailed": "Unlock failed"
+      },
+      "bootsRemaining": "Reboots remaining: {{count}}",
+      "expires": "Expires: {{date}}",
+      "lockNow": "Lock now",
+      "lockNowDescription": "Reboots the radio into the locked state. You'll need the passphrase to use it again.",
+      "disable": "Disable lockdown",
+      "disableDescription": "Turns lockdown off for good. Requires the passphrase."
     }
   },
   "user": {
