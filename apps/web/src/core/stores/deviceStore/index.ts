@@ -349,6 +349,10 @@ function deviceFactory(
                 device.moduleConfig.tak = config.payloadVariant.value;
                 break;
               }
+              case "meshBeacon": {
+                device.moduleConfig.meshBeacon = config.payloadVariant.value;
+                break;
+              }
             }
           }
         }),

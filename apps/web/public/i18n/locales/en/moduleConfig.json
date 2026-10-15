@@ -14,7 +14,8 @@
     "tabTelemetry": "Telemetry",
     "tabRemoteHardware": "Remote Hardware",
     "tabStatusMessage": "Status Message",
-    "tabTak": "TAK"
+    "tabTak": "TAK",
+    "tabMeshBeacon": "Mesh Beacon"
   },
   "ambientLighting": {
     "title": "Ambient Lighting Settings",
@@ -568,6 +569,49 @@
     "role": {
       "label": "Role",
       "description": "Member role reported to ATAK"
+    }
+  },
+  "meshBeacon": {
+    "title": "Mesh Beacon Settings",
+    "description": "Hear and send invitations that let nearby radios join a channel",
+    "listenEnabled": {
+      "label": "Listen for Beacons",
+      "description": "Receive beacons from other nodes. Their text goes to your messages, and their channel offers appear on the Channels page"
+    },
+    "broadcastEnabled": {
+      "label": "Broadcast Beacons",
+      "description": "Periodically send a beacon from this node"
+    },
+    "broadcast": {
+      "label": "Broadcast",
+      "description": "What this node's beacon says and offers"
+    },
+    "broadcastMessage": {
+      "label": "Message",
+      "description": "Text sent with each beacon, up to 100 bytes"
+    },
+    "broadcastIntervalSecs": {
+      "label": "Interval",
+      "description": "How often to send a beacon. The minimum is one hour"
+    },
+    "legacySplit": {
+      "label": "Send Text Separately",
+      "description": "Send the message as a regular text message too, so radios on older firmware can read it"
+    },
+    "offerChannel": {
+      "label": "Offered Channel",
+      "description": "Channel whose name and key the beacon offers to listeners",
+      "none": "None",
+      "keep": "Current: {{name}}"
+    },
+    "broadcastOfferPreset": {
+      "label": "Offered Preset",
+      "description": "Modem preset the offered mesh uses",
+      "unset": "Not advertised"
+    },
+    "broadcastOfferRegion": {
+      "label": "Offered Region",
+      "description": "Region the offered mesh uses. UNSET leaves it out"
     }
   }
 }

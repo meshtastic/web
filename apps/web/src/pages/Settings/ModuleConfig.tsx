@@ -3,6 +3,7 @@ import { Audio } from "@components/PageComponents/ModuleConfig/Audio.tsx";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage.tsx";
 import { DetectionSensor } from "@components/PageComponents/ModuleConfig/DetectionSensor.tsx";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.tsx";
+import { MeshBeacon } from "@components/PageComponents/ModuleConfig/MeshBeacon.tsx";
 import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.tsx";
 import { NeighborInfo } from "@components/PageComponents/ModuleConfig/NeighborInfo.tsx";
 import { Paxcounter } from "@components/PageComponents/ModuleConfig/Paxcounter.tsx";
@@ -125,6 +126,11 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
         element: StatusMessage,
       },
       { case: "tak", label: t("page.tabTak"), element: Tak },
+      {
+        case: "meshBeacon",
+        label: t("page.tabMeshBeacon"),
+        element: MeshBeacon,
+      },
     ],
     [t],
   );
