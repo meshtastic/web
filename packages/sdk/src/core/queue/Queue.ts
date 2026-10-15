@@ -9,6 +9,8 @@ export class Queue {
   private ackNotifier = new SimpleEventDispatcher<number>();
   private errorNotifier = new SimpleEventDispatcher<PacketError>();
   private timeout: number;
+  /** Resolvers for items the device never acks; settled once written. */
+  private unackedResolvers = new Map<number, (id: number) => void>();
 
   constructor() {
     this.timeout = 60000;
@@ -20,14 +22,26 @@ export class Queue {
 
   public clear(): void {
     this.queue = [];
+    this.unackedResolvers.clear();
   }
 
-  public push(item: Omit<QueueItem, "promise" | "sent" | "added">): void {
+  /**
+   * Queues a ToRadio frame. With `expectAck: false` (heartbeat,
+   * want_config_id, packets sent without want_ack) the promise resolves as
+   * soon as the frame is written, because the device never acks it.
+   */
+  public push(
+    item: Omit<QueueItem, "promise" | "sent" | "added">,
+    { expectAck = true }: { expectAck?: boolean } = {},
+  ): Promise<number> {
     const queueItem: QueueItem = {
       ...item,
       sent: false,
       added: new Date(),
       promise: new Promise<number>((resolve, reject) => {
+        if (!expectAck) {
+          this.unackedResolvers.set(item.id, resolve);
+        }
         this.ackNotifier.subscribe((id) => {
           if (item.id === id) {
             this.remove(item.id);
@@ -66,6 +80,7 @@ export class Queue {
       }),
     };
     this.queue.push(queueItem);
+    return queueItem.promise;
   }
 
   public remove(id: number): void {
@@ -113,6 +128,12 @@ export class Queue {
           try {
             await writer.write(item.data);
             item.sent = true;
+            const resolveUnacked = this.unackedResolvers.get(item.id);
+            if (resolveUnacked) {
+              this.unackedResolvers.delete(item.id);
+              this.queue = this.queue.filter((qi) => qi.id !== item.id);
+              resolveUnacked(item.id);
+            }
           } catch (error) {
             const err = error as { code?: string };
             if (

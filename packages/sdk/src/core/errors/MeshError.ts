@@ -18,3 +18,10 @@ export class PacketTooLargeError extends MeshError {
     this.name = "PacketTooLargeError";
   }
 }
+
+export class HandshakeTimeoutError extends MeshError {
+  constructor(public readonly stage: "config" | "nodedb") {
+    super(`Device stopped responding during the ${stage} handshake stage`);
+    this.name = "HandshakeTimeoutError";
+  }
+}

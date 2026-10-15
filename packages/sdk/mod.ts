@@ -14,6 +14,7 @@ export type {
 // Constants & errors
 export { Constants } from "./src/core/constants/index.ts";
 export {
+  HandshakeTimeoutError,
   MeshError,
   PacketTooLargeError,
   TransportClosedError,

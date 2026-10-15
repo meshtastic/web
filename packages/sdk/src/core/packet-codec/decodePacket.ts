@@ -151,22 +151,21 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                 Emitter[Emitter.HandleFromRadio],
                 `⚙️ Received config complete id: ${decodedMessage.payloadVariant.value}`,
               );
+              // MeshClient matches the id against the handshake stage and
+              // marks the device configured after the final stage.
               sink.events.onConfigComplete.dispatch(
                 decodedMessage.payloadVariant.value,
               );
-              if (decodedMessage.payloadVariant.value === sink.configId) {
-                sink.log.info(
-                  Emitter[Emitter.HandleFromRadio],
-                  `⚙️ Config id matches client.configId: ${sink.configId}`,
-                );
-                sink.updateDeviceStatus(DeviceStatusEnum.DeviceConfigured);
-              }
               break;
             }
             case "rebooted": {
               sink.events.onRebooted.dispatch();
-              sink.configure().catch(() => {
-                // workaround for `wantConfigId` not getting acks
+              sink.configure().catch((e: unknown) => {
+                sink.log.warn(
+                  Emitter[Emitter.HandleFromRadio],
+                  "⚠️ Handshake after reboot failed",
+                  e,
+                );
               });
               break;
             }

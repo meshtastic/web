@@ -45,7 +45,7 @@ export const ConnectingOverlay = (): ReactElement | null => {
 
   // Stuck-detection: once an attempt has been visible for STUCK_THRESHOLD_MS,
   // surface a Cancel button so the user can bail out of the overlay even when
-  // `onConfigComplete` never arrives (firmware in CLI / bootloader, framing
+  // the handshake never completes (firmware in CLI / bootloader, framing
   // out of sync, etc.). Resets when a fresh attempt starts.
   const [showCancel, setShowCancel] = useState(false);
   useEffect(() => {
