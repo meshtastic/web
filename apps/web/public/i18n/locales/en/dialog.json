@@ -240,7 +240,7 @@
           "numTxRelayCanceled": "Relays canceled",
           "numTxDropped": "Packets dropped (queue full)",
           "heapFreeBytes": "Free heap",
-          "heapTotalBytes": "Heap used"
+          "heapTotalBytes": "Heap total"
         },
         "trafficManagementStats": {
           "packetsInspected": "Packets inspected",
