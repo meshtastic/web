@@ -15,6 +15,8 @@ interface Cell {
 export interface DataRow {
   id: string | number;
   isFavorite?: boolean;
+  /** Render the row faded, e.g. for a node not heard on the current LoRa settings. */
+  isDimmed?: boolean;
   cells: Cell[];
 }
 
@@ -137,6 +139,7 @@ export const Table = ({ headings, rows }: TableProps) => {
               row.isFavorite
                 ? "bg-yellow-100/30 dark:bg-slate-800 odd:bg-yellow-200/30 dark:odd:bg-slate-600/40"
                 : "bg-white dark:bg-slate-900 odd:bg-slate-200/40 dark:odd:bg-slate-800/40",
+              row.isDimmed && "opacity-60",
             )}
           >
             {row.cells.map((cell, cellIndex) => {

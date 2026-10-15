@@ -261,7 +261,9 @@
           "userString": "Info"
         }
       }
-    }
+    },
+    "statusMessage": "Status: ",
+    "signedTrue": "Signs its packets (XEdDSA)"
   },
   "pkiBackup": {
     "loseKeysWarning": "If you lose your keys, you will need to reset your device.",

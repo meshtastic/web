@@ -18,7 +18,6 @@
     "addReactionLabel": "Add Reaction",
     "replyLabel": "Reply"
   },
-
   "deliveryStatus": {
     "delivered": {
       "label": "Message delivered",
@@ -35,6 +34,22 @@
     "waiting": {
       "label": "Sending message",
       "displayText": "Waiting for delivery"
+    }
+  },
+  "signature": {
+    "signed": {
+      "label": "Signed message",
+      "tooltip": "Signed by the sender (XEdDSA) and verified by your radio."
+    }
+  },
+  "ackProof": {
+    "valid": {
+      "label": "Delivery proven",
+      "tooltip": "Delivery proven: the recipient's acknowledgement carried a valid proof of receipt."
+    },
+    "invalid": {
+      "label": "Forged acknowledgement",
+      "description": "The acknowledgement for this message failed its proof check. It may have been forged, so the message may not have been delivered."
     }
   }
 }

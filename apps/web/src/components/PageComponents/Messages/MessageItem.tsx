@@ -1,3 +1,4 @@
+import { IndicatorIcon } from "@components/generic/NodeTrustIndicators.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import {
   Tooltip,
@@ -13,9 +14,16 @@ import {
 import { useAppStore, useDevice } from "@core/stores";
 import { type Message, MessageState } from "@core/stores/messageStore";
 import { cn } from "@core/utils/cn.ts";
-import { type Protobuf, Types } from "@meshtastic/sdk";
+import { Protobuf, Types } from "@meshtastic/sdk";
 import type { LucideIcon } from "lucide-react";
-import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  CircleEllipsis,
+  ShieldAlertIcon,
+  ShieldCheckIcon,
+  SignatureIcon,
+} from "lucide-react";
 import { type ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -194,6 +202,10 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const isSender = myNodeNum !== undefined && message.from === myNodeNum;
   const isOnPrimaryChannel = message.channel === Types.ChannelNumber.Primary; // Use the enum
   const shouldShowStatusIcon = isSender && isOnPrimaryChannel;
+  const showSigned = !isSender && message.signed === true;
+  // ABSENT and NO_KEY carry no verdict, so they add nothing to the status.
+  const ackProof = isSender ? message.ackProof : undefined;
+  const AckProof = Protobuf.Mesh.MeshPacket_AckProofStatus;
 
   const messageItemWrapperClass = cn(
     "group w-full py-2 relative list-none",
@@ -240,7 +252,35 @@ export const MessageItem = ({ message }: MessageItemProps) => {
                 </span>
               </StatusTooltip>
             )}
+            {showSigned && (
+              <IndicatorIcon
+                icon={SignatureIcon}
+                size={16}
+                label={t("signature.signed.label")}
+                tooltip={t("signature.signed.tooltip")}
+                className="text-green-600 dark:text-green-500"
+              />
+            )}
+            {ackProof === AckProof.ACK_PROOF_VALID && (
+              <IndicatorIcon
+                icon={ShieldCheckIcon}
+                size={16}
+                label={t("ackProof.valid.label")}
+                tooltip={t("ackProof.valid.tooltip")}
+                className="text-green-600 dark:text-green-500"
+              />
+            )}
           </div>
+
+          {ackProof === AckProof.ACK_PROOF_INVALID && (
+            <div className="flex items-start gap-1 text-xs text-red-600 dark:text-red-400">
+              <ShieldAlertIcon className="size-4 shrink-0" aria-hidden="true" />
+              <p>
+                <strong>{t("ackProof.invalid.label")}:</strong>{" "}
+                {t("ackProof.invalid.description")}
+              </p>
+            </div>
+          )}
 
           {message?.message && (
             <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">

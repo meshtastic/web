@@ -7,6 +7,10 @@ import {
 } from "@components/generic/Filter/useFilterNode.ts";
 import { Mono } from "@components/generic/Mono.tsx";
 import {
+  isNodeUnheardOnCurrentLora,
+  NodeTrustIndicators,
+} from "@components/generic/NodeTrustIndicators.tsx";
+import {
   type DataRow,
   type Heading,
   Table,
@@ -164,6 +168,7 @@ const NodesPage = (): JSX.Element => {
     return {
       id: node.num,
       isFavorite: node.isFavorite,
+      isDimmed: isNodeUnheardOnCurrentLora(node),
       cells: [
         {
           content: (
@@ -177,17 +182,33 @@ const NodesPage = (): JSX.Element => {
         },
         {
           content: (
-            <h1
-              onMouseDown={() => handleNodeInfoDialog(node.num)}
-              onKeyUp={(evt) => {
-                if (evt.key === "Enter") {
-                  handleNodeInfoDialog(node.num);
-                }
-              }}
-              className="cursor-pointer underline ml-2 whitespace-break-spaces"
-            >
-              {longName}
-            </h1>
+            <div className="ml-2 flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <h1
+                  onMouseDown={() => handleNodeInfoDialog(node.num)}
+                  onKeyUp={(evt) => {
+                    if (evt.key === "Enter") {
+                      handleNodeInfoDialog(node.num);
+                    }
+                  }}
+                  className="cursor-pointer underline whitespace-break-spaces"
+                >
+                  {longName}
+                </h1>
+                <NodeTrustIndicators node={node} />
+              </div>
+              {node.status && (
+                <span
+                  className="max-w-xs truncate text-xs text-slate-500 dark:text-slate-400"
+                  title={node.status}
+                >
+                  <span className="sr-only">
+                    {t("trust.statusMessage.label")}:{" "}
+                  </span>
+                  {node.status}
+                </span>
+              )}
+            </div>
           ),
           sortValue: longName,
         },
