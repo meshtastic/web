@@ -1,3 +1,4 @@
+import { NodeTelemetry } from "@components/Dialog/NodeDetailsDialog/NodeTelemetry.tsx";
 import { DeviceImage } from "@components/generic/DeviceImage.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
@@ -473,6 +474,8 @@ export const NodeDetailsDialog = ({
                   </table>
                 </div>
               )}
+
+              <NodeTelemetry nodeNum={node.num} className={sectionClassName} />
             </div>
 
             <div className="text-slate-900 dark:text-slate-100 w-full max-w-[464px] bg-slate-100 dark:bg-slate-800 rounded-lg mt-3">
