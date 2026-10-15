@@ -13,7 +13,6 @@ import { StatusMessage } from "@components/PageComponents/ModuleConfig/StatusMes
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
 import { Tak } from "@components/PageComponents/ModuleConfig/Tak.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
-import { TrafficManagement } from "@components/PageComponents/ModuleConfig/TrafficManagement.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import {
   Tabs,
@@ -116,11 +115,6 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
         case: "remoteHardware",
         label: t("page.tabRemoteHardware"),
         element: RemoteHardware,
-      },
-      {
-        case: "trafficManagement",
-        label: t("page.tabTrafficManagement"),
-        element: TrafficManagement,
       },
       {
         case: "statusmessage",

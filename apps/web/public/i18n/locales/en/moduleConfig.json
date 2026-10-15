@@ -13,7 +13,6 @@
     "tabStoreAndForward": "S&F",
     "tabTelemetry": "Telemetry",
     "tabRemoteHardware": "Remote Hardware",
-    "tabTrafficManagement": "Traffic Management",
     "tabStatusMessage": "Status Message",
     "tabTak": "TAK"
   },
@@ -569,30 +568,6 @@
     "role": {
       "label": "Role",
       "description": "Member role reported to ATAK"
-    }
-  },
-  "trafficManagement": {
-    "title": "Traffic Management Settings",
-    "description": "Packet inspection and traffic shaping to reduce channel utilization",
-    "positionMinIntervalSecs": {
-      "label": "Position Min Interval",
-      "description": "Drop positions from the same node that arrive sooner than this. 0 disables"
-    },
-    "nodeinfoDirectResponseMaxHops": {
-      "label": "NodeInfo Response Max Hops",
-      "description": "Answer NodeInfo requests from the local cache for requesters within this many hops. 0 disables"
-    },
-    "rateLimitWindowSecs": {
-      "label": "Rate Limit Window",
-      "description": "Time window packets are counted over for rate limiting. 0 disables"
-    },
-    "rateLimitMaxPackets": {
-      "label": "Rate Limit Max Packets",
-      "description": "Maximum packets one node may send per window. 0 disables"
-    },
-    "unknownPacketThreshold": {
-      "label": "Unknown Packet Threshold",
-      "description": "Undecryptable packets per window before the sender is dropped. 0 disables"
     }
   }
 }
