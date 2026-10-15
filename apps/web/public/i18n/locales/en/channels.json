@@ -40,6 +40,10 @@
     "label": "Downlink Enabled",
     "description": "Send messages from MQTT to the local mesh"
   },
+  "useAead": {
+    "label": "Authenticated Encryption (Experimental)",
+    "description": "Encrypt with AES-CCM, which stops forged and tampered messages. Every node on this channel must turn this on: the channel then rejects standard AES-CTR packets, so nodes without it can no longer talk here."
+  },
   "positionPrecision": {
     "label": "Location",
     "description": "The precision of the location to share with the channel. Choose Position sharing off to share none.",
