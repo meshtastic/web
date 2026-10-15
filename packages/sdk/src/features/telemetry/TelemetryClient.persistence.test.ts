@@ -1,4 +1,4 @@
-import { create } from "@bufbuild/protobuf";
+import { create, isMessage } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import { describe, expect, it } from "vitest";
 import { MeshClient } from "../../core/client/MeshClient.ts";
@@ -65,7 +65,12 @@ describe("TelemetryClient persistence", () => {
     await flush();
 
     expect(sig.value).toHaveLength(1);
-    expect(sig.value[0]?.value.batteryLevel).toBe(60);
+    const reading = sig.value[0]?.value;
+    expect(isMessage(reading, Protobuf.Telemetry.DeviceMetricsSchema)).toBe(
+      true,
+    );
+    if (!isMessage(reading, Protobuf.Telemetry.DeviceMetricsSchema)) return;
+    expect(reading.batteryLevel).toBe(60);
   });
 
   it("retention prune trims the repository to maxPerNode", async () => {
