@@ -3,14 +3,30 @@ import { Link } from "@components/UI/Typography/Link.tsx";
 import { P } from "@components/UI/Typography/P.tsx";
 import newGithubIssueUrl from "@core/utils/github.ts";
 import { ExternalLink } from "lucide-react";
+import type { FallbackProps } from "react-error-boundary";
 import { Trans, useTranslation } from "react-i18next";
 
-export function ErrorPage({ error }: { error: Error }) {
+/** Reads a string `message` or `stack` off a thrown value, whatever its type. */
+function thrownString(
+  thrown: unknown,
+  key: "message" | "stack",
+): string | undefined {
+  if (typeof thrown !== "object" || thrown === null) {
+    return undefined;
+  }
+  const value: unknown = Reflect.get(thrown, key);
+  return typeof value === "string" ? value : undefined;
+}
+
+export function ErrorPage({ error }: Pick<FallbackProps, "error">) {
   const { t } = useTranslation();
 
   if (!error) {
     return null;
   }
+
+  const message = thrownString(error, "message");
+  const stack = thrownString(error, "stack");
 
   return (
     <article className="w-full h-screen overflow-y-auto bg-background-primary text-text-primary">
@@ -39,7 +55,7 @@ export function ErrorPage({ error }: { error: Error }) {
                     template: "bug.yml",
                     title:
                       "[Bug]: An unhandled error occurred. <Add details here>",
-                    logs: error?.stack,
+                    logs: stack,
                   })}
                 />,
               ]}
@@ -67,27 +83,27 @@ export function ErrorPage({ error }: { error: Error }) {
           {t("errorPage.detailsSummary")}
         </summary>
         <span className="text-sm mt-4">
-          {error?.message && (
+          {message && (
             <>
               <label htmlFor="message">
                 {t("errorPage.errorMessageLabel")}
               </label>
               <p className="text-slate-400 break-words overflow-wrap">
-                {error.message}
+                {message}
               </p>
             </> // TODO: Use Trans for the label and message together?
           )}
-          {error?.stack && (
+          {stack && (
             <>
               <label htmlFor="stack">{t("errorPage.stackTraceLabel")}</label>
               <p className="text-slate-400 break-words overflow-wrap">
-                {error.stack}
+                {stack}
               </p>
             </>
           )}
-          {!error?.message && !error?.stack && (
+          {!message && !stack && (
             <p className="text-slate-400">
-              {t("errorPage.fallbackError", { error: error.toString() })}
+              {t("errorPage.fallbackError", { error: String(error) })}
             </p>
           )}
         </span>
