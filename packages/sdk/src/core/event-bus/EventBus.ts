@@ -111,6 +111,10 @@ export class EventBus {
   public readonly onAtakForwarderPacket = new SimpleEventDispatcher<
     PacketMetadata<Uint8Array>
   >();
+  /** Every decoded admin message, before it is routed by variant. */
+  public readonly onAdminPacket = new SimpleEventDispatcher<
+    PacketMetadata<Protobuf.Admin.AdminMessage>
+  >();
   public readonly onNodeStatusPacket = new SimpleEventDispatcher<
     PacketMetadata<Protobuf.Mesh.StatusMessage>
   >();

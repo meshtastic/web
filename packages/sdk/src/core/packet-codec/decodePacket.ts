@@ -446,6 +446,10 @@ function handleDecodedPacket(
         Protobuf.Admin.AdminMessageSchema,
         dataPacket.payload,
       );
+      sink.events.onAdminPacket.dispatch({
+        ...packetMetadata,
+        data: adminMessage,
+      });
       switch (adminMessage.payloadVariant.case) {
         case "getChannelResponse": {
           sink.events.onChannelPacket.dispatch(

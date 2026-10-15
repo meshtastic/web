@@ -4,6 +4,8 @@ import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import { DeviceStatusEnum } from "../../core/transport/Transport.ts";
 import { reboot, rebootOta, shutdown } from "./application/RebootService.ts";
 import { getMetadata } from "./application/GetMetadataUseCase.ts";
+import { AdminSession } from "./infrastructure/AdminSession.ts";
+import { sendAdminMessage } from "./infrastructure/AdminMessageSender.ts";
 import { createDeviceStore, type DeviceStore } from "./state/deviceStore.ts";
 
 /**
@@ -13,6 +15,9 @@ import { createDeviceStore, type DeviceStore } from "./state/deviceStore.ts";
 export class DeviceClient {
   private readonly store: DeviceStore;
   private readonly client: MeshClient;
+
+  /** Admin session passkeys, per node. */
+  public readonly session: AdminSession;
 
   public readonly status: ReadonlySignal<DeviceStatusEnum>;
   public readonly isConfigured: ReadonlySignal<boolean>;
@@ -39,6 +44,7 @@ export class DeviceClient {
 
   constructor(client: MeshClient) {
     this.client = client;
+    this.session = new AdminSession(client.events);
     this.store = createDeviceStore();
     this.status = this.store.status.read;
     this.isConfigured = this.store.isConfigured.read;
@@ -53,12 +59,22 @@ export class DeviceClient {
       this.store.status.write.value = status;
       if (status === DeviceStatusEnum.DeviceConfigured) {
         this.store.isConfigured.write.value = true;
+        this.seedOwnSession();
       } else if (status === DeviceStatusEnum.DeviceConfiguring) {
         this.store.isConfigured.write.value = false;
+      } else if (status === DeviceStatusEnum.DeviceDisconnected) {
+        this.session.clear();
       }
     });
 
     client.events.onMyNodeInfo.subscribe((info) => {
+      // Firmware 2.8 can renumber the node; passkeys belong to the old one.
+      if (
+        this.store.myNodeNum.read.value !== undefined &&
+        this.store.myNodeNum.read.value !== info.myNodeNum
+      ) {
+        this.session.clear();
+      }
       this.store.myNodeInfo.write.value = info;
       this.store.myNodeNum.write.value = info.myNodeNum;
     });
@@ -77,6 +93,20 @@ export class DeviceClient {
 
     client.events.onPendingSettingsChange.subscribe((pending) => {
       this.store.pendingSettingsChanges.write.value = pending;
+    });
+  }
+
+  /**
+   * Ask the connected node for its owner once the handshake completes. The
+   * response carries the session passkey, as the Android app and the Kotlin
+   * SDK do it.
+   */
+  private seedOwnSession(): void {
+    sendAdminMessage(this.client, {
+      case: "getOwnerRequest",
+      value: true,
+    }).catch((e: unknown) => {
+      this.client.log.warn("⚠️ Unable to seed the admin session", e);
     });
   }
 
