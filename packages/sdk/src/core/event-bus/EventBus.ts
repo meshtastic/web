@@ -7,7 +7,8 @@ import type {
   UnhandledPayload,
 } from "../types.ts";
 
-type FromRadioValue<
+/** The value of one FromRadio payload variant. */
+export type FromRadioValue<
   C extends Protobuf.Mesh.FromRadio["payloadVariant"]["case"],
 > = Extract<Protobuf.Mesh.FromRadio["payloadVariant"], { case: C }>["value"];
 
@@ -135,9 +136,9 @@ export class EventBus {
     new SimpleEventDispatcher<Protobuf.Mesh.LockdownStatus>();
   public readonly onRegionPresets =
     new SimpleEventDispatcher<Protobuf.Mesh.LoRaRegionPresetMap>();
-  public readonly onDeviceUiConfig = new SimpleEventDispatcher<
+  public readonly onDeviceUiConfig: SimpleEventDispatcher<
     FromRadioValue<"deviceuiConfig">
-  >();
+  > = new SimpleEventDispatcher();
   public readonly onFileInfo =
     new SimpleEventDispatcher<Protobuf.Mesh.FileInfo>();
   public readonly onClientNotificationPacket =
