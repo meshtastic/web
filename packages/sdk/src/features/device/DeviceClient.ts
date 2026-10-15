@@ -1,4 +1,5 @@
-import type * as Protobuf from "@meshtastic/protobufs";
+import { create } from "@bufbuild/protobuf";
+import * as Protobuf from "@meshtastic/protobufs";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import { DeviceStatusEnum } from "../../core/transport/Transport.ts";
@@ -107,6 +108,29 @@ export class DeviceClient {
       value: true,
     }).catch((e: unknown) => {
       this.client.log.warn("⚠️ Unable to seed the admin session", e);
+    });
+  }
+
+  /**
+   * Drive the manual key-verification handshake through the local node.
+   * Start it with INITIATE_VERIFICATION and the remote node number; answer the
+   * node's prompts with remoteNodenum 0 and the nonce from the prompt, since
+   * the node correlates the exchange by nonce.
+   */
+  public sendKeyVerification(
+    messageType: Protobuf.Admin.KeyVerificationAdmin_MessageType,
+    remoteNodenum: number,
+    nonce: bigint,
+    securityNumber?: number,
+  ): Promise<number> {
+    return sendAdminMessage(this.client, {
+      case: "keyVerification",
+      value: create(Protobuf.Admin.KeyVerificationAdminSchema, {
+        messageType,
+        remoteNodenum,
+        nonce,
+        securityNumber,
+      }),
     });
   }
 
