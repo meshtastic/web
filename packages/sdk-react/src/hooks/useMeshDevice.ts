@@ -1,5 +1,4 @@
-import type * as Protobuf from "@meshtastic/protobufs";
-import type { DeviceStatusEnum } from "@meshtastic/sdk";
+import type { DeviceStatusEnum, Protobuf } from "@meshtastic/sdk";
 import { useClient } from "../adapters/useClient.ts";
 import { useSignal } from "../adapters/useSignal.ts";
 
