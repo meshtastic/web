@@ -431,7 +431,7 @@
       "label": "Advanced",
       "boots": {
         "label": "Reboots before it locks again",
-        "description": "The radio stays unlocked for this many reboots."
+        "description": "The radio stays unlocked for this many reboots. 0 uses the radio's default."
       },
       "validFor": {
         "label": "Expires after (hours)",
