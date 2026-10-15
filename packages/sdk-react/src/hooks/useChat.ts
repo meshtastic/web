@@ -5,14 +5,14 @@ import type {
   SendTextError,
   SendTextInput,
 } from "@meshtastic/sdk";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import { useCallback, useMemo } from "react";
 import { useClient } from "../adapters/useClient.ts";
 import { useSignal } from "../adapters/useSignal.ts";
 
 export interface UseChatResult {
   messages: Message[];
-  send(input: SendTextInput): Promise<ResultType<number, SendTextError>>;
+  send(input: SendTextInput): Promise<Result<number, SendTextError>>;
   loadOlder(before: Date, limit?: number): Promise<Message[]>;
 }
 

@@ -1,6 +1,6 @@
 import * as Protobuf from "@meshtastic/protobufs";
 import { signal } from "@preact/signals-core";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
 import { generatePacketId } from "../../core/identifiers/PacketId.ts";
@@ -201,7 +201,7 @@ export class ChatClient {
    */
   public async resend(
     message: Pick<Message, "id" | "text" | "to" | "channel" | "type">,
-  ): Promise<ResultType<number, SendTextError>> {
+  ): Promise<Result<number, SendTextError>> {
     this.store.remove(message.id);
     void this.repository.remove(message.id).catch(() => {});
     return this.send({
@@ -264,7 +264,7 @@ export class ChatClient {
 
   public async send(
     input: SendTextInput,
-  ): Promise<ResultType<number, SendTextError>> {
+  ): Promise<Result<number, SendTextError>> {
     const conv: ConversationKey =
       typeof input.destination === "number"
         ? { kind: "direct", peer: input.destination }

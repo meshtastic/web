@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import { describe, expect, it } from "vitest";
 import { MeshClient } from "../../core/client/MeshClient.ts";
 import { createFakeTransport } from "../../core/testing/createFakeTransport.ts";
@@ -8,7 +8,7 @@ import { ChannelNumber } from "../../core/types.ts";
 import type { SendTextError } from "./application/SendTextUseCase.ts";
 import { MessageState } from "./domain/MessageState.ts";
 
-type SendResult = ResultType<number, SendTextError>;
+type SendResult = Result<number, SendTextError>;
 
 /**
  * `client.chat.send` resolves only after the packet is ack'd via

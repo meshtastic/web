@@ -2,7 +2,6 @@ import { create } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import { signal } from "@preact/signals-core";
 import { Result } from "better-result";
-import type { ResultType } from "better-result";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
 import {
   type ReadonlySignal,
@@ -236,7 +235,7 @@ export class ConfigEditor {
    * pair. On success the baseline is replaced with the working copy
    * (optimistic update); inbound config packets after commit will reconcile.
    */
-  public async commit(): Promise<ResultType<void, Error>> {
+  public async commit(): Promise<Result<void, Error>> {
     if (!this._isDirty.peek()) return Result.ok(undefined);
 
     const beginResult = await beginEditSettings(this.client);

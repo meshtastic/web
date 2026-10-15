@@ -1,6 +1,5 @@
 import * as Protobuf from "@meshtastic/protobufs";
 import { Result } from "better-result";
-import type { ResultType } from "better-result";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
 import {
   ChannelNumber,
@@ -53,7 +52,7 @@ const MAX_TEXT_BYTES = 228;
 export async function sendText(
   client: MeshClient,
   input: SendTextInput,
-): Promise<ResultType<number, SendTextError>> {
+): Promise<Result<number, SendTextError>> {
   if (input.text.length === 0) {
     return Result.err(new EmptyMessageError());
   }
