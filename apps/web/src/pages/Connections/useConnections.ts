@@ -4,7 +4,14 @@ import {
   openTransport,
   probeConnection,
 } from "@app/core/connections/transports.ts";
-import { createLogger, DeviceStatusEnum } from "@meshtastic/sdk";
+import { toast } from "@core/hooks/useToast.ts";
+import {
+  createLogger,
+  DeviceStatusEnum,
+  FirmwareTooOldError,
+  MIN_FIRMWARE_VERSION,
+} from "@meshtastic/sdk";
+import { t } from "i18next";
 
 const log = createLogger("useConnections");
 import type {
@@ -167,6 +174,17 @@ export function useConnections() {
         log.info("connect transitioned to configured", { id, source });
         device.setConnectionPhase("configured");
         updateStatus(id, "configured");
+        const client = meshDevice.meshClient;
+        if (client.device.firmwareSupport.value === "shouldUpdate") {
+          toast({
+            title: t("toasts.firmwareOutdated", { ns: "connections" }),
+            description: t("toasts.firmwareOutdatedDescription", {
+              ns: "connections",
+              version: client.device.metadata.value?.firmwareVersion,
+              minimum: MIN_FIRMWARE_VERSION,
+            }),
+          });
+        }
       };
 
       const unsubStatusSignal = meshDevice.meshClient.device.status.subscribe(
@@ -214,7 +232,17 @@ export function useConnections() {
             name: e?.name,
             message: e?.message,
           });
-          updateStatus(id, "error", error?.message ?? String(error));
+          updateStatus(
+            id,
+            "error",
+            error instanceof FirmwareTooOldError
+              ? t("errors.firmwareTooOld", {
+                  ns: "connections",
+                  version: error.firmwareVersion,
+                  minimum: MIN_FIRMWARE_VERSION,
+                })
+              : (error?.message ?? String(error)),
+          );
         });
 
       updateSavedConnection(id, { meshDeviceId: deviceId });

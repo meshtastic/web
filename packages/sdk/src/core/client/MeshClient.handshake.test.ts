@@ -1,7 +1,10 @@
 import { create, fromBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { HandshakeTimeoutError } from "../errors/MeshError.ts";
+import {
+  FirmwareTooOldError,
+  HandshakeTimeoutError,
+} from "../errors/MeshError.ts";
 import { createFakeTransport } from "../testing/createFakeTransport.ts";
 import { DeviceStatusEnum } from "../transport/Transport.ts";
 import { MeshClient } from "./MeshClient.ts";
@@ -149,5 +152,37 @@ describe("MeshClient handshake", () => {
       CONFIG_NONCE,
     ]);
     expect(client.device.status.value).toBe(DeviceStatusEnum.DeviceConfiguring);
+  });
+
+  it("refuses firmware older than the absolute minimum", async () => {
+    const { client, respond, done } = await setup();
+    respond.withRaw(
+      create(Protobuf.Mesh.FromRadioSchema, {
+        payloadVariant: {
+          case: "metadata",
+          value: { firmwareVersion: "2.3.2.abc" },
+        },
+      }),
+    );
+    await vi.advanceTimersByTimeAsync(10);
+    await expect(done).rejects.toBeInstanceOf(FirmwareTooOldError);
+    expect(client.device.firmwareSupport.value).toBe("tooOld");
+  });
+
+  it("does not take a remote node's metadata as this device's", async () => {
+    const { client } = await setup();
+    client.events.onDeviceMetadataPacket.dispatch({
+      id: 1,
+      from: 0x99,
+      to: 0,
+      type: "direct",
+      channel: 0,
+      rxTime: new Date(),
+      data: create(Protobuf.Mesh.DeviceMetadataSchema, {
+        firmwareVersion: "2.3.2",
+      }),
+    });
+    expect(client.device.metadata.value).toBeUndefined();
+    expect(client.device.firmwareSupport.value).toBe("unknown");
   });
 });

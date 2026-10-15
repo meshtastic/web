@@ -14,6 +14,7 @@ export type {
 // Constants & errors
 export { Constants } from "./src/core/constants/index.ts";
 export {
+  FirmwareTooOldError,
   HandshakeTimeoutError,
   MeshError,
   PacketTooLargeError,
@@ -77,6 +78,13 @@ export * as Protobuf from "@meshtastic/protobufs";
 // Feature slice clients + domain types
 export { DeviceClient } from "./src/features/device/index.ts";
 export type { Device } from "./src/features/device/index.ts";
+export {
+  ABS_MIN_FIRMWARE_VERSION,
+  firmwareAtLeast,
+  firmwareSupport,
+  MIN_FIRMWARE_VERSION,
+} from "./src/features/device/domain/FirmwareVersion.ts";
+export type { FirmwareSupport } from "./src/features/device/domain/FirmwareVersion.ts";
 
 export { ChatClient } from "./src/features/chat/index.ts";
 export type {

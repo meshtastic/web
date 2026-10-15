@@ -4,9 +4,11 @@ import type { Logger } from "tslog";
 import { Constants } from "../constants/index.ts";
 import { EventBus } from "../event-bus/EventBus.ts";
 import {
+  FirmwareTooOldError,
   HandshakeTimeoutError,
   PacketTooLargeError,
 } from "../errors/MeshError.ts";
+import { firmwareSupport } from "../../features/device/domain/FirmwareVersion.ts";
 import { generatePacketId } from "../identifiers/PacketId.ts";
 import { createLogger } from "../logging/logger.ts";
 import { decodePacket } from "../packet-codec/decodePacket.ts";
@@ -307,6 +309,19 @@ export class MeshClient {
       if (this.handshakeStage !== "config" || this.handshakeTimeSent) return;
       this.handshakeTimeSent = true;
       this.sendSetTimeOnly(info.myNodeNum);
+    });
+
+    // Refuse firmware older than the Android app's absolute minimum.
+    this.events.onDeviceMetadataPacket.subscribe((packet) => {
+      if (this.handshakeStage !== "config" || packet.from !== 0) return;
+      const version = packet.data.firmwareVersion;
+      if (firmwareSupport(version) !== "tooOld") return;
+      this.log.error(
+        Emitter[Emitter.Configure],
+        `Firmware ${version} is too old for this client`,
+      );
+      this.failHandshake(new FirmwareTooOldError(version));
+      this.disconnect().catch(() => {});
     });
 
     this.events.onConfigComplete.subscribe((nonce) => {

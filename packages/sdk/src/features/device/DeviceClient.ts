@@ -5,6 +5,10 @@ import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import { DeviceStatusEnum } from "../../core/transport/Transport.ts";
 import { reboot, rebootOta, shutdown } from "./application/RebootService.ts";
 import { getMetadata } from "./application/GetMetadataUseCase.ts";
+import {
+  type FirmwareSupport,
+  firmwareSupport,
+} from "./domain/FirmwareVersion.ts";
 import { AdminSession } from "./infrastructure/AdminSession.ts";
 import { sendAdminMessage } from "./infrastructure/AdminMessageSender.ts";
 import { createDeviceStore, type DeviceStore } from "./state/deviceStore.ts";
@@ -38,6 +42,8 @@ export class DeviceClient {
   public readonly lockdownStatus: ReadonlySignal<
     Protobuf.Mesh.LockdownStatus | undefined
   >;
+  /** How well this client supports the connected node's firmware. */
+  public readonly firmwareSupport: ReadonlySignal<FirmwareSupport>;
   /** Per-region allowed presets and defaults (firmware 2.8+). */
   public readonly regionPresets: ReadonlySignal<
     Protobuf.Mesh.LoRaRegionPresetMap | undefined
@@ -55,6 +61,7 @@ export class DeviceClient {
     this.myNodeInfo = this.store.myNodeInfo.read;
     this.lockdownStatus = this.store.lockdownStatus.read;
     this.regionPresets = this.store.regionPresets.read;
+    this.firmwareSupport = this.store.firmwareSupport.read;
 
     client.events.onDeviceStatus.subscribe((status) => {
       this.store.status.write.value = status;
@@ -81,7 +88,13 @@ export class DeviceClient {
     });
 
     client.events.onDeviceMetadataPacket.subscribe((pkt) => {
+      // Remote nodes answer getMetadata through the same event; only the
+      // handshake's metadata (from 0) or our own node's describes this device.
+      if (pkt.from !== 0 && pkt.from !== client.myNodeNum) return;
       this.store.metadata.write.value = pkt.data;
+      this.store.firmwareSupport.write.value = firmwareSupport(
+        pkt.data.firmwareVersion,
+      );
     });
 
     client.events.onLockdownStatus.subscribe((status) => {

@@ -246,16 +246,6 @@ export const decodePacket = (
               break;
             }
             case "metadata": {
-              if (
-                Number.parseFloat(
-                  decodedMessage.payloadVariant.value.firmwareVersion,
-                ) < Constants.minFwVer
-              ) {
-                sink.log.fatal(
-                  Emitter[Emitter.HandleFromRadio],
-                  `Device firmware outdated. Min supported: ${Constants.minFwVer} got: ${decodedMessage.payloadVariant.value.firmwareVersion}`,
-                );
-              }
               sink.log.debug(
                 Emitter[Emitter.GetMetadata],
                 "🏷️ Received metadata packet",
