@@ -1,3 +1,8 @@
+import {
+  isPresetAllowed,
+  isRegionAllowed,
+  type LoRaCapabilities,
+} from "@core/utils/loraPresets.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { z } from "zod/v4";
 
@@ -33,3 +38,32 @@ export const LoRaValidationSchema = z.object({
 });
 
 export type LoRaValidation = z.infer<typeof LoRaValidationSchema>;
+
+/**
+ * LoRaValidationSchema plus the device's own limits: the presets legal in the
+ * selected region (firmware 2.8 region_presets) and the presets and regions
+ * older firmware does not know.
+ */
+export function makeLoRaValidationSchema(caps: LoRaCapabilities) {
+  return LoRaValidationSchema.superRefine((data, ctx) => {
+    if (!isRegionAllowed(caps, data.region)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["region"],
+        message: "formValidation.regionNeedsFirmware28",
+      });
+    }
+    if (
+      data.usePreset &&
+      !isPresetAllowed(caps, data.region, data.modemPreset)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["modemPreset"],
+        message: caps.regionPresets
+          ? "formValidation.presetNotAllowedInRegion"
+          : "formValidation.presetNeedsFirmware28",
+      });
+    }
+  });
+}

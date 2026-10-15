@@ -192,6 +192,8 @@
     },
     "modemPreset": {
       "description": "Available modem presets, default is Long Fast.",
+      "descriptionForRegion": "Presets allowed in the selected region. The region's default is marked.",
+      "defaultSuffix": "(default)",
       "label": "Presets"
     },
     "okToMqtt": {
@@ -208,6 +210,7 @@
     },
     "region": {
       "description": "The region where you will be using your radios.",
+      "licensedOnlySuffix": "(licensed operators only)",
       "label": "Region"
     },
     "spreadingFactor": {

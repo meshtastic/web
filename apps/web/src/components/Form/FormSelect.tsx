@@ -23,6 +23,8 @@ export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
       [s: string]: string | number;
     };
     formatEnumName?: boolean;
+    /** Text appended to an option's label, keyed by option value. */
+    optionSuffixes?: Record<number, string>;
   };
 }
 
@@ -52,6 +54,7 @@ export function SelectInput<T extends FieldValues>({
   const {
     enumValue,
     formatEnumName,
+    optionSuffixes,
     defaultValue,
     className,
     ...remainingProperties
@@ -114,6 +117,7 @@ export function SelectInput<T extends FieldValues>({
         {optionsEnumValues.map(([name, val]) => (
           <SelectItem key={name} value={val.toString()}>
             {formatEnumName ? formatEnumDisplay(name) : name}
+            {optionSuffixes?.[val] ? ` ${optionSuffixes[val]}` : null}
           </SelectItem>
         ))}
       </SelectContent>
