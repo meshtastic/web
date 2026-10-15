@@ -10,7 +10,7 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores";
-import { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/sdk";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

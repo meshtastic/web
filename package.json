@@ -36,7 +36,6 @@
     "tslog": "^5.1.0"
   },
   "devDependencies": {
-    "@meshtastic/core": "jsr:^2.6.6",
     "@meshtastic/sdk": "workspace:*",
     "@playwright/test": "^1.62.0",
     "@types/node": "^26.1.2",
