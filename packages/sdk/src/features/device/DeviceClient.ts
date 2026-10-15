@@ -1,10 +1,21 @@
 import { create } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
-import type { ReadonlySignal } from "../../core/signals/createStore.ts";
+import {
+  type ReadonlySignal,
+  toReadonly,
+} from "../../core/signals/createStore.ts";
 import { DeviceStatusEnum } from "../../core/transport/Transport.ts";
 import { reboot, rebootOta, shutdown } from "./application/RebootService.ts";
+import { computed } from "@preact/signals-core";
 import { getMetadata } from "./application/GetMetadataUseCase.ts";
+import {
+  disableLockdown,
+  isLockedState,
+  lockNow,
+  unlock,
+  type UnlockOptions,
+} from "./application/LockdownService.ts";
 import {
   type FirmwareSupport,
   firmwareSupport,
@@ -20,6 +31,7 @@ import { createDeviceStore, type DeviceStore } from "./state/deviceStore.ts";
 export class DeviceClient {
   private readonly store: DeviceStore;
   private readonly client: MeshClient;
+  private unlockPending = false;
 
   /** Admin session passkeys, per node. */
   public readonly session: AdminSession;
@@ -42,6 +54,11 @@ export class DeviceClient {
   public readonly lockdownStatus: ReadonlySignal<
     Protobuf.Mesh.LockdownStatus | undefined
   >;
+  /**
+   * True while a lockdown build withholds its channels and NodeDB until the
+   * client unlocks it with {@link unlock}.
+   */
+  public readonly isLocked: ReadonlySignal<boolean>;
   /** How well this client supports the connected node's firmware. */
   public readonly firmwareSupport: ReadonlySignal<FirmwareSupport>;
   /** Per-region allowed presets and defaults (firmware 2.8+). */
@@ -62,6 +79,9 @@ export class DeviceClient {
     this.lockdownStatus = this.store.lockdownStatus.read;
     this.regionPresets = this.store.regionPresets.read;
     this.firmwareSupport = this.store.firmwareSupport.read;
+    this.isLocked = toReadonly(
+      computed(() => isLockedState(this.store.lockdownStatus.write.value)),
+    );
 
     client.events.onDeviceStatus.subscribe((status) => {
       this.store.status.write.value = status;
@@ -72,6 +92,8 @@ export class DeviceClient {
         this.store.isConfigured.write.value = false;
       } else if (status === DeviceStatusEnum.DeviceDisconnected) {
         this.session.clear();
+        this.unlockPending = false;
+        this.store.lockdownStatus.write.value = undefined;
       }
     });
 
@@ -98,7 +120,22 @@ export class DeviceClient {
     });
 
     client.events.onLockdownStatus.subscribe((status) => {
+      const wasLocked = isLockedState(this.store.lockdownStatus.write.peek());
       this.store.lockdownStatus.write.value = status;
+      // After an unlock the device only releases its config to a new
+      // handshake on the same link. Re-run it only when this session saw the
+      // device locked or sent a passphrase, so a repeated UNLOCKED can't loop.
+      if (
+        status.state === Protobuf.Mesh.LockdownStatus_State.UNLOCKED &&
+        (wasLocked || this.unlockPending)
+      ) {
+        this.unlockPending = false;
+        this.client.configure().catch((e: unknown) => {
+          this.client.log.warn("⚠️ Handshake after unlock failed", e);
+        });
+      } else if (isLockedState(status)) {
+        this.unlockPending = false;
+      }
     });
 
     client.events.onRegionPresets.subscribe((presets) => {
@@ -116,6 +153,9 @@ export class DeviceClient {
    * SDK do it.
    */
   private seedOwnSession(): void {
+    // A locked device answers nothing useful until it is unlocked; the
+    // handshake that follows the unlock seeds the session instead.
+    if (isLockedState(this.store.lockdownStatus.write.peek())) return;
     sendAdminMessage(this.client, {
       case: "getOwnerRequest",
       value: true,
@@ -145,6 +185,22 @@ export class DeviceClient {
         securityNumber,
       }),
     });
+  }
+
+  /** Send the lockdown passphrase. The result arrives on lockdownStatus. */
+  public unlock(options: UnlockOptions): Promise<number> {
+    this.unlockPending = true;
+    return unlock(this.client, options);
+  }
+
+  /** Lock the device again now. */
+  public lockNow(): Promise<number> {
+    return lockNow(this.client);
+  }
+
+  /** Turn lockdown off for good. See {@link disableLockdown}. */
+  public disableLockdown(passphrase: string): Promise<number> {
+    return disableLockdown(this.client, passphrase);
   }
 
   public reboot(seconds = 0): Promise<number> {

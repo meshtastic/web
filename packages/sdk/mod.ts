@@ -85,6 +85,7 @@ export {
   MIN_FIRMWARE_VERSION,
 } from "./src/features/device/domain/FirmwareVersion.ts";
 export type { FirmwareSupport } from "./src/features/device/domain/FirmwareVersion.ts";
+export type { UnlockOptions } from "./src/features/device/application/LockdownService.ts";
 
 export { ChatClient } from "./src/features/chat/index.ts";
 export type {
