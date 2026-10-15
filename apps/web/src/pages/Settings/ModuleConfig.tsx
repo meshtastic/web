@@ -20,7 +20,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import type { ValidModuleConfigType } from "@core/stores";
+import { isModuleExcluded } from "@core/utils/excludedModules.ts";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
@@ -49,7 +51,8 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
     editor?.dirtyModuleSections ?? EMPTY_DIRTY_MODULE_SIGNAL,
   );
   const { t } = useTranslation("moduleConfig");
-  const tabs: TabItem[] = useMemo(
+  const { excludedModules } = useDeviceCapabilities();
+  const allTabs: TabItem[] = useMemo(
     () => [
       {
         case: "mqtt",
@@ -125,6 +128,11 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
     ],
     [t],
   );
+  // Hide the modules this firmware build was compiled without.
+  const tabs = useMemo(
+    () => allTabs.filter((tab) => !isModuleExcluded(excludedModules, tab.case)),
+    [allTabs, excludedModules],
+  );
 
   const flags = useMemo(
     () =>
@@ -133,7 +141,9 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   );
 
   return (
-    <Tabs defaultValue={t("page.tabMqtt")}>
+    // Keyed on the first tab so the default moves on when metadata arriving
+    // later hides it.
+    <Tabs key={tabs[0]?.label} defaultValue={tabs[0]?.label}>
       <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-800">
         {tabs.map((tab) => (
           <TabsTrigger
