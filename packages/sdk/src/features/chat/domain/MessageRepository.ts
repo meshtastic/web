@@ -1,6 +1,5 @@
-import type * as Protobuf from "@meshtastic/protobufs";
 import type { ChannelNumber } from "../../../core/types.ts";
-import type { Message } from "./Message.ts";
+import type { Message, MessageDeliveryPatch } from "./Message.ts";
 import type { MessageState } from "./MessageState.ts";
 
 /**
@@ -35,10 +34,9 @@ export interface MessageRepository {
   append(message: Message): Promise<void>;
   appendBatch(messages: ReadonlyArray<Message>): Promise<void>;
   updateState(id: number, state: MessageState): Promise<void>;
-  updateAckProof(
-    id: number,
-    ackProof: Protobuf.Mesh.MeshPacket_AckProofStatus,
-  ): Promise<void>;
+  updateDelivery(id: number, patch: MessageDeliveryPatch): Promise<void>;
+  /** Deletes one message, e.g. a failed one the user resends. */
+  remove(id: number): Promise<void>;
   prune(policy: RetentionPolicy): Promise<void>;
   /** Deletes every message in a single conversation. */
   clearConversation(key: ConversationKey): Promise<void>;

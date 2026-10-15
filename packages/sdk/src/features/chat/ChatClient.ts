@@ -10,7 +10,7 @@ import {
 } from "../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../core/types.ts";
 import type { DraftRepository } from "./domain/DraftRepository.ts";
-import type { Message } from "./domain/Message.ts";
+import type { Message, MessageDeliveryPatch } from "./domain/Message.ts";
 import type {
   ConversationKey,
   MessageRepository,
@@ -135,38 +135,80 @@ export class ChatClient {
       if (packet.data.variant.case !== "errorReason") return;
       // A routing ack names the message it acks in Data.request_id; its own
       // id is unrelated.
-      const id = packet.requestId ?? packet.id;
-      const state =
-        packet.data.variant.value === Protobuf.Mesh.Routing_Error.NONE
-          ? MessageState.Ack
-          : MessageState.Failed;
-      this.store.updateState(id, state);
-      void this.repository.updateState(id, state).catch(() => {});
-      this.recordAckProof(id, packet.ackProofStatus);
+      this.applyAck(
+        packet.requestId ?? packet.id,
+        packet.from,
+        packet.data.variant.value,
+        packet.ackProofStatus,
+      );
     });
   }
 
   /**
-   * Keep the strongest proof-of-delivery verdict, as the Android app does:
-   * a later ack without proof never clears an earlier verdict, and a VALID
-   * proof is still recorded after a forged ack settled the message.
+   * Fold one ack or NAK into the message it answers, as the Android app's
+   * handleAckNak does. An ack from the addressed node means the recipient got
+   * it (Ack); an ack from anyone else (a relay, or the radio hearing its own
+   * rebroadcast) means it reached the mesh (Delivered). A NAK fails it. Once
+   * the recipient has acked, later acks and NAKs no longer change the state.
+   *
+   * Ack proofs keep the strongest verdict: a later ack without proof never
+   * clears one, and a VALID proof is still recorded after a forged ack
+   * settled the message.
    */
-  private recordAckProof(
+  private applyAck(
     id: number,
-    status: Protobuf.Mesh.MeshPacket_AckProofStatus | undefined,
+    from: number,
+    error: Protobuf.Mesh.Routing_Error,
+    proof: Protobuf.Mesh.MeshPacket_AckProofStatus | undefined,
   ): void {
-    const Status = Protobuf.Mesh.MeshPacket_AckProofStatus;
-    if (status === undefined || status === Status.ACK_PROOF_ABSENT) return;
-    const current = this.store.getMessage(id)?.ackProof;
-    if (current === Status.ACK_PROOF_VALID) return;
-    if (
-      current === Status.ACK_PROOF_INVALID &&
-      status !== Status.ACK_PROOF_VALID
-    ) {
-      return;
+    const message = this.store.getMessage(id);
+    const patch: MessageDeliveryPatch = {};
+
+    if (message?.state !== MessageState.Ack) {
+      const isAck = error === Protobuf.Mesh.Routing_Error.NONE;
+      if (isAck) {
+        patch.state =
+          message && from === message.to
+            ? MessageState.Ack
+            : MessageState.Delivered;
+        patch.relays = (message?.relays ?? 0) + 1;
+        patch.routingError = undefined;
+      } else {
+        patch.state = MessageState.Failed;
+        patch.routingError = error;
+      }
     }
-    this.store.updateAckProof(id, status);
-    void this.repository.updateAckProof(id, status).catch(() => {});
+
+    const Proof = Protobuf.Mesh.MeshPacket_AckProofStatus;
+    const current = message?.ackProof;
+    if (
+      proof !== undefined &&
+      proof !== Proof.ACK_PROOF_ABSENT &&
+      current !== Proof.ACK_PROOF_VALID &&
+      (current !== Proof.ACK_PROOF_INVALID || proof === Proof.ACK_PROOF_VALID)
+    ) {
+      patch.ackProof = proof;
+    }
+
+    if (Object.keys(patch).length === 0) return;
+    this.store.updateDelivery(id, patch);
+    void this.repository.updateDelivery(id, patch).catch(() => {});
+  }
+
+  /**
+   * Send a failed (or unconfirmed) message again. The old message is removed
+   * and a new one, with a fresh packet id, takes its place.
+   */
+  public async resend(
+    message: Pick<Message, "id" | "text" | "to" | "channel" | "type">,
+  ): Promise<ResultType<number, SendTextError>> {
+    this.store.remove(message.id);
+    void this.repository.remove(message.id).catch(() => {});
+    return this.send({
+      text: message.text,
+      destination: message.type === "direct" ? message.to : "broadcast",
+      channel: message.channel,
+    });
   }
 
   public messages(channel: ChannelNumber): ReadonlySignal<Message[]> {
@@ -266,10 +308,17 @@ export class ChatClient {
       // Send pipeline failed (transport closed, validation, etc.). Keep
       // the optimistic message visible but mark it Failed so the user
       // sees the error state next to their bubble.
-      this.store.updateState(packetId, MessageState.Failed);
-      void this.repository
-        .updateState(packetId, MessageState.Failed)
-        .catch(() => {});
+      // A NAK arrives as a PacketError from the queue; keep its reason. The
+      // routing handler has usually recorded it already.
+      const routingError = (result.error as { error?: unknown }).error;
+      const patch: MessageDeliveryPatch = {
+        state: MessageState.Failed,
+        ...(typeof routingError === "number" ? { routingError } : {}),
+      };
+      if (this.store.getMessage(packetId)?.state !== MessageState.Ack) {
+        this.store.updateDelivery(packetId, patch);
+        void this.repository.updateDelivery(packetId, patch).catch(() => {});
+      }
     }
     return result;
   }

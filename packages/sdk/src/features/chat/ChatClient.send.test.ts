@@ -142,7 +142,7 @@ describe("ChatClient.send optimistic append", () => {
     expect(messages.value[0]!.state).toBe(MessageState.Failed);
   });
 
-  it("flips outbound state to Ack on a routing-error=NONE packet matching the id", async () => {
+  it("marks a broadcast Delivered when the mesh acks it", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
     const messages = client.chat.messages(ChannelNumber.Primary);
@@ -160,7 +160,7 @@ describe("ChatClient.send optimistic append", () => {
       data: { variant: { case: "errorReason", value: 0 } },
     } as never);
 
-    expect(messages.value[0]!.state).toBe(MessageState.Ack);
+    expect(messages.value[0]!.state).toBe(MessageState.Delivered);
   });
 
   it("matches a routing ack to the message by request_id", async () => {
@@ -221,5 +221,67 @@ describe("ChatClient.send optimistic append", () => {
     expect(messages.value[0]!.ackProof).toBe(Proof.ACK_PROOF_VALID);
     ack(Proof.ACK_PROOF_INVALID);
     expect(messages.value[0]!.ackProof).toBe(Proof.ACK_PROOF_VALID);
+  });
+
+  describe("direct message delivery", () => {
+    async function sentDirect() {
+      const { transport } = createFakeTransport();
+      const client = new MeshClient({ transport });
+      const messages = client.chat.direct(42);
+      const result = await withAckFlush(client, () =>
+        client.chat.send({ text: "hi", destination: 42 }),
+      );
+      if (result.status !== "ok") throw new Error("send failed");
+      const route = (from: number, error: Protobuf.Mesh.Routing_Error) =>
+        client.events.onRoutingPacket.dispatch({
+          id: Math.floor(Math.random() * 1e6) + 1,
+          requestId: result.value,
+          from,
+          to: 0,
+          channel: 0,
+          type: "direct",
+          rxTime: new Date(),
+          data: create(Protobuf.Mesh.RoutingSchema, {
+            variant: { case: "errorReason", value: error },
+          }),
+        });
+      return { client, messages, route };
+    }
+    const E = Protobuf.Mesh.Routing_Error;
+
+    it("is Delivered when a relay acks and Ack when the recipient does", async () => {
+      const { messages, route } = await sentDirect();
+      route(7, E.NONE);
+      expect(messages.value[0]!.state).toBe(MessageState.Delivered);
+      expect(messages.value[0]!.relays).toBe(1);
+      route(42, E.NONE);
+      expect(messages.value[0]!.state).toBe(MessageState.Ack);
+      expect(messages.value[0]!.relays).toBe(2);
+    });
+
+    it("records why it failed, but never undoes the recipient's ack", async () => {
+      const { messages, route } = await sentDirect();
+      route(7, E.MAX_RETRANSMIT);
+      expect(messages.value[0]!.state).toBe(MessageState.Failed);
+      expect(messages.value[0]!.routingError).toBe(E.MAX_RETRANSMIT);
+      route(42, E.NONE);
+      expect(messages.value[0]!.state).toBe(MessageState.Ack);
+      expect(messages.value[0]!.routingError).toBeUndefined();
+      route(7, E.NO_ROUTE);
+      expect(messages.value[0]!.state).toBe(MessageState.Ack);
+    });
+
+    it("resends as a new message with a fresh id", async () => {
+      const { client, messages, route } = await sentDirect();
+      route(7, E.MAX_RETRANSMIT);
+      const failed = messages.value[0]!;
+      const result = await withAckFlush(client, () =>
+        client.chat.resend(failed),
+      );
+      expect(result.status).toBe("ok");
+      expect(messages.value).toHaveLength(1);
+      expect(messages.value[0]!.id).not.toBe(failed.id);
+      expect(messages.value[0]!.text).toBe("hi");
+    });
   });
 });

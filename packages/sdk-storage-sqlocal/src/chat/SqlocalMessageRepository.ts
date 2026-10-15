@@ -1,6 +1,7 @@
 import type {
   ConversationKey,
   Message,
+  MessageDeliveryPatch,
   MessageRepository,
   Protobuf,
   RetentionPolicy,
@@ -64,13 +65,22 @@ export class SqlocalMessageRepository implements MessageRepository {
     this.notify(input);
   }
 
-  async updateAckProof(
-    id: number,
-    ackProof: Protobuf.Mesh.MeshPacket_AckProofStatus,
-  ): Promise<void> {
+  async updateDelivery(id: number, patch: MessageDeliveryPatch): Promise<void> {
+    const set: Partial<MessageRow> = {};
+    if ("state" in patch) set.state = patch.state;
+    if ("ackProof" in patch) set.ackProof = patch.ackProof ?? null;
+    if ("routingError" in patch) set.routingError = patch.routingError ?? null;
+    if ("relays" in patch) set.relays = patch.relays ?? null;
+    if (Object.keys(set).length === 0) return;
     await this.db
       .update(messages)
-      .set({ ackProof })
+      .set(set)
+      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.db
+      .delete(messages)
       .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
   }
 
@@ -160,9 +170,11 @@ interface MessageRow {
   rxTime: number;
   type: "broadcast" | "direct";
   text: string;
-  state: "pending" | "ack" | "failed";
+  state: "pending" | "delivered" | "ack" | "failed";
   signed?: boolean | null;
   ackProof?: number | null;
+  routingError?: number | null;
+  relays?: number | null;
 }
 
 function rowToMessage(row: MessageRow): Message {
@@ -179,6 +191,9 @@ function rowToMessage(row: MessageRow): Message {
     ackProof:
       (row.ackProof as Protobuf.Mesh.MeshPacket_AckProofStatus | null) ??
       undefined,
+    routingError:
+      (row.routingError as Protobuf.Mesh.Routing_Error | null) ?? undefined,
+    relays: row.relays ?? undefined,
   };
 }
 
@@ -200,5 +215,7 @@ function messageToRow(deviceId: number, message: Message): MessageRow {
     state: message.state,
     signed: message.signed ?? null,
     ackProof: message.ackProof ?? null,
+    routingError: message.routingError ?? null,
+    relays: message.relays ?? null,
   };
 }

@@ -1,9 +1,8 @@
-import type * as Protobuf from "@meshtastic/protobufs";
 import { type Signal, signal } from "@preact/signals-core";
 import type { ReadonlySignal } from "../../../core/signals/createStore.ts";
 import { toReadonly } from "../../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../../core/types.ts";
-import type { Message } from "../domain/Message.ts";
+import type { Message, MessageDeliveryPatch } from "../domain/Message.ts";
 import { MessageState } from "../domain/MessageState.ts";
 
 /**
@@ -78,11 +77,17 @@ export class ChatStore {
     this.patch(id, { state });
   }
 
-  updateAckProof(
-    id: number,
-    ackProof: Protobuf.Mesh.MeshPacket_AckProofStatus,
-  ): void {
-    this.patch(id, { ackProof });
+  updateDelivery(id: number, patch: MessageDeliveryPatch): void {
+    this.patch(id, patch);
+  }
+
+  remove(id: number): void {
+    for (const [, bucket] of this.buckets) {
+      if (bucket.value.some((m) => m.id === id)) {
+        bucket.value = bucket.value.filter((m) => m.id !== id);
+        return;
+      }
+    }
   }
 
   getMessage(id: number): Message | undefined {
@@ -93,10 +98,7 @@ export class ChatStore {
     return undefined;
   }
 
-  private patch(
-    id: number,
-    patch: Partial<Pick<Message, "state" | "ackProof">>,
-  ): void {
+  private patch(id: number, patch: MessageDeliveryPatch): void {
     for (const [, bucket] of this.buckets) {
       const idx = bucket.value.findIndex((m) => m.id === id);
       if (idx !== -1) {

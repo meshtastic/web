@@ -21,4 +21,15 @@ export interface Message {
    * recipient provably got it; INVALID means the ack was forged.
    */
   readonly ackProof?: Protobuf.Mesh.MeshPacket_AckProofStatus;
+  /** Why a Failed message failed, from the NAK or the local queue. */
+  readonly routingError?: Protobuf.Mesh.Routing_Error;
+  /** How many acks (relays and the recipient) came back for it. */
+  readonly relays?: number;
 }
+
+/** Fields an ack or NAK can change on a stored message. */
+export type MessageDeliveryPatch = {
+  -readonly [
+    K in "state" | "ackProof" | "routingError" | "relays"
+  ]?: Message[K];
+};

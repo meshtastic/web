@@ -1,5 +1,4 @@
-import type * as Protobuf from "@meshtastic/protobufs";
-import type { Message } from "../../domain/Message.ts";
+import type { Message, MessageDeliveryPatch } from "../../domain/Message.ts";
 import type { MessageState } from "../../domain/MessageState.ts";
 import {
   type ConversationKey,
@@ -46,15 +45,22 @@ export class InMemoryMessageRepository implements MessageRepository {
     }
   }
 
-  async updateAckProof(
-    id: number,
-    ackProof: Protobuf.Mesh.MeshPacket_AckProofStatus,
-  ): Promise<void> {
+  async updateDelivery(id: number, patch: MessageDeliveryPatch): Promise<void> {
     for (const bucket of this.buckets.values()) {
       const idx = bucket.findIndex((m) => m.id === id);
       const existing = bucket[idx];
       if (existing) {
-        bucket[idx] = { ...existing, ackProof };
+        bucket[idx] = { ...existing, ...patch };
+        return;
+      }
+    }
+  }
+
+  async remove(id: number): Promise<void> {
+    for (const bucket of this.buckets.values()) {
+      const idx = bucket.findIndex((m) => m.id === id);
+      if (idx !== -1) {
+        bucket.splice(idx, 1);
         return;
       }
     }

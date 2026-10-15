@@ -95,6 +95,7 @@ export type {
   ConversationKey,
   DraftRepository,
   Message,
+  MessageDeliveryPatch,
   MessageRepository,
   RetentionPolicy,
   SendTextError,

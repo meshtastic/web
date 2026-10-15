@@ -6,7 +6,7 @@ export type {
 } from "./ChatClient.ts";
 export type { DraftRepository } from "./domain/DraftRepository.ts";
 export { InMemoryDraftRepository } from "./infrastructure/repositories/InMemoryDraftRepository.ts";
-export type { Message } from "./domain/Message.ts";
+export type { Message, MessageDeliveryPatch } from "./domain/Message.ts";
 export { MessageState } from "./domain/MessageState.ts";
 export type {
   ConversationKey,
