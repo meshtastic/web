@@ -52,11 +52,11 @@ export function useChatAsLegacyMessages(
   );
 }
 
-function toLegacy(
+export function toLegacy(
   message: SdkMessage,
   params: UseChatAsLegacyMessagesParams,
 ): LegacyMessage {
-  return {
+  const legacy = {
     type: params.type,
     channel: message.channel,
     to: message.to,
@@ -66,6 +66,13 @@ function toLegacy(
     state: mapState(message.state),
     message: message.text,
   } as LegacyMessage;
+  if (message.signed !== undefined) {
+    legacy.signed = message.signed;
+  }
+  if (message.ackProof !== undefined) {
+    legacy.ackProof = message.ackProof;
+  }
+  return legacy;
 }
 
 function mapState(state: SdkMessageState): LegacyMessageState {

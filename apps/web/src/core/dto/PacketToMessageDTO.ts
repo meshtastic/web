@@ -11,6 +11,7 @@ class PacketToMessageDTO {
   state: MessageState;
   message: string;
   type: MessageType;
+  signed?: boolean;
 
   constructor(data: Types.PacketMetadata<string>, nodeNum: number) {
     this.channel = data.channel;
@@ -20,6 +21,9 @@ class PacketToMessageDTO {
     this.state =
       data.from !== nodeNum ? MessageState.Ack : MessageState.Waiting;
     this.message = data.data;
+    if (data.xeddsaSigned !== undefined) {
+      this.signed = data.xeddsaSigned;
+    }
     this.type =
       data.type === "direct" ? MessageType.Direct : MessageType.Broadcast;
 
@@ -48,6 +52,7 @@ class PacketToMessageDTO {
       state: this.state,
       message: this.message,
       type: this.type,
+      ...(this.signed !== undefined && { signed: this.signed }),
     };
   }
 }

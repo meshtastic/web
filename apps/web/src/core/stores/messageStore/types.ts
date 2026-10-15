@@ -1,5 +1,5 @@
 import type { MessageState, MessageType } from "@core/stores";
-import type { Types } from "@meshtastic/sdk";
+import type { Protobuf, Types } from "@meshtastic/sdk";
 
 type NodeNum = number;
 type MessageId = number;
@@ -15,6 +15,10 @@ interface MessageBase {
   messageId: number;
   state: MessageState;
   message: string;
+  /** Received with an XEdDSA signature the device verified. */
+  signed?: boolean;
+  /** Proof-of-delivery verdict from the ack of an outbound message. */
+  ackProof?: Protobuf.Mesh.MeshPacket_AckProofStatus;
 }
 
 interface GenericMessage<T extends MessageType> extends MessageBase {
