@@ -12,6 +12,22 @@
 *NodeInfoLite.hops_away int_size:8
 *NodeInfoLite.next_hop int_size:8
 
+# Flattened user fields. long_name was 40 on UserLite; trimmed to 25 here so the
+# slim header gives back ~15 B/node of RAM. Names that exceeded 24 chars on the
+# wire (max 40) get truncated on store, with sanitizeUtf8 cleaning up partial
+# multi-byte sequences at the boundary.
+*NodeInfoLite.long_name max_size:25
+*NodeInfoLite.short_name max_size:5
+*NodeInfoLite.public_key max_size:32
+# hw_model + role used to be 32-bit enums inside UserLite. We pin them to one
+# byte each on the slim header to claw back the alignment overhead.
+*NodeInfoLite.hw_model int_size:8
+*NodeInfoLite.role int_size:8
+
+# UserLite survives only as the v24 nodedb migration decode type; it must keep
+# the legacy on-disk width (40) or saves holding longer names fail to decode
+# and the whole DB is discarded. The migration copy truncates into the slim
+# header fields above.
 *UserLite.long_name max_size:40
 *UserLite.short_name max_size:5
 *UserLite.public_key max_size:32 # public key

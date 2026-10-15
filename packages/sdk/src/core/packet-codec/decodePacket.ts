@@ -295,7 +295,8 @@ function handleDecodedPacket(
 ) {
   const packetMetadata: Omit<PacketMetadata<unknown>, "data"> = {
     id: meshPacket.id,
-    rxTime: new Date(meshPacket.rxTime * 1000),
+    // rx_time is optional since protobufs 2.8.0; unset reads as 0 as before.
+    rxTime: new Date((meshPacket.rxTime ?? 0) * 1000),
     type: meshPacket.to === Constants.broadcastNum ? "broadcast" : "direct",
     from: meshPacket.from,
     to: meshPacket.to,

@@ -7,3 +7,9 @@ minimumReleaseAge: 2880 # package dependency library must be at least 2 days old
 packages:
   - "packages/*"
   - "apps/*"
+
+# Resolve every @meshtastic/protobufs dependency (including the jsr: one in
+# packages/sdk, kept for publishing) to the workspace package, so the app and
+# the SDK share one copy of the generated types.
+overrides:
+  "@meshtastic/protobufs": "workspace:*"

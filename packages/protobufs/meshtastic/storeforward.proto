@@ -215,4 +215,9 @@ message StoreAndForward {
      */
     bytes text = 5;
   }
+
+  /*
+   * Contains the original ID of the contained message.
+   */
+  uint32 original_id = 6;
 }

@@ -3,6 +3,7 @@ syntax = "proto3";
 package meshtastic;
 
 import "meshtastic/device_ui.proto";
+import "meshtastic/field_metadata.proto";
 
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
@@ -23,11 +24,17 @@ message Config {
        * Description: App connected or stand alone messaging device.
        * Technical Details: Default Role
        */
-      CLIENT = 0;
+      CLIENT = 0 [(meshtastic.enum_value_metadata) = {
+        label: "Client"
+        description: "App connected or stand alone messaging device."
+      }];
       /*
        *  Description: Device that does not forward packets from other devices.
        */
-      CLIENT_MUTE = 1;
+      CLIENT_MUTE = 1 [(meshtastic.enum_value_metadata) = {
+        label: "Client Mute"
+        description: "Device that does not forward packets from other devices."
+      }];
 
       /*
        * Description: Infrastructure node for extending network coverage by relaying messages. Visible in Nodes list.
@@ -35,14 +42,20 @@ message Config {
        *   The wifi radio and the oled screen will be put to sleep.
        *   This mode may still potentially have higher power usage due to it's preference in message rebroadcasting on the mesh.
        */
-      ROUTER = 2;
+      ROUTER = 2 [(meshtastic.enum_value_metadata) = {
+        label: "Router"
+        description: "Infrastructure node on a tower or mountain top only.  Not to be used for roofs or mobile nodes.  Needs exceptional coverage. Visible in Nodes list."
+      }];
 
       /*
        * Description: Combination of both ROUTER and CLIENT. Not for mobile devices.
        * Deprecated in v2.3.15 because improper usage is impacting public meshes: Use ROUTER or CLIENT instead.
        */
 
-      ROUTER_CLIENT = 3 [deprecated = true];
+      ROUTER_CLIENT = 3 [
+        deprecated = true,
+        (meshtastic.enum_value_metadata) = {label: "Router Client"}
+      ];
 
       /*
        * Description: Infrastructure node for extending network coverage by relaying messages with minimal overhead. Not visible in Nodes list.
@@ -50,7 +63,13 @@ message Config {
        *   or any other packet type. They will simply rebroadcast any mesh packets on the same frequency, channel num, spread factor, and coding rate.
        * Deprecated in v2.7.11 because it creates "holes" in the mesh rebroadcast chain.
        */
-      REPEATER = 4 [deprecated = true];
+      REPEATER = 4 [
+        deprecated = true,
+        (meshtastic.enum_value_metadata) = {
+          label: "Repeater"
+          description: "Deprecated infrastructure role that creates gaps in the mesh rebroadcast chain. Switch this node to a Router-based role (Router or Router Late)."
+        }
+      ];
 
       /*
        * Description: Broadcasts GPS position packets as priority.
@@ -58,7 +77,10 @@ message Config {
        *   When used in conjunction with power.is_power_saving = true, nodes will wake up,
        *   send position, and then sleep for position.position_broadcast_secs seconds.
        */
-      TRACKER = 5;
+      TRACKER = 5 [(meshtastic.enum_value_metadata) = {
+        label: "Tracker"
+        description: "Broadcasts GPS position packets as priority."
+      }];
 
       /*
        * Description: Broadcasts telemetry packets as priority.
@@ -66,7 +88,10 @@ message Config {
        *   When used in conjunction with power.is_power_saving = true, nodes will wake up,
        *   send environment telemetry, and then sleep for telemetry.environment_update_interval seconds.
        */
-      SENSOR = 6;
+      SENSOR = 6 [(meshtastic.enum_value_metadata) = {
+        label: "Sensor"
+        description: "Broadcasts telemetry packets as priority."
+      }];
 
       /*
        * Description: Optimized for ATAK system communication and reduces routine broadcasts.
@@ -74,7 +99,10 @@ message Config {
        *    Turns off many of the routine broadcasts to favor CoT packet stream
        *    from the Meshtastic ATAK plugin -> IMeshService -> Node
        */
-      TAK = 7;
+      TAK = 7 [(meshtastic.enum_value_metadata) = {
+        label: "TAK"
+        description: "Optimized for ATAK system communication, reduces routine broadcasts."
+      }];
 
       /*
        * Description: Device that only broadcasts as needed for stealth or power savings.
@@ -83,7 +111,10 @@ message Config {
        *    Still rebroadcasts, but with local only rebroadcast mode (known meshes only)
        *    Can be used for clandestine operation or to dramatically reduce airtime / power consumption
        */
-      CLIENT_HIDDEN = 8;
+      CLIENT_HIDDEN = 8 [(meshtastic.enum_value_metadata) = {
+        label: "Client Hidden"
+        description: "Device that only broadcasts as needed for stealth or power savings."
+      }];
 
       /*
        * Description: Broadcasts location as message to default channel regularly for to assist with device recovery.
@@ -91,7 +122,10 @@ message Config {
        *    with the current position of the device on a frequent interval:
        *    "I'm lost! Position: lat / long"
        */
-      LOST_AND_FOUND = 9;
+      LOST_AND_FOUND = 9 [(meshtastic.enum_value_metadata) = {
+        label: "Lost and Found"
+        description: "Broadcasts location as message to default channel regularly for to assist with device recovery."
+      }];
 
       /*
        * Description: Enables automatic TAK PLI broadcasts and reduces routine broadcasts.
@@ -99,7 +133,10 @@ message Config {
        *    and automatic TAK PLI (position location information) broadcasts.
        *    Uses position module configuration to determine TAK PLI broadcast interval.
        */
-      TAK_TRACKER = 10;
+      TAK_TRACKER = 10 [(meshtastic.enum_value_metadata) = {
+        label: "TAK Tracker"
+        description: "Enables automatic TAK PLI broadcasts and reduces routine broadcasts."
+      }];
 
       /*
        * Description: Will always rebroadcast packets, but will do so after all other modes.
@@ -108,7 +145,10 @@ message Config {
        *    but should not be given priority over other routers in order to avoid unnecessaraily
        *    consuming hops.
        */
-      ROUTER_LATE = 11;
+      ROUTER_LATE = 11 [(meshtastic.enum_value_metadata) = {
+        label: "Router Late"
+        description: "Infrastructure node that always rebroadcasts packets once but only after all other modes. Visible in Nodes list. Not a good choice for rooftop nodes."
+      }];
 
       /*
        * Description: Treats packets from or to favorited nodes as ROUTER_LATE, and all other packets as CLIENT.
@@ -116,7 +156,10 @@ message Config {
        *    from weaker, indoor, or less-well-positioned nodes. Recommended for users with multiple nodes
        *    where one CLIENT_BASE acts as a more powerful base station, such as an attic/roof node.
        */
-      CLIENT_BASE = 12;
+      CLIENT_BASE = 12 [(meshtastic.enum_value_metadata) = {
+        label: "Client Base"
+        description: "Used for rooftop nodes to distribute messages more widely from multiple nearby client mute nodes."
+      }];
     }
 
     /*
@@ -127,36 +170,54 @@ message Config {
        * Default behavior.
        * Rebroadcast any observed message, if it was on our private channel or from another mesh with the same lora params.
        */
-      ALL = 0;
+      ALL = 0 [(meshtastic.enum_value_metadata) = {
+        label: "All"
+        description: "Rebroadcast any observed message, if it was on our private channel or from another channel with the same lora params."
+      }];
 
       /*
        * Same as behavior as ALL but skips packet decoding and simply rebroadcasts them.
        * Only available in Repeater role. Setting this on any other roles will result in ALL behavior.
        */
-      ALL_SKIP_DECODING = 1;
+      ALL_SKIP_DECODING = 1 [(meshtastic.enum_value_metadata) = {
+        label: "All Skip Decoding"
+        description: "Same as behavior as ALL but skips packet decoding and simply rebroadcasts them. Only available in Repeater role. Setting this on any other roles will result in ALL behavior."
+      }];
 
       /*
        * Ignores observed messages from foreign meshes that are open or those which it cannot decrypt.
        * Only rebroadcasts message on the nodes local primary / secondary channels.
        */
-      LOCAL_ONLY = 2;
+      LOCAL_ONLY = 2 [(meshtastic.enum_value_metadata) = {
+        label: "Local Only"
+        description: "Ignores observed messages from foreign meshes that are open or those which it cannot decrypt. Only rebroadcasts message on the nodes local primary / secondary channels."
+      }];
 
       /*
        * Ignores observed messages from foreign meshes like LOCAL_ONLY,
        * but takes it step further by also ignoring messages from nodenums not in the node's known list (NodeDB)
        */
-      KNOWN_ONLY = 3;
+      KNOWN_ONLY = 3 [(meshtastic.enum_value_metadata) = {
+        label: "Known Only"
+        description: "Ignores observed messages from foreign meshes like Local Only, but takes it step further by also ignoring messages from nodes not already in the node's known list."
+      }];
 
       /*
        * Only permitted for SENSOR, TRACKER and TAK_TRACKER roles, this will inhibit all rebroadcasts, not unlike CLIENT_MUTE role.
        */
-      NONE = 4;
+      NONE = 4 [(meshtastic.enum_value_metadata) = {
+        label: "None"
+        description: "Only permitted for SENSOR, TRACKER and TAK_TRACKER roles, this will inhibit all rebroadcasts, not unlike CLIENT_MUTE role."
+      }];
 
       /*
        * Ignores packets from non-standard portnums such as: TAK, RangeTest, PaxCounter, etc.
        * Only rebroadcasts packets with standard portnums: NodeInfo, Text, Position, Telemetry, and Routing.
        */
-      CORE_PORTNUMS_ONLY = 5;
+      CORE_PORTNUMS_ONLY = 5 [(meshtastic.enum_value_metadata) = {
+        label: "Core Portnums Only"
+        description: "Only rebroadcasts packets from the core portnums: NodeInfo, Text, Position, Telemetry, and Routing."
+      }];
     }
 
     /*
@@ -199,7 +260,7 @@ message Config {
     /*
      * Sets the role of node
      */
-    Role role = 1;
+    Role role = 1 [(meshtastic.field_metadata) = {label: "Device Role"}];
 
     /*
      * Disabling this will disable the SerialConsole by not initilizing the StreamAPI
@@ -211,29 +272,42 @@ message Config {
      * For boards without a hard wired button, this is the pin number that will be used
      * Boards that have more than one button can swap the function with this one. defaults to BUTTON_PIN if defined.
      */
-    uint32 button_gpio = 4;
+    uint32 button_gpio = 4 [(meshtastic.field_metadata) = {
+      label: "Button GPIO"
+      description: "GPIO pin for the user button, can be remapped on boards with multiple buttons"
+    }];
 
     /*
      * For boards without a PWM buzzer, this is the pin number that will be used
      * Defaults to PIN_BUZZER if defined.
      */
-    uint32 buzzer_gpio = 5;
+    uint32 buzzer_gpio = 5 [(meshtastic.field_metadata) = {
+      label: "Buzzer GPIO"
+      description: "GPIO pin for the PWM buzzer"
+    }];
 
     /*
      * Sets the role of node
      */
-    RebroadcastMode rebroadcast_mode = 6;
+    RebroadcastMode rebroadcast_mode = 6 [(meshtastic.field_metadata) = {label: "Rebroadcast Mode"}];
 
     /*
      * Send our nodeinfo this often
      * Defaults to 900 Seconds (15 minutes)
      */
-    uint32 node_info_broadcast_secs = 7;
+    uint32 node_info_broadcast_secs = 7 [(meshtastic.field_metadata) = {
+      label: "Node Info Broadcast Interval"
+      description: "How often node information is sent. Defaults to 900 seconds."
+      unit: "s"
+    }];
 
     /*
      * Treat double tap interrupt on supported accelerometers as a button press if set to true
      */
-    bool double_tap_as_button_press = 8;
+    bool double_tap_as_button_press = 8 [(meshtastic.field_metadata) = {
+      label: "Double Tap as Button"
+      description: "Treat double tap on supported accelerometers as a user button press."
+    }];
 
     /*
      * If true, device is considered to be "managed" by a mesh administrator
@@ -245,23 +319,32 @@ message Config {
     /*
      * Disables the triple-press of user button to enable or disable GPS
      */
-    bool disable_triple_click = 10;
+    bool disable_triple_click = 10 [(meshtastic.field_metadata) = {
+      label: "Disable Triple Click"
+      description: "Disables the user button triple-press shortcut."
+    }];
 
     /*
      * POSIX Timezone definition string from https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv.
      */
-    string tzdef = 11;
+    string tzdef = 11 [(meshtastic.field_metadata) = {
+      label: "Time Zone"
+      description: "POSIX timezone definition string"
+    }];
 
     /*
      * If true, disable the default blinking LED (LED_PIN) behavior on the device
      */
-    bool led_heartbeat_disabled = 12;
+    bool led_heartbeat_disabled = 12 [(meshtastic.field_metadata) = {
+      label: "LED Heartbeat"
+      description: "Controls the blinking LED on the device.  For most devices this will control one of the up to 4 LEDS, the charger and GPS LEDs are not controllable."
+    }];
 
     /*
      * Controls buzzer behavior for audio feedback
      * Defaults to ENABLED
      */
-    BuzzerMode buzzer_mode = 13;
+    BuzzerMode buzzer_mode = 13 [(meshtastic.field_metadata) = {since_firmware: "2.7.0"}];
   }
 
   /*
@@ -285,92 +368,108 @@ message Config {
       /*
        * Include an altitude value (if available)
        */
-      ALTITUDE = 0x0001;
+      ALTITUDE = 0x0001 [(meshtastic.enum_value_metadata) = {
+        label: "Altitude"
+        description: "Include an altitude value in position reports, when one is available."
+      }];
 
       /*
        * Altitude value is MSL
        */
-      ALTITUDE_MSL = 0x0002;
+      ALTITUDE_MSL = 0x0002 [(meshtastic.enum_value_metadata) = {label: "Altitude is Mean Sea Level"}];
 
       /*
        * Include geoidal separation
        */
-      GEOIDAL_SEPARATION = 0x0004;
+      GEOIDAL_SEPARATION = 0x0004 [(meshtastic.enum_value_metadata) = {label: "Altitude Geoidal Separation"}];
 
       /*
        * Include the DOP value ; PDOP used by default, see below
        */
-      DOP = 0x0008;
+      DOP = 0x0008 [(meshtastic.enum_value_metadata) = {
+        label: "DOP"
+        description: "Include the dilution of precision value. PDOP is used by default."
+      }];
 
       /*
        * If POS_DOP set, send separate HDOP / VDOP values instead of PDOP
        */
-      HVDOP = 0x0010;
+      HVDOP = 0x0010 [(meshtastic.enum_value_metadata) = {
+        label: "HDOP / VDOP"
+        description: "If DOP is set, send separate HDOP and VDOP values instead of PDOP."
+      }];
 
       /*
        * Include number of "satellites in view"
        */
-      SATINVIEW = 0x0020;
+      SATINVIEW = 0x0020 [(meshtastic.enum_value_metadata) = {label: "Number of satellites"}];
 
       /*
        * Include a sequence number incremented per packet
        */
-      SEQ_NO = 0x0040;
+      SEQ_NO = 0x0040 [(meshtastic.enum_value_metadata) = {label: "Sequence number"}];
 
       /*
        * Include positional timestamp (from GPS solution)
        */
-      TIMESTAMP = 0x0080;
+      TIMESTAMP = 0x0080 [(meshtastic.enum_value_metadata) = {label: "Timestamp"}];
 
       /*
        * Include positional heading
        * Intended for use with vehicle not walking speeds
        * walking speeds are likely to be error prone like the compass
        */
-      HEADING = 0x0100;
+      HEADING = 0x0100 [(meshtastic.enum_value_metadata) = {label: "Vehicle heading"}];
 
       /*
        * Include positional speed
        * Intended for use with vehicle not walking speeds
        * walking speeds are likely to be error prone like the compass
        */
-      SPEED = 0x0200;
+      SPEED = 0x0200 [(meshtastic.enum_value_metadata) = {label: "Vehicle speed"}];
     }
 
     enum GpsMode {
       /*
        * GPS is present but disabled
        */
-      DISABLED = 0;
+      DISABLED = 0 [(meshtastic.enum_value_metadata) = {label: "Disabled"}];
 
       /*
        * GPS is present and enabled
        */
-      ENABLED = 1;
+      ENABLED = 1 [(meshtastic.enum_value_metadata) = {label: "Enabled"}];
 
       /*
        * GPS is not present on the device
        */
-      NOT_PRESENT = 2;
+      NOT_PRESENT = 2 [(meshtastic.enum_value_metadata) = {label: "Not Present"}];
     }
 
     /*
      * We should send our position this often (but only if it has changed significantly)
      * Defaults to 15 minutes
      */
-    uint32 position_broadcast_secs = 1;
+    uint32 position_broadcast_secs = 1 [(meshtastic.field_metadata) = {
+      label: "Broadcast Interval"
+      unit: "s"
+      description: "The longest a node will go without broadcasting a position."
+    }];
 
     /*
      * Adaptive position braoadcast, which is now the default.
      */
-    bool position_broadcast_smart_enabled = 2;
+    bool position_broadcast_smart_enabled = 2 [(meshtastic.field_metadata) = {label: "Smart Position"}];
 
     /*
      * If set, this node is at a fixed position.
      * We will generate GPS position updates at the regular interval, but use whatever the last lat/lon/alt we have for the node.
      * The lat/lon/alt can be set by an internal GPS or with the help of the app.
      */
-    bool fixed_position = 3;
+    bool fixed_position = 3 [(meshtastic.field_metadata) = {
+      label: "Fixed Position"
+      description: "The last known latitude, longitude and altitude are broadcast over the mesh on the position interval, rather than a live GPS fix."
+    }];
 
     /*
      * Is GPS enabled for this node?
@@ -382,7 +481,11 @@ message Config {
      * or zero for the default of once every 30 seconds
      * or a very large value (maxint) to update only once at boot.
      */
-    uint32 gps_update_interval = 5;
+    uint32 gps_update_interval = 5 [(meshtastic.field_metadata) = {
+      label: "Update Interval"
+      unit: "s"
+      description: "How often to try to get a GPS position."
+    }];
 
     /*
      * Deprecated in favor of using smart / regular broadcast intervals as implicit attempt time
@@ -393,37 +496,60 @@ message Config {
      * Bit field of boolean configuration options for POSITION messages
      * (bitwise OR of PositionFlags)
      */
-    uint32 position_flags = 7;
+    uint32 position_flags = 7 [(meshtastic.field_metadata) = {
+      label: "Position Flags"
+      description: "Optional fields to include when assembling position messages"
+    }];
 
     /*
      * (Re)define GPS_RX_PIN for your board.
      */
-    uint32 rx_gpio = 8;
+    uint32 rx_gpio = 8 [(meshtastic.field_metadata) = {
+      label: "GPS Receive GPIO"
+      description: "GPIO pin for GPS RX"
+      diy_only: true
+    }];
 
     /*
      * (Re)define GPS_TX_PIN for your board.
      */
-    uint32 tx_gpio = 9;
+    uint32 tx_gpio = 9 [(meshtastic.field_metadata) = {
+      label: "GPS Transmit GPIO"
+      description: "GPIO pin for GPS TX"
+      diy_only: true
+    }];
 
     /*
      * The minimum distance in meters traveled (since the last send) before we can send a position to the mesh if position_broadcast_smart_enabled
      */
-    uint32 broadcast_smart_minimum_distance = 10;
+    uint32 broadcast_smart_minimum_distance = 10 [(meshtastic.field_metadata) = {
+      label: "Minimum Distance"
+      unit: "m"
+      description: "The minimum change in distance before a smart position broadcast is considered."
+    }];
 
     /*
      * The minimum number of seconds (since the last send) before we can send a position to the mesh if position_broadcast_smart_enabled
      */
-    uint32 broadcast_smart_minimum_interval_secs = 11;
+    uint32 broadcast_smart_minimum_interval_secs = 11 [(meshtastic.field_metadata) = {
+      label: "Minimum Interval"
+      unit: "s"
+      description: "The shortest interval between position updates once the minimum distance has been met."
+    }];
 
     /*
      * (Re)define PIN_GPS_EN for your board.
      */
-    uint32 gps_en_gpio = 12;
+    uint32 gps_en_gpio = 12 [(meshtastic.field_metadata) = {
+      label: "GPS EN GPIO"
+      description: "GPIO pin for GPS enable"
+      diy_only: true
+    }];
 
     /*
      * Set where GPS is enabled, disabled, or not present
      */
-    GpsMode gps_mode = 13;
+    GpsMode gps_mode = 13 [(meshtastic.field_metadata) = {label: "GPS Mode"}];
   }
 
   /*
@@ -436,12 +562,19 @@ message Config {
      * Don't use this setting if you want to use your device with the phone apps or are using a device without a user button.
      * Technical Details: Works for ESP32 devices and NRF52 devices in the Sensor or Tracker roles
      */
-    bool is_power_saving = 1;
+    bool is_power_saving = 1 [(meshtastic.field_metadata) = {
+      label: "Power Saving"
+      description: "Will sleep everything as much as possible, for the tracker and sensor role this will also include the lora radio. Don't use this setting if you want to use your device with the phone apps or are using a device without a user button."
+    }];
 
     /*
      *  Description: If non-zero, the device will fully power off this many seconds after external power is removed.
      */
-    uint32 on_battery_shutdown_after_secs = 2;
+    uint32 on_battery_shutdown_after_secs = 2 [(meshtastic.field_metadata) = {
+      label: "Shutdown on Power Loss"
+      description: "How long after external power is removed before the device powers off. Zero to disable."
+      unit: "s"
+    }];
 
     /*
      * Ratio of voltage divider for battery pin eg. 3.20 (R1=100k, R2=220k)
@@ -449,13 +582,13 @@ message Config {
      * https://meshtastic.org/docs/configuration/radio/power/#adc-multiplier-override
      * Should be set to floating point value between 2 and 6
      */
-    float adc_multiplier_override = 3;
+    float adc_multiplier_override = 3 [(meshtastic.field_metadata) = {label: "ADC Override"}];
 
     /*
      *  Description: The number of seconds for to wait before turning off BLE in No Bluetooth states
      *  Technical Details: ESP32 Only 0 for default of 1 minute
      */
-    uint32 wait_bluetooth_secs = 4;
+    uint32 wait_bluetooth_secs = 4 [(meshtastic.field_metadata) = {label: "Wait for Bluetooth Duration"}];
 
     /*
      * Super Deep Sleep Seconds
@@ -497,66 +630,81 @@ message Config {
       /*
        * obtain ip address via DHCP
        */
-      DHCP = 0;
+      DHCP = 0 [(meshtastic.enum_value_metadata) = {label: "DHCP"}];
 
       /*
        * use static ip address
        */
-      STATIC = 1;
+      STATIC = 1 [(meshtastic.enum_value_metadata) = {label: "Static"}];
     }
 
     message IpV4Config {
       /*
        * Static IP address
        */
-      fixed32 ip = 1;
+      fixed32 ip = 1 [(meshtastic.field_metadata) = {label: "IP"}];
 
       /*
        * Static gateway address
        */
-      fixed32 gateway = 2;
+      fixed32 gateway = 2 [(meshtastic.field_metadata) = {label: "Gateway"}];
 
       /*
        * Static subnet mask
        */
-      fixed32 subnet = 3;
+      fixed32 subnet = 3 [(meshtastic.field_metadata) = {label: "Subnet"}];
 
       /*
        * Static DNS server address
        */
-      fixed32 dns = 4;
+      fixed32 dns = 4 [(meshtastic.field_metadata) = {label: "DNS"}];
     }
 
     /*
      * Enable WiFi (disables Bluetooth)
      */
-    bool wifi_enabled = 1;
+    bool wifi_enabled = 1 [(meshtastic.field_metadata) = {
+      label: "WiFi Enabled"
+      description: "Enabling WiFi will disable the bluetooth connection to the app."
+    }];
 
     /*
      * If set, this node will try to join the specified wifi network and
      * acquire an address via DHCP
      */
-    string wifi_ssid = 3;
+    string wifi_ssid = 3 [(meshtastic.field_metadata) = {
+      label: "SSID"
+      description: "WiFi network name to connect to"
+    }];
 
     /*
      * If set, will be use to authenticate to the named wifi
      */
-    string wifi_psk = 4;
+    string wifi_psk = 4 [(meshtastic.field_metadata) = {
+      label: "Password"
+      description: "WiFi password for authentication"
+    }];
 
     /*
      * NTP server to use if WiFi is conneced, defaults to `meshtastic.pool.ntp.org`
      */
-    string ntp_server = 5;
+    string ntp_server = 5 [(meshtastic.field_metadata) = {
+      label: "NTP Server"
+      description: "NTP server address. Defaults to meshtastic.pool.ntp.org"
+    }];
 
     /*
      * Enable Ethernet
      */
-    bool eth_enabled = 6;
+    bool eth_enabled = 6 [(meshtastic.field_metadata) = {
+      label: "Ethernet Enabled"
+      description: "Enabling Ethernet will disable the bluetooth connection to the app."
+    }];
 
     /*
      * acquire an address via DHCP or assign static
      */
-    AddressMode address_mode = 7;
+    AddressMode address_mode = 7 [(meshtastic.field_metadata) = {label: "Address Mode"}];
 
     /*
      * struct to keep static address
@@ -566,17 +714,21 @@ message Config {
     /*
      * rsyslog Server and Port
      */
-    string rsyslog_server = 9;
+    string rsyslog_server = 9 [(meshtastic.field_metadata) = {label: "Rsyslog Server"}];
 
     /*
      * Flags for enabling/disabling network protocols
      */
-    uint32 enabled_protocols = 10;
+    uint32 enabled_protocols = 10 [(meshtastic.field_metadata) = {
+      label: "Enabled Protocols"
+      description: "Enable broadcasting packets via UDP over the local network."
+      since_firmware: "2.6.0"
+    }];
 
     /*
      * Enable/Disable ipv6 support
      */
-    bool ipv6_enabled = 11;
+    bool ipv6_enabled = 11 [(meshtastic.field_metadata) = {since_firmware: "2.7.16"}];
 
     /*
      * Available flags auxiliary network protocols
@@ -585,12 +737,12 @@ message Config {
       /*
        * Do not broadcast packets over any network protocol
        */
-      NO_BROADCAST = 0x0000;
+      NO_BROADCAST = 0x0000 [(meshtastic.enum_value_metadata) = {label: "None"}];
 
       /*
        * Enable broadcasting packets via UDP over the local network
        */
-      UDP_BROADCAST = 0x0001;
+      UDP_BROADCAST = 0x0001 [(meshtastic.enum_value_metadata) = {label: "UDP Broadcast"}];
     }
   }
 
@@ -599,7 +751,8 @@ message Config {
    */
   message DisplayConfig {
     /*
-     * Deprecated in 2.7.4: Unused
+     * Unused. Kept so the deprecated gps_format field still has a type; when
+     * firmware stopped reading that field is recorded on the field itself.
      */
     enum DeprecatedGpsCoordinateFormat {
       UNUSED = 0;
@@ -612,12 +765,12 @@ message Config {
       /*
        * Metric (Default)
        */
-      METRIC = 0;
+      METRIC = 0 [(meshtastic.enum_value_metadata) = {label: "Metric"}];
 
       /*
        * Imperial
        */
-      IMPERIAL = 1;
+      IMPERIAL = 1 [(meshtastic.enum_value_metadata) = {label: "Imperial"}];
     }
 
     /*
@@ -627,172 +780,214 @@ message Config {
       /*
        * Default / Autodetect
        */
-      OLED_AUTO = 0;
+      OLED_AUTO = 0 [(meshtastic.enum_value_metadata) = {label: "Detect Automatically"}];
 
       /*
        * Default / Autodetect
        */
-      OLED_SSD1306 = 1;
+      OLED_SSD1306 = 1 [(meshtastic.enum_value_metadata) = {label: "SSD 1306"}];
 
       /*
        * Default / Autodetect
        */
-      OLED_SH1106 = 2;
+      OLED_SH1106 = 2 [(meshtastic.enum_value_metadata) = {label: "SH 1106"}];
 
       /*
        * Can not be auto detected but set by proto. Used for 128x64 screens
        */
-      OLED_SH1107 = 3;
+      OLED_SH1107 = 3 [(meshtastic.enum_value_metadata) = {label: "SH 1107"}];
 
       /*
        * Can not be auto detected but set by proto. Used for 128x128 screens
        */
-      OLED_SH1107_128_128 = 4;
+      OLED_SH1107_128_128 = 4 [(meshtastic.enum_value_metadata) = {label: "SH 1107 128x128"}];
 
       /*
        * Can not be auto detected but set by proto. Used for 64x128 rotated screens
        */
-      OLED_SH1107_ROTATED = 5;
+      OLED_SH1107_ROTATED = 5 [(meshtastic.enum_value_metadata) = {label: "SH 1107 Rotated"}];
     }
 
     /*
      * Number of seconds the screen stays on after pressing the user button or receiving a message
      * 0 for default of one minute MAXUINT for always on
      */
-    uint32 screen_on_secs = 1;
+    uint32 screen_on_secs = 1 [(meshtastic.field_metadata) = {
+      label: "Screen on for"
+      unit: "s"
+      description: "How long the screen remains on after the user button is pressed or messages are received."
+    }];
 
     /*
-     * Deprecated in 2.7.4: Unused
      * How the GPS coordinates are formatted on the OLED screen.
      */
-    DeprecatedGpsCoordinateFormat gps_format = 2 [deprecated = true];
+    DeprecatedGpsCoordinateFormat gps_format = 2 [
+      deprecated = true,
+      (meshtastic.field_metadata) = {deprecated_since: "2.7.10"}
+    ];
 
     /*
      * Automatically toggles to the next page on the screen like a carousel, based the specified interval in seconds.
      * Potentially useful for devices without user buttons.
      */
-    uint32 auto_screen_carousel_secs = 3;
+    uint32 auto_screen_carousel_secs = 3 [(meshtastic.field_metadata) = {
+      label: "Carousel Interval"
+      unit: "s"
+      description: "Automatically moves to the next screen page, like a carousel, on this interval."
+    }];
 
     /*
      * If this is set, the displayed compass will always point north. if unset, the old behaviour
      * (top of display is heading direction) is used.
      */
-    bool compass_north_top = 4 [deprecated = true];
+    bool compass_north_top = 4 [
+      deprecated = true,
+      (meshtastic.field_metadata) = {
+        label: "Always point north"
+        description: "The compass heading on the screen outside of the circle will always point north."
+        deprecated_since: "2.7.1"
+      }
+    ];
 
     /*
      * Flip screen vertically, for cases that mount the screen upside down
      */
-    bool flip_screen = 5;
+    bool flip_screen = 5 [(meshtastic.field_metadata) = {
+      label: "Flip Screen"
+      description: "Flip screen vertically"
+    }];
 
     /*
      * Perferred display units
      */
-    DisplayUnits units = 6;
+    DisplayUnits units = 6 [(meshtastic.field_metadata) = {
+      label: "Display Units"
+      description: "Units shown on the device screen."
+    }];
 
     /*
      * Override auto-detect in screen
      */
-    OledType oled = 7;
+    OledType oled = 7 [(meshtastic.field_metadata) = {
+      label: "OLED Type"
+      description: "Override automatic OLED screen detection."
+    }];
 
     enum DisplayMode {
       /*
        * Default. The old style for the 128x64 OLED screen
        */
-      DEFAULT = 0;
+      DEFAULT = 0 [(meshtastic.enum_value_metadata) = {label: "Default 128x64 screen layout"}];
 
       /*
        * Rearrange display elements to cater for bicolor OLED displays
        */
-      TWOCOLOR = 1;
+      TWOCOLOR = 1 [(meshtastic.enum_value_metadata) = {label: "Optimized for 2 color displays"}];
 
       /*
        * Same as TwoColor, but with inverted top bar. Not so good for Epaper displays
        */
-      INVERTED = 2;
+      INVERTED = 2 [(meshtastic.enum_value_metadata) = {label: "Inverted top bar for 2 Color display"}];
 
       /*
        * TFT Full Color Displays (not implemented yet)
        */
-      COLOR = 3;
+      COLOR = 3 [(meshtastic.enum_value_metadata) = {label: "TFT Full Color Displays"}];
     }
     /*
      * Display Mode
      */
-    DisplayMode displaymode = 8;
+    DisplayMode displaymode = 8 [(meshtastic.field_metadata) = {
+      label: "Display Mode"
+      description: "Override default screen layout."
+    }];
 
     /*
      * Print first line in pseudo-bold? FALSE is original style, TRUE is bold
      */
-    bool heading_bold = 9;
+    bool heading_bold = 9 [(meshtastic.field_metadata) = {
+      label: "Bold Heading"
+      description: "Bold the heading text on the screen."
+    }];
 
     /*
      * Should we wake the screen up on accelerometer detected motion or tap
      */
-    bool wake_on_tap_or_motion = 10;
+    bool wake_on_tap_or_motion = 10 [(meshtastic.field_metadata) = {
+      label: "Wake Screen on tap or motion"
+      description: "Requires that there be an accelerometer on your device."
+    }];
 
     enum CompassOrientation {
       /*
        * The compass and the display are in the same orientation.
        */
-      DEGREES_0 = 0;
+      DEGREES_0 = 0 [(meshtastic.enum_value_metadata) = {label: "0°"}];
 
       /*
        * Rotate the compass by 90 degrees.
        */
-      DEGREES_90 = 1;
+      DEGREES_90 = 1 [(meshtastic.enum_value_metadata) = {label: "90°"}];
 
       /*
        * Rotate the compass by 180 degrees.
        */
-      DEGREES_180 = 2;
+      DEGREES_180 = 2 [(meshtastic.enum_value_metadata) = {label: "180°"}];
 
       /*
        * Rotate the compass by 270 degrees.
        */
-      DEGREES_270 = 3;
+      DEGREES_270 = 3 [(meshtastic.enum_value_metadata) = {label: "270°"}];
 
       /*
        * Don't rotate the compass, but invert the result.
        */
-      DEGREES_0_INVERTED = 4;
+      DEGREES_0_INVERTED = 4 [(meshtastic.enum_value_metadata) = {label: "0° Inverted"}];
 
       /*
        * Rotate the compass by 90 degrees and invert.
        */
-      DEGREES_90_INVERTED = 5;
+      DEGREES_90_INVERTED = 5 [(meshtastic.enum_value_metadata) = {label: "90° Inverted"}];
 
       /*
        * Rotate the compass by 180 degrees and invert.
        */
-      DEGREES_180_INVERTED = 6;
+      DEGREES_180_INVERTED = 6 [(meshtastic.enum_value_metadata) = {label: "180° Inverted"}];
 
       /*
        * Rotate the compass by 270 degrees and invert.
        */
-      DEGREES_270_INVERTED = 7;
+      DEGREES_270_INVERTED = 7 [(meshtastic.enum_value_metadata) = {label: "270° Inverted"}];
     }
 
     /*
      * Indicates how to rotate or invert the compass output to accurate display on the display.
      */
-    CompassOrientation compass_orientation = 11;
+    CompassOrientation compass_orientation = 11 [(meshtastic.field_metadata) = {
+      label: "Compass Orientation"
+      description: "Indicates how to rotate or invert the compass output for accurate display."
+    }];
 
     /*
      * If false (default), the device will display the time in 24-hour format on screen.
      * If true, the device will display the time in 12-hour format on screen.
      */
-    bool use_12h_clock = 12;
+    bool use_12h_clock = 12 [(meshtastic.field_metadata) = {
+      label: "12 Hour Clock"
+      description: "Sets the screen clock format to 12-hour."
+      since_firmware: "2.5.22"
+    }];
 
     /*
      * If false (default), the device will use short names for various display screens.
      * If true, node names will show in long format
      */
-    bool use_long_node_name = 13;
+    bool use_long_node_name = 13 [(meshtastic.field_metadata) = {since_firmware: "2.7.13"}];
 
     /*
      * If true, the device will display message bubbles on screen.
      */
-    bool enable_message_bubbles = 14;
+    bool enable_message_bubbles = 14 [(meshtastic.field_metadata) = {since_firmware: "2.7.19"}];
   }
 
   /*
@@ -803,193 +998,196 @@ message Config {
       /*
        * Region is not set
        */
-      UNSET = 0;
+      UNSET = 0 [(meshtastic.enum_value_metadata) = {label: "Please set a region"}];
 
       /*
        * United States
        */
-      US = 1;
+      US = 1 [(meshtastic.enum_value_metadata) = {label: "United States"}];
 
       /*
        * European Union 433mhz
        */
-      EU_433 = 2;
+      EU_433 = 2 [(meshtastic.enum_value_metadata) = {label: "European Union 433MHz"}];
 
       /*
        * European Union 868mhz
        */
-      EU_868 = 3;
+      EU_868 = 3 [(meshtastic.enum_value_metadata) = {label: "European Union 868MHz"}];
 
       /*
        * China
        */
-      CN = 4;
+      CN = 4 [(meshtastic.enum_value_metadata) = {label: "China"}];
 
       /*
        * Japan
        */
-      JP = 5;
+      JP = 5 [(meshtastic.enum_value_metadata) = {label: "Japan"}];
 
       /*
        * Australia / New Zealand
        */
-      ANZ = 6;
+      ANZ = 6 [(meshtastic.enum_value_metadata) = {label: "Australia / New Zealand"}];
 
       /*
        * Korea
        */
-      KR = 7;
+      KR = 7 [(meshtastic.enum_value_metadata) = {label: "Korea"}];
 
       /*
        * Taiwan
        */
-      TW = 8;
+      TW = 8 [(meshtastic.enum_value_metadata) = {label: "Taiwan"}];
 
       /*
        * Russia
        */
-      RU = 9;
+      RU = 9 [(meshtastic.enum_value_metadata) = {label: "Russia"}];
 
       /*
        * India
        */
-      IN = 10;
+      IN = 10 [(meshtastic.enum_value_metadata) = {label: "India"}];
 
       /*
        * New Zealand 865mhz
        */
-      NZ_865 = 11;
+      NZ_865 = 11 [(meshtastic.enum_value_metadata) = {label: "New Zealand 865MHz"}];
 
       /*
        * Thailand
        */
-      TH = 12;
+      TH = 12 [(meshtastic.enum_value_metadata) = {label: "Thailand"}];
 
       /*
        * WLAN Band
        */
-      LORA_24 = 13;
+      LORA_24 = 13 [(meshtastic.enum_value_metadata) = {label: "2.4 Ghz"}];
 
       /*
        * Ukraine 433mhz
        */
-      UA_433 = 14;
+      UA_433 = 14 [(meshtastic.enum_value_metadata) = {label: "Ukraine 433MHz"}];
 
       /*
        * Ukraine 868mhz
        */
-      UA_868 = 15;
+      UA_868 = 15 [
+        deprecated = true,
+        (meshtastic.enum_value_metadata) = {label: "Ukraine 868MHz"}
+      ];
 
       /*
        * Malaysia 433mhz
        */
-      MY_433 = 16;
+      MY_433 = 16 [(meshtastic.enum_value_metadata) = {label: "Malaysia 433MHz"}];
 
       /*
        * Malaysia 919mhz
        */
-      MY_919 = 17;
+      MY_919 = 17 [(meshtastic.enum_value_metadata) = {label: "Malaysia 919MHz"}];
 
       /*
        * Singapore 923mhz
        */
-      SG_923 = 18;
+      SG_923 = 18 [(meshtastic.enum_value_metadata) = {label: "Singapore 923MHz"}];
 
       /*
        * Philippines 433mhz
        */
-      PH_433 = 19;
+      PH_433 = 19 [(meshtastic.enum_value_metadata) = {label: "Philippines 433MHz"}];
 
       /*
        * Philippines 868mhz
        */
-      PH_868 = 20;
+      PH_868 = 20 [(meshtastic.enum_value_metadata) = {label: "Philippines 868MHz"}];
 
       /*
        * Philippines 915mhz
        */
-      PH_915 = 21;
+      PH_915 = 21 [(meshtastic.enum_value_metadata) = {label: "Philippines 915MHz"}];
 
       /*
        * Australia / New Zealand 433MHz
        */
-      ANZ_433 = 22;
+      ANZ_433 = 22 [(meshtastic.enum_value_metadata) = {label: "Australia / New Zealand 433MHz"}];
 
       /*
        * Kazakhstan 433MHz
        */
-      KZ_433 = 23;
+      KZ_433 = 23 [(meshtastic.enum_value_metadata) = {label: "Kazakhstan 433MHz"}];
 
       /*
        * Kazakhstan 863MHz
        */
-      KZ_863 = 24;
+      KZ_863 = 24 [(meshtastic.enum_value_metadata) = {label: "Kazakhstan 863MHz"}];
 
       /*
        * Nepal 865MHz
        */
-      NP_865 = 25;
+      NP_865 = 25 [(meshtastic.enum_value_metadata) = {label: "Nepal 865MHz"}];
 
       /*
        * Brazil 902MHz
        */
-      BR_902 = 26;
+      BR_902 = 26 [(meshtastic.enum_value_metadata) = {label: "Brazil 902MHz"}];
 
       /*
        * ITU Region 1 Amateur Radio 2m band (144-146 MHz)
        */
-      ITU1_2M = 27;
+      ITU1_2M = 27 [(meshtastic.enum_value_metadata) = {label: "ITU Region 1 / Amateur 2m"}];
 
       /*
        * ITU Region 2 Amateur Radio 2m band (144-148 MHz)
        */
-      ITU2_2M = 28;
+      ITU2_2M = 28 [(meshtastic.enum_value_metadata) = {label: "ITU Region 2 / Amateur 2m"}];
 
       /*
        * EU 866MHz band (Band no. 47b of 2006/771/EC and subsequent amendments) for Non-specific short-range devices (SRD)
        */
-      EU_866 = 29;
+      EU_866 = 29 [(meshtastic.enum_value_metadata) = {label: "European Union 866MHz"}];
 
       /*
        * EU 874MHz and 917MHz bands (Band no. 1 and 4 of 2022/172/EC and subsequent amendments) for Non-specific short-range devices (SRD)
        */
-      EU_874 = 30;
-      EU_917 = 31;
+      EU_874 = 30 [(meshtastic.enum_value_metadata) = {label: "European Union 874MHz"}];
+      EU_917 = 31 [(meshtastic.enum_value_metadata) = {label: "European Union 917MHz"}];
 
       /*
        * EU 868MHz band, with narrow presets
        */
-      EU_N_868 = 32;
+      EU_N_868 = 32 [(meshtastic.enum_value_metadata) = {label: "European Union 868MHz (Narrow)"}];
 
       /*
        * ITU Region 3 Amateur Radio 2m band (144-148 MHz)
        */
-      ITU3_2M = 33;
+      ITU3_2M = 33 [(meshtastic.enum_value_metadata) = {label: "ITU Region 3 / Amateur 2m"}];
 
       /*
        * ITU Region 1 Amateur Radio 70cm band (430-440 MHz)
        */
-      ITU1_70CM = 34;
+      ITU1_70CM = 34 [(meshtastic.enum_value_metadata) = {label: "ITU Region 1 / Amateur 70cm"}];
 
       /*
        * ITU Region 2 Amateur Radio 70cm band (420-450 MHz)
        * Note: Some countries do not allocate 420-430 MHz or 440-450 MHz.
        * Check local law!
        */
-      ITU2_70CM = 35;
+      ITU2_70CM = 35 [(meshtastic.enum_value_metadata) = {label: "ITU Region 2 / Amateur 70cm"}];
 
       /*
        * ITU Region 3 Amateur Radio 70cm band (430-450 MHz)
        * Note: Some countries do not allocate 440-450 MHz. Check local law!
        */
-      ITU3_70CM = 36;
+      ITU3_70CM = 36 [(meshtastic.enum_value_metadata) = {label: "ITU Region 3 / Amateur 70cm"}];
 
       /*
        * ITU Region 2 Amateur Radio 1.25m '125cm' band (220-225 MHz)
        * Note: Some countries do not allocate 220-222 MHz (Ex: USA/Canada).
        * Check local law!
        */
-      ITU2_125CM = 37;
+      ITU2_125CM = 37 [(meshtastic.enum_value_metadata) = {label: "ITU Region 2 / Amateur 1.25m"}];
     }
 
     /*
@@ -1000,71 +1198,80 @@ message Config {
       /*
        * Long Range - Fast
        */
-      LONG_FAST = 0;
+      LONG_FAST = 0 [(meshtastic.enum_value_metadata) = {
+        label: "Long Range - Fast"
+        keywords: "longfast|default"
+      }];
 
       /*
        * Long Range - Slow
        * Deprecated in 2.7: Unpopular slow preset.
        */
-      LONG_SLOW = 1 [deprecated = true];
+      LONG_SLOW = 1 [
+        deprecated = true,
+        (meshtastic.enum_value_metadata) = {label: "Long Range - Slow"}
+      ];
 
       /*
        * Very Long Range - Slow
        * Deprecated in 2.5: Works only with txco and is unusably slow
        */
-      VERY_LONG_SLOW = 2 [deprecated = true];
+      VERY_LONG_SLOW = 2 [
+        deprecated = true,
+        (meshtastic.enum_value_metadata) = {label: "Very Long Range - Slow"}
+      ];
 
       /*
        * Medium Range - Slow
        */
-      MEDIUM_SLOW = 3;
+      MEDIUM_SLOW = 3 [(meshtastic.enum_value_metadata) = {label: "Medium Range - Slow"}];
 
       /*
        * Medium Range - Fast
        */
-      MEDIUM_FAST = 4;
+      MEDIUM_FAST = 4 [(meshtastic.enum_value_metadata) = {label: "Medium Range - Fast"}];
 
       /*
        * Short Range - Slow
        */
-      SHORT_SLOW = 5;
+      SHORT_SLOW = 5 [(meshtastic.enum_value_metadata) = {label: "Short Range - Slow"}];
 
       /*
        * Short Range - Fast
        */
-      SHORT_FAST = 6;
+      SHORT_FAST = 6 [(meshtastic.enum_value_metadata) = {label: "Short Range - Fast"}];
 
       /*
        * Long Range - Moderately Fast
        */
-      LONG_MODERATE = 7;
+      LONG_MODERATE = 7 [(meshtastic.enum_value_metadata) = {label: "Long Range - Moderate"}];
 
       /*
        * Short Range - Turbo
        * This is the fastest preset and the only one with 500kHz bandwidth.
        * It is not legal to use in all regions due to this wider bandwidth.
        */
-      SHORT_TURBO = 8;
+      SHORT_TURBO = 8 [(meshtastic.enum_value_metadata) = {label: "Short Range - Turbo"}];
 
       /*
        * Long Range - Turbo
        * This preset performs similarly to LongFast, but with 500Khz bandwidth.
        */
-      LONG_TURBO = 9;
+      LONG_TURBO = 9 [(meshtastic.enum_value_metadata) = {label: "Long Range - Turbo"}];
 
       /*
        * Lite Fast
        * Medium range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
        * Comparable link budget to MEDIUM_FAST but compliant with Band no. 47b of 2006/771/EC.
        */
-      LITE_FAST = 10;
+      LITE_FAST = 10 [(meshtastic.enum_value_metadata) = {label: "Lite - Fast"}];
 
       /*
        * Lite Slow
        * Medium-to-moderate range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
        * Comparable link budget to LONG_FAST but compliant with Band no. 47b of 2006/771/EC.
        */
-      LITE_SLOW = 11;
+      LITE_SLOW = 11 [(meshtastic.enum_value_metadata) = {label: "Lite - Slow"}];
 
       /*
        * Narrow Fast
@@ -1072,14 +1279,14 @@ message Config {
        * Comparable link budget to SHORT_SLOW, but with half the data rate.
        * Intended to avoid interference with other devices.
        */
-      NARROW_FAST = 12;
+      NARROW_FAST = 12 [(meshtastic.enum_value_metadata) = {label: "Narrow - Fast"}];
 
       /*
        * Narrow Slow
        * Moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
        * Comparable link budget and data rate to LONG_FAST.
        */
-      NARROW_SLOW = 13;
+      NARROW_SLOW = 13 [(meshtastic.enum_value_metadata) = {label: "Narrow - Slow"}];
 
       /*
        * Tiny Fast
@@ -1089,7 +1296,7 @@ message Config {
        * Only compatible with SX127x and SX126x chipsets.
        * Comparable link budget and data rate to LONG_FAST.
        */
-      TINY_FAST = 14;
+      TINY_FAST = 14 [(meshtastic.enum_value_metadata) = {label: "Tiny - Fast"}];
 
       /*
        * Tiny Slow
@@ -1099,7 +1306,14 @@ message Config {
        * Only compatible with SX127x and SX126x chipsets.
        * Comparable link budget and data rate to LONG_MODERATE.
        */
-      TINY_SLOW = 15;
+      TINY_SLOW = 15 [(meshtastic.enum_value_metadata) = {label: "Tiny - Slow"}];
+
+      /*
+       * Medium Range - Turbo
+       * This preset performs similarly to MEDIUM_FAST, but with 500kHz bandwidth.
+       * It is not legal to use in all regions due to this wider bandwidth.
+       */
+      MEDIUM_TURBO = 16 [(meshtastic.enum_value_metadata) = {label: "Medium Range - Turbo"}];
     }
 
     enum FEM_LNA_Mode {
@@ -1120,38 +1334,71 @@ message Config {
     }
 
     /*
-     * When enabled, the `modem_preset` fields will be adhered to, else the `bandwidth`/`spread_factor`/`coding_rate`
-     * will be taked from their respective manually defined fields
+     * When enabled, the `modem_preset` sets the bandwidth and spread factor, and the
+     * `bandwidth`/`spread_factor` fields are ignored. `coding_rate` is the exception:
+     * see that field. When disabled, all three are taken from their respective
+     * manually defined fields.
      */
-    bool use_preset = 1;
+    bool use_preset = 1 [(meshtastic.field_metadata) = {
+      label: "Use Preset"
+      description: "Use the modem preset settings instead of a manual bandwidth, spread factor and coding rate"
+    }];
 
     /*
      * Either modem_config or bandwidth/spreading/coding will be specified - NOT BOTH.
      * As a heuristic: If bandwidth is specified, do not use modem_config.
      * Because protobufs take ZERO space when the value is zero this works out nicely.
      * This value is replaced by bandwidth/spread_factor/coding_rate.
+     * The one exception is `coding_rate`, which can raise the preset's coding rate
+     * without moving off the preset; see that field.
      * If you'd like to experiment with other options add them to MeshRadio.cpp in the device code.
      */
-    ModemPreset modem_preset = 2;
+    ModemPreset modem_preset = 2 [(meshtastic.field_metadata) = {label: "Presets"}];
 
     /*
-     * Bandwidth in MHz
+     * Bandwidth in kHz
      * Certain bandwidth numbers are 'special' and will be converted to the
-     * appropriate floating point value: 31 -> 31.25MHz
+     * appropriate floating point value: 31 -> 31.25kHz
      */
-    uint32 bandwidth = 3;
+    uint32 bandwidth = 3 [(meshtastic.field_metadata) = {
+      label: "Bandwidth"
+      unit: "kHz"
+    }];
 
     /*
-     * A number from 7 to 12.
+     * A number from 5 to 12, which the firmware clamps to that range.
      * Indicates number of chirps per symbol as 1<<spread_factor.
+     * RF95 radios additionally reject 5 and 6; that exclusion is per hardware
+     * and so is not expressible as a bound here.
      */
-    uint32 spread_factor = 4;
+    uint32 spread_factor = 4 [(meshtastic.field_metadata) = {
+      label: "Spread Factor"
+      description: "Number of chirps per symbol, as 2 raised to this value."
+      min_value: 5
+      max_value: 12
+    }];
 
     /*
      * The denominator of the coding rate.
      * ie for 4/5, the value is 5. 4/8 the value is 8.
+     *
+     * With `use_preset` disabled this is the coding rate, clamped to 5 through 8.
+     *
+     * With `use_preset` enabled, since 2.7.18 this raises the preset's coding rate
+     * when it is 5 through 8 AND higher than the preset's. A lower value, a value
+     * out of range, and 0 all leave the preset's coding rate in place, so 0 is how
+     * a client says "use the preset's". Bandwidth and spread factor still come from
+     * the preset, and the coding rate travels in the explicit LoRa header, so nodes
+     * on the same preset still hear each other either way.
+     *
+     * No bound is stated here because the valid set differs between the two cases:
+     * 5 through 8 with `use_preset` off, and 0 plus anything from above the preset's
+     * own coding rate up to 8 with it on.
      */
-    uint32 coding_rate = 5;
+    uint32 coding_rate = 5 [(meshtastic.field_metadata) = {
+      label: "Coding Rate"
+      description: "Error-correction redundancy, as the denominator of 4/n. Higher values survive noisier links but make every packet longer."
+    }];
 
     /*
      * This parameter is for advanced users with advanced test equipment, we do not recommend most users use it.
@@ -1163,20 +1410,32 @@ message Config {
     /*
      * The region code for the radio (US, CN, EU433, etc...)
      */
-    RegionCode region = 7;
+    RegionCode region = 7 [(meshtastic.field_metadata) = {
+      label: "Region"
+      description: "The region where you will be using your radios."
+    }];
 
     /*
      * Maximum number of hops. This can't be greater than 7.
      * Default of 3
      * Attempting to set a value > 7 results in the default
      */
-    uint32 hop_limit = 8;
+    uint32 hop_limit = 8 [(meshtastic.field_metadata) = {
+      label: "Hop Limit"
+      description: "How many times a message may be repeated before it stops being forwarded."
+      keywords: "hops|ttl|range|rebroadcast"
+      min_value: 0
+      max_value: 7
+    }];
 
     /*
      * Disable TX from the LoRa radio. Useful for hot-swapping antennas and other tests.
      * Defaults to false
      */
-    bool tx_enabled = 9;
+    bool tx_enabled = 9 [(meshtastic.field_metadata) = {
+      label: "Transmit Enabled"
+      description: "Allow the LoRa radio to transmit. Turn off while hot-swapping antennas or bench testing."
+    }];
 
     /*
      * If zero, then use default max legal continuous power (ie. something that won't
@@ -1184,7 +1443,14 @@ message Config {
      * In most cases you should use zero here.
      * Units are in dBm.
      */
-    int32 tx_power = 10;
+    int32 tx_power = 10 [(meshtastic.field_metadata) = {
+      label: "Transmit Power"
+      description: "Radio transmit power. Leave at zero to use the highest level legal for the region, which is what most radios should use."
+      keywords: "tx|power|dbm|output|gain"
+      unit: "dBm"
+      min_value: 0
+      max_value: 30
+    }];
 
     /*
      * This controls the actual hardware frequency the radio transmits on.
@@ -1195,19 +1461,25 @@ message Config {
      * If using the hash algorithm the channel number will be: hash(channel_name) %
      * NUM_CHANNELS (Where num channels depends on the regulatory region).
      */
-    uint32 channel_num = 11;
+    uint32 channel_num = 11 [(meshtastic.field_metadata) = {
+      label: "Frequency Slot"
+      description: "Your node’s operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name."
+    }];
 
     /*
      * If true, duty cycle limits will be exceeded and thus you're possibly not following
      * the local regulations if you're not a HAM.
      * Has no effect if the duty cycle of the used region is 100%.
      */
-    bool override_duty_cycle = 12;
+    bool override_duty_cycle = 12 [(meshtastic.field_metadata) = {label: "Override Duty Cycle"}];
 
     /*
      * If true, sets RX boosted gain mode on SX126X based radios
      */
-    bool sx126x_rx_boosted_gain = 13;
+    bool sx126x_rx_boosted_gain = 13 [(meshtastic.field_metadata) = {
+      label: "RX Boosted Gain"
+      description: "Enable RX boosted gain mode on SX126X based radios"
+    }];
 
     /*
      * This parameter is for advanced users and licensed HAM radio operators.
@@ -1216,34 +1488,37 @@ message Config {
      * Please respect your local laws and regulations. If you are a HAM, make sure you
      * enable HAM mode and turn off encryption.
      */
-    float override_frequency = 14;
+    float override_frequency = 14 [(meshtastic.field_metadata) = {label: "Frequency Override"}];
 
     /*
      * If true, disable the build-in PA FAN using pin define in RF95_FAN_EN.
      */
-    bool pa_fan_disabled = 15;
+    bool pa_fan_disabled = 15 [(meshtastic.field_metadata) = {label: "PA Fan Disabled"}];
 
     /*
      * For testing it is useful sometimes to force a node to never listen to
      * particular other nodes (simulating radio out of range). All nodenums listed
      * in ignore_incoming will have packets they send dropped on receive (by router.cpp)
      */
-    repeated uint32 ignore_incoming = 103;
+    repeated uint32 ignore_incoming = 103 [(meshtastic.field_metadata) = {label: "Ignore Incoming"}];
 
     /*
      * If true, the device will not process any packets received via LoRa that passed via MQTT anywhere on the path towards it.
      */
-    bool ignore_mqtt = 104;
+    bool ignore_mqtt = 104 [(meshtastic.field_metadata) = {
+      label: "Ignore MQTT"
+      description: "Ignore packets received over LoRa that travelled via MQTT anywhere on their path."
+    }];
 
     /*
      * Sets the ok_to_mqtt bit on outgoing packets
      */
-    bool config_ok_to_mqtt = 105;
+    bool config_ok_to_mqtt = 105 [(meshtastic.field_metadata) = {label: "Ok to MQTT"}];
 
     /*
      * Set where LORA FEM is enabled, disabled, or not present
      */
-    FEM_LNA_Mode fem_lna_mode = 106;
+    FEM_LNA_Mode fem_lna_mode = 106 [(meshtastic.field_metadata) = {since_firmware: "2.7.20"}];
 
     /*
      * Don't use radiolib to initialize the radio, instead listen for a serialHal connection
@@ -1256,74 +1531,138 @@ message Config {
       /*
        * Device generates a random PIN that will be shown on the screen of the device for pairing
        */
-      RANDOM_PIN = 0;
+      RANDOM_PIN = 0 [(meshtastic.enum_value_metadata) = {label: "Random Pin"}];
 
       /*
        * Device requires a specified fixed PIN for pairing
        */
-      FIXED_PIN = 1;
+      FIXED_PIN = 1 [(meshtastic.enum_value_metadata) = {label: "Fixed Pin"}];
 
       /*
        * Device requires no PIN for pairing
        */
-      NO_PIN = 2;
+      NO_PIN = 2 [(meshtastic.enum_value_metadata) = {label: "No PIN (Just Works)"}];
     }
 
     /*
      * Enable Bluetooth on the device
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "Bluetooth Enabled"
+      description: "Enable Bluetooth on the device"
+    }];
 
     /*
      * Determines the pairing strategy for the device
      */
-    PairingMode mode = 2;
+    PairingMode mode = 2 [(meshtastic.field_metadata) = {
+      label: "Pairing Mode"
+      description: "Bluetooth pairing strategy"
+    }];
 
     /*
      * Specified PIN for PairingMode.FixedPin
      */
-    uint32 fixed_pin = 3;
+    uint32 fixed_pin = 3 [(meshtastic.field_metadata) = {
+      label: "Fixed Pin"
+      description: "Fixed PIN for Bluetooth pairing. Used when pairing mode is set to fixed PIN"
+    }];
   }
 
   message SecurityConfig {
     /*
+     * Controls how the device authenticates remotely received mesh packets.
+     */
+    enum PacketSignaturePolicy {
+      /*
+       * Accept unsigned packets for maximum compatibility while still rejecting malformed or invalid signatures.
+       * This is the default to avoid legacy nodes dropping signed packets during rebroadcast.
+       */
+      PACKET_SIGNATURE_POLICY_COMPATIBLE = 0 [(meshtastic.enum_value_metadata) = {
+        label: "Compatible - Accept Unsigned"
+        description: "Accept unsigned traffic for maximum compatibility. A signature that can be checked and is wrong still drops the packet."
+      }];
+
+      /*
+       * Prefer authenticated packets while retaining compatibility with unsigned packets from nodes not known to sign.
+       * Rejects unsigned, signable broadcasts from nodes that have previously signed.
+       */
+      PACKET_SIGNATURE_POLICY_BALANCED = 1 [(meshtastic.enum_value_metadata) = {
+        label: "Balanced - Prefer Authenticated"
+        description: "Prefer authenticated packets, but still accept unsigned traffic from nodes not known to sign."
+      }];
+
+      /*
+       * Accept only packets authenticated by a verified XEdDSA signature or successful PKI decryption.
+       * Unsigned, malformed, invalid, or unverifiable packets are ignored.
+       */
+      PACKET_SIGNATURE_POLICY_STRICT = 2 [(meshtastic.enum_value_metadata) = {
+        label: "Strict - Require Authentication"
+        description: "Accept only packets with a verified signature or successful PKI decryption. Packets from older nodes may be ignored."
+      }];
+    }
+
+    /*
      * The public key of the user's device.
      * Sent out to other nodes on the mesh to allow them to compute a shared secret key.
      */
-    bytes public_key = 1;
+    bytes public_key = 1 [(meshtastic.field_metadata) = {
+      label: "Public Key"
+      description: "Generated from your private key and sent out to other nodes on the mesh to allow them to compute a shared secret key"
+    }];
 
     /*
      * The private key of the device.
      * Used to create a shared key with a remote device.
      */
-    bytes private_key = 2;
+    bytes private_key = 2 [(meshtastic.field_metadata) = {
+      label: "Private Key"
+      description: "Used to create a shared key with a remote device"
+    }];
 
     /*
      * The public key authorized to send admin messages to this node.
      */
-    repeated bytes admin_key = 3;
+    repeated bytes admin_key = 3 [(meshtastic.field_metadata) = {
+      label: "Admin Key"
+      description: "The public key authorized to send admin messages to this node"
+    }];
 
     /*
      * If true, device is considered to be "managed" by a mesh administrator via admin messages
      * Device is managed by a mesh administrator.
      */
-    bool is_managed = 4;
+    bool is_managed = 4 [(meshtastic.field_metadata) = {
+      label: "Managed Device"
+      description: "Device is managed by a mesh administrator, the user is unable to access any of the device settings."
+    }];
 
     /*
      * Serial Console over the Stream API."
      */
-    bool serial_enabled = 5;
+    bool serial_enabled = 5 [(meshtastic.field_metadata) = {
+      label: "Serial Console"
+      description: "Serial Console over the Stream API."
+    }];
 
     /*
      * By default we turn off logging as soon as an API client connects (to keep shared serial link quiet).
      * Output live debug logging over serial or bluetooth is set to true.
      */
-    bool debug_log_api_enabled = 6;
+    bool debug_log_api_enabled = 6 [(meshtastic.field_metadata) = {
+      label: "Debug Logs"
+      description: "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth."
+    }];
 
     /*
      * Allow incoming device control over the insecure legacy admin channel.
      */
     bool admin_channel_enabled = 8;
+
+    /*
+     * Determines the packet signature policy applied to remotely received mesh packets.
+     */
+    PacketSignaturePolicy packet_signature_policy = 9 [(meshtastic.field_metadata) = {since_firmware: "2.8.0"}];
   }
 
   /*

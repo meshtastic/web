@@ -574,61 +574,25 @@
   "trafficManagement": {
     "title": "Traffic Management Settings",
     "description": "Packet inspection and traffic shaping to reduce channel utilization",
-    "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable traffic management packet inspection and shaping"
-    },
-    "positionDedupEnabled": {
-      "label": "Position Deduplication",
-      "description": "Drop redundant position broadcasts"
-    },
-    "positionPrecisionBits": {
-      "label": "Position Precision Bits",
-      "description": "Bits of precision used for position deduplication (0-32)"
-    },
     "positionMinIntervalSecs": {
       "label": "Position Min Interval",
-      "description": "Minimum seconds between position updates from the same node"
-    },
-    "nodeinfoDirectResponse": {
-      "label": "NodeInfo Direct Response",
-      "description": "Answer NodeInfo requests directly from the local cache"
+      "description": "Drop positions from the same node that arrive sooner than this. 0 disables"
     },
     "nodeinfoDirectResponseMaxHops": {
       "label": "NodeInfo Response Max Hops",
-      "description": "Minimum hop distance from the requester before responding to NodeInfo requests"
-    },
-    "rateLimitEnabled": {
-      "label": "Rate Limiting",
-      "description": "Throttle chatty nodes with per-node rate limiting"
+      "description": "Answer NodeInfo requests from the local cache for requesters within this many hops. 0 disables"
     },
     "rateLimitWindowSecs": {
       "label": "Rate Limit Window",
-      "description": "Time window in seconds for rate-limit calculations"
+      "description": "Time window packets are counted over for rate limiting. 0 disables"
     },
     "rateLimitMaxPackets": {
       "label": "Rate Limit Max Packets",
-      "description": "Maximum packets allowed per node within the rate-limit window"
-    },
-    "dropUnknownEnabled": {
-      "label": "Drop Unknown Packets",
-      "description": "Drop undecryptable packets per rate-limit window"
+      "description": "Maximum packets one node may send per window. 0 disables"
     },
     "unknownPacketThreshold": {
       "label": "Unknown Packet Threshold",
-      "description": "Number of unknown packets before dropping from a node"
-    },
-    "exhaustHopTelemetry": {
-      "label": "Exhaust Hop (Telemetry)",
-      "description": "Set hop limit to 0 for relayed telemetry broadcasts"
-    },
-    "exhaustHopPosition": {
-      "label": "Exhaust Hop (Position)",
-      "description": "Set hop limit to 0 for relayed position broadcasts"
-    },
-    "routerPreserveHops": {
-      "label": "Preserve Router Hops",
-      "description": "Preserve hop limit for router-to-router traffic"
+      "description": "Undecryptable packets per window before the sender is dropped. 0 disables"
     }
   }
 }

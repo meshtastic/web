@@ -77,7 +77,7 @@ export class NodesClient {
       // processPacket but routed through the SDK signal layer.
       const nowSec = Math.floor(Date.now() / 1000);
       this.patch(packet.from, {
-        lastHeard: packet.rxTime > 0 ? packet.rxTime : nowSec,
+        lastHeard: packet.rxTime || nowSec,
         snr: packet.rxSnr,
       });
     });

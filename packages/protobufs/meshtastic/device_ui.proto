@@ -378,6 +378,16 @@ enum Language {
   DANISH = 19;
 
   /*
+   * Hungarian
+   */
+  HUNGARIAN = 20;
+
+  /*
+   * Azerbaijani
+   */
+  AZERBAIJANI = 21;
+
+  /*
    * Simplified Chinese (experimental)
    */
   SIMPLIFIED_CHINESE = 30;

@@ -1,0 +1,25 @@
+# Sized so the encoded message fits a PKI directed packet, not just a PSK
+# channel one. The firmware gates on the encoded Data: MAX_LORA_PAYLOAD_LEN 255
+# less a 16 byte header leaves 239, and a further 12 bytes of PKC overhead
+# leaves 227. Data costs 5 on top of this message, so the ceiling is 222.
+# Head and continuation share a maximum, so a sender may split anywhere.
+*LoRaWANBridge.Uplink.rssi_x10 int_size:16
+*LoRaWANBridge.Uplink.snr_x10 int_size:16
+*LoRaWANBridge.Uplink.radio_params int_size:8
+*LoRaWANBridge.Uplink.fsk_bitrate int_size:16
+*LoRaWANBridge.Uplink.payload_id int_size:8
+*LoRaWANBridge.Uplink.chunk_count int_size:8
+*LoRaWANBridge.Uplink.payload max_size:183
+
+*LoRaWANBridge.Downlink.radio_params int_size:8
+*LoRaWANBridge.Downlink.power_dbm int_size:8
+*LoRaWANBridge.Downlink.request_id int_size:8
+*LoRaWANBridge.Downlink.payload_id int_size:8
+*LoRaWANBridge.Downlink.chunk_count int_size:8
+*LoRaWANBridge.Downlink.payload max_size:183
+
+*LoRaWANBridge.TxResult.request_id int_size:8
+
+*LoRaWANBridge.PayloadChunk.payload_id int_size:8
+*LoRaWANBridge.PayloadChunk.chunk_index int_size:8
+*LoRaWANBridge.PayloadChunk.payload_chunk max_size:183

@@ -2,7 +2,7 @@
 *ServiceEnvelope.channel_id type:FT_POINTER
 *ServiceEnvelope.gateway_id type:FT_POINTER
 
-*MapReport.long_name max_size:40
+*MapReport.long_name max_size:25
 *MapReport.short_name max_size:5
 *MapReport.firmware_version max_size:18
 *MapReport.num_online_local_nodes int_size:16

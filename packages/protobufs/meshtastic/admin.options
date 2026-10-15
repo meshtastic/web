@@ -2,6 +2,8 @@
 
 *AdminMessage.session_passkey max_size:8
 
+*AdminMessage.OTAEvent.ota_hash max_size:32
+
 *AdminMessage.InputEvent.event_code int_size:8
 *AdminMessage.InputEvent.kb_char int_size:8
 *AdminMessage.InputEvent.touch_x int_size:16
@@ -16,4 +18,7 @@
 
 *HamParameters.call_sign max_size:8
 *HamParameters.short_name max_size:5
+*HamParameters.long_name max_size:15
 *NodeRemoteHardwarePinsResponse.node_remote_hardware_pins max_count:16
+
+*LockdownAuth.passphrase max_size:32

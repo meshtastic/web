@@ -50,28 +50,6 @@ export const TrafficManagement = ({
           description: t("trafficManagement.description"),
           fields: [
             {
-              type: "toggle",
-              name: "enabled",
-              label: t("trafficManagement.enabled.label"),
-              description: t("trafficManagement.enabled.description"),
-            },
-            {
-              type: "toggle",
-              name: "positionDedupEnabled",
-              label: t("trafficManagement.positionDedupEnabled.label"),
-              description: t(
-                "trafficManagement.positionDedupEnabled.description",
-              ),
-            },
-            {
-              type: "number",
-              name: "positionPrecisionBits",
-              label: t("trafficManagement.positionPrecisionBits.label"),
-              description: t(
-                "trafficManagement.positionPrecisionBits.description",
-              ),
-            },
-            {
               type: "number",
               name: "positionMinIntervalSecs",
               label: t("trafficManagement.positionMinIntervalSecs.label"),
@@ -83,26 +61,12 @@ export const TrafficManagement = ({
               },
             },
             {
-              type: "toggle",
-              name: "nodeinfoDirectResponse",
-              label: t("trafficManagement.nodeinfoDirectResponse.label"),
-              description: t(
-                "trafficManagement.nodeinfoDirectResponse.description",
-              ),
-            },
-            {
               type: "number",
               name: "nodeinfoDirectResponseMaxHops",
               label: t("trafficManagement.nodeinfoDirectResponseMaxHops.label"),
               description: t(
                 "trafficManagement.nodeinfoDirectResponseMaxHops.description",
               ),
-            },
-            {
-              type: "toggle",
-              name: "rateLimitEnabled",
-              label: t("trafficManagement.rateLimitEnabled.label"),
-              description: t("trafficManagement.rateLimitEnabled.description"),
             },
             {
               type: "number",
@@ -124,43 +88,11 @@ export const TrafficManagement = ({
               ),
             },
             {
-              type: "toggle",
-              name: "dropUnknownEnabled",
-              label: t("trafficManagement.dropUnknownEnabled.label"),
-              description: t(
-                "trafficManagement.dropUnknownEnabled.description",
-              ),
-            },
-            {
               type: "number",
               name: "unknownPacketThreshold",
               label: t("trafficManagement.unknownPacketThreshold.label"),
               description: t(
                 "trafficManagement.unknownPacketThreshold.description",
-              ),
-            },
-            {
-              type: "toggle",
-              name: "exhaustHopTelemetry",
-              label: t("trafficManagement.exhaustHopTelemetry.label"),
-              description: t(
-                "trafficManagement.exhaustHopTelemetry.description",
-              ),
-            },
-            {
-              type: "toggle",
-              name: "exhaustHopPosition",
-              label: t("trafficManagement.exhaustHopPosition.label"),
-              description: t(
-                "trafficManagement.exhaustHopPosition.description",
-              ),
-            },
-            {
-              type: "toggle",
-              name: "routerPreserveHops",
-              label: t("trafficManagement.routerPreserveHops.label"),
-              description: t(
-                "trafficManagement.routerPreserveHops.description",
               ),
             },
           ],

@@ -1,0 +1,6 @@
+# options for nanopb
+# keep payload sizes bounded for serial HAL command framing
+
+*SerialHalCommand.data max_size:512
+*SerialHalResponse.data max_size:512
+*SerialHalResponse.error max_size:80

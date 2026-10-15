@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@meshtastic/protobufs': workspace:*
+
 importers:
 
   .:
@@ -342,8 +345,8 @@ importers:
         specifier: ^2.13.0
         version: 2.13.0
       '@meshtastic/protobufs':
-        specifier: jsr:^2.7.18
-        version: '@jsr/meshtastic__protobufs@2.7.20'
+        specifier: workspace:*
+        version: link:../protobufs
       '@preact/signals-core':
         specifier: ^1.14.4
         version: 1.14.4
