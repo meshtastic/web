@@ -43,7 +43,7 @@ export function createLogger(
 ): Logger<unknown> {
   return new Logger({
     name,
-    prettyLogTemplate,
+    pretty: { template: prettyLogTemplate },
     minLevel: options?.minLevel ?? defaultMinLevel(),
   });
 }
