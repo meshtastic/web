@@ -106,6 +106,7 @@ export {
   EmptyMessageError,
   InMemoryDraftRepository,
   InMemoryMessageRepository,
+  inferConversation,
   MessageState,
   MessageTooLongError,
 } from "./src/features/chat/index.ts";

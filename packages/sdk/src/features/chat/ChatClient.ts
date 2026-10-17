@@ -106,6 +106,12 @@ export class ChatClient {
       markRead: (key) => this.markRead(key),
     };
 
+    // Older versions filed direct messages we sent under our own node, where
+    // no conversation reads them. Move them once we know which node is ours.
+    client.events.onMyNodeInfo.subscribe((info) => {
+      void this.repository.refileSentDirect?.(info.myNodeNum).catch(() => {});
+    });
+
     client.events.onMessagePacket.subscribe((packet) => {
       const message = MessageMapper.fromPacket(packet);
       const conv: ConversationKey =
@@ -122,7 +128,7 @@ export class ChatClient {
       if (this.store.hasMessage(key, message.id)) return;
 
       this.store.append(key, message);
-      void this.persistAppend(message);
+      void this.persistAppend(message, conv);
 
       // Increment unread count when the message is inbound (not from us). The
       // outbound echo of our own send doesn't count as unread.
@@ -298,7 +304,7 @@ export class ChatClient {
     };
     if (!this.store.hasMessage(key, packetId)) {
       this.store.append(key, message);
-      void this.persistAppend(message);
+      void this.persistAppend(message, conv);
     }
     this.draftStore.clear(conv);
     void this.draftRepository.clear(conv).catch(() => {});
@@ -364,12 +370,17 @@ export class ChatClient {
     });
   }
 
-  private async persistAppend(message: Message): Promise<void> {
+  private async persistAppend(
+    message: Message,
+    conv: ConversationKey,
+  ): Promise<void> {
     try {
-      await this.repository.append(message);
+      await this.repository.append(message, conv);
       if (this.retention) await this.repository.prune(this.retention);
-    } catch {
-      // persistence failure must not break reactive flow
+    } catch (e) {
+      // Persistence failure must not break the reactive flow, but say so:
+      // otherwise the message just isn't there after a reload.
+      this.client.log.warn("Could not save message", message.id, e);
     }
   }
 

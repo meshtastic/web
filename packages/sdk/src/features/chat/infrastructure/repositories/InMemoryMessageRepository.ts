@@ -3,6 +3,7 @@ import type { MessageState } from "../../domain/MessageState.ts";
 import {
   type ConversationKey,
   conversationKeyString,
+  inferConversation,
   type MessageRepository,
   type RetentionPolicy,
 } from "../../domain/MessageRepository.ts";
@@ -31,18 +32,42 @@ export class InMemoryMessageRepository implements MessageRepository {
     return bucket.slice(start, end);
   }
 
-  async append(message: Message): Promise<void> {
-    await this.appendBatch([message]);
+  async append(message: Message, key?: ConversationKey): Promise<void> {
+    this.insert(
+      conversationKeyString(key ?? inferConversation(message)),
+      message,
+    );
   }
 
   async appendBatch(messages: ReadonlyArray<Message>): Promise<void> {
     for (const message of messages) {
-      const k = this.inferKey(message);
-      const bucket = this.buckets.get(k) ?? [];
-      bucket.push(message);
-      bucket.sort((a, b) => a.rxTime.getTime() - b.rxTime.getTime());
-      this.buckets.set(k, bucket);
+      this.insert(conversationKeyString(inferConversation(message)), message);
     }
+  }
+
+  async refileSentDirect(localNodeNum: number): Promise<number> {
+    const own = conversationKeyString({ kind: "direct", peer: localNodeNum });
+    const bucket = this.buckets.get(own);
+    if (!bucket) return 0;
+    const sent = bucket.filter(
+      (m) => m.from === localNodeNum && m.to !== localNodeNum,
+    );
+    if (sent.length === 0) return 0;
+    this.buckets.set(
+      own,
+      bucket.filter((m) => !sent.includes(m)),
+    );
+    for (const m of sent) {
+      this.insert(conversationKeyString({ kind: "direct", peer: m.to }), m);
+    }
+    return sent.length;
+  }
+
+  private insert(key: string, message: Message): void {
+    const bucket = this.buckets.get(key) ?? [];
+    bucket.push(message);
+    bucket.sort((a, b) => a.rxTime.getTime() - b.rxTime.getTime());
+    this.buckets.set(key, bucket);
   }
 
   async updateDelivery(id: number, patch: MessageDeliveryPatch): Promise<void> {
@@ -103,11 +128,5 @@ export class InMemoryMessageRepository implements MessageRepository {
 
   async clear(): Promise<void> {
     this.buckets.clear();
-  }
-
-  private inferKey(message: Message): string {
-    return message.type === "direct"
-      ? conversationKeyString({ kind: "direct", peer: message.from })
-      : conversationKeyString({ kind: "channel", channel: message.channel });
   }
 }

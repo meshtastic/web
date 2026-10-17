@@ -13,7 +13,10 @@ export type {
   MessageRepository,
   RetentionPolicy,
 } from "./domain/MessageRepository.ts";
-export { conversationKeyString } from "./domain/MessageRepository.ts";
+export {
+  conversationKeyString,
+  inferConversation,
+} from "./domain/MessageRepository.ts";
 export { MessageMapper } from "./infrastructure/MessageMapper.ts";
 export { InMemoryMessageRepository } from "./infrastructure/repositories/InMemoryMessageRepository.ts";
 export {

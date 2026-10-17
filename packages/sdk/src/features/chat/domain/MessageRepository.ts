@@ -31,7 +31,13 @@ export interface MessageRepository {
     cursor: Date,
     limit: number,
   ): Promise<Message[]>;
-  append(message: Message): Promise<void>;
+  /**
+   * Stores a message. Pass `key` whenever it is known: a direct message we
+   * sent belongs to its recipient, which `message` alone can't tell apart
+   * from one we received. Without it the key is inferred from the sender.
+   */
+  append(message: Message, key?: ConversationKey): Promise<void>;
+  /** Stores received messages, inferring each one's conversation. */
   appendBatch(messages: ReadonlyArray<Message>): Promise<void>;
   updateState(id: number, state: MessageState): Promise<void>;
   updateDelivery(id: number, patch: MessageDeliveryPatch): Promise<void>;
@@ -42,6 +48,23 @@ export interface MessageRepository {
   clearConversation(key: ConversationKey): Promise<void>;
   /** Deletes every message for the scoped device / consumer. */
   clear(): Promise<void>;
+  /**
+   * Moves direct messages we sent that were filed under our own node, as
+   * older versions did, to the conversation with their recipient. Resolves
+   * with how many moved.
+   */
+  refileSentDirect?(localNodeNum: number): Promise<number>;
+}
+
+/**
+ * The conversation a received message belongs to. Wrong for a direct
+ * message we sent, which belongs to its recipient; callers that know the
+ * local node pass the key instead.
+ */
+export function inferConversation(message: Message): ConversationKey {
+  return message.type === "direct"
+    ? { kind: "direct", peer: message.from }
+    : { kind: "channel", channel: message.channel };
 }
 
 export function conversationKeyString(key: ConversationKey): string {
