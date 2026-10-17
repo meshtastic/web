@@ -16,6 +16,7 @@ import {
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
+import { STAGED_FIXED_POSITION } from "@core/utils/stagedAdminKeys.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { LocateFixed } from "lucide-react";
@@ -94,7 +95,11 @@ function UseBrowserLocationButton({ isImperial }: { isImperial: boolean }) {
   );
 }
 
-const FIXED_POSITION_KEY = "fixedPosition";
+const EMPTY_STAGED_SIGNAL = {
+  value: new Map() as ReadonlyMap<string, Protobuf.Admin.AdminMessage>,
+  peek: () => new Map() as ReadonlyMap<string, Protobuf.Admin.AdminMessage>,
+  subscribe: () => () => {},
+} as const;
 
 const EMPTY_RADIO_SIGNAL = {
   value: {} as { position?: Protobuf.Config.Config_PositionConfig },
@@ -109,6 +114,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
   const editor = useConfigEditor();
   const myNode = useMyNodeAsProto();
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const staged = useSignal(editor?.stagedAdminMessages ?? EMPTY_STAGED_SIGNAL);
 
   const effectivePosition =
     radio.position ??
@@ -122,26 +128,34 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
   const { t } = useTranslation("config");
 
   const currentPosition = myNode?.position;
+  // A staged fixed position (from this form or a profile import) is what
+  // the form shows, so coming back to the tab doesn't lose it.
+  const stagedVariant = staged.get(STAGED_FIXED_POSITION)?.payloadVariant;
+  const stagedPosition =
+    stagedVariant?.case === "setFixedPosition"
+      ? stagedVariant.value
+      : undefined;
+  const shownPosition = stagedPosition ?? currentPosition;
   const displayUnits = getEffectiveConfig("display")?.units;
   const isImperial =
     displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL;
 
   const formValues = useMemo(() => {
-    const altitudeMeters = currentPosition?.altitude ?? 0;
+    const altitudeMeters = shownPosition?.altitude ?? 0;
     return {
       ...config.position,
       ...effectivePosition,
-      latitude: currentPosition?.latitudeI
-        ? currentPosition.latitudeI / 1e7
+      latitude: shownPosition?.latitudeI
+        ? shownPosition.latitudeI / 1e7
         : undefined,
-      longitude: currentPosition?.longitudeI
-        ? currentPosition.longitudeI / 1e7
+      longitude: shownPosition?.longitudeI
+        ? shownPosition.longitudeI / 1e7
         : undefined,
       altitude: isImperial
         ? Math.round(metersToFeet(altitudeMeters))
         : altitudeMeters,
     } as PositionValidation;
-  }, [config.position, effectivePosition, currentPosition, isImperial]);
+  }, [config.position, effectivePosition, shownPosition, isImperial]);
 
   const onSubmit = (data: PositionValidation) => {
     const {
@@ -190,7 +204,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
         });
       }
     }
-    editor?.stageAdminMessage(FIXED_POSITION_KEY, fixedPositionMessage);
+    editor?.stageAdminMessage(STAGED_FIXED_POSITION, fixedPositionMessage);
   };
 
   const onPositonFlagChange = useCallback(

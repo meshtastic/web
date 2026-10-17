@@ -28,8 +28,5 @@ describe("dirtyDeviceTabs", () => {
 
   it("counts a staged fixed position under Position", () => {
     expect([...dirtyDeviceTabs([], ["fixedPosition"])]).toEqual(["position"]);
-    expect([...dirtyDeviceTabs([], ["profileFixedPosition"])]).toEqual([
-      "position",
-    ]);
   });
 });

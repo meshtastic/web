@@ -8,6 +8,7 @@ import {
 import { useDeviceConnected } from "@components/PageComponents/SettingsPages/useDeviceConnected.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { STAGED_FIXED_POSITION } from "@core/utils/stagedAdminKeys.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
   buildDeviceProfile,
@@ -74,9 +75,10 @@ const applyPlan = (editor: ConfigEditor, plan: ImportPlan) => {
   }
   for (const channel of plan.channels) editor.setChannel(channel);
   if (plan.fixedPosition) {
-    // Staged by key, so Reset drops it and a second import replaces it.
+    // Same key as the Position page, so only one fixed position is sent;
+    // Reset drops it and a later edit or import replaces it.
     editor.stageAdminMessage(
-      "profileFixedPosition",
+      STAGED_FIXED_POSITION,
       create(Protobuf.Admin.AdminMessageSchema, {
         payloadVariant: { case: "setFixedPosition", value: plan.fixedPosition },
       }),

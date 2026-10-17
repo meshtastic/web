@@ -1,3 +1,5 @@
+import { STAGED_FIXED_POSITION } from "@core/utils/stagedAdminKeys.ts";
+
 /**
  * Admin messages staged in the config editor, by the settings tab they
  * belong to. They are sent with Save like a config section, so they count
@@ -8,8 +10,7 @@ const STAGED_KEY_MODULE: Record<string, string> = {
   ringtone: "externalNotification",
 };
 const STAGED_KEY_DEVICE: Record<string, string> = {
-  fixedPosition: "position",
-  profileFixedPosition: "position",
+  [STAGED_FIXED_POSITION]: "position",
 };
 
 export const DEVICE_SECTIONS = [
