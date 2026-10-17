@@ -25,6 +25,16 @@ export interface Message {
   readonly routingError?: Protobuf.Mesh.Routing_Error;
   /** How many acks (relays and the recipient) came back for it. */
   readonly relays?: number;
+  /** SNR in dB of a received message, when our radio measured it. */
+  readonly snr?: number;
+  /** RSSI in dBm of a received message, when our radio measured it. */
+  readonly rssi?: number;
+  /** Hops a received message took, or undefined when it can't be told. */
+  readonly hopsAway?: number;
+  /** The message reached the mesh through an MQTT gateway. */
+  readonly viaMqtt?: boolean;
+  /** How the message reached our radio. */
+  readonly transport?: Protobuf.Mesh.MeshPacket_TransportMechanism;
 }
 
 /** Fields an ack or NAK can change on a stored message. */

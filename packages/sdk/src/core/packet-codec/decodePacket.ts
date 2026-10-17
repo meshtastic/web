@@ -344,6 +344,34 @@ function handleMeshPacket(
   }
 }
 
+/**
+ * Hops the packet took, from hop_start and hop_limit. Unknown when hop_start
+ * is 0 (firmware older than 2.3, which didn't set it) or hop_limit is above it.
+ */
+export function hopsAway(
+  hopStart: number,
+  hopLimit: number,
+): number | undefined {
+  if (hopStart === 0 || hopLimit > hopStart) return undefined;
+  return hopStart - hopLimit;
+}
+
+/**
+ * How our radio heard the packet. rx_snr is a plain proto3 float, so 0 can
+ * mean either a 0 dB reading or no reading at all; rx_rssi is optional and
+ * only set when the radio measured the packet, so it tells the two apart.
+ */
+function radioMetadata(meshPacket: Protobuf.Mesh.MeshPacket) {
+  const measured = meshPacket.rxRssi !== undefined || meshPacket.rxSnr !== 0;
+  return {
+    rxSnr: measured ? meshPacket.rxSnr : undefined,
+    rxRssi: meshPacket.rxRssi,
+    hopsAway: hopsAway(meshPacket.hopStart, meshPacket.hopLimit),
+    viaMqtt: meshPacket.viaMqtt,
+    transportMechanism: meshPacket.transportMechanism,
+  };
+}
+
 function handleDecodedPacket(
   sink: PacketSink,
   dataPacket: Protobuf.Mesh.Data,
@@ -361,6 +389,7 @@ function handleDecodedPacket(
     requestId: dataPacket.requestId || undefined,
     xeddsaSigned: meshPacket.xeddsaSigned,
     ackProofStatus: meshPacket.ackProofStatus,
+    ...radioMetadata(meshPacket),
   };
 
   sink.log.trace(

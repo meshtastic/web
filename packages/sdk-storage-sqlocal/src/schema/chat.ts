@@ -1,4 +1,10 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  real,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 export const messages = sqliteTable(
   "messages",
@@ -25,6 +31,11 @@ export const messages = sqliteTable(
     ackProof: integer("ack_proof"),
     routingError: integer("routing_error"),
     relays: integer("relays"),
+    snr: real("snr"),
+    rssi: integer("rssi"),
+    hopsAway: integer("hops_away"),
+    viaMqtt: integer("via_mqtt", { mode: "boolean" }),
+    transport: integer("transport"),
   },
   (t) => ({
     pk: index("messages_pk").on(t.deviceId, t.id),

@@ -76,4 +76,15 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
       `ALTER TABLE messages ADD COLUMN relays INTEGER`,
     ],
   },
+  {
+    // How a received message reached us: signal, hops and transport.
+    version: 4,
+    sql: [
+      `ALTER TABLE messages ADD COLUMN snr REAL`,
+      `ALTER TABLE messages ADD COLUMN rssi INTEGER`,
+      `ALTER TABLE messages ADD COLUMN hops_away INTEGER`,
+      `ALTER TABLE messages ADD COLUMN via_mqtt INTEGER`,
+      `ALTER TABLE messages ADD COLUMN transport INTEGER`,
+    ],
+  },
 ];

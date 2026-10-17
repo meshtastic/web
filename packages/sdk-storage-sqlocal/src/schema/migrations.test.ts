@@ -66,6 +66,25 @@ describe("MIGRATIONS", () => {
     expect(columns).toEqual(expect.arrayContaining(["signed", "ack_proof"]));
   });
 
+  it("v4 adds the received-signal message columns", async () => {
+    const db = await freshSqlite();
+    for (const migration of MIGRATIONS) {
+      for (const stmt of migration.sql) db.run(stmt);
+    }
+    const columns = db
+      .exec("PRAGMA table_info(messages)")[0]
+      ?.values.map((row) => [row[1], row[2]]) as [string, string][];
+    expect(columns).toEqual(
+      expect.arrayContaining([
+        ["snr", "REAL"],
+        ["rssi", "INTEGER"],
+        ["hops_away", "INTEGER"],
+        ["via_mqtt", "INTEGER"],
+        ["transport", "INTEGER"],
+      ]),
+    );
+  });
+
   it("a second ALTER TABLE fails with an error isDuplicateColumn recognises", async () => {
     const db = await freshSqlite();
     for (const migration of MIGRATIONS) {

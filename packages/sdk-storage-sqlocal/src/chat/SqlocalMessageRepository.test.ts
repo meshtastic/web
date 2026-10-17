@@ -50,6 +50,34 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     expect(out.map((m) => m.id)).toEqual([1, 2]);
   });
 
+  it("round-trips how a message was received, keeping 0 readings", async () => {
+    await repo.append({
+      ...msg(7, 1000),
+      snr: 0,
+      rssi: -97,
+      hopsAway: 0,
+      viaMqtt: true,
+      transport: 0,
+    });
+    await repo.append(msg(8, 2000));
+    const [withRadio, without] = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      2,
+    );
+    expect(withRadio).toMatchObject({
+      snr: 0,
+      rssi: -97,
+      hopsAway: 0,
+      viaMqtt: true,
+      transport: 0,
+    });
+    expect(without?.snr).toBeUndefined();
+    expect(without?.rssi).toBeUndefined();
+    expect(without?.hopsAway).toBeUndefined();
+    expect(without?.viaMqtt).toBeUndefined();
+    expect(without?.transport).toBeUndefined();
+  });
+
   it("updateState mutates the matching row", async () => {
     await repo.append(msg(42, 1000));
     await repo.updateState(42, MessageState.Failed);

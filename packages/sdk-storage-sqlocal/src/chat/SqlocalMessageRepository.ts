@@ -175,6 +175,11 @@ interface MessageRow {
   ackProof?: number | null;
   routingError?: number | null;
   relays?: number | null;
+  snr?: number | null;
+  rssi?: number | null;
+  hopsAway?: number | null;
+  viaMqtt?: boolean | null;
+  transport?: number | null;
 }
 
 function rowToMessage(row: MessageRow): Message {
@@ -194,6 +199,13 @@ function rowToMessage(row: MessageRow): Message {
     routingError:
       (row.routingError as Protobuf.Mesh.Routing_Error | null) ?? undefined,
     relays: row.relays ?? undefined,
+    snr: row.snr ?? undefined,
+    rssi: row.rssi ?? undefined,
+    hopsAway: row.hopsAway ?? undefined,
+    viaMqtt: row.viaMqtt ?? undefined,
+    transport:
+      (row.transport as Protobuf.Mesh.MeshPacket_TransportMechanism | null) ??
+      undefined,
   };
 }
 
@@ -217,5 +229,10 @@ function messageToRow(deviceId: number, message: Message): MessageRow {
     ackProof: message.ackProof ?? null,
     routingError: message.routingError ?? null,
     relays: message.relays ?? null,
+    snr: message.snr ?? null,
+    rssi: message.rssi ?? null,
+    hopsAway: message.hopsAway ?? null,
+    viaMqtt: message.viaMqtt ?? null,
+    transport: message.transport ?? null,
   };
 }

@@ -17,6 +17,11 @@ export const MessageMapper = {
       text: packet.data,
       state,
       signed: packet.xeddsaSigned || undefined,
+      snr: packet.rxSnr,
+      rssi: packet.rxRssi,
+      hopsAway: packet.hopsAway,
+      viaMqtt: packet.viaMqtt || undefined,
+      transport: packet.transportMechanism,
     };
   },
 };
