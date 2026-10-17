@@ -9,6 +9,7 @@ import {
   createLogger,
   DeviceStatusEnum,
   FirmwareTooOldError,
+  HandshakeTimeoutError,
   MIN_FIRMWARE_VERSION,
 } from "@meshtastic/sdk";
 import { t } from "i18next";
@@ -25,13 +26,18 @@ import { meshRegistry } from "@core/meshRegistry.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 // Per-connection out-of-band handles tracked outside Zustand:
 //   - cachedTransports: held BT device / serial port for reconnect + cleanup.
 //   - configSubscriptions: handshake status / reboot unsubscribers.
 const cachedTransports = new Map<ConnectionId, BluetoothDevice | SerialPort>();
 const configSubscriptions = new Map<ConnectionId, () => void>();
+// Handshake attempts per connection. A stalled handshake is retried by
+// reopening the transport with backoff, as the Android app does, instead of
+// re-sending want_config in the same session.
+const handshakeAttempts = new Map<ConnectionId, number>();
+const HANDSHAKE_RETRY_DELAYS_MS = [2_000, 4_000];
 
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
@@ -44,6 +50,10 @@ export function useConnections() {
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
+  // Set below once connect() exists; used by setupMeshDevice to retry.
+  const retryHandshakeRef = useRef<
+    ((id: ConnectionId, delayMs: number) => Promise<void>) | undefined
+  >(undefined);
 
   const updateStatus = useCallback(
     (
@@ -160,9 +170,10 @@ export function useConnections() {
         });
       }
 
-      if (!meshRegistry.has(id)) {
-        meshRegistry.register(id, meshDevice.meshClient);
-      }
+      // Replace any client left from an earlier attempt, so the app reads
+      // this session's state rather than the dead one's.
+      if (meshRegistry.has(id)) meshRegistry.unregister(id);
+      meshRegistry.register(id, meshDevice.meshClient);
       meshRegistry.setActive(id);
 
       setSelectedDevice(deviceId);
@@ -183,6 +194,7 @@ export function useConnections() {
       const markConfigured = (source: string): void => {
         if (configuredHandled) return;
         configuredHandled = true;
+        handshakeAttempts.delete(id);
         log.info("connect transitioned to configured", { id, source });
         device.setConnectionPhase("configured");
         updateStatus(id, "configured");
@@ -244,6 +256,21 @@ export function useConnections() {
             name: e?.name,
             message: e?.message,
           });
+          if (error instanceof HandshakeTimeoutError) {
+            const attempt = handshakeAttempts.get(id) ?? 0;
+            const delayMs = HANDSHAKE_RETRY_DELAYS_MS[attempt];
+            if (delayMs !== undefined && retryHandshakeRef.current) {
+              handshakeAttempts.set(id, attempt + 1);
+              log.warn("handshake stalled, reopening the transport", {
+                id,
+                attempt: attempt + 1,
+                delayMs,
+              });
+              void retryHandshakeRef.current(id, delayMs);
+              return;
+            }
+          }
+          handshakeAttempts.delete(id);
           updateStatus(
             id,
             "error",
@@ -340,6 +367,17 @@ export function useConnections() {
     },
     [updateStatus, setupMeshDevice],
   );
+
+  retryHandshakeRef.current = async (id, delayMs) => {
+    const conn = useDeviceStore
+      .getState()
+      .savedConnections.find((c) => c.id === id);
+    await teardown(id, conn);
+    await new Promise((r) => setTimeout(r, delayMs));
+    // connect() skips configured/connected connections; this one is still
+    // "configuring", so it reopens the transport and runs a fresh handshake.
+    await connect(id);
+  };
 
   const disconnect = useCallback(
     async (id: ConnectionId) => {

@@ -14,11 +14,32 @@ export const NODEDB_NONCE = 69421;
 export const HANDSHAKE_SETTLE_MS = 100;
 
 /**
- * A stage fails if the device goes this long without sending a frame. Each
- * frame re-arms the timer, so a large NodeDB never trips it while it streams.
- * The first stall resends the stage's `want_config_id` once.
+ * A stage fails if the device goes this long without sending a handshake
+ * frame. Each handshake frame re-arms the timer, so a large NodeDB never
+ * trips it while it streams; live mesh traffic does not, so a lost frame
+ * can't keep a stalled handshake alive. A stall fails the handshake rather
+ * than resending `want_config_id` in the same session, which the Android
+ * client found can wedge firmware; callers recover by reopening the
+ * transport.
  */
 export const HANDSHAKE_IDLE_TIMEOUT_MS = 15_000;
+
+/** Hard cap on one stage, however long frames keep arriving (as Android). */
+export const HANDSHAKE_STAGE_MAX_MS = 10 * HANDSHAKE_IDLE_TIMEOUT_MS;
+
+/** FromRadio variants that count as handshake progress. */
+export const HANDSHAKE_FRAME_CASES: ReadonlySet<string> = new Set([
+  "myInfo",
+  "nodeInfo",
+  "config",
+  "moduleConfig",
+  "channel",
+  "metadata",
+  "fileInfo",
+  "deviceuiConfig",
+  "regionPresets",
+  "configCompleteId",
+]);
 
 export const HEARTBEAT_INTERVAL_MS = 30_000;
 
