@@ -79,7 +79,7 @@
     "idb-keyval": "^6.3.0",
     "immer": "^11.1.18",
     "js-cookie": "^3.0.8",
-    "lucide-react": "^1.28.0",
+    "lucide-react": "^1.56.0",
     "maplibre-gl": "6.13.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
