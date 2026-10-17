@@ -112,30 +112,47 @@ export const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings",
   component: ConfigPage,
-  // beforeLoad: () => {
-  //   throw redirect({
-  //     to: "/settings/radio",
-  //     replace: true,
-  //   });
-  // },
 });
 
-export const radioRoute = createRoute({
+const settingsTabSearchSchema = z.object({
+  tab: z.string().optional(),
+});
+
+const settingsPage = (path: string) =>
+  createRoute({
+    getParentRoute: () => settingsRoute,
+    path,
+    component: ConfigPage,
+  });
+
+const settingsTabbedPage = (path: string) =>
+  createRoute({
+    getParentRoute: () => settingsRoute,
+    path,
+    component: ConfigPage,
+    validateSearch: (search) => settingsTabSearchSchema.parse(search),
+  });
+
+export const userRoute = settingsPage("user");
+export const loraRoute = settingsPage("lora");
+export const channelsRoute = settingsPage("channels");
+export const securityRoute = settingsPage("security");
+export const deviceRoute = settingsTabbedPage("device");
+export const moduleRoute = settingsTabbedPage("module");
+export const administrationRoute = settingsPage("administration");
+export const backupRestoreRoute = settingsPage("backup");
+export const cleanNodeDbRoute = settingsPage("clean-nodes");
+export const debugRoute = settingsPage("debug");
+export const appSettingsRoute = settingsPage("app");
+export const aboutRoute = settingsPage("about");
+
+// Radio Config used to group LoRa, Channels and Security.
+const legacyRadioRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "radio",
-  component: ConfigPage,
-});
-
-export const deviceRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: "device",
-  component: ConfigPage,
-});
-
-export const moduleRoute = createRoute({
-  getParentRoute: () => settingsRoute,
-  path: "module",
-  component: ConfigPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/settings/lora", replace: true });
+  },
 });
 
 const nodesRoute = createRoute({
@@ -162,7 +179,21 @@ export const routeTree = rootRoute.addChildren([
   messagesWithParamsRoute,
   mapRoute,
   mapWithParamsRoute,
-  settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
+  settingsRoute.addChildren([
+    userRoute,
+    loraRoute,
+    channelsRoute,
+    securityRoute,
+    deviceRoute,
+    moduleRoute,
+    administrationRoute,
+    backupRestoreRoute,
+    cleanNodeDbRoute,
+    debugRoute,
+    appSettingsRoute,
+    aboutRoute,
+    legacyRadioRoute,
+  ]),
   nodesRoute,
   dialogWithParamsRoute,
   connectionsRoute,

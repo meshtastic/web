@@ -10,41 +10,82 @@ import { Paxcounter } from "@components/PageComponents/ModuleConfig/Paxcounter.t
 import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.tsx";
 import { RemoteHardware } from "@components/PageComponents/ModuleConfig/RemoteHardware.tsx";
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.tsx";
-import { StatusMessage } from "@components/PageComponents/ModuleConfig/StatusMessage.tsx";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
 import { Tak } from "@components/PageComponents/ModuleConfig/Tak.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@components/UI/Tabs.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import type { ValidModuleConfigType } from "@core/stores";
 import { isModuleExcluded } from "@core/utils/excludedModules.ts";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
-import { type ComponentType, Suspense, useMemo } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-
-interface ConfigProps {
-  onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
-}
-
-type TabItem = {
-  case: ValidModuleConfigType;
-  label: string;
-  element: ComponentType<ConfigProps>;
-  count?: number;
-};
+import {
+  type ConfigProps,
+  type SettingsTab,
+  SettingsTabs,
+} from "./SettingsTabs.tsx";
 
 const EMPTY_DIRTY_MODULE_SIGNAL = {
   value: [] as readonly string[],
   peek: () => [] as readonly string[],
   subscribe: () => () => {},
 } as const;
+
+type ModuleTab = {
+  key: ValidModuleConfigType;
+  labelKey: string;
+  element: ComponentType<ConfigProps>;
+};
+
+/**
+ * Module configuration, in the order of Android's ModuleRoute. Status
+ * Message is not a tab: like Android, its one field lives on the User page.
+ */
+const MODULE_TABS: ModuleTab[] = [
+  { key: "mqtt", labelKey: "page.tabMqtt", element: MQTT },
+  { key: "serial", labelKey: "page.tabSerial", element: Serial },
+  {
+    key: "externalNotification",
+    labelKey: "page.tabExternalNotification",
+    element: ExternalNotification,
+  },
+  {
+    key: "storeForward",
+    labelKey: "page.tabStoreAndForward",
+    element: StoreForward,
+  },
+  { key: "rangeTest", labelKey: "page.tabRangeTest", element: RangeTest },
+  { key: "telemetry", labelKey: "page.tabTelemetry", element: Telemetry },
+  {
+    key: "cannedMessage",
+    labelKey: "page.tabCannedMessage",
+    element: CannedMessage,
+  },
+  { key: "audio", labelKey: "page.tabAudio", element: Audio },
+  {
+    key: "remoteHardware",
+    labelKey: "page.tabRemoteHardware",
+    element: RemoteHardware,
+  },
+  {
+    key: "neighborInfo",
+    labelKey: "page.tabNeighborInfo",
+    element: NeighborInfo,
+  },
+  {
+    key: "ambientLighting",
+    labelKey: "page.tabAmbientLighting",
+    element: AmbientLighting,
+  },
+  {
+    key: "detectionSensor",
+    labelKey: "page.tabDetectionSensor",
+    element: DetectionSensor,
+  },
+  { key: "paxcounter", labelKey: "page.tabPaxcounter", element: Paxcounter },
+  { key: "tak", labelKey: "page.tabTak", element: Tak },
+  { key: "meshBeacon", labelKey: "page.tabMeshBeacon", element: MeshBeacon },
+];
 
 export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   const editor = useConfigEditor();
@@ -53,127 +94,20 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   );
   const { t } = useTranslation("moduleConfig");
   const { excludedModules } = useDeviceCapabilities();
-  const allTabs: TabItem[] = useMemo(
-    () => [
-      {
-        case: "mqtt",
-        label: t("page.tabMqtt"),
-        element: MQTT,
-      },
-      {
-        case: "serial",
-        label: t("page.tabSerial"),
-        element: Serial,
-      },
-      {
-        case: "externalNotification",
-        label: t("page.tabExternalNotification"),
-        element: ExternalNotification,
-      },
-      {
-        case: "storeForward",
-        label: t("page.tabStoreAndForward"),
-        element: StoreForward,
-      },
-      {
-        case: "rangeTest",
-        label: t("page.tabRangeTest"),
-        element: RangeTest,
-      },
-      {
-        case: "telemetry",
-        label: t("page.tabTelemetry"),
-        element: Telemetry,
-      },
-      {
-        case: "cannedMessage",
-        label: t("page.tabCannedMessage"),
-        element: CannedMessage,
-      },
-      {
-        case: "audio",
-        label: t("page.tabAudio"),
-        element: Audio,
-      },
-      {
-        case: "neighborInfo",
-        label: t("page.tabNeighborInfo"),
-        element: NeighborInfo,
-      },
-      {
-        case: "ambientLighting",
-        label: t("page.tabAmbientLighting"),
-        element: AmbientLighting,
-      },
-      {
-        case: "detectionSensor",
-        label: t("page.tabDetectionSensor"),
-        element: DetectionSensor,
-      },
-      {
-        case: "paxcounter",
-        label: t("page.tabPaxcounter"),
-        element: Paxcounter,
-      },
-      {
-        case: "remoteHardware",
-        label: t("page.tabRemoteHardware"),
-        element: RemoteHardware,
-      },
-      {
-        case: "statusmessage",
-        label: t("page.tabStatusMessage"),
-        element: StatusMessage,
-      },
-      { case: "tak", label: t("page.tabTak"), element: Tak },
-      {
-        case: "meshBeacon",
-        label: t("page.tabMeshBeacon"),
-        element: MeshBeacon,
-      },
-    ],
-    [t],
-  );
+
   // Hide the modules this firmware build was compiled without.
-  const tabs = useMemo(
-    () => allTabs.filter((tab) => !isModuleExcluded(excludedModules, tab.case)),
-    [allTabs, excludedModules],
-  );
-
-  const flags = useMemo(
+  const tabs: SettingsTab[] = useMemo(
     () =>
-      new Map(tabs.map((tab) => [tab.case, dirtyModule.includes(tab.case)])),
-    [tabs, dirtyModule],
+      MODULE_TABS.filter(
+        (tab) => !isModuleExcluded(excludedModules, tab.key),
+      ).map((tab) => ({
+        key: tab.key,
+        label: t(tab.labelKey),
+        element: tab.element,
+        isDirty: dirtyModule.includes(tab.key),
+      })),
+    [t, excludedModules, dirtyModule],
   );
 
-  return (
-    // Keyed on the first tab so the default moves on when metadata arriving
-    // later hides it.
-    <Tabs key={tabs[0]?.label} defaultValue={tabs[0]?.label}>
-      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-800">
-        {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.label}
-            value={tab.label}
-            className="dark:text-white relative max-md:shrink-0"
-          >
-            {tab.label}
-            {flags.get(tab.case) && (
-              <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
-                <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
-              </span>
-            )}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      {tabs.map((tab) => (
-        <TabsContent key={tab.label} value={tab.label} className="max-md:px-2">
-          <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <tab.element onFormInit={onFormInit} />
-          </Suspense>
-        </TabsContent>
-      ))}
-    </Tabs>
-  );
+  return <SettingsTabs tabs={tabs} onFormInit={onFormInit} />;
 };

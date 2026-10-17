@@ -98,7 +98,7 @@ export const CommandPalette = () => {
           label: t("goto.command.config"),
           icon: SettingsIcon,
           action() {
-            navigate({ to: "/config" });
+            navigate({ to: "/settings" });
           },
           tags: ["settings"],
         },

@@ -121,7 +121,7 @@ export const ImportDialog = ({
     }
     handleOpenChange(false);
     // Apply only stages the change; take a beacon join to where it's saved.
-    if (joining) navigate({ to: "/settings/radio" });
+    if (joining) navigate({ to: "/settings/lora" });
   };
 
   const onSelectChange = (value: string, index: number) => {

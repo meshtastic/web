@@ -4,30 +4,16 @@ import { Display } from "@components/PageComponents/Settings/Display.tsx";
 import { Network } from "@components/PageComponents/Settings/Network/index.tsx";
 import { Position } from "@components/PageComponents/Settings/Position.tsx";
 import { Power } from "@components/PageComponents/Settings/Power.tsx";
-import { User } from "@components/PageComponents/Settings/User.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import type { ValidConfigType } from "@core/stores";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
-import { type ComponentType, Suspense, useMemo } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-
-interface ConfigProps {
-  onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
-}
-
-type TabItem = {
-  case: ValidConfigType | "user";
-  label: string;
-  element: ComponentType<ConfigProps>;
-  count?: number;
-};
+import {
+  type ConfigProps,
+  type SettingsTab,
+  SettingsTabs,
+} from "./SettingsTabs.tsx";
 
 const EMPTY_DIRTY_RADIO_SIGNAL = {
   value: [] as readonly string[],
@@ -35,101 +21,63 @@ const EMPTY_DIRTY_RADIO_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
-const EMPTY_OWNER_DIRTY_SIGNAL = {
-  value: false,
-  peek: () => false,
-  subscribe: () => () => {},
-} as const;
+type DeviceTab = SettingsTab & { key: ValidConfigType; shown: boolean };
 
+/** Device configuration, in the order of Android's deviceConfigRoutes. */
 export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
   const editor = useConfigEditor();
   const dirtyRadio = useSignal(
     editor?.dirtyRadioSections ?? EMPTY_DIRTY_RADIO_SIGNAL,
   );
-  const isOwnerDirty = useSignal(
-    editor?.isOwnerDirty ?? EMPTY_OWNER_DIRTY_SIGNAL,
-  );
+  const { metadata } = useDeviceCapabilities();
   const { t } = useTranslation("config");
-  const tabs: TabItem[] = useMemo(
-    () => [
+
+  const tabs: SettingsTab[] = useMemo(() => {
+    // Until metadata arrives, show every tab, as Android does.
+    const hasNetwork = !metadata || metadata.hasWifi || metadata.hasEthernet;
+    const hasBluetooth = !metadata || metadata.hasBluetooth;
+    const all: DeviceTab[] = [
       {
-        case: "user",
-        label: t("page.tabUser"),
-        element: User,
-      },
-      {
-        case: "device",
+        key: "device",
         label: t("page.tabDevice"),
         element: Device,
+        shown: true,
       },
       {
-        case: "position",
+        key: "position",
         label: t("page.tabPosition"),
         element: Position,
+        shown: true,
       },
+      { key: "power", label: t("page.tabPower"), element: Power, shown: true },
       {
-        case: "power",
-        label: t("page.tabPower"),
-        element: Power,
-      },
-      {
-        case: "network",
+        key: "network",
         label: t("page.tabNetwork"),
         element: Network,
+        shown: hasNetwork,
       },
       {
-        case: "display",
+        key: "display",
         label: t("page.tabDisplay"),
         element: Display,
+        shown: true,
       },
       {
-        case: "bluetooth",
+        key: "bluetooth",
         label: t("page.tabBluetooth"),
         element: Bluetooth,
+        shown: hasBluetooth,
       },
-    ],
-    [t],
-  );
+    ];
+    return all
+      .filter((tab) => tab.shown)
+      .map((tab) => ({
+        key: tab.key,
+        label: tab.label,
+        element: tab.element,
+        isDirty: dirtyRadio.includes(tab.key),
+      }));
+  }, [t, metadata, dirtyRadio]);
 
-  const flags = useMemo(
-    () =>
-      new Map(
-        tabs.map((tab) => [
-          tab.case,
-          tab.case === "user"
-            ? isOwnerDirty
-            : dirtyRadio.includes(tab.case as ValidConfigType),
-        ]),
-      ),
-    [tabs, dirtyRadio, isOwnerDirty],
-  );
-
-  return (
-    <Tabs defaultValue={t("page.tabUser")}>
-      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-700">
-        {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.label}
-            value={tab.label}
-            className="dark:text-white relative max-md:shrink-0"
-          >
-            {tab.label}
-            {flags.get(tab.case) && (
-              <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
-                <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
-              </span>
-            )}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      {tabs.map((tab) => (
-        <TabsContent key={tab.label} value={tab.label} className="max-md:px-2">
-          <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <tab.element onFormInit={onFormInit} />
-          </Suspense>
-        </TabsContent>
-      ))}
-    </Tabs>
-  );
+  return <SettingsTabs tabs={tabs} onFormInit={onFormInit} />;
 };

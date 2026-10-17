@@ -191,7 +191,9 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   navigate({ to: `/${link.page}` });
                 }
               }}
-              active={link.page === pathname}
+              active={
+                pathname === link.page || pathname.startsWith(`${link.page}/`)
+              }
               disabled={myNode === undefined}
             />
           );

@@ -13,7 +13,28 @@
     "tabSecurity": "Security"
   },
   "sidebar": {
-    "label": "Configuration"
+    "label": "Configuration",
+    "configuration": "Configuration",
+    "backupRestore": "Backup & Restore",
+    "advanced": "Advanced",
+    "app": "App",
+    "information": "Information"
+  },
+  "navigation": {
+    "user": "User",
+    "lora": "LoRa",
+    "channels": "Channels",
+    "security": "Security",
+    "deviceConfiguration": "Device configuration",
+    "moduleConfiguration": "Module configuration",
+    "administration": "Administration",
+    "deviceProfile": "Import / export configuration",
+    "firmwareUpdate": "Firmware update",
+    "cleanNodeDb": "Clean node database",
+    "debugPanel": "Debug panel",
+    "appSettings": "App settings",
+    "about": "About",
+    "help": "Help & documentation"
   },
   "device": {
     "title": "Device",
