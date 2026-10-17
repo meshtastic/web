@@ -9,6 +9,7 @@ import type { ValidConfigType } from "@core/stores";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { dirtyDeviceTabs } from "./dirtySections.ts";
 import {
   type ConfigProps,
   type SettingsTab,
@@ -21,6 +22,12 @@ const EMPTY_DIRTY_RADIO_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
+const EMPTY_STAGED_SIGNAL = {
+  value: new Map() as ReadonlyMap<string, unknown>,
+  peek: () => new Map() as ReadonlyMap<string, unknown>,
+  subscribe: () => () => {},
+} as const;
+
 type DeviceTab = SettingsTab & { key: ValidConfigType; shown: boolean };
 
 /** Device configuration, in the order of Android's deviceConfigRoutes. */
@@ -29,10 +36,12 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
   const dirtyRadio = useSignal(
     editor?.dirtyRadioSections ?? EMPTY_DIRTY_RADIO_SIGNAL,
   );
+  const staged = useSignal(editor?.stagedAdminMessages ?? EMPTY_STAGED_SIGNAL);
   const { metadata } = useDeviceCapabilities();
   const { t } = useTranslation("config");
 
   const tabs: SettingsTab[] = useMemo(() => {
+    const dirty = dirtyDeviceTabs(dirtyRadio, staged.keys());
     // Until metadata arrives, show every tab, as Android does.
     const hasNetwork = !metadata || metadata.hasWifi || metadata.hasEthernet;
     const hasBluetooth = !metadata || metadata.hasBluetooth;
@@ -75,9 +84,9 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
         key: tab.key,
         label: tab.label,
         element: tab.element,
-        isDirty: dirtyRadio.includes(tab.key),
+        isDirty: dirty.has(tab.key),
       }));
-  }, [t, metadata, dirtyRadio]);
+  }, [t, metadata, dirtyRadio, staged]);
 
   return <SettingsTabs tabs={tabs} onFormInit={onFormInit} />;
 };

@@ -20,6 +20,7 @@ import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { dirtyModuleTabs } from "./dirtySections.ts";
 import {
   type ConfigProps,
   type SettingsTab,
@@ -29,6 +30,12 @@ import {
 const EMPTY_DIRTY_MODULE_SIGNAL = {
   value: [] as readonly string[],
   peek: () => [] as readonly string[],
+  subscribe: () => () => {},
+} as const;
+
+const EMPTY_STAGED_SIGNAL = {
+  value: new Map() as ReadonlyMap<string, unknown>,
+  peek: () => new Map() as ReadonlyMap<string, unknown>,
   subscribe: () => () => {},
 } as const;
 
@@ -104,8 +111,13 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   const dirtyModule = useSignal(
     editor?.dirtyModuleSections ?? EMPTY_DIRTY_MODULE_SIGNAL,
   );
+  const staged = useSignal(editor?.stagedAdminMessages ?? EMPTY_STAGED_SIGNAL);
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const { getEffectiveConfig } = useDevice();
+  const dirtyTabs = useMemo(
+    () => dirtyModuleTabs(dirtyModule, staged.keys()),
+    [dirtyModule, staged],
+  );
   const { t } = useTranslation("moduleConfig");
   const { excludedModules, supportsFirmware28 } = useDeviceCapabilities();
 
@@ -131,9 +143,9 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
         key: tab.key,
         label: t(tab.labelKey),
         element: tab.element,
-        isDirty: dirtyModule.includes(tab.key),
+        isDirty: dirtyTabs.has(tab.key),
       })),
-    [t, excludedModules, dirtyModule, showTak],
+    [t, excludedModules, dirtyTabs, showTak],
   );
 
   return <SettingsTabs tabs={tabs} onFormInit={onFormInit} />;

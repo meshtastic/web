@@ -94,6 +94,8 @@ function UseBrowserLocationButton({ isImperial }: { isImperial: boolean }) {
   );
 }
 
+const FIXED_POSITION_KEY = "fixedPosition";
+
 const EMPTY_RADIO_SIGNAL = {
   value: {} as { position?: Protobuf.Config.Config_PositionConfig },
   peek: () => ({}) as { position?: Protobuf.Config.Config_PositionConfig },
@@ -157,28 +159,38 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       );
     }
 
+    // One staged fixed position, replaced on each change and dropped by
+    // Reset. Unchanged coordinates stage nothing so Save stays idle.
+    let fixedPositionMessage: Protobuf.Admin.AdminMessage | undefined;
     if (
       data.fixedPosition &&
       data.latitude !== undefined &&
       data.longitude !== undefined
     ) {
+      const latitudeI = Math.round(data.latitude * 1e7);
+      const longitudeI = Math.round(data.longitude * 1e7);
       const altitudeMeters = isImperial
         ? Math.round(feetToMeters(data.altitude ?? 0))
         : Math.round(data.altitude ?? 0);
-      const message = create(Protobuf.Admin.AdminMessageSchema, {
-        payloadVariant: {
-          case: "setFixedPosition",
-          value: create(Protobuf.Mesh.PositionSchema, {
-            latitudeI: Math.round(data.latitude * 1e7),
-            longitudeI: Math.round(data.longitude * 1e7),
-            altitude: altitudeMeters,
-            time: Math.floor(Date.now() / 1000),
-          }),
-        },
-      });
-
-      editor?.queueAdminMessage(message);
+      const unchanged =
+        latitudeI === (currentPosition?.latitudeI ?? 0) &&
+        longitudeI === (currentPosition?.longitudeI ?? 0) &&
+        altitudeMeters === (currentPosition?.altitude ?? 0);
+      if (!unchanged) {
+        fixedPositionMessage = create(Protobuf.Admin.AdminMessageSchema, {
+          payloadVariant: {
+            case: "setFixedPosition",
+            value: create(Protobuf.Mesh.PositionSchema, {
+              latitudeI,
+              longitudeI,
+              altitude: altitudeMeters,
+              time: Math.floor(Date.now() / 1000),
+            }),
+          },
+        });
+      }
     }
+    editor?.stageAdminMessage(FIXED_POSITION_KEY, fixedPositionMessage);
   };
 
   const onPositonFlagChange = useCallback(

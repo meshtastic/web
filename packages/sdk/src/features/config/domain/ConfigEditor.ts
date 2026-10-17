@@ -291,6 +291,7 @@ export class ConfigEditor {
     this.workingChannels.value = new Map(this.baselineChannels.peek());
     this.workingOwner.value = this.baselineOwner.peek();
     this._stagedAdminMessages.value = new Map();
+    this.queuedAdminMessages.value = [];
     this.recomputeDirty();
   }
 

@@ -48,6 +48,7 @@ import {
 } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { dirtyDeviceTabs, dirtyModuleTabs } from "./dirtySections.ts";
 import { type ConfigProps, SettingsCard } from "./SettingsTabs.tsx";
 
 const EMPTY_DIRTY_STRING_SIGNAL = {
@@ -60,20 +61,16 @@ const EMPTY_DIRTY_NUMBER_SIGNAL = {
   peek: () => [] as readonly number[],
   subscribe: () => () => {},
 } as const;
+const EMPTY_STAGED_SIGNAL = {
+  value: new Map() as ReadonlyMap<string, unknown>,
+  peek: () => new Map() as ReadonlyMap<string, unknown>,
+  subscribe: () => () => {},
+} as const;
 const EMPTY_BOOLEAN_SIGNAL = {
   value: false,
   peek: () => false,
   subscribe: () => () => {},
 } as const;
-
-const DEVICE_SECTIONS = [
-  "device",
-  "position",
-  "power",
-  "network",
-  "display",
-  "bluetooth",
-];
 
 const FIRMWARE_FLASHER_URL = "https://flasher.meshtastic.org";
 const DOCS_URL = "https://meshtastic.org/docs/";
@@ -123,6 +120,7 @@ const ConfigPage = () => {
     editor?.dirtyChannels ?? EMPTY_DIRTY_NUMBER_SIGNAL,
   );
   const isOwnerDirty = useSignal(editor?.isOwnerDirty ?? EMPTY_BOOLEAN_SIGNAL);
+  const staged = useSignal(editor?.stagedAdminMessages ?? EMPTY_STAGED_SIGNAL);
 
   const [isSaving, setIsSaving] = useState(false);
   const [rhfState, setRhfState] = useState({ isDirty: false, isValid: true });
@@ -181,9 +179,7 @@ const ConfigPage = () => {
             icon: RouterIcon,
             component: DeviceConfig,
             edits: true,
-            changeCount: dirtyRadio.filter((key) =>
-              DEVICE_SECTIONS.includes(key),
-            ).length,
+            changeCount: dirtyDeviceTabs(dirtyRadio, staged.keys()).size,
           },
           {
             key: "module",
@@ -191,7 +187,7 @@ const ConfigPage = () => {
             icon: LayersIcon,
             component: ModuleConfig,
             edits: true,
-            changeCount: dirtyModule.length - statusDirty,
+            changeCount: dirtyModuleTabs(dirtyModule, staged.keys()).size,
           },
           {
             key: "administration",
@@ -268,7 +264,7 @@ const ConfigPage = () => {
         ],
       },
     ];
-  }, [t, dirtyRadio, dirtyModule, dirtyChannels, isOwnerDirty]);
+  }, [t, dirtyRadio, dirtyModule, dirtyChannels, isOwnerDirty, staged]);
 
   const sections = useMemo(
     () => groups.flatMap((group) => group.sections),

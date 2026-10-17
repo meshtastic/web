@@ -91,6 +91,25 @@ describe("ConfigEditor", () => {
     expect(editor.radio.value.lora?.region).toBe(4);
   });
 
+  it("reset() drops queued admin messages", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+
+    editor.queueAdminMessage(
+      create(Protobuf.Admin.AdminMessageSchema, {
+        payloadVariant: {
+          case: "setFixedPosition",
+          value: create(Protobuf.Mesh.PositionSchema, { latitudeI: 1 }),
+        },
+      }),
+    );
+    expect(editor.isDirty.value).toBe(true);
+
+    editor.reset();
+    expect(editor.isDirty.value).toBe(false);
+  });
+
   it("inbound baseline updates do not stomp pending working edits", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
