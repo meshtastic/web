@@ -1,7 +1,7 @@
 import { ChannelNumber, type Message, MessageState } from "@meshtastic/sdk";
 import { describe, expect, it } from "vitest";
 import { SqlocalMessageRepository } from "../src/chat/SqlocalMessageRepository.ts";
-import { createSqlocalDb } from "../src/db.ts";
+import { createSqlocalDb, openSqlocalDb } from "../src/db.ts";
 
 /**
  * Browser-mode end-to-end test: opens a real OPFS-backed SQLite database via
@@ -27,6 +27,13 @@ function msg(id: number, ms: number, text = "t"): Message {
 describe.runIf(typeof navigator !== "undefined")(
   "sqlocal OPFS round-trip",
   () => {
+    it("reports that the database is saved to OPFS", async () => {
+      const opened = await openSqlocalDb({
+        databasePath: `meshtastic-test-info-${Date.now()}.db`,
+      });
+      expect(opened).toMatchObject({ storageType: "opfs", persistent: true });
+    });
+
     it("persists messages across DB instances", async () => {
       const dbPath = `meshtastic-test-${Date.now()}.db`;
       const dbA = await createSqlocalDb({ databasePath: dbPath });

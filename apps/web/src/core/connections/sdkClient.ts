@@ -46,9 +46,10 @@ export async function buildMeshDevice(
   let draftRepository: SqlocalDraftRepository | undefined;
   let nodesRepository: SqlocalNodesRepository | undefined;
   let telemetryRepository: SqlocalTelemetryRepository | undefined;
+  let persistent = false;
   try {
     const t0 = Date.now();
-    const db = await Promise.race([
+    const { db, persistent: saved } = await Promise.race([
       getStorageDb(),
       new Promise<never>((_, reject) =>
         setTimeout(
@@ -62,7 +63,11 @@ export async function buildMeshDevice(
         ),
       ),
     ]);
-    log.debug("buildMeshDevice: storage DB ready", { ms: Date.now() - t0 });
+    persistent = saved;
+    log.debug("buildMeshDevice: storage DB ready", {
+      ms: Date.now() - t0,
+      persistent,
+    });
     chatRepository = new SqlocalMessageRepository(db, {
       deviceId: connectionId,
       coordinator,
@@ -103,5 +108,5 @@ export async function buildMeshDevice(
       ? { repository: telemetryRepository, retention: TELEMETRY_RETENTION }
       : undefined,
   });
-  return { meshDevice, persistent: chatRepository !== undefined };
+  return { meshDevice, persistent };
 }
