@@ -13,7 +13,6 @@
     "tabStoreAndForward": "Store & Forward",
     "tabTelemetry": "Telemetry",
     "tabRemoteHardware": "Remote Hardware",
-    "tabStatusMessage": "Status Message",
     "tabTak": "TAK",
     "tabMeshBeacon": "Mesh Beacon"
   },
@@ -579,14 +578,6 @@
       },
       "add": "Add",
       "remove": "Delete"
-    }
-  },
-  "statusMessage": {
-    "title": "Status Message Settings",
-    "description": "Periodically rebroadcast a short status message for this node",
-    "nodeStatus": {
-      "label": "Status Message",
-      "description": "The status string this node broadcasts on change and on a timer"
     }
   },
   "tak": {
