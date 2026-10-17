@@ -136,7 +136,12 @@ export {
   isBeaconAlreadyJoined,
 } from "./src/features/channels/index.ts";
 
-export { ConfigClient, ConfigEditor } from "./src/features/config/index.ts";
+export {
+  CANNED_MESSAGES_MAX_BYTES,
+  ConfigClient,
+  ConfigEditor,
+  RINGTONE_MAX_BYTES,
+} from "./src/features/config/index.ts";
 export type {
   ModuleConfig,
   ModuleConfigSection,

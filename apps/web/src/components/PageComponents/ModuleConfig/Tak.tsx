@@ -11,6 +11,7 @@ import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
+import { TakTeamSwatches } from "./TakTeamSwatches.tsx";
 
 interface TakModuleConfigProps {
   onFormInit: DynamicFormFormInit<TakValidation>;
@@ -76,6 +77,7 @@ export const Tak = ({ onFormInit }: TakModuleConfigProps) => {
               },
             },
           ],
+          footer: <TakTeamSwatches onSubmit={onSubmit} />,
         },
       ]}
     />

@@ -520,6 +520,14 @@ function handleDecodedPacket(
           });
           break;
         }
+        case "getRingtoneResponse": {
+          // ConfigClient reads it from onAdminPacket above.
+          sink.log.debug(
+            Emitter[Emitter.HandleMeshPacket],
+            "🔔 Received ringtone response packet",
+          );
+          break;
+        }
         default: {
           sink.log.error(
             Emitter[Emitter.HandleMeshPacket],

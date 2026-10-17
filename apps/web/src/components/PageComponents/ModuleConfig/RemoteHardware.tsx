@@ -2,6 +2,7 @@ import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type RemoteHardwareValidation,
   RemoteHardwareValidationSchema,
+  toRemoteHardwareConfig,
 } from "@app/validation/moduleConfig/remoteHardware.ts";
 import {
   DynamicForm,
@@ -11,6 +12,7 @@ import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
+import { RemoteHardwarePins } from "./RemoteHardwarePins.tsx";
 
 interface RemoteHardwareModuleConfigProps {
   onFormInit: DynamicFormFormInit<RemoteHardwareValidation>;
@@ -46,7 +48,9 @@ export const RemoteHardware = ({
     if (!editor) return;
     editor.setModuleSection(
       "remoteHardware",
-      data as unknown as Protobuf.ModuleConfig.ModuleConfig_RemoteHardwareConfig,
+      toRemoteHardwareConfig(
+        data,
+      ) as Protobuf.ModuleConfig.ModuleConfig_RemoteHardwareConfig,
     );
   };
 
@@ -55,8 +59,10 @@ export const RemoteHardware = ({
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={RemoteHardwareValidationSchema}
-      defaultValues={moduleConfig.remoteHardware}
-      values={effective}
+      defaultValues={
+        moduleConfig.remoteHardware as RemoteHardwareValidation | undefined
+      }
+      values={effective as RemoteHardwareValidation | undefined}
       fieldGroups={[
         {
           label: t("remoteHardware.title"),
@@ -77,6 +83,7 @@ export const RemoteHardware = ({
               ),
             },
           ],
+          footer: <RemoteHardwarePins onSubmit={onSubmit} />,
         },
       ]}
     />

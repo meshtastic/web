@@ -1,3 +1,5 @@
+import { validateMaxByteLength } from "@core/utils/string.ts";
+import { RINGTONE_MAX_BYTES } from "@meshtastic/sdk";
 import { z } from "zod/v4";
 
 export const ExternalNotificationValidationSchema = z.object({
@@ -16,6 +18,13 @@ export const ExternalNotificationValidationSchema = z.object({
   usePwm: z.boolean(),
   nagTimeout: z.coerce.number().int().min(0),
   useI2sAsBuzzer: z.boolean(),
+  // Not part of the module config: sent with its own admin message.
+  ringtone: z
+    .string()
+    .refine((s) => validateMaxByteLength(s, RINGTONE_MAX_BYTES).isValid, {
+      message: "formValidation.tooBig.bytes",
+      params: { maximum: RINGTONE_MAX_BYTES },
+    }),
 });
 
 export type ExternalNotificationValidation = z.infer<

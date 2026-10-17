@@ -14,8 +14,9 @@ import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForwa
 import { Tak } from "@components/PageComponents/ModuleConfig/Tak.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
-import type { ValidModuleConfigType } from "@core/stores";
+import { useDevice, type ValidModuleConfigType } from "@core/stores";
 import { isModuleExcluded } from "@core/utils/excludedModules.ts";
+import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -28,6 +29,12 @@ import {
 const EMPTY_DIRTY_MODULE_SIGNAL = {
   value: [] as readonly string[],
   peek: () => [] as readonly string[],
+  subscribe: () => () => {},
+} as const;
+
+const EMPTY_RADIO_SIGNAL = {
+  value: {} as { device?: Protobuf.Config.Config_DeviceConfig },
+  peek: () => ({}) as { device?: Protobuf.Config.Config_DeviceConfig },
   subscribe: () => () => {},
 } as const;
 
@@ -87,26 +94,46 @@ const MODULE_TABS: ModuleTab[] = [
   { key: "meshBeacon", labelKey: "page.tabMeshBeacon", element: MeshBeacon },
 ];
 
+const TAK_ROLES: Protobuf.Config.Config_DeviceConfig_Role[] = [
+  Protobuf.Config.Config_DeviceConfig_Role.TAK,
+  Protobuf.Config.Config_DeviceConfig_Role.TAK_TRACKER,
+];
+
 export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   const editor = useConfigEditor();
   const dirtyModule = useSignal(
     editor?.dirtyModuleSections ?? EMPTY_DIRTY_MODULE_SIGNAL,
   );
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const { getEffectiveConfig } = useDevice();
   const { t } = useTranslation("moduleConfig");
-  const { excludedModules } = useDeviceCapabilities();
+  const { excludedModules, supportsFirmware28 } = useDeviceCapabilities();
+
+  // Staged role first, so the TAK tab appears as soon as the role is set.
+  const role = (
+    radio.device ??
+    (getEffectiveConfig("device") as
+      | Protobuf.Config.Config_DeviceConfig
+      | undefined)
+  )?.role;
+  // Like Android, TAK needs firmware 2.8 and a TAK role.
+  const showTak =
+    supportsFirmware28 && role !== undefined && TAK_ROLES.includes(role);
 
   // Hide the modules this firmware build was compiled without.
   const tabs: SettingsTab[] = useMemo(
     () =>
       MODULE_TABS.filter(
-        (tab) => !isModuleExcluded(excludedModules, tab.key),
+        (tab) =>
+          !isModuleExcluded(excludedModules, tab.key) &&
+          (tab.key !== "tak" || showTak),
       ).map((tab) => ({
         key: tab.key,
         label: t(tab.labelKey),
         element: tab.element,
         isDirty: dirtyModule.includes(tab.key),
       })),
-    [t, excludedModules, dirtyModule],
+    [t, excludedModules, dirtyModule, showTak],
   );
 
   return <SettingsTabs tabs={tabs} onFormInit={onFormInit} />;

@@ -8,6 +8,7 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -51,6 +52,11 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
       | undefined);
 
   const { t } = useTranslation("moduleConfig");
+  const { supportsFirmware28 } = useDeviceCapabilities();
+  // JSON output is deprecated from firmware 2.8.0. Like Android, offer it
+  // there only while the radio still has it on.
+  const showJson =
+    !supportsFirmware28 || moduleConfig.mqtt?.jsonEnabled === true;
 
   const onSubmit = (data: MqttValidation) => {
     if (!editor) return;
@@ -149,13 +155,17 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
               description: t("mqtt.encryptionEnabled.description"),
               disabledBy: [{ fieldName: "enabled" }],
             },
-            {
-              type: "toggle",
-              name: "jsonEnabled",
-              label: t("mqtt.jsonEnabled.label"),
-              description: t("mqtt.jsonEnabled.description"),
-              disabledBy: [{ fieldName: "enabled" }],
-            },
+            ...(showJson
+              ? [
+                  {
+                    type: "toggle" as const,
+                    name: "jsonEnabled" as const,
+                    label: t("mqtt.jsonEnabled.label"),
+                    description: t("mqtt.jsonEnabled.description"),
+                    disabledBy: [{ fieldName: "enabled" as const }],
+                  },
+                ]
+              : []),
             {
               type: "toggle",
               name: "tlsEnabled",
