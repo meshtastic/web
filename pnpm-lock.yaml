@@ -18,8 +18,8 @@ importers:
         specifier: ^3.0.11
         version: 3.0.11
       tslog:
-        specifier: ^5.1.0
-        version: 5.1.0
+        specifier: ^5.2.0
+        version: 5.2.0
     devDependencies:
       '@meshtastic/core':
         specifier: jsr:^2.6.6
@@ -357,8 +357,8 @@ importers:
         specifier: ^3.0.11
         version: 3.0.11
       tslog:
-        specifier: ^5.1.0
-        version: 5.1.0
+        specifier: ^5.2.0
+        version: 5.2.0
 
   packages/sdk-react:
     dependencies:
@@ -6192,9 +6192,9 @@ packages:
     resolution: {integrity: sha512-gBe0FTKkRpOv3DenGipjQWQe073jNd1cOLj3nYfVM0/NP29sQzAIx6kfyfTTsQOiWMC+B+tSr289lNXtu7HCmQ==}
     engines: {node: '>=16'}
 
-  tslog@5.1.0:
-    resolution: {integrity: sha512-g77ALovust2HNBX/63ePEJwetIeX0Vi/dlzqBO+ZAg+aERB54KMmaz/khNPxhFpaxKQ6RQj65sK6vIhj1SJgjQ==}
-    engines: {node: '>=20'}
+  tslog@5.2.0:
+    resolution: {integrity: sha512-bD0FpBIFZ1OInp7uzQmEn1SJe6feTkVTCudw/27ILuISbVZtTryXqauxyCWTa1I8ZgTm9OGQ6YrJPKM+6QTeJA==}
+    engines: {node: '>=22'}
     hasBin: true
 
   tsx@4.21.0:
@@ -12862,7 +12862,7 @@ snapshots:
 
   tslog@4.11.0: {}
 
-  tslog@5.1.0: {}
+  tslog@5.2.0: {}
 
   tsx@4.21.0:
     dependencies:
