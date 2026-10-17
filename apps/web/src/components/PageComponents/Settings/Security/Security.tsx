@@ -47,7 +47,7 @@ const toFormShape = (
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
 
-  const { config, setDialogOpen, getEffectiveConfig } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
   const editor = useConfigEditor();
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
@@ -166,11 +166,6 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                     text: t("button.generate"),
                     onClick: () => setPrivateKeyDialogOpen(true),
                     variant: "success",
-                  },
-                  {
-                    text: t("button.backupKey"),
-                    onClick: () => setDialogOpen("pkiBackup", true),
-                    variant: "subtle",
                   },
                 ],
                 properties: {

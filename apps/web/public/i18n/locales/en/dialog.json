@@ -273,23 +273,6 @@
     "statusMessage": "Status: ",
     "signedTrue": "Signs its packets (XEdDSA)"
   },
-  "pkiBackup": {
-    "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
-    "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
-    "footer": "=== END OF KEYS ===",
-    "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-    "privateKey": "Private Key:",
-    "publicKey": "Public Key:",
-    "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-    "title": "Backup Keys"
-  },
-  "pkiBackupReminder": {
-    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
-    "title": "Backup Reminder",
-    "remindLaterPrefix": "Remind me in",
-    "remindNever": "Never remind me",
-    "backupNow": "Back up now"
-  },
   "regionSetup": {
     "title": "Set your region",
     "description": "This device has no LoRa region configured and won't transmit until you pick one.",

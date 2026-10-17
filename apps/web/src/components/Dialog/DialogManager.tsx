@@ -5,7 +5,6 @@ import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationD
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
 import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
-import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
@@ -54,12 +53,6 @@ export const DialogManager = () => {
         open={dialog.nodeRemoval}
         onOpenChange={(open) => {
           setDialogOpen("nodeRemoval", open);
-        }}
-      />
-      <PkiBackupDialog
-        open={dialog.pkiBackup}
-        onOpenChange={(open) => {
-          setDialogOpen("pkiBackup", open);
         }}
       />
       <NodeDetailsDialog
