@@ -37,12 +37,12 @@
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "^0.45.4",
     "sqlocal": "^0.18.0"
   },
   "devDependencies": {
-    "@types/sql.js": "^1.4.9",
-    "sql.js": "^1.12.0"
+    "@types/sql.js": "^1.4.11",
+    "sql.js": "^1.15.0"
   },
   "tsdown": {
     "clean": true,
