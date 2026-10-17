@@ -7,16 +7,30 @@ import {
   CommandItem,
   CommandList,
 } from "@components/UI/Command.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice, useDeviceStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
+import { isModuleExcluded } from "@core/utils/excludedModules.ts";
+import { visibleDeviceTabs } from "@pages/Settings/DeviceConfig.tsx";
+import { MODULE_TABS } from "@pages/Settings/ModuleConfig.tsx";
 import { useNavigate } from "@tanstack/react-router";
 import { useCommandState } from "cmdk";
 import {
+  ArchiveRestoreIcon,
   ArrowLeftRightIcon,
   BoxSelectIcon,
   BugIcon,
+  InfoIcon,
+  LayersIcon,
+  ListIcon,
+  PaletteIcon,
+  RadioTowerIcon,
+  RouterIcon,
+  ShieldAlertIcon,
+  ShieldIcon,
+  UserIcon,
   CloudOff,
   EraserIcon,
   FactoryIcon,
@@ -73,6 +87,63 @@ export const CommandPalette = () => {
   });
   const { t } = useTranslation("commandPalette");
   const navigate = useNavigate({ from: "/" });
+  const { metadata, excludedModules } = useDeviceCapabilities();
+
+  // Every Settings page, and each Device / Module configuration tab as a
+  // sub-item (shown while searching), from the same lists the pages use.
+  const openSettings = (page: string, tab?: string) => {
+    navigate({ to: `/settings/${page}`, search: tab ? { tab } : {} });
+    setCommandPaletteOpen(false);
+  };
+  const settingsPage = (
+    page: string,
+    labelKey: string,
+    icon: LucideIcon,
+  ): Command => ({
+    label: t(labelKey, { ns: "config" }),
+    icon,
+    action: () => openSettings(page),
+    tags: ["settings", "config"],
+  });
+  const settingsGroup: Group = {
+    id: "settingsGroup",
+    label: t("settings.label"),
+    icon: SettingsIcon,
+    commands: [
+      settingsPage("user", "navigation.user", UserIcon),
+      settingsPage("lora", "navigation.lora", RadioTowerIcon),
+      settingsPage("channels", "navigation.channels", ListIcon),
+      settingsPage("security", "navigation.security", ShieldIcon),
+      {
+        ...settingsPage("device", "navigation.deviceConfiguration", RouterIcon),
+        subItems: visibleDeviceTabs(metadata).map((tab) => ({
+          label: t(tab.labelKey, { ns: "config" }),
+          icon: <RouterIcon size={16} className="mr-2" />,
+          action: () => openSettings("device", tab.key),
+        })),
+      },
+      {
+        ...settingsPage("module", "navigation.moduleConfiguration", LayersIcon),
+        subItems: MODULE_TABS.filter(
+          (tab) => !isModuleExcluded(excludedModules, tab.key),
+        ).map((tab) => ({
+          label: t(tab.labelKey, { ns: "moduleConfig" }),
+          icon: <LayersIcon size={16} className="mr-2" />,
+          action: () => openSettings("module", tab.key),
+        })),
+      },
+      settingsPage(
+        "administration",
+        "navigation.administration",
+        ShieldAlertIcon,
+      ),
+      settingsPage("backup", "navigation.deviceProfile", ArchiveRestoreIcon),
+      settingsPage("clean-nodes", "navigation.cleanNodeDb", EraserIcon),
+      settingsPage("debug", "navigation.debugPanel", BugIcon),
+      settingsPage("app", "navigation.appSettings", PaletteIcon),
+      settingsPage("about", "navigation.about", InfoIcon),
+    ],
+  };
 
   const groups: Group[] = [
     {
@@ -245,6 +316,8 @@ export const CommandPalette = () => {
       ],
     },
   ];
+  // Right after "Goto".
+  groups.splice(1, 0, settingsGroup);
 
   const sortedGroups = [...groups].sort((a, b) => {
     const aPinned = pinnedItems.includes(a.id) ? 1 : 0;

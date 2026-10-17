@@ -55,7 +55,7 @@ type ModuleTab = {
  * Module configuration, in the order of Android's ModuleRoute. Status
  * Message is not a tab: like Android, its one field lives on the User page.
  */
-const MODULE_TABS: ModuleTab[] = [
+export const MODULE_TABS: ModuleTab[] = [
   { key: "mqtt", labelKey: "page.tabMqtt", element: MQTT },
   { key: "serial", labelKey: "page.tabSerial", element: Serial },
   {

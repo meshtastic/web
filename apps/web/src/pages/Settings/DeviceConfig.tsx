@@ -6,8 +6,9 @@ import { Position } from "@components/PageComponents/Settings/Position.tsx";
 import { Power } from "@components/PageComponents/Settings/Power.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import type { ValidConfigType } from "@core/stores";
+import type { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
-import { useMemo } from "react";
+import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { dirtyDeviceTabs } from "./dirtySections.ts";
 import {
@@ -28,9 +29,37 @@ const EMPTY_STAGED_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
-type DeviceTab = SettingsTab & { key: ValidConfigType; shown: boolean };
+type DeviceTab = {
+  key: ValidConfigType;
+  labelKey: string;
+  element: ComponentType<ConfigProps>;
+};
 
-/** Device configuration, in the order of Android's deviceConfigRoutes. */
+/** Device configuration tabs, in the order of Android's deviceConfigRoutes. */
+export const DEVICE_TABS: DeviceTab[] = [
+  { key: "device", labelKey: "page.tabDevice", element: Device },
+  { key: "position", labelKey: "page.tabPosition", element: Position },
+  { key: "power", labelKey: "page.tabPower", element: Power },
+  { key: "network", labelKey: "page.tabNetwork", element: Network },
+  { key: "display", labelKey: "page.tabDisplay", element: Display },
+  { key: "bluetooth", labelKey: "page.tabBluetooth", element: Bluetooth },
+];
+
+/**
+ * Tabs this hardware supports: Network needs Wi-Fi or Ethernet, Bluetooth
+ * needs Bluetooth. Until metadata arrives every tab shows, as on Android.
+ */
+export function visibleDeviceTabs(
+  metadata: Protobuf.Mesh.DeviceMetadata | undefined,
+): DeviceTab[] {
+  return DEVICE_TABS.filter((tab) => {
+    if (!metadata) return true;
+    if (tab.key === "network") return metadata.hasWifi || metadata.hasEthernet;
+    if (tab.key === "bluetooth") return metadata.hasBluetooth;
+    return true;
+  });
+}
+
 export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
   const editor = useConfigEditor();
   const dirtyRadio = useSignal(
@@ -42,50 +71,12 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
 
   const tabs: SettingsTab[] = useMemo(() => {
     const dirty = dirtyDeviceTabs(dirtyRadio, staged.keys());
-    // Until metadata arrives, show every tab, as Android does.
-    const hasNetwork = !metadata || metadata.hasWifi || metadata.hasEthernet;
-    const hasBluetooth = !metadata || metadata.hasBluetooth;
-    const all: DeviceTab[] = [
-      {
-        key: "device",
-        label: t("page.tabDevice"),
-        element: Device,
-        shown: true,
-      },
-      {
-        key: "position",
-        label: t("page.tabPosition"),
-        element: Position,
-        shown: true,
-      },
-      { key: "power", label: t("page.tabPower"), element: Power, shown: true },
-      {
-        key: "network",
-        label: t("page.tabNetwork"),
-        element: Network,
-        shown: hasNetwork,
-      },
-      {
-        key: "display",
-        label: t("page.tabDisplay"),
-        element: Display,
-        shown: true,
-      },
-      {
-        key: "bluetooth",
-        label: t("page.tabBluetooth"),
-        element: Bluetooth,
-        shown: hasBluetooth,
-      },
-    ];
-    return all
-      .filter((tab) => tab.shown)
-      .map((tab) => ({
-        key: tab.key,
-        label: tab.label,
-        element: tab.element,
-        isDirty: dirty.has(tab.key),
-      }));
+    return visibleDeviceTabs(metadata).map((tab) => ({
+      key: tab.key,
+      label: t(tab.labelKey),
+      element: tab.element,
+      isDirty: dirty.has(tab.key),
+    }));
   }, [t, metadata, dirtyRadio, staged]);
 
   return <SettingsTabs tabs={tabs} onFormInit={onFormInit} />;
