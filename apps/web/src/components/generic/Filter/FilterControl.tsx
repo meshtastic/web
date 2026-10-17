@@ -228,6 +228,7 @@ export function FilterControl({
         {...parameters?.popoverContentProps}
         className={cn(
           "dark:text-slate-300",
+          "max-md:max-h-[var(--radix-popover-content-available-height)] max-md:overflow-y-auto",
           parameters?.popoverContentProps?.className,
         )}
       >

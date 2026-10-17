@@ -82,12 +82,12 @@ export const RadioConfig = ({ onFormInit }: ConfigProps) => {
 
   return (
     <Tabs defaultValue={t("page.tabLora")}>
-      <TabsList className="w-full dark:bg-slate-700">
+      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-700">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.label}
             value={tab.label}
-            className="dark:text-white relative"
+            className="dark:text-white relative max-md:shrink-0"
           >
             {tab.label}
             {flags.get(tab.case) && (
@@ -100,7 +100,7 @@ export const RadioConfig = ({ onFormInit }: ConfigProps) => {
         ))}
       </TabsList>
       {tabs.map((tab) => (
-        <TabsContent key={tab.label} value={tab.label}>
+        <TabsContent key={tab.label} value={tab.label} className="max-md:px-2">
           <Suspense fallback={<Spinner size="lg" className="my-5" />}>
             <tab.element onFormInit={onFormInit} />
           </Suspense>

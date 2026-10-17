@@ -44,10 +44,16 @@ export function useConnections() {
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
 
   const updateStatus = useCallback(
-    (id: ConnectionId, status: ConnectionStatus, error?: string) => {
+    (
+      id: ConnectionId,
+      status: ConnectionStatus,
+      error?: string,
+      errorKind?: Connection["errorKind"],
+    ) => {
       updateSavedConnection(id, {
         status,
         error: error || undefined,
+        errorKind: error ? errorKind : undefined,
         ...(status === "disconnected" ? { lastConnectedAt: Date.now() } : {}),
       });
     },
@@ -88,7 +94,15 @@ export function useConnections() {
       if (conn?.meshDeviceId) {
         try {
           useDeviceStore.getState().removeDevice(conn.meshDeviceId);
-        } catch {}
+        } catch (e) {
+          const err = e as Error;
+          log.error("removeConnection: removeDevice threw", {
+            id,
+            meshDeviceId: conn.meshDeviceId,
+            name: err?.name,
+            message: err?.message,
+          });
+        }
       }
       meshRegistry.unregister(id);
       removeSavedConnectionFromStore(id);
@@ -365,8 +379,8 @@ export function useConnections() {
     );
     await Promise.all(
       candidates.map(async (c) => {
-        const status = await probeConnection(c);
-        updateSavedConnection(c.id, { status });
+        const { status, error, errorKind } = await probeConnection(c);
+        updateSavedConnection(c.id, { status, error, errorKind });
       }),
     );
   }, [connections, updateSavedConnection]);
