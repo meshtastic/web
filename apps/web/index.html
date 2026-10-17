@@ -1,6 +1,12 @@
 <!doctype html>
-<html lang="en" data-theme="system">
+<!--
+  Browser page translation (e.g. Chrome's) rewrites text nodes React owns,
+  which crashes reconciliation with insertBefore/removeChild NotFoundError.
+  The app ships its own translations, so opt out of machine translation.
+-->
+<html lang="en" data-theme="system" translate="no">
   <head>
+    <meta name="google" content="notranslate" />
     <!-- CookieYes banner -->
     <%- cookieYesScript %>
     <!-- End of CookieYes banner -->
