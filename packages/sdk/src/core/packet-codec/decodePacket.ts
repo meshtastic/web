@@ -26,6 +26,8 @@ export interface PacketSink {
 
 /** How many recent packet keys are remembered for duplicate detection. */
 const RECENT_PACKET_CAPACITY = 256;
+/** How long decoding may run before yielding so the page can repaint. */
+const FRAME_BUDGET_MS = 16;
 
 /**
  * Remembers the most recent `(from, to, channel, id)` keys. Firmware 2.8
@@ -58,262 +60,280 @@ export const decodePacket = (
   sink: PacketSink,
 ): WritableStream<DeviceOutput> => {
   const recent = new RecentPackets();
-  return new WritableStream<DeviceOutput>({
-    write(chunk) {
-      switch (chunk.type) {
-        case "status": {
-          const { status, reason } = chunk.data;
-          sink.updateDeviceStatus(status);
-          sink.log.info(
-            Emitter[Emitter.ConnectionStatus],
-            `🔗 ${DeviceStatusEnum[status]} ${reason ? `(${reason})` : ""}`,
+  let lastYield = performance.now();
+  // A large read (e.g. the NodeDB download) decodes many frames back to
+  // back; pausing once per frame budget lets the page repaint, so progress
+  // UI counts up instead of jumping at the end.
+  const yieldToRenderer = (): Promise<void> | undefined => {
+    const now = performance.now();
+    if (now - lastYield < FRAME_BUDGET_MS) return undefined;
+    lastYield = now;
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      lastYield = performance.now();
+    });
+  };
+
+  const handle = (chunk: DeviceOutput): void => {
+    switch (chunk.type) {
+      case "status": {
+        const { status, reason } = chunk.data;
+        sink.updateDeviceStatus(status);
+        sink.log.info(
+          Emitter[Emitter.ConnectionStatus],
+          `🔗 ${DeviceStatusEnum[status]} ${reason ? `(${reason})` : ""}`,
+        );
+        break;
+      }
+      case "debug": {
+        break;
+      }
+      case "packet": {
+        let decodedMessage: Protobuf.Mesh.FromRadio;
+        try {
+          decodedMessage = fromBinary(
+            Protobuf.Mesh.FromRadioSchema,
+            chunk.data,
+          );
+        } catch (e) {
+          sink.log.error(
+            Emitter[Emitter.HandleFromRadio],
+            "⚠️ Received undecodable packet",
+            e,
           );
           break;
         }
-        case "debug": {
-          break;
-        }
-        case "packet": {
-          let decodedMessage: Protobuf.Mesh.FromRadio;
-          try {
-            decodedMessage = fromBinary(
-              Protobuf.Mesh.FromRadioSchema,
-              chunk.data,
+        sink.events.onFromRadio.dispatch(decodedMessage);
+
+        switch (decodedMessage.payloadVariant.case) {
+          case "packet": {
+            if (recent.seen(decodedMessage.payloadVariant.value)) {
+              sink.log.trace(
+                Emitter[Emitter.HandleFromRadio],
+                `Dropping duplicate packet ${decodedMessage.payloadVariant.value.id}`,
+              );
+              break;
+            }
+            try {
+              handleMeshPacket(sink, decodedMessage.payloadVariant.value);
+            } catch (e) {
+              sink.log.error(
+                Emitter[Emitter.HandleFromRadio],
+                "⚠️ Unable to handle mesh packet",
+                e,
+              );
+            }
+            break;
+          }
+          case "myInfo": {
+            sink.events.onMyNodeInfo.dispatch(
+              decodedMessage.payloadVariant.value,
             );
-          } catch (e) {
-            sink.log.error(
+            sink.log.info(
               Emitter[Emitter.HandleFromRadio],
-              "⚠️ Received undecodable packet",
-              e,
+              "📱 Received Node info for this device",
             );
             break;
           }
-          sink.events.onFromRadio.dispatch(decodedMessage);
+          case "nodeInfo": {
+            sink.log.info(
+              Emitter[Emitter.HandleFromRadio],
+              `📱 Received Node Info packet for node: ${decodedMessage.payloadVariant.value.num}`,
+            );
+            sink.events.onNodeInfoPacket.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
 
-          switch (decodedMessage.payloadVariant.case) {
-            case "packet": {
-              if (recent.seen(decodedMessage.payloadVariant.value)) {
-                sink.log.trace(
-                  Emitter[Emitter.HandleFromRadio],
-                  `Dropping duplicate packet ${decodedMessage.payloadVariant.value.id}`,
-                );
-                break;
-              }
-              try {
-                handleMeshPacket(sink, decodedMessage.payloadVariant.value);
-              } catch (e) {
-                sink.log.error(
-                  Emitter[Emitter.HandleFromRadio],
-                  "⚠️ Unable to handle mesh packet",
-                  e,
-                );
-              }
-              break;
-            }
-            case "myInfo": {
-              sink.events.onMyNodeInfo.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              sink.log.info(
-                Emitter[Emitter.HandleFromRadio],
-                "📱 Received Node info for this device",
-              );
-              break;
-            }
-            case "nodeInfo": {
-              sink.log.info(
-                Emitter[Emitter.HandleFromRadio],
-                `📱 Received Node Info packet for node: ${decodedMessage.payloadVariant.value.num}`,
-              );
-              sink.events.onNodeInfoPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-
-              if (decodedMessage.payloadVariant.value.position) {
-                sink.events.onPositionPacket.dispatch({
-                  id: decodedMessage.id,
-                  rxTime: new Date(),
-                  from: decodedMessage.payloadVariant.value.num,
-                  to: decodedMessage.payloadVariant.value.num,
-                  type: "direct",
-                  channel: ChannelNumber.Primary,
-                  data: decodedMessage.payloadVariant.value.position,
-                });
-              }
-
-              if (decodedMessage.payloadVariant.value.user) {
-                sink.events.onUserPacket.dispatch({
-                  id: decodedMessage.id,
-                  rxTime: new Date(),
-                  from: decodedMessage.payloadVariant.value.num,
-                  to: decodedMessage.payloadVariant.value.num,
-                  type: "direct",
-                  channel: ChannelNumber.Primary,
-                  data: decodedMessage.payloadVariant.value.user,
-                });
-              }
-              break;
-            }
-            case "config": {
-              if (decodedMessage.payloadVariant.value.payloadVariant.case) {
-                sink.log.trace(
-                  Emitter[Emitter.HandleFromRadio],
-                  `💾 Received Config packet of variant: ${decodedMessage.payloadVariant.value.payloadVariant.case}`,
-                );
-              } else {
-                sink.log.warn(
-                  Emitter[Emitter.HandleFromRadio],
-                  "⚠️ Received Config packet of variant: UNK",
-                );
-              }
-              sink.events.onConfigPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "logRecord": {
-              sink.log.trace(
-                Emitter[Emitter.HandleFromRadio],
-                "Received onLogRecord",
-              );
-              sink.events.onLogRecord.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "configCompleteId": {
-              sink.log.info(
-                Emitter[Emitter.HandleFromRadio],
-                `⚙️ Received config complete id: ${decodedMessage.payloadVariant.value}`,
-              );
-              // MeshClient matches the id against the handshake stage and
-              // marks the device configured after the final stage.
-              sink.events.onConfigComplete.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "rebooted": {
-              sink.events.onRebooted.dispatch();
-              sink.configure().catch((e: unknown) => {
-                sink.log.warn(
-                  Emitter[Emitter.HandleFromRadio],
-                  "⚠️ Handshake after reboot failed",
-                  e,
-                );
-              });
-              break;
-            }
-            case "moduleConfig": {
-              if (decodedMessage.payloadVariant.value.payloadVariant.case) {
-                sink.log.trace(
-                  Emitter[Emitter.HandleFromRadio],
-                  `💾 Received Module Config packet of variant: ${decodedMessage.payloadVariant.value.payloadVariant.case}`,
-                );
-              } else {
-                sink.log.warn(
-                  Emitter[Emitter.HandleFromRadio],
-                  "⚠️ Received Module Config packet of variant: UNK",
-                );
-              }
-              sink.events.onModuleConfigPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "channel": {
-              sink.log.trace(
-                Emitter[Emitter.HandleFromRadio],
-                `🔐 Received Channel: ${decodedMessage.payloadVariant.value.index}`,
-              );
-              sink.events.onChannelPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "queueStatus": {
-              sink.log.trace(
-                Emitter[Emitter.HandleFromRadio],
-                `🚧 Received Queue Status: last status: ${decodedMessage.payloadVariant.value.res}, free entries: ${decodedMessage.payloadVariant.value.free} out of ${decodedMessage.payloadVariant.value.maxlen}`,
-              );
-              sink.events.onQueueStatus.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "xmodemPacket": {
-              sink.xModem.handlePacket(decodedMessage.payloadVariant.value);
-              break;
-            }
-            case "metadata": {
-              sink.log.debug(
-                Emitter[Emitter.GetMetadata],
-                "🏷️ Received metadata packet",
-              );
-              sink.events.onDeviceMetadataPacket.dispatch({
+            if (decodedMessage.payloadVariant.value.position) {
+              sink.events.onPositionPacket.dispatch({
                 id: decodedMessage.id,
                 rxTime: new Date(),
-                from: 0,
-                to: 0,
+                from: decodedMessage.payloadVariant.value.num,
+                to: decodedMessage.payloadVariant.value.num,
                 type: "direct",
                 channel: ChannelNumber.Primary,
-                data: decodedMessage.payloadVariant.value,
+                data: decodedMessage.payloadVariant.value.position,
               });
-              break;
             }
-            case "mqttClientProxyMessage": {
-              break;
+
+            if (decodedMessage.payloadVariant.value.user) {
+              sink.events.onUserPacket.dispatch({
+                id: decodedMessage.id,
+                rxTime: new Date(),
+                from: decodedMessage.payloadVariant.value.num,
+                to: decodedMessage.payloadVariant.value.num,
+                type: "direct",
+                channel: ChannelNumber.Primary,
+                data: decodedMessage.payloadVariant.value.user,
+              });
             }
-            case "clientNotification": {
+            break;
+          }
+          case "config": {
+            if (decodedMessage.payloadVariant.value.payloadVariant.case) {
               sink.log.trace(
                 Emitter[Emitter.HandleFromRadio],
-                `📣 Received ClientNotification: ${decodedMessage.payloadVariant.value.message}`,
+                `💾 Received Config packet of variant: ${decodedMessage.payloadVariant.value.payloadVariant.case}`,
               );
-              sink.events.onClientNotificationPacket.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "lockdownStatus": {
-              // Arrives right after config_complete_id on lockdown builds.
-              // While locked, metadata is zeroed and channels and NodeDB are
-              // withheld until the client unlocks and re-runs the handshake.
-              sink.log.info(
-                Emitter[Emitter.HandleFromRadio],
-                `🔒 Received lockdown status: ${Protobuf.Mesh.LockdownStatus_State[decodedMessage.payloadVariant.value.state]}`,
-              );
-              sink.events.onLockdownStatus.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "regionPresets": {
-              sink.events.onRegionPresets.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "deviceuiConfig": {
-              sink.events.onDeviceUiConfig.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            case "fileInfo": {
-              sink.events.onFileInfo.dispatch(
-                decodedMessage.payloadVariant.value,
-              );
-              break;
-            }
-            default: {
+            } else {
               sink.log.warn(
                 Emitter[Emitter.HandleFromRadio],
-                `⚠️ Unhandled payload variant: ${decodedMessage.payloadVariant.case}`,
+                "⚠️ Received Config packet of variant: UNK",
               );
             }
+            sink.events.onConfigPacket.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "logRecord": {
+            sink.log.trace(
+              Emitter[Emitter.HandleFromRadio],
+              "Received onLogRecord",
+            );
+            sink.events.onLogRecord.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "configCompleteId": {
+            sink.log.info(
+              Emitter[Emitter.HandleFromRadio],
+              `⚙️ Received config complete id: ${decodedMessage.payloadVariant.value}`,
+            );
+            // MeshClient matches the id against the handshake stage and
+            // marks the device configured after the final stage.
+            sink.events.onConfigComplete.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "rebooted": {
+            sink.events.onRebooted.dispatch();
+            sink.configure().catch((e: unknown) => {
+              sink.log.warn(
+                Emitter[Emitter.HandleFromRadio],
+                "⚠️ Handshake after reboot failed",
+                e,
+              );
+            });
+            break;
+          }
+          case "moduleConfig": {
+            if (decodedMessage.payloadVariant.value.payloadVariant.case) {
+              sink.log.trace(
+                Emitter[Emitter.HandleFromRadio],
+                `💾 Received Module Config packet of variant: ${decodedMessage.payloadVariant.value.payloadVariant.case}`,
+              );
+            } else {
+              sink.log.warn(
+                Emitter[Emitter.HandleFromRadio],
+                "⚠️ Received Module Config packet of variant: UNK",
+              );
+            }
+            sink.events.onModuleConfigPacket.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "channel": {
+            sink.log.trace(
+              Emitter[Emitter.HandleFromRadio],
+              `🔐 Received Channel: ${decodedMessage.payloadVariant.value.index}`,
+            );
+            sink.events.onChannelPacket.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "queueStatus": {
+            sink.log.trace(
+              Emitter[Emitter.HandleFromRadio],
+              `🚧 Received Queue Status: last status: ${decodedMessage.payloadVariant.value.res}, free entries: ${decodedMessage.payloadVariant.value.free} out of ${decodedMessage.payloadVariant.value.maxlen}`,
+            );
+            sink.events.onQueueStatus.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "xmodemPacket": {
+            sink.xModem.handlePacket(decodedMessage.payloadVariant.value);
+            break;
+          }
+          case "metadata": {
+            sink.log.debug(
+              Emitter[Emitter.GetMetadata],
+              "🏷️ Received metadata packet",
+            );
+            sink.events.onDeviceMetadataPacket.dispatch({
+              id: decodedMessage.id,
+              rxTime: new Date(),
+              from: 0,
+              to: 0,
+              type: "direct",
+              channel: ChannelNumber.Primary,
+              data: decodedMessage.payloadVariant.value,
+            });
+            break;
+          }
+          case "mqttClientProxyMessage": {
+            break;
+          }
+          case "clientNotification": {
+            sink.log.trace(
+              Emitter[Emitter.HandleFromRadio],
+              `📣 Received ClientNotification: ${decodedMessage.payloadVariant.value.message}`,
+            );
+            sink.events.onClientNotificationPacket.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "lockdownStatus": {
+            // Arrives right after config_complete_id on lockdown builds.
+            // While locked, metadata is zeroed and channels and NodeDB are
+            // withheld until the client unlocks and re-runs the handshake.
+            sink.log.info(
+              Emitter[Emitter.HandleFromRadio],
+              `🔒 Received lockdown status: ${Protobuf.Mesh.LockdownStatus_State[decodedMessage.payloadVariant.value.state]}`,
+            );
+            sink.events.onLockdownStatus.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "regionPresets": {
+            sink.events.onRegionPresets.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "deviceuiConfig": {
+            sink.events.onDeviceUiConfig.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          case "fileInfo": {
+            sink.events.onFileInfo.dispatch(
+              decodedMessage.payloadVariant.value,
+            );
+            break;
+          }
+          default: {
+            sink.log.warn(
+              Emitter[Emitter.HandleFromRadio],
+              `⚠️ Unhandled payload variant: ${decodedMessage.payloadVariant.case}`,
+            );
           }
         }
       }
+    }
+  };
+
+  return new WritableStream<DeviceOutput>({
+    write(chunk) {
+      handle(chunk);
+      return yieldToRenderer();
     },
   });
 };
