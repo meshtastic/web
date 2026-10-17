@@ -199,19 +199,35 @@ export class ConfigEditor {
     this.recomputeDirty();
   }
 
+  /**
+   * Stage a radio config section. `value` is merged over the current working
+   * (or baseline) section, so fields a form doesn't render keep the device's
+   * value instead of being sent as protobuf defaults.
+   */
   public setRadioSection<K extends RadioConfigSection & string>(
     key: K,
     value: RadioConfig[K],
   ): void {
-    this.workingRadio.value = { ...this.workingRadio.peek(), [key]: value };
+    const working = this.workingRadio.peek();
+    const current = working[key] ?? this.baselineRadio.peek()[key];
+    this.workingRadio.value = {
+      ...working,
+      [key]: current && value ? { ...current, ...value } : value,
+    };
     this.recomputeDirty();
   }
 
+  /** Stage a module config section, merged like {@link setRadioSection}. */
   public setModuleSection<K extends ModuleConfigSection & string>(
     key: K,
     value: ModuleConfig[K],
   ): void {
-    this.workingModules.value = { ...this.workingModules.peek(), [key]: value };
+    const working = this.workingModules.peek();
+    const current = working[key] ?? this.baselineModules.peek()[key];
+    this.workingModules.value = {
+      ...working,
+      [key]: current && value ? { ...current, ...value } : value,
+    };
     this.recomputeDirty();
   }
 
