@@ -2,7 +2,6 @@ import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { ConnectingOverlay } from "@components/ConnectingOverlay.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
-import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
 import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
@@ -59,7 +58,6 @@ export function App() {
                 // dvh here only: the shell stays h-screen so the connection screen is untouched.
                 <div className="h-dvh flex w-full">
                   <DialogManager />
-                  <KeyBackupReminder />
                   <RegionSetupReminder />
                   <CommandPalette />
                   <MapProvider>
