@@ -1,4 +1,3 @@
-import { IndicatorIcon } from "@components/generic/NodeTrustIndicators.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import {
   useMyNodeAsProto,
@@ -8,8 +7,8 @@ import { useAppStore, useDevice } from "@core/stores";
 import type { Message } from "@core/stores/messageStore";
 import { cn } from "@core/utils/cn.ts";
 import type { Protobuf } from "@meshtastic/sdk";
-import { SignatureIcon } from "lucide-react";
 import { useMemo } from "react";
+import { MessageDiagnostics } from "./MessageDiagnostics.tsx";
 import { MessageStatus } from "./MessageStatus.tsx";
 import { useTranslation } from "react-i18next";
 
@@ -117,7 +116,6 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   );
 
   const isSender = myNodeNum !== undefined && message.from === myNodeNum;
-  const showSigned = !isSender && message.signed === true;
 
   const messageItemWrapperClass = cn(
     "group w-full py-2 relative list-none",
@@ -151,15 +149,6 @@ export const MessageItem = ({ message }: MessageItemProps) => {
                 <span className="sr-only">{fullDateTime}</span>
               </time>
             )}
-            {showSigned && (
-              <IndicatorIcon
-                icon={SignatureIcon}
-                size={16}
-                label={t("signature.signed.label")}
-                tooltip={t("signature.signed.tooltip")}
-                className="text-green-600 dark:text-green-500"
-              />
-            )}
           </div>
 
           {message?.message && (
@@ -168,7 +157,11 @@ export const MessageItem = ({ message }: MessageItemProps) => {
             </div>
           )}
 
-          {isSender && <MessageStatus message={message} />}
+          {isSender ? (
+            <MessageStatus message={message} />
+          ) : (
+            <MessageDiagnostics message={message} lora={config?.lora} />
+          )}
         </div>
       </div>
       {/* Actions Menu Placeholder */}

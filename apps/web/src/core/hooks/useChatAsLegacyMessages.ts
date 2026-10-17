@@ -78,6 +78,11 @@ export function toLegacy(
   if (message.relays !== undefined) {
     legacy.relays = message.relays;
   }
+  if (message.snr !== undefined) legacy.snr = message.snr;
+  if (message.rssi !== undefined) legacy.rssi = message.rssi;
+  if (message.hopsAway !== undefined) legacy.hopsAway = message.hopsAway;
+  if (message.viaMqtt !== undefined) legacy.viaMqtt = message.viaMqtt;
+  if (message.transport !== undefined) legacy.transport = message.transport;
   return legacy;
 }
 

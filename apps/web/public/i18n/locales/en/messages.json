@@ -24,6 +24,35 @@
       "tooltip": "Signed by the sender (XEdDSA) and verified by your radio."
     }
   },
+  "diagnostics": {
+    "snr": {
+      "value": "SNR {{value}} dB",
+      "tooltip": "Signal-to-noise ratio as your radio heard it"
+    },
+    "rssi": {
+      "value": "RSSI {{value}} dBm",
+      "tooltip": "Signal strength as your radio heard it"
+    },
+    "hops": {
+      "value_one": "{{count}} hop away",
+      "value_other": "{{count}} hops away",
+      "unknown": "Hop count unknown"
+    },
+    "transport": {
+      "mqtt": {
+        "label": "Via MQTT",
+        "tooltip": "Reached the mesh through an MQTT gateway."
+      },
+      "udp": {
+        "label": "Via UDP",
+        "tooltip": "Reached your radio over multicast UDP."
+      },
+      "api": {
+        "label": "Via API",
+        "tooltip": "Sent to your radio by an app connected to it."
+      }
+    }
+  },
   "status": {
     "title": "Message delivery status",
     "errorTitle": "Error",

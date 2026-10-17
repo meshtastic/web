@@ -147,3 +147,66 @@ describe("MessageItem delivery status", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("MessageItem mesh diagnostics", () => {
+  const Transport = Protobuf.Mesh.MeshPacket_TransportMechanism;
+  const received = (overrides: Partial<Message>) =>
+    makeMessage({ from: PEER, to: MY_NODE, ...overrides });
+
+  it("shows SNR and RSSI for a message heard straight from the sender", () => {
+    renderItem(
+      received({
+        hopsAway: 0,
+        snr: 0,
+        rssi: -98,
+        transport: Transport.TRANSPORT_LORA,
+      }),
+    );
+    expect(screen.getByText("SNR 0.00 dB")).toBeInTheDocument();
+    expect(screen.getByText("RSSI -98 dBm")).toBeInTheDocument();
+    expect(screen.queryByText("0 hops away")).not.toBeInTheDocument();
+  });
+
+  it("shows the hop count instead of signal for a relayed message", () => {
+    renderItem(received({ hopsAway: 2, snr: 4.5, rssi: -80 }));
+    expect(screen.getByText("2 hops away")).toBeInTheDocument();
+    expect(screen.queryByText(/SNR/)).not.toBeInTheDocument();
+  });
+
+  it("marks an MQTT message and shows its hops, not signal", () => {
+    renderItem(
+      received({
+        hopsAway: 0,
+        snr: 6,
+        rssi: -60,
+        viaMqtt: true,
+        transport: Transport.TRANSPORT_MQTT,
+      }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Via MQTT" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("0 hops away")).toBeInTheDocument();
+    expect(screen.queryByText(/SNR/)).not.toBeInTheDocument();
+  });
+
+  it("says when the hop count is unknown", () => {
+    renderItem(received({}));
+    expect(screen.getByText("Hop count unknown")).toBeInTheDocument();
+  });
+
+  it("does not badge LoRa or an unset transport", () => {
+    renderItem(
+      received({ hopsAway: 1, transport: Transport.TRANSPORT_INTERNAL }),
+    );
+    expect(
+      screen.queryByRole("button", { name: /^Via / }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not show diagnostics on messages we sent", () => {
+    renderItem(makeMessage({ hopsAway: 0, snr: 5, rssi: -70 }));
+    expect(screen.queryByText(/SNR/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/hop/)).not.toBeInTheDocument();
+  });
+});

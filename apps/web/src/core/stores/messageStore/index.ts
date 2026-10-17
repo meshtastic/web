@@ -42,6 +42,16 @@ interface MessageBase {
   routingError?: Protobuf.Mesh.Routing_Error;
   /** How many acks (relays and the recipient) came back. */
   relays?: number;
+  /** SNR in dB of a received message, when the radio measured it. */
+  snr?: number;
+  /** RSSI in dBm of a received message, when the radio measured it. */
+  rssi?: number;
+  /** Hops a received message took; undefined when it can't be told. */
+  hopsAway?: number;
+  /** Reached the mesh through an MQTT gateway. */
+  viaMqtt?: boolean;
+  /** How the message reached the radio. */
+  transport?: Protobuf.Mesh.MeshPacket_TransportMechanism;
 }
 
 interface GenericMessage<T extends MessageType> extends MessageBase {

@@ -69,4 +69,26 @@ describe("toLegacy", () => {
     expect(legacy.routingError).toBe(Protobuf.Mesh.Routing_Error.NO_ROUTE);
     expect(legacy.relays).toBe(3);
   });
+
+  it("carries how the message was received, keeping 0 readings", () => {
+    const legacy = toLegacy(
+      {
+        ...sdkMessage,
+        snr: 0,
+        rssi: -100,
+        hopsAway: 0,
+        viaMqtt: true,
+        transport: Protobuf.Mesh.MeshPacket_TransportMechanism.TRANSPORT_MQTT,
+      },
+      params,
+    );
+    expect(legacy).toMatchObject({
+      snr: 0,
+      rssi: -100,
+      hopsAway: 0,
+      viaMqtt: true,
+      transport: Protobuf.Mesh.MeshPacket_TransportMechanism.TRANSPORT_MQTT,
+    });
+    expect("snr" in toLegacy(sdkMessage, params)).toBe(false);
+  });
 });
