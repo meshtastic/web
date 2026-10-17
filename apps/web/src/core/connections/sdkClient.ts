@@ -33,13 +33,14 @@ const STORAGE_OPEN_TIMEOUT_MS = 5000;
  * shared OPFS-backed SQLite DB. If sqlocal is unavailable, hangs longer than
  * `STORAGE_OPEN_TIMEOUT_MS`, or fails for any reason, falls through to the
  * SDK's in-memory repositories so the connect path is never blocked by
- * persistence.
+ * persistence. `persistent` is false then: nothing from this session will
+ * be saved.
  */
 export async function buildMeshDevice(
   connectionId: ConnectionId,
   deviceId: number,
   transport: AnyTransport,
-): Promise<MeshDevice> {
+): Promise<{ meshDevice: MeshDevice; persistent: boolean }> {
   log.debug("buildMeshDevice: enter", { connectionId, deviceId });
   let chatRepository: SqlocalMessageRepository | undefined;
   let draftRepository: SqlocalDraftRepository | undefined;
@@ -87,7 +88,7 @@ export async function buildMeshDevice(
     );
   }
 
-  return new MeshDevice(transport, {
+  const meshDevice = new MeshDevice(transport, {
     configId: deviceId,
     chat:
       chatRepository || draftRepository
@@ -102,4 +103,5 @@ export async function buildMeshDevice(
       ? { repository: telemetryRepository, retention: TELEMETRY_RETENTION }
       : undefined,
   });
+  return { meshDevice, persistent: chatRepository !== undefined };
 }

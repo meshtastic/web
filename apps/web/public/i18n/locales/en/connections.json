@@ -54,7 +54,9 @@
     "updated": "Updated",
     "updatedByName": "{{name}} has been updated.",
     "firmwareOutdated": "Firmware update recommended",
-    "firmwareOutdatedDescription": "This radio runs firmware {{version}}. Some features need {{minimum}} or newer."
+    "firmwareOutdatedDescription": "This radio runs firmware {{version}}. Some features need {{minimum}} or newer.",
+    "storageUnavailable": "Messages won't be saved",
+    "storageUnavailableDescription": "The browser's storage couldn't be opened, so messages from this session will be gone after a reload. Closing other tabs of this app may help."
   },
   "overlay": {
     "srTitle": "Connecting to device",

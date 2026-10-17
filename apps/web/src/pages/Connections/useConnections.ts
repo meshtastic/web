@@ -145,8 +145,20 @@ export function useConnections() {
       updateStatus(id, "configuring");
       log.debug("setupMeshDevice: building MeshDevice", { id, deviceId });
 
-      const meshDevice = await buildMeshDevice(id, deviceId, transport);
-      log.debug("setupMeshDevice: MeshDevice built", { id });
+      const { meshDevice, persistent } = await buildMeshDevice(
+        id,
+        deviceId,
+        transport,
+      );
+      log.debug("setupMeshDevice: MeshDevice built", { id, persistent });
+      if (!persistent) {
+        toast({
+          title: t("toasts.storageUnavailable", { ns: "connections" }),
+          description: t("toasts.storageUnavailableDescription", {
+            ns: "connections",
+          }),
+        });
+      }
 
       if (!meshRegistry.has(id)) {
         meshRegistry.register(id, meshDevice.meshClient);
