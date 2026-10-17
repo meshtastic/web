@@ -151,17 +151,14 @@ export const Connections = () => {
               connection={c}
               onConnect={async () => {
                 const ok = await connect(c.id, { allowPrompt: true });
-                toast({
-                  title: ok ? t("toasts.connected") : t("toasts.failed"),
-                  description: ok
-                    ? t("toasts.nowConnected", {
-                        name: c.name,
-                        interpolation: { escapeValue: false },
-                      })
-                    : t("toasts.checkConnection"),
-                });
+                // Success needs no toast: the connecting overlay shows it.
                 if (ok) {
                   navigate({ to: "/" });
+                } else {
+                  toast({
+                    title: t("toasts.failed"),
+                    description: t("toasts.checkConnection"),
+                  });
                 }
               }}
               onDisconnect={async () => {
@@ -197,17 +194,14 @@ export const Connections = () => {
               }}
               onRetry={async () => {
                 const ok = await connect(c.id, { allowPrompt: true });
-                toast({
-                  title: ok ? t("toasts.connected") : t("toasts.failed"),
-                  description: ok
-                    ? t("toasts.nowConnected", {
-                        name: c.name,
-                        interpolation: { escapeValue: false },
-                      })
-                    : t("toasts.pickConnectionAgain"),
-                });
+                // Success needs no toast: the connecting overlay shows it.
                 if (ok) {
                   navigate({ to: "/" });
+                } else {
+                  toast({
+                    title: t("toasts.failed"),
+                    description: t("toasts.pickConnectionAgain"),
+                  });
                 }
               }}
             />

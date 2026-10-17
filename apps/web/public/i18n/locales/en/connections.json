@@ -37,7 +37,6 @@
   },
   "toasts": {
     "connected": "Connected",
-    "nowConnected": "{{name}} is now connected",
     "nowDisconnected": "{{name}} is now disconnected",
     "disconnected": "Disconnected",
     "failed": "Failed to connect",
