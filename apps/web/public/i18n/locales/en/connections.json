@@ -59,7 +59,10 @@
     "storageUnavailableDescription": "The browser couldn't open the app's storage, so messages from this session will be gone after a reload. This can happen in a private window, or with the app open in other tabs."
   },
   "overlay": {
-    "srTitle": "Connecting to device",
+    "title": {
+      "connecting": "Connecting",
+      "reconnecting": "Reconnecting"
+    },
     "phase": {
       "connecting": "Opening transport…",
       "configuring": "Streaming configuration…"

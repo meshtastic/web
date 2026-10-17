@@ -77,6 +77,11 @@ export const ConnectingOverlay = (): ReactElement | null => {
         };
 
   const isConnecting = active.status === "connecting";
+  // A connection that has been connected before is being reconnected.
+  const title =
+    active.lastConnectedAt !== undefined
+      ? t("overlay.title.reconnecting")
+      : t("overlay.title.connecting");
   const phaseLabel = isConnecting
     ? t("overlay.phase.connecting", { defaultValue: "Opening transport…" })
     : t("overlay.phase.configuring", {
@@ -86,14 +91,10 @@ export const ConnectingOverlay = (): ReactElement | null => {
   return (
     <Dialog open>
       <DialogContent
-        className="max-w-sm overflow-hidden bg-background-primary p-0 text-text-primary shadow-2xl"
+        className="max-w-md overflow-hidden bg-background-primary p-0 text-text-primary shadow-2xl"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogTitle className="sr-only">
-          {t("overlay.srTitle", { defaultValue: "Connecting to device" })}
-        </DialogTitle>
-
         <div className="flex flex-col items-center gap-6 px-8 pt-10 pb-8">
           {/* Hero icon with radial pings — uses the theme link color so light
               and dark modes both look at-home. */}
@@ -104,13 +105,16 @@ export const ConnectingOverlay = (): ReactElement | null => {
             <Icon className="relative h-9 w-9 text-background-primary" />
           </div>
 
-          {/* Name + phase */}
-          <div className="text-center">
-            <div className="text-lg font-semibold tracking-tight text-text-primary">
+          {/* What's happening, to which device, and the current phase */}
+          <div className="flex flex-col items-center gap-1 text-center">
+            <DialogTitle className="text-2xl font-semibold tracking-tight text-text-primary">
+              {title}
+            </DialogTitle>
+            <div className="text-lg font-medium text-text-primary">
               {active.name}
             </div>
-            <div className="mt-1 inline-flex items-center gap-1.5 text-xs text-text-secondary">
-              <Loader2 className="h-3 w-3 animate-spin" />
+            <div className="mt-1 inline-flex items-center gap-2 text-base text-text-secondary">
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               {phaseLabel}
             </div>
           </div>
@@ -139,7 +143,7 @@ export const ConnectingOverlay = (): ReactElement | null => {
 
           {showCancel && (
             <div className="flex w-full flex-col items-center gap-2">
-              <p className="text-center text-xs text-text-secondary">
+              <p className="text-center text-sm text-text-secondary">
                 {t("overlay.stuckHint", {
                   defaultValue:
                     "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
@@ -171,7 +175,7 @@ function Chip({ label, count, done }: ChipProps): ReactElement {
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
+        "flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-base transition-colors",
         filled
           ? "border-green-500/40 bg-green-500/10 text-green-700 dark:text-green-300"
           : "border-text-secondary/30 bg-text-secondary/5 text-text-secondary",
@@ -179,11 +183,11 @@ function Chip({ label, count, done }: ChipProps): ReactElement {
     >
       <span className="font-medium">{label}</span>
       {count !== undefined ? (
-        <span className="font-mono text-xs tabular-nums">{count}</span>
+        <span className="font-mono text-sm tabular-nums">{count}</span>
       ) : done ? (
-        <CheckCircle2 className="h-4 w-4 text-green-500" />
+        <CheckCircle2 className="h-5 w-5 text-green-500" />
       ) : (
-        <span className="h-4 w-4 rounded-full border border-dashed border-text-secondary/50" />
+        <span className="h-5 w-5 rounded-full border border-dashed border-text-secondary/50" />
       )}
     </div>
   );
