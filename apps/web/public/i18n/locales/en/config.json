@@ -482,7 +482,6 @@
   "security": {
     "description": "Settings for the Security configuration",
     "title": "Security",
-    "button_backupKey": "Backup Key",
     "adminChannelEnabled": {
       "description": "Allow incoming device control over the insecure legacy admin channel",
       "label": "Legacy Admin channel"
