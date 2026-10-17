@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["@types/w3c-web-serial"]
   },
-  "include": ["src"]
+  "include": ["mod.ts", "src"]
 }

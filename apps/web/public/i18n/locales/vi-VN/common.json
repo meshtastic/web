@@ -1,0 +1,164 @@
+{
+  "button": {
+    "apply": "Áp dụng",
+    "addConnection": "Add Connection",
+    "saveConnection": "Lưu lại kết nối",
+    "backupKey": "Backup Key",
+    "cancel": "Hủy",
+    "connect": "Kết nối",
+    "clearMessages": "Clear Messages",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "delete": "Xóa",
+    "dismiss": "Bỏ qua",
+    "download": "Download",
+    "disconnect": "Disconnect",
+    "export": "Xuất",
+    "generate": "Generate",
+    "regenerate": "Regenerate",
+    "import": "Nhập",
+    "message": "Message",
+    "now": "Bây giờ",
+    "ok": "OKê",
+    "print": "In",
+    "remove": "Remove",
+    "requestNewKeys": "Request New Keys",
+    "requestPosition": "Request Position",
+    "reset": "Đặt lại",
+    "retry": "Thử lại",
+    "save": "Lưu",
+    "setDefault": "Set as default",
+    "unsetDefault": "Unset default",
+    "scanQr": "Quét mã QR",
+    "traceRoute": "Truy Đường",
+    "submit": "Submit"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "fullTitle": "Meshtastic Web Client"
+  },
+  "loading": "Đang tải...",
+  "unit": {
+    "cps": "CPS",
+    "dbm": "dBm",
+    "hertz": "Hz",
+    "hop": {
+      "one": "Nhảy",
+      "plural": "Cú nhảy"
+    },
+    "hopsAway": {
+      "one": "{{count}} cú nhảy từ đây",
+      "plural": "{{count}} hops away",
+      "unknown": "Unknown hops away"
+    },
+    "megahertz": "MHz",
+    "raw": "raw",
+    "meter": {
+      "one": "Mét",
+      "plural": "Mét",
+      "suffix": "m"
+    },
+    "kilometer": {
+      "one": "Kilômét",
+      "plural": "Kilômét",
+      "suffix": "km"
+    },
+    "minute": {
+      "one": "Phút",
+      "plural": "Phút"
+    },
+    "hour": {
+      "one": "Giờ",
+      "plural": "Giờ"
+    },
+    "millisecond": {
+      "one": "Mili giây",
+      "plural": "Miligiây",
+      "suffix": "miligiây"
+    },
+    "second": {
+      "one": "Giây",
+      "plural": "Giây"
+    },
+    "day": {
+      "one": "Ngày",
+      "plural": "Ngày",
+      "today": "Hôm nay",
+      "yesterday": "Hôm qua"
+    },
+    "month": {
+      "one": "Tháng",
+      "plural": "Tháng"
+    },
+    "year": {
+      "one": "Năm",
+      "plural": "Năm"
+    },
+    "snr": "SNR",
+    "volt": {
+      "one": "Vôn",
+      "plural": "Vôn",
+      "suffix": "V"
+    },
+    "record": {
+      "one": "Records",
+      "plural": "Records"
+    },
+    "degree": {
+      "one": "Độ",
+      "plural": "Độ",
+      "suffix": "°"
+    }
+  },
+  "security": {
+    "0bit": "Rỗng",
+    "8bit": "8 bit",
+    "128bit": "128 bit",
+    "256bit": "256 bit"
+  },
+  "unknown": {
+    "longName": "Không rõ",
+    "shortName": "Ko rõ",
+    "notAvailable": "KHÔNG",
+    "num": "??"
+  },
+  "nodeUnknownPrefix": "!",
+  "unset": "CHƯA ĐẶT",
+  "fallbackName": "Meshtastic {{last4}}",
+  "node": "Điểm",
+  "formValidation": {
+    "unsavedChanges": "Unsaved changes",
+    "tooBig": {
+      "string": "Too long, expected less than or equal to {{maximum}} characters.",
+      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
+      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+    },
+    "tooSmall": {
+      "string": "Too short, expected more than or equal to {{minimum}} characters.",
+      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+    },
+    "invalidFormat": {
+      "ipv4": "Invalid format, expected an IPv4 address.",
+      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+    },
+    "invalidType": {
+      "number": "Invalid type, expected a number."
+    },
+    "pskLength": {
+      "0bit": "Chìa khóa cần phải để trống.",
+      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
+      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
+      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+    },
+    "required": {
+      "generic": "This field is required.",
+      "managed": "At least one admin key is requred if the node is managed.",
+      "key": "Bắt buộc phải có chìa khóa."
+    },
+    "invalidOverrideFreq": {
+      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+    }
+  },
+  "yes": "Có",
+  "no": "Không"
+}

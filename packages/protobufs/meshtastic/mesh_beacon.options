@@ -1,0 +1,3 @@
+*MeshBeacon.message max_size:61
+*MeshBeacon.offer_channel.name max_size:12
+*MeshBeacon.offer_channel.psk max_size:32

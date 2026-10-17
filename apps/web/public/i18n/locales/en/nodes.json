@@ -52,12 +52,28 @@
       "never": "Never"
     }
   },
-
   "actions": {
     "added": "Added",
     "removed": "Removed",
     "ignoreNode": "Ignore Node",
     "unignoreNode": "Unignore Node",
     "requestPosition": "Request Position"
+  },
+  "trust": {
+    "signed": {
+      "label": "Signed",
+      "tooltip": "This node signs its packets (XEdDSA), so your radio can verify they really come from it."
+    },
+    "unheard": {
+      "label": "Not heard on current LoRa settings",
+      "tooltip": "Last heard before this radio's LoRa settings changed. It may not be reachable on the current settings."
+    },
+    "muted": {
+      "label": "Muted",
+      "tooltip": "Notifications from this node are muted."
+    },
+    "statusMessage": {
+      "label": "Status message"
+    }
   }
 }

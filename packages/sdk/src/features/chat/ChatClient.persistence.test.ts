@@ -95,4 +95,44 @@ describe("ChatClient persistence", () => {
     );
     expect(persisted.map((m) => m.text)).toEqual(["hi"]);
   });
+
+  it("saves a direct message we send under its recipient", async () => {
+    const repository = new InMemoryMessageRepository();
+    const { transport, respond } = createFakeTransport();
+    const client = new MeshClient({ transport, chat: { repository } });
+    respond.withMyNodeInfo({ myNodeNum: 0x10 });
+    await new Promise((r) => setTimeout(r, 10));
+
+    void client.chat.send({ text: "hi peer", destination: 0x20 });
+    await new Promise((r) => setTimeout(r, 10));
+
+    const withPeer = await repository.loadRecent(
+      { kind: "direct", peer: 0x20 },
+      10,
+    );
+    expect(withPeer.map((m) => m.text)).toEqual(["hi peer"]);
+  });
+
+  it("refiles sent direct messages an older version filed under our node", async () => {
+    const repository = new InMemoryMessageRepository();
+    await repository.appendBatch([
+      {
+        ...seedMessage(1, 1000, "sent earlier"),
+        from: 0x10,
+        to: 0x20,
+        type: "direct",
+      },
+    ]);
+    const { transport, respond } = createFakeTransport();
+    new MeshClient({ transport, chat: { repository } });
+
+    respond.withMyNodeInfo({ myNodeNum: 0x10 });
+    await new Promise((r) => setTimeout(r, 10));
+
+    const withPeer = await repository.loadRecent(
+      { kind: "direct", peer: 0x20 },
+      10,
+    );
+    expect(withPeer.map((m) => m.text)).toEqual(["sent earlier"]);
+  });
 });

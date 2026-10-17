@@ -2,7 +2,7 @@ import { type Signal, signal } from "@preact/signals-core";
 import type { ReadonlySignal } from "../../../core/signals/createStore.ts";
 import { toReadonly } from "../../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../../core/types.ts";
-import type { Message } from "../domain/Message.ts";
+import type { Message, MessageDeliveryPatch } from "../domain/Message.ts";
 import { MessageState } from "../domain/MessageState.ts";
 
 /**
@@ -74,13 +74,38 @@ export class ChatStore {
   }
 
   updateState(id: number, state: MessageState): void {
+    this.patch(id, { state });
+  }
+
+  updateDelivery(id: number, patch: MessageDeliveryPatch): void {
+    this.patch(id, patch);
+  }
+
+  remove(id: number): void {
+    for (const [, bucket] of this.buckets) {
+      if (bucket.value.some((m) => m.id === id)) {
+        bucket.value = bucket.value.filter((m) => m.id !== id);
+        return;
+      }
+    }
+  }
+
+  getMessage(id: number): Message | undefined {
+    for (const bucket of this.buckets.values()) {
+      const found = bucket.value.find((m) => m.id === id);
+      if (found) return found;
+    }
+    return undefined;
+  }
+
+  private patch(id: number, patch: MessageDeliveryPatch): void {
     for (const [, bucket] of this.buckets) {
       const idx = bucket.value.findIndex((m) => m.id === id);
       if (idx !== -1) {
         const next = bucket.value.slice();
         const existing = next[idx];
         if (!existing) continue;
-        next[idx] = { ...existing, state };
+        next[idx] = { ...existing, ...patch };
         bucket.value = next;
         return;
       }

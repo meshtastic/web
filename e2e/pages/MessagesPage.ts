@@ -23,7 +23,9 @@ export class MessagesPage {
     await expect(this.input()).toBeEnabled();
     // The SDK chat client lags the composer (device handshake + sqlocal init), so
     // an immediate send is silently dropped. Gate on the "Connected" status.
-    await expect(this.page.getByText("Connected", { exact: true }).first()).toBeVisible({
+    await expect(
+      this.page.getByText("Connected", { exact: true }).first(),
+    ).toBeVisible({
       timeout: 30_000,
     });
   }

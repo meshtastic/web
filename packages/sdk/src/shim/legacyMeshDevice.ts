@@ -282,6 +282,20 @@ export class MeshDevice {
     });
   }
 
+  public sendKeyVerification(
+    messageType: Protobuf.Admin.KeyVerificationAdmin_MessageType,
+    remoteNodenum: number,
+    nonce: bigint,
+    securityNumber?: number,
+  ): Promise<number> {
+    return this.client.device.sendKeyVerification(
+      messageType,
+      remoteNodenum,
+      nonce,
+      securityNumber,
+    );
+  }
+
   public getMetadata(nodeNum: number): Promise<number> {
     return sendAdminMessage(
       this.client,

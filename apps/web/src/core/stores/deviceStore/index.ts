@@ -30,6 +30,11 @@ type DeviceData = {
   // Persisted data
   id: number;
   myNodeNum: number | undefined;
+  /**
+   * Hex of MyNodeInfo.device_id. Firmware 2.8 derives the node number from
+   * the public key, so it changes on upgrade or re-key; this id doesn't.
+   */
+  hardwareId?: string;
   traceroutes: Map<
     number,
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
@@ -149,6 +154,7 @@ function deviceFactory(
   data?: Partial<DeviceData>,
 ): Device {
   const myNodeNum = data?.myNodeNum;
+  const hardwareId = data?.hardwareId;
   const traceroutes =
     data?.traceroutes ??
     new Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>();
@@ -158,6 +164,7 @@ function deviceFactory(
   return {
     id,
     myNodeNum,
+    hardwareId,
     traceroutes,
     waypoints,
     neighborInfo,
@@ -179,7 +186,6 @@ function deviceFactory(
       reboot: false,
       deviceName: false,
       nodeRemoval: false,
-      pkiBackup: false,
       nodeDetails: false,
       unsafeRoles: false,
       refreshKeys: false,
@@ -342,6 +348,10 @@ function deviceFactory(
                 device.moduleConfig.tak = config.payloadVariant.value;
                 break;
               }
+              case "meshBeacon": {
+                device.moduleConfig.meshBeacon = config.payloadVariant.value;
+                break;
+              }
             }
           }
         }),
@@ -371,9 +381,20 @@ function deviceFactory(
             throw new Error(`No DeviceStore found for id: ${id}`);
           }
           newDevice.myNodeNum = hardware.myNodeNum;
+          // Lockdown zeroes device_id, so an empty one identifies nothing.
+          const hardwareId =
+            hardware.deviceId.length > 0
+              ? Array.from(hardware.deviceId, (b) =>
+                  b.toString(16).padStart(2, "0"),
+                ).join("")
+              : undefined;
+          if (hardwareId) newDevice.hardwareId = hardwareId;
 
           for (const [otherId, oldStore] of draft.devices) {
-            if (otherId === id || oldStore.myNodeNum !== hardware.myNodeNum) {
+            const sameRadio =
+              oldStore.myNodeNum === hardware.myNodeNum ||
+              (hardwareId !== undefined && oldStore.hardwareId === hardwareId);
+            if (otherId === id || !sameRadio) {
               continue;
             }
             newDevice.traceroutes = oldStore.traceroutes;
@@ -776,6 +797,7 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
         {
           id: db.id,
           myNodeNum: db.myNodeNum,
+          hardwareId: db.hardwareId,
           traceroutes: db.traceroutes,
           waypoints: db.waypoints,
           neighborInfo: db.neighborInfo,

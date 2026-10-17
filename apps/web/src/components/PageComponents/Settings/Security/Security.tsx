@@ -12,6 +12,7 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
+import { LockdownSection } from "./LockdownSection.tsx";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -46,7 +47,7 @@ const toFormShape = (
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
 
-  const { config, setDialogOpen, getEffectiveConfig } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
   const editor = useConfigEditor();
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
   const effective =
@@ -118,6 +119,18 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     }
   };
 
+  // Option text keyed to the enum value, so the select shows translated
+  // labels rather than the raw enum names.
+  const PacketSignaturePolicy =
+    Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy;
+  const packetSignaturePolicyOptions = {
+    [t("security.packetSignaturePolicy.compatible")]:
+      PacketSignaturePolicy.COMPATIBLE,
+    [t("security.packetSignaturePolicy.balanced")]:
+      PacketSignaturePolicy.BALANCED,
+    [t("security.packetSignaturePolicy.strict")]: PacketSignaturePolicy.STRICT,
+  };
+
   const bits = [
     {
       text: t("security.256bit"),
@@ -153,11 +166,6 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                     text: t("button.generate"),
                     onClick: () => setPrivateKeyDialogOpen(true),
                     variant: "success",
-                  },
-                  {
-                    text: t("button.backupKey"),
-                    onClick: () => setDialogOpen("pkiBackup", true),
-                    variant: "subtle",
                   },
                 ],
                 properties: {
@@ -226,6 +234,21 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
             ],
           },
           {
+            label: t("security.packetSignaturesCard.label"),
+            description: t("security.packetSignaturesCard.description"),
+            fields: [
+              {
+                type: "select",
+                name: "packetSignaturePolicy",
+                label: t("security.packetSignaturePolicy.label"),
+                description: t("security.packetSignaturePolicy.description"),
+                properties: {
+                  enumValue: packetSignaturePolicyOptions,
+                },
+              },
+            ],
+          },
+          {
             label: t("security.logsCard.label"),
             description: t("security.logsCard.description"),
             fields: [
@@ -269,6 +292,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
           },
         ]}
       />
+      <LockdownSection />
       <PkiRegenerateDialog
         text={{
           button: t("button.regenerate"),

@@ -24,13 +24,41 @@ export interface PacketSink {
   configure(): Promise<number>;
 }
 
+/** How many recent packet keys are remembered for duplicate detection. */
+const RECENT_PACKET_CAPACITY = 256;
+
+/**
+ * Remembers the most recent `(from, to, channel, id)` keys. Firmware 2.8
+ * replays each node's cached packets with a stable id after every handshake,
+ * so a reconnect would otherwise deliver the same packets again.
+ */
+class RecentPackets {
+  private readonly keys = new Set<string>();
+
+  /** True if the packet was already seen; records it otherwise. */
+  public seen(packet: Protobuf.Mesh.MeshPacket): boolean {
+    if (packet.id === 0) return false;
+    const key = `${packet.from}:${packet.to}:${packet.channel}:${packet.id}`;
+    if (this.keys.has(key)) return true;
+    this.keys.add(key);
+    if (this.keys.size > RECENT_PACKET_CAPACITY) {
+      const oldest = this.keys.values().next().value;
+      if (oldest !== undefined) this.keys.delete(oldest);
+    }
+    return false;
+  }
+}
+
 /**
  * Writable stream that consumes framed DeviceOutput chunks, decodes FromRadio
  * protobufs, routes MeshPackets through their portnums, and dispatches typed
  * events on the provided EventBus.
  */
-export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
-  new WritableStream<DeviceOutput>({
+export const decodePacket = (
+  sink: PacketSink,
+): WritableStream<DeviceOutput> => {
+  const recent = new RecentPackets();
+  return new WritableStream<DeviceOutput>({
     write(chunk) {
       switch (chunk.type) {
         case "status": {
@@ -64,6 +92,13 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
 
           switch (decodedMessage.payloadVariant.case) {
             case "packet": {
+              if (recent.seen(decodedMessage.payloadVariant.value)) {
+                sink.log.trace(
+                  Emitter[Emitter.HandleFromRadio],
+                  `Dropping duplicate packet ${decodedMessage.payloadVariant.value.id}`,
+                );
+                break;
+              }
               try {
                 handleMeshPacket(sink, decodedMessage.payloadVariant.value);
               } catch (e) {
@@ -151,22 +186,21 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
                 Emitter[Emitter.HandleFromRadio],
                 `⚙️ Received config complete id: ${decodedMessage.payloadVariant.value}`,
               );
+              // MeshClient matches the id against the handshake stage and
+              // marks the device configured after the final stage.
               sink.events.onConfigComplete.dispatch(
                 decodedMessage.payloadVariant.value,
               );
-              if (decodedMessage.payloadVariant.value === sink.configId) {
-                sink.log.info(
-                  Emitter[Emitter.HandleFromRadio],
-                  `⚙️ Config id matches client.configId: ${sink.configId}`,
-                );
-                sink.updateDeviceStatus(DeviceStatusEnum.DeviceConfigured);
-              }
               break;
             }
             case "rebooted": {
               sink.events.onRebooted.dispatch();
-              sink.configure().catch(() => {
-                // workaround for `wantConfigId` not getting acks
+              sink.configure().catch((e: unknown) => {
+                sink.log.warn(
+                  Emitter[Emitter.HandleFromRadio],
+                  "⚠️ Handshake after reboot failed",
+                  e,
+                );
               });
               break;
             }
@@ -200,7 +234,7 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
             case "queueStatus": {
               sink.log.trace(
                 Emitter[Emitter.HandleFromRadio],
-                `🚧 Received Queue Status: ${decodedMessage.payloadVariant.value}`,
+                `🚧 Received Queue Status: last status: ${decodedMessage.payloadVariant.value.res}, free entries: ${decodedMessage.payloadVariant.value.free} out of ${decodedMessage.payloadVariant.value.maxlen}`,
               );
               sink.events.onQueueStatus.dispatch(
                 decodedMessage.payloadVariant.value,
@@ -212,16 +246,6 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
               break;
             }
             case "metadata": {
-              if (
-                Number.parseFloat(
-                  decodedMessage.payloadVariant.value.firmwareVersion,
-                ) < Constants.minFwVer
-              ) {
-                sink.log.fatal(
-                  Emitter[Emitter.HandleFromRadio],
-                  `Device firmware outdated. Min supported: ${Constants.minFwVer} got: ${decodedMessage.payloadVariant.value.firmwareVersion}`,
-                );
-              }
               sink.log.debug(
                 Emitter[Emitter.GetMetadata],
                 "🏷️ Received metadata packet",
@@ -250,6 +274,37 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
               );
               break;
             }
+            case "lockdownStatus": {
+              // Arrives right after config_complete_id on lockdown builds.
+              // While locked, metadata is zeroed and channels and NodeDB are
+              // withheld until the client unlocks and re-runs the handshake.
+              sink.log.info(
+                Emitter[Emitter.HandleFromRadio],
+                `🔒 Received lockdown status: ${Protobuf.Mesh.LockdownStatus_State[decodedMessage.payloadVariant.value.state]}`,
+              );
+              sink.events.onLockdownStatus.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
+            case "regionPresets": {
+              sink.events.onRegionPresets.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
+            case "deviceuiConfig": {
+              sink.events.onDeviceUiConfig.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
+            case "fileInfo": {
+              sink.events.onFileInfo.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
             default: {
               sink.log.warn(
                 Emitter[Emitter.HandleFromRadio],
@@ -261,6 +316,7 @@ export const decodePacket = (sink: PacketSink): WritableStream<DeviceOutput> =>
       }
     },
   });
+};
 
 function handleMeshPacket(
   sink: PacketSink,
@@ -288,6 +344,34 @@ function handleMeshPacket(
   }
 }
 
+/**
+ * Hops the packet took, from hop_start and hop_limit. Unknown when hop_start
+ * is 0 (firmware older than 2.3, which didn't set it) or hop_limit is above it.
+ */
+export function hopsAway(
+  hopStart: number,
+  hopLimit: number,
+): number | undefined {
+  if (hopStart === 0 || hopLimit > hopStart) return undefined;
+  return hopStart - hopLimit;
+}
+
+/**
+ * How our radio heard the packet. rx_snr is a plain proto3 float, so 0 can
+ * mean either a 0 dB reading or no reading at all; rx_rssi is optional and
+ * only set when the radio measured the packet, so it tells the two apart.
+ */
+function radioMetadata(meshPacket: Protobuf.Mesh.MeshPacket) {
+  const measured = meshPacket.rxRssi !== undefined || meshPacket.rxSnr !== 0;
+  return {
+    rxSnr: measured ? meshPacket.rxSnr : undefined,
+    rxRssi: meshPacket.rxRssi,
+    hopsAway: hopsAway(meshPacket.hopStart, meshPacket.hopLimit),
+    viaMqtt: meshPacket.viaMqtt,
+    transportMechanism: meshPacket.transportMechanism,
+  };
+}
+
 function handleDecodedPacket(
   sink: PacketSink,
   dataPacket: Protobuf.Mesh.Data,
@@ -295,11 +379,17 @@ function handleDecodedPacket(
 ) {
   const packetMetadata: Omit<PacketMetadata<unknown>, "data"> = {
     id: meshPacket.id,
-    rxTime: new Date(meshPacket.rxTime * 1000),
+    // rx_time is optional since protobufs 2.8.0. Unset means the device had
+    // no wall-clock time, so the time it reached us is the best estimate.
+    rxTime: meshPacket.rxTime ? new Date(meshPacket.rxTime * 1000) : new Date(),
     type: meshPacket.to === Constants.broadcastNum ? "broadcast" : "direct",
     from: meshPacket.from,
     to: meshPacket.to,
     channel: meshPacket.channel,
+    requestId: dataPacket.requestId || undefined,
+    xeddsaSigned: meshPacket.xeddsaSigned,
+    ackProofStatus: meshPacket.ackProofStatus,
+    ...radioMetadata(meshPacket),
   };
 
   sink.log.trace(
@@ -366,7 +456,10 @@ function handleDecodedPacket(
         case "routeRequest":
           break;
         default:
-          throw new Error(`Unhandled case ${routingPacket.variant.case}`);
+          sink.log.warn(
+            Emitter[Emitter.HandleMeshPacket],
+            `⚠️ Routing packet ${meshPacket.id} has no variant set`,
+          );
       }
       break;
     }
@@ -375,6 +468,10 @@ function handleDecodedPacket(
         Protobuf.Admin.AdminMessageSchema,
         dataPacket.payload,
       );
+      sink.events.onAdminPacket.dispatch({
+        ...packetMetadata,
+        data: adminMessage,
+      });
       switch (adminMessage.payloadVariant.case) {
         case "getChannelResponse": {
           sink.events.onChannelPacket.dispatch(
@@ -567,7 +664,46 @@ function handleDecodedPacket(
       });
       break;
     }
+    case Protobuf.Portnums.PortNum.NODE_STATUS_APP: {
+      sink.events.onNodeStatusPacket.dispatch({
+        ...packetMetadata,
+        data: fromBinary(Protobuf.Mesh.StatusMessageSchema, dataPacket.payload),
+      });
+      break;
+    }
+    case Protobuf.Portnums.PortNum.MESH_BEACON_APP: {
+      sink.events.onMeshBeaconPacket.dispatch({
+        ...packetMetadata,
+        data: fromBinary(
+          Protobuf.MeshBeacon.MeshBeaconSchema,
+          dataPacket.payload,
+        ),
+      });
+      break;
+    }
+    case Protobuf.Portnums.PortNum.KEY_VERIFICATION_APP: {
+      sink.events.onKeyVerificationPacket.dispatch({
+        ...packetMetadata,
+        data: fromBinary(
+          Protobuf.Mesh.KeyVerificationSchema,
+          dataPacket.payload,
+        ),
+      });
+      break;
+    }
+    case Protobuf.Portnums.PortNum.ALERT_APP: {
+      sink.events.onAlertPacket.dispatch({
+        ...packetMetadata,
+        data: new TextDecoder().decode(dataPacket.payload),
+      });
+      break;
+    }
     default:
-      throw new Error(`Unhandled case ${dataPacket.portnum}`);
+      // Newer firmware adds portnums faster than clients learn them; hand
+      // the raw payload on rather than dropping the packet.
+      sink.events.onUnhandledPacket.dispatch({
+        ...packetMetadata,
+        data: { portnum: dataPacket.portnum, payload: dataPacket.payload },
+      });
   }
 }

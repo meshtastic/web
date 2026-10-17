@@ -1,0 +1,7 @@
+# nanopb options for the legacy migration descriptor.
+# Mirrors deviceonly.options sizing for the NodeInfoLite_Legacy message so old
+# /prefs/nodes.proto saves parse with the same byte layout.
+
+*NodeInfoLite_Legacy.channel int_size:8
+*NodeInfoLite_Legacy.hops_away int_size:8
+*NodeInfoLite_Legacy.next_hop int_size:8

@@ -1,15 +1,25 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type LoRaValidation,
-  LoRaValidationSchema,
+  makeLoRaValidationSchema,
 } from "@app/validation/config/lora.ts";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
+import {
+  getAllowedPresets,
+  getAllowedRegions,
+  getDefaultPreset,
+  getLicensedOnlyRegions,
+  pickEnumValues,
+} from "@core/utils/loraPresets.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 interface LoRaConfigProps {
@@ -37,6 +47,75 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
 
   const { t } = useTranslation("config");
 
+  const { regionPresets, supportsFirmware28 } = useDeviceCapabilities();
+  const caps = useMemo(
+    () => ({ regionPresets, supportsFirmware28 }),
+    [regionPresets, supportsFirmware28],
+  );
+  const validationSchema = useMemo(
+    () => makeLoRaValidationSchema(caps),
+    [caps],
+  );
+
+  // The region picked in the form, which may not be saved yet. A pick only
+  // holds while the effective config still has the region it was made
+  // against; once it is saved or discarded the effective config wins.
+  const formRef = useRef<UseFormReturn<LoRaValidation> | undefined>(undefined);
+  const effectiveRegion = effectiveLora?.region;
+  const [picked, setPicked] = useState<{
+    region: Protobuf.Config.Config_LoRaConfig_RegionCode;
+    over: Protobuf.Config.Config_LoRaConfig_RegionCode | undefined;
+  }>();
+  const region =
+    picked && picked.over === effectiveRegion ? picked.region : effectiveRegion;
+
+  const handleFormInit = useCallback<DynamicFormFormInit<LoRaValidation>>(
+    (methods) => {
+      formRef.current = methods;
+      onFormInit(methods);
+    },
+    [onFormInit],
+  );
+
+  const onRegionChange = (value: string) => {
+    const next = Number.parseInt(
+      value,
+      10,
+    ) as Protobuf.Config.Config_LoRaConfig_RegionCode;
+    setPicked({ region: next, over: effectiveRegion });
+    // Firmware 2.8 asks clients to select the region's default preset when
+    // switching regions.
+    const defaultPreset = getDefaultPreset(regionPresets, next);
+    if (defaultPreset !== undefined) {
+      formRef.current?.setValue("modemPreset", defaultPreset, {
+        shouldDirty: true,
+      });
+    }
+  };
+
+  const regionOptions = pickEnumValues(
+    Protobuf.Config.Config_LoRaConfig_RegionCode,
+    getAllowedRegions(caps),
+    effectiveLora?.region,
+  );
+  const regionSuffixes = Object.fromEntries(
+    getLicensedOnlyRegions(regionPresets).map((r) => [
+      r,
+      t("lora.region.licensedOnlySuffix"),
+    ]),
+  );
+
+  const presetOptions = pickEnumValues(
+    Protobuf.Config.Config_LoRaConfig_ModemPreset,
+    getAllowedPresets(caps, region),
+    effectiveLora?.modemPreset,
+  );
+  const defaultPreset = getDefaultPreset(regionPresets, region);
+  const presetSuffixes =
+    defaultPreset === undefined
+      ? undefined
+      : { [defaultPreset]: t("lora.modemPreset.defaultSuffix") };
+
   const onSubmit = (data: LoRaValidation) => {
     if (!editor) return;
     editor.setRadioSection(
@@ -48,8 +127,8 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
   return (
     <DynamicForm<LoRaValidation>
       onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={LoRaValidationSchema}
+      onFormInit={handleFormInit}
+      validationSchema={validationSchema}
       defaultValues={config.lora}
       values={effectiveLora}
       fieldGroups={[
@@ -62,8 +141,10 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
               name: "region",
               label: t("lora.region.label"),
               description: t("lora.region.description"),
+              selectChange: onRegionChange,
               properties: {
-                enumValue: Protobuf.Config.Config_LoRaConfig_RegionCode,
+                enumValue: regionOptions,
+                optionSuffixes: regionSuffixes,
               },
             },
             {
@@ -76,11 +157,15 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
               type: "select",
               name: "modemPreset",
               label: t("lora.modemPreset.label"),
-              description: t("lora.modemPreset.description"),
+              description:
+                defaultPreset === undefined
+                  ? t("lora.modemPreset.description")
+                  : t("lora.modemPreset.descriptionForRegion"),
               disabledBy: [{ fieldName: "usePreset" }],
               properties: {
-                enumValue: Protobuf.Config.Config_LoRaConfig_ModemPreset,
+                enumValue: presetOptions,
                 formatEnumName: true,
+                optionSuffixes: presetSuffixes,
               },
             },
             {

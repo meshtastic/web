@@ -1,7 +1,6 @@
 import { toBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import { Result } from "better-result";
-import type { ResultType } from "better-result";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
 import { generatePacketId } from "../../../core/identifiers/PacketId.ts";
 import {
@@ -15,7 +14,7 @@ export async function sendWaypoint(
   waypoint: Protobuf.Mesh.Waypoint,
   destination: Destination,
   channel: ChannelNumber = ChannelNumber.Primary,
-): Promise<ResultType<number, Error>> {
+): Promise<Result<number, Error>> {
   client.log.debug(
     Emitter[Emitter.SendWaypoint],
     `📤 Sending waypoint to ${destination} on channel ${channel}`,

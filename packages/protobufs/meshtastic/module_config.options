@@ -27,3 +27,10 @@
 *DetectionSensorConfig.monitor_pin int_size:8
 *DetectionSensorConfig.name max_size:20
 *DetectionSensorConfig.detection_trigger_type max_size:8
+
+*StatusMessageConfig.node_status max_size:80
+
+*MeshBeaconConfig.broadcast_message max_size:61
+*MeshBeaconConfig.broadcast_offer_channel.name max_size:12
+*MeshBeaconConfig.broadcast_offer_channel.psk max_size:32
+*MeshBeaconConfig.broadcast_targets max_count:4

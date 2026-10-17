@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@meshtastic/sdk": "workspace:*",
-    "@types/web-bluetooth": "npm:@types/web-bluetooth@^0.0.20"
+    "@types/web-bluetooth": "npm:@types/web-bluetooth@^0.0.21"
   },
   "tsdown": {
     "clean": true,

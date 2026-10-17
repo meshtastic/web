@@ -1,11 +1,17 @@
 import type {
   ConversationKey,
   Message,
+  MessageDeliveryPatch,
   MessageRepository,
+  Protobuf,
   RetentionPolicy,
 } from "@meshtastic/sdk";
-import { conversationKeyString, MessageState } from "@meshtastic/sdk";
-import { and, desc, eq, lt, sql } from "drizzle-orm";
+import {
+  conversationKeyString,
+  inferConversation,
+  MessageState,
+} from "@meshtastic/sdk";
+import { and, desc, eq, lt, ne, sql } from "drizzle-orm";
 import { type MultiTabCoordinator } from "../coordination/MultiTabCoordinator.ts";
 import type { SqlocalDb } from "../db.ts";
 import { messages } from "../schema/chat.ts";
@@ -52,15 +58,62 @@ export class SqlocalMessageRepository implements MessageRepository {
     return rows.reverse().map(rowToMessage);
   }
 
-  async append(message: Message): Promise<void> {
-    await this.appendBatch([message]);
+  async append(message: Message, key?: ConversationKey): Promise<void> {
+    await this.insert([
+      messageToRow(this.deviceId, message, key ?? inferConversation(message)),
+    ]);
   }
 
   async appendBatch(input: ReadonlyArray<Message>): Promise<void> {
-    if (input.length === 0) return;
-    const rows = input.map((m) => messageToRow(this.deviceId, m));
+    await this.insert(
+      input.map((m) => messageToRow(this.deviceId, m, inferConversation(m))),
+    );
+  }
+
+  async refileSentDirect(localNodeNum: number): Promise<number> {
+    const moved = await this.db
+      .update(messages)
+      .set({ conversationKey: sql`'direct:' || ${messages.toNode}` })
+      .where(
+        and(
+          eq(messages.deviceId, this.deviceId),
+          eq(messages.type, "direct"),
+          eq(messages.fromNode, localNodeNum),
+          ne(messages.toNode, localNodeNum),
+          eq(
+            messages.conversationKey,
+            conversationKeyString({ kind: "direct", peer: localNodeNum }),
+          ),
+        )!,
+      )
+      .returning({ conversationKey: messages.conversationKey });
+    this.notify(moved.map((r) => r.conversationKey));
+    return moved.length;
+  }
+
+  private async insert(rows: MessageRow[]): Promise<void> {
+    if (rows.length === 0) return;
     await this.db.insert(messages).values(rows).onConflictDoNothing();
-    this.notify(input);
+    this.notify(rows.map((r) => r.conversationKey));
+  }
+
+  async updateDelivery(id: number, patch: MessageDeliveryPatch): Promise<void> {
+    const set: Partial<MessageRow> = {};
+    if ("state" in patch) set.state = patch.state;
+    if ("ackProof" in patch) set.ackProof = patch.ackProof ?? null;
+    if ("routingError" in patch) set.routingError = patch.routingError ?? null;
+    if ("relays" in patch) set.relays = patch.relays ?? null;
+    if (Object.keys(set).length === 0) return;
+    await this.db
+      .update(messages)
+      .set(set)
+      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.db
+      .delete(messages)
+      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id))!);
   }
 
   async updateState(id: number, state: MessageState): Promise<void> {
@@ -119,17 +172,9 @@ export class SqlocalMessageRepository implements MessageRepository {
     )!;
   }
 
-  private notify(input: ReadonlyArray<Message>): void {
+  private notify(keys: ReadonlyArray<string>): void {
     if (!this.coordinator) return;
-    const seen = new Set<string>();
-    for (const m of input) {
-      const conv: ConversationKey =
-        m.type === "direct"
-          ? { kind: "direct", peer: m.from }
-          : { kind: "channel", channel: m.channel };
-      const key = conversationKeyString(conv);
-      if (seen.has(key)) continue;
-      seen.add(key);
+    for (const key of new Set(keys)) {
       this.coordinator.broadcast({
         kind: "messages-changed",
         deviceId: this.deviceId,
@@ -149,7 +194,16 @@ interface MessageRow {
   rxTime: number;
   type: "broadcast" | "direct";
   text: string;
-  state: "pending" | "ack" | "failed";
+  state: "pending" | "delivered" | "ack" | "failed";
+  signed?: boolean | null;
+  ackProof?: number | null;
+  routingError?: number | null;
+  relays?: number | null;
+  snr?: number | null;
+  rssi?: number | null;
+  hopsAway?: number | null;
+  viaMqtt?: boolean | null;
+  transport?: number | null;
 }
 
 function rowToMessage(row: MessageRow): Message {
@@ -162,14 +216,28 @@ function rowToMessage(row: MessageRow): Message {
     type: row.type,
     text: row.text,
     state: row.state as MessageState,
+    signed: row.signed ?? undefined,
+    ackProof:
+      (row.ackProof as Protobuf.Mesh.MeshPacket_AckProofStatus | null) ??
+      undefined,
+    routingError:
+      (row.routingError as Protobuf.Mesh.Routing_Error | null) ?? undefined,
+    relays: row.relays ?? undefined,
+    snr: row.snr ?? undefined,
+    rssi: row.rssi ?? undefined,
+    hopsAway: row.hopsAway ?? undefined,
+    viaMqtt: row.viaMqtt ?? undefined,
+    transport:
+      (row.transport as Protobuf.Mesh.MeshPacket_TransportMechanism | null) ??
+      undefined,
   };
 }
 
-function messageToRow(deviceId: number, message: Message): MessageRow {
-  const conv: ConversationKey =
-    message.type === "direct"
-      ? { kind: "direct", peer: message.from }
-      : { kind: "channel", channel: message.channel };
+function messageToRow(
+  deviceId: number,
+  message: Message,
+  conv: ConversationKey,
+): MessageRow {
   return {
     id: message.id,
     deviceId,
@@ -181,5 +249,14 @@ function messageToRow(deviceId: number, message: Message): MessageRow {
     type: message.type,
     text: message.text,
     state: message.state,
+    signed: message.signed ?? null,
+    ackProof: message.ackProof ?? null,
+    routingError: message.routingError ?? null,
+    relays: message.relays ?? null,
+    snr: message.snr ?? null,
+    rssi: message.rssi ?? null,
+    hopsAway: message.hopsAway ?? null,
+    viaMqtt: message.viaMqtt ?? null,
+    transport: message.transport ?? null,
   };
 }

@@ -40,11 +40,15 @@
     "label": "Downlink Enabled",
     "description": "Send messages from MQTT to the local mesh"
   },
+  "useAead": {
+    "label": "Authenticated Encryption (Experimental)",
+    "description": "Encrypt with AES-CCM, which stops forged and tampered messages. Every node on this channel must turn this on: the channel then rejects standard AES-CTR packets, so nodes without it can no longer talk here."
+  },
   "positionPrecision": {
     "label": "Location",
-    "description": "The precision of the location to share with the channel. Can be disabled.",
+    "description": "The precision of the location to share with the channel. Choose Position sharing off to share none.",
     "options": {
-      "none": "Do not share location",
+      "none": "Position sharing off",
       "precise": "Precise Location",
       "metric_km23": "Within 23 kilometers",
       "metric_km12": "Within 12 kilometers",
@@ -67,5 +71,15 @@
       "imperial_ft300": "Within 300 feet",
       "imperial_ft150": "Within 150 feet"
     }
+  },
+  "beaconOffers": {
+    "title": "Mesh Beacon offers",
+    "from": "Invitation from {{sender}}",
+    "defaultChannel": "Default channel",
+    "addHint": "Joining adds this channel. The radio stays on its current settings.",
+    "switchHint": "Joining replaces your primary channel and LoRa settings. The radio retunes and reboots.",
+    "join": "Join",
+    "switch": "Switch",
+    "dismiss": "Dismiss"
   }
 }

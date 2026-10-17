@@ -9,7 +9,11 @@ import { expect, type Page } from "@playwright/test";
 export class ConnectionPage {
   constructor(private readonly page: Page) {}
 
-  async connectHttp(opts: { host: string; tls: boolean; name?: string }): Promise<void> {
+  async connectHttp(opts: {
+    host: string;
+    tls: boolean;
+    name?: string;
+  }): Promise<void> {
     const { host, tls, name = "E2E Device" } = opts;
     const page = this.page;
 
@@ -25,7 +29,8 @@ export class ConnectionPage {
     await dialog.locator("#url").fill(host);
 
     const httpsSwitch = dialog.getByRole("switch");
-    const isChecked = (await httpsSwitch.getAttribute("aria-checked")) === "true";
+    const isChecked =
+      (await httpsSwitch.getAttribute("aria-checked")) === "true";
     if (tls !== isChecked) {
       await httpsSwitch.click();
     }
@@ -33,11 +38,16 @@ export class ConnectionPage {
     await dialog.getByRole("button", { name: "Test connection" }).click();
 
     const save = dialog.getByRole("button", { name: "Save connection" });
-    await expect(save, "Save enables only after the device is reachable").toBeEnabled({
+    await expect(
+      save,
+      "Save enables only after the device is reachable",
+    ).toBeEnabled({
       timeout: 20_000,
     });
     await save.click();
 
-    await expect(page).toHaveURL(/\/messages\/broadcast\/0/, { timeout: 60_000 });
+    await expect(page).toHaveURL(/\/messages\/broadcast\/0/, {
+      timeout: 60_000,
+    });
   }
 }

@@ -1,4 +1,4 @@
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import type { TraceRoute } from "./domain/TraceRoute.ts";
@@ -29,7 +29,7 @@ export class TraceRouteClient {
     return this.store.get(destination);
   }
 
-  public run(destination: number): Promise<ResultType<number, Error>> {
+  public run(destination: number): Promise<Result<number, Error>> {
     return runTraceRoute(this.client, destination);
   }
 }

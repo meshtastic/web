@@ -1,12 +1,13 @@
 import BatteryStatus from "@components/BatteryStatus.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
+import { NodeTrustIndicators } from "@components/generic/NodeTrustIndicators.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Separator } from "@components/UI/Separator.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { formatQuantity } from "@core/utils/string.ts";
-import type { Protobuf as ProtobufType } from "@meshtastic/sdk";
+import type { NodeInfoWithStatus } from "@core/hooks/useNodesAsProto.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import {
   Tooltip,
@@ -27,7 +28,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 export interface NodeDetailProps {
-  node: ProtobufType.Mesh.NodeInfo;
+  node: NodeInfoWithStatus;
 }
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
@@ -124,7 +125,18 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         </div>
 
         <div>
-          <Heading as="h5">{name}</Heading>
+          <div className="flex items-center gap-1.5">
+            <Heading as="h5">{name}</Heading>
+            <NodeTrustIndicators node={node} />
+          </div>
+          {node.status && (
+            <div className="text-sm italic break-words">
+              <span className="sr-only">
+                {t("trust.statusMessage.label")}:{" "}
+              </span>
+              {node.status}
+            </div>
+          )}
           {hardwareType !== t("unset") && <Subtle>{hardwareType}</Subtle>}
 
           {!!node.deviceMetrics?.batteryLevel && (

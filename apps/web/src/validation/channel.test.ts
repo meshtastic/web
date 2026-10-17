@@ -33,6 +33,22 @@ describe("makeChannelSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("keeps use_aead through validation", () => {
+    const on = schema.safeParse({
+      index: 0,
+      settings: { ...validSettings, useAead: true },
+      role: mockRole,
+    });
+    expect(on.success && on.data.settings.useAead).toBe(true);
+
+    const absent = schema.safeParse({
+      index: 0,
+      settings: validSettings,
+      role: mockRole,
+    });
+    expect(absent.success && absent.data.settings.useAead).toBe(false);
+  });
+
   it("rejects invalid base64 psk", () => {
     const result = schema.safeParse({
       index: 0,

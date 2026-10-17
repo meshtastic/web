@@ -55,4 +55,14 @@ message DeviceProfile {
    * Predefined messages for CannedMessage
    */
   optional string canned_messages = 8;
+
+  /*
+   * Is the node unmessagable
+   */
+  optional bool is_unmessagable = 9;
+
+  /*
+   * Is this node in licensed user mode
+   */
+  optional bool is_licensed = 10;
 }

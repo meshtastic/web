@@ -1,10 +1,15 @@
 import { create } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createFakeTransport } from "../testing/createFakeTransport.ts";
 import { MeshClient } from "./MeshClient.ts";
+import { CONFIG_NONCE, NODEDB_NONCE } from "./handshake.ts";
 
 describe("MeshClient.progress", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("starts in the idle phase before configure() is called", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
@@ -14,7 +19,7 @@ describe("MeshClient.progress", () => {
   it("flips to configuring with empty counters when configure() runs", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
-    void client.configure();
+    client.configure().catch(() => {});
     expect(client.progress.value.phase).toBe("configuring");
     expect(client.progress.value).toEqual({
       phase: "configuring",
@@ -32,7 +37,7 @@ describe("MeshClient.progress", () => {
   it("tallies inbound packets onto the configuring counters", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
-    void client.configure();
+    client.configure().catch(() => {});
 
     client.events.onConfigPacket.dispatch(
       create(Protobuf.Config.ConfigSchema, {}),
@@ -60,14 +65,19 @@ describe("MeshClient.progress", () => {
     expect(cur.received.modules).toBe(0);
   });
 
-  it("flips to configured when onConfigComplete fires", () => {
+  it("flips to configured only after the NodeDB stage completes", async () => {
+    vi.useFakeTimers();
     const { transport } = createFakeTransport();
-    const client = new MeshClient({ transport });
-    void client.configure();
+    const client = new MeshClient({ transport, heartbeatIntervalMs: false });
+    client.configure().catch(() => {});
     client.events.onConfigPacket.dispatch(
       create(Protobuf.Config.ConfigSchema, {}),
     );
-    client.events.onConfigComplete.dispatch(0);
+    client.events.onConfigComplete.dispatch(CONFIG_NONCE);
+    expect(client.progress.value.phase).toBe("configuring");
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    client.events.onConfigComplete.dispatch(NODEDB_NONCE);
 
     const cur = client.progress.value;
     expect(cur.phase).toBe("configured");
@@ -88,12 +98,12 @@ describe("MeshClient.progress", () => {
   it("resets counters when configure() runs again", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
-    void client.configure();
+    client.configure().catch(() => {});
     client.events.onConfigPacket.dispatch(
       create(Protobuf.Config.ConfigSchema, {}),
     );
-    client.events.onConfigComplete.dispatch(0);
-    void client.configure();
+    client.events.onConfigComplete.dispatch(CONFIG_NONCE);
+    client.configure().catch(() => {});
     expect(client.progress.value).toEqual({
       phase: "configuring",
       received: {

@@ -1,0 +1,214 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "LoRaWANBridgeProtos";
+option java_package = "org.meshtastic.proto";
+option swift_prefix = "";
+
+/*
+ * Payload for LORAWAN_BRIDGE packets. Tunnels raw LoRaWAN PHY payloads and their
+ * RF metadata so a gateway can reach a network server over a mesh.
+ */
+message LoRaWANBridge {
+  /*
+   * An uplink heard by the gateway, travelling towards the network server.
+   */
+  message Uplink {
+    /*
+     * Receive frequency in Hz.
+     */
+    fixed32 freq_hz = 1;
+
+    /*
+     * Concentrator receive timestamp in microseconds. Free running, wraps about
+     * every 72 minutes.
+     */
+    fixed32 tmst = 2;
+
+    /*
+     * Received signal strength in tenths of a dBm. Fits signed 16 bit.
+     */
+    sint32 rssi_x10 = 3;
+
+    /*
+     * Signal to noise ratio in tenths of a dB. Fits signed 16 bit.
+     */
+    sint32 snr_x10 = 4;
+
+    /*
+     * Packed radio settings, 0 to 255. Meaningless when fsk_bitrate is set.
+     *   bits 7-5  0 to 7 for SF5 to SF12
+     *   bits 4-2  bandwidth in kHz: 0 125, 1 250, 2 500, 3 203.125, 4 406.25,
+     *             5 812.5, 6 1625, 7 reserved. Codes 0 to 2 are the sub-GHz set
+     *             and 3 to 6 the 2.4 GHz set; the two do not overlap. Any future
+     *             bandwidth takes the next free code rather than sorting in.
+     *   bits 1-0  0 to 3 for 4/5 to 4/8
+     */
+    uint32 radio_params = 5;
+
+    /*
+     * FSK bit rate in bits per second. Non-zero only for an FSK frame, in which
+     * case radio_params does not apply. Fits unsigned 16 bit.
+     */
+    uint32 fsk_bitrate = 9;
+
+    /*
+     * PHY payload, or its first part when chunk_count is 2.
+     */
+    bytes payload = 6;
+
+    /*
+     * Groups this head with its continuation. 1 to 255, or 0 when not chunked.
+     */
+    uint32 payload_id = 7;
+
+    /*
+     * 0 when the frame fits one packet, otherwise 2.
+     */
+    uint32 chunk_count = 8;
+  }
+
+  /*
+   * A downlink from the network server, travelling towards the gateway.
+   */
+  message Downlink {
+    /*
+     * Transmit frequency in Hz.
+     */
+    fixed32 freq_hz = 1;
+
+    /*
+     * Concentrator timestamp to transmit at. Ignored when immediate is set.
+     */
+    fixed32 tmst = 2;
+
+    /*
+     * Packed radio settings, encoded as in Uplink.radio_params. FSK downlink is
+     * not supported, so there is no bit rate or frequency deviation here.
+     */
+    uint32 radio_params = 3;
+
+    /*
+     * Transmit power in dBm, 0 to 255. The gateway clamps it to its region.
+     */
+    uint32 power_dbm = 4;
+
+    /*
+     * Transmit as soon as possible instead of at tmst. Used for Class C.
+     */
+    bool immediate = 5;
+
+    /*
+     * Invert LoRa polarity. True for every LoRaWAN downlink.
+     */
+    bool invert_polarity = 6;
+
+    /*
+     * Disable the physical layer CRC.
+     */
+    bool no_crc = 7;
+
+    /*
+     * Allow the gateway to send this in a later receive window if it arrives too
+     * late. Leave clear for anything tied to a specific uplink.
+     */
+    bool may_defer = 8;
+
+    /*
+     * Identifies this downlink so its TxResult can be matched to it. 1 to 255.
+     */
+    uint32 request_id = 12;
+
+    /*
+     * PHY payload, or its first part when chunk_count is 2.
+     */
+    bytes payload = 9;
+
+    /*
+     * Groups this head with its continuation. 1 to 255, or 0 when not chunked.
+     */
+    uint32 payload_id = 10;
+
+    /*
+     * 0 when the frame fits one packet, otherwise 2.
+     */
+    uint32 chunk_count = 11;
+  }
+
+  /*
+   * The remainder of a chunked Uplink or Downlink. Carries no RF metadata.
+   */
+  message PayloadChunk {
+    /*
+     * Matches payload_id in the head message. Reassembly keys on the sending
+     * node and this value.
+     */
+    uint32 payload_id = 1;
+
+    /*
+     * Position of this chunk. Always 1.
+     */
+    uint32 chunk_index = 2;
+
+    /*
+     * This part of the PHY payload.
+     */
+    bytes payload_chunk = 3;
+  }
+
+  /*
+   * The outcome of a downlink, reported back towards the network server.
+   */
+  message TxResult {
+    /*
+     * Values 0 to 7 mirror the Semtech TX_ACK error field. Keep every value non
+     * negative; enums encode as int32.
+     */
+    enum Status {
+      NONE = 0;
+      TOO_LATE = 1;
+      TOO_EARLY = 2;
+      COLLISION_PACKET = 3;
+      COLLISION_BEACON = 4;
+      TX_FREQ = 5;
+      TX_POWER = 6;
+      GPS_UNLOCKED = 7;
+
+      /*
+       * Held by the gateway for a later receive window.
+       */
+      DEFERRED = 8;
+
+      /*
+       * Discarded, either undeferrable or refused by an authorization check.
+       */
+      DROPPED = 9;
+    }
+
+    /*
+     * The tmst the downlink was scheduled for. Zero when it was immediate, so
+     * diagnostic only; correlate on request_id.
+     */
+    fixed32 tmst = 1;
+
+    /*
+     * What happened to it.
+     */
+    Status status = 2;
+
+    /*
+     * Echoes Downlink.request_id.
+     */
+    uint32 request_id = 3;
+  }
+
+  oneof variant {
+    Uplink uplink = 1;
+    Downlink downlink = 2;
+    TxResult tx_result = 3;
+    PayloadChunk chunk = 4;
+  }
+}

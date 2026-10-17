@@ -13,9 +13,9 @@
     "tabStoreAndForward": "S&F",
     "tabTelemetry": "Telemetry",
     "tabRemoteHardware": "Remote Hardware",
-    "tabTrafficManagement": "Traffic Management",
     "tabStatusMessage": "Status Message",
-    "tabTak": "TAK"
+    "tabTak": "TAK",
+    "tabMeshBeacon": "Mesh Beacon"
   },
   "ambientLighting": {
     "title": "Ambient Lighting Settings",
@@ -571,64 +571,47 @@
       "description": "Member role reported to ATAK"
     }
   },
-  "trafficManagement": {
-    "title": "Traffic Management Settings",
-    "description": "Packet inspection and traffic shaping to reduce channel utilization",
-    "enabled": {
-      "label": "Module Enabled",
-      "description": "Enable traffic management packet inspection and shaping"
+  "meshBeacon": {
+    "title": "Mesh Beacon Settings",
+    "description": "Hear and send invitations that let nearby radios join a channel",
+    "listenEnabled": {
+      "label": "Listen for Beacons",
+      "description": "Receive beacons from other nodes. Their text goes to your messages, and their channel offers appear on the Channels page"
     },
-    "positionDedupEnabled": {
-      "label": "Position Deduplication",
-      "description": "Drop redundant position broadcasts"
+    "broadcastEnabled": {
+      "label": "Broadcast Beacons",
+      "description": "Periodically send a beacon from this node"
     },
-    "positionPrecisionBits": {
-      "label": "Position Precision Bits",
-      "description": "Bits of precision used for position deduplication (0-32)"
+    "broadcast": {
+      "label": "Broadcast",
+      "description": "What this node's beacon says and offers"
     },
-    "positionMinIntervalSecs": {
-      "label": "Position Min Interval",
-      "description": "Minimum seconds between position updates from the same node"
+    "broadcastMessage": {
+      "label": "Message",
+      "description": "Text sent with each beacon, up to 100 bytes"
     },
-    "nodeinfoDirectResponse": {
-      "label": "NodeInfo Direct Response",
-      "description": "Answer NodeInfo requests directly from the local cache"
+    "broadcastIntervalSecs": {
+      "label": "Interval",
+      "description": "How often to send a beacon. The minimum is one hour"
     },
-    "nodeinfoDirectResponseMaxHops": {
-      "label": "NodeInfo Response Max Hops",
-      "description": "Minimum hop distance from the requester before responding to NodeInfo requests"
+    "legacySplit": {
+      "label": "Send Text Separately",
+      "description": "Send the message as a regular text message too, so radios on older firmware can read it"
     },
-    "rateLimitEnabled": {
-      "label": "Rate Limiting",
-      "description": "Throttle chatty nodes with per-node rate limiting"
+    "offerChannel": {
+      "label": "Offered Channel",
+      "description": "Channel whose name and key the beacon offers to listeners",
+      "none": "None",
+      "keep": "Current: {{name}}"
     },
-    "rateLimitWindowSecs": {
-      "label": "Rate Limit Window",
-      "description": "Time window in seconds for rate-limit calculations"
+    "broadcastOfferPreset": {
+      "label": "Offered Preset",
+      "description": "Modem preset the offered mesh uses",
+      "unset": "Not advertised"
     },
-    "rateLimitMaxPackets": {
-      "label": "Rate Limit Max Packets",
-      "description": "Maximum packets allowed per node within the rate-limit window"
-    },
-    "dropUnknownEnabled": {
-      "label": "Drop Unknown Packets",
-      "description": "Drop undecryptable packets per rate-limit window"
-    },
-    "unknownPacketThreshold": {
-      "label": "Unknown Packet Threshold",
-      "description": "Number of unknown packets before dropping from a node"
-    },
-    "exhaustHopTelemetry": {
-      "label": "Exhaust Hop (Telemetry)",
-      "description": "Set hop limit to 0 for relayed telemetry broadcasts"
-    },
-    "exhaustHopPosition": {
-      "label": "Exhaust Hop (Position)",
-      "description": "Set hop limit to 0 for relayed position broadcasts"
-    },
-    "routerPreserveHops": {
-      "label": "Preserve Router Hops",
-      "description": "Preserve hop limit for router-to-router traffic"
+    "broadcastOfferRegion": {
+      "label": "Offered Region",
+      "description": "Region the offered mesh uses. UNSET leaves it out"
     }
   }
 }

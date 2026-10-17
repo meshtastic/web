@@ -35,10 +35,12 @@ import {
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
 import { Separator } from "@components/UI/Separator.tsx";
+import { Link } from "@components/UI/Typography/Link.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  ExternalLink,
   LinkIcon,
   MoreHorizontal,
   RotateCw,
@@ -94,7 +96,7 @@ export const Connections = () => {
 
   return (
     <div className="space-y-6 p-6">
-      <header className="flex items-start justify-between">
+      <header className="flex items-start justify-between max-md:flex-col max-md:gap-4">
         <div className="flex items-stretch gap-3">
           <button
             type="button"
@@ -113,7 +115,7 @@ export const Connections = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col items-end ml-2 gap-2">
+        <div className="flex flex-col items-end ml-2 gap-2 max-md:w-full max-md:flex-row max-md:flex-wrap max-md:items-center max-md:ml-0">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
             <RouterIcon className="size-5" />
             {t("button.addConnection")}
@@ -149,17 +151,14 @@ export const Connections = () => {
               connection={c}
               onConnect={async () => {
                 const ok = await connect(c.id, { allowPrompt: true });
-                toast({
-                  title: ok ? t("toasts.connected") : t("toasts.failed"),
-                  description: ok
-                    ? t("toasts.nowConnected", {
-                        name: c.name,
-                        interpolation: { escapeValue: false },
-                      })
-                    : t("toasts.checkConnection"),
-                });
+                // Success needs no toast: the connecting overlay shows it.
                 if (ok) {
                   navigate({ to: "/" });
+                } else {
+                  toast({
+                    title: t("toasts.failed"),
+                    description: t("toasts.checkConnection"),
+                  });
                 }
               }}
               onDisconnect={async () => {
@@ -195,17 +194,14 @@ export const Connections = () => {
               }}
               onRetry={async () => {
                 const ok = await connect(c.id, { allowPrompt: true });
-                toast({
-                  title: ok ? t("toasts.connected") : t("toasts.failed"),
-                  description: ok
-                    ? t("toasts.nowConnected", {
-                        name: c.name,
-                        interpolation: { escapeValue: false },
-                      })
-                    : t("toasts.pickConnectionAgain"),
-                });
+                // Success needs no toast: the connecting overlay shows it.
                 if (ok) {
                   navigate({ to: "/" });
+                } else {
+                  toast({
+                    title: t("toasts.failed"),
+                    description: t("toasts.pickConnectionAgain"),
+                  });
                 }
               }}
             />
@@ -372,9 +368,20 @@ function ConnectionCard({
       </CardHeader>
       <CardContent className="pt-0">
         {connection.error ? (
-          <p className="text-sm text-red-600 dark:text-red-400">
-            {connection.error}
-          </p>
+          <div className="space-y-1">
+            <p className="text-sm text-red-600 dark:text-red-400">
+              {connection.error}
+            </p>
+            {connection.errorKind === "cert" && connection.type === "http" && (
+              <Link
+                href={connection.url}
+                className="inline-flex items-center gap-1 text-sm text-red-600 dark:text-red-400 underline hover:no-underline"
+              >
+                <ExternalLink className="size-3" />
+                {t("errors.openInNewTab")}
+              </Link>
+            )}
+          </div>
         ) : connection.lastConnectedAt ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {t("lastConnectedAt", { date: "" })}{" "}

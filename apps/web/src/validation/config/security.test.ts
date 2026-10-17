@@ -1,6 +1,10 @@
+import { Protobuf } from "@meshtastic/sdk";
 import { fromByteArray } from "base64-js";
 import { describe, expect, it } from "vitest";
 import { ParsedSecuritySchema, RawSecuritySchema } from "./security.ts";
+
+const Policy = Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy;
+const COMPATIBLE = Policy.COMPATIBLE;
 
 function makeBase64OfLength(len: number): string {
   return fromByteArray(new Uint8Array(len));
@@ -15,6 +19,7 @@ describe("RawSecuritySchema", () => {
       adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
+      packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
       adminKey: [validKey, "", ""],
@@ -28,6 +33,7 @@ describe("RawSecuritySchema", () => {
       adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
+      packetSignaturePolicy: COMPATIBLE,
       privateKey: "badkey",
       publicKey: validKey,
       adminKey: [validKey, "", ""],
@@ -46,6 +52,7 @@ describe("RawSecuritySchema", () => {
       adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
+      packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
       adminKey: ["", "", ""],
@@ -66,11 +73,43 @@ describe("RawSecuritySchema", () => {
       adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
+      packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
       adminKey: [validKey, "", ""],
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("packetSignaturePolicy", () => {
+  const base = {
+    isManaged: false,
+    adminChannelEnabled: false,
+    debugLogApiEnabled: false,
+    serialEnabled: true,
+    privateKey: makeBase64OfLength(32),
+    publicKey: makeBase64OfLength(32),
+    adminKey: ["", "", ""],
+  };
+
+  it.each([Policy.COMPATIBLE, Policy.BALANCED, Policy.STRICT])(
+    "accepts policy %s",
+    (packetSignaturePolicy) => {
+      const result = RawSecuritySchema.safeParse({
+        ...base,
+        packetSignaturePolicy,
+      });
+      expect(result.success).toBe(true);
+    },
+  );
+
+  it("rejects an unknown policy", () => {
+    const result = RawSecuritySchema.safeParse({
+      ...base,
+      packetSignaturePolicy: 99,
+    });
+    expect(result.success).toBe(false);
   });
 });
 
@@ -83,6 +122,7 @@ describe("ParsedSecuritySchema", () => {
       adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
+      packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
       adminKey: [validKey, new Uint8Array(), new Uint8Array()],
@@ -96,6 +136,7 @@ describe("ParsedSecuritySchema", () => {
       adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
+      packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
       adminKey: [new Uint8Array(), new Uint8Array(), new Uint8Array()],

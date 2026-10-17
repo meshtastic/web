@@ -1,7 +1,6 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import { Result } from "better-result";
-import type { ResultType } from "better-result";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
 import { sendAdminMessage } from "../../device/infrastructure/AdminMessageSender.ts";
 
@@ -9,7 +8,7 @@ export async function setFixedPosition(
   client: MeshClient,
   latitude: number,
   longitude: number,
-): Promise<ResultType<number, Error>> {
+): Promise<Result<number, Error>> {
   try {
     const position = create(Protobuf.Mesh.PositionSchema, {
       latitudeI: Math.floor(latitude / 1e-7),
@@ -31,7 +30,7 @@ export async function setFixedPosition(
 
 export async function removeFixedPosition(
   client: MeshClient,
-): Promise<ResultType<number, Error>> {
+): Promise<Result<number, Error>> {
   try {
     const id = await sendAdminMessage(
       client,
@@ -50,7 +49,7 @@ export async function removeFixedPosition(
 export async function setPosition(
   client: MeshClient,
   position: Protobuf.Mesh.Position,
-): Promise<ResultType<number, Error>> {
+): Promise<Result<number, Error>> {
   try {
     const id = await client.sendPacket(
       toBinary(Protobuf.Mesh.PositionSchema, position),
@@ -66,7 +65,7 @@ export async function setPosition(
 export async function requestPosition(
   client: MeshClient,
   destination: number,
-): Promise<ResultType<number, Error>> {
+): Promise<Result<number, Error>> {
   try {
     const id = await client.sendPacket(
       new Uint8Array(),

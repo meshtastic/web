@@ -1,4 +1,6 @@
+import { NodeTelemetry } from "@components/Dialog/NodeDetailsDialog/NodeTelemetry.tsx";
 import { DeviceImage } from "@components/generic/DeviceImage.tsx";
+import { NodeTrustIndicators } from "@components/generic/NodeTrustIndicators.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
 import {
@@ -214,6 +216,11 @@ export const NodeDetailsDialog = ({
                 node.user?.shortName ?? t("unknown.shortName")
               })`,
             })}
+            <NodeTrustIndicators
+              node={node}
+              size={16}
+              className="ml-2 align-middle"
+            />
           </DialogTitle>
         </DialogHeader>
         <DialogFooter>
@@ -345,6 +352,12 @@ export const NodeDetailsDialog = ({
                           ).replace(/_/g, " ")}
                         </td>
                       </tr>
+                      {node.status && (
+                        <tr>
+                          <td>{t("nodeDetails.statusMessage")}</td>
+                          <td className="break-words">{node.status}</td>
+                        </tr>
+                      )}
                       <tr>
                         <td>{t("nodeDetails.messageable")}</td>
                         <td>
@@ -390,6 +403,12 @@ export const NodeDetailsDialog = ({
                           : t("nodeDetails.KeyManuallyVerifiedFalse")}
                       </td>
                     </tr>
+                    {node.hasXeddsaSigned && (
+                      <tr>
+                        <td></td>
+                        <td>{t("nodeDetails.signedTrue")}</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -473,6 +492,8 @@ export const NodeDetailsDialog = ({
                   </table>
                 </div>
               )}
+
+              <NodeTelemetry nodeNum={node.num} className={sectionClassName} />
             </div>
 
             <div className="text-slate-900 dark:text-slate-100 w-full max-w-[464px] bg-slate-100 dark:bg-slate-800 rounded-lg mt-3">

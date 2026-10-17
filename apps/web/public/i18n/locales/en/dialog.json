@@ -16,7 +16,14 @@
     "channelSetUrl": "Channel Set/QR Code URL",
     "useLoraConfig": "Import LoRa Config",
     "presetDescription": "The current LoRa Config will be replaced.",
-    "title": "Import Channels"
+    "title": "Import Channels",
+    "beacon": {
+      "addTitle": "Joining a Mesh Beacon offer",
+      "addDescription": "The offered channel goes into a free secondary slot and your radio stays on its current settings. Apply stages the change; save it in Settings.",
+      "noFreeSlot": "Every secondary slot is in use. Pick a slot below; the channel in it will be replaced.",
+      "switchTitle": "Switching to another mesh",
+      "switchDescription": "The offered channel replaces your primary channel and the LoRa settings change to the offered mesh. Apply stages the change. When you save it in Settings, the radio retunes and reboots, and you leave your current mesh."
+    }
   },
   "locationResponse": {
     "title": "Location: {{identifier}}",
@@ -91,6 +98,7 @@
         },
         "reachable": "Reachable",
         "notReachable": "Not reachable",
+        "slowLocalName": "Looking up this .local name took a few seconds. Using the radio's IP address instead connects faster.",
         "success": {
           "title": "Connection test successful",
           "description": "The device appears to be reachable."
@@ -129,24 +137,141 @@
     "messageable": "Messageable: ",
     "KeyManuallyVerifiedTrue": "Public Key has been manually verified",
     "KeyManuallyVerifiedFalse": "Public Key is not manually verified",
-    "verifyKey": "Verify Key"
-  },
-  "pkiBackup": {
-    "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
-    "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
-    "footer": "=== END OF KEYS ===",
-    "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-    "privateKey": "Private Key:",
-    "publicKey": "Public Key:",
-    "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-    "title": "Backup Keys"
-  },
-  "pkiBackupReminder": {
-    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
-    "title": "Backup Reminder",
-    "remindLaterPrefix": "Remind me in",
-    "remindNever": "Never remind me",
-    "backupNow": "Back up now"
+    "verifyKey": "Verify Key",
+    "telemetry": {
+      "title": "Sensors:",
+      "kind": {
+        "environmentMetrics": "Environment",
+        "airQualityMetrics": "Air Quality",
+        "soilWaterMetrics": "Soil & Water",
+        "powerMetrics": "Power",
+        "healthMetrics": "Health",
+        "localStats": "Local Stats",
+        "trafficManagementStats": "Traffic Management",
+        "hostMetrics": "Host"
+      },
+      "field": {
+        "environmentMetrics": {
+          "temperature": "Temperature",
+          "relativeHumidity": "Relative humidity",
+          "barometricPressure": "Barometric pressure",
+          "gasResistance": "Gas resistance",
+          "iaq": "Indoor air quality (IAQ)",
+          "voltage": "Voltage",
+          "current": "Current",
+          "lux": "Light",
+          "whiteLux": "White light",
+          "irLux": "Infrared light",
+          "uvLux": "Ultraviolet light",
+          "windDirection": "Wind direction",
+          "windSpeed": "Wind speed",
+          "windGust": "Wind gust",
+          "windLull": "Wind lull",
+          "rainfall1h": "Rainfall (1 h)",
+          "rainfall24h": "Rainfall (24 h)",
+          "lightningStrikeCount1h": "Lightning strikes (1 h)",
+          "lightningDistanceKm": "Storm distance",
+          "soilMoisture": "Soil moisture",
+          "soilTemperature": "Soil temperature",
+          "distance": "Distance",
+          "weight": "Weight",
+          "radiation": "Radiation",
+          "oneWireTemperature": "One-wire temperature (ch {{channel}})",
+          "adcVoltage": "ADC voltage (ch {{channel}})"
+        },
+        "airQualityMetrics": {
+          "pm10Standard": "PM1.0 (standard)",
+          "pm25Standard": "PM2.5 (standard)",
+          "pm40Standard": "PM4.0 (standard)",
+          "pm100Standard": "PM10 (standard)",
+          "pm10Environmental": "PM1.0 (environmental)",
+          "pm25Environmental": "PM2.5 (environmental)",
+          "pm100Environmental": "PM10 (environmental)",
+          "particles03um": "Particles ≥0.3 µm",
+          "particles05um": "Particles ≥0.5 µm",
+          "particles10um": "Particles ≥1.0 µm",
+          "particles25um": "Particles ≥2.5 µm",
+          "particles40um": "Particles ≥4.0 µm",
+          "particles50um": "Particles ≥5.0 µm",
+          "particles100um": "Particles ≥10 µm",
+          "particlesTps": "Typical particle size",
+          "co2": "CO₂",
+          "co2Temperature": "CO₂ sensor temperature",
+          "co2Humidity": "CO₂ sensor humidity",
+          "formFormaldehyde": "Formaldehyde",
+          "formTemperature": "Formaldehyde sensor temperature",
+          "formHumidity": "Formaldehyde sensor humidity",
+          "pmTemperature": "PM sensor temperature",
+          "pmHumidity": "PM sensor humidity",
+          "pmVocIdx": "VOC index",
+          "pmNoxIdx": "NOx index",
+          "pmStatusFlags": "PM sensor status flags"
+        },
+        "soilWaterMetrics": {
+          "soilPh": "Soil pH",
+          "ph": "pH",
+          "electricalConductivity": "Electrical conductivity",
+          "salinity": "Salinity",
+          "nitrogen": "Nitrogen",
+          "phosphorus": "Phosphorus",
+          "potassium": "Potassium",
+          "nitrate": "Nitrate",
+          "ammonium": "Ammonium",
+          "dissolvedOxygen": "Dissolved oxygen",
+          "orp": "Oxidation-reduction potential",
+          "chemicalOxygenDemand": "Chemical oxygen demand",
+          "biochemicalOxygenDemand": "Biochemical oxygen demand",
+          "turbidity": "Turbidity",
+          "solarIrradiance": "Solar irradiance"
+        },
+        "powerMetrics": {
+          "channelVoltage": "Channel {{channel}} voltage",
+          "channelCurrent": "Channel {{channel}} current"
+        },
+        "healthMetrics": {
+          "heartBpm": "Heart rate",
+          "spO2": "SpO₂",
+          "temperature": "Body temperature"
+        },
+        "localStats": {
+          "uptimeSeconds": "Uptime",
+          "channelUtilization": "Channel utilization",
+          "airUtilTx": "Air TX utilization",
+          "noiseFloor": "Noise floor",
+          "numOnlineNodes": "Nodes online",
+          "numTotalNodes": "Nodes total",
+          "numPacketsTx": "Packets sent",
+          "numPacketsRx": "Packets received",
+          "numPacketsRxBad": "Bad packets received",
+          "numRxDupe": "Duplicate packets received",
+          "numTxRelay": "Packets relayed",
+          "numTxRelayCanceled": "Relays canceled",
+          "numTxDropped": "Packets dropped (queue full)",
+          "heapFreeBytes": "Free heap",
+          "heapTotalBytes": "Heap total"
+        },
+        "trafficManagementStats": {
+          "packetsInspected": "Packets inspected",
+          "positionDedupDrops": "Duplicate positions dropped",
+          "nodeinfoCacheHits": "NodeInfo cache hits",
+          "rateLimitDrops": "Rate limit drops",
+          "unknownPacketDrops": "Unknown packets dropped",
+          "hopExhaustedPackets": "Hop limit exhausted",
+          "routerHopsPreserved": "Router hops preserved"
+        },
+        "hostMetrics": {
+          "uptimeSeconds": "Uptime",
+          "freememBytes": "Free memory",
+          "diskfree1Bytes": "Free disk (/)",
+          "diskfree2Bytes": "Free disk (secondary)",
+          "diskfree3Bytes": "Free disk (tertiary)",
+          "load": "Load (1 / 5 / 15 min)",
+          "userString": "Info"
+        }
+      }
+    },
+    "statusMessage": "Status: ",
+    "signedTrue": "Signs its packets (XEdDSA)"
   },
   "regionSetup": {
     "title": "Set your region",
@@ -259,6 +384,63 @@
       "description": "Confirm these characters match the ones shown on {{name}}'s device:",
       "verify": "Verify",
       "reject": "Don't Verify"
+    }
+  },
+  "lockdown": {
+    "title": "Radio locked",
+    "description": "This radio is in lockdown. Enter its passphrase to unlock it. Its channels and nodes stay hidden until you do.",
+    "provision": {
+      "title": "Set a lockdown passphrase",
+      "description": "This radio needs a lockdown passphrase before you can use it. The passphrase you set here encrypts its stored settings, and you will enter it to unlock the radio from now on.",
+      "warning": "A lost passphrase can't be recovered. Lockdown also permanently locks the radio's debug port, even if you disable lockdown later.",
+      "submit": "Set passphrase and unlock"
+    },
+    "failed": {
+      "title": "Unlock failed",
+      "description": "The radio rejected the passphrase.",
+      "backoff": "Too many attempts. You can try again in {{seconds}}s."
+    },
+    "reason": {
+      "label": "Reason: {{reason}}",
+      "needs_auth": "This connection needs the passphrase",
+      "token_missing": "No unlock is stored on the radio",
+      "token_expired": "The previous unlock has expired",
+      "token_boots_zero": "The previous unlock ran out of reboots",
+      "token_hmac_fail": "The stored unlock is invalid",
+      "token_dek_fail": "The stored unlock is invalid",
+      "token_wrong_size": "The stored unlock is damaged",
+      "token_bad_magic": "The stored unlock is damaged",
+      "not_provisioned": "No passphrase has been set yet"
+    },
+    "passphrase": {
+      "label": "Passphrase",
+      "confirmLabel": "Confirm passphrase",
+      "length": "Use 1 to 32 bytes.",
+      "mismatch": "The passphrases don't match."
+    },
+    "advanced": {
+      "label": "Advanced",
+      "boots": {
+        "label": "Reboots before it locks again",
+        "description": "The radio stays unlocked for this many reboots. 0 uses the radio's default."
+      },
+      "validFor": {
+        "label": "Expires after (hours)",
+        "description": "0 means no time limit."
+      },
+      "maxSession": {
+        "label": "Session limit (seconds)",
+        "description": "Longest a session can last after each boot. 0 means unlimited."
+      }
+    },
+    "unlock": "Unlock",
+    "waiting": "Waiting for the radio…",
+    "disconnect": "Disconnect",
+    "disable": {
+      "title": "Disable lockdown?",
+      "description": "The radio decrypts its stored settings, removes the passphrase and reboots out of lockdown. This can't be undone: to use lockdown again you have to set it up from scratch. The radio's debug port stays locked.",
+      "confirmUnderstanding": "I understand that this can't be undone",
+      "submit": "Disable lockdown"
     }
   }
 }

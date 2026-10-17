@@ -24,7 +24,10 @@ export default defineConfig({
   timeout: 90_000,
   expect: { timeout: 15_000 },
 
-  reporter: [["list"], ["html", { outputFolder: "e2e/.report", open: "never" }]],
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: "e2e/.report", open: "never" }],
+  ],
 
   use: {
     baseURL: `http://localhost:${WEB_PORT}`,

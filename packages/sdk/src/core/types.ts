@@ -19,6 +19,11 @@ export type LogEventPacket = LogEvent & { date: Date };
 
 export type PacketDestination = "broadcast" | "direct";
 
+export interface UnhandledPayload {
+  portnum: Protobuf.Portnums.PortNum;
+  payload: Uint8Array;
+}
+
 export interface PacketMetadata<T> {
   id: number;
   rxTime: Date;
@@ -27,6 +32,25 @@ export interface PacketMetadata<T> {
   to: number;
   channel: ChannelNumber;
   data: T;
+  /** Data.request_id: the packet this one answers or acks. */
+  requestId?: number;
+  /** The sender signed the packet with XEdDSA and the device verified it. */
+  xeddsaSigned?: boolean;
+  /** Firmware's verdict on an ack's proof of delivery (2.8.1+). */
+  ackProofStatus?: Protobuf.Mesh.MeshPacket_AckProofStatus;
+  /**
+   * SNR in dB as our radio heard the packet, or undefined when it carried no
+   * measurement. 0 dB is a real reading.
+   */
+  rxSnr?: number;
+  /** RSSI in dBm as our radio heard the packet, or undefined when unset. */
+  rxRssi?: number;
+  /** Hops the packet took to reach us, or undefined when it can't be told. */
+  hopsAway?: number;
+  /** The packet reached the mesh through an MQTT gateway. */
+  viaMqtt?: boolean;
+  /** How the packet reached our radio (LoRa, MQTT, UDP, API...). */
+  transportMechanism?: Protobuf.Mesh.MeshPacket_TransportMechanism;
 }
 
 export enum EmitterScope {

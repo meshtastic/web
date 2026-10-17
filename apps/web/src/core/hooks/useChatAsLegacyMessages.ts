@@ -52,11 +52,11 @@ export function useChatAsLegacyMessages(
   );
 }
 
-function toLegacy(
+export function toLegacy(
   message: SdkMessage,
   params: UseChatAsLegacyMessagesParams,
 ): LegacyMessage {
-  return {
+  const legacy = {
     type: params.type,
     channel: message.channel,
     to: message.to,
@@ -66,12 +66,32 @@ function toLegacy(
     state: mapState(message.state),
     message: message.text,
   } as LegacyMessage;
+  if (message.signed !== undefined) {
+    legacy.signed = message.signed;
+  }
+  if (message.ackProof !== undefined) {
+    legacy.ackProof = message.ackProof;
+  }
+  if (message.routingError !== undefined) {
+    legacy.routingError = message.routingError;
+  }
+  if (message.relays !== undefined) {
+    legacy.relays = message.relays;
+  }
+  if (message.snr !== undefined) legacy.snr = message.snr;
+  if (message.rssi !== undefined) legacy.rssi = message.rssi;
+  if (message.hopsAway !== undefined) legacy.hopsAway = message.hopsAway;
+  if (message.viaMqtt !== undefined) legacy.viaMqtt = message.viaMqtt;
+  if (message.transport !== undefined) legacy.transport = message.transport;
+  return legacy;
 }
 
 function mapState(state: SdkMessageState): LegacyMessageState {
   switch (state) {
     case SdkMessageState.Ack:
       return LegacyMessageState.Ack;
+    case SdkMessageState.Delivered:
+      return LegacyMessageState.Delivered;
     case SdkMessageState.Failed:
       return LegacyMessageState.Failed;
     case SdkMessageState.Pending:

@@ -8,37 +8,183 @@ option java_outer_classname = "InterdeviceProtos";
 option java_package = "org.meshtastic.proto";
 option swift_prefix = "";
 
-// encapsulate up to 1k of NMEA string data
-
-enum MessageType {
-  ACK = 0;
-  COLLECT_INTERVAL = 160; // in ms
-  BEEP_ON = 161; // duration ms
-  BEEP_OFF = 162; // cancel prematurely
-  SHUTDOWN = 163;
-  POWER_ON = 164;
-  SCD41_TEMP = 176;
-  SCD41_HUMIDITY = 177;
-  SCD41_CO2 = 178;
-  AHT20_TEMP = 179;
-  AHT20_HUMIDITY = 180;
-  TVOC_INDEX = 181;
+// Version of the interdevice protocol spoken on the link. Both sides send
+// theirs in the ping/pong handshake; a peer reporting a different one runs
+// firmware that does not match and is not talked to.
+//
+// On a change that breaks the other side (renumbered fields, changed
+// semantics, removed messages), raise the value of CURRENT. Do not add
+// another entry: this enum carries a single constant, not a history.
+enum InterdeviceVersion {
+  INTERDEVICE_VERSION_UNSPECIFIED = 0;
+  // Never use 1: ping/pong were bools before the handshake existed, and a
+  // bool true is the same varint on the wire as the number 1, so firmware
+  // predating the handshake would pass it.
+  INTERDEVICE_VERSION_CURRENT = 2;
 }
 
-message SensorData {
-  // The message type
-  MessageType type = 1;
-  // The sensor data, either as a float or an uint32
-  oneof data {
-    float float_value = 2;
-    uint32 uint32_value = 3;
+// Defines the supported file operations
+enum FileOperation {
+  GET = 0;
+  POST = 1;
+  PUT = 2;
+  DELETE = 3;
+}
+
+// Outcome of a file or directory operation. The requester must be able to
+// tell a transient condition from a definitive one: BUSY is worth another
+// try, NOT_FOUND is not.
+enum FileStatus {
+  FILE_UNSPECIFIED = 0;
+  FILE_OK = 1;
+  // Retry later: the co-processor is doing card maintenance (mount,
+  // free space scan) and cannot serve the request right now
+  FILE_BUSY = 2;
+  FILE_NO_CARD = 3;
+  FILE_NOT_FOUND = 4;
+  // PUT only: offset did not match the current end of the file. file_size
+  // carries the size the file actually has, so the writer can resync (or
+  // recognize its own chunk as already written after a lost response).
+  FILE_OFFSET_CONFLICT = 5;
+  FILE_IO_ERROR = 6;
+  FILE_NOT_A_FILE = 7; // path is a directory (GET) or not one (listing)
+}
+
+// Message for file operations
+message FileTransfer {
+  FileOperation operation = 1; // File operation (GET, POST, PUT, DELETE)
+  string filepath = 2; // Path of the file on the SD card
+  bytes filedata = 3; // Chunk content (POST/PUT request, GET response)
+  FileStatus status = 4; // Response: outcome of the operation
+  string message = 5; // Response: human readable detail, may be empty
+  uint64 offset = 6; // Byte offset of this chunk within the file (ranged GET/PUT)
+  // GET request: number of bytes to read, 0 = max chunk size. A response
+  // carries at most the filedata max_size (see interdevice.options) per
+  // chunk; larger requests are truncated, visible in the filedata length.
+  uint32 length = 7;
+  uint64 file_size = 8; // GET response: total size of the file
+}
+
+// Message for structured directory listing
+message DirectoryListing {
+  string directory = 1; // Path of the directory
+  // One page of entry names, full FAT LFN length. Subdirectories carry a
+  // trailing slash. Note that a name whose directory prefix pushes the
+  // combined path past the FileTransfer.filepath limit cannot round-trip.
+  // Page size is the max_count in interdevice.options; page through with
+  // offset and total_count.
+  repeated string filenames = 2;
+  FileStatus status = 3; // Response: outcome of the operation
+  string message = 4; // Response: human readable detail, may be empty
+  uint32 offset = 5; // Request: skip this many entries (paging)
+  uint32 total_count = 6; // Response: total number of entries in the directory
+}
+
+// A single I2C transaction: an optional write followed by an optional
+// read with repeated start, matching the TwoWire usage of sensor drivers
+// (beginTransmission/write.../endTransmission(false)/requestFrom)
+message I2CTransaction {
+  uint32 address = 1; // 7-bit device address
+  bytes write_data = 2; // Bytes to write, may be empty
+  // Number of bytes to read after the write, 0 = write-only. Bounded by
+  // the read_data max_size of I2CResult (see interdevice.options); larger
+  // requests are truncated, visible in the returned byte count.
+  uint32 read_len = 3;
+}
+
+// SD card statistics
+message SdCardInfo {
+  enum CardType {
+    NONE = 0;
+    MMC = 1;
+    SD = 2;
+    SDHC = 3;
+    SDXC = 4;
+    UNKNOWN_CARD = 5;
   }
+  enum FatType {
+    UNKNOWN_FAT = 0;
+    FAT16 = 1;
+    FAT32 = 2;
+    EXFAT = 3;
+  }
+  // Card initialized and usable. False while `busy` is set does not mean
+  // there is no card: the co-processor does not know yet.
+  bool present = 1;
+  CardType card_type = 2;
+  FatType fat_type = 3;
+  uint64 card_size = 4; // Filesystem size in bytes
+  uint64 used_bytes = 5; // Used bytes (may be expensive to compute on FAT32)
+  uint64 free_bytes = 6; // Free bytes
+  // used_bytes/free_bytes are only meaningful when true: the scan behind
+  // them runs in the background after mount and can take a while, and a
+  // full card is otherwise indistinguishable from a scan in progress
+  bool stats_valid = 7;
+  // The co-processor is mounting a card right now, so whether one is
+  // present is not decided yet. Ask again rather than concluding the slot
+  // is empty.
+  bool busy = 8;
+  // A card answers in the slot but carries no filesystem that could be
+  // mounted (present is false then). Formatting it makes it usable.
+  bool unformatted = 9;
 }
 
+// What to do with the SD card of the co-processor
+enum SdCommand {
+  SD_COMMAND_UNSPECIFIED = 0;
+  SD_MOUNT = 1; // mount a card that is in the slot, also after an eject
+  SD_EJECT = 2; // flush and release the card so it can be pulled safely
+  SD_FORMAT = 3; // wipe the card and put a fresh FAT on it, then mount it
+}
+
+// Result of an I2CTransaction
+message I2CResult {
+  enum Status {
+    // Never sent: an all-defaults (e.g. accidentally empty) message must
+    // not decode as a successful transaction
+    UNSPECIFIED = 0;
+    OK = 1;
+    NACK_ADDRESS = 2;
+    NACK_DATA = 3;
+    ERROR = 4;
+  }
+  Status status = 1;
+  bytes read_data = 2; // Data read from the device, empty for write-only transactions
+}
+
+// Main message for interdevice communication
 message InterdeviceMessage {
+  // Correlates a response with its request: responses echo the id of the
+  // request they answer. 0 for unsolicited messages (e.g. the nmea stream).
+  uint32 id = 15;
   // The message data
   oneof data {
     string nmea = 1;
-    SensorData sensor = 2;
+    uint32 beep = 2;
+    I2CTransaction i2c_transaction = 3;
+    I2CResult i2c_result = 4;
+    bool i2c_scan = 5; // Request: scan the secondary I2C bus
+    bytes i2c_scan_result = 6; // Response: 7-bit addresses of discovered devices
+    FileTransfer file_transfer = 7;
+    DirectoryListing directory_listing = 8;
+    bool get_sd_info = 9; // Request: SD card statistics
+    SdCardInfo sd_info = 10; // Response
+    // Link liveness probe and version handshake. The receiver answers ping
+    // with pong, echoing the id. Touches no peripherals, so it works with
+    // nothing attached. Both carry the version the sender speaks; a peer
+    // that answers with a different one speaks another protocol and must
+    // not be used.
+    InterdeviceVersion ping = 11;
+    InterdeviceVersion pong = 12;
+    // Response: the request could not be decoded or is of an unhandled
+    // type, so the requester fails fast instead of burning its timeout.
+    // Echoes the id when known, 0 when the frame was undecodable. Never
+    // sent in reaction to a nack.
+    bool nack = 13;
+    // Request: mount the card, or release it so it can be pulled safely. The
+    // co-processor answers with sd_info. Without an eject the card is mounted
+    // on its own and kept mounted; after one it stays released until a mount
+    // is asked for.
+    SdCommand sd_command = 14;
   }
 }

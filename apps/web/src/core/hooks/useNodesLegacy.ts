@@ -1,8 +1,7 @@
-import { create } from "@bufbuild/protobuf";
-import type { Node as SdkNode } from "@meshtastic/sdk";
-import { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@meshtastic/sdk";
 import { useMeshDevice, useNodes } from "@meshtastic/sdk-react";
 import { useMemo } from "react";
+import { toNodeInfo } from "./useNodesAsProto.ts";
 
 /**
  * Adapter hooks that surface SDK-managed nodes in the legacy
@@ -41,21 +40,4 @@ export function useMyNodeAsProto(): Protobuf.Mesh.NodeInfo | undefined {
     const found = nodes.find((n) => n.num === myNodeNum);
     return found ? toNodeInfo(found) : undefined;
   }, [myNodeNum, nodes]);
-}
-
-function toNodeInfo(node: SdkNode): Protobuf.Mesh.NodeInfo {
-  return create(Protobuf.Mesh.NodeInfoSchema, {
-    num: node.num,
-    user: node.user,
-    position: node.position,
-    deviceMetrics: node.deviceMetrics,
-    snr: node.snr ?? 0,
-    lastHeard: node.lastHeard ?? 0,
-    channel: node.channel ?? 0,
-    viaMqtt: node.viaMqtt ?? false,
-    hopsAway: node.hopsAway,
-    isFavorite: node.isFavorite,
-    isIgnored: node.isIgnored,
-    isKeyManuallyVerified: node.isKeyManuallyVerified ?? false,
-  });
 }
