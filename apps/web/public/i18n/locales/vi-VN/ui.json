@@ -1,0 +1,230 @@
+{
+  "navigation": {
+    "title": "Navigation",
+    "messages": "Messages",
+    "map": "Bản đồ",
+    "settings": "Settings",
+    "channels": "Channels",
+    "radioConfig": "Radio Config",
+    "deviceConfig": "Device Config",
+    "moduleConfig": "Module Config",
+    "manageConnections": "Quản Lý Kết Nối",
+    "nodes": "Điểm"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "logo": "Meshtastic Logo"
+  },
+  "sidebar": {
+    "collapseToggle": {
+      "button": {
+        "open": "Open sidebar",
+        "close": "Đóng thanh bên"
+      }
+    },
+    "deviceInfo": {
+      "volts": "{{voltage}} vôn",
+      "firmware": {
+        "title": "Firmware",
+        "version": "v{{version}}",
+        "buildDate": "Build date: {{date}}"
+      }
+    }
+  },
+  "batteryStatus": {
+    "charging": "{{level}}% đang sạc",
+    "pluggedIn": "Plugged in",
+    "title": "Pin"
+  },
+  "search": {
+    "nodes": "Tìm kiếm điểm...",
+    "channels": "Tìm kiếm kênh...",
+    "commandPalette": "Tìm kiếm lệnh..."
+  },
+  "toast": {
+    "positionRequestSent": {
+      "title": "Position request sent."
+    },
+    "requestingPosition": {
+      "title": "Requesting position, please wait..."
+    },
+    "sendingTraceroute": {
+      "title": "Sending Traceroute, please wait..."
+    },
+    "tracerouteSent": {
+      "title": "Traceroute sent."
+    },
+    "savedChannel": {
+      "title": "Saved Channel: {{channelName}}"
+    },
+    "messages": {
+      "pkiEncryption": {
+        "title": "Chat is using PKI encryption."
+      },
+      "pskEncryption": {
+        "title": "Chat is using PSK encryption."
+      }
+    },
+    "configSaveError": {
+      "title": "Error Saving Config",
+      "description": "An error occurred while saving the configuration."
+    },
+    "validationError": {
+      "title": "Config Errors Exist",
+      "description": "Please fix the configuration errors before saving."
+    },
+    "saveSuccess": {
+      "title": "Saving Config",
+      "description": "The configuration change {{case}} has been saved."
+    },
+    "saveAllSuccess": {
+      "title": "Đã lưu",
+      "description": "All configuration changes have been saved."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "action": {
+        "added": "Đã thêm",
+        "removed": "Đã loại bỏ",
+        "to": "đến",
+        "from": "from"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "action": {
+        "added": "Đã thêm",
+        "removed": "Đã loại bỏ",
+        "to": "đến",
+        "from": "from"
+      }
+    }
+  },
+  "notifications": {
+    "copied": {
+      "label": "Copied!"
+    },
+    "copyToClipboard": {
+      "label": "Sao chép vào bảng nhớ tạm"
+    },
+    "hidePassword": {
+      "label": "Hide password"
+    },
+    "showPassword": {
+      "label": "Show password"
+    },
+    "deliveryStatus": {
+      "delivered": "Đã nhận",
+      "failed": "Đã Không Gửi Được",
+      "waiting": "Đang chờ",
+      "unknown": "Không rõ"
+    }
+  },
+  "general": {
+    "label": "Chung"
+  },
+  "hardware": {
+    "label": "Phần cứng"
+  },
+  "metrics": {
+    "label": "Metrics"
+  },
+  "role": {
+    "label": "Chức"
+  },
+  "filter": {
+    "label": "Bộ lọc"
+  },
+  "advanced": {
+    "label": "Advanced"
+  },
+  "clearInput": {
+    "label": "Clear input"
+  },
+  "resetFilters": {
+    "label": "Reset Filters"
+  },
+  "nodeName": {
+    "label": "Tên/số hiệu điểm",
+    "placeholder": "Meshtastic 1234"
+  },
+  "airtimeUtilization": {
+    "label": "Airtime Utilization (%)",
+    "short": "Airtime Util. (%)"
+  },
+  "batteryLevel": {
+    "label": "Mức pin (%)",
+    "labelText": "Mức pin (%): {{value}}"
+  },
+  "batteryVoltage": {
+    "label": "Điện áp pin (Vôn)",
+    "title": "Điện áp"
+  },
+  "channelUtilization": {
+    "label": "Channel Utilization (%)",
+    "short": "Độ bận kênh (%)"
+  },
+  "hops": {
+    "direct": "Trực tiếp",
+    "label": "Số lần cú nhảy",
+    "text": "Số lần cú nhảy: {{value}}"
+  },
+  "lastHeard": {
+    "label": "Nghe lần cuối",
+    "labelText": "Nghe lần cuối: {{value}}",
+    "nowLabel": "Bây giờ"
+  },
+  "snr": {
+    "label": "SNR (db)"
+  },
+  "favorites": {
+    "label": "Favorites"
+  },
+  "hide": {
+    "label": "Ẩn"
+  },
+  "showOnly": {
+    "label": "Chỉ Hiện"
+  },
+  "viaMqtt": {
+    "label": "Connected via MQTT"
+  },
+  "hopsUnknown": {
+    "label": "Unknown number of hops"
+  },
+  "showUnheard": {
+    "label": "Unknown last heard"
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "changeLanguage": "Đổi Ngôn Ngữ"
+  },
+  "theme": {
+    "dark": "Tối",
+    "light": "Sáng",
+    "system": "Tự động",
+    "changeTheme": "Change Color Scheme"
+  },
+  "errorPage": {
+    "title": "This is a little embarrassing...",
+    "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
+    "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
+    "reportInstructions": "Please include the following information in your report:",
+    "reportSteps": {
+      "step1": "What you were doing when the error occurred",
+      "step2": "What you expected to happen",
+      "step3": "What actually happened",
+      "step4": "Any other relevant information"
+    },
+    "reportLink": "You can report the issue to our <0>GitHub</0>",
+    "connectionsLink": "Return to the <0>connections</0>",
+    "detailsSummary": "Error Details",
+    "errorMessageLabel": "Thông báo lỗi:",
+    "stackTraceLabel": "Stack trace:",
+    "fallbackError": "{{error}}"
+  },
+  "footer": {
+    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
+    "commitSha": "Commit SHA: {{sha}}"
+  }
+}

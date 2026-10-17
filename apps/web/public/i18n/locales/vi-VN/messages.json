@@ -1,0 +1,39 @@
+{
+  "page": {
+    "title": "Tin nhắn: {{chatName}}",
+    "placeholder": "Enter Message"
+  },
+  "emptyState": {
+    "title": "Chọn cuộc Chat",
+    "text": "Chưa có tin nhắn nào."
+  },
+  "selectChatPrompt": {
+    "text": "Select a channel or node to start messaging."
+  },
+  "sendMessage": {
+    "placeholder": "Enter your message here...",
+    "sendButton": "Gửi"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "Add Reaction",
+    "replyLabel": "Trả lời"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Message delivered",
+      "displayText": "Message delivered"
+    },
+    "failed": {
+      "label": "Message delivery failed",
+      "displayText": "Đã không gửi được"
+    },
+    "unknown": {
+      "label": "Message status unknown",
+      "displayText": "Unknown state"
+    },
+    "waiting": {
+      "label": "Đang gửi tin nhắn",
+      "displayText": "Waiting for delivery"
+    }
+  }
+}

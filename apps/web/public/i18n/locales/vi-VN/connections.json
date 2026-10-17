@@ -1,0 +1,34 @@
+{
+  "page": {
+    "title": "Connect to a Meshtastic device",
+    "description": "Add a device connection via HTTP, Bluetooth, or Serial. Your saved connections will be saved in your browser."
+  },
+  "connectionType_ble": "BLE",
+  "connectionType_serial": "Serial",
+  "connectionType_network": "Mạng",
+  "deleteConnection": "Xóa kết nối",
+  "areYouSure": "This will remove {{name}}. You canot undo this action.",
+  "moreActions": "Thao tác khác",
+  "noConnections": {
+    "title": "No connections yet.",
+    "description": "Create your first connection. It will connect immediately and be saved for later."
+  },
+  "lastConnectedAt": "Kết nối lần cuối: {{date}}",
+  "neverConnected": "Chưa từng kết nối",
+  "toasts": {
+    "connected": "Đã kết nối",
+    "nowConnected": "{{name}} hiện được kết nối",
+    "nowDisconnected": "{{name}} are now disconnecte",
+    "disconnected": "Đã ngắt kết nối",
+    "failed": "Kết nối thất bại",
+    "checkConnetion": "Check your device or settings and try again",
+    "defaultSet": "Default set",
+    "defaultConnection": "Default connection is now {{nameisconnected}}",
+    "deleted": "Đã xóa",
+    "deletedByName": "{{name}} was removed",
+    "pickConnectionAgain": "Could not connect. You may need to reselect the device/port.",
+    "added": "Đã thêm kết nối",
+    "savedByName": "Đã lưu {{name}}.",
+    "savedCantConnect": "The connection was saved but could not connect."
+  }
+}

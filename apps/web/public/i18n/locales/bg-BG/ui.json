@@ -121,7 +121,7 @@
     }
   },
   "general": {
-    "label": "General"
+    "label": "Общи"
   },
   "hardware": {
     "label": "Хардуер"
@@ -150,7 +150,7 @@
   },
   "airtimeUtilization": {
     "label": "Използване на ефира (%)",
-    "short": "Airtime Util. (%)"
+    "short": "Изп. на ефирно време (%)"
   },
   "batteryLevel": {
     "label": "Ниво на батерията (%)",
@@ -162,12 +162,12 @@
   },
   "channelUtilization": {
     "label": "Използване на канала (%)",
-    "short": "Channel Util. (%)"
+    "short": "Изп. на канала (%)"
   },
   "hops": {
     "direct": "Директно",
-    "label": "Брой хопове",
-    "text": "Брой хопове: {{value}}"
+    "label": "Брой отскоци",
+    "text": "Брой отскоци: {{value}}"
   },
   "lastHeard": {
     "label": "Последно чут",
@@ -190,7 +190,7 @@
     "label": "Свързан чрез MQTT"
   },
   "hopsUnknown": {
-    "label": "Неизвестен брой хопове"
+    "label": "Неизвестен брой отскоци"
   },
   "showUnheard": {
     "label": "Никога не е чуван"
