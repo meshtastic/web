@@ -98,6 +98,7 @@
         },
         "reachable": "Reachable",
         "notReachable": "Not reachable",
+        "slowLocalName": "Looking up this .local name took a few seconds. Using the radio's IP address instead connects faster.",
         "success": {
           "title": "Connection test successful",
           "description": "The device appears to be reachable."

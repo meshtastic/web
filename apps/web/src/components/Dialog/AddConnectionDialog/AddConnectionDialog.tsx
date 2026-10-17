@@ -40,6 +40,9 @@ import { DialogWrapper } from "../DialogWrapper.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
 
 type TabKey = ConnectionType;
+
+/** A .local test slower than this was mostly spent looking the name up. */
+const SLOW_LOCAL_NAME_MS = 2000;
 type TestingStatus = "idle" | "testing" | "success" | "failure" | "cert-error";
 type DialogState = {
   tab: TabKey;
@@ -47,6 +50,8 @@ type DialogState = {
   protocol: "http" | "https";
   url: string;
   testStatus: TestingStatus;
+  /** The last test reached a .local name, but only slowly. */
+  slowLocalName: boolean;
   btSelected:
     | { id: string; name?: string; device?: BluetoothDevice }
     | undefined;
@@ -60,6 +65,7 @@ type DialogAction =
   | { type: "SET_PROTOCOL"; payload: "http" | "https" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
+  | { type: "SET_SLOW_LOCAL_NAME"; payload: boolean }
   | {
       type: "SET_BT_SELECTED";
       payload:
@@ -170,6 +176,7 @@ const initialState: DialogState = {
   protocol: "http",
   url: "",
   testStatus: "idle",
+  slowLocalName: false,
   btSelected: undefined,
   serialSelected: undefined,
 };
@@ -199,12 +206,19 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
       return { ...state, url: action.payload };
     case "SET_TEST_STATUS":
       return { ...state, testStatus: action.payload };
+    case "SET_SLOW_LOCAL_NAME":
+      return { ...state, slowLocalName: action.payload };
     case "SET_BT_SELECTED":
       return { ...state, btSelected: action.payload };
     case "SET_SERIAL_SELECTED":
       return { ...state, serialSelected: action.payload };
     case "SET_URL_AND_RESET_TEST":
-      return { ...state, url: action.payload, testStatus: "idle" };
+      return {
+        ...state,
+        url: action.payload,
+        testStatus: "idle",
+        slowLocalName: false,
+      };
     default:
       return state;
   }
@@ -396,9 +410,18 @@ export default function AddConnectionDialog({
       return;
     }
     dispatch({ type: "SET_TEST_STATUS", payload: "testing" });
-    const { reachable, certError } = await testHttpReachable(validatedURL.data);
+    dispatch({ type: "SET_SLOW_LOCAL_NAME", payload: false });
+    const { reachable, certError, elapsedMs } = await testHttpReachable(
+      validatedURL.data,
+    );
     if (reachable) {
       dispatch({ type: "SET_TEST_STATUS", payload: "success" });
+      dispatch({
+        type: "SET_SLOW_LOCAL_NAME",
+        payload:
+          elapsedMs > SLOW_LOCAL_NAME_MS &&
+          new URL(validatedURL.data).hostname.endsWith(".local"),
+      });
     } else if (certError) {
       dispatch({ type: "SET_TEST_STATUS", payload: "cert-error" });
     } else {
@@ -509,6 +532,11 @@ export default function AddConnectionDialog({
                 </div>
               )}
             </div>
+            {state.testStatus === "success" && state.slowLocalName && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {t("addConnection.httpConnection.connectionTest.slowLocalName")}
+              </p>
+            )}
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {t("addConnection.httpConnection.connectionTest.description")}
             </p>
