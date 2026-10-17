@@ -192,6 +192,8 @@
     },
     "modemPreset": {
       "description": "Available modem presets, default is Long Fast.",
+      "descriptionForRegion": "Presets allowed in the selected region. The region's default is marked.",
+      "defaultSuffix": "(default)",
       "label": "Presets"
     },
     "okToMqtt": {
@@ -208,6 +210,7 @@
     },
     "region": {
       "description": "The region where you will be using your radios.",
+      "licensedOnlySuffix": "(licensed operators only)",
       "label": "Region"
     },
     "spreadingFactor": {
@@ -541,6 +544,35 @@
     "administration": {
       "label": "Administration",
       "description": "Managed-mode and legacy admin channel"
+    },
+    "packetSignaturesCard": {
+      "label": "Packet Signatures",
+      "description": "How the device treats signed and unsigned packets it receives (firmware 2.8+)"
+    },
+    "packetSignaturePolicy": {
+      "label": "Packet Signature Policy",
+      "description": "Compatible accepts unsigned packets but drops any with a wrong signature. Balanced also rejects unsigned broadcasts from nodes that have signed before. Strict accepts only packets with a verified signature or successful PKI decryption, so packets from older nodes may be ignored.",
+      "compatible": "Compatible - Accept Unsigned",
+      "balanced": "Balanced - Prefer Authenticated",
+      "strict": "Strict - Require Authentication"
+    },
+    "lockdown": {
+      "label": "Lockdown",
+      "description": "Encrypts the radio's stored settings and withholds them from clients until they unlock it with a passphrase.",
+      "status": "Status",
+      "state": {
+        "off": "Off",
+        "unlocked": "Unlocked",
+        "locked": "Locked",
+        "needsProvision": "Not set up",
+        "unlockFailed": "Unlock failed"
+      },
+      "bootsRemaining": "Reboots remaining: {{count}}",
+      "expires": "Expires: {{date}}",
+      "lockNow": "Lock now",
+      "lockNowDescription": "Reboots the radio into the locked state. You'll need the passphrase to use it again.",
+      "disable": "Disable lockdown",
+      "disableDescription": "Turns lockdown off for good. Requires the passphrase."
     }
   },
   "user": {
@@ -548,7 +580,7 @@
     "description": "Configure your device name and identity settings",
     "longName": {
       "label": "Long Name",
-      "description": "Your full display name (1-40 characters)",
+      "description": "Your full display name, up to 24 bytes. Emoji and accented letters use more than one byte each.",
       "validation": {
         "min": "Long name must be at least 1 character",
         "max": "Long name must be at most 40 characters"

@@ -1,5 +1,6 @@
+import * as Protobuf from "@meshtastic/protobufs";
 import { signal } from "@preact/signals-core";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import { Constants } from "../../core/constants/index.ts";
 import { generatePacketId } from "../../core/identifiers/PacketId.ts";
@@ -9,7 +10,7 @@ import {
 } from "../../core/signals/createStore.ts";
 import type { ChannelNumber } from "../../core/types.ts";
 import type { DraftRepository } from "./domain/DraftRepository.ts";
-import type { Message } from "./domain/Message.ts";
+import type { Message, MessageDeliveryPatch } from "./domain/Message.ts";
 import type {
   ConversationKey,
   MessageRepository,
@@ -105,6 +106,12 @@ export class ChatClient {
       markRead: (key) => this.markRead(key),
     };
 
+    // Older versions filed direct messages we sent under our own node, where
+    // no conversation reads them. Move them once we know which node is ours.
+    client.events.onMyNodeInfo.subscribe((info) => {
+      void this.repository.refileSentDirect?.(info.myNodeNum).catch(() => {});
+    });
+
     client.events.onMessagePacket.subscribe((packet) => {
       const message = MessageMapper.fromPacket(packet);
       const conv: ConversationKey =
@@ -121,7 +128,7 @@ export class ChatClient {
       if (this.store.hasMessage(key, message.id)) return;
 
       this.store.append(key, message);
-      void this.persistAppend(message);
+      void this.persistAppend(message, conv);
 
       // Increment unread count when the message is inbound (not from us). The
       // outbound echo of our own send doesn't count as unread.
@@ -131,14 +138,82 @@ export class ChatClient {
     });
 
     client.events.onRoutingPacket.subscribe((packet) => {
-      if (packet.data.variant.case === "errorReason") {
-        const state =
-          packet.data.variant.value === 0
+      if (packet.data.variant.case !== "errorReason") return;
+      // A routing ack names the message it acks in Data.request_id; its own
+      // id is unrelated.
+      this.applyAck(
+        packet.requestId ?? packet.id,
+        packet.from,
+        packet.data.variant.value,
+        packet.ackProofStatus,
+      );
+    });
+  }
+
+  /**
+   * Fold one ack or NAK into the message it answers, as the Android app's
+   * handleAckNak does. An ack from the addressed node means the recipient got
+   * it (Ack); an ack from anyone else (a relay, or the radio hearing its own
+   * rebroadcast) means it reached the mesh (Delivered). A NAK fails it. Once
+   * the recipient has acked, later acks and NAKs no longer change the state.
+   *
+   * Ack proofs keep the strongest verdict: a later ack without proof never
+   * clears one, and a VALID proof is still recorded after a forged ack
+   * settled the message.
+   */
+  private applyAck(
+    id: number,
+    from: number,
+    error: Protobuf.Mesh.Routing_Error,
+    proof: Protobuf.Mesh.MeshPacket_AckProofStatus | undefined,
+  ): void {
+    const message = this.store.getMessage(id);
+    const patch: MessageDeliveryPatch = {};
+
+    if (message?.state !== MessageState.Ack) {
+      const isAck = error === Protobuf.Mesh.Routing_Error.NONE;
+      if (isAck) {
+        patch.state =
+          message && from === message.to
             ? MessageState.Ack
-            : MessageState.Failed;
-        this.store.updateState(packet.id, state);
-        void this.repository.updateState(packet.id, state).catch(() => {});
+            : MessageState.Delivered;
+        patch.relays = (message?.relays ?? 0) + 1;
+        patch.routingError = undefined;
+      } else {
+        patch.state = MessageState.Failed;
+        patch.routingError = error;
       }
+    }
+
+    const Proof = Protobuf.Mesh.MeshPacket_AckProofStatus;
+    const current = message?.ackProof;
+    if (
+      proof !== undefined &&
+      proof !== Proof.ACK_PROOF_ABSENT &&
+      current !== Proof.ACK_PROOF_VALID &&
+      (current !== Proof.ACK_PROOF_INVALID || proof === Proof.ACK_PROOF_VALID)
+    ) {
+      patch.ackProof = proof;
+    }
+
+    if (Object.keys(patch).length === 0) return;
+    this.store.updateDelivery(id, patch);
+    void this.repository.updateDelivery(id, patch).catch(() => {});
+  }
+
+  /**
+   * Send a failed (or unconfirmed) message again. The old message is removed
+   * and a new one, with a fresh packet id, takes its place.
+   */
+  public async resend(
+    message: Pick<Message, "id" | "text" | "to" | "channel" | "type">,
+  ): Promise<Result<number, SendTextError>> {
+    this.store.remove(message.id);
+    void this.repository.remove(message.id).catch(() => {});
+    return this.send({
+      text: message.text,
+      destination: message.type === "direct" ? message.to : "broadcast",
+      channel: message.channel,
     });
   }
 
@@ -195,7 +270,7 @@ export class ChatClient {
 
   public async send(
     input: SendTextInput,
-  ): Promise<ResultType<number, SendTextError>> {
+  ): Promise<Result<number, SendTextError>> {
     const conv: ConversationKey =
       typeof input.destination === "number"
         ? { kind: "direct", peer: input.destination }
@@ -229,7 +304,7 @@ export class ChatClient {
     };
     if (!this.store.hasMessage(key, packetId)) {
       this.store.append(key, message);
-      void this.persistAppend(message);
+      void this.persistAppend(message, conv);
     }
     this.draftStore.clear(conv);
     void this.draftRepository.clear(conv).catch(() => {});
@@ -239,10 +314,17 @@ export class ChatClient {
       // Send pipeline failed (transport closed, validation, etc.). Keep
       // the optimistic message visible but mark it Failed so the user
       // sees the error state next to their bubble.
-      this.store.updateState(packetId, MessageState.Failed);
-      void this.repository
-        .updateState(packetId, MessageState.Failed)
-        .catch(() => {});
+      // A NAK arrives as a PacketError from the queue; keep its reason. The
+      // routing handler has usually recorded it already.
+      const routingError = (result.error as { error?: unknown }).error;
+      const patch: MessageDeliveryPatch = {
+        state: MessageState.Failed,
+        ...(typeof routingError === "number" ? { routingError } : {}),
+      };
+      if (this.store.getMessage(packetId)?.state !== MessageState.Ack) {
+        this.store.updateDelivery(packetId, patch);
+        void this.repository.updateDelivery(packetId, patch).catch(() => {});
+      }
     }
     return result;
   }
@@ -288,12 +370,17 @@ export class ChatClient {
     });
   }
 
-  private async persistAppend(message: Message): Promise<void> {
+  private async persistAppend(
+    message: Message,
+    conv: ConversationKey,
+  ): Promise<void> {
     try {
-      await this.repository.append(message);
+      await this.repository.append(message, conv);
       if (this.retention) await this.repository.prune(this.retention);
-    } catch {
-      // persistence failure must not break reactive flow
+    } catch (e) {
+      // Persistence failure must not break the reactive flow, but say so:
+      // otherwise the message just isn't there after a reload.
+      this.client.log.warn("Could not save message", message.id, e);
     }
   }
 

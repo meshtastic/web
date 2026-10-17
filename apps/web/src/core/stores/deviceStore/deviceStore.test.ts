@@ -252,6 +252,39 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
 
     vi.useRealTimers();
   });
+
+  it("setHardware recognises a renumbered radio by its device_id", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const deviceId = new Uint8Array([0xde, 0xad, 0xbe, 0xef]);
+
+    const oldDevice = state.addDevice(1);
+    oldDevice.setHardware(
+      create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum: 777, deviceId }),
+    );
+    oldDevice.addTraceRoute(makeRoute(55));
+
+    // Firmware 2.8 derives the node number from the public key.
+    const newDevice = state.addDevice(2);
+    newDevice.setHardware(
+      create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum: 888, deviceId }),
+    );
+
+    expect(state.getDevice(1)).toBeUndefined();
+    expect(state.getDevice(2)!.traceroutes.size).toBe(1);
+    expect(state.getDevice(2)!.hardwareId).toBe("deadbeef");
+  });
+
+  it("setHardware ignores an empty device_id", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+
+    state.addDevice(1).setHardware(makeHardware(777));
+    state.addDevice(2).setHardware(makeHardware(888));
+
+    expect(state.getDevice(1)).toBeDefined();
+    expect(state.getDevice(2)).toBeDefined();
+  });
 });
 
 describe("DeviceStore – persistence partialize & rehydrate", () => {

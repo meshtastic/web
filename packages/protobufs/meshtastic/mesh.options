@@ -5,6 +5,10 @@
 *id max_size:16 # node id strings
 *public_key max_size:32 # public key
 
+# Decode width stays 40 so NodeInfo/set_owner from senders built against the
+# old 39-byte limit still parse (nanopb halts on string overflow rather than
+# truncating). Firmware clamps everything it stores or transmits to 24 bytes -
+# see NodeInfoLite.long_name in deviceonly.options.
 *User.long_name max_size:40
 *User.short_name max_size:5
 
@@ -19,6 +23,7 @@
 # outside of this envelope
 *Data.payload max_size:233
 *Data.bitfield int_size:8
+*Data.xeddsa_signature max_size:64
 
 *NodeInfo.channel int_size:8
 *NodeInfo.hops_away int_size:8
@@ -53,6 +58,7 @@
 *FromRadio.payload_variant anonymous_oneof:true
 
 *Routing.variant anonymous_oneof:true
+*Routing.ack_proof max_size:8
 
 *LogRecord.message max_size:384
 *LogRecord.source max_size:32
@@ -69,6 +75,14 @@
 *KeyVerification.hash1 max_size:32
 *KeyVerification.hash2 max_size:32
 
+*StoreForwardPlusPlus.message_hash max_size:32
+*StoreForwardPlusPlus.commit_hash max_size:32
+*StoreForwardPlusPlus.root_hash max_size:32
+*StoreForwardPlusPlus.message max_size:240
+
+*RemoteShell.payload max_size:200
+
+*StatusMessage.status max_size:80
 
 # MyMessage.name         max_size:40 
 # or fixed_length or fixed_count, or max_count
@@ -83,6 +97,19 @@
 
 *DeviceMetadata.firmware_version max_size:18
 
+# Region->preset compatibility map (FromRadio.region_presets). Bounds chosen
+# above the current table (6 groups / 9 presets in the largest group / 32 regions)
+# so LoRaRegionPresetMap stays small enough that FromRadio_size does not grow past
+# the 512-byte MAX_TO_FROM_RADIO_SIZE cap. nanopb sizes repeated enums unpacked
+# (~2 bytes/element), so the flat groups + region_groups layout keeps cost additive
+# rather than groups*regions. See bin/regen-protos.sh output for the actual size.
+# region_groups capped at 38 = the number of RegionCode enum values, so it can
+# never overflow regardless of how many regions gain a firmware table entry.
+*LoRaRegionPresetMap.groups        max_count:8
+*LoRaRegionPresetMap.region_groups max_count:38
+*LoRaPresetGroup.presets           max_count:11
+*LoRaRegionPresets.group_index     int_size:8
+
 *MqttClientProxyMessage.topic max_size:60
 *MqttClientProxyMessage.data max_size:435
 *MqttClientProxyMessage.text max_size:435
@@ -90,3 +117,7 @@
 *ChunkedPayload.chunk_count int_size:16
 *ChunkedPayload.chunk_index int_size:16
 *ChunkedPayload.payload_chunk max_size:228
+
+# Longest documented value is "token_wrong_size" (16 chars); 32 leaves room
+# for future short reasons without forcing nanopb to use callbacks.
+*LockdownStatus.lock_reason max_size:32

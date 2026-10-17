@@ -1,13 +1,12 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import { Result } from "better-result";
-import type { ResultType } from "better-result";
 import type { MeshClient } from "../../../core/client/MeshClient.ts";
 
 export async function runTraceRoute(
   client: MeshClient,
   destination: number,
-): Promise<ResultType<number, Error>> {
+): Promise<Result<number, Error>> {
   try {
     const routeDiscovery = create(Protobuf.Mesh.RouteDiscoverySchema, {
       route: [],

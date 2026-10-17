@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package meshtastic;
+
+import "meshtastic/channel.proto";
+import "meshtastic/config.proto";
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "MeshBeaconProtos";
+option java_package = "org.meshtastic.proto";
+option swift_prefix = "";
+
+/*
+ * Payload for MESH_BEACON_APP packets.
+ * Periodically broadcast by nodes in beacon mode.
+ * Listeners deliver the text message to the local inbox and cache any offered
+ * channel/preset for the client app to act on - the firmware never auto-applies them.
+ */
+message MeshBeacon {
+  /*
+   * Human-readable beacon message. Max 100 bytes enforced by firmware on send.
+   */
+  string message = 1;
+
+  /*
+   * Optional channel (name + PSK) being advertised to listening clients.
+   * A client app may offer to switch the user to this channel; firmware never applies it automatically.
+   */
+  ChannelSettings offer_channel = 2;
+
+  /*
+   * Optional region being advertised alongside offer_preset.
+   */
+  Config.LoRaConfig.RegionCode offer_region = 3;
+
+  /*
+   * Optional modem preset being advertised.
+   * Combined with offer_region, tells a client "there is a mesh on this preset/region".
+   */
+  optional Config.LoRaConfig.ModemPreset offer_preset = 4;
+
+  /*
+   * Frequency slot this mesh uses, 1-based, matching Config.LoRaConfig.channel_num.
+   * OMITTED when a receiver can derive the slot itself from offer_region, offer_channel's
+   * name and offer_preset - an unset offer_preset means the region's default preset. That
+   * covers both a region with a mandated slot and a mesh on the default name hash.
+   * PRESENT means this mesh deliberately deviates from what derivation would produce; a
+   * client should still validate the result against its own region before offering to join.
+   * Do not send 0 - it is the same as omitting the field.
+   */
+  optional uint32 offer_frequency_slot = 5;
+}

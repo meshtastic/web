@@ -3,6 +3,7 @@ import { Audio } from "@components/PageComponents/ModuleConfig/Audio.tsx";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage.tsx";
 import { DetectionSensor } from "@components/PageComponents/ModuleConfig/DetectionSensor.tsx";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.tsx";
+import { MeshBeacon } from "@components/PageComponents/ModuleConfig/MeshBeacon.tsx";
 import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.tsx";
 import { NeighborInfo } from "@components/PageComponents/ModuleConfig/NeighborInfo.tsx";
 import { Paxcounter } from "@components/PageComponents/ModuleConfig/Paxcounter.tsx";
@@ -13,7 +14,6 @@ import { StatusMessage } from "@components/PageComponents/ModuleConfig/StatusMes
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
 import { Tak } from "@components/PageComponents/ModuleConfig/Tak.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
-import { TrafficManagement } from "@components/PageComponents/ModuleConfig/TrafficManagement.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import {
   Tabs,
@@ -21,7 +21,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import type { ValidModuleConfigType } from "@core/stores";
+import { isModuleExcluded } from "@core/utils/excludedModules.ts";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
@@ -50,7 +52,8 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
     editor?.dirtyModuleSections ?? EMPTY_DIRTY_MODULE_SIGNAL,
   );
   const { t } = useTranslation("moduleConfig");
-  const tabs: TabItem[] = useMemo(
+  const { excludedModules } = useDeviceCapabilities();
+  const allTabs: TabItem[] = useMemo(
     () => [
       {
         case: "mqtt",
@@ -118,18 +121,23 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
         element: RemoteHardware,
       },
       {
-        case: "trafficManagement",
-        label: t("page.tabTrafficManagement"),
-        element: TrafficManagement,
-      },
-      {
         case: "statusmessage",
         label: t("page.tabStatusMessage"),
         element: StatusMessage,
       },
       { case: "tak", label: t("page.tabTak"), element: Tak },
+      {
+        case: "meshBeacon",
+        label: t("page.tabMeshBeacon"),
+        element: MeshBeacon,
+      },
     ],
     [t],
+  );
+  // Hide the modules this firmware build was compiled without.
+  const tabs = useMemo(
+    () => allTabs.filter((tab) => !isModuleExcluded(excludedModules, tab.case)),
+    [allTabs, excludedModules],
   );
 
   const flags = useMemo(
@@ -139,7 +147,9 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
   );
 
   return (
-    <Tabs defaultValue={t("page.tabMqtt")}>
+    // Keyed on the first tab so the default moves on when metadata arriving
+    // later hides it.
+    <Tabs key={tabs[0]?.label} defaultValue={tabs[0]?.label}>
       <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-800">
         {tabs.map((tab) => (
           <TabsTrigger

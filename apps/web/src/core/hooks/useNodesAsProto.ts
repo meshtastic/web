@@ -43,14 +43,14 @@ function useMyNodeNumSafe(): number | undefined {
   );
 }
 
-export function useNodesAsProto(): Protobuf.Mesh.NodeInfo[] {
+export function useNodesAsProto(): NodeInfoWithStatus[] {
   const nodes = useSdkNodesSafe();
   return useMemo(() => nodes.map(toNodeInfo), [nodes]);
 }
 
 export function useNodeAsProto(
   nodeNum: number,
-): Protobuf.Mesh.NodeInfo | undefined {
+): NodeInfoWithStatus | undefined {
   const nodes = useSdkNodesSafe();
   return useMemo(() => {
     const found = nodes.find((n) => n.num === nodeNum);
@@ -63,7 +63,7 @@ export function useNodeAsProto(
  * NodeInfo packet has been observed yet. Returns undefined while the
  * device is still configuring or there is no active client.
  */
-export function useMyNodeAsProto(): Protobuf.Mesh.NodeInfo | undefined {
+export function useMyNodeAsProto(): NodeInfoWithStatus | undefined {
   const myNodeNum = useMyNodeNumSafe();
   const nodes = useSdkNodesSafe();
   return useMemo(() => {
@@ -73,8 +73,16 @@ export function useMyNodeAsProto(): Protobuf.Mesh.NodeInfo | undefined {
   }, [myNodeNum, nodes]);
 }
 
-function toNodeInfo(node: SdkNode): Protobuf.Mesh.NodeInfo {
-  return create(Protobuf.Mesh.NodeInfoSchema, {
+/**
+ * The proto NodeInfo plus SDK-only fields the proto has no slot for.
+ * `status` is the node's latest status message (NODE_STATUS_APP).
+ */
+export type NodeInfoWithStatus = Protobuf.Mesh.NodeInfo & {
+  status?: string;
+};
+
+export function toNodeInfo(node: SdkNode): NodeInfoWithStatus {
+  const info: NodeInfoWithStatus = create(Protobuf.Mesh.NodeInfoSchema, {
     num: node.num,
     user: node.user,
     position: node.position,
@@ -87,5 +95,14 @@ function toNodeInfo(node: SdkNode): Protobuf.Mesh.NodeInfo {
     isFavorite: node.isFavorite,
     isIgnored: node.isIgnored,
     isKeyManuallyVerified: node.isKeyManuallyVerified ?? false,
+    isMuted: node.isMuted ?? false,
+    hasXeddsaSigned: node.hasXeddsaSigned ?? false,
+    // proto3 bools default to false, which would read as "unheard"; the SDK
+    // leaves it undefined only when it has no answer, so treat that as heard.
+    heardOnCurrentLora: node.heardOnCurrentLora ?? true,
   });
+  if (node.status) {
+    info.status = node.status;
+  }
+  return info;
 }

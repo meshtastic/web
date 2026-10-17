@@ -3,6 +3,9 @@ syntax = "proto3";
 package meshtastic;
 
 import "meshtastic/atak.proto";
+import "meshtastic/channel.proto";
+import "meshtastic/config.proto";
+import "meshtastic/field_metadata.proto";
 
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
@@ -22,27 +25,39 @@ message ModuleConfig {
      * If a meshtastic node is able to reach the internet it will normally attempt to gateway any channels that are marked as
      * is_uplink_enabled or is_downlink_enabled.
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "MQTT Enabled"
+      description: "Enable MQTT gateway"
+    }];
 
     /*
      * The server to use for our MQTT global message gateway feature.
      * If not set, the default server will be used
      */
-    string address = 2;
+    string address = 2 [(meshtastic.field_metadata) = {
+      label: "Address"
+      description: "MQTT server address"
+    }];
 
     /*
      * MQTT username to use (most useful for a custom MQTT server).
      * If using a custom server, this will be honoured even if empty.
      * If using the default server, this will only be honoured if set, otherwise the device will use the default username
      */
-    string username = 3;
+    string username = 3 [(meshtastic.field_metadata) = {
+      label: "Username"
+      description: "MQTT username"
+    }];
 
     /*
      * MQTT password to use (most useful for a custom MQTT server).
      * If using a custom server, this will be honoured even if empty.
      * If using the default server, this will only be honoured if set, otherwise the device will use the default password
      */
-    string password = 4;
+    string password = 4 [(meshtastic.field_metadata) = {
+      label: "Password"
+      description: "MQTT password"
+    }];
 
     /*
      * Whether to send encrypted or decrypted packets to MQTT.
@@ -50,33 +65,51 @@ message ModuleConfig {
      * (the default official mqtt.meshtastic.org server can handle encrypted packets)
      * Decrypted packets may be useful for external systems that want to consume meshtastic packets
      */
-    bool encryption_enabled = 5;
+    bool encryption_enabled = 5 [(meshtastic.field_metadata) = {
+      label: "Encryption Enabled"
+      description: "Send encrypted packets to MQTT"
+    }];
 
     /*
      * Deprecated: JSON packet support on MQTT was removed, and this field is ignored.
      */
-    bool json_enabled = 6 [deprecated = true];
+    bool json_enabled = 6 [
+      deprecated = true,
+      (meshtastic.field_metadata) = {deprecated_since: "2.8.0"}
+    ];
 
     /*
      * If true, we attempt to establish a secure connection using TLS
      */
-    bool tls_enabled = 7;
+    bool tls_enabled = 7 [(meshtastic.field_metadata) = {
+      label: "TLS Enabled"
+      description: "TLS is required for the public Meshtastic MQTT server."
+    }];
 
     /*
      * The root topic to use for MQTT messages. Default is "msh".
      * This is useful if you want to use a single MQTT server for multiple meshtastic networks and separate them via ACLs
      */
-    string root = 8;
+    string root = 8 [(meshtastic.field_metadata) = {
+      label: "Root Topic"
+      description: "MQTT root topic"
+    }];
 
     /*
      * If true, we can use the connected phone / client to proxy messages to MQTT instead of a direct connection
      */
-    bool proxy_to_client_enabled = 9;
+    bool proxy_to_client_enabled = 9 [(meshtastic.field_metadata) = {
+      label: "MQTT Client Proxy"
+      description: "Utilizes the network connection on your phone to connect to MQTT."
+    }];
 
     /*
      * If true, we will periodically report unencrypted information about our node to a map via MQTT
      */
-    bool map_reporting_enabled = 10;
+    bool map_reporting_enabled = 10 [(meshtastic.field_metadata) = {
+      label: "Map Reporting"
+      description: "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
+    }];
 
     /*
      * Settings for reporting information about our node to a map via MQTT
@@ -91,7 +124,11 @@ message ModuleConfig {
     /*
      * How often we should report our info to the map (in seconds)
      */
-    uint32 publish_interval_secs = 1;
+    uint32 publish_interval_secs = 1 [(meshtastic.field_metadata) = {
+      label: "Map Publish Interval"
+      description: "How often a map report is published."
+      unit: "s"
+    }];
 
     /*
      * Bits of precision for the location sent (default of 32 is full precision).
@@ -101,7 +138,11 @@ message ModuleConfig {
     /*
      * Whether we have opted-in to report our location to the map
      */
-    bool should_report_location = 3;
+    bool should_report_location = 3 [(meshtastic.field_metadata) = {
+      label: "Report Location"
+      description: "I have read and understand the above. I voluntarily consent to the unencrypted transmission of my node data via MQTT."
+      since_firmware: "2.6.8"
+    }];
   }
 
   /*
@@ -131,19 +172,29 @@ message ModuleConfig {
     /*
      * Whether the Module is enabled
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "Neighbor Info Enabled"
+      description: "Enable neighbor info broadcasting. Periodically sends information about directly-heard neighbors to help visualize mesh topology."
+    }];
 
     /*
      * Interval in seconds of how often we should try to send our
      * Neighbor Info (minimum is 14400, i.e., 4 hours)
      */
-    uint32 update_interval = 2;
+    uint32 update_interval = 2 [(meshtastic.field_metadata) = {
+      label: "Update Interval"
+      unit: "s"
+      description: "How often to broadcast neighbor info."
+    }];
 
     /*
      * Whether in addition to sending it to MQTT and the PhoneAPI, our NeighborInfo should be transmitted over LoRa.
      * Note that this is not available on a channel with default key and name.
      */
-    bool transmit_over_lora = 3;
+    bool transmit_over_lora = 3 [(meshtastic.field_metadata) = {
+      label: "Transmit over LoRa"
+      description: "Whether to transmit neighbor info over LoRa in addition to MQTT and PhoneAPI. Not available on channels with default key and name."
+    }];
   }
 
   /*
@@ -152,30 +203,37 @@ message ModuleConfig {
   message DetectionSensorConfig {
     enum TriggerType {
       // Event is triggered if pin is low
-      LOGIC_LOW = 0;
+      LOGIC_LOW = 0 [(meshtastic.enum_value_metadata) = {label: "Low"}];
       // Event is triggered if pin is high
-      LOGIC_HIGH = 1;
+      LOGIC_HIGH = 1 [(meshtastic.enum_value_metadata) = {label: "High"}];
       // Event is triggered when pin goes high to low
-      FALLING_EDGE = 2;
+      FALLING_EDGE = 2 [(meshtastic.enum_value_metadata) = {label: "Falling Edge"}];
       // Event is triggered when pin goes low to high
-      RISING_EDGE = 3;
+      RISING_EDGE = 3 [(meshtastic.enum_value_metadata) = {label: "Rising Edge"}];
       // Event is triggered on every pin state change, low is considered to be
       // "active"
-      EITHER_EDGE_ACTIVE_LOW = 4;
+      EITHER_EDGE_ACTIVE_LOW = 4 [(meshtastic.enum_value_metadata) = {label: "Either Edge Low"}];
       // Event is triggered on every pin state change, high is considered to be
       // "active"
-      EITHER_EDGE_ACTIVE_HIGH = 5;
+      EITHER_EDGE_ACTIVE_HIGH = 5 [(meshtastic.enum_value_metadata) = {label: "Either Edge High"}];
     }
     /*
      * Whether the Module is enabled
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "Detection Sensor Enabled"
+      description: "Enables the detection sensor module, it needs to be enabled on both the node with the sensor, and any nodes that you want to receive detection sensor text messages or view the detection sensor log and chart."
+    }];
 
     /*
      * Interval in seconds of how often we can send a message to the mesh when a
      * trigger event is detected
      */
-    uint32 minimum_broadcast_secs = 2;
+    uint32 minimum_broadcast_secs = 2 [(meshtastic.field_metadata) = {
+      label: "Minimum time between detection broadcasts"
+      unit: "s"
+      description: "Minimum time between detection broadcasts."
+    }];
 
     /*
      * Interval in seconds of how often we should send a message to the mesh
@@ -183,36 +241,55 @@ message ModuleConfig {
      * trigger events will be broadcasted Works as a sort of status heartbeat
      * for peace of mind
      */
-    uint32 state_broadcast_secs = 3;
+    uint32 state_broadcast_secs = 3 [(meshtastic.field_metadata) = {
+      label: "State Broadcast Interval"
+      unit: "s"
+      description: "How often to send the detection sensor state to the mesh, whether or not anything was detected."
+    }];
 
     /*
      * Send ASCII bell with alert message
      * Useful for triggering ext. notification on bell
      */
-    bool send_bell = 4;
+    bool send_bell = 4 [(meshtastic.field_metadata) = {
+      label: "Send Bell"
+      description: "Send ASCII bell with alert message. Useful for triggering external notification on bell."
+    }];
 
     /*
      * Friendly name used to format message sent to mesh
      * Example: A name "Motion" would result in a message "Motion detected"
      * Maximum length of 20 characters
      */
-    string name = 5;
+    string name = 5 [(meshtastic.field_metadata) = {
+      label: "Name"
+      description: "Sensor name for mesh messages"
+    }];
 
     /*
      * GPIO pin to monitor for state changes
      */
-    uint32 monitor_pin = 6;
+    uint32 monitor_pin = 6 [(meshtastic.field_metadata) = {
+      label: "GPIO Pin to monitor"
+      description: "GPIO pin watched for state changes."
+    }];
 
     /*
      * The type of trigger event to be used
      */
-    TriggerType detection_trigger_type = 7;
+    TriggerType detection_trigger_type = 7 [(meshtastic.field_metadata) = {
+      label: "TriggerType"
+      description: "Type of trigger event"
+    }];
 
     /*
      * Whether or not use INPUT_PULLUP mode for GPIO pin
      * Only applicable if the board uses pull-up resistors on the pin
      */
-    bool use_pullup = 8;
+    bool use_pullup = 8 [(meshtastic.field_metadata) = {
+      label: "Uses pullup resistor"
+      description: "Whether or not use INPUT_PULLUP mode for GPIO pin. Only applicable if the board uses pull-up resistors on the pin"
+    }];
   }
 
   /*
@@ -223,51 +300,75 @@ message ModuleConfig {
      * Baudrate for codec2 voice
      */
     enum Audio_Baud {
-      CODEC2_DEFAULT = 0;
-      CODEC2_3200 = 1;
-      CODEC2_2400 = 2;
-      CODEC2_1600 = 3;
-      CODEC2_1400 = 4;
-      CODEC2_1300 = 5;
-      CODEC2_1200 = 6;
-      CODEC2_700 = 7;
-      CODEC2_700B = 8;
+      CODEC2_DEFAULT = 0 [(meshtastic.enum_value_metadata) = {label: "Default"}];
+      CODEC2_3200 = 1 [(meshtastic.enum_value_metadata) = {label: "3200 bps"}];
+      CODEC2_2400 = 2 [(meshtastic.enum_value_metadata) = {label: "2400 bps"}];
+      CODEC2_1600 = 3 [(meshtastic.enum_value_metadata) = {label: "1600 bps"}];
+      CODEC2_1400 = 4 [(meshtastic.enum_value_metadata) = {label: "1400 bps"}];
+      CODEC2_1300 = 5 [(meshtastic.enum_value_metadata) = {label: "1300 bps"}];
+      CODEC2_1200 = 6 [(meshtastic.enum_value_metadata) = {label: "1200 bps"}];
+
+      /*
+       * Removed from libcodec2 upstream. A device configured to one of these
+       * falls back to CODEC2_700C.
+       */
+      CODEC2_700 = 7 [deprecated = true];
+      CODEC2_700B = 8 [deprecated = true];
+
+      /*
+       * Replaces CODEC2_700. Default for new configurations.
+       */
+      CODEC2_700C = 9 [(meshtastic.enum_value_metadata) = {label: "700C bps"}];
+
+      /*
+       * Lowest rate, and the only one usable on slower modem presets.
+       */
+      CODEC2_450 = 10 [(meshtastic.enum_value_metadata) = {label: "450 bps"}];
     }
 
     /*
      * Whether Audio is enabled
      */
-    bool codec2_enabled = 1;
+    bool codec2_enabled = 1 [(meshtastic.field_metadata) = {
+      label: "Codec2 Enabled"
+      description: "Enable Codec2 audio encoding/decoding for voice communication over the mesh."
+    }];
 
     /*
      * PTT Pin
      */
-    uint32 ptt_pin = 2;
+    uint32 ptt_pin = 2 [(meshtastic.field_metadata) = {
+      label: "PTT Pin"
+      description: "Push-to-talk GPIO pin number."
+    }];
 
     /*
-     * The audio sample rate to use for codec2
+     * The codec2 bitrate to encode at. Sample rate is always 8 kHz.
      */
-    Audio_Baud bitrate = 3;
+    Audio_Baud bitrate = 3 [(meshtastic.field_metadata) = {
+      label: "Bitrate"
+      description: "The Codec2 bitrate to use. The sample rate is always 8 kHz. Lower bitrates use less bandwidth but reduce audio quality."
+    }];
 
     /*
      * I2S Word Select
      */
-    uint32 i2s_ws = 4;
+    uint32 i2s_ws = 4 [(meshtastic.field_metadata) = {label: "I2S WS"}];
 
     /*
      * I2S Data IN
      */
-    uint32 i2s_sd = 5;
+    uint32 i2s_sd = 5 [(meshtastic.field_metadata) = {label: "I2S SD"}];
 
     /*
      * I2S Data OUT
      */
-    uint32 i2s_din = 6;
+    uint32 i2s_din = 6 [(meshtastic.field_metadata) = {label: "I2S DIN"}];
 
     /*
      * I2S Clock
      */
-    uint32 i2s_sck = 7;
+    uint32 i2s_sck = 7 [(meshtastic.field_metadata) = {label: "I2S SCK"}];
   }
 
   /*
@@ -277,100 +378,106 @@ message ModuleConfig {
     /*
      * Enable the Paxcounter Module
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "PAX Counter Enabled"
+      description: "When enabled the PAX Counter module counts the number of people passing by using WiFi and Bluetooth. Both WiFI and Bluetooth must be disabled for PAX counter to work."
+    }];
 
     /*
      * Interval in seconds of how often we should try to send our
      * metrics to the mesh
      */
 
-    uint32 paxcounter_update_interval = 2;
+    uint32 paxcounter_update_interval = 2 [(meshtastic.field_metadata) = {
+      label: "Update Interval"
+      unit: "s"
+      description: "How often we can send a message to the mesh when people are detected."
+    }];
 
     /*
      * WiFi RSSI threshold. Defaults to -80
      */
-    int32 wifi_threshold = 3;
+    int32 wifi_threshold = 3 [(meshtastic.field_metadata) = {
+      label: "WiFi Threshold"
+      description: "RSSI threshold for counting WiFi devices."
+      unit: "dBm"
+    }];
 
     /*
      * BLE RSSI threshold. Defaults to -80
      */
-    int32 ble_threshold = 4;
+    int32 ble_threshold = 4 [(meshtastic.field_metadata) = {
+      label: "BLE Threshold"
+      description: "RSSI threshold for counting BLE devices."
+      unit: "dBm"
+    }];
   }
 
   /*
    * Config for the Traffic Management module.
-   * Provides packet inspection and traffic shaping to help reduce channel utilization
+   * Provides packet inspection and traffic shaping to help reduce channel utilization.
+   * Every field uses the proto3 zero value to mean "disabled"; there is no
+   * "use the firmware default" sentinel. Firmware installs its own defaults when it
+   * first creates this config, and a client that writes 0 turns that feature off.
    */
   message TrafficManagementConfig {
-    /*
-     * Master enable for traffic management module
-     */
-    bool enabled = 1;
+    // Tags 1, 2, 3, 5, 7, 10, 12, 13, 14 were bool toggle fields removed in favour
+    // of the "non-zero implies enabled" convention on their companion uint32 fields.
+    // Tag 3 (position_precision_bits) was removed because precision is now derived
+    // from the channel's own position_precision ceiling.
+    // None of these tags ever shipped in a stable release.
+    reserved 1, 2, 3, 5, 7, 10, 12, 13, 14;
+    reserved "enabled", "position_dedup_enabled", "position_precision_bits", "nodeinfo_direct_response", "rate_limit_enabled", "drop_unknown_enabled", "exhaust_hop_telemetry", "exhaust_hop_position", "router_preserve_hops";
 
     /*
-     * Enable position deduplication to drop redundant position broadcasts
+     * Minimum interval in seconds between position updates from the same node.
+     * A non-zero value implicitly enables the suppression window; 0 disables it.
+     * Firmware default: 21600 (6 hours), installed when this config is first created.
      */
-    bool position_dedup_enabled = 2;
+    uint32 position_min_interval_secs = 4 [(meshtastic.field_metadata) = {
+      label: "Minimum Position Interval"
+      unit: "s"
+      description: "Positions from the same node arriving sooner than this are dropped."
+    }];
 
     /*
-     * Number of bits of precision for position deduplication (0-32)
+     * Maximum hop distance from the requestor at which direct NodeInfo responses
+     * are served from the local cache. A non-zero value implicitly enables direct
+     * response; 0 disables it.
      */
-    uint32 position_precision_bits = 3;
+    uint32 nodeinfo_direct_response_max_hops = 6 [(meshtastic.field_metadata) = {
+      label: "Direct NodeInfo Max Hops"
+      description: "Only answer requestors within this many hops."
+    }];
 
     /*
-     * Minimum interval in seconds between position updates from the same node
+     * Time window in seconds for per-node rate limiting.
+     * A non-zero value implicitly enables rate limiting; 0 disables it.
      */
-    uint32 position_min_interval_secs = 4;
+    uint32 rate_limit_window_secs = 8 [(meshtastic.field_metadata) = {
+      label: "Rate Limit Window"
+      unit: "s"
+      description: "The time window packets are counted over."
+    }];
 
     /*
-     * Enable direct response to NodeInfo requests from local cache
+     * Maximum packets allowed per node within the rate limit window.
+     * A non-zero value implicitly enables rate limiting; 0 disables it.
      */
-    bool nodeinfo_direct_response = 5;
+    uint32 rate_limit_max_packets = 9 [(meshtastic.field_metadata) = {
+      label: "Rate Limit Max Packets"
+      description: "The most packets one node may send per window."
+    }];
 
     /*
-     * Minimum hop distance from requestor before responding to NodeInfo requests
+     * Maximum unknown/undecryptable packets per rate window before the source
+     * is dropped. A non-zero value implicitly enables unknown-packet filtering;
+     * 0 disables it.
      */
-    uint32 nodeinfo_direct_response_max_hops = 6;
-
-    /*
-     * Enable per-node rate limiting to throttle chatty nodes
-     */
-    bool rate_limit_enabled = 7;
-
-    /*
-     * Time window in seconds for rate limiting calculations
-     */
-    uint32 rate_limit_window_secs = 8;
-
-    /*
-     * Maximum packets allowed per node within the rate limit window
-     */
-    uint32 rate_limit_max_packets = 9;
-
-    /*
-     * Enable dropping of unknown/undecryptable packets per rate_limit_window_secs
-     */
-    bool drop_unknown_enabled = 10;
-
-    /*
-     * Number of unknown packets before dropping from a node
-     */
-    uint32 unknown_packet_threshold = 11;
-
-    /*
-     * Set hop_limit to 0 for relayed telemetry broadcasts (own packets unaffected)
-     */
-    bool exhaust_hop_telemetry = 12;
-
-    /*
-     * Set hop_limit to 0 for relayed position broadcasts (own packets unaffected)
-     */
-    bool exhaust_hop_position = 13;
-
-    /*
-     * Preserve hop_limit for router-to-router traffic
-     */
-    bool router_preserve_hops = 14;
+    uint32 unknown_packet_threshold = 11 [(meshtastic.field_metadata) = {
+      label: "Unknown Packet Threshold"
+      description: "How many per window before the sender is dropped."
+    }];
   }
 
   /*
@@ -381,35 +488,35 @@ message ModuleConfig {
      * TODO: REPLACE
      */
     enum Serial_Baud {
-      BAUD_DEFAULT = 0;
-      BAUD_110 = 1;
-      BAUD_300 = 2;
-      BAUD_600 = 3;
-      BAUD_1200 = 4;
-      BAUD_2400 = 5;
-      BAUD_4800 = 6;
-      BAUD_9600 = 7;
-      BAUD_19200 = 8;
-      BAUD_38400 = 9;
-      BAUD_57600 = 10;
-      BAUD_115200 = 11;
-      BAUD_230400 = 12;
-      BAUD_460800 = 13;
-      BAUD_576000 = 14;
-      BAUD_921600 = 15;
+      BAUD_DEFAULT = 0 [(meshtastic.enum_value_metadata) = {label: "Default"}];
+      BAUD_110 = 1 [(meshtastic.enum_value_metadata) = {label: "110 Baud"}];
+      BAUD_300 = 2 [(meshtastic.enum_value_metadata) = {label: "300 Baud"}];
+      BAUD_600 = 3 [(meshtastic.enum_value_metadata) = {label: "600 Baud"}];
+      BAUD_1200 = 4 [(meshtastic.enum_value_metadata) = {label: "1200 Baud"}];
+      BAUD_2400 = 5 [(meshtastic.enum_value_metadata) = {label: "2400 Baud"}];
+      BAUD_4800 = 6 [(meshtastic.enum_value_metadata) = {label: "4800 Baud"}];
+      BAUD_9600 = 7 [(meshtastic.enum_value_metadata) = {label: "9600 Baud"}];
+      BAUD_19200 = 8 [(meshtastic.enum_value_metadata) = {label: "19200 Baud"}];
+      BAUD_38400 = 9 [(meshtastic.enum_value_metadata) = {label: "38400 Baud"}];
+      BAUD_57600 = 10 [(meshtastic.enum_value_metadata) = {label: "57600 Baud"}];
+      BAUD_115200 = 11 [(meshtastic.enum_value_metadata) = {label: "115200 Baud"}];
+      BAUD_230400 = 12 [(meshtastic.enum_value_metadata) = {label: "230400 Baud"}];
+      BAUD_460800 = 13 [(meshtastic.enum_value_metadata) = {label: "460800 Baud"}];
+      BAUD_576000 = 14 [(meshtastic.enum_value_metadata) = {label: "576000 Baud"}];
+      BAUD_921600 = 15 [(meshtastic.enum_value_metadata) = {label: "921600 Baud"}];
     }
 
     /*
      * TODO: REPLACE
      */
     enum Serial_Mode {
-      DEFAULT = 0;
-      SIMPLE = 1;
-      PROTO = 2;
-      TEXTMSG = 3;
-      NMEA = 4;
+      DEFAULT = 0 [(meshtastic.enum_value_metadata) = {label: "Default"}];
+      SIMPLE = 1 [(meshtastic.enum_value_metadata) = {label: "Simple"}];
+      PROTO = 2 [(meshtastic.enum_value_metadata) = {label: "Protobufs"}];
+      TEXTMSG = 3 [(meshtastic.enum_value_metadata) = {label: "Text Message"}];
+      NMEA = 4 [(meshtastic.enum_value_metadata) = {label: "NMEA Positions"}];
       // NMEA messages specifically tailored for CalTopo
-      CALTOPO = 5;
+      CALTOPO = 5 [(meshtastic.enum_value_metadata) = {label: "CALTOPO"}];
       // Ecowitt WS85 weather station
       WS85 = 6;
       // VE.Direct is a serial protocol used by Victron Energy products
@@ -426,37 +533,58 @@ message ModuleConfig {
     /*
      * Preferences for the SerialModule
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "Serial Enabled"
+      description: "Enable serial module"
+    }];
 
     /*
      * TODO: REPLACE
      */
-    bool echo = 2;
+    bool echo = 2 [(meshtastic.field_metadata) = {
+      label: "Echo"
+      description: "If set, any packets you send will be echoed back to your device."
+    }];
 
     /*
      * RX pin (should match Arduino gpio pin number)
      */
-    uint32 rxd = 3;
+    uint32 rxd = 3 [(meshtastic.field_metadata) = {
+      label: "Receive data (rxd) GPIO pin"
+      description: "RX pin number"
+    }];
 
     /*
      * TX pin (should match Arduino gpio pin number)
      */
-    uint32 txd = 4;
+    uint32 txd = 4 [(meshtastic.field_metadata) = {
+      label: "Transmit data (txd) GPIO pin"
+      description: "TX pin number"
+    }];
 
     /*
      * Serial baud rate
      */
-    Serial_Baud baud = 5;
+    Serial_Baud baud = 5 [(meshtastic.field_metadata) = {
+      label: "Baud"
+      description: "Serial baud rate"
+    }];
 
     /*
      * TODO: REPLACE
      */
-    uint32 timeout = 6;
+    uint32 timeout = 6 [(meshtastic.field_metadata) = {
+      label: "Timeout"
+      description: "The amount of time to wait before we consider your packet as done."
+    }];
 
     /*
      * Mode for serial module operation
      */
-    Serial_Mode mode = 7;
+    Serial_Mode mode = 7 [(meshtastic.field_metadata) = {
+      label: "Mode"
+      description: "Serial module operation mode"
+    }];
 
     /*
      * Overrides the platform's defacto Serial port instance to use with Serial module config settings
@@ -473,88 +601,135 @@ message ModuleConfig {
     /*
      * Enable the ExternalNotificationModule
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "External Notification Enabled"
+      description: "Enable external notifications"
+    }];
 
     /*
      * When using in On/Off mode, keep the output on for this many
      * milliseconds. Default 1000ms (1 second).
      */
-    uint32 output_ms = 2;
+    uint32 output_ms = 2 [(meshtastic.field_metadata) = {
+      label: "GPIO Output Duration"
+      unit: "ms"
+      description: "In GPIO mode, how long to keep the output on."
+    }];
 
     /*
      * Define the output pin GPIO setting Defaults to
      * EXT_NOTIFY_OUT if set for the board.
      * In standalone devices this pin should drive the LED to match the UI.
      */
-    uint32 output = 3;
+    uint32 output = 3 [(meshtastic.field_metadata) = {
+      label: "Output pin GPIO"
+      description: "GPIO pin driven on notification. Defaults to the board's EXT_NOTIFY_OUT pin."
+    }];
 
     /*
      * Optional: Define a secondary output pin for a vibra motor
      * This is used in standalone devices to match the UI.
      */
-    uint32 output_vibra = 8;
+    uint32 output_vibra = 8 [(meshtastic.field_metadata) = {
+      label: "Output pin vibra GPIO"
+      description: "Vibration motor output pin"
+    }];
 
     /*
      * Optional: Define a tertiary output pin for an active buzzer
      * This is used in standalone devices to to match the UI.
      */
-    uint32 output_buzzer = 9;
+    uint32 output_buzzer = 9 [(meshtastic.field_metadata) = {
+      label: "Output pin buzzer GPIO"
+      description: "Buzzer output pin"
+    }];
 
     /*
      * IF this is true, the 'output' Pin will be pulled active high, false
      * means active low.
      */
-    bool active = 4;
+    bool active = 4 [(meshtastic.field_metadata) = {
+      label: "Active"
+      description: "If enabled, the 'output' Pin will be pulled active high, disabled means active low."
+    }];
 
     /*
      * True: Alert when a text message arrives (output)
      */
-    bool alert_message = 5;
+    bool alert_message = 5 [(meshtastic.field_metadata) = {
+      label: "Alert when receiving a message"
+      description: "Alert on incoming message"
+    }];
 
     /*
      * True: Alert when a text message arrives (output_vibra)
      */
-    bool alert_message_vibra = 10;
+    bool alert_message_vibra = 10 [(meshtastic.field_metadata) = {
+      label: "Vibra Motor Alert"
+      description: "Alert GPIO vibra motor when receiving a message"
+    }];
 
     /*
      * True: Alert when a text message arrives (output_buzzer)
      */
-    bool alert_message_buzzer = 11;
+    bool alert_message_buzzer = 11 [(meshtastic.field_metadata) = {
+      label: "Alert GPIO buzzer when receiving a message"
+      description: "Buzz on incoming message"
+    }];
 
     /*
      * True: Alert when the bell character is received (output)
      */
-    bool alert_bell = 6;
+    bool alert_bell = 6 [(meshtastic.field_metadata) = {
+      label: "Alert when receiving a bell"
+      description: "Alert on bell character"
+    }];
 
     /*
      * True: Alert when the bell character is received (output_vibra)
      */
-    bool alert_bell_vibra = 12;
+    bool alert_bell_vibra = 12 [(meshtastic.field_metadata) = {
+      label: "Alert GPIO vibra motor when receiving a bell"
+      description: "Vibrate on bell character"
+    }];
 
     /*
      * True: Alert when the bell character is received (output_buzzer)
      */
-    bool alert_bell_buzzer = 13;
+    bool alert_bell_buzzer = 13 [(meshtastic.field_metadata) = {
+      label: "Alert GPIO buzzer when receiving a bell"
+      description: "Buzz on bell character"
+    }];
 
     /*
      * use a PWM output instead of a simple on/off output. This will ignore
      * the 'output', 'output_ms' and 'active' settings and use the
      * device.buzzer_gpio instead.
      */
-    bool use_pwm = 7;
+    bool use_pwm = 7 [(meshtastic.field_metadata) = {
+      label: "Use PWM Buzzer"
+      description: "Use a PWM output (like the RAK Buzzer) for tunes instead of an on/off output. This will ignore the output, output duration and active settings and use the device config buzzer GPIO option instead."
+    }];
 
     /*
      * The notification will toggle with 'output_ms' for this time of seconds.
      * Default is 0 which means don't repeat at all. 60 would mean blink
      * and/or beep for 60 seconds
      */
-    uint32 nag_timeout = 14;
+    uint32 nag_timeout = 14 [(meshtastic.field_metadata) = {
+      label: "Nag Timeout"
+      description: "How long the notification lasts."
+      unit: "s"
+    }];
 
     /*
      * When true, enables devices with native I2S audio output to use the RTTTL over speaker like a buzzer
      * T-Watch S3 and T-Deck for example have this capability
      */
-    bool use_i2s_as_buzzer = 15;
+    bool use_i2s_as_buzzer = 15 [(meshtastic.field_metadata) = {
+      label: "Use I2S As Buzzer"
+      description: "Enables devices with native I2S audio output to use the RTTTL over speaker like a buzzer. T-Watch S3 and T-Deck for example have this capability."
+    }];
   }
 
   /*
@@ -564,32 +739,41 @@ message ModuleConfig {
     /*
      * Enable the Store and Forward Module
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "Store and Forward Enabled"
+      description: "Enables the store and forward module."
+    }];
 
     /*
      * TODO: REPLACE
      */
-    bool heartbeat = 2;
+    bool heartbeat = 2 [(meshtastic.field_metadata) = {
+      label: "Send Heartbeat"
+      description: "Send a heartbeat to advertise the server's presence."
+    }];
 
     /*
      * TODO: REPLACE
      */
-    uint32 records = 3;
+    uint32 records = 3 [(meshtastic.field_metadata) = {label: "Number of records"}];
 
     /*
      * TODO: REPLACE
      */
-    uint32 history_return_max = 4;
+    uint32 history_return_max = 4 [(meshtastic.field_metadata) = {label: "History Return Max"}];
 
     /*
      * TODO: REPLACE
      */
-    uint32 history_return_window = 5;
+    uint32 history_return_window = 5 [(meshtastic.field_metadata) = {label: "History Return Window"}];
 
     /*
      * Set to true to let this node act as a server that stores received messages and resends them upon request.
      */
-    bool is_server = 6;
+    bool is_server = 6 [(meshtastic.field_metadata) = {
+      label: "Server"
+      description: "Enable this device as a Store and Forward server. Requires an ESP32 device with PSRAM."
+    }];
   }
 
   /*
@@ -599,24 +783,34 @@ message ModuleConfig {
     /*
      * Enable the Range Test Module
      */
-    bool enabled = 1;
+    bool enabled = 1 [(meshtastic.field_metadata) = {
+      label: "Range Test Enabled"
+      description: "Enable range test module"
+    }];
 
     /*
      * Send out range test messages from this node
      */
-    uint32 sender = 2;
+    uint32 sender = 2 [(meshtastic.field_metadata) = {
+      label: "Sender Interval"
+      description: "This device will send out range test messages on the selected interval."
+      unit: "s"
+    }];
 
     /*
      * Bool value indicating that this node should save a RangeTest.csv file.
      * ESP32 Only
      */
-    bool save = 3;
+    bool save = 3 [(meshtastic.field_metadata) = {
+      label: "Save"
+      description: "Saves a CSV with the range test message details, currently only available on ESP32 devices with a web server."
+    }];
 
     /*
      * Bool indicating that the node should cleanup / destroy it's RangeTest.csv file.
      * ESP32 Only
      */
-    bool clear_on_reboot = 4;
+    bool clear_on_reboot = 4 [(meshtastic.field_metadata) = {since_firmware: "2.7.11"}];
   }
 
   /*
@@ -627,58 +821,92 @@ message ModuleConfig {
      * Interval in seconds of how often we should try to send our
      * device metrics to the mesh
      */
-    uint32 device_update_interval = 1;
+    uint32 device_update_interval = 1 [(meshtastic.field_metadata) = {
+      label: "Device Metrics Interval"
+      unit: "s"
+      description: "How often device metrics are sent over the mesh."
+    }];
 
     /*
      * Interval in seconds of how often we should try to send our
      * environment measurements to the mesh
      */
 
-    uint32 environment_update_interval = 2;
+    uint32 environment_update_interval = 2 [(meshtastic.field_metadata) = {
+      label: "Environment Metrics Interval"
+      unit: "s"
+      description: "How often environment metrics are sent over the mesh."
+    }];
 
     /*
      * Preferences for the Telemetry Module (Environment)
      * Enable/Disable the telemetry measurement module measurement collection
      */
-    bool environment_measurement_enabled = 3;
+    bool environment_measurement_enabled = 3 [(meshtastic.field_metadata) = {
+      label: "Environment Metrics Enabled"
+      description: "Collect environment measurements"
+    }];
 
     /*
      * Enable/Disable the telemetry measurement module on-device display
      */
-    bool environment_screen_enabled = 4;
+    bool environment_screen_enabled = 4 [(meshtastic.field_metadata) = {
+      label: "Show on device screen"
+      description: "Display environment measurements on device"
+    }];
 
     /*
      * We'll always read the sensor in Celsius, but sometimes we might want to
      * display the results in Fahrenheit as a "user preference".
      */
-    bool environment_display_fahrenheit = 5;
+    bool environment_display_fahrenheit = 5 [(meshtastic.field_metadata) = {
+      label: "Display Fahrenheit"
+      description: "Display environment in Fahrenheit"
+    }];
 
     /*
      * Enable/Disable the air quality metrics
      */
-    bool air_quality_enabled = 6;
+    bool air_quality_enabled = 6 [(meshtastic.field_metadata) = {
+      label: "Air Quality Metrics Enabled"
+      description: "Collect air quality metrics"
+    }];
 
     /*
      * Interval in seconds of how often we should try to send our
      * air quality metrics to the mesh
      */
-    uint32 air_quality_interval = 7;
+    uint32 air_quality_interval = 7 [(meshtastic.field_metadata) = {
+      label: "Air Quality Metrics Interval"
+      unit: "s"
+      description: "How often air quality metrics are sent over the mesh."
+    }];
 
     /*
      * Enable/disable Power metrics
      */
-    bool power_measurement_enabled = 8;
+    bool power_measurement_enabled = 8 [(meshtastic.field_metadata) = {
+      label: "Power Measurement Enabled"
+      description: "Collect power metrics"
+    }];
 
     /*
      * Interval in seconds of how often we should try to send our
      * power metrics to the mesh
      */
-    uint32 power_update_interval = 9;
+    uint32 power_update_interval = 9 [(meshtastic.field_metadata) = {
+      label: "Power Metrics Interval"
+      unit: "s"
+      description: "How often power metrics are sent over the mesh."
+    }];
 
     /*
      * Enable/Disable the power measurement module on-device display
      */
-    bool power_screen_enabled = 10;
+    bool power_screen_enabled = 10 [(meshtastic.field_metadata) = {
+      label: "Power Screen"
+      description: "Display power metrics on device"
+    }];
 
     /*
      * Preferences for the (Health) Telemetry Module
@@ -701,12 +929,16 @@ message ModuleConfig {
      * Enable/Disable the device telemetry module to send metrics to the mesh
      * Note: We will still send telemtry to the connected phone / client every minute over the API
      */
-    bool device_telemetry_enabled = 14;
+    bool device_telemetry_enabled = 14 [(meshtastic.field_metadata) = {
+      label: "Broadcast Device Metrics"
+      description: "Enable broadcasting device metrics to the mesh network. When disabled, metrics are only sent to connected clients."
+      since_firmware: "2.7.13"
+    }];
 
     /*
      * Enable/Disable the air quality telemetry measurement module on-device display
      */
-    bool air_quality_screen_enabled = 15;
+    bool air_quality_screen_enabled = 15 [(meshtastic.field_metadata) = {since_firmware: "2.7.18"}];
   }
 
   /*
@@ -720,100 +952,133 @@ message ModuleConfig {
       /*
        * TODO: REPLACE
        */
-      NONE = 0;
+      NONE = 0 [(meshtastic.enum_value_metadata) = {label: "None"}];
 
       /*
        * TODO: REPLACE
        */
-      UP = 17;
+      UP = 17 [(meshtastic.enum_value_metadata) = {label: "Up"}];
 
       /*
        * TODO: REPLACE
        */
-      DOWN = 18;
+      DOWN = 18 [(meshtastic.enum_value_metadata) = {label: "Down"}];
 
       /*
        * TODO: REPLACE
        */
-      LEFT = 19;
+      LEFT = 19 [(meshtastic.enum_value_metadata) = {label: "Left"}];
 
       /*
        * TODO: REPLACE
        */
-      RIGHT = 20;
+      RIGHT = 20 [(meshtastic.enum_value_metadata) = {label: "Right"}];
 
       /*
        * '\n'
        */
-      SELECT = 10;
+      SELECT = 10 [(meshtastic.enum_value_metadata) = {label: "Select"}];
 
       /*
        * TODO: REPLACE
        */
-      BACK = 27;
+      BACK = 27 [(meshtastic.enum_value_metadata) = {label: "Back"}];
 
       /*
        * TODO: REPLACE
        */
-      CANCEL = 24;
+      CANCEL = 24 [(meshtastic.enum_value_metadata) = {label: "Cancel"}];
     }
 
     /*
      * Enable the rotary encoder #1. This is a 'dumb' encoder sending pulses on both A and B pins while rotating.
      */
-    bool rotary1_enabled = 1;
+    bool rotary1_enabled = 1 [(meshtastic.field_metadata) = {
+      label: "Rotary 1"
+      description: "Enable rotary encoder"
+    }];
 
     /*
      * GPIO pin for rotary encoder A port.
      */
-    uint32 inputbroker_pin_a = 2;
+    uint32 inputbroker_pin_a = 2 [(meshtastic.field_metadata) = {
+      label: "Pin A"
+      description: "GPIO pin for rotary encoder A port."
+    }];
 
     /*
      * GPIO pin for rotary encoder B port.
      */
-    uint32 inputbroker_pin_b = 3;
+    uint32 inputbroker_pin_b = 3 [(meshtastic.field_metadata) = {
+      label: "Pin B"
+      description: "GPIO pin for rotary encoder B port."
+    }];
 
     /*
      * GPIO pin for rotary encoder Press port.
      */
-    uint32 inputbroker_pin_press = 4;
+    uint32 inputbroker_pin_press = 4 [(meshtastic.field_metadata) = {
+      label: "Press Pin"
+      description: "GPIO pin for rotary encoder Press port."
+    }];
 
     /*
      * Generate input event on CW of this kind.
      */
-    InputEventChar inputbroker_event_cw = 5;
+    InputEventChar inputbroker_event_cw = 5 [(meshtastic.field_metadata) = {
+      label: "Clockwise Rotary Event"
+      description: "Input event for clockwise rotation"
+    }];
 
     /*
      * Generate input event on CCW of this kind.
      */
-    InputEventChar inputbroker_event_ccw = 6;
+    InputEventChar inputbroker_event_ccw = 6 [(meshtastic.field_metadata) = {
+      label: "Counter Clockwise Rotary Event"
+      description: "Input event for counter-clockwise rotation"
+    }];
 
     /*
      * Generate input event on Press of this kind.
      */
-    InputEventChar inputbroker_event_press = 7;
+    InputEventChar inputbroker_event_press = 7 [(meshtastic.field_metadata) = {
+      label: "Encoder Press Event"
+      description: "Input event for encoder press"
+    }];
 
     /*
      * Enable the Up/Down/Select input device. Can be RAK rotary encoder or 3 buttons. Uses the a/b/press definitions from inputbroker.
      */
-    bool updown1_enabled = 8;
+    bool updown1_enabled = 8 [(meshtastic.field_metadata) = {
+      label: "Up Down 1"
+      description: "Enable up/down/select input"
+    }];
 
     /*
      * Enable/disable CannedMessageModule.
      */
-    bool enabled = 9 [deprecated = true];
+    bool enabled = 9 [
+      deprecated = true,
+      (meshtastic.field_metadata) = {deprecated_since: "2.7.0"}
+    ];
 
     /*
      * Input event origin accepted by the canned message module.
      * Can be e.g. "rotEnc1", "upDownEnc1", "scanAndSelect", "cardkb", "serialkb", or keyword "_any"
      */
-    string allow_input_source = 10 [deprecated = true];
+    string allow_input_source = 10 [
+      deprecated = true,
+      (meshtastic.field_metadata) = {deprecated_since: "2.7.0"}
+    ];
 
     /*
      * CannedMessageModule also sends a bell character with the messages.
      * ExternalNotificationModule can benefit from this feature.
      */
-    bool send_bell = 11;
+    bool send_bell = 11 [(meshtastic.field_metadata) = {
+      label: "Send Bell"
+      description: "Send bell character with messages"
+    }];
   }
 
   /*
@@ -824,27 +1089,54 @@ message ModuleConfig {
     /*
      * Sets LED to on or off.
      */
-    bool led_state = 1;
+    bool led_state = 1 [(meshtastic.field_metadata) = {
+      label: "LED State"
+      description: "The state of the LED (on/off)"
+    }];
 
     /*
      * Sets the current for the LED output. Default is 10.
      */
-    uint32 current = 2;
+    uint32 current = 2 [(meshtastic.field_metadata) = {
+      label: "Current"
+      description: "Drive current for the LED output."
+      keywords: "led|brightness|ambient|lighting"
+      min_value: 0
+      max_value: 31
+    }];
 
     /*
      * Sets the red LED level. Values are 0-255.
      */
-    uint32 red = 3;
+    uint32 red = 3 [(meshtastic.field_metadata) = {
+      label: "Red"
+      description: "The red level of the ambient lighting LED."
+      keywords: "color|colour|rgb|led|ambient|lighting"
+      min_value: 0
+      max_value: 255
+    }];
 
     /*
      * Sets the green LED level. Values are 0-255.
      */
-    uint32 green = 4;
+    uint32 green = 4 [(meshtastic.field_metadata) = {
+      label: "Green"
+      description: "The green level of the ambient lighting LED."
+      keywords: "color|colour|rgb|led|ambient|lighting"
+      min_value: 0
+      max_value: 255
+    }];
 
     /*
      * Sets the blue LED level. Values are 0-255.
      */
-    uint32 blue = 5;
+    uint32 blue = 5 [(meshtastic.field_metadata) = {
+      label: "Blue"
+      description: "The blue level of the ambient lighting LED."
+      keywords: "color|colour|rgb|led|ambient|lighting"
+      min_value: 0
+      max_value: 255
+    }];
   }
 
   /*
@@ -855,6 +1147,153 @@ message ModuleConfig {
      * The actual status string
      */
     string node_status = 1;
+  }
+
+  /*
+   * MeshBeacon module config
+   */
+  message MeshBeaconConfig {
+    /*
+     * Boolean options for the beacon module, packed into the `flags` bitfield below.
+     * OR the FLAG_* values together; a flag is on when its bit is set.
+     */
+    enum Flags {
+      /*
+       * No options enabled.
+       */
+      FLAG_NONE = 0;
+
+      /*
+       * Enable receiving MESH_BEACON_APP packets from other nodes.
+       * The text portion is delivered to the local message inbox.
+       * Offered channel/preset are stored for the client app to act on.
+       */
+      FLAG_LISTEN_ENABLED = 1;
+
+      /*
+       * Enable periodically broadcasting MESH_BEACON_APP packets from this node.
+       */
+      FLAG_BROADCAST_ENABLED = 2;
+
+      /*
+       * When both text and offer content are present, split the beacon into a separate
+       * MESH_BEACON_APP (offer only) and TEXT_MESSAGE_APP (text only) packet, so firmware
+       * that only decodes TEXT_MESSAGE_APP still receives the human-readable text.
+       */
+      FLAG_LEGACY_SPLIT = 4;
+    }
+
+    /*
+     * Bitwise-OR of Flags values (listen / broadcast / legacy-split toggles).
+     */
+    uint32 flags = 1;
+
+    /*
+     * Frequency slot to advertise, 1-based, matching Config.LoRaConfig.channel_num.
+     * Unset means the receiver derives it from the advertised region, channel name and
+     * preset, which covers a region that mandates a slot and a mesh on the default hash.
+     * Set it only where the mesh deliberately pins a non-default slot. Do not send 0.
+     */
+    optional uint32 broadcast_offer_frequency_slot = 2;
+
+    // Tag 3 was broadcast_send_as_node, a node-ID override that rewrote the `from` field of
+    // outgoing beacon packets so they appeared to originate from another node. Firmware never
+    // applied it (the assignment was left commented out) and it never reached a tagged release,
+    // so it is removed rather than kept as a settable no-op. Reserved to prevent reuse.
+    reserved 3;
+    reserved "broadcast_send_as_node";
+
+    /*
+     * Message to include in each beacon broadcast.
+     * Every beacon copy carries this on the air, so it is the largest single cost in both
+     * this config and the packet it produces. Held to 60 bytes for that reason. The nanopb
+     * max_size is 61 because it counts the terminator, which is what leaves a client a
+     * round 60.
+     */
+    string broadcast_message = 4 [(meshtastic.field_metadata) = {
+      label: "Message"
+      description: "Message for beacon broadcasts"
+    }];
+
+    /*
+     * Optional channel (name + PSK) to advertise in the MeshBeacon offer_channel field.
+     */
+    ChannelSettings broadcast_offer_channel = 5;
+
+    /*
+     * Optional region to advertise in the MeshBeacon offer_region field.
+     */
+    Config.LoRaConfig.RegionCode broadcast_offer_region = 6;
+
+    /*
+     * Optional modem preset to advertise in the MeshBeacon offer_preset field.
+     */
+    optional Config.LoRaConfig.ModemPreset broadcast_offer_preset = 7;
+
+    // Tags 8, 9 and 10 were broadcast_on_channel / broadcast_on_region / broadcast_on_preset: a
+    // second way to describe a single beacon destination, used only when broadcast_targets was
+    // empty. Consolidated onto broadcast_targets so there is one way to name a destination.
+    // broadcast_on_channel embedded a ChannelSettings inline, which allowed transmitting on a
+    // channel absent from the node's channel table; that is no longer supported - the channel must
+    // exist on the node. Never in a tagged release. Reserved to prevent reuse.
+    reserved 8, 9, 10;
+    reserved "broadcast_on_channel", "broadcast_on_region", "broadcast_on_preset";
+
+    /*
+     * How often to broadcast, in seconds. Min 3600 (1 h), default 3600.
+     */
+    uint32 broadcast_interval_secs = 11 [(meshtastic.field_metadata) = {
+      label: "Interval"
+      description: "How often a beacon is broadcast."
+      unit: "s"
+    }];
+
+    /*
+     * One entry in the broadcast destination list.
+     * Each entry names one set of radio settings to send a beacon copy on.
+     */
+    message BroadcastTarget {
+      /*
+       * Modem preset to use for this target.
+       * Falls back to the running config preset if unset.
+       */
+      optional Config.LoRaConfig.ModemPreset preset = 1;
+
+      /*
+       * Region to use for this target. UNSET means use the running config region.
+       */
+      Config.LoRaConfig.RegionCode region = 2;
+
+      // Tag 3 was an embedded ChannelSettings; replaced by channel_index (tag 4) to keep
+      // ModuleConfig within the BLE FromRadio size budget. Branch unreleased, so tag 3 is a gap.
+
+      /*
+       * Index into the device's channel table (0..MAX_NUM_CHANNELS-1) of the channel to
+       * transmit this target's beacon on. The referenced channel must already be configured
+       * on the node (its key is needed to encrypt). If unset, the default channel for the
+       * preset is used.
+       */
+      optional uint32 channel_index = 4;
+
+      /*
+       * Frequency slot to transmit this target's beacon on, 1-based, matching
+       * Config.LoRaConfig.channel_num. Unset means derive it the way any node on this
+       * channel would: the region's override slot if it has one, otherwise the hash of the
+       * target channel's name. Do not send 0 - it is the same as unset.
+       */
+      optional uint32 frequency_slot = 5;
+    }
+
+    /*
+     * Broadcast destination list.
+     * The broadcaster sends one beacon copy per distinct destination, in sequence, temporarily
+     * switching the radio to that entry's preset/region/channel for each.
+     * When empty, a single beacon is sent on the node's running preset and region over the
+     * primary channel.
+     * Entries that resolve to the same effective preset, region and channel are deduplicated, so
+     * a duplicate entry does not produce a second transmission.
+     */
+    repeated BroadcastTarget broadcast_targets = 13;
   }
 
   /*
@@ -929,17 +1368,22 @@ message ModuleConfig {
     /*
      * TODO: REPLACE
      */
-    StatusMessageConfig statusmessage = 14;
+    StatusMessageConfig statusmessage = 14 [(meshtastic.field_metadata) = {since_firmware: "2.7.20"}];
 
     /*
      * Traffic management module config for mesh network optimization
      */
-    TrafficManagementConfig traffic_management = 15;
+    TrafficManagementConfig traffic_management = 15 [(meshtastic.field_metadata) = {since_firmware: "2.8.0"}];
 
     /*
      * TAK team/role configuration for TAK_TRACKER
      */
-    TAKConfig tak = 16;
+    TAKConfig tak = 16 [(meshtastic.field_metadata) = {since_firmware: "2.8.0"}];
+
+    /*
+     * MeshBeacon module config
+     */
+    MeshBeaconConfig mesh_beacon = 17 [(meshtastic.field_metadata) = {since_firmware: "2.8.0"}];
   }
 
   /*
@@ -950,12 +1394,18 @@ message ModuleConfig {
      * Team color.
      * Default Unspecifed_Color -> firmware uses Cyan
      */
-    Team team = 1;
+    Team team = 1 [(meshtastic.field_metadata) = {
+      label: "Team"
+      description: "TAK team color"
+    }];
     /*
      * Member role.
      * Default Unspecifed -> firmware uses TeamMember
      */
-    MemberRole role = 2;
+    MemberRole role = 2 [(meshtastic.field_metadata) = {
+      label: "Role"
+      description: "TAK member role"
+    }];
   }
 }
 

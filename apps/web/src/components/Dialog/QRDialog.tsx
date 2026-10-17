@@ -1,4 +1,4 @@
-import { create, toBinary } from "@bufbuild/protobuf";
+import { create } from "@bufbuild/protobuf";
 import {
   Dialog,
   DialogClose,
@@ -10,9 +10,9 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
+import { channelSetToUrl } from "@core/utils/channelUrl.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useChannels } from "@meshtastic/sdk-react";
-import { fromByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QRCode } from "react-qrcode-logo";
@@ -44,16 +44,7 @@ export const QRDialog = ({ open, onOpenChange, loraConfig }: QRDialogProps) => {
         settings: channelsToEncode,
       }),
     );
-    const base64 = fromByteArray(
-      toBinary(Protobuf.AppOnly.ChannelSetSchema, encoded),
-    )
-      .replace(/=/g, "")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
-
-    setQrCodeUrl(
-      `https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`,
-    );
+    setQrCodeUrl(channelSetToUrl(encoded, { add: qrCodeAdd }));
   }, [allChannels, selectedChannels, qrCodeAdd, loraConfig]);
 
   return (

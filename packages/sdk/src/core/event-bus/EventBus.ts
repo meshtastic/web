@@ -1,7 +1,16 @@
 import type * as Protobuf from "@meshtastic/protobufs";
 import { SimpleEventDispatcher } from "ste-simple-events";
 import type { DeviceStatusEnum } from "../transport/Transport.ts";
-import type { LogEventPacket, PacketMetadata } from "../types.ts";
+import type {
+  LogEventPacket,
+  PacketMetadata,
+  UnhandledPayload,
+} from "../types.ts";
+
+/** The value of one FromRadio payload variant. */
+export type FromRadioValue<
+  C extends Protobuf.Mesh.FromRadio["payloadVariant"]["case"],
+> = Extract<Protobuf.Mesh.FromRadio["payloadVariant"], { case: C }>["value"];
 
 /**
  * Typed event bus. Ports the former `EventSystem` into the SDK.
@@ -103,6 +112,35 @@ export class EventBus {
   public readonly onAtakForwarderPacket = new SimpleEventDispatcher<
     PacketMetadata<Uint8Array>
   >();
+  /** Every decoded admin message, before it is routed by variant. */
+  public readonly onAdminPacket = new SimpleEventDispatcher<
+    PacketMetadata<Protobuf.Admin.AdminMessage>
+  >();
+  public readonly onNodeStatusPacket = new SimpleEventDispatcher<
+    PacketMetadata<Protobuf.Mesh.StatusMessage>
+  >();
+  public readonly onMeshBeaconPacket = new SimpleEventDispatcher<
+    PacketMetadata<Protobuf.MeshBeacon.MeshBeacon>
+  >();
+  public readonly onKeyVerificationPacket = new SimpleEventDispatcher<
+    PacketMetadata<Protobuf.Mesh.KeyVerification>
+  >();
+  public readonly onAlertPacket = new SimpleEventDispatcher<
+    PacketMetadata<string>
+  >();
+  /** Decoded packets on a portnum the SDK has no specific handler for. */
+  public readonly onUnhandledPacket = new SimpleEventDispatcher<
+    PacketMetadata<UnhandledPayload>
+  >();
+  public readonly onLockdownStatus =
+    new SimpleEventDispatcher<Protobuf.Mesh.LockdownStatus>();
+  public readonly onRegionPresets =
+    new SimpleEventDispatcher<Protobuf.Mesh.LoRaRegionPresetMap>();
+  public readonly onDeviceUiConfig: SimpleEventDispatcher<
+    FromRadioValue<"deviceuiConfig">
+  > = new SimpleEventDispatcher();
+  public readonly onFileInfo =
+    new SimpleEventDispatcher<Protobuf.Mesh.FileInfo>();
   public readonly onClientNotificationPacket =
     new SimpleEventDispatcher<Protobuf.Mesh.ClientNotification>();
   public readonly onDeviceStatus =

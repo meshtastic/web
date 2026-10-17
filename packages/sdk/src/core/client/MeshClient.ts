@@ -3,7 +3,12 @@ import * as Protobuf from "@meshtastic/protobufs";
 import type { Logger } from "tslog";
 import { Constants } from "../constants/index.ts";
 import { EventBus } from "../event-bus/EventBus.ts";
-import { PacketTooLargeError } from "../errors/MeshError.ts";
+import {
+  FirmwareTooOldError,
+  HandshakeTimeoutError,
+  PacketTooLargeError,
+} from "../errors/MeshError.ts";
+import { firmwareSupport } from "../../features/device/domain/FirmwareVersion.ts";
 import { generatePacketId } from "../identifiers/PacketId.ts";
 import { createLogger } from "../logging/logger.ts";
 import { decodePacket } from "../packet-codec/decodePacket.ts";
@@ -18,6 +23,15 @@ import {
   type PacketMetadata,
 } from "../types.ts";
 import { Xmodem } from "../xmodem/Xmodem.ts";
+import {
+  CONFIG_NONCE,
+  FIRST_HEARTBEAT_NONCE,
+  HANDSHAKE_IDLE_TIMEOUT_MS,
+  HANDSHAKE_SETTLE_MS,
+  HEARTBEAT_INTERVAL_MS,
+  NODEDB_NONCE,
+  sleep,
+} from "./handshake.ts";
 import { ChatClient } from "../../features/chat/index.ts";
 import { ChannelsClient } from "../../features/channels/index.ts";
 import { ConfigClient } from "../../features/config/index.ts";
@@ -39,7 +53,14 @@ export interface MeshClientOptions {
   chat?: ChatClientOptions;
   nodes?: NodesClientOptions;
   telemetry?: TelemetryClientOptions;
+  /**
+   * Keep-alive interval once the handshake completes. Defaults to
+   * {@link HEARTBEAT_INTERVAL_MS}; `false` disables the automatic heartbeat.
+   */
+  heartbeatIntervalMs?: number | false;
 }
+
+type HandshakeStage = "idle" | "config" | "settling" | "nodedb" | "complete";
 
 /**
  * Per-section / per-event tally of what has streamed in since the most
@@ -58,7 +79,7 @@ export interface ConnectionProgressCounters {
 /**
  * Connection progress signal shape. The state machine moves
  * `idle → configuring → configured` once `configure()` runs and the
- * device finishes streaming its config bundle.
+ * device finishes both handshake stages.
  */
 export type ConnectionProgress =
   | { phase: "idle" }
@@ -111,6 +132,17 @@ export class MeshClient {
   });
 
   private _heartbeatIntervalId: ReturnType<typeof setInterval> | undefined;
+  private readonly heartbeatIntervalMs: number | false;
+  private heartbeatNonce = FIRST_HEARTBEAT_NONCE;
+
+  private handshakeStage: HandshakeStage = "idle";
+  private handshakeTimer: ReturnType<typeof setTimeout> | undefined;
+  private handshakeRetried = false;
+  private handshakeTimeSent = false;
+  private handshakeWaiters: {
+    resolve: (nonce: number) => void;
+    reject: (error: unknown) => void;
+  }[] = [];
 
   constructor(options: MeshClientOptions) {
     this.log = options.logger ?? createLogger("MeshClient");
@@ -119,6 +151,8 @@ export class MeshClient {
     this.queue = new Queue();
     this.xModem = new Xmodem(this.sendRaw.bind(this));
     this.configId = options.configId ?? generatePacketId();
+    this.heartbeatIntervalMs =
+      options.heartbeatIntervalMs ?? HEARTBEAT_INTERVAL_MS;
 
     this.device = new DeviceClient(this);
     this.chat = new ChatClient(this, options.chat);
@@ -132,12 +166,12 @@ export class MeshClient {
 
     this.progress = this.progressStore.read;
     this.wireProgressTracking();
+    this.wireHandshake();
 
     this.events.onDeviceStatus.subscribe((status) => {
       if (status === DeviceStatusEnum.DeviceDisconnected) {
-        if (this._heartbeatIntervalId !== undefined) {
-          clearInterval(this._heartbeatIntervalId);
-        }
+        this.stopHeartbeat();
+        this.failHandshake(new Error("Device connection lost"));
         this.complete();
       }
     });
@@ -150,38 +184,204 @@ export class MeshClient {
   }
 
   /**
-   * Begin the wantConfigId → config-complete handshake. Resolves when the
-   * device has ack'd the wantConfigId packet (status changes to
-   * DeviceConfigured when the device finishes sending its configuration).
+   * Run the two-stage handshake. Resolves once the device has sent both
+   * config and NodeDB; rejects with {@link HandshakeTimeoutError} if it stops
+   * responding.
    */
   public async connect(): Promise<void> {
     this.updateDeviceStatus(DeviceStatusEnum.DeviceConnecting);
     await this.configure();
   }
 
+  /**
+   * Start (or restart, e.g. after `rebooted`) the handshake. Calling it while
+   * a handshake is already running restarts it; every pending caller settles
+   * when the restarted handshake does.
+   */
   public configure(): Promise<number> {
     this.log.debug(
       Emitter[Emitter.Configure],
       "⚙️ Requesting device configuration",
     );
+    this.stopHeartbeat();
     this.updateDeviceStatus(DeviceStatusEnum.DeviceConfiguring);
     this.progressStore.write.value = {
       phase: "configuring",
       received: { ...EMPTY_COUNTERS },
     };
 
+    const done = new Promise<number>((resolve, reject) => {
+      this.handshakeWaiters.push({ resolve, reject });
+    });
+    this.handshakeTimeSent = false;
+    this.startHandshakeStage("config");
+    return done;
+  }
+
+  private startHandshakeStage(stage: "config" | "nodedb"): void {
+    this.handshakeStage = stage;
+    this.handshakeRetried = false;
+    this.sendWantConfig(stage === "config" ? CONFIG_NONCE : NODEDB_NONCE);
+    this.armHandshakeTimer();
+  }
+
+  private sendWantConfig(nonce: number): void {
     const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
-      payloadVariant: { case: "wantConfigId", value: this.configId },
+      payloadVariant: { case: "wantConfigId", value: nonce },
+    });
+    this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio), undefined, {
+      expectAck: false,
+    }).catch((e: unknown) => this.failHandshake(e));
+  }
+
+  private armHandshakeTimer(): void {
+    this.clearHandshakeTimer();
+    this.handshakeTimer = setTimeout(
+      () => this.onHandshakeStall(),
+      HANDSHAKE_IDLE_TIMEOUT_MS,
+    );
+  }
+
+  private clearHandshakeTimer(): void {
+    if (this.handshakeTimer !== undefined) {
+      clearTimeout(this.handshakeTimer);
+      this.handshakeTimer = undefined;
+    }
+  }
+
+  private onHandshakeStall(): void {
+    const stage = this.handshakeStage;
+    if (stage !== "config" && stage !== "nodedb") return;
+    if (!this.handshakeRetried) {
+      this.log.warn(
+        Emitter[Emitter.Configure],
+        `⚠️ Handshake stalled in the ${stage} stage, asking again`,
+      );
+      this.handshakeRetried = true;
+      this.sendWantConfig(stage === "config" ? CONFIG_NONCE : NODEDB_NONCE);
+      this.armHandshakeTimer();
+      return;
+    }
+    this.failHandshake(new HandshakeTimeoutError(stage));
+  }
+
+  private failHandshake(error: unknown): void {
+    this.clearHandshakeTimer();
+    if (this.handshakeStage === "complete" || this.handshakeStage === "idle") {
+      return;
+    }
+    this.handshakeStage = "idle";
+    const waiters = this.handshakeWaiters;
+    this.handshakeWaiters = [];
+    for (const w of waiters) w.reject(error);
+  }
+
+  private finishHandshake(): void {
+    this.clearHandshakeTimer();
+    this.handshakeStage = "complete";
+    const cur = this.progressStore.read.value;
+    const received =
+      cur.phase === "configuring" ? cur.received : { ...EMPTY_COUNTERS };
+    this.progressStore.write.value = { phase: "configured", received };
+    this.updateDeviceStatus(DeviceStatusEnum.DeviceConfigured);
+    if (this.heartbeatIntervalMs !== false) {
+      this.setHeartbeatInterval(this.heartbeatIntervalMs);
+    }
+    const waiters = this.handshakeWaiters;
+    this.handshakeWaiters = [];
+    for (const w of waiters) w.resolve(NODEDB_NONCE);
+  }
+
+  private wireHandshake(): void {
+    // Any frame proves the device is still streaming.
+    this.events.onFromRadio.subscribe(() => {
+      if (
+        this.handshakeStage === "config" ||
+        this.handshakeStage === "nodedb"
+      ) {
+        this.armHandshakeTimer();
+      }
     });
 
-    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio)).catch(
-      (e) => {
-        if (this.device.status.value === DeviceStatusEnum.DeviceDisconnected) {
-          throw new Error("Device connection lost");
-        }
-        throw e;
+    // Set the clock as soon as the device identifies itself, so firmware can
+    // timestamp the backlog it replays during the handshake.
+    this.events.onMyNodeInfo.subscribe((info) => {
+      if (this.handshakeStage !== "config" || this.handshakeTimeSent) return;
+      this.handshakeTimeSent = true;
+      this.sendSetTimeOnly(info.myNodeNum);
+    });
+
+    // Refuse firmware older than the Android app's absolute minimum.
+    this.events.onDeviceMetadataPacket.subscribe((packet) => {
+      if (this.handshakeStage !== "config" || packet.from !== 0) return;
+      const version = packet.data.firmwareVersion;
+      if (firmwareSupport(version) !== "tooOld") return;
+      this.log.error(
+        Emitter[Emitter.Configure],
+        `Firmware ${version} is too old for this client`,
+      );
+      this.failHandshake(new FirmwareTooOldError(version));
+      this.disconnect().catch(() => {});
+    });
+
+    this.events.onConfigComplete.subscribe((nonce) => {
+      if (this.handshakeStage === "config" && nonce === CONFIG_NONCE) {
+        this.handshakeStage = "settling";
+        this.clearHandshakeTimer();
+        void this.settleBetweenStages();
+      } else if (this.handshakeStage === "nodedb" && nonce === NODEDB_NONCE) {
+        this.finishHandshake();
+      } else {
+        this.log.debug(
+          Emitter[Emitter.Configure],
+          `Ignoring config_complete_id ${nonce} in stage ${this.handshakeStage}`,
+        );
+      }
+    });
+  }
+
+  private async settleBetweenStages(): Promise<void> {
+    await sleep(HANDSHAKE_SETTLE_MS);
+    if (this.handshakeStage !== "settling") return;
+    this.heartbeat().catch(() => {
+      // best effort; the NodeDB request below re-arms the stall guard
+    });
+    await sleep(HANDSHAKE_SETTLE_MS);
+    if (this.handshakeStage !== "settling") return;
+    this.startHandshakeStage("nodedb");
+  }
+
+  private sendSetTimeOnly(myNodeNum: number): void {
+    const admin = create(Protobuf.Admin.AdminMessageSchema, {
+      payloadVariant: {
+        case: "setTimeOnly",
+        value: Math.floor(Date.now() / 1000),
       },
-    );
+    });
+    const meshPacket = create(Protobuf.Mesh.MeshPacketSchema, {
+      payloadVariant: {
+        case: "decoded",
+        value: {
+          payload: toBinary(Protobuf.Admin.AdminMessageSchema, admin),
+          portnum: Protobuf.Portnums.PortNum.ADMIN_APP,
+        },
+      },
+      from: myNodeNum,
+      to: myNodeNum,
+      id: generatePacketId(),
+    });
+    const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
+      payloadVariant: { case: "packet", value: meshPacket },
+    });
+    this.sendRaw(
+      toBinary(Protobuf.Mesh.ToRadioSchema, toRadio),
+      meshPacket.id,
+      {
+        expectAck: false,
+      },
+    ).catch((e: unknown) => {
+      this.log.warn(Emitter[Emitter.Configure], "⚠️ Unable to set time", e);
+    });
   }
 
   /**
@@ -212,27 +412,27 @@ export class MeshClient {
     this.events.onNodeInfoPacket.subscribe(() => bump("nodes"));
     this.events.onMyNodeInfo.subscribe(() => bump("myInfo"));
     this.events.onDeviceMetadataPacket.subscribe(() => bump("metadata"));
-
-    this.events.onConfigComplete.subscribe(() => {
-      const cur = this.progressStore.read.value;
-      const received =
-        cur.phase === "configuring" ? cur.received : { ...EMPTY_COUNTERS };
-      this.progressStore.write.value = { phase: "configured", received };
-    });
   }
 
   public heartbeat(): Promise<number> {
     this.log.debug(Emitter[Emitter.Ping], "❤️ Send heartbeat ping to radio");
+    const nonce = this.heartbeatNonce;
+    this.heartbeatNonce =
+      nonce >= 0xffffffff ? FIRST_HEARTBEAT_NONCE : nonce + 1;
     const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
-      payloadVariant: { case: "heartbeat", value: {} },
+      payloadVariant: { case: "heartbeat", value: { nonce } },
     });
-    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio));
+    return this.sendRaw(
+      toBinary(Protobuf.Mesh.ToRadioSchema, toRadio),
+      undefined,
+      {
+        expectAck: false,
+      },
+    );
   }
 
   public setHeartbeatInterval(interval: number): void {
-    if (this._heartbeatIntervalId !== undefined) {
-      clearInterval(this._heartbeatIntervalId);
-    }
+    this.stopHeartbeat();
     this._heartbeatIntervalId = setInterval(() => {
       this.heartbeat().catch((err: Error) => {
         this.log.error(
@@ -241,6 +441,13 @@ export class MeshClient {
         );
       });
     }, interval);
+  }
+
+  private stopHeartbeat(): void {
+    if (this._heartbeatIntervalId !== undefined) {
+      clearInterval(this._heartbeatIntervalId);
+      this._heartbeatIntervalId = undefined;
+    }
   }
 
   public updateDeviceStatus(status: DeviceStatusEnum): void {
@@ -311,16 +518,22 @@ export class MeshClient {
     );
   }
 
+  /**
+   * Queue a ToRadio frame. Resolves on the device's ack, or as soon as the
+   * frame is written when `expectAck` is false (the device never acks
+   * heartbeats, `want_config_id`, or packets sent without `want_ack`).
+   */
   public async sendRaw(
     toRadio: Uint8Array,
     id: number = generatePacketId(),
+    { expectAck = true }: { expectAck?: boolean } = {},
   ): Promise<number> {
     if (toRadio.length > 512) {
       throw new PacketTooLargeError(toRadio.length);
     }
-    this.queue.push({ id, data: toRadio });
+    const settled = this.queue.push({ id, data: toRadio }, { expectAck });
     await this.queue.processQueue(this.transport.toDevice);
-    return this.queue.wait(id);
+    return settled;
   }
 
   /**
@@ -344,9 +557,8 @@ export class MeshClient {
 
   public async disconnect(): Promise<void> {
     this.log.debug(Emitter[Emitter.Disconnect], "🔌 Disconnecting from device");
-    if (this._heartbeatIntervalId !== undefined) {
-      clearInterval(this._heartbeatIntervalId);
-    }
+    this.stopHeartbeat();
+    this.failHandshake(new Error("Device connection lost"));
     this.complete();
     await this.transport.toDevice.close();
     await this.transport.disconnect();

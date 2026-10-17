@@ -14,6 +14,8 @@ export type {
 // Constants & errors
 export { Constants } from "./src/core/constants/index.ts";
 export {
+  FirmwareTooOldError,
+  HandshakeTimeoutError,
   MeshError,
   PacketTooLargeError,
   TransportClosedError,
@@ -76,6 +78,14 @@ export * as Protobuf from "@meshtastic/protobufs";
 // Feature slice clients + domain types
 export { DeviceClient } from "./src/features/device/index.ts";
 export type { Device } from "./src/features/device/index.ts";
+export {
+  ABS_MIN_FIRMWARE_VERSION,
+  firmwareAtLeast,
+  firmwareSupport,
+  MIN_FIRMWARE_VERSION,
+} from "./src/features/device/domain/FirmwareVersion.ts";
+export type { FirmwareSupport } from "./src/features/device/domain/FirmwareVersion.ts";
+export type { UnlockOptions } from "./src/features/device/application/LockdownService.ts";
 
 export { ChatClient } from "./src/features/chat/index.ts";
 export type {
@@ -85,6 +95,7 @@ export type {
   ConversationKey,
   DraftRepository,
   Message,
+  MessageDeliveryPatch,
   MessageRepository,
   RetentionPolicy,
   SendTextError,
@@ -95,11 +106,15 @@ export {
   EmptyMessageError,
   InMemoryDraftRepository,
   InMemoryMessageRepository,
+  inferConversation,
   MessageState,
   MessageTooLongError,
 } from "./src/features/chat/index.ts";
 
-export { NodesClient } from "./src/features/nodes/index.ts";
+export {
+  isUnheardOnCurrentLora,
+  NodesClient,
+} from "./src/features/nodes/index.ts";
 export type {
   Node,
   NodeError,
@@ -110,7 +125,16 @@ export type {
 export { InMemoryNodesRepository } from "./src/features/nodes/index.ts";
 
 export { ChannelsClient } from "./src/features/channels/index.ts";
-export type { Channel } from "./src/features/channels/index.ts";
+export type {
+  BeaconJoinOption,
+  Channel,
+  MeshBeaconOffer,
+} from "./src/features/channels/index.ts";
+export {
+  beaconJoinChannelSet,
+  beaconJoinOption,
+  isBeaconAlreadyJoined,
+} from "./src/features/channels/index.ts";
 
 export { ConfigClient, ConfigEditor } from "./src/features/config/index.ts";
 export type {

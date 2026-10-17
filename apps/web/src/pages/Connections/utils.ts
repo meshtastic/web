@@ -49,9 +49,35 @@ export function createConnectionFromInput(input: NewConnection): Connection {
 const CERT_MIN_MS = 20;
 const CERT_MAX_MS = 2000;
 
+export interface HttpReachability {
+  reachable: boolean;
+  certError: boolean;
+  /** How long the check took, retry included. */
+  elapsedMs: number;
+}
+
+/**
+ * Checks that a device answers at `url`, trying a second time when the first
+ * attempt fails. A `.local` name can take the first attempt past its timeout:
+ * macOS waits about 5 s for an IPv6 answer the radio never sends before it
+ * falls back to IPv4. The browser has the address cached by the retry.
+ */
 export async function testHttpReachable(
   url: string,
   timeoutMs = 10000,
+): Promise<HttpReachability> {
+  const start = performance.now();
+  let result = await attemptHttpReachable(url, timeoutMs);
+  if (!result.reachable && !result.certError) {
+    // The name is cached by now, so a reachable device answers quickly.
+    result = await attemptHttpReachable(url, Math.min(timeoutMs, 5000));
+  }
+  return { ...result, elapsedMs: performance.now() - start };
+}
+
+async function attemptHttpReachable(
+  url: string,
+  timeoutMs: number,
 ): Promise<{ reachable: boolean; certError: boolean }> {
   const start = performance.now();
   try {

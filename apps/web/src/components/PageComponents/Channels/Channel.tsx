@@ -9,6 +9,7 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -41,6 +42,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
   const editor = useConfigEditor();
   const editorChannels = useSignal(editor?.channels ?? EMPTY_CHANNELS_SIGNAL);
   const { t } = useTranslation(["channels", "ui", "dialog"]);
+  const { supportsFirmware28 } = useDeviceCapabilities();
 
   const defaultConfig = channel;
   const defaultValues = {
@@ -226,6 +228,17 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
                 label: t("downlinkEnabled.label"),
                 description: t("downlinkEnabled.description"),
               },
+              // Firmware before 2.8 ignores use_aead.
+              ...(supportsFirmware28
+                ? [
+                    {
+                      type: "toggle" as const,
+                      name: "settings.useAead" as const,
+                      label: t("useAead.label"),
+                      description: t("useAead.description"),
+                    },
+                  ]
+                : []),
               {
                 type: "select",
                 name: "settings.moduleSettings.positionPrecision",

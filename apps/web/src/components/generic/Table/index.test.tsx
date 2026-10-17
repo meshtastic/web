@@ -11,6 +11,20 @@ import { describe, expect, it } from "vitest";
 // @ts-types="react"
 
 describe("Generic Table", () => {
+  it("fades rows marked isDimmed", () => {
+    render(
+      <Table
+        headings={[{ title: "Name", sortable: false }]}
+        rows={[
+          { id: 1, isDimmed: true, cells: [{ content: "A", sortValue: "A" }] },
+          { id: 2, cells: [{ content: "B", sortValue: "B" }] },
+        ]}
+      />,
+    );
+    expect(screen.getByText("A").closest("tr")).toHaveClass("opacity-60");
+    expect(screen.getByText("B").closest("tr")).not.toHaveClass("opacity-60");
+  });
+
   it("Can render an empty table.", () => {
     render(<Table headings={[]} rows={[]} />);
     expect(screen.getByRole("table")).toBeInTheDocument();

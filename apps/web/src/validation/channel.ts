@@ -26,6 +26,9 @@ export function makeChannelSchema(allowedBytes: number) {
     id: z.coerce.number().int(),
     uplinkEnabled: z.boolean(),
     downlinkEnabled: z.boolean(),
+    // Experimental AES-CCM (firmware 2.8). Kept in the schema so saving the
+    // form does not drop a value set elsewhere.
+    useAead: z.boolean().default(false),
     moduleSettings: moduleSettingsSchema,
   });
 

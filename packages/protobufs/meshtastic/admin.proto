@@ -167,6 +167,11 @@ message AdminMessage {
      * TAK module config
      */
     TAK_CONFIG = 15;
+
+    /*
+     * Mesh Beacon module config
+     */
+    MESHBEACON_CONFIG = 16;
   }
 
   enum BackupLocation {
@@ -604,7 +609,7 @@ message LockdownAuth {
    * token at unlock time: the client-supplied boots_remaining when
    * non-zero, otherwise the firmware default (TOKEN_DEFAULT_BOOTS).
    * Note that boots_remaining == 0 in this message means "use firmware
-   * default", NOT "zero boots" — a client computing the ceiling for
+   * default", NOT "zero boots" - a client computing the ceiling for
    * display should mirror that resolution rather than multiplying the
    * raw request value.
    *
@@ -614,7 +619,7 @@ message LockdownAuth {
    *
    * Uses millis() (CPU uptime), not wall-clock time, so the cap is
    * immune to GPS spoofing, RTC backup-battery removal, and Faraday
-   * cage isolation — none of those move the uptime counter. The only
+   * cage isolation - none of those move the uptime counter. The only
    * way to reset the session clock is a reboot, which costs a boot
    * from the on-flash, HMAC-bound counter.
    */
@@ -634,7 +639,7 @@ message LockdownAuth {
    *
    * NOT reversed by this operation: APPROTECT. Once the debug port
    * lockout has been burned (on silicon where it is effective) it is
-   * permanent — disabling lockdown decrypts your data and removes the
+   * permanent - disabling lockdown decrypts your data and removes the
    * access gates, but the SWD/JTAG port stays locked for the life of
    * the device (recoverable only via a full chip erase over a debug
    * probe, which destroys all data). Clients should make this
@@ -799,6 +804,21 @@ message SensorConfig {
    * SHTXX temperature and relative humidity sensor configuration
    */
   SHTXX_config shtxx_config = 4;
+
+  /*
+   * DS248X-800 temperature sensor configuration
+   */
+  DS248X_config ds248x_config = 5;
+
+  /*
+   * SEN6X PM/RHT/VOC/NOx/CO2/HCHO Sensor configuration
+   */
+  SEN6X_config sen6x_config = 6;
+
+  /*
+   * AS3935 lightning sensor configuration
+   */
+  AS3935_config as3935_config = 7;
 }
 
 message SCD4X_config {
@@ -848,6 +868,53 @@ message SEN5X_config {
    * One-shot mode (true for low power - one-shot mode, false for normal - continuous mode)
    */
   optional bool set_one_shot_mode = 2;
+
+  /*
+   * Trigger a fan cleaning cycle
+   */
+  optional bool start_fan_cleaning = 3;
+}
+
+message SEN6X_config {
+  /*
+   * Reference temperature in degC
+   */
+  optional float set_temperature = 1;
+
+  /*
+   * One-shot mode (true for low power - one-shot mode, false for normal - continuous mode)
+   */
+  optional bool set_one_shot_mode = 2;
+
+  /*
+   * Trigger a fan cleaning cycle
+   */
+  optional bool start_fan_cleaning = 3;
+
+  /*
+   * Set Automatic self-calibration enabled (CO2-capable variants only: SEN63C, SEN66, SEN69C)
+   */
+  optional bool set_asc = 4;
+
+  /*
+   * Recalibration target CO2 concentration in ppm (FRC only), CO2-capable variants only
+   */
+  optional uint32 set_target_co2_conc = 5;
+
+  /*
+   * Altitude of sensor in meters above sea level. 0 - 3000m (overrides ambient pressure), CO2-capable variants only
+   */
+  optional uint32 set_altitude = 6;
+
+  /*
+   * Sensor ambient pressure in Pa. 70000 - 120000 Pa (overrides altitude), CO2-capable variants only
+   */
+  optional uint32 set_ambient_pressure = 7;
+
+  /*
+   * Perform a factory reset of the CO2 sensor's calibration, CO2-capable variants only
+   */
+  optional bool factory_reset = 8;
 }
 
 message SCD30_config {
@@ -887,4 +954,19 @@ message SHTXX_config {
    * Accuracy mode (0 = low, 1 = medium, 2 = high)
    */
   optional uint32 set_accuracy = 1;
+}
+
+message DS248X_config {
+  /*
+   * Main channel for temperature reporting (0-7)
+   */
+  optional uint32 main_temperature_channel = 1;
+}
+
+message AS3935_config {
+  /*
+   * Antenna tuning capacitance in pF, 0 to 120 in steps of 8. The antenna tank must
+   * resonate within 3.5% of 500kHz; the correct trim is specific to the sensor board.
+   */
+  optional uint32 set_tuning_cap_pf = 1;
 }

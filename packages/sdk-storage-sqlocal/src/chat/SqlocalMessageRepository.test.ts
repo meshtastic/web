@@ -50,6 +50,72 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     expect(out.map((m) => m.id)).toEqual([1, 2]);
   });
 
+  it("round-trips how a message was received, keeping 0 readings", async () => {
+    await repo.append({
+      ...msg(7, 1000),
+      snr: 0,
+      rssi: -97,
+      hopsAway: 0,
+      viaMqtt: true,
+      transport: 0,
+    });
+    await repo.append(msg(8, 2000));
+    const [withRadio, without] = await repo.loadRecent(
+      { kind: "channel", channel: ChannelNumber.Primary },
+      2,
+    );
+    expect(withRadio).toMatchObject({
+      snr: 0,
+      rssi: -97,
+      hopsAway: 0,
+      viaMqtt: true,
+      transport: 0,
+    });
+    expect(without?.snr).toBeUndefined();
+    expect(without?.rssi).toBeUndefined();
+    expect(without?.hopsAway).toBeUndefined();
+    expect(without?.viaMqtt).toBeUndefined();
+    expect(without?.transport).toBeUndefined();
+  });
+
+  it("files a message under the conversation it is given", async () => {
+    const sent: Message = {
+      ...msg(5, 1000, "hi"),
+      from: 1,
+      to: 2,
+      type: "direct",
+    };
+    await repo.append(sent, { kind: "direct", peer: 2 });
+    expect(
+      (await repo.loadRecent({ kind: "direct", peer: 2 }, 10)).map((m) => m.id),
+    ).toEqual([5]);
+    expect(await repo.loadRecent({ kind: "direct", peer: 1 }, 10)).toEqual([]);
+  });
+
+  it("refiles sent direct messages filed under our own node", async () => {
+    const direct = (id: number, from: number, to: number): Message => ({
+      ...msg(id, id * 1000),
+      from,
+      to,
+      type: "direct",
+    });
+    // What older versions wrote: everything under direct:<from>.
+    await repo.appendBatch([
+      direct(1, 1, 2), // sent by us (node 1) to 2: misfiled
+      direct(2, 2, 1), // received from 2: already right
+      direct(3, 1, 1), // a note to ourselves: stays put
+    ]);
+
+    expect(await repo.refileSentDirect(1)).toBe(1);
+    expect(
+      (await repo.loadRecent({ kind: "direct", peer: 2 }, 10)).map((m) => m.id),
+    ).toEqual([1, 2]);
+    expect(
+      (await repo.loadRecent({ kind: "direct", peer: 1 }, 10)).map((m) => m.id),
+    ).toEqual([3]);
+    expect(await repo.refileSentDirect(1)).toBe(0);
+  });
+
   it("updateState mutates the matching row", async () => {
     await repo.append(msg(42, 1000));
     await repo.updateState(42, MessageState.Failed);

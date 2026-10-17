@@ -16,6 +16,9 @@ export const NodeMapper = {
       isFavorite: info.isFavorite,
       isIgnored: info.isIgnored,
       isKeyManuallyVerified: info.isKeyManuallyVerified,
+      isMuted: info.isMuted,
+      hasXeddsaSigned: info.hasXeddsaSigned,
+      heardOnCurrentLora: info.heardOnCurrentLora,
     };
   },
 };

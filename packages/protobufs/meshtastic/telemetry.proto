@@ -155,9 +155,186 @@ message EnvironmentMetrics {
   optional float soil_temperature = 22;
 
   /*
-   * One-wire temperature (*C)
+   * Never implemented, but Voltage may be mis-interpreted by old clients as temperature
    */
-  repeated float one_wire_temperature = 23;
+  repeated float one_wire_temperature = 23 [deprecated = true];
+
+  /*
+   * Multi-channel ADC Voltage Channel 0 (V)
+   */
+  optional float adc_voltage_ch0 = 24;
+
+  /*
+   * Multi-channel ADC Voltage Channel 1 (V)
+   */
+  optional float adc_voltage_ch1 = 25;
+
+  /*
+   * Multi-channel ADC Voltage Channel 2 (V)
+   */
+  optional float adc_voltage_ch2 = 26;
+
+  /*
+   * Multi-channel ADC Voltage Channel 3 (V)
+   */
+  optional float adc_voltage_ch3 = 27;
+
+  /*
+   * Multi-channel ADC Voltage Channel 4 (V)
+   */
+  optional float adc_voltage_ch4 = 28;
+
+  /*
+   * Multi-channel ADC Voltage Channel 5 (V)
+   */
+  optional float adc_voltage_ch5 = 29;
+
+  /*
+   * Multi-channel ADC Voltage Channel 6 (V)
+   */
+  optional float adc_voltage_ch6 = 30;
+
+  /*
+   * Multi-channel ADC Voltage Channel 7 (V)
+   */
+  optional float adc_voltage_ch7 = 31;
+
+  /*
+   * Multi-channel One-Wire Temperature Channel 0 (*C)
+   */
+  optional float one_wire_temperature_ch0 = 32;
+
+  /*
+   * Multi-channel One-Wire Temperature Channel 1 (*C)
+   */
+  optional float one_wire_temperature_ch1 = 33;
+
+  /*
+   * Multi-channel One-Wire Temperature Channel 2 (*C)
+   */
+  optional float one_wire_temperature_ch2 = 34;
+
+  /*
+   * Multi-channel One-Wire Temperature Channel 3 (*C)
+   */
+  optional float one_wire_temperature_ch3 = 35;
+
+  /*
+   * Multi-channel One-Wire Temperature Channel 4 (*C)
+   */
+  optional float one_wire_temperature_ch4 = 36;
+
+  /*
+   * Multi-channel One-Wire Temperature Channel 5 (*C)
+   */
+  optional float one_wire_temperature_ch5 = 37;
+
+  /*
+   * Multi-channel One-Wire Temperature Channel 6 (*C)
+   */
+  optional float one_wire_temperature_ch6 = 38;
+
+  /*
+   * Multi-channel One-Wire Temperature Channel 7 (*C)
+   */
+  optional float one_wire_temperature_ch7 = 39;
+
+  /*
+   * Lightning strikes detected in the last hour
+   */
+  optional uint32 lightning_strike_count_1h = 40;
+
+  /*
+   * Estimated distance to the leading edge of the storm, in km
+   */
+  optional float lightning_distance_km = 41;
+
+  reserved 42 to 56;
+  reserved "soil_ph", "ph", "electrical_conductivity", "salinity", "nitrogen", "phosphorus", "potassium", "dissolved_oxygen", "orp", "chemical_oxygen_demand", "turbidity", "nitrate", "ammonium", "biochemical_oxygen_demand", "solar_irradiance";
+}
+
+/*
+ * Soil and water probe metrics.
+ *
+ * Chemistry reported by soil probes (RS-485/SDI-12 NPK probes) and by
+ * water-quality sondes. Split out of EnvironmentMetrics so that message stays
+ * within the mesh payload budget.
+ */
+message SoilWaterMetrics {
+  /*
+   * Soil pH, 0-14
+   */
+  optional float soil_ph = 1;
+
+  /*
+   * pH of water or other solution, 0-14
+   */
+  optional float ph = 2;
+
+  /*
+   * Electrical conductivity in mS/cm
+   */
+  optional float electrical_conductivity = 3;
+
+  /*
+   * Salinity in mg/l
+   */
+  optional float salinity = 4;
+
+  /*
+   * Nitrogen concentration in mg/kg
+   */
+  optional float nitrogen = 5;
+
+  /*
+   * Phosphorus concentration in mg/kg
+   */
+  optional float phosphorus = 6;
+
+  /*
+   * Potassium concentration in mg/kg
+   */
+  optional float potassium = 7;
+
+  /*
+   * Dissolved oxygen in mg/l
+   */
+  optional float dissolved_oxygen = 8;
+
+  /*
+   * Oxidation-reduction potential (ORP) in mV
+   */
+  optional float orp = 9;
+
+  /*
+   * Chemical oxygen demand in mg/l
+   */
+  optional float chemical_oxygen_demand = 10;
+
+  /*
+   * Turbidity in NTU
+   */
+  optional float turbidity = 11;
+
+  /*
+   * Nitrate concentration in ppm
+   */
+  optional float nitrate = 12;
+
+  /*
+   * Ammonium concentration in ppm
+   */
+  optional float ammonium = 13;
+
+  /*
+   * Biochemical oxygen demand in mg/l
+   */
+  optional float biochemical_oxygen_demand = 14;
+
+  /*
+   * Solar irradiance in W/m^2 (distinct from the radiation field's uR/h)
+   */
+  optional float solar_irradiance = 15;
 }
 
 /*
@@ -195,54 +372,54 @@ message PowerMetrics {
   optional float ch3_current = 6;
 
   /*
-   * Voltage (Ch4)
+   * Voltage (Ch4) - TODO Remove
    */
-  optional float ch4_voltage = 7;
+  optional float ch4_voltage = 7 [deprecated = true];
 
   /*
-   * Current (Ch4)
+   * Current (Ch4) - TODO Remove
    */
-  optional float ch4_current = 8;
+  optional float ch4_current = 8 [deprecated = true];
 
   /*
-   * Voltage (Ch5)
+   * Voltage (Ch5) - TODO Remove
    */
-  optional float ch5_voltage = 9;
+  optional float ch5_voltage = 9 [deprecated = true];
 
   /*
-   * Current (Ch5)
+   * Current (Ch5) - TODO Remove
    */
-  optional float ch5_current = 10;
+  optional float ch5_current = 10 [deprecated = true];
 
   /*
-   * Voltage (Ch6)
+   * Voltage (Ch6) - TODO Remove
    */
-  optional float ch6_voltage = 11;
+  optional float ch6_voltage = 11 [deprecated = true];
 
   /*
-   * Current (Ch6)
+   * Current (Ch6) - TODO Remove
    */
-  optional float ch6_current = 12;
+  optional float ch6_current = 12 [deprecated = true];
 
   /*
-   * Voltage (Ch7)
+   * Voltage (Ch7) - TODO Remove
    */
-  optional float ch7_voltage = 13;
+  optional float ch7_voltage = 13 [deprecated = true];
 
   /*
-   * Current (Ch7)
+   * Current (Ch7) - TODO Remove
    */
-  optional float ch7_current = 14;
+  optional float ch7_current = 14 [deprecated = true];
 
   /*
-   * Voltage (Ch8)
+   * Voltage (Ch8) - TODO Remove
    */
-  optional float ch8_voltage = 15;
+  optional float ch8_voltage = 15 [deprecated = true];
 
   /*
-   * Current (Ch8)
+   * Current (Ch8) - TODO Remove
    */
-  optional float ch8_current = 16;
+  optional float ch8_current = 16 [deprecated = true];
 }
 
 /*
@@ -373,6 +550,14 @@ message AirQualityMetrics {
    * Typical Particle Size in um
    */
   optional float particles_tps = 25;
+
+  /*
+   * Raw PM sensor device status/error register bitmask, as defined by the sensor's own datasheet
+   * (currently populated by the SEN6X family: bit 4 fan error, bit 6 RH&T error, bit 7 gas/VOC-NOx
+   * error, bit 9 CO2 error (SEN66), bit 10 HCHO error, bit 11 PM error, bit 12 CO2 error (SEN63C/SEN69C),
+   * bit 21 fan speed warning)
+   */
+  optional uint32 pm_status_flags = 26;
 }
 
 /*
@@ -615,6 +800,11 @@ message Telemetry {
      * Traffic management statistics
      */
     TrafficManagementStats traffic_management_stats = 9;
+
+    /*
+     * Soil and water probe metrics
+     */
+    SoilWaterMetrics soil_water_metrics = 11;
   }
 }
 
@@ -660,7 +850,7 @@ enum TelemetrySensorType {
   /*
    * TODO - REMOVE High accuracy temperature and humidity
    */
-  SHTC3 = 7;
+  SHTC3 = 7 [deprecated = true];
 
   /*
    * High accuracy pressure
@@ -685,7 +875,7 @@ enum TelemetrySensorType {
   /*
    * TODO - REMOVE High accuracy temperature and humidity
    */
-  SHT31 = 12;
+  SHT31 = 12 [deprecated = true];
 
   /*
    * PM2.5 air quality sensor
@@ -710,7 +900,7 @@ enum TelemetrySensorType {
   /*
    * TODO - REMOVE Sensirion High accuracy temperature and humidity
    */
-  SHT4X = 17;
+  SHT4X = 17 [deprecated = true];
 
   /*
    * VEML7700 high accuracy ambient light(Lux) digital 16-bit resolution sensor.
@@ -860,7 +1050,7 @@ enum TelemetrySensorType {
   /*
    * TODO - REMOVE STH21 Temperature and R. Humidity sensor
    */
-  SHT21 = 47;
+  SHT21 = 47 [deprecated = true];
 
   /*
    * Sensirion STC31 CO2 sensor
@@ -888,9 +1078,29 @@ enum TelemetrySensorType {
   MMC5983MA = 52;
 
   /*
-   * ICM-42607-P 6‑Axis IMU
+   * ICM-42607-P 6-Axis IMU
    */
   ICM42607P = 53;
+
+  /*
+   * SPA06 pressure and temperature
+   */
+  SPA06 = 54;
+
+  /*
+   * HM330X PM SENSOR
+   */
+  HM330X = 55;
+
+  /*
+   * Sensirion SEN6X PM/RHT/VOC/NOx/CO2/HCHO sensor family (SEN62, SEN63C, SEN65, SEN66, SEN68, SEN69C)
+   */
+  SEN6X = 56;
+
+  /*
+   * AS3935 Franklin lightning sensor
+   */
+  AS3935 = 57;
 }
 
 /*
@@ -909,7 +1119,18 @@ message Nau7802Config {
 }
 
 /*
- * SEN5X State, for saving to flash
+ * AS3935 lightning sensor state, for saving to flash
+ */
+message AS3935State {
+  /*
+   * Antenna tuning capacitance in pF, 0 to 120 in steps of 8. The chip does not retain
+   * this across power loss, so it is stored here and re-applied on every boot.
+   */
+  uint32 tuning_cap_pf = 1;
+}
+
+/*
+ * SEN5X State, for saving to flash (to be merged with SEN6XState)
  */
 message SEN5XState {
   /*
@@ -939,6 +1160,41 @@ message SEN5XState {
 
   /*
    * VOC state array (8x uint8t) for SEN55
+   */
+  optional fixed64 voc_state_array = 6;
+}
+
+/*
+ * SEN6X State, for saving to flash
+ */
+message SEN6XState {
+  /*
+   * Last cleaning time for SEN6X
+   */
+  uint32 last_cleaning_time = 1;
+
+  /*
+   * Last cleaning time for SEN6X - valid flag
+   */
+  bool last_cleaning_valid = 2;
+
+  /*
+   * Config flag for one-shot mode (see admin.proto)
+   */
+  bool one_shot_mode = 3;
+
+  /*
+   * Last VOC state time, for models with a VOC sensor (SEN65, SEN66, SEN68, SEN69C)
+   */
+  optional uint32 voc_state_time = 4;
+
+  /*
+   * Last VOC state validity flag, for models with a VOC sensor (SEN65, SEN66, SEN68, SEN69C)
+   */
+  optional bool voc_state_valid = 5;
+
+  /*
+   * VOC state array (8x uint8t), for models with a VOC sensor (SEN65, SEN66, SEN68, SEN69C)
    */
   optional fixed64 voc_state_array = 6;
 }

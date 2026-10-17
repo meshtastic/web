@@ -1,11 +1,12 @@
 import { create } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
-import type { ResultType } from "better-result";
+import type { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import type { ReadonlySignal } from "../../core/signals/createStore.ts";
 import type { Node } from "./domain/Node.ts";
 import type { NodeError, NodeErrorType } from "./domain/NodeError.ts";
 import type { NodesRepository } from "./domain/NodesRepository.ts";
+import { firmwareAtLeast } from "../device/domain/FirmwareVersion.ts";
 import { NodeMapper } from "./infrastructure/NodeMapper.ts";
 import { InMemoryNodesRepository } from "./infrastructure/repositories/InMemoryNodesRepository.ts";
 import { validateIncomingNode } from "./infrastructure/nodeValidation.ts";
@@ -71,13 +72,20 @@ export class NodesClient {
       }
     });
 
+    client.events.onNodeStatusPacket.subscribe((packet) => {
+      this.patch(packet.from, { status: packet.data.status });
+    });
+
     client.events.onMeshPacket.subscribe((packet) => {
       // Every inbound mesh packet refreshes lastHeard / snr for the
-      // originating node — same semantics as the legacy nodeDB
-      // processPacket but routed through the SDK signal layer.
-      const nowSec = Math.floor(Date.now() / 1000);
+      // originating node. Since firmware 2.8 the device also replays each
+      // node's cached position and telemetry after the handshake, with
+      // rx_time set to when it last heard the node, or unset when it had no
+      // wall-clock time then. A packet without rx_time says nothing about
+      // when the node was heard, so it must not mark the node as heard now.
+      if (!packet.rxTime) return;
       this.patch(packet.from, {
-        lastHeard: packet.rxTime > 0 ? packet.rxTime : nowSec,
+        lastHeard: packet.rxTime,
         snr: packet.rxSnr,
       });
     });
@@ -109,10 +117,27 @@ export class NodesClient {
     }
     if (!verdict.accepted) return;
 
-    const node = NodeMapper.fromProto(verdict.accepted);
+    const existing = this.store.get(info.num);
+    const mapped = NodeMapper.fromProto(verdict.accepted);
+    const node: Node = {
+      ...mapped,
+      // Firmware 2.8 sends NodeInfo without position or metrics and replays
+      // those separately, so keep what we already know.
+      position: mapped.position ?? existing?.position,
+      deviceMetrics: mapped.deviceMetrics ?? existing?.deviceMetrics,
+      status: existing?.status,
+      heardOnCurrentLora:
+        mapped.heardOnCurrentLora || !this.firmwareReportsHeard(),
+    };
     this.store.set(node.num, node);
     if (this.errorsStore.has(node.num)) this.errorsStore.delete(node.num);
     void this.repository.upsert(node).catch(() => {});
+  }
+
+  /** heard_on_current_lora exists from firmware 2.8.1. */
+  private firmwareReportsHeard(): boolean {
+    const version = this.client.device.metadata.value?.firmwareVersion;
+    return !!version && firmwareAtLeast(version, "2.8.1");
   }
 
   /**
@@ -173,31 +198,31 @@ export class NodesClient {
     this.errorsStore.clear();
   }
 
-  public async favorite(nodeNum: number): Promise<ResultType<number, Error>> {
+  public async favorite(nodeNum: number): Promise<Result<number, Error>> {
     const result = await favoriteNode(this.client, nodeNum);
     if (result.status === "ok") this.patch(nodeNum, { isFavorite: true });
     return result;
   }
 
-  public async unfavorite(nodeNum: number): Promise<ResultType<number, Error>> {
+  public async unfavorite(nodeNum: number): Promise<Result<number, Error>> {
     const result = await removeFavoriteNode(this.client, nodeNum);
     if (result.status === "ok") this.patch(nodeNum, { isFavorite: false });
     return result;
   }
 
-  public async ignore(nodeNum: number): Promise<ResultType<number, Error>> {
+  public async ignore(nodeNum: number): Promise<Result<number, Error>> {
     const result = await ignoreNode(this.client, nodeNum);
     if (result.status === "ok") this.patch(nodeNum, { isIgnored: true });
     return result;
   }
 
-  public async unignore(nodeNum: number): Promise<ResultType<number, Error>> {
+  public async unignore(nodeNum: number): Promise<Result<number, Error>> {
     const result = await removeIgnoredNode(this.client, nodeNum);
     if (result.status === "ok") this.patch(nodeNum, { isIgnored: false });
     return result;
   }
 
-  public remove(nodeNum: number): Promise<ResultType<number, Error>> {
+  public remove(nodeNum: number): Promise<Result<number, Error>> {
     void this.repository.remove(nodeNum).catch(() => {});
     this.store.delete(nodeNum);
     this.errorsStore.delete(nodeNum);
@@ -212,7 +237,7 @@ export class NodesClient {
    */
   public async reset(
     options: { keepMyNode?: boolean } = {},
-  ): Promise<ResultType<number, Error>> {
+  ): Promise<Result<number, Error>> {
     const myNodeNum = this.client.device.myNodeNum.value;
     if (options.keepMyNode && myNodeNum !== undefined) {
       const me = this.store.get(myNodeNum);

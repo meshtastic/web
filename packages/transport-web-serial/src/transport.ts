@@ -6,7 +6,7 @@ import {
   toDeviceStream,
   type Transport,
 } from "@meshtastic/sdk";
-import { Result, type ResultType } from "better-result";
+import { Result } from "better-result";
 
 const log = createLogger("TransportWebSerial");
 
@@ -70,7 +70,7 @@ export class TransportWebSerial implements Transport {
    */
   public static async create(
     baudRate?: number,
-  ): Promise<ResultType<TransportWebSerial, SerialConnectError>> {
+  ): Promise<Result<TransportWebSerial, SerialConnectError>> {
     let port: SerialPort;
     try {
       port = await navigator.serial.requestPort();
@@ -101,7 +101,7 @@ export class TransportWebSerial implements Transport {
   public static async createFromPort(
     port: SerialPort,
     baudRate?: number,
-  ): Promise<ResultType<TransportWebSerial, SerialConnectError>> {
+  ): Promise<Result<TransportWebSerial, SerialConnectError>> {
     const prep = await TransportWebSerial.preparePort(port, baudRate ?? 115200);
     if (Result.isError(prep)) return Result.err(prep.error);
     try {
@@ -120,7 +120,7 @@ export class TransportWebSerial implements Transport {
   private static async preparePort(
     port: SerialPort,
     baudRate: number,
-  ): Promise<ResultType<true, SerialConnectError>> {
+  ): Promise<Result<true, SerialConnectError>> {
     log.debug("preparePort: enter", {
       readable: !!port.readable,
       writable: !!port.writable,

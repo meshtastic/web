@@ -4,6 +4,7 @@
 *EnvironmentMetrics.iaq int_size:16
 *EnvironmentMetrics.wind_direction int_size:16
 *EnvironmentMetrics.soil_moisture int_size:8
+*EnvironmentMetrics.one_wire_temperature type:FT_IGNORE
 
 *LocalStats.num_online_nodes int_size:16
 *LocalStats.num_total_nodes int_size:16
@@ -15,4 +16,4 @@
 *HostMetrics.load1 int_size:16
 *HostMetrics.load5 int_size:16
 *HostMetrics.load15 int_size:16
-*HostMetrics.user_string max_size:200
+*HostMetrics.user_string max_size:161

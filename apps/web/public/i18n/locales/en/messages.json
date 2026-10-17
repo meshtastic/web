@@ -18,23 +18,100 @@
     "addReactionLabel": "Add Reaction",
     "replyLabel": "Reply"
   },
-
-  "deliveryStatus": {
-    "delivered": {
-      "label": "Message delivered",
-      "displayText": "Message delivered"
+  "signature": {
+    "signed": {
+      "label": "Signed message",
+      "tooltip": "Signed by the sender (XEdDSA) and verified by your radio."
+    }
+  },
+  "diagnostics": {
+    "snr": {
+      "value": "SNR {{value}} dB",
+      "tooltip": "Signal-to-noise ratio as your radio heard it"
     },
-    "failed": {
-      "label": "Message delivery failed",
-      "displayText": "Delivery failed"
+    "rssi": {
+      "value": "RSSI {{value}} dBm",
+      "tooltip": "Signal strength as your radio heard it"
     },
-    "unknown": {
-      "label": "Message status unknown",
-      "displayText": "Unknown state"
+    "hops": {
+      "value_one": "{{count}} hop away",
+      "value_other": "{{count}} hops away",
+      "unknown": "Hop count unknown"
     },
-    "waiting": {
-      "label": "Sending message",
-      "displayText": "Waiting for delivery"
+    "transport": {
+      "mqtt": {
+        "label": "Via MQTT",
+        "tooltip": "Reached the mesh through an MQTT gateway."
+      },
+      "udp": {
+        "label": "Via UDP",
+        "tooltip": "Reached your radio over multicast UDP."
+      },
+      "api": {
+        "label": "Via API",
+        "tooltip": "Sent to your radio by an app connected to it."
+      }
+    }
+  },
+  "status": {
+    "title": "Message delivery status",
+    "errorTitle": "Error",
+    "showDetails": "Show message status",
+    "resend": "Resend",
+    "close": "Close",
+    "relays_one": "Acknowledged by {{count}} node",
+    "relays_other": "Acknowledged by {{count}} nodes",
+    "enroute": "Sending…",
+    "delivered": "Delivered to mesh",
+    "relayedNotConfirmed": "Relayed, not confirmed by recipient",
+    "recipientDelivered": "Delivered to recipient",
+    "recipientDeliveredProven": "Delivered to recipient · proven",
+    "ackProofInvalid": "Delivery proof failed",
+    "unknown": "Unknown",
+    "error": {
+      "maxRetransmit": "Failed to deliver to mesh",
+      "noRoute": "No route",
+      "noChannel": "Channel/key mismatch",
+      "noInterface": "No radio interface",
+      "dutyCycleLimit": "Duty cycle limit",
+      "rateLimitExceeded": "Rate limited",
+      "tooLarge": "Message is too large to send",
+      "noResponse": "No app response",
+      "badRequest": "Invalid request",
+      "notAuthorized": "Not authorized",
+      "pkiFailed": "Could not send encrypted message",
+      "pkiUnknownPubkey": "Recipient needs your key",
+      "pkiSendFailPublicKey": "Recipient key unavailable",
+      "adminBadSessionKey": "Admin session expired",
+      "adminPublicKeyUnauthorized": "Admin key not authorized",
+      "unknownError": "Not delivered"
+    },
+    "detail": {
+      "noRoute": "No route to the destination node was found in the mesh. Try again when more nodes are reachable.",
+      "gotNak": "A node rejected this message. Try again when the route changes.",
+      "timeout": "No acknowledgment was received in time. Try again when you have better signal or more mesh coverage.",
+      "maxRetransmit": "No node confirmed this message. Try again when you have better signal or more mesh coverage.",
+      "noChannel": "The sender or recipient could not use a matching channel/key for this message.",
+      "noInterface": "The sender has no usable radio interface for this message.",
+      "dutyCycleLimit": "Local airtime limits are temporarily blocking sends. Wait before trying again.",
+      "rateLimitExceeded": "Messages are being sent too quickly. Wait before trying again.",
+      "tooLarge": "Shorten the message and send it again.",
+      "noResponse": "The destination received the request, but no app or module responded. Try again when the recipient is reachable.",
+      "badRequest": "The destination rejected this request as invalid.",
+      "notAuthorized": "The destination refused this request because it is not authorized.",
+      "pkiFailed": "The encrypted send path could not be used. Wait for node info or keys to sync, then try again.",
+      "pkiUnknownPubkey": "The recipient does not know your public key yet. Your node may share its info automatically; try again after it syncs.",
+      "pkiSendFailPublicKey": "Your node does not have the recipient's public key yet. Wait for node info to sync, then try again.",
+      "adminBadSessionKey": "The admin session key is missing, expired, or invalid. Request a new session before trying again.",
+      "adminPublicKeyUnauthorized": "The remote node does not authorize your admin key."
+    },
+    "proof": {
+      "verified": "Delivery proven",
+      "verifiedInfo": "The node you addressed proved it received this message.",
+      "failed": "Delivery proof failed",
+      "failedInfo": "Something acknowledged this message without the key only the recipient holds.",
+      "noKey": "Delivery proof unchecked",
+      "noKeyInfo": "A delivery proof arrived, but there was no key to check it against."
     }
   }
 }

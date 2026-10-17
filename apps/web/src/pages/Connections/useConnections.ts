@@ -1,15 +1,17 @@
-import {
-  startConfigHeartbeat,
-  startMaintenanceHeartbeat,
-  stopHeartbeat,
-} from "@app/core/connections/heartbeat.ts";
 import { buildMeshDevice } from "@app/core/connections/sdkClient.ts";
 import {
   closeTransport,
   openTransport,
   probeConnection,
 } from "@app/core/connections/transports.ts";
-import { createLogger, DeviceStatusEnum } from "@meshtastic/sdk";
+import { toast } from "@core/hooks/useToast.ts";
+import {
+  createLogger,
+  DeviceStatusEnum,
+  FirmwareTooOldError,
+  MIN_FIRMWARE_VERSION,
+} from "@meshtastic/sdk";
+import { t } from "i18next";
 
 const log = createLogger("useConnections");
 import type {
@@ -27,7 +29,7 @@ import { useCallback } from "react";
 
 // Per-connection out-of-band handles tracked outside Zustand:
 //   - cachedTransports: held BT device / serial port for reconnect + cleanup.
-//   - configSubscriptions: onConfigComplete unsubscribers.
+//   - configSubscriptions: handshake status / reboot unsubscribers.
 const cachedTransports = new Map<ConnectionId, BluetoothDevice | SerialPort>();
 const configSubscriptions = new Map<ConnectionId, () => void>();
 
@@ -62,7 +64,6 @@ export function useConnections() {
 
   const teardown = useCallback(async (id: ConnectionId, conn?: Connection) => {
     log.debug("teardown: enter", { id });
-    stopHeartbeat(id);
     configSubscriptions.get(id)?.();
     configSubscriptions.delete(id);
 
@@ -144,8 +145,20 @@ export function useConnections() {
       updateStatus(id, "configuring");
       log.debug("setupMeshDevice: building MeshDevice", { id, deviceId });
 
-      const meshDevice = await buildMeshDevice(id, deviceId, transport);
-      log.debug("setupMeshDevice: MeshDevice built", { id });
+      const { meshDevice, persistent } = await buildMeshDevice(
+        id,
+        deviceId,
+        transport,
+      );
+      log.debug("setupMeshDevice: MeshDevice built", { id, persistent });
+      if (!persistent) {
+        toast({
+          title: t("toasts.storageUnavailable", { ns: "connections" }),
+          description: t("toasts.storageUnavailableDescription", {
+            ns: "connections",
+          }),
+        });
+      }
 
       if (!meshRegistry.has(id)) {
         meshRegistry.register(id, meshDevice.meshClient);
@@ -162,18 +175,10 @@ export function useConnections() {
       setActiveConnectionId(id);
       device.setConnectionId(id);
 
-      // Two paths drive the "configured" transition:
-      //   1. The `onConfigComplete` event from the firmware. The handler is
-      //      attached AFTER buildMeshDevice, which means MeshClient already
-      //      started piping fromDevice → decodePacket. If the serial port
-      //      had a buffered configCompleteId from a prior session, the
-      //      dispatch happens synchronously before this subscribe and we
-      //      miss it.
-      //   2. The MeshClient.device.status signal. decodePacket flips the
-      //      signal to DeviceConfigured on the same configCompleteId, and
-      //      signals replay their current value to new subscribers — so we
-      //      catch the case the event missed.
-      // Either path may fire first; `markConfigured` is idempotent.
+      // MeshClient flips device.status to DeviceConfigured once both
+      // handshake stages (config, then NodeDB) are done, and starts its own
+      // heartbeat. onConfigComplete also fires after the config stage, so it
+      // can't be used here. `markConfigured` is idempotent.
       let configuredHandled = false;
       const markConfigured = (source: string): void => {
         if (configuredHandled) return;
@@ -181,12 +186,19 @@ export function useConnections() {
         log.info("connect transitioned to configured", { id, source });
         device.setConnectionPhase("configured");
         updateStatus(id, "configured");
-        startMaintenanceHeartbeat(id, meshDevice);
+        const client = meshDevice.meshClient;
+        if (client.device.firmwareSupport.value === "shouldUpdate") {
+          toast({
+            title: t("toasts.firmwareOutdated", { ns: "connections" }),
+            description: t("toasts.firmwareOutdatedDescription", {
+              ns: "connections",
+              version: client.device.metadata.value?.firmwareVersion,
+              minimum: MIN_FIRMWARE_VERSION,
+            }),
+          });
+        }
       };
 
-      const unsubConfigComplete = meshDevice.events.onConfigComplete.subscribe(
-        () => markConfigured("onConfigComplete"),
-      );
       const unsubStatusSignal = meshDevice.meshClient.device.status.subscribe(
         (s) => {
           if (s === DeviceStatusEnum.DeviceConfigured)
@@ -203,22 +215,18 @@ export function useConnections() {
       }
 
       // Reboot: firmware emits `rebooted` after a soft reset (config write,
-      // OTA, manual reboot). The SDK re-runs configure() so MeshClient state
-      // re-streams, but the saved-connection status is already "configured"
-      // — so the overlay would stay hidden. Flip status back to "configuring"
-      // and reset `configuredHandled` so the next onConfigComplete re-marks.
-      // Maintenance heartbeat is stopped here so the reconfigure handshake
-      // isn't racing pings; markConfigured() restarts it.
+      // OTA, manual reboot). The SDK re-runs the handshake, but the
+      // saved-connection status is already "configured" — so the overlay
+      // would stay hidden. Flip status back to "configuring" and reset
+      // `configuredHandled` so the next DeviceConfigured re-marks.
       const unsubRebooted = meshDevice.events.onRebooted.subscribe(() => {
         log.info("device rebooted — re-entering configuring", { id });
-        stopHeartbeat(id);
         configuredHandled = false;
         device.setConnectionPhase("configuring");
         updateStatus(id, "configuring");
       });
 
       configSubscriptions.set(id, () => {
-        unsubConfigComplete();
         unsubStatusSignal();
         unsubRebooted();
       });
@@ -227,13 +235,7 @@ export function useConnections() {
       meshDevice
         .configure()
         .then(() => {
-          log.debug(
-            "setupMeshDevice: configure() resolved, sending heartbeat",
-            { id },
-          );
-          return meshDevice
-            .heartbeat()
-            .then(() => startConfigHeartbeat(id, meshDevice));
+          log.debug("setupMeshDevice: configure() resolved", { id });
         })
         .catch((error) => {
           const e = error as Error;
@@ -242,7 +244,17 @@ export function useConnections() {
             name: e?.name,
             message: e?.message,
           });
-          updateStatus(id, "error", error?.message ?? String(error));
+          updateStatus(
+            id,
+            "error",
+            error instanceof FirmwareTooOldError
+              ? t("errors.firmwareTooOld", {
+                  ns: "connections",
+                  version: error.firmwareVersion,
+                  minimum: MIN_FIRMWARE_VERSION,
+                })
+              : (error?.message ?? String(error)),
+          );
         });
 
       updateSavedConnection(id, { meshDeviceId: deviceId });
@@ -301,10 +313,9 @@ export function useConnections() {
           result.bluetoothDevice,
           result.serialPort,
         );
-        log.info(
-          "connect: setupMeshDevice resolved, awaiting onConfigComplete",
-          { id },
-        );
+        log.info("connect: setupMeshDevice resolved, awaiting handshake", {
+          id,
+        });
 
         // BT-specific: catch device-side disconnect to flip status.
         result.bluetoothDevice?.addEventListener(

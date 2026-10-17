@@ -6,3 +6,104 @@
 *GeoChat.to max_size:120
 *GeoChat.to_callsign max_size:120
 *TAKPacket.detail max_size:220
+*TAKPacketV2.cot_type_str max_size:32
+*TAKPacketV2.callsign max_size:120
+*TAKPacketV2.uid max_size:48
+*TAKPacketV2.device_callsign max_size:120
+*TAKPacketV2.tak_version max_size:64
+*TAKPacketV2.tak_device max_size:32
+*TAKPacketV2.tak_platform max_size:32
+*TAKPacketV2.tak_os max_size:16
+*TAKPacketV2.endpoint max_size:32
+*TAKPacketV2.phone max_size:20
+*TAKPacketV2.raw_detail max_size:220
+*TAKPacketV2.stale_seconds int_size:16
+*TAKPacketV2.battery int_size:8
+*TAKPacketV2.course int_size:16
+*AircraftTrack.icao max_size:8
+*AircraftTrack.registration max_size:16
+*AircraftTrack.flight max_size:16
+*AircraftTrack.aircraft_type max_size:8
+*AircraftTrack.squawk int_size:16
+*AircraftTrack.category max_size:4
+*AircraftTrack.cot_host_id max_size:64
+
+# --- Typed geometry payloads (v2 protocol extension) ---
+#
+# CotGeoPoint: sint32 deltas from the enclosing event's latitude_i/longitude_i.
+# For nearby vertices (telestrations, small rectangles) the varint+zigzag
+# encoding is 2-3 bytes per field, cutting telestration vertex data in half
+# versus sfixed32. int_size:32 keeps the C type a plain int32.
+# Named with a `Cot` prefix to avoid a collision with `meshtastic.GeoPoint`
+# in device_ui.proto, which is an unrelated zoom/latitude/longitude type.
+*CotGeoPoint.lat_delta_i int_size:32
+*CotGeoPoint.lon_delta_i int_size:32
+#
+# DrawnShape pool sizing. `kind` and `style` are varint enums (no int_size
+# needed). stroke_color / fill_color are Team enum, also varint. stroke_argb
+# / fill_argb are fixed32 (always 4 bytes on the wire). Vertex pool is 32
+# entries x ~12B each ~= 384B worst case. Telestrations beyond 32 vertices
+# MUST be pre-truncated by the sender with `truncated = true`.
+*DrawnShape.major_cm int_size:32
+*DrawnShape.minor_cm int_size:32
+*DrawnShape.angle_deg int_size:16
+*DrawnShape.stroke_weight_x10 int_size:16
+*DrawnShape.bullseye_distance_dm int_size:32
+*DrawnShape.bullseye_bearing_ref int_size:8
+*DrawnShape.bullseye_flags int_size:8
+*DrawnShape.bullseye_uid_ref max_size:48
+
+# Marker pool sizing. Strings bounded tight to keep fixed pool small on
+# ESP32 nanopb. parent_uid matches existing TAKPacketV2.uid cap (48).
+# iconset fits "f7f71666-8b28-4b57-9fbb-e38e61d33b79/Google/hiker.png"
+# (~52 chars) with slack.
+*Marker.parent_uid max_size:48
+*Marker.parent_type max_size:24
+*Marker.parent_callsign max_size:24
+*Marker.iconset max_size:80
+
+# RangeAndBearing pool sizing.
+*RangeAndBearing.anchor_uid max_size:48
+*RangeAndBearing.range_cm int_size:32
+*RangeAndBearing.bearing_cdeg int_size:16
+*RangeAndBearing.stroke_weight_x10 int_size:16
+
+# Route pool sizing. 16 links x ~24B each ~= 384B worst case. prefix is
+# ATAK's short waypoint name prefix ("CP", "RP", etc.) - 8 chars is plenty.
+*Route.links max_count:16
+*Route.prefix max_size:8
+*Route.stroke_weight_x10 int_size:16
+*Route.Link.uid max_size:48
+*Route.Link.callsign max_size:16
+*Route.Link.link_type int_size:8
+
+# GeoChat receipt extension. receipt_for_uid matches TAKPacketV2.uid caps.
+*GeoChat.receipt_for_uid max_size:48
+
+# CasevacReport pool sizing. All numeric fields are small (0..255 for
+# patient counts, 1 byte for flags bitfields); strings are short.
+*CasevacReport.equipment_flags int_size:8
+*CasevacReport.terrain_flags int_size:8
+*CasevacReport.litter_patients int_size:8
+*CasevacReport.ambulatory_patients int_size:8
+*CasevacReport.us_military int_size:8
+*CasevacReport.us_civilian int_size:8
+*CasevacReport.non_us_military int_size:8
+*CasevacReport.non_us_civilian int_size:8
+*CasevacReport.epw int_size:8
+*CasevacReport.child int_size:8
+*CasevacReport.zone_marker max_size:16
+*CasevacReport.frequency max_size:16
+
+# EmergencyAlert pool sizing. UIDs match TAKPacketV2.uid caps (48).
+*EmergencyAlert.authoring_uid max_size:48
+*EmergencyAlert.cancel_reference_uid max_size:48
+
+# TaskRequest pool sizing. All four strings are capped tight so the
+# worst-case wire size stays under the LoRa MTU with headroom. task_type
+# is a short category tag; target_uid/assignee_uid match TAKPacketV2.uid
+# conventions; note is the one user-entered field.
+*TaskRequest.task_type max_size:12
+*TaskRequest.target_uid max_size:32
+*TaskRequest.assignee_uid max_size:32
+*TaskRequest.note max_size:48

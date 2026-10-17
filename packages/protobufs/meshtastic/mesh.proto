@@ -157,7 +157,7 @@ message Position {
   uint32 gps_accuracy = 14;
 
   /*
-   * Ground speed in m/s and True North TRACK in 1/100 degrees
+   * Ground speed in km/h and True North TRACK in 1/100 degrees
    * Clarification of terms:
    * - "track" is the direction of motion (measured in horizontal plane)
    * - "heading" is where the fuselage points (measured in horizontal plane)
@@ -356,14 +356,14 @@ enum HardwareModel {
   RAK11310 = 26;
 
   /*
-   * Makerfabs SenseLoRA Receiver (RP2040 + RFM96)
+   * Makerfabs Tracker Reserved
    */
-  SENSELORA_RP2040 = 27;
+  MAKERFABS_TRACKER = 27;
 
   /*
-   * Makerfabs SenseLoRA Industrial Monitor (ESP32-S3 + RFM96)
+   * Makerfabs Reserved
    */
-  SENSELORA_S3 = 28;
+  MAKERFABS_RESERVED = 28;
 
   /*
    * Canary Radio Company - CanaryOne: https://canaryradio.io/products/canaryone
@@ -876,10 +876,10 @@ enum HardwareModel {
   HELTEC_MESH_NODE_T096 = 127;
 
   /*
-   * Seeed studio T1000-E Pro tracker card. NRF52840 w/ LR2021 radio,
+   * Seeed studio Mesh Tracker X1card. NRF52840 w/ LR2021 radio,
    * GPS, button, buzzer, and sensors.
    */
-  TRACKER_T1000_E_PRO = 128;
+  MESH_TRACKER_X1 = 128;
 
   /*
    * Elecrow ThinkNode M7, M8 and M9
@@ -932,6 +932,56 @@ enum HardwareModel {
    * Meshnology W10
    */
   MESHNOLOGY_W10 = 140;
+
+  /*
+   * Heltec ESP32S3 + SX1262
+   */
+  HELTEC_RC32 = 141;
+
+  /*
+   * Heltec NRF52840 + SX1262
+   */
+  HELTEC_RC52 = 142;
+
+  /*
+   * Heltec ESP32C6 + SX1262
+   */
+  HELTEC_RCC6 = 143;
+
+  /*
+   * Seeed Wio Tracker L1 Pro 1W, nRF52840 + SX1262 with 1 W external PA
+   */
+  SEEED_WIO_TRACKER_L1_PRO_1W = 144;
+
+  /*
+   * Meshnology W12
+   */
+  MESHNOLOGY_W12 = 145;
+
+  /*
+   * Seeed Studio MeshPager X2
+   */
+  MESHPAGER_X2 = 146;
+
+  /*
+   * Lilygo T-CONNECT PRO
+   */
+  T_CONNECT_PRO = 147;
+
+  /*
+   * Axiometa Axiometa Genesis Mini
+   */
+  AXIOMETA_GENESIS_MINI = 148;
+
+  /*
+   * MakerFabs Nomad Terminal
+   */
+  MAKERFABS_NOMAD_TERMINAL = 149;
+
+  /*
+   * Elecrow ThinkNode MX
+   */
+  THINKNODE_MX = 150;
 
   /*
    * ------------------------------------------------------------------------------------------------------------------------------------------
@@ -1171,6 +1221,34 @@ message Routing {
      */
     Error error_reason = 3;
   }
+
+  /*
+   * Optional proof that this ack/nak was produced by the node that actually received the packet
+   * identified by Data.request_id, rather than by anyone holding the channel key.
+   *
+   * Explicit acks are usually sent on the channel, and channel traffic is encrypted but not
+   * authenticated, so such an ack can be forged by any listener holding the PSK. When the
+   * acknowledged packet WAS PKI encrypted, the two endpoints already share a Curve25519 secret, so
+   * the receiver can prove receipt cheaply rather than signing the ack:
+   *
+   *   ack_proof = HMAC-SHA256(shared_key,
+   *                           "ack" | LE32(from) | LE32(to) | LE32(request_id) | routing)[0..8)
+   *
+   * where shared_key is the same SHA256(X25519(sender_private, receiver_public)) used for PKI
+   * packet encryption, and `routing` is this encoded Routing message without the ack_proof field.
+   *
+   * Each input is load-bearing. request_id stops a captured proof being replayed against a
+   * different outstanding packet. The Routing bytes stop a bit-flip turning a proven success into a
+   * failure: an ack and a nak for one packet otherwise share every other input, and channel
+   * encryption is CTR with no integrity check. Integers are little-endian so the value is a
+   * property of the protocol rather than of the host that computed it.
+   *
+   * Unset when no pairwise key is available, including the PKI_UNKNOWN_PUBKEY and NO_CHANNEL naks,
+   * which are emitted precisely because the packet could not be decrypted. Receivers that do not
+   * understand this field ignore it. It does not replace xeddsa_signature, which remains the only
+   * option for traffic with no pairwise key and the only proof a third party can check.
+   */
+  bytes ack_proof = 4;
 }
 
 /*
@@ -1432,6 +1510,36 @@ message RemoteShell {
 }
 
 /*
+ * A rectangular, axis-aligned geographic bounding box.
+ * Used to define a rectangular geofence region for a Waypoint.
+ * Fields are ordered west, south, east, north to match the standard bounding box
+ * convention used by GeoJSON and PMTiles (min longitude, min latitude, max longitude, max latitude),
+ * so the box can drive an offline map extract directly.
+ * All coordinates are in degrees scaled by 1e-7 (same convention as Position and Waypoint).
+ */
+message BoundingBox {
+  /*
+   * Western edge of the box - minimum longitude (south-west corner)
+   */
+  sfixed32 longitude_west_i = 1;
+
+  /*
+   * Southern edge of the box - minimum latitude (south-west corner)
+   */
+  sfixed32 latitude_south_i = 2;
+
+  /*
+   * Eastern edge of the box - maximum longitude (north-east corner)
+   */
+  sfixed32 longitude_east_i = 3;
+
+  /*
+   * Northern edge of the box - maximum latitude (north-east corner)
+   */
+  sfixed32 latitude_north_i = 4;
+}
+
+/*
  * Waypoint message, used to share arbitrary locations across the mesh
  */
 message Waypoint {
@@ -1475,6 +1583,39 @@ message Waypoint {
    * Designator icon for the waypoint in the form of a unicode emoji
    */
   fixed32 icon = 8;
+
+  /*
+   * If greater than zero, defines a circular geofence centred on this waypoint's
+   * location (latitude_i / longitude_i) with this radius in meters.
+   * Zero means the waypoint has no circular geofence.
+   */
+  uint32 geofence_radius = 9;
+
+  /*
+   * Optional rectangular geofence region for this waypoint.
+   * May be used instead of, or in addition to, geofence_radius.
+   */
+  optional BoundingBox bounding_box = 10;
+
+  /*
+   * If true, a notification should be raised when a tracked node enters this
+   * waypoint's geofence (the circular radius and/or the bounding box).
+   */
+  bool notify_on_enter = 11;
+
+  /*
+   * If true, a notification should be raised when a tracked node exits this
+   * waypoint's geofence (the circular radius and/or the bounding box).
+   */
+  bool notify_on_exit = 12;
+
+  /*
+   * If true, only raise geofence enter/exit notifications for nodes that are
+   * marked as favorites on the receiving device. Applies to both notify_on_enter
+   * and notify_on_exit. Favorite status is resolved locally per receiver, so the
+   * same waypoint alerts each node only for its own favorites.
+   */
+  bool notify_favorites_only = 13;
 }
 
 /*
@@ -1667,6 +1808,81 @@ message MeshPacket {
   }
 
   /*
+   * Outcome of checking Routing.ack_proof on a received ack or nak.
+   *
+   * Reported, never enforced: an ack without a usable proof is acted on exactly as it was before
+   * proofs existed. The value exists so a client can tell a proven delivery receipt from an
+   * unproven one, and can tell "nobody proved this" from "somebody tried and failed".
+   */
+  enum AckProofStatus {
+    /*
+     * No verdict. The default, and what every ack from firmware predating Routing.ack_proof looks
+     * like, so an absent field and an absent proof read the same.
+     *
+     * Also reported when a proof was carried but not checked: the ack came from a node other than
+     * the one the packet was addressed to (a nak from an intermediate, for example), the packet was
+     * no longer awaiting an ack, or the proof was malformed. A build without PKI never checks one.
+     * A proof is only checked while the packet it acknowledges is still pending, so on a multi-hop
+     * path an overheard relay can settle the packet first and leave a genuine receipt reading ABSENT.
+     */
+    ACK_PROOF_ABSENT = 0;
+
+    /*
+     * A proof was carried and verified against the public key of the node the acknowledged packet
+     * was addressed to. The only value that means "the recipient received it".
+     *
+     * Verifying against the key of whoever the ack claims to be from is NOT sufficient: the proof
+     * only shows its author holds a pairwise secret with us, and every keyed peer holds one, so
+     * any of them could otherwise mint a receipt for a packet addressed to someone else.
+     */
+    ACK_PROOF_VALID = 1;
+
+    /*
+     * A proof was carried and did not verify. Someone produced an ack for an outstanding packet
+     * without holding the pairwise secret, so this is an attempted forgery rather than a quiet
+     * absence, and is worth surfacing differently from ACK_PROOF_ABSENT.
+     */
+    ACK_PROOF_INVALID = 2;
+
+    /*
+     * A proof was carried but no authoritative public key was available to check it against, so
+     * the ack is neither proven nor disproven.
+     */
+    ACK_PROOF_NO_KEY = 3;
+  }
+
+  /*
+   * Which slots of the CSMA backoff grid a transmission may draw from.
+   *
+   * Never sent over the radio links. Like priority, it steers how the local node schedules the
+   * packet: a module sets it on a packet it is queueing, and the radio driver reads it when it
+   * draws the backoff for that packet.
+   *
+   * A node normally draws any slot of the contention window, counted from the moment it draws.
+   * A packet that asks for a parity instead has its slots counted from the end of the last frame
+   * this node sent or heard, and only slots of that parity are taken, so two senders on opposite
+   * parities that redraw after the same frame never land on the same slot, and so are always at
+   * least a slot apart. Useful for a pair of nodes exchanging a stream, where the two ends
+   * otherwise collide with each other far more often than with the rest of the mesh.
+   */
+  enum SlotParity {
+    /*
+     * No parity asked for: the ordinary backoff draw over the whole contention window.
+     */
+    SLOT_PARITY_UNSET = 0;
+
+    /*
+     * Only even-numbered slots, counted from the end of the last frame on air.
+     */
+    SLOT_PARITY_EVEN = 1;
+
+    /*
+     * Only odd-numbered slots, counted from the end of the last frame on air.
+     */
+    SLOT_PARITY_ODD = 2;
+  }
+
+  /*
    * The sending node number.
    * Note: Our crypto implementation uses this field as well.
    * See [crypto](/docs/overview/encryption) for details.
@@ -1731,8 +1947,14 @@ message MeshPacket {
    * Note: this field is _never_ sent on the radio link itself (to save space) Times
    * are typically not sent over the mesh, but they will be added to any Packet
    * (chain of SubPacket) sent to the phone (so the phone can know exact time of reception)
+   * Explicit presence: firmware cannot always attach a trustworthy wall-clock timestamp at the
+   * moment of reception - a node with no GPS and no phone connected yet has no time source at
+   * all. has_rx_time disambiguates that state from a genuine (if coincidental) 1970-01-01
+   * reading. A packet delivered with this field absent may still be re-timestamped once a valid
+   * clock becomes available, before the phone ever sees it - "absent" is not guaranteed
+   * permanent, only "not yet known at last observation".
    */
-  fixed32 rx_time = 7;
+  optional fixed32 rx_time = 7;
 
   /*
    * *Never* sent over the radio links.
@@ -1770,8 +1992,11 @@ message MeshPacket {
 
   /*
    * rssi of received packet. Only sent to phone for dispay purposes.
+   * Explicit presence: rssi 0 is a legitimate reading on some radios (SX126x can report exactly
+   * 0 dBm; SX127x's formula can even go positive). has_rx_rssi disambiguates; a replayed packet
+   * built from history should leave this field absent rather than emitting 0.
    */
-  int32 rx_rssi = 12;
+  optional int32 rx_rssi = 12;
 
   /*
    * Describe if this message is delayed
@@ -1786,6 +2011,10 @@ message MeshPacket {
   /*
    * Hop limit with which the original packet started. Sent via LoRa using three bits in the unencrypted header.
    * When receiving a packet, the difference between hop_start and hop_limit gives how many hops it traveled.
+   * hop_start == 0 does not necessarily mean a direct (0-hop) neighbor: firmware prior to 2.3.0
+   * never populated this field, so a receiver can only trust hop_start == 0 as genuine once it has
+   * decoded the packet and confirmed the sender's bitfield is present (added in 2.5.0). Until then,
+   * or for a sender that never sets that bitfield, treat hop_start == 0 as unknown, not direct.
    */
   uint32 hop_start = 15;
 
@@ -1827,6 +2056,26 @@ message MeshPacket {
    * Indicates whether the packet has a valid signature
    */
   bool xeddsa_signed = 22;
+
+  /*
+   * *Never* sent over the radio links.
+   * Set by the firmware on a received ack or nak, reporting whether its Routing.ack_proof proved
+   * that the node we addressed is the one acknowledging. Clients are not supposed to set this, and
+   * the firmware clears whatever arrives here before evaluating a packet - an inbound value is
+   * attacker-controlled, since MQTT and the client API both carry whole MeshPacket protobufs.
+   *
+   * Distinct from xeddsa_signed, which is an identity signature any holder of the sender's public
+   * key can check. This is a pairwise MAC that only the original sender can check, and it attests
+   * to delivery rather than to authorship.
+   */
+  AckProofStatus ack_proof_status = 23;
+
+  /*
+   * Never sent over the radio links.
+   * Which parity of the CSMA backoff slot grid this packet may be sent in; see SlotParity.
+   * Set by whoever queues the packet, and read by the radio driver when it draws the backoff.
+   */
+  SlotParity slot_parity = 24;
 }
 
 /*
@@ -1970,6 +2219,24 @@ message NodeInfo {
    * LSB 1 of the bitfield
    */
   bool has_xeddsa_signed = 14;
+
+  /*
+   * True if we have heard this node over RF on the LoRa configuration the
+   * radio is using right now. Derived on the device rather than stored: each
+   * node records the frequency slot it was last heard on, and this reports
+   * whether that slot matches the one the radio is currently committed to.
+   * The slot covers the region, modem preset (or the custom bandwidth/spread
+   * factor/coding rate when use_preset is false), override_frequency,
+   * channel_num and the primary channel name.
+   * Because it is derived, leaving a configuration and returning to it
+   * restores the previous answers, so a client sweeping through presets to
+   * listen for traffic does not disturb them.
+   * Not set for nodes heard only over MQTT, which reach us over the internet
+   * rather than over our own radio - see via_mqtt - nor for nodes added as a
+   * shared contact, which have never been heard over RF at all.
+   * Derived from LSB 11 and bits 12..23 of NodeInfoLite.bitfield.
+   */
+  bool heard_on_current_lora = 15;
 }
 
 /*
@@ -2088,6 +2355,21 @@ enum FirmwareEdition {
    * Hamvention, the Dayton amateur radio convention
    */
   HAMVENTION = 19;
+
+  /*
+   * FAB, the international Fab Lab digital fabrication conference
+   */
+  FAB = 20;
+
+  /*
+   * Dragon Con, the yearly pop culture convention in Atlanta, GA
+   */
+  DRAGON_CON = 21;
+
+  /*
+   * Chaos Communication Congress, the hacker conference held yearly in Germany
+   */
+  CCC = 22;
 
   /*
    * Placeholder for DIY and unofficial events
@@ -2337,6 +2619,15 @@ message FromRadio {
      * encoding state as magic-string prefixes inside ClientNotification.
      */
     LockdownStatus lockdown_status = 18;
+
+    /*
+     * Map of which modem presets are legal in each LoRa region. Sent once
+     * during the want_config handshake (right after `metadata`, before the
+     * first `channel`) so client UIs can prevent the user from selecting an
+     * illegal region+preset combination. A region that does not appear in
+     * any group carries no constraint info and should not be restricted.
+     */
+    LoRaRegionPresetMap region_presets = 19;
   }
 }
 
@@ -2393,15 +2684,15 @@ message LockdownStatus {
 
   /*
    * For LOCKED: machine-readable reason. Known values:
-   *   "needs_auth"        — storage already unlocked, client must auth
-   *   "token_missing"     — no boot token on flash
-   *   "token_expired"     — boot token wall-clock TTL elapsed
-   *   "token_boots_zero"  — boot token boot-count TTL exhausted
-   *   "token_hmac_fail"   — token tampered or wrong device
-   *   "token_dek_fail"    — token DEK decrypt failed
-   *   "token_wrong_size"  — token file corrupted
-   *   "token_bad_magic"   — token file corrupted
-   *   "not_provisioned"   — should generally use NEEDS_PROVISION state instead
+   *   "needs_auth"        - storage already unlocked, client must auth
+   *   "token_missing"     - no boot token on flash
+   *   "token_expired"     - boot token wall-clock TTL elapsed
+   *   "token_boots_zero"  - boot token boot-count TTL exhausted
+   *   "token_hmac_fail"   - token tampered or wrong device
+   *   "token_dek_fail"    - token DEK decrypt failed
+   *   "token_wrong_size"  - token file corrupted
+   *   "token_bad_magic"   - token file corrupted
+   *   "not_provisioned"   - should generally use NEEDS_PROVISION state instead
    * Other values may be added; clients should treat unknown values as
    * "locked, ask for passphrase".
    */
@@ -2675,6 +2966,80 @@ message DeviceMetadata {
    * (bitwise OR of ExcludedModules)
    */
   uint32 excluded_modules = 12;
+
+  /*
+   * Indicates whether this firmware build includes XEdDSA packet signature verification.
+   * This is a read-only capability and must be false when XEdDSA is not compiled in.
+   */
+  bool has_xeddsa = 14;
+}
+
+/*
+ * A distinct set of legal modem presets shared by one or more LoRa regions.
+ * Regions that have an identical preset list / default / licensing reference
+ * the same group (by index) via LoRaRegionPresetMap.region_groups. This keeps
+ * the whole map small enough to fit in a single FromRadio packet, since most
+ * regions share the one standard preset list.
+ */
+message LoRaPresetGroup {
+  /*
+   * The modem presets that are legal for every region referencing this group.
+   */
+  repeated Config.LoRaConfig.ModemPreset presets = 1;
+
+  /*
+   * The firmware's default modem preset for regions in this group.
+   * Always one of `presets`. Clients should select this when switching to one
+   * of these regions, or when the current preset is not legal in the new region.
+   */
+  Config.LoRaConfig.ModemPreset default_preset = 2;
+
+  /*
+   * True if regions referencing this group are for licensed operators only
+   * (e.g. amateur / ham radio bands). Clients should warn or gate accordingly.
+   */
+  bool licensed_only = 3;
+}
+
+/*
+ * Associates a single LoRa region with its preset group.
+ */
+message LoRaRegionPresets {
+  /*
+   * The LoRa region this entry describes.
+   */
+  Config.LoRaConfig.RegionCode region = 1;
+
+  /*
+   * Index into LoRaRegionPresetMap.groups for the preset list that is legal
+   * in `region`.
+   */
+  uint32 group_index = 2;
+}
+
+/*
+ * Map describing which modem presets are valid for each LoRa region. Sent by
+ * the firmware during the want_config handshake (as FromRadio.region_presets)
+ * so that client UIs can prevent illegal region+preset selections.
+ *
+ * Delivery is grouped to save space: `groups` holds each distinct preset list,
+ * and `region_groups` maps every known region to one of those groups by index.
+ * A region that does NOT appear in `region_groups` carries no constraint
+ * information and should not be restricted by the client (e.g. firmware that
+ * predates this message, or a region with no firmware table entry). Clients
+ * must also tolerate this whole message being absent.
+ */
+message LoRaRegionPresetMap {
+  /*
+   * One entry per distinct (preset-list, default, licensing) combination.
+   * Referenced by index from `region_groups`.
+   */
+  repeated LoRaPresetGroup groups = 1;
+
+  /*
+   * One entry per known LoRa region, pointing at its preset group.
+   */
+  repeated LoRaRegionPresets region_groups = 2;
 }
 
 /*
@@ -2762,6 +3127,26 @@ enum ExcludedModules {
    * Network config (not technically a module, but used to indicate network capabilities)
    */
   NETWORK_CONFIG = 0x4000;
+
+  /*
+   * Status Message module
+   */
+  STATUSMESSAGE_CONFIG = 0x8000;
+
+  /*
+   * Traffic Management module
+   */
+  TRAFFICMANAGEMENT_CONFIG = 0x10000;
+
+  /*
+   * TAK module
+   */
+  TAK_CONFIG = 0x20000;
+
+  /*
+   * Mesh Beacon module
+   */
+  MESHBEACON_CONFIG = 0x40000;
 }
 
 /*

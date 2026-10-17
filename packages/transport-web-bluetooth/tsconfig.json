@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["@types/web-bluetooth"]
   },
-  "include": ["src"]
+  "include": ["mod.ts", "src"]
 }
