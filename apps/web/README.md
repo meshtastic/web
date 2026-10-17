@@ -89,7 +89,7 @@ instructions listed on the home page.
 Install the dependencies.
 
 ```bash
-cd packages/web &&
+cd apps/web &&
 pnpm install
 ```
 
