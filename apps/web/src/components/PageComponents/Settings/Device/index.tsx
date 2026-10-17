@@ -2,6 +2,8 @@ import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type DeviceValidation,
   DeviceValidationSchema,
+  toDeviceConfig,
+  toDeviceFormValues,
 } from "@app/validation/config/device.ts";
 import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
 import {
@@ -42,7 +44,7 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
     if (!editor) return;
     editor.setRadioSection(
       "device",
-      data as unknown as Protobuf.Config.Config_DeviceConfig,
+      toDeviceConfig(data) as unknown as Protobuf.Config.Config_DeviceConfig,
     );
   };
 
@@ -51,8 +53,8 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={DeviceValidationSchema}
-      defaultValues={config.device}
-      values={effective}
+      defaultValues={toDeviceFormValues(config.device)}
+      values={toDeviceFormValues(effective)}
       fieldGroups={[
         {
           label: t("device.options.label"),
@@ -100,15 +102,15 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
             },
             {
               type: "toggle",
-              name: "disableTripleClick",
-              label: t("device.disableTripleClick.label"),
-              description: t("device.disableTripleClick.description"),
+              name: "tripleClickAdHocPing",
+              label: t("device.tripleClickAdHocPing.label"),
+              description: t("device.tripleClickAdHocPing.description"),
             },
             {
               type: "toggle",
-              name: "ledHeartbeatDisabled",
-              label: t("device.ledHeartbeatDisabled.label"),
-              description: t("device.ledHeartbeatDisabled.description"),
+              name: "ledHeartbeat",
+              label: t("device.ledHeartbeat.label"),
+              description: t("device.ledHeartbeat.description"),
             },
           ],
         },

@@ -16,7 +16,6 @@ function makeSecuritySchema<KeyT>(
   return z
     .object({
       isManaged: z.boolean(),
-      adminChannelEnabled: z.boolean(),
       debugLogApiEnabled: z.boolean(),
       serialEnabled: z.boolean(),
       packetSignaturePolicy: PacketSignaturePolicyEnum,

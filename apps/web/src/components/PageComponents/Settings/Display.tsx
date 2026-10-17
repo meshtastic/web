@@ -145,12 +145,6 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
                 formatEnumName: true,
               },
             },
-            {
-              type: "toggle",
-              name: "enableMessageBubbles",
-              label: t("display.enableMessageBubbles.label"),
-              description: t("display.enableMessageBubbles.description"),
-            },
           ],
         },
       ]}
