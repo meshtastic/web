@@ -36,7 +36,8 @@ in Docker, meshed over the firmware's built-in **UDP multicast** LAN transport
 
 ## Running locally (Docker sim — default)
 
-Prerequisites: Docker, Node + pnpm (`11.5.2`), Python 3.11+.
+Prerequisites: Docker, Node 24 + pnpm (the version in the root
+`package.json` `packageManager` field), Python 3.11+.
 
 ```bash
 pnpm install
