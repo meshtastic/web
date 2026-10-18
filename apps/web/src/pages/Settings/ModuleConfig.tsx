@@ -150,12 +150,12 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
     // Keyed on the first tab so the default moves on when metadata arriving
     // later hides it.
     <Tabs key={tabs[0]?.label} defaultValue={tabs[0]?.label}>
-      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-800">
+      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.label}
             value={tab.label}
-            className="dark:text-white relative max-md:shrink-0"
+            className="relative max-md:shrink-0"
           >
             {tab.label}
             {flags.get(tab.case) && (

@@ -106,12 +106,12 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
 
   return (
     <Tabs defaultValue={t("page.tabUser")}>
-      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-700">
+      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.label}
             value={tab.label}
-            className="dark:text-white relative max-md:shrink-0"
+            className="relative max-md:shrink-0"
           >
             {tab.label}
             {flags.get(tab.case) && (
