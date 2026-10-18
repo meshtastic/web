@@ -8,6 +8,7 @@ import {
   isLocalNetworkHost,
   testHttpReachable,
 } from "@app/pages/Connections/utils";
+import { CertificateGuide } from "@components/CertificateGuide.tsx";
 import { useLocalNetworkAccess } from "@core/hooks/useLocalNetworkAccess.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
@@ -30,12 +31,10 @@ import {
   Bluetooth,
   Cable,
   CheckCircle2,
-  ExternalLink,
   Globe,
   Loader2,
   type LucideIcon,
   MousePointerClick,
-  ShieldAlert,
   XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
@@ -564,25 +563,22 @@ export default function AddConnectionDialog({
                   )}
                 </div>
               )}
-              {state.testStatus === "cert-error" && (
-                <div className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400">
-                  <ShieldAlert className="h-4 w-4 shrink-0" />
-                  <span>
-                    <Trans
-                      i18nKey="connections:httpTest.certNotTrusted"
-                      components={[
-                        <Link
-                          key="open"
-                          href={`${state.protocol}://${state.url}`}
-                          className="inline-flex items-center gap-0.5 underline hover:no-underline"
-                        />,
-                      ]}
-                    />
-                    <ExternalLink className="h-3 w-3 inline-block ml-0.5" />
-                  </span>
-                </div>
-              )}
             </div>
+            {state.testStatus === "cert-error" && (
+              <CertificateGuide
+                url={`${state.protocol}://${state.url.trim()}`}
+                retest={async () =>
+                  (
+                    await testHttpReachable(
+                      `${state.protocol}://${state.url.trim()}`,
+                    )
+                  ).reachable
+                }
+                onTrusted={() =>
+                  dispatch({ type: "SET_TEST_STATUS", payload: "success" })
+                }
+              />
+            )}
             {state.testStatus === "success" && state.slowLocalName && (
               <p className="text-xs text-amber-600 dark:text-amber-400">
                 {t("addConnection.httpConnection.connectionTest.slowLocalName")}

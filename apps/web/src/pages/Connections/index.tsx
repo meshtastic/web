@@ -7,6 +7,7 @@ import { useConnections } from "@app/pages/Connections/useConnections";
 import {
   connectionTypeIcon,
   formatConnectionSubtext,
+  testHttpReachable,
 } from "@app/pages/Connections/utils";
 import {
   AlertDialog,
@@ -19,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@components/UI/AlertDialog.tsx";
+import { CertificateGuide } from "@components/CertificateGuide.tsx";
 import { Badge } from "@components/UI/Badge.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import {
@@ -35,12 +37,10 @@ import {
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
 import { Separator } from "@components/UI/Separator.tsx";
-import { Link } from "@components/UI/Typography/Link.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
-  ExternalLink,
   LinkIcon,
   MoreHorizontal,
   RotateCw,
@@ -373,13 +373,13 @@ function ConnectionCard({
               {connection.error}
             </p>
             {connection.errorKind === "cert" && connection.type === "http" && (
-              <Link
-                href={connection.url}
-                className="inline-flex items-center gap-1 text-sm text-red-600 dark:text-red-400 underline hover:no-underline"
-              >
-                <ExternalLink className="size-3" />
-                {t("errors.openInNewTab")}
-              </Link>
+              <CertificateGuide
+                url={connection.url}
+                retest={async () =>
+                  (await testHttpReachable(connection.url)).reachable
+                }
+                onTrusted={() => void onConnect()}
+              />
             )}
           </div>
         ) : connection.lastConnectedAt ? (

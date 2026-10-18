@@ -85,5 +85,34 @@
   },
   "httpTest": {
     "certNotTrusted": "Certificate not trusted. <0>Open in new tab</0> and accept the warning, then test again."
+  },
+  "certGuide": {
+    "title": "Your browser doesn't trust this radio's certificate yet",
+    "description": "Radios use a self-signed certificate. Accept it once and your browser remembers it for this radio; you don't need to install anything.",
+    "steps": {
+      "firefox": [
+        "Click Open radio below.",
+        "On the warning page, click Advanced…",
+        "Click Accept the Risk and Continue.",
+        "Come back to this tab. The connection is checked again automatically."
+      ],
+      "safari": [
+        "Click Open radio below.",
+        "On the warning page, click Show Details.",
+        "Click visit this website, then Visit Website, and enter your Mac password if asked.",
+        "Come back to this tab. The connection is checked again automatically."
+      ],
+      "chromium": [
+        "Click Open radio below.",
+        "On the warning page, click Advanced.",
+        "Click Proceed to the radio's address (unsafe).",
+        "Come back to this tab. The connection is checked again automatically."
+      ]
+    },
+    "openRadio": "Open radio",
+    "openAgain": "Open radio again",
+    "waiting": "Waiting for you to accept the certificate…",
+    "timedOut": "Still not trusted. Open the radio again and accept the warning.",
+    "trusted": "Certificate accepted. The radio is reachable."
   }
 }
