@@ -169,8 +169,8 @@ importers:
         specifier: ^1.5.1
         version: 1.5.1
       better-result:
-        specifier: ^2.10.0
-        version: 2.10.0
+        specifier: ^3.0.1
+        version: 3.0.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -348,8 +348,8 @@ importers:
         specifier: ^1.14.4
         version: 1.14.4
       better-result:
-        specifier: ^2.10.0
-        version: 2.10.0
+        specifier: ^3.0.1
+        version: 3.0.1
       crc:
         specifier: npm:crc@^4.3.2
         version: 4.3.2
@@ -366,8 +366,8 @@ importers:
         specifier: workspace:*
         version: link:../sdk
       better-result:
-        specifier: ^2.10.0
-        version: 2.10.0
+        specifier: ^3.0.1
+        version: 3.0.1
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.3
@@ -449,8 +449,8 @@ importers:
         specifier: npm:@types/w3c-web-serial@^1.0.8
         version: 1.0.8
       better-result:
-        specifier: ^2.10.0
-        version: 2.10.0
+        specifier: ^3.0.1
+        version: 3.0.1
 
   packages/ui:
     dependencies:
@@ -3519,8 +3519,8 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  better-result@2.10.0:
-    resolution: {integrity: sha512-oQhh0y1qo2/ZKdAAEvHZAqKKiHOFU5k/bW96fE2ScgQOVkJRiHwB+nOS1SgFsYqRlxMDWvefXi9Q3px7QvgNDw==}
+  better-result@3.0.1:
+    resolution: {integrity: sha512-rnCeqEXkKPHmz5MO5ZroPRDyHe4YvlNPyy7qj8cVcWs/GnvSvC3086G74/220W+wWcIWlXgzvcjskFV0A4blUQ==}
 
   bidi-js@1.1.0:
     resolution: {integrity: sha512-fX1Onk0tdVPC7obPWB5EbJ1z7NVhLq4m2xZLq2YXBkxzMXIGRpNMU88n0EPgWseKl12J7zXs7qrDxPK4sRs2fg==}
@@ -9576,7 +9576,7 @@ snapshots:
 
   baseline-browser-mapping@2.11.28: {}
 
-  better-result@2.10.0: {}
+  better-result@3.0.1: {}
 
   bidi-js@1.1.0:
     dependencies:
