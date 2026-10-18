@@ -28,7 +28,7 @@ const TabsTrigger = React.forwardRef<
       // The selected tab is a solid grey with white text so it stands out
       // from the light track (and from the darker Settings tracks in dark
       // mode); unselected tabs are muted until hovered.
-      "inline-flex min-w-[100px] items-center justify-center rounded-none px-3 py-2 text-sm font-medium text-neutral-600 transition-all hover:bg-neutral-300/60 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-neutral-600 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:hover:bg-neutral-600 dark:data-[state=active]:bg-neutral-500 dark:data-[state=active]:text-white dark:data-[state=active]:hover:bg-neutral-500 cursor-pointer",
+      "inline-flex min-w-[100px] items-center justify-center rounded-none px-3 py-2 text-sm font-medium text-neutral-600 transition-all hover:bg-neutral-300/60 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-neutral-600 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:hover:bg-neutral-600 dark:data-[state=active]:bg-neutral-400 dark:data-[state=active]:text-black dark:data-[state=active]:hover:text-black dark:data-[state=active]:hover:bg-neutral-400 cursor-pointer",
       className,
     )}
     {...props}
