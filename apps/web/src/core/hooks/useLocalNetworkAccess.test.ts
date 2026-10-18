@@ -25,20 +25,14 @@ const withPermissions = (names: Record<string, PermissionState>) => {
 describe("useLocalNetworkAccess", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("reads Firefox's local-network permission", async () => {
-    withPermissions({ "local-network": "prompt" });
-    const { result } = renderHook(() => useLocalNetworkAccess());
-    await waitFor(() => expect(result.current).toBe("prompt"));
-  });
-
-  it("falls back to Chrome's local-network-access name", async () => {
+  it("reads Chrome's local-network-access permission", async () => {
     withPermissions({ "local-network-access": "granted" });
     const { result } = renderHook(() => useLocalNetworkAccess());
     await waitFor(() => expect(result.current).toBe("granted"));
   });
 
-  it("is unsupported when the browser knows neither name", async () => {
-    withPermissions({});
+  it("treats Firefox as unsupported: it still blocks HTTP from HTTPS", async () => {
+    withPermissions({ "local-network": "prompt" });
     const { result } = renderHook(() => useLocalNetworkAccess());
     await waitFor(() => expect(result.current).toBe("unsupported"));
   });

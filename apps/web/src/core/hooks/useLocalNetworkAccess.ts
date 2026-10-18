@@ -28,13 +28,9 @@ export function useLocalNetworkAccess(): LocalNetworkAccess {
       setState("unsupported");
       return;
     }
-    // Firefox names the permission "local-network"; Chrome also answers to
-    // its combined "local-network-access". Browsers without Local Network
-    // Access reject both names.
-    const query = (name: string) =>
-      navigator.permissions.query({ name: name as PermissionName });
-    query("local-network")
-      .catch(() => query("local-network-access"))
+    // Browsers without Local Network Access reject the unknown name.
+    navigator.permissions
+      .query({ name: "local-network-access" as PermissionName })
       .then((result) => {
         status = result;
         update();
