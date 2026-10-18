@@ -37,7 +37,7 @@ import {
   MousePointerClick,
   XCircle,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
@@ -72,6 +72,15 @@ type DialogAction =
   | { type: "FORCE_PROTOCOL"; payload: "http" | "https" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
+  | {
+      type: "TEST_RESULT";
+      payload: {
+        protocol: "http" | "https";
+        url: string;
+        status: TestingStatus;
+        slowLocalName: boolean;
+      };
+    }
   | { type: "SET_SLOW_LOCAL_NAME"; payload: boolean }
   | {
       type: "SET_BT_SELECTED";
@@ -198,7 +207,21 @@ export const dialogStateInitializer = (
   overrides?: Partial<DialogState>,
 ): DialogState => createInitialDialogState(overrides);
 
-function dialogReducer(state: DialogState, action: DialogAction): DialogState {
+/** Change the protocol and drop the previous test, which no longer applies. */
+const withProtocol = (
+  state: DialogState,
+  protocol: "http" | "https",
+): DialogState => ({
+  ...state,
+  protocol,
+  testStatus: "idle",
+  slowLocalName: false,
+});
+
+export function dialogReducer(
+  state: DialogState,
+  action: DialogAction,
+): DialogState {
   switch (action.type) {
     case "RESET":
       return createInitialDialogState(
@@ -213,11 +236,22 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
     case "FORCE_PROTOCOL":
       return state.protocol === action.payload
         ? state
-        : { ...state, protocol: action.payload };
+        : withProtocol(state, action.payload);
     case "SET_PROTOCOL_DEFAULT":
       return state.protocolTouched || state.protocol === action.payload
         ? state
-        : { ...state, protocol: action.payload };
+        : withProtocol(state, action.payload);
+    case "TEST_RESULT":
+      // A test that finished after the protocol or URL changed tested
+      // something else; ignore it.
+      return action.payload.protocol === state.protocol &&
+        action.payload.url === state.url
+        ? {
+            ...state,
+            testStatus: action.payload.status,
+            slowLocalName: action.payload.slowLocalName,
+          }
+        : state;
     case "SET_URL":
       return { ...state, url: action.payload };
     case "SET_TEST_STATUS":
@@ -300,6 +334,9 @@ export default function AddConnectionDialog({
   const [state, dispatch] = useReducer(dialogReducer, initialState, () =>
     dialogStateInitializer(isHTTPS ? { protocol: "https" } : {}),
   );
+  // Lets an async test check whether the form changed while it ran.
+  const stateRef = useRef(state);
+  stateRef.current = state;
   const { unsupported } = useBrowserFeatureDetection();
   const { t } = useTranslation();
 
@@ -447,23 +484,34 @@ export default function AddConnectionDialog({
       });
       return;
     }
+    const tested = { protocol: state.protocol, url: state.url };
     dispatch({ type: "SET_TEST_STATUS", payload: "testing" });
     dispatch({ type: "SET_SLOW_LOCAL_NAME", payload: false });
     const { reachable, certError, elapsedMs } = await testHttpReachable(
       validatedURL.data,
     );
-    if (reachable) {
-      dispatch({ type: "SET_TEST_STATUS", payload: "success" });
-      dispatch({
-        type: "SET_SLOW_LOCAL_NAME",
-        payload:
+    const status: TestingStatus = reachable
+      ? "success"
+      : certError
+        ? "cert-error"
+        : "failure";
+    dispatch({
+      type: "TEST_RESULT",
+      payload: {
+        ...tested,
+        status,
+        slowLocalName:
+          reachable &&
           elapsedMs > SLOW_LOCAL_NAME_MS &&
           new URL(validatedURL.data).hostname.endsWith(".local"),
-      });
-    } else if (certError) {
-      dispatch({ type: "SET_TEST_STATUS", payload: "cert-error" });
-    } else {
-      dispatch({ type: "SET_TEST_STATUS", payload: "failure" });
+      },
+    });
+    const current = stateRef.current;
+    if (
+      status === "failure" &&
+      current.protocol === tested.protocol &&
+      current.url === tested.url
+    ) {
       toast({
         title: t("addConnection.httpConnection.connectionTest.failure.title"),
         description: t(
