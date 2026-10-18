@@ -4,7 +4,11 @@ import type {
   ConnectionType,
   NewConnection,
 } from "@app/core/stores/deviceStore/types.ts";
-import { testHttpReachable } from "@app/pages/Connections/utils";
+import {
+  isLocalNetworkHost,
+  testHttpReachable,
+} from "@app/pages/Connections/utils";
+import { useLocalNetworkAccess } from "@core/hooks/useLocalNetworkAccess.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -48,6 +52,8 @@ type DialogState = {
   tab: TabKey;
   name: string;
   protocol: "http" | "https";
+  /** The user set the protocol; automatic defaults leave it alone. */
+  protocolTouched: boolean;
   url: string;
   testStatus: TestingStatus;
   /** The last test reached a .local name, but only slowly. */
@@ -63,6 +69,7 @@ type DialogAction =
   | { type: "SET_TAB"; payload: TabKey }
   | { type: "SET_NAME"; payload: string }
   | { type: "SET_PROTOCOL"; payload: "http" | "https" }
+  | { type: "SET_PROTOCOL_DEFAULT"; payload: "http" | "https" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
   | { type: "SET_SLOW_LOCAL_NAME"; payload: boolean }
@@ -174,6 +181,7 @@ const initialState: DialogState = {
   tab: "http",
   name: "",
   protocol: "http",
+  protocolTouched: false,
   url: "",
   testStatus: "idle",
   slowLocalName: false,
@@ -201,7 +209,11 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
     case "SET_NAME":
       return { ...state, name: action.payload };
     case "SET_PROTOCOL":
-      return { ...state, protocol: action.payload };
+      return { ...state, protocol: action.payload, protocolTouched: true };
+    case "SET_PROTOCOL_DEFAULT":
+      return state.protocolTouched || state.protocol === action.payload
+        ? state
+        : { ...state, protocol: action.payload };
     case "SET_URL":
       return { ...state, url: action.payload };
     case "SET_TEST_STATUS":
@@ -291,7 +303,21 @@ export default function AddConnectionDialog({
     typeof navigator !== "undefined" && "bluetooth" in navigator;
   const serialSupported =
     typeof navigator !== "undefined" && "serial" in navigator;
-  const isURLHTTPS = isHTTPS;
+  // On an HTTPS page, plain HTTP to a device is mixed content unless the
+  // browser supports Chrome's Local Network Access (Chrome/Edge 142+).
+  const localNetworkAccess = useLocalNetworkAccess();
+  const httpAllowed = !isHTTPS || localNetworkAccess !== "unsupported";
+  const isLocalHost = isLocalNetworkHost(state.url);
+
+  // Default local devices to HTTP (no certificate) where the browser allows
+  // it, everything else to HTTPS, until the user picks a protocol.
+  useEffect(() => {
+    if (!isHTTPS || localNetworkAccess === "unknown") return;
+    dispatch({
+      type: "SET_PROTOCOL_DEFAULT",
+      payload: httpAllowed && isLocalHost ? "http" : "https",
+    });
+  }, [isHTTPS, localNetworkAccess, httpAllowed, isLocalHost]);
 
   const reset = useCallback(() => {
     dispatch({ type: "RESET", payload: { isHTTPS } });
@@ -461,7 +487,7 @@ export default function AddConnectionDialog({
             <div className="flex items-center gap-2 mt-1">
               <Switch
                 value={state.protocol}
-                disabled={!!isURLHTTPS}
+                disabled={!httpAllowed}
                 checked={state.protocol === "https"}
                 onCheckedChange={(value) => {
                   dispatch({
@@ -473,6 +499,24 @@ export default function AddConnectionDialog({
               ></Switch>
               <Label>{t("addConnection.httpConnection.useHttps")}</Label>
             </div>
+            {isHTTPS && state.protocol === "http" && (
+              <p
+                className={
+                  localNetworkAccess === "denied"
+                    ? "text-sm text-amber-600 dark:text-amber-400"
+                    : "text-sm text-slate-500 dark:text-slate-400"
+                }
+              >
+                {localNetworkAccess === "denied"
+                  ? t("addConnection.httpConnection.localNetwork.denied")
+                  : t("addConnection.httpConnection.localNetwork.prompt")}
+              </p>
+            )}
+            {isHTTPS && !httpAllowed && (
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                {t("addConnection.httpConnection.localNetwork.unsupported")}
+              </p>
+            )}
             <div className="flex items-center gap-2 mt-4">
               <Button
                 variant="subtle"
@@ -639,7 +683,9 @@ export default function AddConnectionDialog({
       state,
       bluetoothSupported,
       serialSupported,
-      isURLHTTPS,
+      httpAllowed,
+      isHTTPS,
+      localNetworkAccess,
       handlePickBluetooth,
       handlePickSerial,
       handleTestHttp,
