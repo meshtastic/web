@@ -28,6 +28,11 @@ interface CertificateGuideProps {
   retest: () => Promise<boolean>;
   /** Called once the certificate is trusted. */
   onTrusted?: () => void;
+  /**
+   * The failure may not be the certificate (some browsers, e.g. Firefox,
+   * fail too slowly to tell); word the title as a likely cause.
+   */
+  uncertain?: boolean;
   className?: string;
 }
 
@@ -44,6 +49,7 @@ export function CertificateGuide({
   url,
   retest,
   onTrusted,
+  uncertain = false,
   className,
 }: CertificateGuideProps) {
   const { t } = useTranslation("connections");
@@ -116,7 +122,7 @@ export function CertificateGuide({
     >
       <p className="flex items-center gap-2 font-medium text-amber-800 dark:text-amber-300">
         <ShieldAlert className="size-4 shrink-0" />
-        {t("certGuide.title")}
+        {uncertain ? t("certGuide.titleUncertain") : t("certGuide.title")}
       </p>
       <p className="text-slate-600 dark:text-slate-300">
         {t("certGuide.description")}

@@ -372,15 +372,17 @@ function ConnectionCard({
             <p className="text-sm text-red-600 dark:text-red-400">
               {connection.error}
             </p>
-            {connection.errorKind === "cert" && connection.type === "http" && (
-              <CertificateGuide
-                url={connection.url}
-                retest={async () =>
-                  (await testHttpReachable(connection.url)).reachable
-                }
-                onTrusted={() => void onConnect()}
-              />
-            )}
+            {connection.type === "http" &&
+              connection.url.startsWith("https:") && (
+                <CertificateGuide
+                  uncertain={connection.errorKind !== "cert"}
+                  url={connection.url}
+                  retest={async () =>
+                    (await testHttpReachable(connection.url)).reachable
+                  }
+                  onTrusted={() => void onConnect()}
+                />
+              )}
           </div>
         ) : connection.lastConnectedAt ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">

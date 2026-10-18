@@ -42,6 +42,17 @@ describe("CertificateGuide", () => {
   const openRadio = () =>
     fireEvent.click(screen.getByRole("button", { name: /open radio/i }));
 
+  it("words the title as a likely cause when the failure is uncertain", () => {
+    render(
+      <CertificateGuide
+        uncertain
+        url="https://192.168.1.10"
+        retest={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/may not trust its certificate/i)).toBeTruthy();
+  });
+
   it("opens the radio in a new tab", () => {
     render(<CertificateGuide url="https://192.168.1.10" retest={vi.fn()} />);
     openRadio();

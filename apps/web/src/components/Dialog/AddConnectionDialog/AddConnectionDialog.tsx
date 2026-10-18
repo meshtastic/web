@@ -564,8 +564,11 @@ export default function AddConnectionDialog({
                 </div>
               )}
             </div>
-            {state.testStatus === "cert-error" && (
+            {(state.testStatus === "cert-error" ||
+              (state.testStatus === "failure" &&
+                state.protocol === "https")) && (
               <CertificateGuide
+                uncertain={state.testStatus === "failure"}
                 url={`${state.protocol}://${state.url.trim()}`}
                 retest={async () =>
                   (

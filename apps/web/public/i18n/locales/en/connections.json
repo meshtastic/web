@@ -88,6 +88,7 @@
   },
   "certGuide": {
     "title": "Your browser doesn't trust this radio's certificate yet",
+    "titleUncertain": "If the radio is on, your browser may not trust its certificate yet",
     "description": "Radios use a self-signed certificate. Accept it once and your browser remembers it for this radio; you don't need to install anything.",
     "steps": {
       "firefox": [
