@@ -10,4 +10,9 @@ export interface DraftRepository {
   save(key: ConversationKey, text: string): Promise<void>;
   clear(key: ConversationKey): Promise<void>;
   loadAll(): Promise<ReadonlyArray<{ key: ConversationKey; text: string }>>;
+  /**
+   * Points every later read and write at another storage scope. See
+   * `MessageRepository.setScope`.
+   */
+  setScope?(scope: number): void;
 }

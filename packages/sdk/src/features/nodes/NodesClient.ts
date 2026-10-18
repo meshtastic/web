@@ -40,6 +40,8 @@ export class NodesClient {
   private readonly errorsStore: NodeErrorsStore;
   private readonly repository: NodesRepository;
   private hydrated = false;
+  /** Bumped on every storage rescope; see `ChatClient`. */
+  private epoch = 0;
 
   public readonly list: ReadonlySignal<ReadonlyArray<Node>>;
   public readonly errors: ReadonlySignal<ReadonlyArray<NodeError>>;
@@ -164,14 +166,30 @@ export class NodesClient {
   private async hydrate(): Promise<void> {
     if (this.hydrated) return;
     this.hydrated = true;
+    const epoch = this.epoch;
     try {
       const persisted = await this.repository.loadAll();
+      if (epoch !== this.epoch) return;
       for (const node of persisted) {
         if (!this.store.has(node.num)) this.store.set(node.num, node);
       }
     } catch {
       // ok — adapter may not have history yet
     }
+  }
+
+  /**
+   * Points the repository at another storage scope and reloads the node list
+   * from it. Nodes and errors held for the old scope are dropped; nodes the
+   * device reports from now on win over stored ones.
+   */
+  public rescope(scope: number): void {
+    this.repository.setScope?.(scope);
+    this.epoch++;
+    this.store.clear();
+    this.errorsStore.clear();
+    this.hydrated = false;
+    void this.hydrate();
   }
 
   public byNum(nodeNum: number): Node | undefined {

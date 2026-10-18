@@ -1,5 +1,6 @@
 import { ChannelNumber, type Message, MessageState } from "@meshtastic/sdk";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MultiTabCoordinator } from "../coordination/MultiTabCoordinator.ts";
 import type { SqlocalDb } from "../db.ts";
 import { createMemoryDb } from "../testing/createMemoryDb.ts";
 import { SqlocalMessageRepository } from "./SqlocalMessageRepository.ts";
@@ -169,5 +170,46 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     );
     expect(a.map((m) => m.text)).toEqual(["from-1"]);
     expect(b.map((m) => m.text)).toEqual(["from-2"]);
+  });
+
+  it("setScope moves reads, writes and pruning to the new scope", async () => {
+    const channel = {
+      kind: "channel",
+      channel: ChannelNumber.Primary,
+    } as const;
+    await repo.appendBatch([msg(1, 1000, "old"), msg(2, 2000, "old")]);
+
+    repo.setScope(0xabcd);
+    expect(await repo.loadRecent(channel, 10)).toEqual([]);
+    await repo.append(msg(3, 3000, "new"), channel);
+    await repo.append(msg(4, 4000, "new"), channel);
+    await repo.prune({ maxPerBucket: 1 });
+    await repo.updateState(1, MessageState.Failed);
+    expect(
+      (await repo.loadRecent(channel, 10)).map((m) => [m.id, m.text]),
+    ).toEqual([[4, "new"]]);
+
+    const old = new SqlocalMessageRepository(db, { deviceId: 1 });
+    const untouched = await old.loadRecent(channel, 10);
+    expect(untouched.map((m) => m.id)).toEqual([1, 2]);
+    expect(untouched.map((m) => m.state)).toEqual([
+      MessageState.Ack,
+      MessageState.Ack,
+    ]);
+  });
+
+  it("broadcasts changes under the current scope", async () => {
+    const coordinator = new MultiTabCoordinator();
+    const broadcast = vi.spyOn(coordinator, "broadcast");
+    const scoped = new SqlocalMessageRepository(db, {
+      deviceId: 1,
+      coordinator,
+    });
+    scoped.setScope(0xabcd);
+    await scoped.append(msg(5, 5000));
+    expect(broadcast.mock.calls).toEqual([
+      [{ kind: "messages-changed", deviceId: 0xabcd, key: "channel:0" }],
+    ]);
+    coordinator.close();
   });
 });

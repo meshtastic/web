@@ -15,4 +15,9 @@ export interface NodesRepository {
   upsertBatch(nodes: ReadonlyArray<Node>): Promise<void>;
   remove(nodeNum: number): Promise<void>;
   clear(): Promise<void>;
+  /**
+   * Points every later read and write at another storage scope. See
+   * `MessageRepository.setScope`.
+   */
+  setScope?(scope: number): void;
 }

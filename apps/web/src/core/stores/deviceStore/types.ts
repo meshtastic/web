@@ -55,6 +55,12 @@ export type Connection = {
   error?: string;
   errorKind?: "cert" | "network";
   meshDeviceId?: number;
+  /**
+   * Node number of the radio this connection last reached, from the
+   * handshake's my_info. Message, node and telemetry history is stored per
+   * node, so every connection to the same radio shares it.
+   */
+  nodeNum?: number;
 } & NewConnection;
 
 export type NewConnection =

@@ -21,6 +21,8 @@ export class TelemetryClient {
   private readonly repository: TelemetryRepository;
   private readonly retention?: TelemetryRetentionPolicy;
   private readonly hydrated = new Set<number>();
+  /** Bumped on every storage rescope; see `ChatClient`. */
+  private epoch = 0;
 
   constructor(client: MeshClient, options: TelemetryClientOptions = {}) {
     this.store = new TelemetryStore();
@@ -64,6 +66,20 @@ export class TelemetryClient {
     return this.repository.loadBefore(nodeNum, cursor, limit);
   }
 
+  /**
+   * Points the repository at another storage scope and reloads from it the
+   * history of every node loaded so far. Readings held for the old scope are
+   * dropped.
+   */
+  public rescope(scope: number): void {
+    this.repository.setScope?.(scope);
+    this.epoch++;
+    const nodes = [...this.hydrated];
+    this.store.clear();
+    this.hydrated.clear();
+    for (const nodeNum of nodes) void this.hydrate(nodeNum);
+  }
+
   public clearNode(nodeNum: number): Promise<void> {
     this.hydrated.delete(nodeNum);
     return this.repository.clearNode(nodeNum);
@@ -77,11 +93,11 @@ export class TelemetryClient {
   private async hydrate(nodeNum: number): Promise<void> {
     if (this.hydrated.has(nodeNum)) return;
     this.hydrated.add(nodeNum);
+    const epoch = this.epoch;
     try {
       const readings = await this.repository.loadRecent(nodeNum, HYDRATE_LIMIT);
-      for (const reading of readings) {
-        this.store.append(reading);
-      }
+      if (epoch !== this.epoch) return;
+      this.store.merge(nodeNum, readings);
     } catch (e) {
       console.warn("[TelemetryClient] hydrate failed:", e);
     }

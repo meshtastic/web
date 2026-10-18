@@ -54,6 +54,22 @@ export interface MeshClientOptions {
   nodes?: NodesClientOptions;
   telemetry?: TelemetryClientOptions;
   /**
+   * How the chat, draft, nodes and telemetry repositories are scoped. With
+   * `"node"` they keep one history per radio, whatever the transport: as
+   * soon as the handshake's my_info names the radio, the client calls
+   * {@link MeshClient.rescopeStorage} with its node number, unless the
+   * repositories were already opened for that node (`storageNodeNum`).
+   * my_info is the first handshake frame, so this happens before the NodeDB
+   * and any message arrives. Left out, the repositories are never rescoped.
+   */
+  storageScope?: "node";
+  /**
+   * The node number the repositories were opened for, when the caller knows
+   * it (e.g. saved from an earlier connection). Only read with
+   * `storageScope: "node"`.
+   */
+  storageNodeNum?: number;
+  /**
    * Keep-alive interval once the handshake completes. Defaults to
    * {@link HEARTBEAT_INTERVAL_MS}; `false` disables the automatic heartbeat.
    */
@@ -134,6 +150,7 @@ export class MeshClient {
   private _heartbeatIntervalId: ReturnType<typeof setInterval> | undefined;
   private readonly heartbeatIntervalMs: number | false;
   private heartbeatNonce = FIRST_HEARTBEAT_NONCE;
+  private storageNodeNum: number | undefined;
 
   private handshakeStage: HandshakeStage = "idle";
   private handshakeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -153,6 +170,19 @@ export class MeshClient {
     this.configId = options.configId ?? generatePacketId();
     this.heartbeatIntervalMs =
       options.heartbeatIntervalMs ?? HEARTBEAT_INTERVAL_MS;
+    this.storageNodeNum = options.storageNodeNum;
+
+    // Subscribed before the slice clients so the repositories already point
+    // at the new scope when their own my_info handlers run (ChatClient
+    // refiles sent direct messages there). The handler only runs once a frame
+    // arrives, after the slices below exist.
+    if (options.storageScope === "node") {
+      this.events.onMyNodeInfo.subscribe((info) => {
+        if (info.myNodeNum <= 0 || info.myNodeNum === this.storageNodeNum)
+          return;
+        this.rescopeStorage(info.myNodeNum);
+      });
+    }
 
     this.device = new DeviceClient(this);
     this.chat = new ChatClient(this, options.chat);
@@ -181,6 +211,24 @@ export class MeshClient {
 
   public get myNodeNum(): number {
     return this.device.myNodeNum.value ?? 0;
+  }
+
+  /**
+   * Points every slice's repositories at the history stored for `nodeNum`
+   * and reloads from it what the slices had loaded (open conversations,
+   * drafts, the node list, telemetry), dropping what they held for the old
+   * scope. Signals already handed out stay valid. Repositories without a
+   * `setScope` (the in-memory defaults) keep their contents.
+   */
+  public rescopeStorage(nodeNum: number): void {
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      `Storage scope ${this.storageNodeNum ?? "none"} -> ${nodeNum}`,
+    );
+    this.storageNodeNum = nodeNum;
+    this.chat.rescope(nodeNum);
+    this.nodes.rescope(nodeNum);
+    this.telemetry.rescope(nodeNum);
   }
 
   /**
