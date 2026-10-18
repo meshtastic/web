@@ -67,6 +67,10 @@
       "title": "Saved",
       "description": "All configuration changes have been saved."
     },
+    "savePending": {
+      "title": "Saved",
+      "description": "Changes made while saving haven't been sent yet. Save again to send them."
+    },
     "favoriteNode": {
       "title": "{{action}} {{nodeName}} {{direction}} favorites.",
       "action": {
