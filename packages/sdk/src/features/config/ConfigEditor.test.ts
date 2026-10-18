@@ -1,4 +1,4 @@
-import { create } from "@bufbuild/protobuf";
+import { create, fromBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import { describe, expect, it } from "vitest";
 import { MeshClient } from "../../core/client/MeshClient.ts";
@@ -213,6 +213,60 @@ describe("ConfigEditor", () => {
     client.events.onDeviceStatus.dispatch(DeviceStatusEnum.DeviceDisconnected);
 
     expect(editor.radio.value).toEqual({});
+    expect(editor.isDirty.value).toBe(false);
+  });
+
+  it("keeps an edit made while a commit is in flight dirty", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+
+    client.events.onConfigPacket.dispatch(loraPacket(1));
+    client.events.onModuleConfigPacket.dispatch(mqttPacket(false));
+    editor.setRadioSection(
+      "lora",
+      create(Protobuf.Config.Config_LoRaConfigSchema, { region: 4 }),
+    );
+
+    // Hold the first commitEditSettings open so the commit is in flight.
+    const sent: Protobuf.Admin.AdminMessage[] = [];
+    let release: (() => void) | undefined;
+    let held = false;
+    client.sendPacket = (async (payload: Uint8Array) => {
+      const admin = fromBinary(Protobuf.Admin.AdminMessageSchema, payload);
+      sent.push(admin);
+      if (!held && admin.payloadVariant.case === "commitEditSettings") {
+        held = true;
+        await new Promise<void>((resolve) => {
+          release = resolve;
+        });
+      }
+      return 1;
+    }) as never;
+
+    const pending = editor.commit();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    editor.setModuleSection(
+      "mqtt",
+      create(Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema, {
+        enabled: true,
+      }),
+    );
+    release?.();
+    expect((await pending).status).toBe("ok");
+
+    // The lora edit was sent and is clean; the mqtt edit was not and is not.
+    expect(editor.dirtyRadioSections.value).toEqual([]);
+    expect(editor.dirtyModuleSections.value).toEqual(["mqtt"]);
+    expect(editor.isDirty.value).toBe(true);
+    expect(sent.map((a) => a.payloadVariant.case)).not.toContain(
+      "setModuleConfig",
+    );
+
+    // The next commit carries it.
+    expect((await editor.commit()).status).toBe("ok");
+    expect(sent.map((a) => a.payloadVariant.case)).toContain("setModuleConfig");
     expect(editor.isDirty.value).toBe(false);
   });
 });

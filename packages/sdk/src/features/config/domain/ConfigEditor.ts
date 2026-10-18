@@ -297,17 +297,31 @@ export class ConfigEditor {
 
   /**
    * Send all dirty sections to the device wrapped in a beginEdit/commitEdit
-   * pair. On success the baseline is replaced with the working copy
+   * pair. On success the baseline is replaced with what was sent
    * (optimistic update); inbound config packets after commit will reconcile.
+   *
+   * The user can keep editing while a commit is in flight. Those edits replace
+   * the working signals (they are never mutated), so they are not part of the
+   * snapshot taken here and stay dirty for the next commit.
    */
   public async commit(): Promise<Result<void, Error>> {
     if (!this._isDirty.peek()) return Result.ok(undefined);
 
+    const radio = this.workingRadio.peek();
+    const dirtyRadio = this._dirtyRadioSections.peek();
+    const modules = this.workingModules.peek();
+    const dirtyModules = this._dirtyModuleSections.peek();
+    const channels = this.workingChannels.peek();
+    const dirtyChannels = this._dirtyChannels.peek();
+    const owner = this.workingOwner.peek();
+    const ownerDirty = this._isOwnerDirty.peek();
+    const queued = this.queuedAdminMessages.peek();
+    const stagedByKey = this._stagedAdminMessages.peek();
+
     const beginResult = await beginEditSettings(this.client);
     if (Result.isError(beginResult)) return Result.err(beginResult.error);
 
-    const radio = this.workingRadio.peek();
-    for (const variant of this._dirtyRadioSections.peek()) {
+    for (const variant of dirtyRadio) {
       const value = radio[variant];
       if (value === undefined) continue;
       const config = buildRadioConfig(variant, value);
@@ -315,8 +329,7 @@ export class ConfigEditor {
       if (Result.isError(result)) return Result.err(result.error);
     }
 
-    const modules = this.workingModules.peek();
-    for (const variant of this._dirtyModuleSections.peek()) {
+    for (const variant of dirtyModules) {
       const value = modules[variant];
       if (value === undefined) continue;
       const moduleConfig = buildModuleConfig(variant, value);
@@ -324,23 +337,19 @@ export class ConfigEditor {
       if (Result.isError(result)) return Result.err(result.error);
     }
 
-    const channels = this.workingChannels.peek();
-    for (const index of this._dirtyChannels.peek()) {
+    for (const index of dirtyChannels) {
       const channel = channels.get(index);
       if (!channel) continue;
       const result = await setChannel(this.client, channel);
       if (Result.isError(result)) return Result.err(result.error);
     }
 
-    if (this._isOwnerDirty.peek()) {
-      const owner = this.workingOwner.peek();
-      if (owner) {
-        const result = await setOwner(this.client, owner);
-        if (Result.isError(result)) return Result.err(result.error);
-      }
+    if (ownerDirty && owner) {
+      const result = await setOwner(this.client, owner);
+      if (Result.isError(result)) return Result.err(result.error);
     }
 
-    for (const message of this.queuedAdminMessages.peek()) {
+    for (const message of queued) {
       const variant = message.payloadVariant;
       if (!variant.case) continue;
       try {
@@ -350,7 +359,7 @@ export class ConfigEditor {
       }
     }
 
-    const staged = [...this._stagedAdminMessages.peek().values()];
+    const staged = [...stagedByKey.values()];
     for (const message of staged) {
       const variant = message.payloadVariant;
       if (!variant.case) continue;
@@ -364,17 +373,21 @@ export class ConfigEditor {
     const commitResult = await commitEditSettings(this.client);
     if (Result.isError(commitResult)) return Result.err(commitResult.error);
 
-    this.baselineRadio.value = this.workingRadio.peek();
-    this.baselineModules.value = this.workingModules.peek();
-    this.baselineChannels.value = new Map(this.workingChannels.peek());
-    this.baselineOwner.value = this.workingOwner.peek();
-    this.queuedAdminMessages.value = [];
-    this._stagedAdminMessages.value = new Map();
-    this._dirtyRadioSections.value = [];
-    this._dirtyModuleSections.value = [];
-    this._dirtyChannels.value = [];
-    this._isOwnerDirty.value = false;
-    this._isDirty.value = false;
+    this.baselineRadio.value = radio;
+    this.baselineModules.value = modules;
+    this.baselineChannels.value = new Map(channels);
+    this.baselineOwner.value = owner;
+    // Drop only the admin messages that were sent; one queued or staged while
+    // the commit was in flight has not been sent yet.
+    this.queuedAdminMessages.value = this.queuedAdminMessages
+      .peek()
+      .filter((message) => !queued.includes(message));
+    const unsent = new Map(this._stagedAdminMessages.peek());
+    for (const [key, message] of stagedByKey) {
+      if (unsent.get(key) === message) unsent.delete(key);
+    }
+    this._stagedAdminMessages.value = unsent;
+    this.recomputeDirty();
 
     for (const message of staged) {
       this.onStagedAdminMessageCommitted?.(message);
