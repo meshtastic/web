@@ -25,9 +25,10 @@ const TabsTrigger = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.Trigger
     className={cn(
-      // The selected tab is a dark fill with white text so it stands out
-      // from the light track; unselected tabs are muted until hovered.
-      "inline-flex min-w-[100px] items-center justify-center rounded-[0.185rem] px-3 py-1.5 text-sm font-medium text-slate-600 transition-all hover:text-slate-900 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-white cursor-pointer",
+      // The selected tab is a solid grey with white text so it stands out
+      // from the light track (and from the darker Settings tracks in dark
+      // mode); unselected tabs are muted until hovered.
+      "inline-flex min-w-[100px] items-center justify-center rounded-[0.185rem] px-3 py-1.5 text-sm font-medium text-slate-600 transition-all hover:bg-slate-300/60 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-slate-600 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:hover:bg-slate-600 dark:data-[state=active]:bg-slate-500 dark:data-[state=active]:text-white dark:data-[state=active]:hover:bg-slate-500 cursor-pointer",
       className,
     )}
     {...props}
