@@ -86,6 +86,10 @@
       "inputPlaceholder": "192.168.1.10 or meshtastic.local",
       "heading": "URL or IP",
       "useHttps": "Use HTTPS",
+      "localNetwork": {
+        "denied": "Local network access is blocked for this site. Allow it in the site settings (the icon next to the address bar), or switch to HTTPS.",
+        "unsupported": "This browser requires HTTPS on this page. Chrome and Edge can connect over HTTP to devices on your local network."
+      },
       "invalidUrl": {
         "title": "Invalid URL",
         "description": "Please enter a valid HTTP or HTTPS URL."

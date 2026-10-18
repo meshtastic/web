@@ -35,6 +35,27 @@ export class ChatStore {
   }
 
   /**
+   * Adds stored messages to a bucket, skipping any it already holds, and
+   * keeps the bucket in time order. Used on hydrate, where live messages
+   * may already be in the bucket and the stored copy of one of them may
+   * come back from the query too.
+   */
+  merge(key: string, messages: ReadonlyArray<Message>): void {
+    if (messages.length === 0) return;
+    const bucket = this.writeBucket(key);
+    const seen = new Set(bucket.value.map((m) => m.id));
+    const added = messages.filter((m) => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+    if (added.length === 0) return;
+    bucket.value = [...bucket.value, ...added].sort(
+      (a, b) => a.rxTime.getTime() - b.rxTime.getTime(),
+    );
+  }
+
+  /**
    * Whether a message with `id` is already present in the bucket. Used by
    * the inbound-packet subscriber to skip duplicates of an outbound message
    * that was optimistically appended on send.

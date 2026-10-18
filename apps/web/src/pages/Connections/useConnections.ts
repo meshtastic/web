@@ -145,10 +145,16 @@ export function useConnections() {
       updateStatus(id, "configuring");
       log.debug("setupMeshDevice: building MeshDevice", { id, deviceId });
 
+      // Read the node number from the live store: the `connections` closure
+      // can predate the last handshake's update.
+      const nodeNum = useDeviceStore
+        .getState()
+        .savedConnections.find((c) => c.id === id)?.nodeNum;
       const { meshDevice, persistent } = await buildMeshDevice(
         id,
         deviceId,
         transport,
+        nodeNum,
       );
       log.debug("setupMeshDevice: MeshDevice built", { id, persistent });
       if (!persistent) {
@@ -226,9 +232,25 @@ export function useConnections() {
         updateStatus(id, "configuring");
       });
 
+      // History is stored per radio. The SDK switches this session to the
+      // node my_info names; saving it on the connection lets the next connect
+      // open that node's history straight away.
+      const unsubMyNodeInfo = meshDevice.events.onMyNodeInfo.subscribe(
+        ({ myNodeNum }) => {
+          if (myNodeNum <= 0) return;
+          const saved = useDeviceStore
+            .getState()
+            .savedConnections.find((c) => c.id === id);
+          if (saved && saved.nodeNum !== myNodeNum) {
+            updateSavedConnection(id, { nodeNum: myNodeNum });
+          }
+        },
+      );
+
       configSubscriptions.set(id, () => {
         unsubStatusSignal();
         unsubRebooted();
+        unsubMyNodeInfo();
       });
 
       log.debug("setupMeshDevice: calling configure()", { id });

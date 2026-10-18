@@ -47,12 +47,12 @@ export const SettingsTabs = ({ tabs, onFormInit }: SettingsTabsProps) => {
         navigate({ to: ".", search: { tab }, replace: true })
       }
     >
-      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto dark:bg-slate-700">
+      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.key}
             value={tab.key}
-            className="dark:text-white relative max-md:shrink-0"
+            className="relative max-md:shrink-0"
           >
             {tab.label}
             {tab.isDirty && <DirtyDot />}

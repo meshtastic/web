@@ -4,7 +4,12 @@ import type {
   ConnectionType,
   NewConnection,
 } from "@app/core/stores/deviceStore/types.ts";
-import { testHttpReachable } from "@app/pages/Connections/utils";
+import {
+  isLocalNetworkHost,
+  testHttpReachable,
+} from "@app/pages/Connections/utils";
+import { CertificateGuide } from "@components/CertificateGuide.tsx";
+import { useLocalNetworkAccess } from "@core/hooks/useLocalNetworkAccess.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -26,15 +31,13 @@ import {
   Bluetooth,
   Cable,
   CheckCircle2,
-  ExternalLink,
   Globe,
   Loader2,
   type LucideIcon,
   MousePointerClick,
-  ShieldAlert,
   XCircle,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
@@ -48,6 +51,8 @@ type DialogState = {
   tab: TabKey;
   name: string;
   protocol: "http" | "https";
+  /** The user set the protocol; automatic defaults leave it alone. */
+  protocolTouched: boolean;
   url: string;
   testStatus: TestingStatus;
   /** The last test reached a .local name, but only slowly. */
@@ -63,8 +68,19 @@ type DialogAction =
   | { type: "SET_TAB"; payload: TabKey }
   | { type: "SET_NAME"; payload: string }
   | { type: "SET_PROTOCOL"; payload: "http" | "https" }
+  | { type: "SET_PROTOCOL_DEFAULT"; payload: "http" | "https" }
+  | { type: "FORCE_PROTOCOL"; payload: "http" | "https" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
+  | {
+      type: "TEST_RESULT";
+      payload: {
+        protocol: "http" | "https";
+        url: string;
+        status: TestingStatus;
+        slowLocalName: boolean;
+      };
+    }
   | { type: "SET_SLOW_LOCAL_NAME"; payload: boolean }
   | {
       type: "SET_BT_SELECTED";
@@ -174,6 +190,7 @@ const initialState: DialogState = {
   tab: "http",
   name: "",
   protocol: "http",
+  protocolTouched: false,
   url: "",
   testStatus: "idle",
   slowLocalName: false,
@@ -190,7 +207,21 @@ export const dialogStateInitializer = (
   overrides?: Partial<DialogState>,
 ): DialogState => createInitialDialogState(overrides);
 
-function dialogReducer(state: DialogState, action: DialogAction): DialogState {
+/** Change the protocol and drop the previous test, which no longer applies. */
+const withProtocol = (
+  state: DialogState,
+  protocol: "http" | "https",
+): DialogState => ({
+  ...state,
+  protocol,
+  testStatus: "idle",
+  slowLocalName: false,
+});
+
+export function dialogReducer(
+  state: DialogState,
+  action: DialogAction,
+): DialogState {
   switch (action.type) {
     case "RESET":
       return createInitialDialogState(
@@ -201,7 +232,26 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
     case "SET_NAME":
       return { ...state, name: action.payload };
     case "SET_PROTOCOL":
-      return { ...state, protocol: action.payload };
+      return { ...state, protocol: action.payload, protocolTouched: true };
+    case "FORCE_PROTOCOL":
+      return state.protocol === action.payload
+        ? state
+        : withProtocol(state, action.payload);
+    case "SET_PROTOCOL_DEFAULT":
+      return state.protocolTouched || state.protocol === action.payload
+        ? state
+        : withProtocol(state, action.payload);
+    case "TEST_RESULT":
+      // A test that finished after the protocol or URL changed tested
+      // something else; ignore it.
+      return action.payload.protocol === state.protocol &&
+        action.payload.url === state.url
+        ? {
+            ...state,
+            testStatus: action.payload.status,
+            slowLocalName: action.payload.slowLocalName,
+          }
+        : state;
     case "SET_URL":
       return { ...state, url: action.payload };
     case "SET_TEST_STATUS":
@@ -284,6 +334,9 @@ export default function AddConnectionDialog({
   const [state, dispatch] = useReducer(dialogReducer, initialState, () =>
     dialogStateInitializer(isHTTPS ? { protocol: "https" } : {}),
   );
+  // Lets an async test check whether the form changed while it ran.
+  const stateRef = useRef(state);
+  stateRef.current = state;
   const { unsupported } = useBrowserFeatureDetection();
   const { t } = useTranslation();
 
@@ -291,7 +344,29 @@ export default function AddConnectionDialog({
     typeof navigator !== "undefined" && "bluetooth" in navigator;
   const serialSupported =
     typeof navigator !== "undefined" && "serial" in navigator;
-  const isURLHTTPS = isHTTPS;
+  // On an HTTPS page, plain HTTP to a device is mixed content unless the
+  // browser supports Chrome's Local Network Access (Chrome/Edge 142+).
+  const localNetworkAccess = useLocalNetworkAccess();
+  // HTTP stays locked until the browser confirms support.
+  const httpAllowed =
+    !isHTTPS ||
+    (localNetworkAccess !== "unsupported" && localNetworkAccess !== "unknown");
+  const isLocalHost = isLocalNetworkHost(state.url);
+
+  // Default local devices to HTTP (no certificate) where the browser allows
+  // it, everything else to HTTPS, until the user picks a protocol.
+  useEffect(() => {
+    if (!isHTTPS || localNetworkAccess === "unknown") return;
+    if (!httpAllowed) {
+      // Unsupported overrides any earlier choice: HTTP would be blocked.
+      dispatch({ type: "FORCE_PROTOCOL", payload: "https" });
+      return;
+    }
+    dispatch({
+      type: "SET_PROTOCOL_DEFAULT",
+      payload: isLocalHost ? "http" : "https",
+    });
+  }, [isHTTPS, localNetworkAccess, httpAllowed, isLocalHost]);
 
   const reset = useCallback(() => {
     dispatch({ type: "RESET", payload: { isHTTPS } });
@@ -409,23 +484,34 @@ export default function AddConnectionDialog({
       });
       return;
     }
+    const tested = { protocol: state.protocol, url: state.url };
     dispatch({ type: "SET_TEST_STATUS", payload: "testing" });
     dispatch({ type: "SET_SLOW_LOCAL_NAME", payload: false });
     const { reachable, certError, elapsedMs } = await testHttpReachable(
       validatedURL.data,
     );
-    if (reachable) {
-      dispatch({ type: "SET_TEST_STATUS", payload: "success" });
-      dispatch({
-        type: "SET_SLOW_LOCAL_NAME",
-        payload:
+    const status: TestingStatus = reachable
+      ? "success"
+      : certError
+        ? "cert-error"
+        : "failure";
+    dispatch({
+      type: "TEST_RESULT",
+      payload: {
+        ...tested,
+        status,
+        slowLocalName:
+          reachable &&
           elapsedMs > SLOW_LOCAL_NAME_MS &&
           new URL(validatedURL.data).hostname.endsWith(".local"),
-      });
-    } else if (certError) {
-      dispatch({ type: "SET_TEST_STATUS", payload: "cert-error" });
-    } else {
-      dispatch({ type: "SET_TEST_STATUS", payload: "failure" });
+      },
+    });
+    const current = stateRef.current;
+    if (
+      status === "failure" &&
+      current.protocol === tested.protocol &&
+      current.url === tested.url
+    ) {
       toast({
         title: t("addConnection.httpConnection.connectionTest.failure.title"),
         description: t(
@@ -461,7 +547,7 @@ export default function AddConnectionDialog({
             <div className="flex items-center gap-2 mt-1">
               <Switch
                 value={state.protocol}
-                disabled={!!isURLHTTPS}
+                disabled={!httpAllowed}
                 checked={state.protocol === "https"}
                 onCheckedChange={(value) => {
                   dispatch({
@@ -473,6 +559,18 @@ export default function AddConnectionDialog({
               ></Switch>
               <Label>{t("addConnection.httpConnection.useHttps")}</Label>
             </div>
+            {isHTTPS &&
+              state.protocol === "http" &&
+              localNetworkAccess === "denied" && (
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  {t("addConnection.httpConnection.localNetwork.denied")}
+                </p>
+              )}
+            {isHTTPS && !httpAllowed && (
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                {t("addConnection.httpConnection.localNetwork.unsupported")}
+              </p>
+            )}
             <div className="flex items-center gap-2 mt-4">
               <Button
                 variant="subtle"
@@ -513,25 +611,25 @@ export default function AddConnectionDialog({
                   )}
                 </div>
               )}
-              {state.testStatus === "cert-error" && (
-                <div className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400">
-                  <ShieldAlert className="h-4 w-4 shrink-0" />
-                  <span>
-                    <Trans
-                      i18nKey="connections:httpTest.certNotTrusted"
-                      components={[
-                        <Link
-                          key="open"
-                          href={`${state.protocol}://${state.url}`}
-                          className="inline-flex items-center gap-0.5 underline hover:no-underline"
-                        />,
-                      ]}
-                    />
-                    <ExternalLink className="h-3 w-3 inline-block ml-0.5" />
-                  </span>
-                </div>
-              )}
             </div>
+            {(state.testStatus === "cert-error" ||
+              (state.testStatus === "failure" &&
+                state.protocol === "https")) && (
+              <CertificateGuide
+                uncertain={state.testStatus === "failure"}
+                url={`${state.protocol}://${state.url.trim()}`}
+                retest={async () =>
+                  (
+                    await testHttpReachable(
+                      `${state.protocol}://${state.url.trim()}`,
+                    )
+                  ).reachable
+                }
+                onTrusted={() =>
+                  dispatch({ type: "SET_TEST_STATUS", payload: "success" })
+                }
+              />
+            )}
             {state.testStatus === "success" && state.slowLocalName && (
               <p className="text-xs text-amber-600 dark:text-amber-400">
                 {t("addConnection.httpConnection.connectionTest.slowLocalName")}
@@ -639,7 +737,9 @@ export default function AddConnectionDialog({
       state,
       bluetoothSupported,
       serialSupported,
-      isURLHTTPS,
+      httpAllowed,
+      isHTTPS,
+      localNetworkAccess,
       handlePickBluetooth,
       handlePickSerial,
       handleTestHttp,

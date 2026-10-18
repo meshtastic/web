@@ -3,6 +3,7 @@ import {
   type DeviceOutput,
   type Transport,
 } from "@meshtastic/sdk";
+import { withLocalNetworkTarget } from "./localNetwork.ts";
 
 const FETCH_INTERVAL_MS = 3000;
 const READ_TIMEOUT_MS = 7000;
@@ -52,9 +53,10 @@ export class TransportHTTP implements Transport {
     tls?: boolean,
   ): Promise<TransportHTTP> {
     const connectionUrl = `${tls ? "https" : "http"}://${address}`;
-    await fetch(`${connectionUrl}/api/v1/toradio`, {
-      method: "OPTIONS",
-    });
+    await fetch(
+      `${connectionUrl}/api/v1/toradio`,
+      withLocalNetworkTarget(connectionUrl, { method: "OPTIONS" }),
+    );
     return new TransportHTTP(connectionUrl);
   }
 
@@ -123,11 +125,11 @@ export class TransportHTTP implements Transport {
       try {
         const response = await fetch(
           `${this.url}/api/v1/fromradio?all=${this.receiveBatchRequests ? "true" : "false"}`,
-          {
+          withLocalNetworkTarget(this.url, {
             method: "GET",
             headers: { Accept: "application/x-protobuf" },
             signal,
-          },
+          }),
         );
         if (!response.ok) {
           throw new Error(
@@ -154,12 +156,15 @@ export class TransportHTTP implements Transport {
   /** Write a protobuf-encoded request to `/api/v1/toradio`. */
   private async writeToRadio(data: Uint8Array): Promise<void> {
     try {
-      const response = await fetch(`${this.url}/api/v1/toradio`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/x-protobuf" },
-        body: toArrayBuffer(data),
-        signal: AbortSignal.timeout(WRITE_TIMEOUT_MS),
-      });
+      const response = await fetch(
+        `${this.url}/api/v1/toradio`,
+        withLocalNetworkTarget(this.url, {
+          method: "PUT",
+          headers: { "Content-Type": "application/x-protobuf" },
+          body: toArrayBuffer(data),
+          signal: AbortSignal.timeout(WRITE_TIMEOUT_MS),
+        }),
+      );
       if (!response.ok) {
         throw new Error(`toradio ${response.status} ${response.statusText}`);
       }

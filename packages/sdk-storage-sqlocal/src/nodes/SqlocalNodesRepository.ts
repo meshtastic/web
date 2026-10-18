@@ -16,11 +16,19 @@ export interface SqlocalNodesRepositoryOptions {
  */
 export class SqlocalNodesRepository implements NodesRepository {
   private readonly db: SqlocalDb;
-  private readonly deviceId: number;
+  private deviceId: number;
 
   constructor(db: SqlocalDb, options: SqlocalNodesRepositoryOptions) {
     this.db = db;
     this.deviceId = options.deviceId;
+  }
+
+  /**
+   * Points every later read and write at another `device_id`. Rows under the
+   * old one are left as they are.
+   */
+  setScope(deviceId: number): void {
+    this.deviceId = deviceId;
   }
 
   async loadAll(): Promise<Node[]> {

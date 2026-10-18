@@ -33,6 +33,14 @@ export class DraftStore {
     this.ensure(k).value = "";
   }
 
+  /**
+   * Empties every draft. Signals stay in place so subscribers keep
+   * receiving updates.
+   */
+  reset(): void {
+    for (const bucket of this.buckets.values()) bucket.value = "";
+  }
+
   private ensure(k: string): Signal<string> {
     let bucket = this.buckets.get(k);
     if (!bucket) {

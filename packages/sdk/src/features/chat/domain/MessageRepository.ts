@@ -54,6 +54,13 @@ export interface MessageRepository {
    * with how many moved.
    */
   refileSentDirect?(localNodeNum: number): Promise<number>;
+  /**
+   * Points every later read and write at another storage scope (e.g. the
+   * node number of the connected radio). Synchronous, so a write issued
+   * right after the call already lands in the new scope. Repositories with
+   * nothing to scope, like the in-memory one, leave it out.
+   */
+  setScope?(scope: number): void;
 }
 
 /**
@@ -71,4 +78,13 @@ export function conversationKeyString(key: ConversationKey): string {
   return key.kind === "channel"
     ? `channel:${key.channel}`
     : `direct:${key.peer}`;
+}
+
+/** Inverse of {@link conversationKeyString}. */
+export function parseConversationKey(s: string): ConversationKey {
+  if (s.startsWith("channel:"))
+    return { kind: "channel", channel: Number(s.slice(8)) };
+  if (s.startsWith("direct:"))
+    return { kind: "direct", peer: Number(s.slice(7)) };
+  throw new Error(`Unknown conversation key format: ${s}`);
 }

@@ -70,4 +70,23 @@ describe("SqlocalDraftRepository", () => {
     const all = await repo.loadAll();
     expect(all.length).toBe(2);
   });
+
+  it("setScope moves reads and writes to the new scope", async () => {
+    const channel = {
+      kind: "channel",
+      channel: ChannelNumber.Primary,
+    } as const;
+    await repo.save(channel, "old");
+
+    repo.setScope(0xabcd);
+    expect(await repo.load(channel)).toBe("");
+    expect(await repo.loadAll()).toEqual([]);
+    await repo.save(channel, "new");
+    await repo.save({ kind: "direct", peer: 7 }, "dm");
+    await repo.clear({ kind: "direct", peer: 7 });
+    expect(await repo.loadAll()).toEqual([{ key: channel, text: "new" }]);
+
+    const old = new SqlocalDraftRepository(db, { deviceId: 1 });
+    expect(await old.load(channel)).toBe("old");
+  });
 });

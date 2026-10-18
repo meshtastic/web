@@ -100,4 +100,21 @@ describe("SqlocalTelemetryRepository", () => {
     expect(v?.batteryLevel).toBe(73);
     expect(v?.voltage).toBeCloseTo(4.1);
   });
+
+  it("setScope moves reads, writes and pruning to the new scope", async () => {
+    await repo.appendBatch([reading(100, 1000), reading(100, 2000)]);
+
+    repo.setScope(0xabcd);
+    expect(await repo.loadRecent(100, 10)).toEqual([]);
+    await repo.appendBatch([reading(100, 3000), reading(100, 4000)]);
+    await repo.prune({ maxPerNode: 1 });
+    expect(
+      (await repo.loadRecent(100, 10)).map((r) => r.time.getTime()),
+    ).toEqual([4000]);
+
+    const old = new SqlocalTelemetryRepository(db, { deviceId: 1 });
+    expect(
+      (await old.loadRecent(100, 10)).map((r) => r.time.getTime()),
+    ).toEqual([1000, 2000]);
+  });
 });
