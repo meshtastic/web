@@ -199,6 +199,28 @@ describe("ConfigEditor", () => {
     expect(editor.isDirty.value).toBe(false);
   });
 
+  it("an undefined section reverts to the baseline", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+    const radio = interceptAdminMessages(client);
+
+    client.events.onConfigPacket.dispatch(loraPacket(4));
+    client.events.onModuleConfigPacket.dispatch(mqttPacket(false));
+    editor.setRadioSection(
+      "lora",
+      create(Protobuf.Config.Config_LoRaConfigSchema, { region: 7 }),
+    );
+    editor.setRadioSection("lora", undefined);
+    editor.setModuleSection("mqtt", undefined);
+    editor.setRadioSection("position", undefined);
+
+    expect(editor.radio.value.lora?.region).toBe(4);
+    expect(editor.isDirty.value).toBe(false);
+    expect((await editor.commit()).status).toBe("ok");
+    expect(radio.sent).toEqual([]);
+  });
+
   it("disconnect drops baseline and working", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
