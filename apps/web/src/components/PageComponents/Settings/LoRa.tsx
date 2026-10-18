@@ -1,13 +1,21 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
+  codingRateOverride,
+  codingRateOverrides,
+  hasPaFan,
   type LoRaValidation,
   makeLoRaValidationSchema,
+  normalizeCodingRate,
+  presetCodingRate,
 } from "@app/validation/config/lora.ts";
+import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import type { FieldProps } from "@components/Form/DynamicFormField.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
+import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useDevice } from "@core/stores";
 import {
   getAllowedPresets,
@@ -16,10 +24,10 @@ import {
   getLicensedOnlyRegions,
   pickEnumValues,
 } from "@core/utils/loraPresets.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { firmwareAtLeast, Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
-import { useCallback, useMemo, useRef, useState } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 interface LoRaConfigProps {
@@ -47,7 +55,8 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
 
   const { t } = useTranslation("config");
 
-  const { regionPresets, supportsFirmware28 } = useDeviceCapabilities();
+  const { regionPresets, supportsFirmware28, metadata } =
+    useDeviceCapabilities();
   const caps = useMemo(
     () => ({ regionPresets, supportsFirmware28 }),
     [regionPresets, supportsFirmware28],
@@ -56,11 +65,52 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
     () => makeLoRaValidationSchema(caps),
     [caps],
   );
+  // Firmware 2.7.18+ applies a coding rate above the preset's own.
+  const supportsCodingRateOverride =
+    supportsFirmware28 ||
+    firmwareAtLeast(metadata?.firmwareVersion ?? "", "2.7.18");
+  const showPaFan = hasPaFan(useMyNodeAsProto()?.user?.hwModel);
+
+  const toFormValues = (cfg: Protobuf.Config.Config_LoRaConfig | undefined) =>
+    (cfg && supportsCodingRateOverride
+      ? normalizeCodingRate(cfg)
+      : cfg) as unknown as LoRaValidation;
+
+  // The form is created here, not in DynamicForm, so the coding rate
+  // override can follow Use Preset and the selected preset.
+  const formMethods = useForm<LoRaValidation>({
+    mode: "onChange",
+    defaultValues: toFormValues(config.lora),
+    resolver: createZodResolver(validationSchema),
+    shouldFocusError: false,
+    resetOptions: { keepDefaultValues: true },
+    values: toFormValues(effectiveLora),
+  });
+  const { control, getValues, setValue } = formMethods;
+  const [usePreset, modemPreset] = useWatch({
+    control,
+    name: ["usePreset", "modemPreset"],
+  });
+
+  useEffect(() => {
+    onFormInit(formMethods);
+  }, [onFormInit, formMethods]);
+
+  // Keep an override only while it still raises the newly chosen preset.
+  const onPresetChange = (
+    next: Protobuf.Config.Config_LoRaConfig_ModemPreset,
+  ) => {
+    if (!supportsCodingRateOverride || !getValues("usePreset")) return;
+    const current = Number(getValues("codingRate"));
+    const kept = codingRateOverride(next, current);
+    if (kept !== current) {
+      setValue("codingRate", kept, { shouldDirty: true });
+    }
+  };
 
   // The region picked in the form, which may not be saved yet. A pick only
   // holds while the effective config still has the region it was made
   // against; once it is saved or discarded the effective config wins.
-  const formRef = useRef<UseFormReturn<LoRaValidation> | undefined>(undefined);
   const effectiveRegion = effectiveLora?.region;
   const [picked, setPicked] = useState<{
     region: Protobuf.Config.Config_LoRaConfig_RegionCode;
@@ -68,14 +118,6 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
   }>();
   const region =
     picked && picked.over === effectiveRegion ? picked.region : effectiveRegion;
-
-  const handleFormInit = useCallback<DynamicFormFormInit<LoRaValidation>>(
-    (methods) => {
-      formRef.current = methods;
-      onFormInit(methods);
-    },
-    [onFormInit],
-  );
 
   const onRegionChange = (value: string) => {
     const next = Number.parseInt(
@@ -87,9 +129,8 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
     // switching regions.
     const defaultPreset = getDefaultPreset(regionPresets, next);
     if (defaultPreset !== undefined) {
-      formRef.current?.setValue("modemPreset", defaultPreset, {
-        shouldDirty: true,
-      });
+      setValue("modemPreset", defaultPreset, { shouldDirty: true });
+      onPresetChange(defaultPreset);
     }
   };
 
@@ -120,17 +161,116 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
     if (!editor) return;
     editor.setRadioSection(
       "lora",
-      data as unknown as Protobuf.Config.Config_LoRaConfig,
+      (supportsCodingRateOverride
+        ? normalizeCodingRate(data)
+        : data) as unknown as Protobuf.Config.Config_LoRaConfig,
     );
   };
 
+  // Coding Rate Override: shown with presets on, like Android. Offers
+  // "Preset default" (stored as 0) and the rates above the preset's own.
+  const presetRate =
+    modemPreset === undefined ? undefined : presetCodingRate(modemPreset);
+  const codingRateOverrideFields: FieldProps<LoRaValidation>[] = [];
+  if (
+    supportsCodingRateOverride &&
+    usePreset &&
+    modemPreset !== undefined &&
+    presetRate !== undefined
+  ) {
+    const overrides = codingRateOverrides(modemPreset);
+    const fraction = (rate: number) =>
+      t("lora.codingRateOverride.fraction", { rate });
+    codingRateOverrideFields.push({
+      type: "select",
+      name: "codingRate",
+      label: t("lora.codingRateOverride.label"),
+      description:
+        overrides.length === 0
+          ? t("lora.codingRateOverride.maxDescription")
+          : t("lora.codingRateOverride.description"),
+      disabled: overrides.length === 0,
+      properties: {
+        enumValue: Object.fromEntries([
+          [
+            t("lora.codingRateOverride.presetDefault", {
+              rate: fraction(presetRate),
+              // Plain text in a select option; keep the "/" as is.
+              interpolation: { escapeValue: false },
+            }),
+            0,
+          ],
+          ...overrides.map((rate) => [fraction(rate), rate]),
+        ]),
+      },
+    });
+  }
+
+  // As on Android, presets on shows the preset (and its coding rate
+  // override); presets off shows the manual modem settings instead.
+  const modemFields: FieldProps<LoRaValidation>[] = usePreset
+    ? [
+        {
+          type: "select",
+          name: "modemPreset",
+          label: t("lora.modemPreset.label"),
+          description:
+            defaultPreset === undefined
+              ? t("lora.modemPreset.description")
+              : t("lora.modemPreset.descriptionForRegion"),
+          selectChange: (value) =>
+            onPresetChange(
+              Number.parseInt(
+                value,
+                10,
+              ) as Protobuf.Config.Config_LoRaConfig_ModemPreset,
+            ),
+          properties: {
+            enumValue: presetOptions,
+            formatEnumName: true,
+            optionSuffixes: presetSuffixes,
+          },
+        },
+        ...codingRateOverrideFields,
+      ]
+    : [
+        {
+          type: "number",
+          name: "bandwidth",
+          label: t("lora.bandwidth.label"),
+          description: t("lora.bandwidth.description"),
+          properties: { suffix: t("unit.kilohertz") },
+        },
+        {
+          type: "number",
+          name: "spreadFactor",
+          label: t("lora.spreadingFactor.label"),
+          description: t("lora.spreadingFactor.description"),
+          properties: { suffix: t("unit.cps") },
+        },
+        {
+          type: "number",
+          name: "codingRate",
+          label: t("lora.codingRate.label"),
+          description: t("lora.codingRate.description"),
+        },
+      ];
+
+  const paFanFields: FieldProps<LoRaValidation>[] = showPaFan
+    ? [
+        {
+          type: "toggle",
+          name: "paFanDisabled",
+          label: t("lora.paFanDisabled.label"),
+          description: t("lora.paFanDisabled.description"),
+        },
+      ]
+    : [];
+
   return (
     <DynamicForm<LoRaValidation>
+      propMethods={formMethods}
       onSubmit={onSubmit}
-      onFormInit={handleFormInit}
-      validationSchema={validationSchema}
-      defaultValues={config.lora}
-      values={effectiveLora}
       fieldGroups={[
         {
           label: t("lora.optionsCard.label"),
@@ -153,44 +293,7 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
               label: t("lora.usePreset.label"),
               description: t("lora.usePreset.description"),
             },
-            {
-              type: "select",
-              name: "modemPreset",
-              label: t("lora.modemPreset.label"),
-              description:
-                defaultPreset === undefined
-                  ? t("lora.modemPreset.description")
-                  : t("lora.modemPreset.descriptionForRegion"),
-              disabledBy: [{ fieldName: "usePreset" }],
-              properties: {
-                enumValue: presetOptions,
-                formatEnumName: true,
-                optionSuffixes: presetSuffixes,
-              },
-            },
-            {
-              type: "number",
-              name: "bandwidth",
-              label: t("lora.bandwidth.label"),
-              description: t("lora.bandwidth.description"),
-              disabledBy: [{ fieldName: "usePreset", invert: true }],
-              properties: { suffix: t("unit.kilohertz") },
-            },
-            {
-              type: "number",
-              name: "spreadFactor",
-              label: t("lora.spreadingFactor.label"),
-              description: t("lora.spreadingFactor.description"),
-              disabledBy: [{ fieldName: "usePreset", invert: true }],
-              properties: { suffix: t("unit.cps") },
-            },
-            {
-              type: "number",
-              name: "codingRate",
-              label: t("lora.codingRate.label"),
-              description: t("lora.codingRate.description"),
-              disabledBy: [{ fieldName: "usePreset", invert: true }],
-            },
+            ...modemFields,
           ],
         },
         {
@@ -237,15 +340,6 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
               description: t("lora.frequencySlot.description"),
             },
             {
-              type: "number",
-              name: "frequencyOffset",
-              label: t("lora.frequencyOffset.label"),
-              description: t("lora.frequencyOffset.description"),
-              properties: {
-                suffix: t("unit.hertz"),
-              },
-            },
-            {
               type: "toggle",
               name: "sx126xRxBoostedGain",
               label: t("lora.boostedRxGain.label"),
@@ -268,22 +362,7 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
               description: t("lora.transmitPower.description"),
               properties: { suffix: t("unit.dbm") },
             },
-            {
-              type: "select",
-              name: "femLnaMode",
-              label: t("lora.femLnaMode.label"),
-              description: t("lora.femLnaMode.description"),
-              properties: {
-                enumValue: Protobuf.Config.Config_LoRaConfig_FEM_LNA_Mode,
-                formatEnumName: true,
-              },
-            },
-            {
-              type: "toggle",
-              name: "serialHalOnly",
-              label: t("lora.serialHalOnly.label"),
-              description: t("lora.serialHalOnly.description"),
-            },
+            ...paFanFields,
           ],
         },
       ]}

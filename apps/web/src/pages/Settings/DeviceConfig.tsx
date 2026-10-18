@@ -4,30 +4,18 @@ import { Display } from "@components/PageComponents/Settings/Display.tsx";
 import { Network } from "@components/PageComponents/Settings/Network/index.tsx";
 import { Position } from "@components/PageComponents/Settings/Position.tsx";
 import { Power } from "@components/PageComponents/Settings/Power.tsx";
-import { User } from "@components/PageComponents/Settings/User.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import type { ValidConfigType } from "@core/stores";
+import type { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
-import { type ComponentType, Suspense, useMemo } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-
-interface ConfigProps {
-  onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
-}
-
-type TabItem = {
-  case: ValidConfigType | "user";
-  label: string;
-  element: ComponentType<ConfigProps>;
-  count?: number;
-};
+import { dirtyDeviceTabs } from "./dirtySections.ts";
+import {
+  type ConfigProps,
+  type SettingsTab,
+  SettingsTabs,
+} from "./SettingsTabs.tsx";
 
 const EMPTY_DIRTY_RADIO_SIGNAL = {
   value: [] as readonly string[],
@@ -35,101 +23,61 @@ const EMPTY_DIRTY_RADIO_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
-const EMPTY_OWNER_DIRTY_SIGNAL = {
-  value: false,
-  peek: () => false,
+const EMPTY_STAGED_SIGNAL = {
+  value: new Map() as ReadonlyMap<string, unknown>,
+  peek: () => new Map() as ReadonlyMap<string, unknown>,
   subscribe: () => () => {},
 } as const;
+
+type DeviceTab = {
+  key: ValidConfigType;
+  labelKey: string;
+  element: ComponentType<ConfigProps>;
+};
+
+/** Device configuration tabs, in the order of Android's deviceConfigRoutes. */
+export const DEVICE_TABS: DeviceTab[] = [
+  { key: "device", labelKey: "page.tabDevice", element: Device },
+  { key: "position", labelKey: "page.tabPosition", element: Position },
+  { key: "power", labelKey: "page.tabPower", element: Power },
+  { key: "network", labelKey: "page.tabNetwork", element: Network },
+  { key: "display", labelKey: "page.tabDisplay", element: Display },
+  { key: "bluetooth", labelKey: "page.tabBluetooth", element: Bluetooth },
+];
+
+/**
+ * Tabs this hardware supports: Network needs Wi-Fi or Ethernet, Bluetooth
+ * needs Bluetooth. Until metadata arrives every tab shows, as on Android.
+ */
+export function visibleDeviceTabs(
+  metadata: Protobuf.Mesh.DeviceMetadata | undefined,
+): DeviceTab[] {
+  return DEVICE_TABS.filter((tab) => {
+    if (!metadata) return true;
+    if (tab.key === "network") return metadata.hasWifi || metadata.hasEthernet;
+    if (tab.key === "bluetooth") return metadata.hasBluetooth;
+    return true;
+  });
+}
 
 export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
   const editor = useConfigEditor();
   const dirtyRadio = useSignal(
     editor?.dirtyRadioSections ?? EMPTY_DIRTY_RADIO_SIGNAL,
   );
-  const isOwnerDirty = useSignal(
-    editor?.isOwnerDirty ?? EMPTY_OWNER_DIRTY_SIGNAL,
-  );
+  const staged = useSignal(editor?.stagedAdminMessages ?? EMPTY_STAGED_SIGNAL);
+  const { metadata } = useDeviceCapabilities();
   const { t } = useTranslation("config");
-  const tabs: TabItem[] = useMemo(
-    () => [
-      {
-        case: "user",
-        label: t("page.tabUser"),
-        element: User,
-      },
-      {
-        case: "device",
-        label: t("page.tabDevice"),
-        element: Device,
-      },
-      {
-        case: "position",
-        label: t("page.tabPosition"),
-        element: Position,
-      },
-      {
-        case: "power",
-        label: t("page.tabPower"),
-        element: Power,
-      },
-      {
-        case: "network",
-        label: t("page.tabNetwork"),
-        element: Network,
-      },
-      {
-        case: "display",
-        label: t("page.tabDisplay"),
-        element: Display,
-      },
-      {
-        case: "bluetooth",
-        label: t("page.tabBluetooth"),
-        element: Bluetooth,
-      },
-    ],
-    [t],
-  );
 
-  const flags = useMemo(
-    () =>
-      new Map(
-        tabs.map((tab) => [
-          tab.case,
-          tab.case === "user"
-            ? isOwnerDirty
-            : dirtyRadio.includes(tab.case as ValidConfigType),
-        ]),
-      ),
-    [tabs, dirtyRadio, isOwnerDirty],
-  );
+  const tabs: SettingsTab[] = useMemo(() => {
+    const dirty = dirtyDeviceTabs(dirtyRadio, staged.keys());
+    return visibleDeviceTabs(metadata).map((tab) => ({
+      key: tab.key,
+      label: t(tab.labelKey),
+      element: tab.element,
+      isDirty: dirty.has(tab.key),
+    }));
+  }, [t, metadata, dirtyRadio, staged]);
 
-  return (
-    <Tabs defaultValue={t("page.tabUser")}>
-      <TabsList className="w-full max-md:flex-nowrap max-md:overflow-x-auto">
-        {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.label}
-            value={tab.label}
-            className="relative max-md:shrink-0"
-          >
-            {tab.label}
-            {flags.get(tab.case) && (
-              <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
-                <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
-              </span>
-            )}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      {tabs.map((tab) => (
-        <TabsContent key={tab.label} value={tab.label} className="max-md:px-2">
-          <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <tab.element onFormInit={onFormInit} />
-          </Suspense>
-        </TabsContent>
-      ))}
-    </Tabs>
-  );
+  return <SettingsTabs tabs={tabs} onFormInit={onFormInit} />;
 };

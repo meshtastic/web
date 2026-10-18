@@ -18,6 +18,9 @@
       "nodes": "Nodes"
     }
   },
+  "settings": {
+    "label": "Settings"
+  },
   "manage": {
     "label": "Manage",
     "command": {

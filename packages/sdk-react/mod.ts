@@ -39,6 +39,11 @@ export {
   useModuleConfig,
 } from "./src/hooks/useConfig.ts";
 export { useConfigEditor } from "./src/hooks/useConfigEditor.ts";
+export {
+  useCannedMessages,
+  useRingtone,
+} from "./src/hooks/useModuleMessages.ts";
+export type { UseModuleMessagesResult } from "./src/hooks/useModuleMessages.ts";
 export { useConnectionProgress } from "./src/hooks/useConnectionProgress.ts";
 export {
   useTotalUnread,

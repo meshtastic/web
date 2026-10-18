@@ -16,7 +16,6 @@ describe("RawSecuritySchema", () => {
   it("accepts valid security config", () => {
     const result = RawSecuritySchema.safeParse({
       isManaged: false,
-      adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
       packetSignaturePolicy: COMPATIBLE,
@@ -30,7 +29,6 @@ describe("RawSecuritySchema", () => {
   it("rejects if privateKey is invalid", () => {
     const result = RawSecuritySchema.safeParse({
       isManaged: false,
-      adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
       packetSignaturePolicy: COMPATIBLE,
@@ -49,7 +47,6 @@ describe("RawSecuritySchema", () => {
   it("requires at least one adminKey if isManaged", () => {
     const result = RawSecuritySchema.safeParse({
       isManaged: true,
-      adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
       packetSignaturePolicy: COMPATIBLE,
@@ -70,7 +67,6 @@ describe("RawSecuritySchema", () => {
   it("accepts if at least one adminKey is valid when isManaged", () => {
     const result = RawSecuritySchema.safeParse({
       isManaged: true,
-      adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
       packetSignaturePolicy: COMPATIBLE,
@@ -82,10 +78,27 @@ describe("RawSecuritySchema", () => {
   });
 });
 
+describe("adminChannelEnabled", () => {
+  it("is not part of the form, so a save keeps the device's value", () => {
+    const validKey = makeBase64OfLength(32);
+    const result = RawSecuritySchema.safeParse({
+      isManaged: false,
+      adminChannelEnabled: true,
+      debugLogApiEnabled: false,
+      serialEnabled: true,
+      packetSignaturePolicy: COMPATIBLE,
+      privateKey: validKey,
+      publicKey: validKey,
+      adminKey: [validKey, "", ""],
+    });
+    expect(result.success).toBe(true);
+    expect(result.data).not.toHaveProperty("adminChannelEnabled");
+  });
+});
+
 describe("packetSignaturePolicy", () => {
   const base = {
     isManaged: false,
-    adminChannelEnabled: false,
     debugLogApiEnabled: false,
     serialEnabled: true,
     privateKey: makeBase64OfLength(32),
@@ -119,7 +132,6 @@ describe("ParsedSecuritySchema", () => {
   it("accepts valid parsed security config", () => {
     const result = ParsedSecuritySchema.safeParse({
       isManaged: false,
-      adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
       packetSignaturePolicy: COMPATIBLE,
@@ -133,7 +145,6 @@ describe("ParsedSecuritySchema", () => {
   it("requires at least one adminKey if isManaged", () => {
     const result = ParsedSecuritySchema.safeParse({
       isManaged: true,
-      adminChannelEnabled: true,
       debugLogApiEnabled: false,
       serialEnabled: true,
       packetSignaturePolicy: COMPATIBLE,

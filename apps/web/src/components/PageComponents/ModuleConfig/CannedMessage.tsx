@@ -7,10 +7,17 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { firmwareAtLeast, Protobuf } from "@meshtastic/sdk";
+import {
+  useCannedMessages,
+  useConfigEditor,
+  useSignal,
+} from "@meshtastic/sdk-react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useStagedAdminString } from "./useStagedAdminString.ts";
 
 interface CannedMessageModuleConfigProps {
   onFormInit: DynamicFormFormInit<CannedMessageValidation>;
@@ -43,32 +50,82 @@ export const CannedMessage = ({
 
   const { t } = useTranslation("moduleConfig");
 
+  // Both fields are deprecated from firmware 2.7.0. Like Android, offer
+  // them there only while the radio still has them set.
+  const { metadata } = useDeviceCapabilities();
+  const deprecatedFieldsRetired = firmwareAtLeast(
+    metadata?.firmwareVersion ?? "",
+    "2.7.0",
+  );
+  const showEnabled =
+    !deprecatedFieldsRetired || moduleConfig.cannedMessage?.enabled === true;
+  const showAllowInputSource =
+    !deprecatedFieldsRetired ||
+    (moduleConfig.cannedMessage?.allowInputSource ?? "") !== "";
+
+  // The message list isn't module config; it has its own admin get/set.
+  const device = useCannedMessages();
+  const messages = useStagedAdminString("cannedMessages", device.value);
+
+  const defaultValues = useMemo(
+    () =>
+      ({
+        ...moduleConfig.cannedMessage,
+        messages: device.value ?? "",
+      }) as CannedMessageValidation,
+    [moduleConfig.cannedMessage, device.value],
+  );
+  const values = useMemo(
+    () =>
+      ({
+        ...effective,
+        messages: messages.value ?? "",
+      }) as CannedMessageValidation,
+    [effective, messages.value],
+  );
+
   const onSubmit = (data: CannedMessageValidation) => {
     if (!editor) return;
+    const { messages: messageList, ...config } = data;
     editor.setModuleSection(
       "cannedMessage",
-      data as unknown as Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig,
+      config as unknown as Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig,
     );
+    messages.stage(messageList);
   };
+
+  const messagesDescription =
+    device.value !== undefined
+      ? t("cannedMessage.messages.description")
+      : device.isLoading
+        ? t("cannedMessage.messages.loading")
+        : t("cannedMessage.messages.unavailable");
 
   return (
     <DynamicForm<CannedMessageValidation>
+      // Remount once the list arrives so it becomes the form's default
+      // value instead of showing up as an unsaved edit.
+      key={device.value === undefined ? "loading" : "loaded"}
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={CannedMessageValidationSchema}
-      defaultValues={moduleConfig.cannedMessage}
-      values={effective}
+      defaultValues={defaultValues}
+      values={values}
       fieldGroups={[
         {
           label: t("cannedMessage.cannedMessageConfig.label"),
           description: t("cannedMessage.cannedMessageConfig.description"),
           fields: [
-            {
-              type: "toggle",
-              name: "enabled",
-              label: t("cannedMessage.enabled.label"),
-              description: t("cannedMessage.enabled.description"),
-            },
+            ...(showEnabled
+              ? [
+                  {
+                    type: "toggle" as const,
+                    name: "enabled" as const,
+                    label: t("cannedMessage.enabled.label"),
+                    description: t("cannedMessage.enabled.description"),
+                  },
+                ]
+              : []),
             {
               type: "toggle",
               name: "rotary1Enabled",
@@ -132,17 +189,30 @@ export const CannedMessage = ({
               label: t("cannedMessage.updown1Enabled.label"),
               description: t("cannedMessage.updown1Enabled.description"),
             },
-            {
-              type: "text",
-              name: "allowInputSource",
-              label: t("cannedMessage.allowInputSource.label"),
-              description: t("cannedMessage.allowInputSource.description"),
-            },
+            ...(showAllowInputSource
+              ? [
+                  {
+                    type: "text" as const,
+                    name: "allowInputSource" as const,
+                    label: t("cannedMessage.allowInputSource.label"),
+                    description: t(
+                      "cannedMessage.allowInputSource.description",
+                    ),
+                  },
+                ]
+              : []),
             {
               type: "toggle",
               name: "sendBell",
               label: t("cannedMessage.sendBell.label"),
               description: t("cannedMessage.sendBell.description"),
+            },
+            {
+              type: "text",
+              name: "messages",
+              label: t("cannedMessage.messages.label"),
+              description: messagesDescription,
+              disabled: device.value === undefined,
             },
           ],
         },

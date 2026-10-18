@@ -45,7 +45,7 @@ export const RegionSetupReminder = (): null => {
           className="w-full"
           onClick={() => {
             dismiss();
-            navigate({ to: "/settings/radio" });
+            navigate({ to: "/settings/lora" });
           }}
         >
           {t("regionSetup.cta", { defaultValue: "Set region" })}

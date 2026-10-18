@@ -13,7 +13,28 @@
     "tabSecurity": "Security"
   },
   "sidebar": {
-    "label": "Configuration"
+    "label": "Configuration",
+    "configuration": "Configuration",
+    "backupRestore": "Backup & Restore",
+    "advanced": "Advanced",
+    "app": "App",
+    "information": "Information"
+  },
+  "navigation": {
+    "user": "User",
+    "lora": "LoRa",
+    "channels": "Channels",
+    "security": "Security",
+    "deviceConfiguration": "Device configuration",
+    "moduleConfiguration": "Module configuration",
+    "administration": "Administration",
+    "deviceProfile": "Import / export configuration",
+    "firmwareUpdate": "Firmware update",
+    "cleanNodeDb": "Clean node database",
+    "debugPanel": "Debug panel",
+    "appSettings": "App settings",
+    "about": "About",
+    "help": "Help & documentation"
   },
   "device": {
     "title": "Device",
@@ -26,17 +47,17 @@
       "description": "Buzzer pin override",
       "label": "Buzzer GPIO"
     },
-    "disableTripleClick": {
-      "description": "Disable triple click",
-      "label": "Disable Triple Click"
+    "tripleClickAdHocPing": {
+      "label": "Triple Click Ad Hoc Ping",
+      "description": "Send a position on the primary channel when the user button is triple clicked."
     },
     "doubleTapAsButtonPress": {
       "description": "Treat double tap as button press",
-      "label": "Double Tap as Button Press"
+      "label": "Double Tap as Button"
     },
-    "ledHeartbeatDisabled": {
-      "description": "Disable default blinking LED",
-      "label": "LED Heartbeat Disabled"
+    "ledHeartbeat": {
+      "label": "LED Heartbeat",
+      "description": "Controls the blinking LED on the device. For most devices this controls one of up to 4 LEDs; the charger and GPS LEDs are not controllable."
     },
     "nodeInfoBroadcastInterval": {
       "description": "How often to broadcast node info",
@@ -136,15 +157,11 @@
     },
     "twelveHourClock": {
       "description": "Display time in 12h format",
-      "label": "Use 12h clock format"
+      "label": "12 Hour Clock"
     },
     "wakeOnTapOrMotion": {
       "description": "Wake the device on tap or motion",
-      "label": "Wake on tap or motion"
-    },
-    "enableMessageBubbles": {
-      "label": "Message Bubbles",
-      "description": "Display incoming messages as bubbles on the device screen"
+      "label": "Wake screen on tap or motion"
     },
     "deviceDisplay": {
       "label": "Device Display",
@@ -174,9 +191,12 @@
       "description": "The denominator of the coding rate",
       "label": "Coding Rate"
     },
-    "frequencyOffset": {
-      "description": "Frequency offset to correct for crystal calibration errors",
-      "label": "Frequency Offset"
+    "codingRateOverride": {
+      "label": "Coding Rate Override",
+      "description": "Adds error correction on top of the preset. A higher coding rate makes every packet longer on air and uses more of the duty cycle and channel utilization budget.",
+      "maxDescription": "This preset already uses the highest coding rate.",
+      "presetDefault": "Preset default ({{rate}})",
+      "fraction": "4/{{rate}}"
     },
     "frequencySlot": {
       "description": "Your node's operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name and will change from the default public slot.",
@@ -184,7 +204,7 @@
     },
     "hopLimit": {
       "description": "Sets the maximum number of hops, default is 3. Increasing hops also increases congestion and should be used carefully. 0 hop broadcast messages will not get ACKs.",
-      "label": "Number of Hops"
+      "label": "Hop Limit"
     },
     "ignoreMqtt": {
       "description": "Don't forward MQTT messages over the mesh",
@@ -207,6 +227,10 @@
     "overrideFrequency": {
       "description": "Override frequency",
       "label": "Frequency Override"
+    },
+    "paFanDisabled": {
+      "label": "PA Fan Disabled",
+      "description": "Turn off the power amplifier's cooling fan"
     },
     "region": {
       "description": "The region where you will be using your radios.",
@@ -241,14 +265,6 @@
       "label": "Radio Settings",
       "description": "Settings for the LoRa radio"
     },
-    "femLnaMode": {
-      "label": "FEM/LNA Mode",
-      "description": "Control an external RF front-end module / low-noise amplifier (only on boards that have one)"
-    },
-    "serialHalOnly": {
-      "label": "Serial HAL Only",
-      "description": "Communicate with the radio exclusively over the serial hardware abstraction layer"
-    },
     "optionsCard": {
       "label": "Options",
       "description": "LoRa core options"
@@ -264,7 +280,7 @@
     "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
     "addressMode": {
       "description": "Address assignment selection",
-      "label": "IPv4 mode"
+      "label": "Address mode"
     },
     "dns": {
       "description": "DNS Server",
@@ -298,9 +314,9 @@
       "description": "Enable or disable the WiFi radio",
       "label": "WiFi enabled"
     },
-    "meshViaUdp": {
-      "label": "Enabled",
-      "description": "Forward mesh packets over UDP"
+    "udpBroadcast": {
+      "label": "UDP broadcasting",
+      "description": "Enable broadcasting packets via UDP over the local network."
     },
     "ntpServer": {
       "label": "NTP server"
@@ -370,11 +386,11 @@
     },
     "gpsMode": {
       "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-      "label": "GPS Mode (Physical Hardware)"
+      "label": "GPS Mode"
     },
     "gpsUpdateInterval": {
       "description": "How often should we try to get a GPS position (<10sec keeps GPS on).",
-      "label": "GPS Polling Interval"
+      "label": "Update Interval"
     },
     "positionFlags": {
       "description": "Optional fields to include when assembling position messages. The more fields are included, the larger the message will be — leading to longer airtime and a higher risk of packet loss.",
@@ -390,11 +406,11 @@
     },
     "smartPositionMinDistance": {
       "description": "The minimum distance change in meters to be considered for a smart position broadcast.",
-      "label": "Smart Distance"
+      "label": "Minimum Distance"
     },
     "smartPositionMinInterval": {
       "description": "The fastest that position updates will be sent if the minimum distance has been satisfied.",
-      "label": "Smart Interval"
+      "label": "Minimum Interval"
     },
     "transmitPin": {
       "description": "GPS transmit GPIO pin override",
@@ -439,7 +455,11 @@
   "power": {
     "adcMultiplierOverride": {
       "description": "Used for tweaking battery voltage reading",
-      "label": "ADC multiplier override ratio"
+      "label": "ADC Override"
+    },
+    "adcOverrideEnabled": {
+      "label": "ADC multiplier override",
+      "description": "Override the battery voltage reading's ADC multiplier"
     },
     "ina219Address": {
       "description": "Address of the INA219 battery monitor",
@@ -459,7 +479,7 @@
     },
     "powerSavingEnabled": {
       "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
-      "label": "Enable power saving mode"
+      "label": "Power saving"
     },
     "shutdownOnBatteryDelay": {
       "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
@@ -485,10 +505,6 @@
   "security": {
     "description": "Settings for the Security configuration",
     "title": "Security",
-    "adminChannelEnabled": {
-      "description": "Allow incoming device control over the insecure legacy admin channel",
-      "label": "Legacy Admin channel"
-    },
     "enableDebugLogApi": {
       "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
       "label": "Debug log API enabled"
@@ -543,21 +559,22 @@
     },
     "administration": {
       "label": "Administration",
-      "description": "Managed-mode and legacy admin channel"
+      "description": "Managed mode and lockdown"
     },
     "packetSignaturesCard": {
-      "label": "Packet Signatures",
+      "label": "Packet authenticity",
       "description": "How the device treats signed and unsigned packets it receives (firmware 2.8+)"
     },
     "packetSignaturePolicy": {
-      "label": "Packet Signature Policy",
+      "label": "Protection level",
       "description": "Compatible accepts unsigned packets but drops any with a wrong signature. Balanced also rejects unsigned broadcasts from nodes that have signed before. Strict accepts only packets with a verified signature or successful PKI decryption, so packets from older nodes may be ignored.",
       "compatible": "Compatible - Accept Unsigned",
       "balanced": "Balanced - Prefer Authenticated",
-      "strict": "Strict - Require Authentication"
+      "strict": "Strict - Require Authentication",
+      "unsupported": "This device does not support packet signature verification."
     },
     "lockdown": {
-      "label": "Lockdown",
+      "label": "Lockdown mode",
       "description": "Encrypts the radio's stored settings and withholds them from clients until they unlock it with a passphrase.",
       "status": "Status",
       "state": {
@@ -613,6 +630,10 @@
     "hardwareModel": {
       "label": "Hardware model",
       "description": "Read-only — reported by the device"
+    },
+    "statusMessage": {
+      "label": "Status Message",
+      "description": "A public status message that is broadcast to the mesh on change and every 12 hours. Up to 80 bytes."
     }
   }
 }

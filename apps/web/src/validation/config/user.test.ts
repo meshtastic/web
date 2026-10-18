@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { LONG_NAME_MAX_BYTES, UserValidationSchema } from "./user.ts";
+import {
+  LONG_NAME_MAX_BYTES,
+  NODE_STATUS_MAX_BYTES,
+  UserValidationSchema,
+} from "./user.ts";
 
 const parse = (longName: string) =>
   UserValidationSchema.safeParse({
@@ -42,5 +46,33 @@ describe("UserValidationSchema longName", () => {
 
   it("still requires a long name", () => {
     expect(parse("").success).toBe(false);
+  });
+});
+
+describe("UserValidationSchema nodeStatus", () => {
+  const parseStatus = (nodeStatus?: string) =>
+    UserValidationSchema.safeParse({
+      longName: "Node",
+      shortName: "ABCD",
+      isUnmessageable: false,
+      isLicensed: false,
+      nodeStatus,
+    });
+
+  it("limits the status message to 80 bytes", () => {
+    expect(NODE_STATUS_MAX_BYTES).toBe(80);
+    expect(parseStatus("a".repeat(80)).success).toBe(true);
+    expect(parseStatus("a".repeat(81)).success).toBe(false);
+    // 21 emoji are 84 bytes.
+    const result = parseStatus("📡".repeat(21));
+    expect(result.success).toBe(false);
+    const issue = result.error?.issues.find((i) => i.path[0] === "nodeStatus");
+    expect(issue?.message).toBe("formValidation.tooBig.bytes");
+  });
+
+  it("defaults to an empty status when the radio has none", () => {
+    const result = parseStatus(undefined);
+    expect(result.success).toBe(true);
+    expect(result.data?.nodeStatus).toBe("");
   });
 });

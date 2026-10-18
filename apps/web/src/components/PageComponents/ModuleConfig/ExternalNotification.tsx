@@ -9,8 +9,10 @@ import {
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { useConfigEditor, useRingtone, useSignal } from "@meshtastic/sdk-react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useStagedAdminString } from "./useStagedAdminString.ts";
 
 interface ExternalNotificationModuleConfigProps {
   onFormInit: DynamicFormFormInit<ExternalNotificationValidation>;
@@ -43,21 +45,59 @@ export const ExternalNotification = ({
 
   const { t } = useTranslation("moduleConfig");
 
+  // The ringtone isn't module config; it has its own admin get/set.
+  const device = useRingtone();
+  const ringtone = useStagedAdminString("ringtone", device.value);
+
+  const defaultValues = useMemo(
+    () =>
+      ({
+        ...moduleConfig.externalNotification,
+        ringtone: device.value ?? "",
+      }) as ExternalNotificationValidation,
+    [moduleConfig.externalNotification, device.value],
+  );
+  const values = useMemo(
+    () =>
+      ({
+        ...effective,
+        ringtone: ringtone.value ?? "",
+      }) as ExternalNotificationValidation,
+    [effective, ringtone.value],
+  );
+
   const onSubmit = (data: ExternalNotificationValidation) => {
     if (!editor) return;
+    const { ringtone: rtttl, ...config } = data;
     editor.setModuleSection(
       "externalNotification",
-      data as unknown as Protobuf.ModuleConfig.ModuleConfig_ExternalNotificationConfig,
+      config as unknown as Protobuf.ModuleConfig.ModuleConfig_ExternalNotificationConfig,
     );
+    ringtone.stage(rtttl);
   };
+
+  const ringtoneDescription =
+    device.value !== undefined
+      ? t("externalNotification.ringtone.description")
+      : device.isLoading
+        ? t("externalNotification.ringtone.loading")
+        : t("externalNotification.ringtone.unavailable");
+
+  // Like Android, the active-high and PWM options only apply once their
+  // pin is set.
+  const hasOutput = (effective?.output ?? 0) !== 0;
+  const hasBuzzer = (effective?.outputBuzzer ?? 0) !== 0;
 
   return (
     <DynamicForm<ExternalNotificationValidation>
+      // Remount once the ringtone arrives so it becomes the form's default
+      // value instead of showing up as an unsaved edit.
+      key={device.value === undefined ? "loading" : "loaded"}
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={ExternalNotificationValidationSchema}
-      defaultValues={moduleConfig.externalNotification}
-      values={effective}
+      defaultValues={defaultValues}
+      values={values}
       fieldGroups={[
         {
           label: t("externalNotification.externalNotificationConfig.label"),
@@ -141,24 +181,32 @@ export const ExternalNotification = ({
               label: t("externalNotification.output.label"),
               description: t("externalNotification.output.description"),
             },
-            {
-              type: "toggle",
-              name: "active",
-              label: t("externalNotification.active.label"),
-              description: t("externalNotification.active.description"),
-            },
+            ...(hasOutput
+              ? [
+                  {
+                    type: "toggle" as const,
+                    name: "active" as const,
+                    label: t("externalNotification.active.label"),
+                    description: t("externalNotification.active.description"),
+                  },
+                ]
+              : []),
             {
               type: "number",
               name: "outputBuzzer",
               label: t("externalNotification.outputBuzzer.label"),
               description: t("externalNotification.outputBuzzer.description"),
             },
-            {
-              type: "toggle",
-              name: "usePwm",
-              label: t("externalNotification.usePwm.label"),
-              description: t("externalNotification.usePwm.description"),
-            },
+            ...(hasBuzzer
+              ? [
+                  {
+                    type: "toggle" as const,
+                    name: "usePwm" as const,
+                    label: t("externalNotification.usePwm.label"),
+                    description: t("externalNotification.usePwm.description"),
+                  },
+                ]
+              : []),
             {
               type: "number",
               name: "outputVibra",
@@ -178,6 +226,13 @@ export const ExternalNotification = ({
               label: t("externalNotification.nagTimeout.label"),
               description: t("externalNotification.nagTimeout.description"),
               properties: { suffix: t("unit.second.plural") },
+            },
+            {
+              type: "text",
+              name: "ringtone",
+              label: t("externalNotification.ringtone.label"),
+              description: ringtoneDescription,
+              disabled: device.value === undefined,
             },
             {
               type: "toggle",

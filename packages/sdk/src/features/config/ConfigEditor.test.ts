@@ -91,6 +91,25 @@ describe("ConfigEditor", () => {
     expect(editor.radio.value.lora?.region).toBe(4);
   });
 
+  it("reset() drops queued admin messages", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+
+    editor.queueAdminMessage(
+      create(Protobuf.Admin.AdminMessageSchema, {
+        payloadVariant: {
+          case: "setFixedPosition",
+          value: create(Protobuf.Mesh.PositionSchema, { latitudeI: 1 }),
+        },
+      }),
+    );
+    expect(editor.isDirty.value).toBe(true);
+
+    editor.reset();
+    expect(editor.isDirty.value).toBe(false);
+  });
+
   it("inbound baseline updates do not stomp pending working edits", () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });
@@ -109,6 +128,74 @@ describe("ConfigEditor", () => {
     // Working edit preserved; dirty still set
     expect(editor.radio.value.lora?.region).toBe(7);
     expect(editor.dirtyRadioSections.value).toEqual(["lora"]);
+  });
+
+  it("keeps radio fields a partial update leaves out", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+
+    client.events.onConfigPacket.dispatch(
+      create(Protobuf.Config.ConfigSchema, {
+        payloadVariant: {
+          case: "lora",
+          value: create(Protobuf.Config.Config_LoRaConfigSchema, {
+            region: 4,
+            paFanDisabled: true,
+            ignoreIncoming: [1234],
+          }),
+        },
+      }),
+    );
+
+    // Form data after zod validation: only the fields the form renders.
+    editor.setRadioSection("lora", {
+      region: 7,
+    } as unknown as Protobuf.Config.Config_LoRaConfig);
+
+    const lora = editor.radio.value.lora;
+    expect(lora?.region).toBe(7);
+    expect(lora?.paFanDisabled).toBe(true);
+    expect(lora?.ignoreIncoming).toEqual([1234]);
+    expect(editor.dirtyRadioSections.value).toEqual(["lora"]);
+  });
+
+  it("keeps module fields a partial update leaves out", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+
+    client.events.onModuleConfigPacket.dispatch(
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+        payloadVariant: {
+          case: "rangeTest",
+          value: create(
+            Protobuf.ModuleConfig.ModuleConfig_RangeTestConfigSchema,
+            { enabled: false, clearOnReboot: true },
+          ),
+        },
+      }),
+    );
+
+    editor.setModuleSection("rangeTest", {
+      enabled: true,
+    } as unknown as Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig);
+
+    expect(editor.modules.value.rangeTest?.enabled).toBe(true);
+    expect(editor.modules.value.rangeTest?.clearOnReboot).toBe(true);
+  });
+
+  it("a partial update equal to the baseline is not dirty", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    const editor = client.config.editor;
+
+    client.events.onConfigPacket.dispatch(loraPacket(4));
+    editor.setRadioSection("lora", {
+      region: 4,
+    } as unknown as Protobuf.Config.Config_LoRaConfig);
+
+    expect(editor.isDirty.value).toBe(false);
   });
 
   it("disconnect drops baseline and working", () => {

@@ -7,49 +7,97 @@
     "import": "Import",
     "export": "Export"
   },
+  "header": {
+    "frequency": "Freq: {{frequency}} MHz",
+    "slot": "Slot: {{slot}}",
+    "slotAuto": "Slot: Auto"
+  },
+  "list": {
+    "add": "Add channel",
+    "edit": "Edit {{name}}",
+    "delete": "Delete {{name}}"
+  },
+  "legend": {
+    "primary": "Primary",
+    "secondary": "Secondary",
+    "dialog": {
+      "title": "Channel Features",
+      "description": "What the primary and secondary channels do and what the channel icons mean.",
+      "primaryFeature": "Periodic position and telemetry broadcast",
+      "secondaryNoTelemetry": "No periodic telemetry broadcast",
+      "secondaryPositionFeature": "Disabling position on the primary channel allows periodic position broadcasts on the first secondary channel with the position enabled, otherwise manual position request required.",
+      "manualPositionRequest": "Manual position request required",
+      "iconMeanings": "Icon Meanings"
+    }
+  },
+  "icons": {
+    "location": {
+      "label": "Location Sharing",
+      "description": "Periodic position broadcast"
+    },
+    "uplink": {
+      "label": "MQTT Uplink Enabled",
+      "description": "Messages from the mesh will be sent to the public internet through any node's configured gateway."
+    },
+    "downlink": {
+      "label": "MQTT Downlink Enabled",
+      "description": "Messages from a public internet gateway are forwarded to the local mesh. Due to the zero-hop policy, traffic from the default MQTT server will not propagate further than this device."
+    }
+  },
+  "security": {
+    "label": "Security Status",
+    "secure": {
+      "label": "Secure",
+      "description": "A green lock means the channel is securely encrypted with either a 128 or 256 bit AES key."
+    },
+    "insecureNoPrecise": {
+      "label": "Insecure Channel, Not Precise",
+      "description": "A yellow open lock means the channel is not securely encrypted, is not used for precise location data, and uses either no key at all or a 1 byte known key."
+    },
+    "insecurePreciseOnly": {
+      "label": "Insecure Channel, Precise Location",
+      "description": "A red open lock means the channel is not securely encrypted, is used for precise location data, and uses either no key at all or a 1 byte known key."
+    },
+    "insecurePreciseMqtt": {
+      "label": "Warning: Insecure, Precise Location & MQTT Uplink",
+      "description": "A red open lock with a warning means the channel is not securely encrypted, is used for precise location data which is being uplinked to the internet via MQTT, and uses either no key at all or a 1 byte known key."
+    }
+  },
+  "editDialog": {
+    "addTitle": "Add channel",
+    "editTitle": "Edit channel {{index}}",
+    "description": "Changes are sent to the radio when you save the settings."
+  },
   "validation": {
     "pskInvalid": "Please enter a valid {{bits}} bit PSK."
   },
-  "settings": {
-    "label": "Channel Settings",
-    "description": "Crypto, MQTT & misc settings"
-  },
-  "role": {
-    "label": "Role",
-    "description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
-    "options": {
-      "primary": "PRIMARY",
-      "disabled": "DISABLED",
-      "secondary": "SECONDARY"
-    }
+  "name": {
+    "label": "Channel Name",
+    "description": "Up to 11 bytes. Leave blank to use the default name."
   },
   "psk": {
-    "label": "Pre-Shared Key",
+    "label": "PSK",
     "description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
     "generate": "Generate"
   },
-  "name": {
-    "label": "Name",
-    "description": "A unique name for the channel <12 bytes, leave blank for default"
-  },
   "uplinkEnabled": {
-    "label": "Uplink Enabled",
+    "label": "MQTT Uplink Enabled",
     "description": "Send messages from the local mesh to MQTT"
   },
   "downlinkEnabled": {
-    "label": "Downlink Enabled",
+    "label": "MQTT Downlink Enabled",
     "description": "Send messages from MQTT to the local mesh"
   },
-  "useAead": {
-    "label": "Authenticated Encryption (Experimental)",
-    "description": "Encrypt with AES-CCM, which stops forged and tampered messages. Every node on this channel must turn this on: the channel then rejects standard AES-CTR packets, so nodes without it can no longer talk here."
+  "positionEnabled": {
+    "label": "Position enabled",
+    "description": "Share this node's position on this channel."
+  },
+  "preciseLocation": {
+    "label": "Precise location"
   },
   "positionPrecision": {
-    "label": "Location",
-    "description": "The precision of the location to share with the channel. Choose Position sharing off to share none.",
+    "label": "Location precision",
     "options": {
-      "none": "Position sharing off",
-      "precise": "Precise Location",
       "metric_km23": "Within 23 kilometers",
       "metric_km12": "Within 12 kilometers",
       "metric_km5_8": "Within 5.8 kilometers",

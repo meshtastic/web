@@ -1,13 +1,16 @@
 import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
+  hasUdpBroadcast,
   type NetworkValidation,
   NetworkValidationSchema,
+  withUdpBroadcast,
 } from "@app/validation/config/network.ts";
 import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
 import {
   convertIntToIpAddress,
@@ -37,9 +40,7 @@ const toFormShape = (
     subnet: convertIntToIpAddress(cfg?.ipv4Config?.subnet ?? 0),
     dns: convertIntToIpAddress(cfg?.ipv4Config?.dns ?? 0),
   },
-  enabledProtocols:
-    cfg?.enabledProtocols ??
-    Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
+  udpBroadcast: hasUdpBroadcast(cfg?.enabledProtocols),
 });
 
 export const Network = ({ onFormInit }: NetworkConfigProps) => {
@@ -55,11 +56,18 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
       | undefined);
 
   const { t } = useTranslation("config");
+  const { metadata } = useDeviceCapabilities();
+  // Until metadata arrives, show Ethernet, as the Device tabs do.
+  const hasEthernet = !metadata || metadata.hasEthernet;
 
-  const onSubmit = (data: NetworkValidation) => {
+  const onSubmit = ({ udpBroadcast, ...data }: NetworkValidation) => {
     if (!editor) return;
     const payload = {
       ...data,
+      enabledProtocols: withUdpBroadcast(
+        effective?.enabledProtocols,
+        udpBroadcast,
+      ),
       ipv4Config: create(
         Protobuf.Config.Config_NetworkConfig_IpV4ConfigSchema,
         {
@@ -111,18 +119,22 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
             },
           ],
         },
-        {
-          label: t("network.ethernetOptionsCard.label"),
-          description: t("network.ethernetOptionsCard.description"),
-          fields: [
-            {
-              type: "toggle",
-              name: "ethEnabled",
-              label: t("network.ethernetEnabled.label"),
-              description: t("network.ethernetEnabled.description"),
-            },
-          ],
-        },
+        ...(hasEthernet
+          ? [
+              {
+                label: t("network.ethernetOptionsCard.label"),
+                description: t("network.ethernetOptionsCard.description"),
+                fields: [
+                  {
+                    type: "toggle" as const,
+                    name: "ethEnabled" as const,
+                    label: t("network.ethernetEnabled.label"),
+                    description: t("network.ethernetEnabled.description"),
+                  },
+                ],
+              },
+            ]
+          : []),
         {
           label: t("network.advancedCard.label"),
           description: t("network.advancedCard.description"),
@@ -138,14 +150,10 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
               label: t("network.rsyslogServer.label"),
             },
             {
-              type: "select",
-              name: "enabledProtocols",
-              label: t("network.meshViaUdp.label"),
-              description: t("network.meshViaUdp.description"),
-              properties: {
-                enumValue: Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
-                formatEnumName: true,
-              },
+              type: "toggle",
+              name: "udpBroadcast",
+              label: t("network.udpBroadcast.label"),
+              description: t("network.udpBroadcast.description"),
             },
             {
               type: "select",

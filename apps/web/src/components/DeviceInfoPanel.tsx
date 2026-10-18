@@ -5,9 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   ChevronRight,
   CpuIcon,
-  Languages,
   type LucideIcon,
-  Palette,
   Search as SearchIcon,
   ZapIcon,
 } from "lucide-react";
@@ -15,8 +13,6 @@ import type React from "react";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import BatteryStatus from "./BatteryStatus.tsx";
-import LanguageSwitcher from "./LanguageSwitcher.tsx";
-import ThemeSwitcher from "./ThemeSwitcher.tsx";
 import type { DeviceMetrics } from "./types.ts";
 import { Avatar } from "./UI/Avatar.tsx";
 import { Button } from "./UI/Button.tsx";
@@ -121,23 +117,10 @@ export const DeviceInfoPanel = ({
 
   const actionButtons: ActionButtonConfig[] = [
     {
-      id: "theme",
-      label: t("theme.changeTheme"),
-      icon: Palette,
-      render: () => <ThemeSwitcher />,
-    },
-    {
       id: "commandMenu",
       label: t("page.title", { ns: "commandPalette" }),
       icon: SearchIcon,
       onClick: setCommandPaletteOpen,
-    },
-
-    {
-      id: "language",
-      label: t("languagePicker.label"),
-      icon: Languages,
-      render: () => <LanguageSwitcher />,
     },
   ];
 

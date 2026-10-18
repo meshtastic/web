@@ -1,6 +1,6 @@
 import { DisableLockdownDialog } from "@components/Dialog/LockdownDialog/DisableLockdownDialog.tsx";
+import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useLockdown } from "@core/hooks/useLockdown.ts";
 import { useToast } from "@core/hooks/useToast.ts";
@@ -20,8 +20,9 @@ const STATE_KEYS: Partial<Record<Protobuf.Mesh.LockdownStatus_State, string>> =
   };
 
 /**
- * Lockdown controls on the Security page. Only rendered for firmware that
- * reports a lockdown status, i.e. lockdown-capable builds.
+ * Lockdown controls, shown as the last row of the Security page's
+ * Administration group (after Managed Mode), as on Android. Only rendered for
+ * firmware that reports a lockdown status, i.e. lockdown-capable builds.
  */
 export const LockdownSection = () => {
   const { t } = useTranslation("config");
@@ -46,61 +47,62 @@ export const LockdownSection = () => {
   };
 
   return (
-    <section className="mt-8 space-y-5">
-      <div>
-        <Heading as="h4" className="font-medium">
-          {t("security.lockdown.label")}
-        </Heading>
-        <Subtle>{t("security.lockdown.description")}</Subtle>
-      </div>
-
-      <div className="grid gap-1 text-sm">
-        <p>
-          <span className="font-medium">{t("security.lockdown.status")}: </span>
-          <span data-testid="lockdown-state">
-            {t(`security.lockdown.state.${stateKey}`)}
-          </span>
-        </p>
-        {unlocked && status.bootsRemaining > 0 && (
+    <FieldWrapper
+      label={t("security.lockdown.label")}
+      fieldName="lockdown"
+      description={t("security.lockdown.description")}
+    >
+      <div id="lockdown" className="flex flex-col gap-4">
+        <div className="grid gap-1 text-sm">
           <p>
-            {t("security.lockdown.bootsRemaining", {
-              count: status.bootsRemaining,
-            })}
+            <span className="font-medium">
+              {t("security.lockdown.status")}:{" "}
+            </span>
+            <span data-testid="lockdown-state">
+              {t(`security.lockdown.state.${stateKey}`)}
+            </span>
           </p>
-        )}
-        {unlocked && status.validUntilEpoch > 0 && (
-          <p>
-            {t("security.lockdown.expires", {
-              date: new Date(status.validUntilEpoch * 1000).toLocaleString(),
-            })}
-          </p>
-        )}
-      </div>
-
-      {unlocked && (
-        <div className="flex flex-col gap-4">
-          <div className="space-y-1">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => report(client.device.lockNow())}
-            >
-              {t("security.lockdown.lockNow")}
-            </Button>
-            <Subtle>{t("security.lockdown.lockNowDescription")}</Subtle>
-          </div>
-          <div className="space-y-1">
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => setDisableOpen(true)}
-            >
-              {t("security.lockdown.disable")}
-            </Button>
-            <Subtle>{t("security.lockdown.disableDescription")}</Subtle>
-          </div>
+          {unlocked && status.bootsRemaining > 0 && (
+            <p>
+              {t("security.lockdown.bootsRemaining", {
+                count: status.bootsRemaining,
+              })}
+            </p>
+          )}
+          {unlocked && status.validUntilEpoch > 0 && (
+            <p>
+              {t("security.lockdown.expires", {
+                date: new Date(status.validUntilEpoch * 1000).toLocaleString(),
+              })}
+            </p>
+          )}
         </div>
-      )}
+
+        {unlocked && (
+          <div className="flex flex-col gap-4">
+            <div className="space-y-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => report(client.device.lockNow())}
+              >
+                {t("security.lockdown.lockNow")}
+              </Button>
+              <Subtle>{t("security.lockdown.lockNowDescription")}</Subtle>
+            </div>
+            <div className="space-y-1">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => setDisableOpen(true)}
+              >
+                {t("security.lockdown.disable")}
+              </Button>
+              <Subtle>{t("security.lockdown.disableDescription")}</Subtle>
+            </div>
+          </div>
+        )}
+      </div>
 
       <DisableLockdownDialog
         open={disableOpen}
@@ -109,6 +111,6 @@ export const LockdownSection = () => {
           report(client.device.disableLockdown(passphrase))
         }
       />
-    </section>
+    </FieldWrapper>
   );
 };

@@ -2,14 +2,20 @@ import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type PowerValidation,
   PowerValidationSchema,
+  toPowerConfig,
+  toPowerFormValues,
 } from "@app/validation/config/power.ts";
+import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import type { FieldProps } from "@components/Form/DynamicFormField.tsx";
 import { useDevice } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 interface PowerConfigProps {
@@ -36,21 +42,62 @@ export const Power = ({ onFormInit }: PowerConfigProps) => {
 
   const { t } = useTranslation("config");
 
+  // The form is created here, not in DynamicForm, so the ADC ratio field can
+  // follow the override switch.
+  const formMethods = useForm<PowerValidation>({
+    mode: "onChange",
+    defaultValues: toPowerFormValues(config.power),
+    resolver: createZodResolver(PowerValidationSchema),
+    shouldFocusError: false,
+    resetOptions: { keepDefaultValues: true },
+    values: toPowerFormValues(effective),
+  });
+  const { control, getValues, setValue } = formMethods;
+  const adcOverrideEnabled = useWatch({ control, name: "adcOverrideEnabled" });
+
+  useEffect(() => {
+    onFormInit(formMethods);
+  }, [onFormInit, formMethods]);
+
   const onSubmit = (data: PowerValidation) => {
     if (!editor) return;
     editor.setRadioSection(
       "power",
-      data as unknown as Protobuf.Config.Config_PowerConfig,
+      toPowerConfig(data) as unknown as Protobuf.Config.Config_PowerConfig,
     );
   };
 
+  const adcFields: FieldProps<PowerValidation>[] = [
+    {
+      type: "toggle",
+      name: "adcOverrideEnabled",
+      label: t("power.adcOverrideEnabled.label"),
+      description: t("power.adcOverrideEnabled.description"),
+      // As on Android: switching on starts from a ratio of 1, off clears it.
+      inputChange: (checked) => {
+        const ratio = getValues("adcMultiplierOverride");
+        if (checked && !(Number(ratio) > 0)) {
+          setValue("adcMultiplierOverride", 1, { shouldDirty: true });
+        } else if (!checked) {
+          setValue("adcMultiplierOverride", 0, { shouldDirty: true });
+        }
+      },
+    },
+  ];
+  if (adcOverrideEnabled) {
+    adcFields.push({
+      type: "number",
+      name: "adcMultiplierOverride",
+      label: t("power.adcMultiplierOverride.label"),
+      description: t("power.adcMultiplierOverride.description"),
+      properties: { step: 0.0001 },
+    });
+  }
+
   return (
     <DynamicForm<PowerValidation>
+      propMethods={formMethods}
       onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={PowerValidationSchema}
-      defaultValues={config.power}
-      values={effective}
       fieldGroups={[
         {
           label: t("power.powerConfig.label"),
@@ -69,13 +116,7 @@ export const Power = ({ onFormInit }: PowerConfigProps) => {
               description: t("power.shutdownOnBatteryDelay.description"),
               properties: { suffix: t("unit.second.plural") },
             },
-            {
-              type: "number",
-              name: "adcMultiplierOverride",
-              label: t("power.adcMultiplierOverride.label"),
-              description: t("power.adcMultiplierOverride.description"),
-              properties: { step: 0.0001 },
-            },
+            ...adcFields,
             {
               type: "number",
               name: "waitBluetoothSecs",

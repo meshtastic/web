@@ -11,8 +11,8 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
-import { LockdownSection } from "./LockdownSection.tsx";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
@@ -20,6 +20,7 @@ import { fromByteArray, toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { LockdownSection } from "./LockdownSection.tsx";
 
 interface SecurityConfigProps {
   onFormInit: DynamicFormFormInit<RawSecurity>;
@@ -57,6 +58,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
       | undefined);
 
   const { t } = useTranslation("config");
+  const { metadata } = useDeviceCapabilities();
 
   const formMethods = useForm<RawSecurity>({
     mode: "onChange",
@@ -146,9 +148,39 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
         onSubmit={onSubmit}
         fieldGroups={[
           {
+            label: t("security.packetSignaturesCard.label"),
+            description: t("security.packetSignaturesCard.description"),
+            fields: [
+              {
+                type: "select",
+                name: "packetSignaturePolicy",
+                label: t("security.packetSignaturePolicy.label"),
+                description:
+                  metadata?.hasXeddsa === false
+                    ? t("security.packetSignaturePolicy.unsupported")
+                    : t("security.packetSignaturePolicy.description"),
+                // Only a radio that reports XEdDSA signing can apply the policy.
+                disabled: metadata?.hasXeddsa !== true,
+                properties: {
+                  enumValue: packetSignaturePolicyOptions,
+                },
+              },
+            ],
+          },
+          {
             label: t("security.directMessageKey.label"),
             description: t("security.directMessageKey.description"),
             fields: [
+              {
+                type: "text",
+                name: "publicKey",
+                label: t("security.publicKey.label"),
+                disabled: true,
+                description: t("security.publicKey.description"),
+                properties: {
+                  showCopyButton: true,
+                },
+              },
               {
                 type: "passwordGenerator",
                 id: "pskInput",
@@ -173,16 +205,6 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                   showPasswordToggle: true,
                 },
               },
-              {
-                type: "text",
-                name: "publicKey",
-                label: t("security.publicKey.label"),
-                disabled: true,
-                description: t("security.publicKey.description"),
-                properties: {
-                  showCopyButton: true,
-                },
-              },
             ],
           },
           {
@@ -198,9 +220,6 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
                 properties: { showCopyButton: true },
               },
               {
@@ -212,9 +231,6 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
                 properties: { showCopyButton: true },
               },
               {
@@ -226,25 +242,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 bits,
                 devicePSKBitCount: 32,
                 actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
                 properties: { showCopyButton: true },
-              },
-            ],
-          },
-          {
-            label: t("security.packetSignaturesCard.label"),
-            description: t("security.packetSignaturesCard.description"),
-            fields: [
-              {
-                type: "select",
-                name: "packetSignaturePolicy",
-                label: t("security.packetSignaturePolicy.label"),
-                description: t("security.packetSignaturePolicy.description"),
-                properties: {
-                  enumValue: packetSignaturePolicyOptions,
-                },
               },
             ],
           },
@@ -282,17 +280,11 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                   setValue("isManaged", false);
                 },
               },
-              {
-                type: "toggle",
-                name: "adminChannelEnabled",
-                label: t("security.adminChannelEnabled.label"),
-                description: t("security.adminChannelEnabled.description"),
-              },
             ],
+            footer: <LockdownSection />,
           },
         ]}
       />
-      <LockdownSection />
       <PkiRegenerateDialog
         text={{
           button: t("button.regenerate"),

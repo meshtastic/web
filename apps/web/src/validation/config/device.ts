@@ -15,9 +15,35 @@ export const DeviceValidationSchema = z.object({
   nodeInfoBroadcastSecs: z.coerce.number().int().min(0),
   doubleTapAsButtonPress: z.boolean(),
   isManaged: z.boolean(),
-  disableTripleClick: z.boolean(),
-  ledHeartbeatDisabled: z.boolean(),
+  // Shown the way Android shows them, as the inverse of the proto fields
+  // disableTripleClick and ledHeartbeatDisabled.
+  tripleClickAdHocPing: z.boolean(),
+  ledHeartbeat: z.boolean(),
   tzdef: z.string().max(65),
 });
 
 export type DeviceValidation = z.infer<typeof DeviceValidationSchema>;
+
+/** The form's values for a DeviceConfig, with the inverted toggles. */
+export function toDeviceFormValues(
+  cfg: Protobuf.Config.Config_DeviceConfig | undefined,
+): DeviceValidation {
+  return {
+    ...cfg,
+    tripleClickAdHocPing: !cfg?.disableTripleClick,
+    ledHeartbeat: !cfg?.ledHeartbeatDisabled,
+  } as DeviceValidation;
+}
+
+/** The DeviceConfig fields to stage from the form. */
+export function toDeviceConfig({
+  tripleClickAdHocPing,
+  ledHeartbeat,
+  ...rest
+}: DeviceValidation) {
+  return {
+    ...rest,
+    disableTripleClick: !tripleClickAdHocPing,
+    ledHeartbeatDisabled: !ledHeartbeat,
+  };
+}

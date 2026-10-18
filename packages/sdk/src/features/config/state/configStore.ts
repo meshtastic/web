@@ -6,6 +6,8 @@ export function createConfigStore() {
   return {
     radio: createStore<RadioConfig>({}),
     modules: createStore<ModuleConfig>({}),
+    cannedMessages: createStore<string | undefined>(undefined),
+    ringtone: createStore<string | undefined>(undefined),
   };
 }
 

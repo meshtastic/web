@@ -58,6 +58,9 @@ export class ConfigEditor {
   private readonly queuedAdminMessages = signal<
     readonly Protobuf.Admin.AdminMessage[]
   >([]);
+  private readonly _stagedAdminMessages = signal<
+    ReadonlyMap<string, Protobuf.Admin.AdminMessage>
+  >(new Map());
   private readonly _dirtyRadioSections = signal<readonly RadioConfigSection[]>(
     [],
   );
@@ -92,9 +95,29 @@ export class ConfigEditor {
     this._isOwnerDirty,
   );
   public readonly isDirty: ReadonlySignal<boolean> = toReadonly(this._isDirty);
+  /**
+   * Admin messages staged with {@link stageAdminMessage}, by key. Sent on the
+   * next commit; cleared by commit, reset and disconnect.
+   */
+  public readonly stagedAdminMessages: ReadonlySignal<
+    ReadonlyMap<string, Protobuf.Admin.AdminMessage>
+  > = toReadonly(this._stagedAdminMessages);
 
-  constructor(client: MeshClient) {
+  private readonly onStagedAdminMessageCommitted?: (
+    message: Protobuf.Admin.AdminMessage,
+  ) => void;
+
+  constructor(
+    client: MeshClient,
+    options: {
+      /** Called for each staged admin message after a successful commit. */
+      onStagedAdminMessageCommitted?: (
+        message: Protobuf.Admin.AdminMessage,
+      ) => void;
+    } = {},
+  ) {
     this.client = client;
+    this.onStagedAdminMessageCommitted = options.onStagedAdminMessageCommitted;
 
     client.events.onConfigPacket.subscribe((config) => {
       const next = ConfigMapper.mergeRadio(this.baselineRadio.peek(), config);
@@ -158,6 +181,7 @@ export class ConfigEditor {
         this.workingChannels.value = new Map();
         this.workingOwner.value = undefined;
         this.queuedAdminMessages.value = [];
+        this._stagedAdminMessages.value = new Map();
         this._dirtyRadioSections.value = [];
         this._dirtyModuleSections.value = [];
         this._dirtyChannels.value = [];
@@ -199,19 +223,58 @@ export class ConfigEditor {
     this.recomputeDirty();
   }
 
+  /**
+   * Stage an admin message under `key`, replacing any message staged under
+   * the same key, or remove it with `undefined`. Unlike
+   * {@link queueAdminMessage}, a form can call this on every change and
+   * {@link reset} drops it. Used for settings that live outside Config and
+   * ModuleConfig, such as the canned message list and the ringtone.
+   */
+  public stageAdminMessage(
+    key: string,
+    message: Protobuf.Admin.AdminMessage | undefined,
+  ): void {
+    const current = this._stagedAdminMessages.peek();
+    if (message === undefined && !current.has(key)) return;
+    const next = new Map(current);
+    if (message === undefined) {
+      next.delete(key);
+    } else {
+      next.set(key, message);
+    }
+    this._stagedAdminMessages.value = next;
+    this.recomputeDirty();
+  }
+
+  /**
+   * Stage a radio config section. `value` is merged over the current working
+   * (or baseline) section, so fields a form doesn't render keep the device's
+   * value instead of being sent as protobuf defaults.
+   */
   public setRadioSection<K extends RadioConfigSection & string>(
     key: K,
     value: RadioConfig[K],
   ): void {
-    this.workingRadio.value = { ...this.workingRadio.peek(), [key]: value };
+    const working = this.workingRadio.peek();
+    const current = working[key] ?? this.baselineRadio.peek()[key];
+    this.workingRadio.value = {
+      ...working,
+      [key]: current && value ? { ...current, ...value } : value,
+    };
     this.recomputeDirty();
   }
 
+  /** Stage a module config section, merged like {@link setRadioSection}. */
   public setModuleSection<K extends ModuleConfigSection & string>(
     key: K,
     value: ModuleConfig[K],
   ): void {
-    this.workingModules.value = { ...this.workingModules.peek(), [key]: value };
+    const working = this.workingModules.peek();
+    const current = working[key] ?? this.baselineModules.peek()[key];
+    this.workingModules.value = {
+      ...working,
+      [key]: current && value ? { ...current, ...value } : value,
+    };
     this.recomputeDirty();
   }
 
@@ -227,6 +290,8 @@ export class ConfigEditor {
     this.workingModules.value = this.baselineModules.peek();
     this.workingChannels.value = new Map(this.baselineChannels.peek());
     this.workingOwner.value = this.baselineOwner.peek();
+    this._stagedAdminMessages.value = new Map();
+    this.queuedAdminMessages.value = [];
     this.recomputeDirty();
   }
 
@@ -285,6 +350,17 @@ export class ConfigEditor {
       }
     }
 
+    const staged = [...this._stagedAdminMessages.peek().values()];
+    for (const message of staged) {
+      const variant = message.payloadVariant;
+      if (!variant.case) continue;
+      try {
+        await sendAdminMessage(this.client, variant);
+      } catch (e) {
+        return Result.err(e instanceof Error ? e : new Error(String(e)));
+      }
+    }
+
     const commitResult = await commitEditSettings(this.client);
     if (Result.isError(commitResult)) return Result.err(commitResult.error);
 
@@ -293,11 +369,16 @@ export class ConfigEditor {
     this.baselineChannels.value = new Map(this.workingChannels.peek());
     this.baselineOwner.value = this.workingOwner.peek();
     this.queuedAdminMessages.value = [];
+    this._stagedAdminMessages.value = new Map();
     this._dirtyRadioSections.value = [];
     this._dirtyModuleSections.value = [];
     this._dirtyChannels.value = [];
     this._isOwnerDirty.value = false;
     this._isDirty.value = false;
+
+    for (const message of staged) {
+      this.onStagedAdminMessageCommitted?.(message);
+    }
 
     return Result.ok(undefined);
   }
@@ -356,7 +437,9 @@ export class ConfigEditor {
       this.baselineOwner.peek(),
       this.workingOwner.peek(),
     );
-    const hasQueuedAdmin = this.queuedAdminMessages.peek().length > 0;
+    const hasQueuedAdmin =
+      this.queuedAdminMessages.peek().length > 0 ||
+      this._stagedAdminMessages.peek().size > 0;
 
     this._dirtyRadioSections.value = radioDirty;
     this._dirtyModuleSections.value = moduleDirty;

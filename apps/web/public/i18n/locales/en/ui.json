@@ -212,5 +212,157 @@
   "footer": {
     "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
     "commitSha": "Commit SHA: {{sha}}"
+  },
+  "settingsPages": {
+    "notConnected": "Connect a node to use these actions.",
+    "administration": {
+      "title": "Administration",
+      "description": "Power and reset actions run on the connected node straight away. The destructive ones ask for confirmation first.",
+      "reboot": {
+        "label": "Reboot",
+        "description": "Restart the node now or after a delay, optionally into OTA mode.",
+        "action": "Reboot…"
+      },
+      "dfu": {
+        "label": "Reboot into DFU mode",
+        "description": "nRF52 boards only. The node stays in its bootloader and off the mesh until new firmware is flashed or it is reset.",
+        "action": "Enter DFU mode…",
+        "confirmTitle": "Reboot into DFU mode?",
+        "confirm": "Enter DFU mode",
+        "sent": "DFU request sent",
+        "failed": "Couldn't send the DFU request"
+      },
+      "shutdown": {
+        "label": "Shutdown",
+        "description": "Turn the node off, now or after a delay.",
+        "action": "Shut down…"
+      },
+      "factoryResetDevice": {
+        "label": "Factory reset",
+        "description": "Return all device state and configuration to factory defaults and clear Bluetooth pairings. Nodes and messages saved in this app are erased too.",
+        "action": "Factory reset…"
+      },
+      "factoryResetConfig": {
+        "label": "Factory reset configuration",
+        "description": "Return all device state and configuration to factory defaults, keeping Bluetooth pairings.",
+        "action": "Reset configuration…"
+      },
+      "resetNodeDb": {
+        "label": "NodeDB reset",
+        "description": "Clear the device's node database and the message history saved in this app.",
+        "action": "Reset NodeDB…"
+      }
+    },
+    "backup": {
+      "title": "Device profile",
+      "description": "A profile (.cfg file) holds the node's names, channels, configuration and module configuration. The same format is used by the Android, Apple and command-line clients.",
+      "export": {
+        "label": "Export configuration",
+        "description": "Choose what to include, then save a .cfg file of this node's current settings.",
+        "action": "Export…",
+        "dialogTitle": "Export configuration",
+        "dialogDescription": "Choose which parts of this node's settings go into the file.",
+        "confirm": "Export",
+        "pendingChanges": "Save or reset your unsaved changes before exporting, so the file matches what's on the node.",
+        "failed": "Couldn't export the profile"
+      },
+      "import": {
+        "label": "Import configuration",
+        "description": "Pick a .cfg file and choose which of its parts to apply. Nothing is sent to the node yet: the changes are staged like any other edit, so you can review them in the configuration pages and then press Save, or Reset to discard them.",
+        "action": "Choose file…",
+        "dialogTitle": "Import configuration",
+        "dialogDescription": "Only the parts this file contains can be selected.",
+        "confirm": "Stage changes",
+        "staged": "Profile staged",
+        "stagedDescription": "Review the changes, then press Save to write them to the node.",
+        "failed": "Import failed",
+        "invalidFile": "This file isn't a valid device profile.",
+        "invalidChannels": "The profile's channel URL is invalid; nothing was staged.",
+        "notConnected": "Connect a node before importing."
+      },
+      "fields": {
+        "longName": "Long name",
+        "shortName": "Short name",
+        "channelUrl": "Channels (channel URL)",
+        "config": "Configuration",
+        "moduleConfig": "Module configuration",
+        "fixedPosition": "Fixed position",
+        "isUnmessagable": "Unmessageable",
+        "isLicensed": "Licensed amateur radio",
+        "privateKey": "Private key"
+      },
+      "privateKeyWarning": "The private key is your node's identity. Anyone with this file could impersonate the node and read its direct messages. Include it only for your own backup, and keep the file safe.",
+      "privateKeyExcludedNote": "Without the private key, this app keeps the importing node's own keys, but other clients may give that node a new key pair when they install the security settings.",
+      "privateKeyImportWarning": "Importing a private key replaces this node's identity. Other nodes will see it as the node the file came from.",
+      "notApplied": "Not applied on import",
+      "skipped": {
+        "title": "Not applied:",
+        "owner": "names (the node's user info hasn't loaded)",
+        "isLicensed": "licensed flag (use the User page to change ham mode)",
+        "security": "security (the node's current keys haven't loaded)",
+        "trafficManagement": "traffic management",
+        "ringtone": "ringtone",
+        "cannedMessages": "canned messages"
+      }
+    },
+    "cleanNodes": {
+      "title": "Clean node database",
+      "description": "Caution: this removes nodes from both the app and the node's database. Selections are additive.",
+      "olderThan": "Clean up nodes last seen older than {{count}} days",
+      "olderThanDescription": "Nodes never heard count as old. Your own node, favourites and ignored nodes are always kept.",
+      "onlyUnknown": "Clean up only unknown nodes",
+      "onlyUnknownDescription": "Unknown nodes are ones that never sent their user info (no long name).",
+      "queued": "{{count}} nodes queued for deletion",
+      "queued_one": "{{count}} node queued for deletion",
+      "queued_other": "{{count}} nodes queued for deletion",
+      "none": "No nodes match.",
+      "cleanNow": "Clean now",
+      "confirmTitle": "Clean node database?",
+      "confirmDescription": "Remove {{count}} nodes from the app and the node's database. This can't be undone.",
+      "confirmDescription_one": "Remove {{count}} node from the app and the node's database. This can't be undone.",
+      "confirmDescription_other": "Remove {{count}} nodes from the app and the node's database. This can't be undone.",
+      "done": "Removed {{count}} nodes",
+      "done_one": "Removed {{count}} node",
+      "done_other": "Removed {{count}} nodes",
+      "failed": "{{count}} could not be removed"
+    },
+    "debug": {
+      "title": "Device logs",
+      "description": "Log records the node has sent since this page was opened. The node only sends them when \"Debug log API\" is enabled on the Security page; they aren't stored, so leaving this page clears them.",
+      "securityLink": "Open Security settings",
+      "search": "Filter logs",
+      "clear": "Clear",
+      "export": "Export",
+      "empty": "No log records yet.",
+      "noMatch": "No log records match the filter.",
+      "count": "{{shown}} of {{total}} records",
+      "capped": "Only the latest {{max}} records are kept."
+    },
+    "app": {
+      "appearance": "Appearance",
+      "appearanceDescription": "These settings are stored in this browser only.",
+      "theme": "Theme",
+      "themeDescription": "Light, dark, or follow the system setting.",
+      "language": "Language",
+      "languageDescription": "The language of the app."
+    },
+    "about": {
+      "whatIs": "What is Meshtastic?",
+      "whatIsDescription": "An open source, off-grid, decentralized mesh network that runs on affordable, low-power radios.",
+      "app": "Meshtastic Web",
+      "version": "App version",
+      "github": "GitHub repository",
+      "githubDescription": "Source code, issues and releases of this app.",
+      "project": "Project information",
+      "website": "Website",
+      "documentation": "Documentation",
+      "license": "License",
+      "licenseDescription": "GNU General Public License v3.0",
+      "needHardware": "Need hardware?",
+      "needHardwareDescription": "Meshtastic needs a compatible device. See the supported devices to find one.",
+      "devices": "Supported devices",
+      "copyright": "Meshtastic® Copyright Meshtastic LLC",
+      "licenseNotice": "Free software under the GNU General Public License v3, with no warranty. You may redistribute it under the same license."
+    }
   }
 }

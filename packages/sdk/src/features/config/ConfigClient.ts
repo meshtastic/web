@@ -1,6 +1,6 @@
 import * as Protobuf from "@meshtastic/protobufs";
 import { computed } from "@preact/signals-core";
-import type { Result } from "better-result";
+import { Result } from "better-result";
 import type { MeshClient } from "../../core/client/MeshClient.ts";
 import {
   type ReadonlySignal,
@@ -14,6 +14,13 @@ import {
   setConfig,
   setModuleConfig,
 } from "./application/ConfigUseCases.ts";
+import {
+  requestCannedMessages,
+  requestRingtone,
+  setCannedMessages,
+  setRingtone,
+} from "./application/ModuleMessagesUseCases.ts";
+import { DeviceStatusEnum } from "../device/domain/DeviceStatus.ts";
 import { ConfigEditor } from "./domain/ConfigEditor.ts";
 import type { ModuleConfig } from "./domain/ModuleConfig.ts";
 import type { RadioConfig } from "./domain/RadioConfig.ts";
@@ -36,13 +43,28 @@ export class ConfigClient {
    * flash a "set region" prompt during the connect handshake.
    */
   public readonly isRegionUnset: ReadonlySignal<boolean>;
+  /**
+   * The device's `|`-separated canned message list, or undefined until
+   * {@link requestCannedMessages} has been answered.
+   */
+  public readonly cannedMessages: ReadonlySignal<string | undefined>;
+  /**
+   * The External Notification ringtone (RTTTL), or undefined until
+   * {@link requestRingtone} has been answered.
+   */
+  public readonly ringtone: ReadonlySignal<string | undefined>;
 
   constructor(client: MeshClient) {
     this.client = client;
     this.store = createConfigStore();
     this.radio = this.store.radio.read;
     this.modules = this.store.modules.read;
-    this.editor = new ConfigEditor(client);
+    this.cannedMessages = this.store.cannedMessages.read;
+    this.ringtone = this.store.ringtone.read;
+    this.editor = new ConfigEditor(client, {
+      onStagedAdminMessageCommitted: (message) =>
+        this.applySentAdminMessage(message.payloadVariant),
+    });
 
     this.isRegionUnset = toReadonly(
       computed(() => {
@@ -66,6 +88,63 @@ export class ConfigClient {
         moduleConfig,
       );
     });
+    client.events.onAdminPacket.subscribe((packet) => {
+      // Only the local node's answers; a remote node's list is not ours.
+      if (packet.from !== client.myNodeNum) return;
+      const variant = packet.data.payloadVariant;
+      if (variant.case === "getCannedMessageModuleMessagesResponse") {
+        this.store.cannedMessages.write.value = variant.value;
+      } else if (variant.case === "getRingtoneResponse") {
+        this.store.ringtone.write.value = variant.value;
+      }
+    });
+    client.events.onDeviceStatus.subscribe((status) => {
+      if (status === DeviceStatusEnum.DeviceDisconnected) {
+        this.store.cannedMessages.write.value = undefined;
+        this.store.ringtone.write.value = undefined;
+      }
+    });
+  }
+
+  /** Ask the device for its canned message list; see {@link cannedMessages}. */
+  public requestCannedMessages(): Promise<Result<number, Error>> {
+    return requestCannedMessages(this.client);
+  }
+
+  /** Set the canned message list (`|`-separated, at most 200 bytes). */
+  public async setCannedMessages(
+    messages: string,
+  ): Promise<Result<number, Error>> {
+    const result = await setCannedMessages(this.client, messages);
+    if (Result.isOk(result)) {
+      this.store.cannedMessages.write.value = messages;
+    }
+    return result;
+  }
+
+  /** Ask the device for its ringtone; see {@link ringtone}. */
+  public requestRingtone(): Promise<Result<number, Error>> {
+    return requestRingtone(this.client);
+  }
+
+  /** Set the External Notification ringtone (RTTTL, at most 230 bytes). */
+  public async setRingtone(ringtone: string): Promise<Result<number, Error>> {
+    const result = await setRingtone(this.client, ringtone);
+    if (Result.isOk(result)) {
+      this.store.ringtone.write.value = ringtone;
+    }
+    return result;
+  }
+
+  /** Keep the cached values in step with sets sent through the editor. */
+  private applySentAdminMessage(
+    variant: Protobuf.Admin.AdminMessage["payloadVariant"],
+  ): void {
+    if (variant.case === "setCannedMessageModuleMessages") {
+      this.store.cannedMessages.write.value = variant.value;
+    } else if (variant.case === "setRingtoneMessage") {
+      this.store.ringtone.write.value = variant.value;
+    }
   }
 
   public beginEdit(): Promise<Result<number, Error>> {

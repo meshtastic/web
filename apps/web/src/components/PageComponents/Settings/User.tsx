@@ -1,4 +1,5 @@
 import {
+  NODE_STATUS_MAX_BYTES,
   type UserValidation,
   UserValidationSchema,
 } from "@app/validation/config/user.ts";
@@ -7,8 +8,11 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { useDevice } from "@core/stores";
+import { isModuleExcluded } from "@core/utils/excludedModules.ts";
+import { firmwareAtLeast, Protobuf } from "@meshtastic/sdk";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -23,11 +27,41 @@ const EMPTY_OWNER_SIGNAL = {
   subscribe: () => () => {},
 } as const;
 
+const EMPTY_MODULES_SIGNAL = {
+  value: {} as {
+    statusmessage?: Protobuf.ModuleConfig.ModuleConfig_StatusMessageConfig;
+  },
+  peek: () =>
+    ({}) as {
+      statusmessage?: Protobuf.ModuleConfig.ModuleConfig_StatusMessageConfig;
+    },
+  subscribe: () => () => {},
+} as const;
+
 export const User = ({ onFormInit }: UserConfigProps) => {
   const { t } = useTranslation("config");
   const editor = useConfigEditor();
   const myNode = useMyNodeAsProto();
   const owner = useSignal(editor?.owner ?? EMPTY_OWNER_SIGNAL);
+  const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const { metadata, supportsFirmware28, excludedModules } =
+    useDeviceCapabilities();
+
+  // The Status Message module's one field lives here, as on Android: from
+  // firmware 2.7.20, unless the build leaves the module out. It also waits
+  // for the module's config, so an edit is never shown but not staged.
+  const supportsStatusMessage =
+    (supportsFirmware28 ||
+      firmwareAtLeast(metadata?.firmwareVersion ?? "", "2.7.20")) &&
+    !isModuleExcluded(excludedModules, "statusmessage");
+  const showStatusMessage =
+    supportsStatusMessage && moduleConfig.statusmessage !== undefined;
+  const baselineStatus = moduleConfig.statusmessage?.nodeStatus ?? "";
+  const effectiveStatus =
+    modules.statusmessage?.nodeStatus ??
+    getEffectiveModuleConfig("statusmessage")?.nodeStatus ??
+    baselineStatus;
 
   // Seed the editor's baseline when the device's user info first arrives.
   // setBaselineOwner is a no-op when the working copy is dirty, so user
@@ -59,6 +93,16 @@ export const User = ({ onFormInit }: UserConfigProps) => {
       isLicensed: data.isLicensed,
     });
     editor.setOwner(merged);
+    // Only stage the status once the device has sent the module's config,
+    // so a node without it never gets a new, dirty section.
+    if (showStatusMessage) {
+      editor.setModuleSection(
+        "statusmessage",
+        create(Protobuf.ModuleConfig.ModuleConfig_StatusMessageConfigSchema, {
+          nodeStatus: data.nodeStatus,
+        }),
+      );
+    }
   };
 
   const hwName =
@@ -77,6 +121,7 @@ export const User = ({ onFormInit }: UserConfigProps) => {
         shortName: baselineUser.shortName,
         isLicensed: baselineUser.isLicensed,
         isUnmessageable: baselineUser.isUnmessagable ?? false,
+        nodeStatus: baselineStatus,
       }}
       values={{
         nodeId: effectiveUser.id,
@@ -85,6 +130,7 @@ export const User = ({ onFormInit }: UserConfigProps) => {
         shortName: effectiveUser.shortName,
         isLicensed: effectiveUser.isLicensed,
         isUnmessageable: effectiveUser.isUnmessagable ?? false,
+        nodeStatus: effectiveStatus,
       }}
       fieldGroups={[
         {
@@ -119,6 +165,22 @@ export const User = ({ onFormInit }: UserConfigProps) => {
                 fieldLength: { min: 1, max: 4, showCharacterCount: true },
               },
             },
+            ...(showStatusMessage
+              ? [
+                  {
+                    type: "text" as const,
+                    name: "nodeStatus" as const,
+                    label: t("user.statusMessage.label"),
+                    description: t("user.statusMessage.description"),
+                    properties: {
+                      fieldLength: {
+                        max: NODE_STATUS_MAX_BYTES,
+                        showCharacterCount: true,
+                      },
+                    },
+                  },
+                ]
+              : []),
             {
               type: "text",
               name: "hardwareModel",

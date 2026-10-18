@@ -37,6 +37,9 @@ export const SidebarButton = ({
       size="sm"
       className={cn(
         "flex w-full items-center text-wrap",
+        // Buttons sit 4px apart, so an offset ring spills onto the next one.
+        // Ring only for keyboard focus, drawn inside the button.
+        "focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400",
         isButtonCollapsed
           ? "justify-center gap-0 px-2 h-9"
           : "justify-start gap-2 min-h-9",
