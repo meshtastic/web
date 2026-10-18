@@ -100,7 +100,13 @@ export function buildEditedChannel(
 ): Protobuf.Channel.Channel {
   const settings = existing.settings;
   const moduleSettings = settings?.moduleSettings;
-  const precision = draft.positionPrecision;
+  const existingPrecision = moduleSettings?.positionPrecision ?? 0;
+  // The dialog rounds precision into its 10-19 range; keep a device value
+  // outside it (set by another client) unless the user changed it.
+  const precision =
+    draft.positionPrecision === normalizePositionPrecision(existingPrecision)
+      ? existingPrecision
+      : draft.positionPrecision;
   const keepModuleSettings =
     moduleSettings !== undefined || precision !== POSITION_PRECISION_OFF;
 

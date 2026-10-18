@@ -68,6 +68,25 @@ describe("buildEditedChannel", () => {
     expect(edited).toEqual(existing);
   });
 
+  it.each([24, 5])(
+    "keeps an out-of-range precision (%i) set by another client",
+    (precision) => {
+      const other = makeChannel(
+        3,
+        Role.SECONDARY,
+        { name: "cli", psk: key16 },
+        { positionPrecision: precision },
+      );
+      const draft = draftFromChannel(other);
+      expect(buildEditedChannel(other, draft)).toEqual(other);
+      // Renaming alone still keeps the device's precision.
+      const renamed = buildEditedChannel(other, { ...draft, name: "renamed" });
+      expect(renamed.settings?.moduleSettings?.positionPrecision).toBe(
+        precision,
+      );
+    },
+  );
+
   it("is unchanged for a channel without module settings", () => {
     const bare = makeChannel(1, Role.SECONDARY, { name: "x", psk: key16 });
     const edited = buildEditedChannel(bare, draftFromChannel(bare));

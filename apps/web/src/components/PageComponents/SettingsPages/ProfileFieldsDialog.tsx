@@ -43,8 +43,15 @@ export const ProfileFieldsDialog = ({
   const toggle = (field: ProfileField, checked: boolean) =>
     setSelection((current) => ({ ...current, [field]: checked }));
 
+  // A row the user can't select (unavailable, not imported, or the private
+  // key without the configuration) doesn't count, even if still ticked.
+  const isEnabled = (field: ProfileField) =>
+    available[field] &&
+    !(mode === "import" && NOT_IMPORTED.includes(field)) &&
+    !(field === "privateKey" && !selection.config);
+
   const anySelected = PROFILE_FIELDS.some(
-    (field) => selection[field] && available[field],
+    (field) => selection[field] && isEnabled(field),
   );
 
   return (
@@ -75,8 +82,7 @@ export const ProfileFieldsDialog = ({
         {PROFILE_FIELDS.map((field) => {
           const notApplied = mode === "import" && NOT_IMPORTED.includes(field);
           // The key lives in the configuration's security section.
-          const needsConfig = field === "privateKey" && !selection.config;
-          const enabled = available[field] && !notApplied && !needsConfig;
+          const enabled = isEnabled(field);
           return (
             <div key={field} className="flex flex-col gap-1">
               <Checkbox
