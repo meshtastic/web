@@ -13,7 +13,7 @@ your needs already exists. Many common labels like "Save," "Cancel," "Name,"
 "Description," "Loading...," or "Error" are likely already present, especially
 in the common.json namespace. Reusing existing keys prevents duplication and
 ensures consistency across the application. Using your code editor's search
-function across the /i18n/locales/en/ directory is an effective way to do this.
+function across the apps/web/public/i18n/locales/en/ directory is an effective way to do this.
 
 ### Key Naming and Structure Rules
 
