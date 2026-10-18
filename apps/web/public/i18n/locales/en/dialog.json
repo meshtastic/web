@@ -88,7 +88,7 @@
       "useHttps": "Use HTTPS",
       "localNetwork": {
         "denied": "Local network access is blocked for this site. Allow it in the site settings (the icon next to the address bar), or switch to HTTPS.",
-        "unsupported": "This browser requires HTTPS on this page. Chrome and Edge can connect over HTTP to devices on your local network."
+        "unsupported": "This browser requires HTTPS on this page. Chrome, Edge and Firefox can connect over HTTP to devices on your local network."
       },
       "invalidUrl": {
         "title": "Invalid URL",
