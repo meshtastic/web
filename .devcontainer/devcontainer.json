@@ -1,6 +1,6 @@
 {
   "name": "meshtastic-web",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24-bookworm",
   "features": {
     "ghcr.io/r3dpoint/devcontainer-features/tailwindcss-standalone-cli:1": {
       "version": "latest"
