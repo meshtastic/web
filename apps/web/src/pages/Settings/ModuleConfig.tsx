@@ -155,7 +155,7 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
           <TabsTrigger
             key={tab.label}
             value={tab.label}
-            className="dark:text-slate-300 dark:hover:bg-slate-600/60 dark:hover:text-white relative max-md:shrink-0"
+            className="dark:text-slate-300 dark:hover:bg-neutral-600/60 dark:hover:text-white relative max-md:shrink-0"
           >
             {tab.label}
             {flags.get(tab.case) && (

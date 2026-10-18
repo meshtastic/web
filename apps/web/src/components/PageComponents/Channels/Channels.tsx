@@ -82,7 +82,7 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
             <TabsTrigger
               key={`channel_${channel.index}`}
               value={`channel_${channel.index}`}
-              className="dark:text-slate-300 dark:hover:bg-slate-600/60 dark:hover:text-white relative max-md:shrink-0"
+              className="dark:text-slate-300 dark:hover:bg-neutral-600/60 dark:hover:text-white relative max-md:shrink-0"
             >
               {getChannelName(channel)}
               {flags.get(channel.index) && (

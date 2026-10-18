@@ -11,7 +11,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex flex-wrap items-center rounded-md  p-1 mt-2 bg-slate-200 dark:bg-slate-100",
+      "inline-flex flex-wrap items-stretch overflow-hidden rounded-md p-0 mt-2 bg-neutral-200 dark:bg-neutral-100",
       className,
     )}
     {...props}
@@ -28,7 +28,7 @@ const TabsTrigger = React.forwardRef<
       // The selected tab is a solid grey with white text so it stands out
       // from the light track (and from the darker Settings tracks in dark
       // mode); unselected tabs are muted until hovered.
-      "inline-flex min-w-[100px] items-center justify-center rounded-[0.185rem] px-3 py-1.5 text-sm font-medium text-slate-600 transition-all hover:bg-slate-300/60 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-slate-600 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:hover:bg-slate-600 dark:data-[state=active]:bg-slate-500 dark:data-[state=active]:text-white dark:data-[state=active]:hover:bg-slate-500 cursor-pointer",
+      "inline-flex min-w-[100px] items-center justify-center rounded-none px-3 py-2 text-sm font-medium text-neutral-600 transition-all hover:bg-neutral-300/60 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-neutral-600 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:hover:bg-neutral-600 dark:data-[state=active]:bg-neutral-500 dark:data-[state=active]:text-white dark:data-[state=active]:hover:bg-neutral-500 cursor-pointer",
       className,
     )}
     {...props}
