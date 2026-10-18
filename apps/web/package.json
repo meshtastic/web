@@ -111,7 +111,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "autoprefixer": "^10.6.1",
     "gzipper": "^8.3.0",
-    "happy-dom": "^20.11.1",
+    "happy-dom": "^21.0.1",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
     "tailwind-merge": "^3.7.0",
