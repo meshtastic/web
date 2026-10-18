@@ -512,19 +512,13 @@ export default function AddConnectionDialog({
               ></Switch>
               <Label>{t("addConnection.httpConnection.useHttps")}</Label>
             </div>
-            {isHTTPS && state.protocol === "http" && (
-              <p
-                className={
-                  localNetworkAccess === "denied"
-                    ? "text-sm text-amber-600 dark:text-amber-400"
-                    : "text-sm text-slate-500 dark:text-slate-400"
-                }
-              >
-                {localNetworkAccess === "denied"
-                  ? t("addConnection.httpConnection.localNetwork.denied")
-                  : t("addConnection.httpConnection.localNetwork.prompt")}
-              </p>
-            )}
+            {isHTTPS &&
+              state.protocol === "http" &&
+              localNetworkAccess === "denied" && (
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  {t("addConnection.httpConnection.localNetwork.denied")}
+                </p>
+              )}
             {isHTTPS && !httpAllowed && (
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 {t("addConnection.httpConnection.localNetwork.unsupported")}

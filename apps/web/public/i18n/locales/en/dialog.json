@@ -87,7 +87,6 @@
       "heading": "URL or IP",
       "useHttps": "Use HTTPS",
       "localNetwork": {
-        "prompt": "Your browser will ask to allow access to devices on your local network. Choose Allow to connect over HTTP without installing a certificate.",
         "denied": "Local network access is blocked for this site. Allow it in the site settings (the icon next to the address bar), or switch to HTTPS.",
         "unsupported": "This browser requires HTTPS on this page. Chrome and Edge can connect over HTTP to devices on your local network."
       },
