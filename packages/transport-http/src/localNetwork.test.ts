@@ -14,6 +14,16 @@ describe("withLocalNetworkTarget", () => {
     ).toEqual({ method: "GET", targetAddressSpace: "local" });
   });
 
+  it.each([
+    "http://localhost",
+    "http://localhost:4403",
+    "http://127.0.0.1",
+    "http://[::1]:80",
+  ])("leaves loopback %s unannotated", (url) => {
+    onPage("https:");
+    expect(withLocalNetworkTarget(url)).toEqual({});
+  });
+
   it("leaves https:// requests alone", () => {
     onPage("https:");
     expect(withLocalNetworkTarget("https://meshtastic.local")).toEqual({});

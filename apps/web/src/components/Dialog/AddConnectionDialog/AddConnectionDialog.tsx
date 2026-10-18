@@ -70,6 +70,7 @@ type DialogAction =
   | { type: "SET_NAME"; payload: string }
   | { type: "SET_PROTOCOL"; payload: "http" | "https" }
   | { type: "SET_PROTOCOL_DEFAULT"; payload: "http" | "https" }
+  | { type: "FORCE_PROTOCOL"; payload: "http" | "https" }
   | { type: "SET_URL"; payload: string }
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
   | { type: "SET_SLOW_LOCAL_NAME"; payload: boolean }
@@ -210,6 +211,10 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
       return { ...state, name: action.payload };
     case "SET_PROTOCOL":
       return { ...state, protocol: action.payload, protocolTouched: true };
+    case "FORCE_PROTOCOL":
+      return state.protocol === action.payload
+        ? state
+        : { ...state, protocol: action.payload };
     case "SET_PROTOCOL_DEFAULT":
       return state.protocolTouched || state.protocol === action.payload
         ? state
@@ -306,16 +311,24 @@ export default function AddConnectionDialog({
   // On an HTTPS page, plain HTTP to a device is mixed content unless the
   // browser supports Chrome's Local Network Access (Chrome/Edge 142+).
   const localNetworkAccess = useLocalNetworkAccess();
-  const httpAllowed = !isHTTPS || localNetworkAccess !== "unsupported";
+  // HTTP stays locked until the browser confirms support.
+  const httpAllowed =
+    !isHTTPS ||
+    (localNetworkAccess !== "unsupported" && localNetworkAccess !== "unknown");
   const isLocalHost = isLocalNetworkHost(state.url);
 
   // Default local devices to HTTP (no certificate) where the browser allows
   // it, everything else to HTTPS, until the user picks a protocol.
   useEffect(() => {
     if (!isHTTPS || localNetworkAccess === "unknown") return;
+    if (!httpAllowed) {
+      // Unsupported overrides any earlier choice: HTTP would be blocked.
+      dispatch({ type: "FORCE_PROTOCOL", payload: "https" });
+      return;
+    }
     dispatch({
       type: "SET_PROTOCOL_DEFAULT",
-      payload: httpAllowed && isLocalHost ? "http" : "https",
+      payload: isLocalHost ? "http" : "https",
     });
   }, [isHTTPS, localNetworkAccess, httpAllowed, isLocalHost]);
 

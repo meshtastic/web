@@ -17,5 +17,24 @@ export function withLocalNetworkTarget(
   if (!url.startsWith("http:") || globalThis.location?.protocol !== "https:") {
     return init;
   }
+  // Loopback is its own address space: a "local" target would make Chrome
+  // reject the request. http://localhost is already trusted, so it needs
+  // no annotation.
+  if (isLoopback(url)) return init;
   return { ...init, targetAddressSpace: "local" } as RequestInit;
+}
+
+function isLoopback(url: string): boolean {
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    host === "[::1]" ||
+    /^127\.\d+\.\d+\.\d+$/.test(host)
+  );
 }
