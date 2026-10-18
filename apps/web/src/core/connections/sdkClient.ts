@@ -29,8 +29,30 @@ const TELEMETRY_RETENTION = {
 const STORAGE_OPEN_TIMEOUT_MS = 5000;
 
 /**
+ * Storage scope used until the radio's node number is known. Node numbers
+ * and connection ids are both unsigned 32-bit, so no stored row has it and
+ * nothing is shown before the handshake names the radio.
+ */
+export const UNKNOWN_NODE_SCOPE = -1;
+
+/**
  * Builds a MeshDevice wired with persistence repositories opened against the
- * shared OPFS-backed SQLite DB. If sqlocal is unavailable, hangs longer than
+ * shared OPFS-backed SQLite DB.
+ *
+ * History is stored per radio, not per saved connection: the repositories
+ * are scoped to `nodeNum` (the node this connection reached last time), so
+ * serial, Bluetooth and HTTP connections to the same radio share messages,
+ * drafts, nodes and telemetry. When `nodeNum` is unknown, or the radio turns
+ * out to be a different node, the SDK rescopes to the node number my_info
+ * reports (`storageScope: "node"`).
+ *
+ * Rows written before this was per node sit under the connection id in the
+ * same `device_id` column and are no longer read. Connection ids come from
+ * `randId()`, a uniformly random unsigned 32-bit integer, and node numbers
+ * are unsigned 32-bit too, so a given id matches a given node number with
+ * odds of 1 in 2^32 (about 4.3 billion). If it did, that node's history
+ * would also show the old rows of that one connection; nothing is lost.
+ * If sqlocal is unavailable, hangs longer than
  * `STORAGE_OPEN_TIMEOUT_MS`, or fails for any reason, falls through to the
  * SDK's in-memory repositories so the connect path is never blocked by
  * persistence. `persistent` is false then: nothing from this session will
@@ -40,8 +62,10 @@ export async function buildMeshDevice(
   connectionId: ConnectionId,
   deviceId: number,
   transport: AnyTransport,
+  nodeNum?: number,
 ): Promise<{ meshDevice: MeshDevice; persistent: boolean }> {
-  log.debug("buildMeshDevice: enter", { connectionId, deviceId });
+  log.debug("buildMeshDevice: enter", { connectionId, deviceId, nodeNum });
+  const scope = nodeNum ?? UNKNOWN_NODE_SCOPE;
   let chatRepository: SqlocalMessageRepository | undefined;
   let draftRepository: SqlocalDraftRepository | undefined;
   let nodesRepository: SqlocalNodesRepository | undefined;
@@ -69,17 +93,17 @@ export async function buildMeshDevice(
       persistent,
     });
     chatRepository = new SqlocalMessageRepository(db, {
-      deviceId: connectionId,
+      deviceId: scope,
       coordinator,
     });
     draftRepository = new SqlocalDraftRepository(db, {
-      deviceId: connectionId,
+      deviceId: scope,
     });
     nodesRepository = new SqlocalNodesRepository(db, {
-      deviceId: connectionId,
+      deviceId: scope,
     });
     telemetryRepository = new SqlocalTelemetryRepository(db, {
-      deviceId: connectionId,
+      deviceId: scope,
     });
     log.debug("buildMeshDevice: repositories opened");
   } catch (err) {
@@ -95,6 +119,8 @@ export async function buildMeshDevice(
 
   const meshDevice = new MeshDevice(transport, {
     configId: deviceId,
+    storageScope: "node",
+    storageNodeNum: nodeNum,
     chat:
       chatRepository || draftRepository
         ? {

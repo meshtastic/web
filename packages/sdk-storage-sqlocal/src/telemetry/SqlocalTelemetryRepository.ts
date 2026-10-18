@@ -27,11 +27,19 @@ type KnownKind = keyof typeof SCHEMA_FOR_KIND;
 
 export class SqlocalTelemetryRepository implements TelemetryRepository {
   private readonly db: SqlocalDb;
-  private readonly deviceId: number;
+  private deviceId: number;
 
   constructor(db: SqlocalDb, options: SqlocalTelemetryRepositoryOptions) {
     this.db = db;
     this.deviceId = options.deviceId;
+  }
+
+  /**
+   * Points every later read and write at another `device_id`. Rows under the
+   * old one are left as they are.
+   */
+  setScope(deviceId: number): void {
+    this.deviceId = deviceId;
   }
 
   async loadRecent(

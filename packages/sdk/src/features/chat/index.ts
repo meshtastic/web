@@ -16,6 +16,7 @@ export type {
 export {
   conversationKeyString,
   inferConversation,
+  parseConversationKey,
 } from "./domain/MessageRepository.ts";
 export { MessageMapper } from "./infrastructure/MessageMapper.ts";
 export { InMemoryMessageRepository } from "./infrastructure/repositories/InMemoryMessageRepository.ts";

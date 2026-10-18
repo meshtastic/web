@@ -32,6 +32,42 @@ export class TelemetryStore {
     histSig.value = next;
   }
 
+  /**
+   * Adds stored readings for one node, skipping any already held (same kind
+   * and time), and keeps history in time order with the newest as latest.
+   */
+  merge(nodeNum: number, readings: ReadonlyArray<TelemetryReading>): void {
+    if (readings.length === 0) return;
+    const histSig = this.ensureHistory(nodeNum);
+    const keyOf = (r: TelemetryReading): string =>
+      `${r.kind}:${r.time.getTime()}`;
+    const seen = new Set(histSig.value.map(keyOf));
+    const added = readings.filter((r) => {
+      const key = keyOf(r);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    if (added.length === 0) return;
+    const next = [...histSig.value, ...added].sort(
+      (a, b) => a.time.getTime() - b.time.getTime(),
+    );
+    if (next.length > MAX_HISTORY) next.splice(0, next.length - MAX_HISTORY);
+    histSig.value = next;
+    this.ensureLatest(nodeNum).value = next[next.length - 1];
+  }
+
+  /**
+   * Empties every node's latest reading and history. Signals stay in place
+   * so subscribers keep receiving updates.
+   */
+  clear(): void {
+    for (const sig of this.latest.values()) sig.value = undefined;
+    for (const sig of this.history.values()) {
+      if (sig.value.length > 0) sig.value = [];
+    }
+  }
+
   latestFor(nodeNum: number): ReadonlySignal<TelemetryReading | undefined> {
     this.ensureLatest(nodeNum);
     const read = this.latestRead.get(nodeNum);

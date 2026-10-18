@@ -1,5 +1,5 @@
 import type { ConversationKey, DraftRepository } from "@meshtastic/sdk";
-import { conversationKeyString } from "@meshtastic/sdk";
+import { conversationKeyString, parseConversationKey } from "@meshtastic/sdk";
 import { and, eq, sql } from "drizzle-orm";
 import type { SqlocalDb } from "../db.ts";
 import { drafts } from "../schema/drafts.ts";
@@ -14,11 +14,19 @@ export interface SqlocalDraftRepositoryOptions {
  */
 export class SqlocalDraftRepository implements DraftRepository {
   private readonly db: SqlocalDb;
-  private readonly deviceId: number;
+  private deviceId: number;
 
   constructor(db: SqlocalDb, options: SqlocalDraftRepositoryOptions) {
     this.db = db;
     this.deviceId = options.deviceId;
+  }
+
+  /**
+   * Points every later read and write at another `device_id`. Rows under the
+   * old one are left as they are.
+   */
+  setScope(deviceId: number): void {
+    this.deviceId = deviceId;
   }
 
   async load(key: ConversationKey): Promise<string> {
@@ -73,16 +81,8 @@ export class SqlocalDraftRepository implements DraftRepository {
       .from(drafts)
       .where(eq(drafts.deviceId, this.deviceId));
     return rows.map((r) => ({
-      key: parseKey(r.conversationKey),
+      key: parseConversationKey(r.conversationKey),
       text: r.text,
     }));
   }
-}
-
-function parseKey(s: string): ConversationKey {
-  if (s.startsWith("channel:"))
-    return { kind: "channel", channel: Number(s.slice(8)) };
-  if (s.startsWith("direct:"))
-    return { kind: "direct", peer: Number(s.slice(7)) };
-  throw new Error(`Unknown conversation key format: ${s}`);
 }

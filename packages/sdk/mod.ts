@@ -109,6 +109,7 @@ export {
   inferConversation,
   MessageState,
   MessageTooLongError,
+  parseConversationKey,
 } from "./src/features/chat/index.ts";
 
 export {

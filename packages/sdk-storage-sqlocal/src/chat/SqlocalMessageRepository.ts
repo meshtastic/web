@@ -17,7 +17,10 @@ import type { SqlocalDb } from "../db.ts";
 import { messages } from "../schema/chat.ts";
 
 export interface SqlocalMessageRepositoryOptions {
-  /** Identifies the device (matches MeshRegistry ConnectionId). */
+  /**
+   * The `device_id` rows are stored and read under: the storage scope, e.g.
+   * the radio's node number. Change it later with `setScope`.
+   */
   deviceId: number;
   /** Optional cross-tab coordinator. If omitted, mutations are silent. */
   coordinator?: MultiTabCoordinator;
@@ -25,13 +28,21 @@ export interface SqlocalMessageRepositoryOptions {
 
 export class SqlocalMessageRepository implements MessageRepository {
   private readonly db: SqlocalDb;
-  private readonly deviceId: number;
+  private deviceId: number;
   private readonly coordinator: MultiTabCoordinator | undefined;
 
   constructor(db: SqlocalDb, options: SqlocalMessageRepositoryOptions) {
     this.db = db;
     this.deviceId = options.deviceId;
     this.coordinator = options.coordinator;
+  }
+
+  /**
+   * Points every later read and write at another `device_id`. Rows under the
+   * old one are left as they are.
+   */
+  setScope(deviceId: number): void {
+    this.deviceId = deviceId;
   }
 
   async loadRecent(key: ConversationKey, limit: number): Promise<Message[]> {

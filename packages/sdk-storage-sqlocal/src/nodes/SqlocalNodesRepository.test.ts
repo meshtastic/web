@@ -74,4 +74,23 @@ describe("SqlocalNodesRepository", () => {
     expect((await repo.get(1))?.isFavorite).toBe(true);
     expect((await repoB.get(1))?.isFavorite).toBe(false);
   });
+
+  it("setScope moves reads and writes to the new scope", async () => {
+    await repo.upsert(node(1, { snr: 1 }));
+    await repo.upsert(node(2));
+
+    repo.setScope(0xabcd);
+    expect(await repo.loadAll()).toEqual([]);
+    expect(await repo.get(1)).toBeUndefined();
+    await repo.upsert(node(1, { snr: 9 }));
+    await repo.remove(2);
+    expect((await repo.loadAll()).map((n) => [n.num, n.snr])).toEqual([[1, 9]]);
+    await repo.clear();
+
+    const old = new SqlocalNodesRepository(db, { deviceId: 1 });
+    expect((await old.loadAll()).map((n) => [n.num, n.snr]).sort()).toEqual([
+      [1, 1],
+      [2, undefined],
+    ]);
+  });
 });

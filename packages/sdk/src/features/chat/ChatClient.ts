@@ -11,10 +11,11 @@ import {
 import type { ChannelNumber } from "../../core/types.ts";
 import type { DraftRepository } from "./domain/DraftRepository.ts";
 import type { Message, MessageDeliveryPatch } from "./domain/Message.ts";
-import type {
-  ConversationKey,
-  MessageRepository,
-  RetentionPolicy,
+import {
+  type ConversationKey,
+  type MessageRepository,
+  parseConversationKey,
+  type RetentionPolicy,
 } from "./domain/MessageRepository.ts";
 import { MessageState } from "./domain/MessageState.ts";
 import { MessageMapper } from "./infrastructure/MessageMapper.ts";
@@ -79,6 +80,12 @@ export class ChatClient {
   private readonly hydrated = new Set<string>();
   private readonly draftsHydrated = new Set<string>();
   private readonly unreadByKey = signal<ReadonlyMap<string, number>>(new Map());
+  /**
+   * Bumped on every storage rescope. A load started before the bump belongs
+   * to the old scope, so its result is dropped instead of being merged into
+   * the stores.
+   */
+  private epoch = 0;
 
   public readonly drafts: ChatDrafts;
   public readonly unread: ChatUnread;
@@ -232,7 +239,9 @@ export class ChatClient {
     before: Date,
     limit = 50,
   ): Promise<Message[]> {
+    const epoch = this.epoch;
     const older = await this.repository.loadBefore(conv, before, limit);
+    if (epoch !== this.epoch) return [];
     const key = this.keyFor(conv);
     for (let i = older.length - 1; i >= 0; i--)
       this.store.prepend(key, older[i]!);
@@ -266,6 +275,30 @@ export class ChatClient {
     } catch {
       // ok
     }
+  }
+
+  /**
+   * Points the message and draft repositories at another storage scope and
+   * reloads from it every conversation and draft loaded so far. Messages,
+   * drafts and unread counts held for the old scope are dropped. Signals
+   * already handed out stay valid and update in place.
+   */
+  public rescope(scope: number): void {
+    this.repository.setScope?.(scope);
+    this.draftRepository.setScope?.(scope);
+    this.epoch++;
+
+    const conversations = [...this.hydrated];
+    const drafts = [...this.draftsHydrated];
+    this.store.clearAll();
+    this.hydrated.clear();
+    this.draftStore.reset();
+    this.draftsHydrated.clear();
+    if (this.unreadByKey.peek().size > 0) this.unreadByKey.value = new Map();
+
+    for (const key of conversations)
+      this.ensureHydrated(parseConversationKey(key));
+    for (const key of drafts) this.draftFor(parseConversationKey(key));
   }
 
   public async send(
@@ -333,13 +366,15 @@ export class ChatClient {
     const key = this.keyFor(conv);
     if (this.hydrated.has(key)) return;
     this.hydrated.add(key);
+    const epoch = this.epoch;
     void (async () => {
       try {
         const recent = await this.repository.loadRecent(
           conv,
           this.initialLoadLimit,
         );
-        for (const m of recent) this.store.append(key, m);
+        if (epoch !== this.epoch) return;
+        this.store.merge(key, recent);
       } catch {
         // adapter may not have history yet; safe to ignore
       }
@@ -350,9 +385,11 @@ export class ChatClient {
     const key = this.keyFor(conv);
     if (!this.draftsHydrated.has(key)) {
       this.draftsHydrated.add(key);
+      const epoch = this.epoch;
       void (async () => {
         try {
           const stored = await this.draftRepository.load(conv);
+          if (epoch !== this.epoch) return;
           if (stored) this.draftStore.set(conv, stored);
         } catch {
           // ok
