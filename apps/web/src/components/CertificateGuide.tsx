@@ -56,6 +56,9 @@ export function CertificateGuide({
   const [state, setState] = useState<GuideState>("idle");
   const deadline = useRef(0);
   const checking = useRef(false);
+  // Bumped on unmount and when the URL changes, so a re-test that finishes
+  // afterwards can't mark a different address as trusted.
+  const generation = useRef(0);
   const browser = detectCertBrowser(
     typeof navigator === "undefined" ? "" : navigator.userAgent,
   );
@@ -66,8 +69,11 @@ export function CertificateGuide({
   const check = useCallback(async () => {
     if (checking.current) return;
     checking.current = true;
+    const started = generation.current;
     try {
-      if (await retest()) {
+      const trusted = await retest();
+      if (started !== generation.current) return;
+      if (trusted) {
         setState("trusted");
         onTrusted?.();
       } else if (Date.now() > deadline.current) {
@@ -77,6 +83,13 @@ export function CertificateGuide({
       checking.current = false;
     }
   }, [retest, onTrusted]);
+
+  useEffect(
+    () => () => {
+      generation.current += 1;
+    },
+    [url],
+  );
 
   useEffect(() => {
     if (state !== "waiting") return;

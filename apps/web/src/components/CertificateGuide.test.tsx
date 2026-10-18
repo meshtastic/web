@@ -83,6 +83,30 @@ describe("CertificateGuide", () => {
     expect(onTrusted).toHaveBeenCalledTimes(1);
   });
 
+  it("ignores a re-test that finishes after the guide unmounts", async () => {
+    let finish: (trusted: boolean) => void = () => {};
+    const retest = vi.fn(
+      () => new Promise<boolean>((resolve) => (finish = resolve)),
+    );
+    const onTrusted = vi.fn();
+    const { unmount } = render(
+      <CertificateGuide
+        url="https://192.168.1.10"
+        retest={retest}
+        onTrusted={onTrusted}
+      />,
+    );
+    openRadio();
+    await act(async () => {
+      window.dispatchEvent(new Event("focus"));
+    });
+    expect(retest).toHaveBeenCalled();
+
+    unmount();
+    await act(async () => finish(true));
+    expect(onTrusted).not.toHaveBeenCalled();
+  });
+
   it("keeps polling while waiting, then gives up", async () => {
     const retest = vi.fn().mockResolvedValue(false);
     render(<CertificateGuide url="https://192.168.1.10" retest={retest} />);
