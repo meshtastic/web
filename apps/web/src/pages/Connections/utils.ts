@@ -7,6 +7,7 @@ import type {
 import { randId } from "@app/core/utils/randId";
 import { t } from "i18next";
 import { Bluetooth, Cable, Globe, type LucideIcon } from "lucide-react";
+import { withLocalNetworkTarget } from "@meshtastic/transport-http";
 
 export function createConnectionFromInput(input: NewConnection): Connection {
   const base = {
@@ -84,12 +85,15 @@ async function attemptHttpReachable(
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     // no-cors: opaque responses resolve fine; CORS failures and cert rejections both throw TypeError
-    await fetch(url, {
-      method: "GET",
-      mode: "no-cors",
-      cache: "no-store",
-      signal: controller.signal,
-    });
+    await fetch(
+      url,
+      withLocalNetworkTarget(url, {
+        method: "GET",
+        mode: "no-cors",
+        cache: "no-store",
+        signal: controller.signal,
+      }),
+    );
     clearTimeout(timer);
     return { reachable: true, certError: false };
   } catch (err) {
@@ -136,4 +140,43 @@ export function formatConnectionSubtext(conn: Connection): string {
   const v = conn.usbVendorId ? conn.usbVendorId.toString(16) : "?";
   const p = conn.usbProductId ? conn.usbProductId.toString(16) : "?";
   return `USB ${v}:${p}`;
+}
+
+/**
+ * Whether `host` is on the local network as Chrome's Local Network Access
+ * sees it: private, link-local or loopback addresses, `localhost` and
+ * `.local` names. Used to default such devices to HTTP on an HTTPS page.
+ */
+export function isLocalNetworkHost(host: string): boolean {
+  const trimmed = host.trim().toLowerCase().split("/")[0] ?? "";
+  // "[v6]:port", "v4-or-name:port", or a bare IPv6 address.
+  const bracketed = trimmed.match(/^\[([^\]]+)\]/);
+  const name = bracketed
+    ? (bracketed[1] ?? "")
+    : trimmed.split(":").length === 2
+      ? (trimmed.split(":")[0] ?? "")
+      : trimmed;
+  if (name === "localhost" || name.endsWith(".local")) return true;
+
+  const ipv4 = name.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4) {
+    const [a, b] = [Number(ipv4[1]), Number(ipv4[2])];
+    return (
+      a === 10 ||
+      a === 127 ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 169 && b === 254)
+    );
+  }
+
+  // IPv6: loopback, unique local (fc00::/7) and link-local (fe80::/10).
+  if (name.includes(":")) {
+    return (
+      name === "::1" ||
+      /^f[cd][0-9a-f]{2}:/.test(name) ||
+      /^fe[89ab][0-9a-f]:/.test(name)
+    );
+  }
+  return false;
 }
