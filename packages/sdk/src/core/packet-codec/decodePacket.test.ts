@@ -1,10 +1,10 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MeshClient } from "../client/MeshClient.ts";
 import type { PacketMetadata } from "../types.ts";
 import { createFakeTransport } from "../testing/createFakeTransport.ts";
-import { hopsAway } from "./decodePacket.ts";
+import { decodePacket, hopsAway } from "./decodePacket.ts";
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 10));
 
@@ -194,5 +194,33 @@ describe("hopsAway", () => {
   it("is unknown without a hop_start or with hop_limit above it", () => {
     expect(hopsAway(0, 3)).toBeUndefined();
     expect(hopsAway(2, 3)).toBeUndefined();
+  });
+});
+
+describe("decodePacket pacing", () => {
+  it("pauses once a frame budget has passed so the page can repaint", async () => {
+    const now = vi.spyOn(performance, "now").mockReturnValue(0);
+    const client = new MeshClient({
+      transport: createFakeTransport().transport,
+    });
+    const writer = decodePacket(client).getWriter();
+    const debug = { type: "debug", data: "" } as const;
+
+    // Within the budget: no pause.
+    await writer.write(debug);
+
+    // Past the budget: the write waits for a macrotask.
+    now.mockReturnValue(20);
+    let settled = false;
+    const pending = writer.write(debug).then(() => {
+      settled = true;
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(settled).toBe(false);
+
+    await pending;
+    expect(settled).toBe(true);
+    now.mockRestore();
   });
 });

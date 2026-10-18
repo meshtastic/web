@@ -32,6 +32,7 @@ describe("lockdown", () => {
     });
     client.configure().catch(() => {});
     await vi.advanceTimersByTimeAsync(300);
+    fake.respond.withMyNodeInfo({ myNodeNum: 0x1234 });
     fake.respond.withConfigCompleteId(CONFIG_NONCE);
     fake.respond.withRaw(
       create(Protobuf.Mesh.FromRadioSchema, {

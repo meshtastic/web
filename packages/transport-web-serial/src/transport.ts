@@ -35,6 +35,14 @@ export class SerialConnectError extends Error {
 
 const PORT_OPEN_RETRY_DELAYS_MS = [250, 500, 750] as const;
 const POST_CLOSE_DELAY_MS = 200;
+/**
+ * Read buffer for the port. Web Serial's default (255 bytes) holds one or two
+ * NodeInfo frames, so a busy main thread during the NodeDB download stalls
+ * reads and native-USB boards (ESP32-S3) drop frames.
+ */
+const READ_BUFFER_SIZE = 64 * 1024;
+/** Sent before the handshake so a sleeping radio starts listening (as Android does). */
+const WAKE_BYTES = new Uint8Array([0x94, 0x94, 0x94, 0x94]);
 
 function isPortBusyError(err: unknown): boolean {
   if (!(err instanceof Error)) return false;
@@ -117,6 +125,32 @@ export class TransportWebSerial implements Transport {
     }
   }
 
+  /**
+   * Assert DTR and RTS together, as Android does for native-USB boards
+   * (toggling them one at a time can reset an ESP32), then send the wake
+   * bytes. Failures are logged, not fatal: some adapters reject signals.
+   */
+  private static async wakeDevice(port: SerialPort): Promise<void> {
+    try {
+      await port.setSignals({ dataTerminalReady: true, requestToSend: true });
+    } catch (err) {
+      log.warn("wakeDevice: setSignals failed", {
+        message: (err as Error)?.message,
+      });
+    }
+    if (!port.writable) return;
+    const writer = port.writable.getWriter();
+    try {
+      await writer.write(WAKE_BYTES);
+    } catch (err) {
+      log.warn("wakeDevice: wake bytes failed", {
+        message: (err as Error)?.message,
+      });
+    } finally {
+      writer.releaseLock();
+    }
+  }
+
   private static async preparePort(
     port: SerialPort,
     baudRate: number,
@@ -157,8 +191,9 @@ export class TransportWebSerial implements Transport {
     ) {
       try {
         log.debug("preparePort: open() attempt", { attempt });
-        await port.open({ baudRate });
+        await port.open({ baudRate, bufferSize: READ_BUFFER_SIZE });
         log.debug("preparePort: open() ok", { attempt });
+        await TransportWebSerial.wakeDevice(port);
         return Result.ok(true);
       } catch (err) {
         lastErr = err;

@@ -26,8 +26,10 @@ import { Xmodem } from "../xmodem/Xmodem.ts";
 import {
   CONFIG_NONCE,
   FIRST_HEARTBEAT_NONCE,
+  HANDSHAKE_FRAME_CASES,
   HANDSHAKE_IDLE_TIMEOUT_MS,
   HANDSHAKE_SETTLE_MS,
+  HANDSHAKE_STAGE_MAX_MS,
   HEARTBEAT_INTERVAL_MS,
   NODEDB_NONCE,
   sleep,
@@ -154,7 +156,8 @@ export class MeshClient {
 
   private handshakeStage: HandshakeStage = "idle";
   private handshakeTimer: ReturnType<typeof setTimeout> | undefined;
-  private handshakeRetried = false;
+  private handshakeStageTimer: ReturnType<typeof setTimeout> | undefined;
+  private handshakeHasMyInfo = false;
   private handshakeTimeSent = false;
   private handshakeWaiters: {
     resolve: (nonce: number) => void;
@@ -262,15 +265,22 @@ export class MeshClient {
       this.handshakeWaiters.push({ resolve, reject });
     });
     this.handshakeTimeSent = false;
+    this.handshakeHasMyInfo = false;
     this.startHandshakeStage("config");
     return done;
   }
 
   private startHandshakeStage(stage: "config" | "nodedb"): void {
     this.handshakeStage = stage;
-    this.handshakeRetried = false;
     this.sendWantConfig(stage === "config" ? CONFIG_NONCE : NODEDB_NONCE);
     this.armHandshakeTimer();
+    if (this.handshakeStageTimer !== undefined) {
+      clearTimeout(this.handshakeStageTimer);
+    }
+    this.handshakeStageTimer = setTimeout(
+      () => this.onHandshakeStall(),
+      HANDSHAKE_STAGE_MAX_MS,
+    );
   }
 
   private sendWantConfig(nonce: number): void {
@@ -283,7 +293,7 @@ export class MeshClient {
   }
 
   private armHandshakeTimer(): void {
-    this.clearHandshakeTimer();
+    if (this.handshakeTimer !== undefined) clearTimeout(this.handshakeTimer);
     this.handshakeTimer = setTimeout(
       () => this.onHandshakeStall(),
       HANDSHAKE_IDLE_TIMEOUT_MS,
@@ -295,21 +305,19 @@ export class MeshClient {
       clearTimeout(this.handshakeTimer);
       this.handshakeTimer = undefined;
     }
+    if (this.handshakeStageTimer !== undefined) {
+      clearTimeout(this.handshakeStageTimer);
+      this.handshakeStageTimer = undefined;
+    }
   }
 
   private onHandshakeStall(): void {
     const stage = this.handshakeStage;
     if (stage !== "config" && stage !== "nodedb") return;
-    if (!this.handshakeRetried) {
-      this.log.warn(
-        Emitter[Emitter.Configure],
-        `⚠️ Handshake stalled in the ${stage} stage, asking again`,
-      );
-      this.handshakeRetried = true;
-      this.sendWantConfig(stage === "config" ? CONFIG_NONCE : NODEDB_NONCE);
-      this.armHandshakeTimer();
-      return;
-    }
+    this.log.warn(
+      Emitter[Emitter.Configure],
+      `⚠️ Handshake stalled in the ${stage} stage`,
+    );
     this.failHandshake(new HandshakeTimeoutError(stage));
   }
 
@@ -341,11 +349,13 @@ export class MeshClient {
   }
 
   private wireHandshake(): void {
-    // Any frame proves the device is still streaming.
-    this.events.onFromRadio.subscribe(() => {
+    // Only handshake frames prove the handshake is progressing; live mesh
+    // traffic would otherwise keep a stalled handshake alive forever.
+    this.events.onFromRadio.subscribe((fromRadio) => {
       if (
-        this.handshakeStage === "config" ||
-        this.handshakeStage === "nodedb"
+        (this.handshakeStage === "config" ||
+          this.handshakeStage === "nodedb") &&
+        HANDSHAKE_FRAME_CASES.has(fromRadio.payloadVariant.case ?? "")
       ) {
         this.armHandshakeTimer();
       }
@@ -354,6 +364,7 @@ export class MeshClient {
     // Set the clock as soon as the device identifies itself, so firmware can
     // timestamp the backlog it replays during the handshake.
     this.events.onMyNodeInfo.subscribe((info) => {
+      if (this.handshakeStage === "config") this.handshakeHasMyInfo = true;
       if (this.handshakeStage !== "config" || this.handshakeTimeSent) return;
       this.handshakeTimeSent = true;
       this.sendSetTimeOnly(info.myNodeNum);
@@ -374,6 +385,15 @@ export class MeshClient {
 
     this.events.onConfigComplete.subscribe((nonce) => {
       if (this.handshakeStage === "config" && nonce === CONFIG_NONCE) {
+        if (!this.handshakeHasMyInfo) {
+          // my_info was lost; without it the session has no identity.
+          this.log.warn(
+            Emitter[Emitter.Configure],
+            "⚠️ Config stage completed without my_info",
+          );
+          this.failHandshake(new HandshakeTimeoutError("config"));
+          return;
+        }
         this.handshakeStage = "settling";
         this.clearHandshakeTimer();
         void this.settleBetweenStages();

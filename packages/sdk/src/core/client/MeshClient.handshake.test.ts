@@ -11,6 +11,7 @@ import { MeshClient } from "./MeshClient.ts";
 import {
   CONFIG_NONCE,
   HANDSHAKE_IDLE_TIMEOUT_MS,
+  HANDSHAKE_STAGE_MAX_MS,
   HEARTBEAT_INTERVAL_MS,
   NODEDB_NONCE,
 } from "./handshake.ts";
@@ -50,11 +51,19 @@ describe("MeshClient handshake", () => {
     const { client, respond, sent, done } = await setup();
     expect(wantConfigIds(sent)).toEqual([CONFIG_NONCE]);
 
+    respond.withMyNodeInfo({ myNodeNum: 0x1234 });
+
     respond.withConfigCompleteId(CONFIG_NONCE);
     await vi.advanceTimersByTimeAsync(1_000);
 
     const kinds = decodeSent(sent).map((m) => m.payloadVariant.case);
-    expect(kinds).toEqual(["wantConfigId", "heartbeat", "wantConfigId"]);
+    // "packet" is the set-time admin message sent when my_info arrives.
+    expect(kinds).toEqual([
+      "wantConfigId",
+      "packet",
+      "heartbeat",
+      "wantConfigId",
+    ]);
     expect(wantConfigIds(sent)).toEqual([CONFIG_NONCE, NODEDB_NONCE]);
     expect(client.device.status.value).toBe(DeviceStatusEnum.DeviceConfiguring);
 
@@ -93,13 +102,42 @@ describe("MeshClient handshake", () => {
     expect(admin.payloadVariant.case).toBe("setTimeOnly");
   });
 
-  it("asks again once when the device stalls, then fails", async () => {
+  it("fails on a stall without asking again in the same session", async () => {
     const { sent, done } = await setup();
     await vi.advanceTimersByTimeAsync(HANDSHAKE_IDLE_TIMEOUT_MS);
-    expect(wantConfigIds(sent)).toEqual([CONFIG_NONCE, CONFIG_NONCE]);
-
-    await vi.advanceTimersByTimeAsync(HANDSHAKE_IDLE_TIMEOUT_MS);
     await expect(done).rejects.toBeInstanceOf(HandshakeTimeoutError);
+    expect(wantConfigIds(sent)).toEqual([CONFIG_NONCE]);
+  });
+
+  it("is not kept alive by live mesh traffic", async () => {
+    const { respond, done } = await setup();
+    for (let i = 0; i < 4; i++) {
+      await vi.advanceTimersByTimeAsync(HANDSHAKE_IDLE_TIMEOUT_MS / 4);
+      respond.withMeshPacket(
+        create(Protobuf.Mesh.MeshPacketSchema, { from: 7 }),
+      );
+    }
+    await expect(done).rejects.toBeInstanceOf(HandshakeTimeoutError);
+  });
+
+  it("fails a stage that runs past its hard cap", async () => {
+    const { respond, done } = await setup();
+    let elapsed = 0;
+    let num = 1;
+    while (elapsed <= HANDSHAKE_STAGE_MAX_MS) {
+      await vi.advanceTimersByTimeAsync(HANDSHAKE_IDLE_TIMEOUT_MS - 1_000);
+      elapsed += HANDSHAKE_IDLE_TIMEOUT_MS - 1_000;
+      respond.withNodeInfo({ num: num++ });
+    }
+    await expect(done).rejects.toBeInstanceOf(HandshakeTimeoutError);
+  });
+
+  it("fails the config stage when my_info never arrived", async () => {
+    const { respond, sent, done } = await setup();
+    respond.withConfigCompleteId(CONFIG_NONCE);
+    await vi.advanceTimersByTimeAsync(1_000);
+    await expect(done).rejects.toBeInstanceOf(HandshakeTimeoutError);
+    expect(wantConfigIds(sent)).toEqual([CONFIG_NONCE]);
   });
 
   it("keeps waiting while frames keep arriving", async () => {
@@ -121,6 +159,7 @@ describe("MeshClient handshake", () => {
 
   it("sends counting heartbeats from 2 once configured", async () => {
     const { respond, sent } = await setup();
+    respond.withMyNodeInfo({ myNodeNum: 0x1234 });
     respond.withConfigCompleteId(CONFIG_NONCE);
     await vi.advanceTimersByTimeAsync(1_000);
     respond.withConfigCompleteId(NODEDB_NONCE);
@@ -134,6 +173,7 @@ describe("MeshClient handshake", () => {
 
   it("restarts from the config stage when the device reboots", async () => {
     const { client, respond, sent } = await setup();
+    respond.withMyNodeInfo({ myNodeNum: 0x1234 });
     respond.withConfigCompleteId(CONFIG_NONCE);
     await vi.advanceTimersByTimeAsync(1_000);
     respond.withConfigCompleteId(NODEDB_NONCE);

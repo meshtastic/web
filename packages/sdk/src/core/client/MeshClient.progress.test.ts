@@ -73,6 +73,9 @@ describe("MeshClient.progress", () => {
     client.events.onConfigPacket.dispatch(
       create(Protobuf.Config.ConfigSchema, {}),
     );
+    client.events.onMyNodeInfo.dispatch(
+      create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum: 0x1234 }),
+    );
     client.events.onConfigComplete.dispatch(CONFIG_NONCE);
     expect(client.progress.value.phase).toBe("configuring");
 

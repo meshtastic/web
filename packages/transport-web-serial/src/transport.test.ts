@@ -294,6 +294,41 @@ describe("TransportWebSerial.createFromPort port hygiene", () => {
     if (Result.isOk(result)) await result.value.disconnect();
   });
 
+  it("opens with a large read buffer, asserts DTR/RTS and sends wake bytes", async () => {
+    const fake = new FakeSerialPort();
+    await fake.close();
+    const openSpy = vi.spyOn(fake, "open");
+    const setSignals = vi.fn().mockResolvedValue(undefined);
+    (fake as any).setSignals = setSignals;
+
+    const result = await TransportWebSerial.createFromPort(fake as any);
+
+    expect(Result.isOk(result)).toBe(true);
+    expect(openSpy).toHaveBeenCalledWith({
+      baudRate: 115200,
+      bufferSize: 64 * 1024,
+    });
+    expect(setSignals).toHaveBeenCalledWith({
+      dataTerminalReady: true,
+      requestToSend: true,
+    });
+    expect(Array.from(fake.lastWritten ?? [])).toEqual([
+      0x94, 0x94, 0x94, 0x94,
+    ]);
+    if (Result.isOk(result)) await result.value.disconnect();
+  });
+
+  it("still connects when the adapter rejects setSignals", async () => {
+    const fake = new FakeSerialPort();
+    await fake.close();
+    (fake as any).setSignals = vi.fn().mockRejectedValue(new Error("nope"));
+
+    const result = await TransportWebSerial.createFromPort(fake as any);
+
+    expect(Result.isOk(result)).toBe(true);
+    if (Result.isOk(result)) await result.value.disconnect();
+  });
+
   it("retries open() with backoff on InvalidStateError", async () => {
     const fake = new FakeSerialPort();
     await fake.close();

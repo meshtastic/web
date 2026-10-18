@@ -9,6 +9,7 @@ import {
   createLogger,
   DeviceStatusEnum,
   FirmwareTooOldError,
+  HandshakeTimeoutError,
   MIN_FIRMWARE_VERSION,
 } from "@meshtastic/sdk";
 import { t } from "i18next";
@@ -25,13 +26,25 @@ import { meshRegistry } from "@core/meshRegistry.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 // Per-connection out-of-band handles tracked outside Zustand:
 //   - cachedTransports: held BT device / serial port for reconnect + cleanup.
 //   - configSubscriptions: handshake status / reboot unsubscribers.
 const cachedTransports = new Map<ConnectionId, BluetoothDevice | SerialPort>();
 const configSubscriptions = new Map<ConnectionId, () => void>();
+// Handshake attempts per connection. A stalled handshake is retried by
+// reopening the transport with backoff, as the Android app does, instead of
+// re-sending want_config in the same session.
+const handshakeAttempts = new Map<ConnectionId, number>();
+const HANDSHAKE_RETRY_DELAYS_MS = [2_000, 4_000];
+// The pending retry per connection; disconnect or removal cancels it.
+const pendingRetries = new Map<ConnectionId, symbol>();
+
+const cancelHandshakeRetry = (id: ConnectionId): void => {
+  pendingRetries.delete(id);
+  handshakeAttempts.delete(id);
+};
 
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
@@ -44,6 +57,10 @@ export function useConnections() {
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
+  // Set below once connect() exists; used by setupMeshDevice to retry.
+  const retryHandshakeRef = useRef<
+    ((id: ConnectionId, delayMs: number) => Promise<void>) | undefined
+  >(undefined);
 
   const updateStatus = useCallback(
     (
@@ -62,35 +79,43 @@ export function useConnections() {
     [updateSavedConnection],
   );
 
-  const teardown = useCallback(async (id: ConnectionId, conn?: Connection) => {
-    log.debug("teardown: enter", { id });
-    configSubscriptions.get(id)?.();
-    configSubscriptions.delete(id);
+  const teardown = useCallback(
+    async (
+      id: ConnectionId,
+      conn?: Connection,
+      { keepHandle = false }: { keepHandle?: boolean } = {},
+    ) => {
+      log.debug("teardown: enter", { id });
+      configSubscriptions.get(id)?.();
+      configSubscriptions.delete(id);
 
-    if (conn?.meshDeviceId) {
-      const device = useDeviceStore.getState().getDevice(conn.meshDeviceId);
-      try {
-        // Await the underlying transport's close so the port is fully
-        // released before the user clicks reconnect — otherwise port.open()
-        // can race the close and throw "port already open".
-        await device?.connection?.disconnect();
-        log.debug("teardown: transport disconnect awaited");
-      } catch (e) {
-        const err = e as Error;
-        log.warn("teardown: transport disconnect threw", {
-          name: err?.name,
-          message: err?.message,
-        });
+      if (conn?.meshDeviceId) {
+        const device = useDeviceStore.getState().getDevice(conn.meshDeviceId);
+        try {
+          // Await the underlying transport's close so the port is fully
+          // released before the user clicks reconnect — otherwise port.open()
+          // can race the close and throw "port already open".
+          await device?.connection?.disconnect();
+          log.debug("teardown: transport disconnect awaited");
+        } catch (e) {
+          const err = e as Error;
+          log.warn("teardown: transport disconnect threw", {
+            name: err?.name,
+            message: err?.message,
+          });
+        }
       }
-    }
-    closeTransport(cachedTransports.get(id));
-    cachedTransports.delete(id);
-    log.debug("teardown: done", { id });
-  }, []);
+      closeTransport(cachedTransports.get(id));
+      if (!keepHandle) cachedTransports.delete(id);
+      log.debug("teardown: done", { id });
+    },
+    [],
+  );
 
   const removeConnection = useCallback(
     async (id: ConnectionId) => {
       const conn = connections.find((c) => c.id === id);
+      cancelHandshakeRetry(id);
       await teardown(id, conn);
       if (conn?.meshDeviceId) {
         try {
@@ -166,9 +191,10 @@ export function useConnections() {
         });
       }
 
-      if (!meshRegistry.has(id)) {
-        meshRegistry.register(id, meshDevice.meshClient);
-      }
+      // Replace any client left from an earlier attempt, so the app reads
+      // this session's state rather than the dead one's.
+      if (meshRegistry.has(id)) meshRegistry.unregister(id);
+      meshRegistry.register(id, meshDevice.meshClient);
       meshRegistry.setActive(id);
 
       setSelectedDevice(deviceId);
@@ -189,6 +215,7 @@ export function useConnections() {
       const markConfigured = (source: string): void => {
         if (configuredHandled) return;
         configuredHandled = true;
+        handshakeAttempts.delete(id);
         log.info("connect transitioned to configured", { id, source });
         device.setConnectionPhase("configured");
         updateStatus(id, "configured");
@@ -266,6 +293,21 @@ export function useConnections() {
             name: e?.name,
             message: e?.message,
           });
+          if (error instanceof HandshakeTimeoutError) {
+            const attempt = handshakeAttempts.get(id) ?? 0;
+            const delayMs = HANDSHAKE_RETRY_DELAYS_MS[attempt];
+            if (delayMs !== undefined && retryHandshakeRef.current) {
+              handshakeAttempts.set(id, attempt + 1);
+              log.warn("handshake stalled, reopening the transport", {
+                id,
+                attempt: attempt + 1,
+                delayMs,
+              });
+              void retryHandshakeRef.current(id, delayMs);
+              return;
+            }
+          }
+          handshakeAttempts.delete(id);
           updateStatus(
             id,
             "error",
@@ -363,10 +405,32 @@ export function useConnections() {
     [updateStatus, setupMeshDevice],
   );
 
+  useEffect(() => {
+    retryHandshakeRef.current = async (id, delayMs) => {
+      const token = Symbol();
+      pendingRetries.set(id, token);
+      const conn = useDeviceStore
+        .getState()
+        .savedConnections.find((c) => c.id === id);
+      // Keep the port or BT device: rediscovering it can need a prompt.
+      await teardown(id, conn, { keepHandle: true });
+      await new Promise((r) => setTimeout(r, delayMs));
+      if (pendingRetries.get(id) !== token) return;
+      pendingRetries.delete(id);
+      // connect() skips configured/connected connections; this one is still
+      // "configuring", so it reopens the transport and runs a fresh handshake.
+      await connect(id);
+    };
+    return () => {
+      retryHandshakeRef.current = undefined;
+    };
+  }, [connect, teardown]);
+
   const disconnect = useCallback(
     async (id: ConnectionId) => {
       const conn = connections.find((c) => c.id === id);
       if (!conn) return;
+      cancelHandshakeRetry(id);
       try {
         await teardown(id, conn);
         if (conn.meshDeviceId) {
