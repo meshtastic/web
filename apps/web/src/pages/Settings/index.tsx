@@ -313,6 +313,16 @@ const ConfigPage = () => {
       if (result.status === "error") {
         throw result.error;
       }
+
+      // Edits made while the save was in flight are still pending.
+      if (editor.isDirty.value) {
+        toast({
+          title: t("toast.savePending.title"),
+          description: t("toast.savePending.description"),
+        });
+        return;
+      }
+
       toast({
         title: t("toast.saveAllSuccess.title"),
         description: t("toast.saveAllSuccess.description"),

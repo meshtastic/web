@@ -107,6 +107,10 @@ export class ConfigEditor {
     message: Protobuf.Admin.AdminMessage,
   ) => void;
 
+  private commitQueue: Promise<unknown> = Promise.resolve();
+  /** Bumped on disconnect so an in-flight commit can tell. */
+  private connectionGeneration = 0;
+
   constructor(
     client: MeshClient,
     options: {
@@ -172,6 +176,7 @@ export class ConfigEditor {
 
     client.events.onDeviceStatus.subscribe((status) => {
       if (status === DeviceStatusEnum.DeviceDisconnected) {
+        this.connectionGeneration++;
         this.baselineRadio.value = {};
         this.baselineModules.value = {};
         this.baselineChannels.value = new Map();
@@ -249,17 +254,24 @@ export class ConfigEditor {
   /**
    * Stage a radio config section. `value` is merged over the current working
    * (or baseline) section, so fields a form doesn't render keep the device's
-   * value instead of being sent as protobuf defaults.
+   * value instead of being sent as protobuf defaults. `undefined` reverts the
+   * section to the baseline.
    */
   public setRadioSection<K extends RadioConfigSection & string>(
     key: K,
     value: RadioConfig[K],
   ): void {
     const working = this.workingRadio.peek();
-    const current = working[key] ?? this.baselineRadio.peek()[key];
+    const baseline = this.baselineRadio.peek()[key];
+    const current = working[key] ?? baseline;
     this.workingRadio.value = {
       ...working,
-      [key]: current && value ? { ...current, ...value } : value,
+      [key]:
+        value === undefined
+          ? baseline
+          : current
+            ? { ...current, ...value }
+            : value,
     };
     this.recomputeDirty();
   }
@@ -270,10 +282,16 @@ export class ConfigEditor {
     value: ModuleConfig[K],
   ): void {
     const working = this.workingModules.peek();
-    const current = working[key] ?? this.baselineModules.peek()[key];
+    const baseline = this.baselineModules.peek()[key];
+    const current = working[key] ?? baseline;
     this.workingModules.value = {
       ...working,
-      [key]: current && value ? { ...current, ...value } : value,
+      [key]:
+        value === undefined
+          ? baseline
+          : current
+            ? { ...current, ...value }
+            : value,
     };
     this.recomputeDirty();
   }
@@ -297,90 +315,182 @@ export class ConfigEditor {
 
   /**
    * Send all dirty sections to the device wrapped in a beginEdit/commitEdit
-   * pair. On success the baseline is replaced with the working copy
-   * (optimistic update); inbound config packets after commit will reconcile.
+   * pair. Commits run one at a time; edits made during a commit stay dirty
+   * for the next one.
    */
-  public async commit(): Promise<Result<void, Error>> {
+  public commit(): Promise<Result<void, Error>> {
+    const run = this.commitQueue.then(() => this.runCommit());
+    this.commitQueue = run.catch(() => undefined);
+    return run;
+  }
+
+  private async runCommit(): Promise<Result<void, Error>> {
     if (!this._isDirty.peek()) return Result.ok(undefined);
+
+    // Taken before the first await. Setters replace the working signals, so
+    // later edits never reach it.
+    const payload = this.collectPayload();
+    // An empty transaction makes the radio rewrite its config and report
+    // success for nothing.
+    if (isEmptyPayload(payload)) return Result.ok(undefined);
+    const generation = this.connectionGeneration;
 
     const beginResult = await beginEditSettings(this.client);
     if (Result.isError(beginResult)) return Result.err(beginResult.error);
 
-    const radio = this.workingRadio.peek();
-    for (const variant of this._dirtyRadioSections.peek()) {
-      const value = radio[variant];
-      if (value === undefined) continue;
-      const config = buildRadioConfig(variant, value);
-      const result = await setConfig(this.client, config);
-      if (Result.isError(result)) return Result.err(result.error);
-    }
-
-    const modules = this.workingModules.peek();
-    for (const variant of this._dirtyModuleSections.peek()) {
-      const value = modules[variant];
-      if (value === undefined) continue;
-      const moduleConfig = buildModuleConfig(variant, value);
-      const result = await setModuleConfig(this.client, moduleConfig);
-      if (Result.isError(result)) return Result.err(result.error);
-    }
-
-    const channels = this.workingChannels.peek();
-    for (const index of this._dirtyChannels.peek()) {
-      const channel = channels.get(index);
-      if (!channel) continue;
-      const result = await setChannel(this.client, channel);
-      if (Result.isError(result)) return Result.err(result.error);
-    }
-
-    if (this._isOwnerDirty.peek()) {
-      const owner = this.workingOwner.peek();
-      if (owner) {
-        const result = await setOwner(this.client, owner);
-        if (Result.isError(result)) return Result.err(result.error);
+    const sendResult = await this.sendPayload(payload);
+    if (Result.isError(sendResult)) {
+      // There is no abort message. Close the transaction rather than leave it
+      // open; everything stays dirty, so the next commit resends it.
+      if (generation === this.connectionGeneration) {
+        await commitEditSettings(this.client);
       }
-    }
-
-    for (const message of this.queuedAdminMessages.peek()) {
-      const variant = message.payloadVariant;
-      if (!variant.case) continue;
-      try {
-        await sendAdminMessage(this.client, variant);
-      } catch (e) {
-        return Result.err(e instanceof Error ? e : new Error(String(e)));
-      }
-    }
-
-    const staged = [...this._stagedAdminMessages.peek().values()];
-    for (const message of staged) {
-      const variant = message.payloadVariant;
-      if (!variant.case) continue;
-      try {
-        await sendAdminMessage(this.client, variant);
-      } catch (e) {
-        return Result.err(e instanceof Error ? e : new Error(String(e)));
-      }
+      return Result.err(sendResult.error);
     }
 
     const commitResult = await commitEditSettings(this.client);
     if (Result.isError(commitResult)) return Result.err(commitResult.error);
 
-    this.baselineRadio.value = this.workingRadio.peek();
-    this.baselineModules.value = this.workingModules.peek();
-    this.baselineChannels.value = new Map(this.workingChannels.peek());
-    this.baselineOwner.value = this.workingOwner.peek();
-    this.queuedAdminMessages.value = [];
-    this._stagedAdminMessages.value = new Map();
-    this._dirtyRadioSections.value = [];
-    this._dirtyModuleSections.value = [];
-    this._dirtyChannels.value = [];
-    this._isOwnerDirty.value = false;
-    this._isDirty.value = false;
+    // Disconnect already cleared the editor; don't carry this payload into
+    // the next connection.
+    if (generation !== this.connectionGeneration) {
+      return Result.err(
+        new Error("The device disconnected before the commit finished"),
+      );
+    }
 
-    for (const message of staged) {
+    this.reconcileAfterCommit(payload);
+    for (const message of payload.staged.values()) {
       this.onStagedAdminMessageCommitted?.(message);
+    }
+    return Result.ok(undefined);
+  }
+
+  private collectPayload(): CommitPayload {
+    const radio = this.workingRadio.peek();
+    const radioPayload: CommitPayload["radio"] = [];
+    for (const variant of this._dirtyRadioSections.peek()) {
+      const value = radio[variant];
+      if (value !== undefined) radioPayload.push([variant, value]);
+    }
+
+    const modules = this.workingModules.peek();
+    const modulePayload: CommitPayload["modules"] = [];
+    for (const variant of this._dirtyModuleSections.peek()) {
+      const value = modules[variant];
+      if (value !== undefined) modulePayload.push([variant, value]);
+    }
+
+    const channels = this.workingChannels.peek();
+    const channelPayload: CommitPayload["channels"] = [];
+    for (const index of this._dirtyChannels.peek()) {
+      const channel = channels.get(index);
+      if (channel) channelPayload.push([index, channel]);
+    }
+
+    return {
+      radio: radioPayload,
+      modules: modulePayload,
+      channels: channelPayload,
+      owner: this._isOwnerDirty.peek() ? this.workingOwner.peek() : undefined,
+      queued: this.queuedAdminMessages.peek(),
+      staged: this._stagedAdminMessages.peek(),
+    };
+  }
+
+  private async sendPayload(
+    payload: CommitPayload,
+  ): Promise<Result<void, Error>> {
+    for (const [variant, value] of payload.radio) {
+      const result = await setConfig(
+        this.client,
+        buildRadioConfig(variant, value),
+      );
+      if (Result.isError(result)) return Result.err(result.error);
+    }
+
+    for (const [variant, value] of payload.modules) {
+      const result = await setModuleConfig(
+        this.client,
+        buildModuleConfig(variant, value),
+      );
+      if (Result.isError(result)) return Result.err(result.error);
+    }
+
+    for (const [, channel] of payload.channels) {
+      const result = await setChannel(this.client, channel);
+      if (Result.isError(result)) return Result.err(result.error);
+    }
+
+    if (payload.owner) {
+      const result = await setOwner(this.client, payload.owner);
+      if (Result.isError(result)) return Result.err(result.error);
+    }
+
+    for (const message of [...payload.queued, ...payload.staged.values()]) {
+      const variant = message.payloadVariant;
+      if (!variant.case) continue;
+      try {
+        await sendAdminMessage(this.client, variant);
+      } catch (e) {
+        return Result.err(e instanceof Error ? e : new Error(String(e)));
+      }
     }
 
     return Result.ok(undefined);
+  }
+
+  /**
+   * Make only what was sent the new baseline. Other sections keep theirs,
+   * including device packets that arrived during the commit.
+   */
+  private reconcileAfterCommit(payload: CommitPayload): void {
+    if (payload.radio.length > 0) {
+      const baseline: Record<string, unknown> = {
+        ...this.baselineRadio.peek(),
+      };
+      for (const [variant, value] of payload.radio) baseline[variant] = value;
+      this.baselineRadio.value = baseline as RadioConfig;
+    }
+
+    if (payload.modules.length > 0) {
+      const baseline: Record<string, unknown> = {
+        ...this.baselineModules.peek(),
+      };
+      for (const [variant, value] of payload.modules) baseline[variant] = value;
+      this.baselineModules.value = baseline as ModuleConfig;
+    }
+
+    if (payload.channels.length > 0) {
+      const baseline = new Map(this.baselineChannels.peek());
+      for (const [index, channel] of payload.channels) {
+        baseline.set(index, channel);
+      }
+      this.baselineChannels.value = baseline;
+    }
+
+    if (payload.owner) this.baselineOwner.value = payload.owner;
+
+    // One entry per message sent: the same object may have been queued again
+    // during the commit, and that copy hasn't been sent.
+    if (payload.queued.length > 0) {
+      const remaining = [...this.queuedAdminMessages.peek()];
+      for (const message of payload.queued) {
+        const index = remaining.indexOf(message);
+        if (index !== -1) remaining.splice(index, 1);
+      }
+      this.queuedAdminMessages.value = remaining;
+    }
+
+    if (payload.staged.size > 0) {
+      const unsent = new Map(this._stagedAdminMessages.peek());
+      for (const [key, message] of payload.staged) {
+        if (unsent.get(key) === message) unsent.delete(key);
+      }
+      this._stagedAdminMessages.value = unsent;
+    }
+
+    this.recomputeDirty();
   }
 
   private recomputeDirty(): void {
@@ -452,6 +562,30 @@ export class ConfigEditor {
       ownerDirty ||
       hasQueuedAdmin;
   }
+}
+
+interface CommitPayload {
+  radio: [RadioConfigSection, NonNullable<RadioConfig[RadioConfigSection]>][];
+  modules: [
+    ModuleConfigSection,
+    NonNullable<ModuleConfig[ModuleConfigSection]>,
+  ][];
+  channels: [number, Protobuf.Channel.Channel][];
+  /** Set only when the owner was dirty. */
+  owner: Protobuf.Mesh.User | undefined;
+  queued: readonly Protobuf.Admin.AdminMessage[];
+  staged: ReadonlyMap<string, Protobuf.Admin.AdminMessage>;
+}
+
+function isEmptyPayload(payload: CommitPayload): boolean {
+  return (
+    payload.radio.length === 0 &&
+    payload.modules.length === 0 &&
+    payload.channels.length === 0 &&
+    payload.owner === undefined &&
+    payload.queued.length === 0 &&
+    payload.staged.size === 0
+  );
 }
 
 function buildRadioConfig(
