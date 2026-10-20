@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Meshtastic Discord
+    url: https://discord.gg/meshtastic
+    about: Real-time help with setup, connection problems, and general usage. Start here if you're not sure it's a bug.
+  - name: 🗣️ Meshtastic Forum
+    url: https://meshtastic.discourse.group
+    about: Longer-form discussion, ideas, and community support.
+  - name: 📚 Documentation
+    url: https://meshtastic.org/docs/software/web-client
+    about: Web client docs, including connection setup and troubleshooting.
+  - name: 🔌 Firmware or device issues
+    url: https://github.com/meshtastic/firmware/issues
+    about: Report problems with the device firmware itself, not the web client.
+  - name: 🔐 Report a security vulnerability
+    url: https://github.com/meshtastic/web/security/advisories/new
+    about: Please report security issues privately, not as a public issue.

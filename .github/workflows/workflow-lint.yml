@@ -1,0 +1,67 @@
+name: Workflow Lint
+
+# Static analysis for the workflows themselves:
+#   - actionlint: YAML/expression/shell errors (catches things like a `run:`
+#     block whose bash won't parse, or a bad `needs:` reference)
+#   - zizmor:     workflow security audit (over-broad permissions, template
+#     injection into `run:`, unpinned actions, artifact poisoning)
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workflow-lint-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Run actionlint
+        uses: docker://rhysd/actionlint:latest
+        with:
+          args: -color
+
+  zizmor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # upload SARIF to code scanning
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      # `--persona=regular` skips the pedantic/auditor findings that would flag
+      # most of the ecosystem. Non-blocking on the first pass: flip
+      # continue-on-error off once the existing findings are triaged.
+      - name: Run zizmor
+        run: uvx zizmor --persona=regular --format=sarif . > zizmor.sarif
+        continue-on-error: true
+
+      # Skip the upload if zizmor crashed outright and left an empty file,
+      # rather than failing the job on a malformed SARIF.
+      - name: Upload SARIF
+        if: ${{ hashFiles('zizmor.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: zizmor.sarif
+          category: zizmor

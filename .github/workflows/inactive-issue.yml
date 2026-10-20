@@ -1,11 +1,22 @@
 name: Close inactive issues
 on:
   schedule:
-    - cron: "0 */4 * * *" # every 4 hours
+    - cron: "30 1 * * *" # daily at 01:30 UTC
   workflow_dispatch: # allow manual runs
+
+# Issues take 60 days to go stale; running more than once a day just burns
+# minutes against the action's per-run operations budget.
+permissions:
+  contents: read
+
+concurrency:
+  group: stale
+  cancel-in-progress: false
+
 jobs:
   close-issues:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       issues: write
       pull-requests: write
@@ -20,5 +31,7 @@ jobs:
           close-issue-message: "This issue was closed because it has been inactive for 14 days since being marked as stale."
           days-before-pr-stale: -1
           days-before-pr-close: -1
-          only-issue-labels: "Bug"
+          # Must match the label applied by .github/ISSUE_TEMPLATE/bug.yml.
+          only-issue-labels: "bug"
+          exempt-issue-labels: "pinned,security,help wanted"
           remove-stale-when-updated: true

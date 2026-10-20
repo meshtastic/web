@@ -13,7 +13,13 @@ on:
         type: boolean
         default: false
 
-permissions: write-all
+# Least privilege by default; `publish-jsr` widens this for OIDC below.
+permissions:
+  contents: read
+
+concurrency:
+  group: release-protobufs-${{ inputs.version }}
+  cancel-in-progress: false
 
 env:
   PROTOBUF_DIR: ./packages/protobufs
@@ -21,6 +27,7 @@ env:
 jobs:
   codegen:
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -34,12 +41,20 @@ jobs:
           cat $PROTOBUF_DIR/packages/ts/deno.json
 
       - name: Determine VERSION
+        # Workflow inputs are untrusted text; never interpolate into the script body.
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
-          if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
+          if [ -n "${INPUT_VERSION}" ]; then
+            VERSION="${INPUT_VERSION}"
           else
             echo "No 'version' input. Provide inputs.version." >&2
+            exit 1
+          fi
+          # Reject anything that isn't a plain semver-ish tag before it reaches jq/git.
+          if ! printf '%s' "$VERSION" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+([-+.][0-9A-Za-z.-]+)?$'; then
+            echo "::error::Invalid version '$VERSION' (expected e.g. v1.2.3)." >&2
             exit 1
           fi
           STRIPPED="${VERSION#v}"
@@ -63,8 +78,9 @@ jobs:
             mv "$f.tmp" "$f"
           done
 
+      # Pinned: a publishing workflow must not track a moving branch.
       - name: Setup Buf
-        uses: bufbuild/buf-setup-action@main
+        uses: bufbuild/buf-setup-action@v1
         with:
           github_token: ${{ github.token }}
 
@@ -114,6 +130,7 @@ jobs:
   publish-jsr:
     runs-on: ubuntu-24.04
     needs: codegen
+    timeout-minutes: 15
     permissions:
       contents: read
       id-token: write
@@ -125,10 +142,11 @@ jobs:
         with:
           name: ts_code
 
+      # Pinned to a release tag and a stable Deno line rather than @main + rc.
       - name: Set up Deno
-        uses: denoland/setup-deno@main
+        uses: denoland/setup-deno@v2
         with:
-          deno-version: rc
+          deno-version: v2.x
 
       - name: Publish to JSR
         run: |

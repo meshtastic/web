@@ -13,10 +13,21 @@ on:
       - "playwright.config.ts"
       - ".github/workflows/e2e.yml"
 
+permissions:
+  contents: read
+
+# This is the most expensive workflow in the repo (Docker mesh + Playwright).
+# Superseded runs on the same PR are pointless, so cancel them.
+concurrency:
+  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Drafts don't need a 30-minute device suite on every push.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false }}
     env:
       CI: "true"
     steps:
@@ -32,12 +43,33 @@ jobs:
       - name: Install workspace deps
         run: pnpm install --frozen-lockfile
 
+      # Key the browser cache on the resolved Playwright version so a dependency
+      # bump invalidates it instead of restoring a mismatched browser build.
+      - name: Resolve Playwright version
+        id: pw
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.pw.outputs.version }}
+
       - name: Install Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
         run: pnpm exec playwright install --with-deps chromium
+
+      # Cached browsers still need their OS-level shared libraries.
+      - name: Install Chromium system deps
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
 
       - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
+          cache: pip
+          cache-dependency-path: e2e/peer/requirements.txt
 
       - name: Install Python mesh peer
         run: |

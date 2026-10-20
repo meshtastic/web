@@ -2,16 +2,26 @@ name: Crowdin Upload Sources Action
 
 on:
   push:
-    # Monitor all .json files within the /i18n/locales/en/ directory.
+    # Monitor all .json files within the English locale directory.
     # This ensures the workflow triggers if any the English namespace files are modified on the main branch.
+    # NOTE: path filters are relative to the repo root and must NOT start with "/",
+    # otherwise the glob never matches and this workflow silently never runs.
     paths:
-      - "/apps/web/public/i18n/locales/en/*.json"
+      - "apps/web/public/i18n/locales/en/*.json"
     branches: [main]
   workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crowdin-upload-sources
+  cancel-in-progress: false
 
 jobs:
   synchronize-with-crowdin:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout

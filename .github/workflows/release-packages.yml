@@ -12,14 +12,26 @@ on:
         required: false
         default: "patch"
 
+permissions:
+  contents: read
+
+concurrency:
+  group: release-packages
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
       contents: write # we commit the bumped versions back
-      id-token: write # required for JSR OIDC
+      pull-requests: write # `gh pr create` for the version bump
+      id-token: write # required for JSR OIDC and npm provenance
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Workflow inputs are untrusted text; keep them out of every script body.
+      INPUT_PACKAGES: ${{ inputs.packages }}
+      INPUT_BUMP: ${{ inputs.bump }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -43,22 +55,38 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ "${{ github.event.inputs.packages }}" = "all" ] || [ -z "${{ github.event.inputs.packages }}" ]; then
+          if [ "${INPUT_PACKAGES}" = "all" ] || [ -z "${INPUT_PACKAGES}" ]; then
             mapfile -t TARGETS < <(ls -d packages/*)
           else
-            IFS=',' read -ra TARGETS <<< "${{ github.event.inputs.packages }}"
+            IFS=',' read -ra TARGETS <<< "${INPUT_PACKAGES}"
             TARGETS=("${TARGETS[@]/#/packages/}")
           fi
+
+          # Validate every target before anything mutates the tree, so a typo
+          # fails fast instead of half-publishing.
+          for dir in "${TARGETS[@]}"; do
+            if [ ! -f "$dir/package.json" ]; then
+              echo "::error::No package.json at '$dir' - check the 'packages' input." >&2
+              exit 1
+            fi
+          done
+
           printf '%s\n' "${TARGETS[@]}" | paste -sd, - > targets.txt
           echo "list=$(cat targets.txt)" >> "$GITHUB_OUTPUT"
           echo "Targets: $(cat targets.txt)"
 
       - name: Bump package.json versions (no git tag)
         shell: bash
+        env:
+          TARGET_LIST: ${{ steps.pkgs.outputs.list }}
         run: |
           set -euo pipefail
-          BUMP="${{ github.event.inputs.bump }}"
-          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          BUMP="${INPUT_BUMP}"
+          case "$BUMP" in
+            patch|minor|major) ;;
+            *) echo "::error::bump must be patch, minor, or major (got '$BUMP')." >&2; exit 1 ;;
+          esac
+          IFS=',' read -ra TARGETS <<< "${TARGET_LIST}"
           for dir in "${TARGETS[@]}"; do
             if [ -f "$dir/package.json" ]; then
               echo "Bumping $dir -> $BUMP"
@@ -68,9 +96,11 @@ jobs:
 
       - name: Generate jsr.json from package.json (pkg-to-jsr)
         shell: bash
+        env:
+          TARGET_LIST: ${{ steps.pkgs.outputs.list }}
         run: |
           set -euo pipefail
-          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          IFS=',' read -ra TARGETS <<< "${TARGET_LIST}"
           for dir in "${TARGETS[@]}"; do
             if [ -f "$dir/package.json" ]; then
               echo "Generating jsr.json for $dir"
@@ -89,21 +119,31 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add packages/*/package.json packages/*/jsr.json 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git checkout -b version_bump
-            git commit -m "chore(release): bump package versions (${{ github.event.inputs.bump }})"
-            git push -u origin version_bump
-            gh pr create --title "Bump package versions" --body "Bump versions of NPM and JSR packages" --base main --head version_bump
-            echo "Pushed to branch version_bump"
-          else
+          if git diff --cached --quiet; then
             echo "No changes to commit."
+            exit 0
           fi
+
+          # One branch per run: a fixed `version_bump` branch makes the second
+          # run fail on `checkout -b` (or silently reuse a stale branch).
+          BRANCH="release/version-bump-${GITHUB_RUN_ID}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore(release): bump package versions (${INPUT_BUMP})"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "chore(release): bump package versions (${INPUT_BUMP})" \
+            --body "Automated version bump for NPM and JSR packages from run [\`${GITHUB_RUN_ID}\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})." \
+            --base "${GITHUB_REF_NAME}" \
+            --head "$BRANCH"
+          echo "Opened version bump PR from $BRANCH"
 
       - name: Build selected packages
         shell: bash
+        env:
+          TARGET_LIST: ${{ steps.pkgs.outputs.list }}
         run: |
           set -euo pipefail
-          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          IFS=',' read -ra TARGETS <<< "${TARGET_LIST}"
           for dir in "${TARGETS[@]}"; do
             echo "Building $dir"
             pnpm --filter "./$dir" run build
@@ -111,9 +151,11 @@ jobs:
 
       - name: Publish to JSR (OIDC)
         shell: bash
+        env:
+          TARGET_LIST: ${{ steps.pkgs.outputs.list }}
         run: |
           set -euo pipefail
-          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          IFS=',' read -ra TARGETS <<< "${TARGET_LIST}"
           for dir in "${TARGETS[@]}"; do
             if [ -f "$dir/jsr.json" ]; then
               echo "Publishing $dir to JSR via OIDC…"
@@ -126,20 +168,24 @@ jobs:
 
       - name: Configure npm auth
         run: |
-          pnpm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+          pnpm config set //registry.npmjs.org/:_authToken="${NODE_AUTH_TOKEN}"
           pnpm config set registry https://registry.npmjs.org/
 
       - name: Publish to npm
         shell: bash
+        env:
+          TARGET_LIST: ${{ steps.pkgs.outputs.list }}
         run: |
           set -euo pipefail
-          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          IFS=',' read -ra TARGETS <<< "${TARGET_LIST}"
           for dir in "${TARGETS[@]}"; do
             if [ -f "$dir/package.json" ]; then
               echo "Publishing $dir to npm…"
               ( cd "$dir"
                 [ -d dist ] || pnpm run build
-                npm publish --access public
+                # --provenance uses the job's OIDC token to publish a signed
+                # build attestation alongside the tarball.
+                npm publish --access public --provenance
               )
             fi
           done
