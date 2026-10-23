@@ -67,6 +67,8 @@ export class TransportWebSerial implements Transport {
   private pipePromise: Promise<void> | null = null;
   private abortController: AbortController;
   private portReadable: ReadableStream<Uint8Array>;
+  private reader?: ReadableStreamDefaultReader<DeviceOutput>;
+  private readLoopPromise?: Promise<void>;
 
   private lastStatus: DeviceStatusEnum = DeviceStatusEnum.DeviceDisconnected;
   private closingByUser = false;
@@ -296,38 +298,56 @@ export class TransportWebSerial implements Transport {
         };
         navigator.serial.addEventListener("disconnect", onOsDisconnect);
 
+        this.reader = reader;
+
         log.debug("read loop starting");
         this.emitStatus(DeviceStatusEnum.DeviceConnected);
 
-        try {
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) {
-              log.debug("read loop: done=true");
-              break;
-            }
-            ctrl.enqueue(value);
-          }
-          ctrl.close();
-        } catch (error) {
-          const e = error as Error;
-          log.warn("read loop threw", {
-            closingByUser: this.closingByUser,
-            name: e?.name,
-            message: e?.message,
-          });
-          if (!this.closingByUser) {
-            this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "read-error");
-          }
-          ctrl.error(error instanceof Error ? error : new Error(String(error)));
+        this.readLoopPromise = (async () => {
           try {
-            await transformed.cancel();
-          } catch {}
-        } finally {
-          reader.releaseLock();
-          navigator.serial.removeEventListener("disconnect", onOsDisconnect);
-          log.debug("read loop: released reader lock + listener");
-        }
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) {
+                log.debug("read loop: done=true");
+                break;
+              }
+              ctrl.enqueue(value);
+            }
+            try {
+              ctrl.close();
+            } catch {}
+          } catch (error) {
+            const e = error as Error;
+            log.warn("read loop threw", {
+              closingByUser: this.closingByUser,
+              name: e?.name,
+              message: e?.message,
+            });
+            if (!this.closingByUser) {
+              this.emitStatus(
+                DeviceStatusEnum.DeviceDisconnected,
+                "read-error",
+              );
+            }
+            try {
+              ctrl.error(
+                error instanceof Error ? error : new Error(String(error)),
+              );
+            } catch {}
+            try {
+              await transformed.cancel();
+            } catch {}
+          } finally {
+            try {
+              reader.releaseLock();
+            } catch {}
+            this.reader = undefined;
+            navigator.serial.removeEventListener("disconnect", onOsDisconnect);
+            log.debug("read loop: released reader lock + listener");
+          }
+        })();
+
+        await this.readLoopPromise;
       },
     });
   }
@@ -347,10 +367,14 @@ export class TransportWebSerial implements Transport {
       return;
     }
     this.lastStatus = next;
-    this.fromDeviceController?.enqueue({
-      type: "status",
-      data: { status: next, reason },
-    });
+    try {
+      this.fromDeviceController?.enqueue({
+        type: "status",
+        data: { status: next, reason },
+      });
+    } catch {
+      log.debug("emitStatus: controller already closed");
+    }
   }
 
   /**
@@ -361,6 +385,9 @@ export class TransportWebSerial implements Transport {
     try {
       this.closingByUser = true;
 
+      // Emit status while the controller is open so subscribers receive the disconnect event
+      this.emitStatus(DeviceStatusEnum.DeviceDisconnected, "user");
+
       // Stop outbound piping
       this.abortController.abort();
       log.debug("disconnect: aborted toDevice pipe");
@@ -369,8 +396,28 @@ export class TransportWebSerial implements Transport {
         log.debug("disconnect: pipePromise settled");
       }
 
-      // Cancel any remaining streams
-      if (this._fromDevice?.locked) {
+      // Stop inbound reading by cancelling the reader and waiting for the loop to exit
+      if (this.reader) {
+        try {
+          await this.reader.cancel();
+          log.debug("disconnect: cancelled reader");
+        } catch (e) {
+          const err = e as Error;
+          log.warn("disconnect: reader.cancel() threw", {
+            name: err?.name,
+            message: err?.message,
+          });
+        }
+      }
+      if (this.readLoopPromise) {
+        try {
+          await this.readLoopPromise;
+          log.debug("disconnect: readLoopPromise settled");
+        } catch {}
+      }
+
+      // Cancel any remaining streams only if NOT locked (spec throws TypeError if cancelled while locked)
+      if (this._fromDevice && !this._fromDevice.locked) {
         try {
           await this._fromDevice.cancel();
           log.debug("disconnect: cancelled fromDevice");
