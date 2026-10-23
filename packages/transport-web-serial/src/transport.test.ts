@@ -154,6 +154,11 @@ class FakeSerialPort {
   }
 
   close(): Promise<void> {
+    if (this.readable?.locked) {
+      throw new TypeError(
+        "Failed to execute 'close' on 'SerialPort': Cannot cancel a locked stream",
+      );
+    }
     try {
       this._readController.close();
     } catch {}
@@ -263,6 +268,23 @@ describe("TransportWebSerial (extras)", () => {
 
     reader.releaseLock();
     await transport.disconnect();
+  });
+
+  it("disconnects cleanly without throwing when fromDevice stream is locked (fixes #1437)", async () => {
+    const fake = new FakeSerialPort();
+    const result = await TransportWebSerial.createFromPort(fake as any);
+    const transport = result.unwrap();
+
+    // Lock fromDevice with an active reader (as MeshClient does with pipeTo)
+    const reader = transport.fromDevice.getReader();
+    expect(transport.fromDevice.locked).toBe(true);
+
+    // Call disconnect while the reader is actively holding the lock
+    await expect(transport.disconnect()).resolves.toBeUndefined();
+
+    // Verify port streams are closed and nullified
+    expect(fake.readable).toBeNull();
+    expect(fake.writable).toBeNull();
   });
 });
 
