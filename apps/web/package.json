@@ -60,9 +60,9 @@
     "@radix-ui/react-tooltip": "^1.4.1",
     "@radix-ui/react-visually-hidden": "^1.2.13",
     "@tailwindcss/vite": "^4.3.3",
-    "@tanstack/react-router": "^1.170.44",
+    "@tanstack/react-router": "^1.170.45",
     "@tanstack/react-router-devtools": "^1.167.2",
-    "@tanstack/router-cli": "^1.167.44",
+    "@tanstack/router-cli": "^1.167.45",
     "@tanstack/router-devtools": "^1.167.2",
     "@turf/turf": "^7.4.0",
     "@types/node": "^26.6.5",
@@ -96,7 +96,7 @@
     "zustand": "5.0.15"
   },
   "devDependencies": {
-    "@tanstack/router-plugin": "^1.168.46",
+    "@tanstack/router-plugin": "^1.168.47",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
