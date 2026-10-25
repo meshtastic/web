@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/sql.js": "^1.4.11",
-    "sql.js": "^1.15.0"
+    "sql.js": "^1.15.1"
   },
   "tsdown": {
     "clean": true,
