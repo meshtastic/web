@@ -313,6 +313,10 @@ export class ChatClient {
         ? { kind: "direct", peer: input.destination }
         : { kind: "channel", channel: input.channel ?? 0 };
 
+    if (conv.kind === "direct") {
+      this.autoFavorite(conv.peer);
+    }
+
     // Optimistic-append BEFORE awaiting `sendText`. The send pipeline
     // resolves only after `queue.processAck(id)` fires (firmware ack —
     // can be 1–3 s on LoRa) and we don't want the UI to wait that long
@@ -437,13 +441,17 @@ export class ChatClient {
     this.unreadByKey.value = next;
   }
 
+  private readonly favoriteRequested = new Set<number>();
+
   private autoFavorite(peer: number): void {
+    if (this.favoriteRequested.has(peer)) return;
     const node = this.client.nodes.byNum(peer);
     if (node?.isFavorite) return;
     const role = this.client.config.radio.value.device?.role;
     if (role === Protobuf.Config.Config_DeviceConfig_Role.CLIENT_BASE) {
       return;
     }
+    this.favoriteRequested.add(peer);
     void this.client.nodes.favorite(peer).catch(() => {});
   }
 

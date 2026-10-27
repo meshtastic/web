@@ -95,4 +95,44 @@ describe("ChatClient auto-favorite on direct message", () => {
 
     expect(favoriteSpy).not.toHaveBeenCalled();
   });
+
+  it("calls favorite only once for repeated messages from the same peer", () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    setMyNode(client);
+    setDeviceRole(client, Protobuf.Config.Config_DeviceConfig_Role.CLIENT);
+
+    const favoriteSpy = vi
+      .spyOn(client.nodes, "favorite")
+      .mockResolvedValue(Result.ok(1));
+
+    dispatchDirectMessage(client, { from: 100, to: MY_NODE, ms: 1000 });
+    dispatchDirectMessage(client, { from: 100, to: MY_NODE, ms: 2000 });
+    dispatchDirectMessage(client, { from: 100, to: MY_NODE, ms: 3000 });
+
+    expect(favoriteSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("auto-favorites the peer on outbound direct message via send()", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    setMyNode(client);
+    setDeviceRole(client, Protobuf.Config.Config_DeviceConfig_Role.CLIENT);
+
+    const favoriteSpy = vi
+      .spyOn(client.nodes, "favorite")
+      .mockResolvedValue(Result.ok(1));
+
+    const flush = setInterval(() => {
+      for (const item of client.queue.getState())
+        client.queue.processAck(item.id);
+    }, 5);
+    try {
+      await client.chat.send({ text: "hey", destination: 300 });
+    } finally {
+      clearInterval(flush);
+    }
+
+    expect(favoriteSpy).toHaveBeenCalledWith(300);
+  });
 });
