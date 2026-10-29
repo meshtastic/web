@@ -454,7 +454,8 @@ export class ChatClient {
     this.favoriteRequested.add(peer);
     void this.client.nodes
       .favorite(peer)
-      .finally(() => this.favoriteRequested.delete(peer));
+      .finally(() => this.favoriteRequested.delete(peer))
+      .catch(() => {});
   }
 
   private markRead(key: ConversationKey): void {
