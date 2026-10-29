@@ -113,6 +113,28 @@ describe("ChatClient auto-favorite on direct message", () => {
     expect(favoriteSpy).toHaveBeenCalledTimes(1);
   });
 
+  it("re-attempts favorite after the in-flight request settles", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    setMyNode(client);
+    setDeviceRole(client, Protobuf.Config.Config_DeviceConfig_Role.CLIENT);
+
+    const favoriteSpy = vi
+      .spyOn(client.nodes, "favorite")
+      .mockResolvedValue(Result.ok(1));
+
+    dispatchDirectMessage(client, { from: 100, to: MY_NODE, ms: 1000 });
+    expect(favoriteSpy).toHaveBeenCalledTimes(1);
+
+    await vi.waitFor(() => {
+      expect(favoriteSpy).toHaveBeenCalledTimes(1);
+    });
+    await new Promise((r) => setTimeout(r, 0));
+
+    dispatchDirectMessage(client, { from: 100, to: MY_NODE, ms: 2000 });
+    expect(favoriteSpy).toHaveBeenCalledTimes(2);
+  });
+
   it("auto-favorites the peer on outbound direct message via send()", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });

@@ -452,7 +452,9 @@ export class ChatClient {
       return;
     }
     this.favoriteRequested.add(peer);
-    void this.client.nodes.favorite(peer).catch(() => {});
+    void this.client.nodes
+      .favorite(peer)
+      .finally(() => this.favoriteRequested.delete(peer));
   }
 
   private markRead(key: ConversationKey): void {
