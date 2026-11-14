@@ -142,6 +142,10 @@ export class ChatClient {
       if (packet.from !== client.myNodeNum) {
         this.bumpUnread(key);
       }
+
+      if (conv.kind === "direct") {
+        this.autoFavorite(conv.peer);
+      }
     });
 
     client.events.onRoutingPacket.subscribe((packet) => {
@@ -358,6 +362,8 @@ export class ChatClient {
         this.store.updateDelivery(packetId, patch);
         void this.repository.updateDelivery(packetId, patch).catch(() => {});
       }
+    } else if (conv.kind === "direct") {
+      this.autoFavorite(conv.peer);
     }
     return result;
   }
@@ -431,6 +437,23 @@ export class ChatClient {
     const next = new Map(this.unreadByKey.peek());
     next.set(key, (next.get(key) ?? 0) + 1);
     this.unreadByKey.value = next;
+  }
+
+  private readonly favoriteRequested = new Set<number>();
+
+  private autoFavorite(peer: number): void {
+    if (this.favoriteRequested.has(peer)) return;
+    const node = this.client.nodes.byNum(peer);
+    if (node?.isFavorite) return;
+    const role = this.client.config.radio.value.device?.role;
+    if (role === Protobuf.Config.Config_DeviceConfig_Role.CLIENT_BASE) {
+      return;
+    }
+    this.favoriteRequested.add(peer);
+    void this.client.nodes
+      .favorite(peer)
+      .finally(() => this.favoriteRequested.delete(peer))
+      .catch(() => {});
   }
 
   private markRead(key: ConversationKey): void {
