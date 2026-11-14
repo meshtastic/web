@@ -135,6 +135,41 @@ describe("ChatClient auto-favorite on direct message", () => {
     expect(favoriteSpy).toHaveBeenCalledTimes(2);
   });
 
+  it("does not auto-favorite when an outbound direct message is empty", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    setMyNode(client);
+    setDeviceRole(client, Protobuf.Config.Config_DeviceConfig_Role.CLIENT);
+
+    const favoriteSpy = vi
+      .spyOn(client.nodes, "favorite")
+      .mockResolvedValue(Result.ok(1));
+
+    const result = await client.chat.send({ text: "", destination: 400 });
+
+    expect(result.status).toBe("error");
+    expect(favoriteSpy).not.toHaveBeenCalled();
+  });
+
+  it("does not auto-favorite when an outbound direct message is oversized", async () => {
+    const { transport } = createFakeTransport();
+    const client = new MeshClient({ transport });
+    setMyNode(client);
+    setDeviceRole(client, Protobuf.Config.Config_DeviceConfig_Role.CLIENT);
+
+    const favoriteSpy = vi
+      .spyOn(client.nodes, "favorite")
+      .mockResolvedValue(Result.ok(1));
+
+    const result = await client.chat.send({
+      text: "x".repeat(300),
+      destination: 500,
+    });
+
+    expect(result.status).toBe("error");
+    expect(favoriteSpy).not.toHaveBeenCalled();
+  });
+
   it("auto-favorites the peer on outbound direct message via send()", async () => {
     const { transport } = createFakeTransport();
     const client = new MeshClient({ transport });

@@ -313,10 +313,6 @@ export class ChatClient {
         ? { kind: "direct", peer: input.destination }
         : { kind: "channel", channel: input.channel ?? 0 };
 
-    if (conv.kind === "direct") {
-      this.autoFavorite(conv.peer);
-    }
-
     // Optimistic-append BEFORE awaiting `sendText`. The send pipeline
     // resolves only after `queue.processAck(id)` fires (firmware ack —
     // can be 1–3 s on LoRa) and we don't want the UI to wait that long
@@ -366,6 +362,8 @@ export class ChatClient {
         this.store.updateDelivery(packetId, patch);
         void this.repository.updateDelivery(packetId, patch).catch(() => {});
       }
+    } else if (conv.kind === "direct") {
+      this.autoFavorite(conv.peer);
     }
     return result;
   }
