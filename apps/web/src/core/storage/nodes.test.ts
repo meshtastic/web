@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SqlocalDb } from "./db.ts";
 import { createMemoryDb } from "./memoryDb.ts";
 import { SqlocalNodesRepository } from "./nodes.ts";
@@ -59,6 +59,17 @@ describe("SqlocalNodesRepository", () => {
     await repo.upsert(node(9));
     await repo.remove(9);
     expect(await repo.get(9)).toBeUndefined();
+  });
+
+  it("upsertBatch writes every node in one statement", async () => {
+    await repo.upsert(node(2, { snr: 1 }));
+    const insert = vi.spyOn(db, "insert");
+
+    await repo.upsertBatch([node(1), node(2, { snr: 9 }), node(3)]);
+
+    expect(insert).toHaveBeenCalledTimes(1);
+    expect((await repo.loadAll()).map((n) => n.num).sort()).toEqual([1, 2, 3]);
+    expect((await repo.get(2))?.snr).toBe(9);
   });
 
   it("clear wipes all rows for the scoped device", async () => {

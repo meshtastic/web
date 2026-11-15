@@ -23,7 +23,6 @@ import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.PowerMetrics
 import org.meshtastic.proto.RouteDiscovery
 import org.meshtastic.proto.Telemetry
-import org.meshtastic.proto.ToRadio
 import org.meshtastic.proto.TrafficManagementStats
 import org.meshtastic.sdk.AutoReconnectConfig
 import org.meshtastic.sdk.ChannelIndex
@@ -65,20 +64,8 @@ class MeshtasticClient internal constructor(
 
     val myNodeNum: Int? get() = client.ownNode.value?.num
 
-    /** The handshake's config bundle, or null before the device has delivered one. */
-    val configBundle: ConfigBundleJs? get() = client.configBundle.value?.toJs()
-
-    /** The device's channels as encoded `Channel`s, or null before the handshake delivers them. */
-    val channels: Array<Uint8Array>? get() = client.channels.value?.toJs()
-
     fun onConnectionState(cb: (ConnectionStateJs) -> Unit): () -> Unit =
         client.connection.onEach { cb(it.toJs(maxAttempts)) }.subscribe()
-
-    fun onConfigBundle(cb: (ConfigBundleJs?) -> Unit): () -> Unit =
-        client.configBundle.onEach { cb(it?.toJs()) }.subscribe()
-
-    fun onChannels(cb: (Array<Uint8Array>?) -> Unit): () -> Unit =
-        client.channels.onEach { cb(it?.toJs()) }.subscribe()
 
     fun onNodeChange(cb: (NodeChangeJs) -> Unit): () -> Unit =
         client.nodes.onEach { cb(it.toJs()) }.subscribe()
@@ -93,11 +80,6 @@ class MeshtasticClient internal constructor(
     fun onFromRadio(cb: (Uint8Array) -> Unit): () -> Unit {
         frameListeners.add(cb)
         return { frameListeners.remove(cb) }
-    }
-
-    /** Every `NodeInfo` the SDK holds, encoded. */
-    fun nodes(): Promise<Array<Uint8Array>> = scope.promise {
-        client.nodeSnapshot().values.map { it.encodeJs() }.toTypedArray()
     }
 
     /** Admin messages for the local node, or for `dest` when given. */
@@ -151,14 +133,6 @@ class MeshtasticClient internal constructor(
             "trafficManagement" ->
                 telemetry.requestTrafficManagement(node).toJs { TrafficManagementStats.ADAPTER.encode(it).toUint8Array() }
             else -> failure("unsupported")
-        }
-    }
-
-    fun sendRaw(toRadio: Uint8Array) {
-        try {
-            client.sendRaw(ToRadio.ADAPTER.decode(toRadio.toByteArray()))
-        } catch (e: Throwable) {
-            throw e.toJsError().unsafeCast<Throwable>()
         }
     }
 

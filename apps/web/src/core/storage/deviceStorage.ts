@@ -35,10 +35,6 @@ export class SqlocalDeviceStorage implements DeviceStorageJs {
     this.scope = scope;
   }
 
-  get currentScope(): number {
-    return this.scope;
-  }
-
   async loadNodes(): Promise<Uint8Array[]> {
     const rows = await this.db
       .select()

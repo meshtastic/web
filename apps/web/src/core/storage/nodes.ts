@@ -1,6 +1,6 @@
 import { fromBinary, toBinary } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { SqlocalDb } from "./db.ts";
 import { nodes } from "./schema.ts";
 import {
@@ -13,6 +13,9 @@ import {
 export interface SqlocalNodesRepositoryOptions {
   deviceId: number;
 }
+
+/** Rows per INSERT: 9 bound values each, well inside SQLite's variable limit. */
+const UPSERT_CHUNK = 500;
 
 /**
  * Persists the snapshot of the device's NodeDB. user/position/metrics are
@@ -57,23 +60,25 @@ export class SqlocalNodesRepository implements NodesRepository {
     await this.upsertBatch([node]);
   }
 
+  /** One multi-row statement per chunk, so a large node DB is a few worker round trips, not one per node. */
   async upsertBatch(input: ReadonlyArray<Node>): Promise<void> {
-    if (input.length === 0) return;
-    for (const node of input) {
-      const row = nodeToRow(this.deviceId, node);
+    for (let i = 0; i < input.length; i += UPSERT_CHUNK) {
+      const rows = input
+        .slice(i, i + UPSERT_CHUNK)
+        .map((node) => nodeToRow(this.deviceId, node));
       await this.db
         .insert(nodes)
-        .values(row)
+        .values(rows)
         .onConflictDoUpdate({
           target: [nodes.deviceId, nodes.num],
           set: {
-            lastHeard: row.lastHeard,
-            snr: row.snr,
-            isFavorite: row.isFavorite,
-            isIgnored: row.isIgnored,
-            userJson: row.userJson,
-            positionJson: row.positionJson,
-            metricsJson: row.metricsJson,
+            lastHeard: sql`excluded.last_heard`,
+            snr: sql`excluded.snr`,
+            isFavorite: sql`excluded.is_favorite`,
+            isIgnored: sql`excluded.is_ignored`,
+            userJson: sql`excluded.user_json`,
+            positionJson: sql`excluded.position_json`,
+            metricsJson: sql`excluded.metrics_json`,
           },
         });
     }

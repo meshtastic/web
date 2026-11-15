@@ -120,7 +120,6 @@ describe("SqlocalDeviceStorage", () => {
     await storage.saveNode(nodeInfo(1, "known"));
     expect(await unknown.loadNodes()).toEqual([]);
     await unknown.recordOwnNode(NODE, "2.8.3");
-    expect(unknown.currentScope).toBe(NODE);
     expect((await unknown.loadNodes()).length).toBe(1);
 
     await unknown.clear();

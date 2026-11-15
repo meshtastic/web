@@ -1,7 +1,6 @@
 import type {
   AdminJs,
   AdminResultJs,
-  ConfigBundleJs,
   ConnectionStateJs,
   MeshtasticClient,
   NodeChangeJs,
@@ -65,10 +64,6 @@ export class FakeAdmin implements AdminJs {
 export class FakeKmpClient implements MeshtasticClient {
   connectionState: ConnectionStateJs = state("disconnected");
   myNodeNum: number | null = null;
-  configBundle: ConfigBundleJs | null = null;
-  channels: Uint8Array[] | null = null;
-  nodeList: Uint8Array[] = [];
-  readonly sent: Uint8Array[] = [];
   readonly texts: Array<{
     text: string;
     to: number;
@@ -92,8 +87,6 @@ export class FakeKmpClient implements MeshtasticClient {
   adminResult: AdminResultJs = adminOk();
   private frameListeners: Listeners<Uint8Array> = new Set();
   private stateListeners: Listeners<ConnectionStateJs> = new Set();
-  private bundleListeners: Listeners<ConfigBundleJs | null> = new Set();
-  private channelListeners: Listeners<Uint8Array[] | null> = new Set();
   private nodeListeners: Listeners<NodeChangeJs> = new Set();
   private packetListeners: Listeners<Uint8Array> = new Set();
   private telemetryListeners = new Map<number, Listeners<Uint8Array>>();
@@ -123,18 +116,6 @@ export class FakeKmpClient implements MeshtasticClient {
     return () => this.stateListeners.delete(cb);
   }
 
-  onConfigBundle(cb: (bundle: ConfigBundleJs | null) => void): () => void {
-    this.bundleListeners.add(cb);
-    cb(this.configBundle);
-    return () => this.bundleListeners.delete(cb);
-  }
-
-  onChannels(cb: (channels: Uint8Array[] | null) => void): () => void {
-    this.channelListeners.add(cb);
-    cb(this.channels);
-    return () => this.channelListeners.delete(cb);
-  }
-
   onNodeChange(cb: (change: NodeChangeJs) => void): () => void {
     this.nodeListeners.add(cb);
     return () => this.nodeListeners.delete(cb);
@@ -155,10 +136,6 @@ export class FakeKmpClient implements MeshtasticClient {
   onFromRadio(cb: (bytes: Uint8Array) => void): () => void {
     this.frameListeners.add(cb);
     return () => this.frameListeners.delete(cb);
-  }
-
-  async nodes(): Promise<Uint8Array[]> {
-    return this.nodeList;
   }
 
   admin(dest = 0): FakeAdmin {
@@ -223,15 +200,6 @@ export class FakeKmpClient implements MeshtasticClient {
     return this.adminResult;
   }
 
-  sendRaw(toRadio: Uint8Array): void {
-    if (this.connectionState.kind !== "connected") {
-      const error = new Error("Client not connected");
-      error.name = "not-connected";
-      throw error;
-    }
-    this.sent.push(toRadio);
-  }
-
   emitFrame(bytes: Uint8Array): void {
     for (const cb of this.frameListeners) {
       cb(bytes);
@@ -253,20 +221,6 @@ export class FakeKmpClient implements MeshtasticClient {
   emitTelemetry(nodeNum: number, bytes: Uint8Array): void {
     for (const cb of this.telemetryListeners.get(nodeNum) ?? []) {
       cb(bytes);
-    }
-  }
-
-  setConfigBundle(bundle: ConfigBundleJs | null): void {
-    this.configBundle = bundle;
-    for (const cb of this.bundleListeners) {
-      cb(bundle);
-    }
-  }
-
-  setChannels(channels: Uint8Array[] | null): void {
-    this.channels = channels;
-    for (const cb of this.channelListeners) {
-      cb(channels);
     }
   }
 

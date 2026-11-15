@@ -97,9 +97,10 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
     await act(() => result.current.disconnect(conn.id));
   });
 
-  it("hands a click's permitted port to the SDK without prompting", async () => {
+  it("shows the picker first on a click, filtered to the saved ids, even when a port is permitted", async () => {
     const radio = fakePort(ids);
-    const requestPort = installSerial([radio]);
+    const requestPort = installSerial([radio], radio);
+    const getPorts = vi.spyOn(navigator.serial, "getPorts");
     const { result } = renderHook(() => useConnections());
     const conn = result.current.addConnection({
       type: "serial",
@@ -109,12 +110,13 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
 
     await act(() => result.current.connect(conn.id, { allowPrompt: true }));
 
-    expect(requestPort).not.toHaveBeenCalled();
+    expect(requestPort).toHaveBeenCalledWith({ filters: [ids] });
+    expect(getPorts).not.toHaveBeenCalled();
     expect(kmp.serialTargets).toEqual([{ port: radio, ...ids }]);
     await act(() => result.current.disconnect(conn.id));
   });
 
-  it("shows the port picker on a click only when no permitted port matches, and saves the picked ids", async () => {
+  it("shows the port picker on a click and saves the picked ids", async () => {
     const newIds = { usbVendorId: 0x10c4, usbProductId: 0xea60 };
     const picked = fakePort(newIds);
     const requestPort = installSerial([], picked);
@@ -177,9 +179,13 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
     await act(() => result.current.disconnect(conn.id));
   });
 
-  it("shows the device picker on a click only when the device is unknown, and saves the picked device", async () => {
+  it("shows the device picker on a click without consulting getDevices, and saves the picked device", async () => {
     const picked = new FakeBluetoothDevice("radio-2", "Meshtastic_abcd");
-    const requestDevice = installBluetooth([], picked);
+    const requestDevice = installBluetooth(
+      [new FakeBluetoothDevice("radio-1")],
+      picked,
+    );
+    const getDevices = vi.spyOn(navigator.bluetooth, "getDevices");
     const { result } = renderHook(() => useConnections());
     const conn = result.current.addConnection({
       type: "bluetooth",
@@ -190,6 +196,7 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
     await act(() => result.current.connect(conn.id, { allowPrompt: true }));
 
     expect(requestDevice).toHaveBeenCalledTimes(1);
+    expect(getDevices).not.toHaveBeenCalled();
     expect(kmp.bluetoothTargets).toEqual([
       { device: picked, deviceId: "radio-2" },
     ]);

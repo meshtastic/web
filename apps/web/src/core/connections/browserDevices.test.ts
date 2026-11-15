@@ -6,7 +6,7 @@ import {
   installSerial as installFakeSerial,
   uninstallBrowserDevices,
 } from "@app/tests/fakeBrowserDevices.ts";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   type BluetoothConnection,
   MESHTASTIC_BLE_SERVICE,
@@ -59,6 +59,7 @@ function installBluetooth(ids: string[]) {
 
 afterEach(() => {
   uninstallBrowserDevices();
+  vi.unstubAllGlobals();
 });
 
 describe("permittedSerialPort", () => {
@@ -118,6 +119,42 @@ describe("pickers", () => {
 });
 
 describe("probeConnection", () => {
+  const savedHttp: Connection = {
+    id: 3,
+    type: "http",
+    name: "Radio",
+    url: "http://192.168.1.10",
+    status: "disconnected",
+    createdAt: 0,
+  };
+
+  function installLocalNetworkPermission(state: string) {
+    vi.stubGlobal("location", { protocol: "https:" });
+    vi.stubGlobal("isSecureContext", true);
+    vi.stubGlobal("navigator", {
+      permissions: { query: vi.fn().mockResolvedValue({ state }) },
+    });
+    const fetch = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubGlobal("fetch", fetch);
+    return fetch;
+  }
+
+  it("does not fetch a local target while the local network permission would prompt", async () => {
+    const fetch = installLocalNetworkPermission("prompt");
+    await expect(probeConnection(savedHttp)).resolves.toEqual({
+      status: "disconnected",
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("probes a local target once the permission is granted", async () => {
+    const fetch = installLocalNetworkPermission("granted");
+    await expect(probeConnection(savedHttp)).resolves.toEqual({
+      status: "online",
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("reports a permitted serial port as online", async () => {
     installSerial([fakePort(ids)]);
     await expect(probeConnection(savedSerial)).resolves.toEqual({

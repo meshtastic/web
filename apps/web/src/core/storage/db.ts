@@ -50,13 +50,6 @@ export async function openSqlocalDb(
   return { db, storageType, persistent: storageType === "opfs" };
 }
 
-/** {@link openSqlocalDb} for callers that only need the Drizzle client. */
-export async function createSqlocalDb(
-  options: CreateSqlocalDbOptions = {},
-): Promise<SqlocalDb> {
-  return (await openSqlocalDb(options)).db;
-}
-
 type RawSql = (
   query: TemplateStringsArray,
   ...values: ReadonlyArray<unknown>

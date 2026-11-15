@@ -23,10 +23,6 @@ export class MeshRegistry {
     }
   }
 
-  has(id: number): boolean {
-    return this.sessions.has(id);
-  }
-
   get(id: number): MeshSession | undefined {
     return this.sessions.get(id);
   }

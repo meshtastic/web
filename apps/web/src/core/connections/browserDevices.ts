@@ -1,3 +1,7 @@
+import {
+  needsLocalNetworkAccess,
+  queryLocalNetworkAccess,
+} from "@core/connections/lna.ts";
 import type { Connection } from "@core/stores/deviceStore/types";
 import { httpErrorMessage, testHttpReachable } from "@pages/Connections/utils";
 
@@ -115,11 +119,19 @@ export type ProbeResult = {
 
 /**
  * Probes a saved connection for reachability or permission without opening
- * it, for the saved-connection status badges.
+ * it, for the saved-connection status badges. A local target whose Local
+ * Network Access permission is still `prompt` is left alone: only a click
+ * may trigger that prompt.
  */
 export async function probeConnection(conn: Connection): Promise<ProbeResult> {
   switch (conn.type) {
     case "http": {
+      if (
+        needsLocalNetworkAccess(conn.url) &&
+        (await queryLocalNetworkAccess()) === "prompt"
+      ) {
+        return { status: "disconnected" };
+      }
       const { reachable, certError } = await testHttpReachable(conn.url);
       if (reachable) {
         return { status: "online" };

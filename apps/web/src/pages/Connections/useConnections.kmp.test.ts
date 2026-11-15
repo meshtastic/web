@@ -132,11 +132,36 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
       reconnect: undefined,
     });
 
-    act(() => client.setState(state("reconnecting", { attempt: 1 })));
+    act(() => client.setState(state("reconnecting", { attempt: 3 })));
     act(() => client.setState(state("disconnected")));
     expect(saved(conn.id)).toMatchObject({
       status: "error",
       errorKind: "network",
+      reconnect: undefined,
+    });
+  });
+
+  it("reports the cause when the SDK drops without retrying", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+
+    act(() =>
+      client.setState(
+        state("reconnecting", {
+          attempt: 1,
+          error: "Firmware 2.3.0 is older than the minimum 2.6.0",
+          errorKind: "firmware-too-old",
+        }),
+      ),
+    );
+    act(() => client.setState(state("disconnected")));
+
+    expect(saved(conn.id)).toMatchObject({
+      status: "error",
+      error: "Firmware 2.3.0 is older than the minimum 2.6.0",
       reconnect: undefined,
     });
   });

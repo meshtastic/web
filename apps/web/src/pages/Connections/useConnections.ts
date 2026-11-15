@@ -1,8 +1,6 @@
 import {
   type BluetoothConnection,
   type ConnectionHandle,
-  knownBluetoothDevice,
-  permittedSerialPort,
   pickBluetoothDevice,
   pickSerialPort,
   probeConnection,
@@ -22,6 +20,7 @@ import { createConnectionFromInput } from "@app/pages/Connections/utils";
 import { toast } from "@core/hooks/useToast.ts";
 import {
   type BluetoothTarget,
+  type ConnectionStateJs,
   createBluetoothClient,
   createHttpClient,
   createSerialClient,
@@ -58,8 +57,9 @@ const sessionTeardowns = new Map<ConnectionId, () => void>();
 /**
  * What the SDK opens for a serial connection. Automatic connects pass only
  * the saved USB ids and the SDK reopens the permitted port itself; a click
- * (`allowPrompt`) may show the port picker when no permitted port matches,
- * and hands the chosen port over.
+ * (`allowPrompt`) without a held port shows the picker, filtered to the
+ * saved ids, straight away so the gesture is still live, and hands the
+ * chosen port over.
  */
 async function serialTarget(
   conn: SerialConnection,
@@ -76,8 +76,7 @@ async function serialTarget(
   if (!allowPrompt) {
     return ids;
   }
-  const port =
-    (await permittedSerialPort(conn)) ?? (await pickSerialPort(conn));
+  const port = await pickSerialPort(conn);
   heldSerialPorts.set(conn.id, port);
   const info = port.getInfo();
   if (
@@ -107,8 +106,7 @@ async function bluetoothTarget(
   if (!allowPrompt) {
     return { deviceId: conn.deviceId };
   }
-  const device =
-    (await knownBluetoothDevice(conn)) ?? (await pickBluetoothDevice());
+  const device = await pickBluetoothDevice();
   heldBluetoothDevices.set(conn.id, device);
   if (device.id !== conn.deviceId) {
     useDeviceStore.getState().updateSavedConnection(conn.id, {
@@ -247,7 +245,7 @@ export function useConnections() {
       device.setConnectionId(id);
       updateSavedConnection(id, { meshDeviceId: deviceId });
 
-      let reconnecting = false;
+      let reconnecting: ConnectionStateJs | undefined;
       let firmwareChecked = false;
       const unsubscribes = [
         unsubscribeStore,
@@ -270,7 +268,7 @@ export function useConnections() {
             return;
           }
           if (reconnect) {
-            reconnecting = true;
+            reconnecting = state;
             log.warn("kmp: reconnecting", { id, ...reconnect });
             updateSavedConnection(id, {
               status: "connecting",
@@ -282,7 +280,23 @@ export function useConnections() {
           }
           if (state.kind === "disconnected") {
             if (!reconnecting) return;
-            reconnecting = false;
+            const last = reconnecting;
+            reconnecting = undefined;
+            // The SDK gives up before its first attempt on a drop it
+            // cannot retry; that cause is the error, not the attempt cap.
+            if (last.attempt === 1 && last.error) {
+              log.error("kmp: dropped without retrying", {
+                id,
+                errorKind: last.errorKind,
+              });
+              const cause = new Error(last.error);
+              cause.name = last.errorKind ?? "transport";
+              updateSavedConnection(id, {
+                ...connectFailure(cause),
+                reconnect: undefined,
+              });
+              return;
+            }
             log.error("kmp: reconnect attempts exhausted", { id });
             updateSavedConnection(id, {
               status: "error",
@@ -294,7 +308,7 @@ export function useConnections() {
             });
             return;
           }
-          reconnecting = false;
+          reconnecting = undefined;
           updateSavedConnection(id, {
             status: toConnectionStatus(state),
             reconnect: undefined,

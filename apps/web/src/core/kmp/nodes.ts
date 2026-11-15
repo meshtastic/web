@@ -92,7 +92,9 @@ export interface NodesAdmin {
 /**
  * The device's node DB as the SDK reports it, plus the per-node errors the
  * web tracks (PKI collisions and routing failures) and the stored snapshot
- * shown until the handshake's node DB arrives.
+ * shown until the handshake's node DB arrives. The SDK's storage writes
+ * every node column this reads, so nothing is written back here except
+ * removals and resets.
  */
 export class NodesClient {
   private readonly nodes = signal<ReadonlyMap<number, Node>>(new Map());
@@ -123,7 +125,6 @@ export class NodesClient {
           );
         }
         this.nodes.value = next;
-        void this.repository?.upsertBatch([...next.values()]).catch(() => {});
         return;
       }
       case "added":
@@ -210,7 +211,6 @@ export class NodesClient {
     const next = new Map(this.nodes.peek());
     next.set(node.num, node);
     this.nodes.value = next;
-    void this.repository?.upsert(node).catch(() => {});
   }
 
   private delete(nodeNum: number): void {
