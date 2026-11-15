@@ -98,6 +98,8 @@ export const nodes = sqliteTable(
     userJson: text("user_json"),
     positionJson: text("position_json"),
     metricsJson: text("metrics_json"),
+    /** The whole NodeInfo as the SDK last saved it, base64; absent on rows older than v5. */
+    nodeInfo: text("node_info"),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.deviceId, t.num] }),
@@ -125,6 +127,48 @@ export const telemetry = sqliteTable(
 
 export type TelemetryRow = typeof telemetry.$inferSelect;
 export type TelemetryInsert = typeof telemetry.$inferInsert;
+
+/** The SDK's DeviceStorage: one config bundle per node, protobufs as base64. */
+export const sdkConfig = sqliteTable("sdk_config", {
+  deviceId: integer("device_id").primaryKey(),
+  myInfo: text("my_info").notNull(),
+  metadata: text("metadata").notNull(),
+  configs: text("configs").notNull(),
+  moduleConfigs: text("module_configs").notNull(),
+  deviceUiConfig: text("device_ui_config"),
+});
+
+export const sdkChannels = sqliteTable(
+  "sdk_channels",
+  {
+    deviceId: integer("device_id").notNull(),
+    idx: integer("idx").notNull(),
+    channel: text("channel").notNull(),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.deviceId, t.idx] }) }),
+);
+
+export const sdkHeartbeats = sqliteTable(
+  "sdk_heartbeats",
+  {
+    deviceId: integer("device_id").notNull(),
+    nodeNum: integer("node_num").notNull(),
+    epochMs: integer("epoch_ms").notNull(),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.deviceId, t.nodeNum] }) }),
+);
+
+export const sdkPasskey = sqliteTable("sdk_passkey", {
+  deviceId: integer("device_id").primaryKey(),
+  passkey: text("passkey").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+});
+
+export const sdkOwnNode = sqliteTable("sdk_own_node", {
+  deviceId: integer("device_id").primaryKey(),
+  nodeNum: integer("node_num").notNull(),
+  firmwareVersion: text("firmware_version").notNull(),
+});
 
 export const schemaVersion = sqliteTable("_schema", {
   version: integer("version").primaryKey(),
@@ -211,6 +255,44 @@ export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
       `ALTER TABLE messages ADD COLUMN hops_away INTEGER`,
       `ALTER TABLE messages ADD COLUMN via_mqtt INTEGER`,
       `ALTER TABLE messages ADD COLUMN transport INTEGER`,
+    ],
+  },
+  {
+    // The Kotlin SDK's DeviceStorage (config bundle, channels, heartbeats,
+    // passkey) next to the existing tables, and the whole NodeInfo on nodes.
+    version: 5,
+    sql: [
+      `ALTER TABLE nodes ADD COLUMN node_info TEXT`,
+      `CREATE TABLE IF NOT EXISTS sdk_config (
+        device_id INTEGER PRIMARY KEY,
+        my_info TEXT NOT NULL,
+        metadata TEXT NOT NULL,
+        configs TEXT NOT NULL,
+        module_configs TEXT NOT NULL,
+        device_ui_config TEXT
+      )`,
+      `CREATE TABLE IF NOT EXISTS sdk_channels (
+        device_id INTEGER NOT NULL,
+        idx INTEGER NOT NULL,
+        channel TEXT NOT NULL,
+        PRIMARY KEY (device_id, idx)
+      )`,
+      `CREATE TABLE IF NOT EXISTS sdk_heartbeats (
+        device_id INTEGER NOT NULL,
+        node_num INTEGER NOT NULL,
+        epoch_ms INTEGER NOT NULL,
+        PRIMARY KEY (device_id, node_num)
+      )`,
+      `CREATE TABLE IF NOT EXISTS sdk_passkey (
+        device_id INTEGER PRIMARY KEY,
+        passkey TEXT NOT NULL,
+        expires_at INTEGER NOT NULL
+      )`,
+      `CREATE TABLE IF NOT EXISTS sdk_own_node (
+        device_id INTEGER PRIMARY KEY,
+        node_num INTEGER NOT NULL,
+        firmware_version TEXT NOT NULL
+      )`,
     ],
   },
 ];

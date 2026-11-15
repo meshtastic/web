@@ -1,6 +1,8 @@
 import type { SessionOptions } from "@core/kmp/session.ts";
+import type { StorageJs } from "@meshtastic/sdk-kmp";
 import { createLogger } from "@core/log.ts";
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
+import { sqlocalStorage } from "@core/storage/deviceStorage.ts";
 import { SqlocalDraftRepository } from "@core/storage/drafts.ts";
 import { SqlocalMessageRepository } from "@core/storage/messages.ts";
 import { SqlocalNodesRepository } from "@core/storage/nodes.ts";
@@ -24,6 +26,18 @@ const STORAGE_OPEN_TIMEOUT_MS = 5000;
  * nothing is shown before the handshake names the radio.
  */
 export const UNKNOWN_NODE_SCOPE = -1;
+
+/**
+ * The SDK's own storage (node DB, config bundle, channels, heartbeats) over
+ * the same DB and key. Opening fails loudly: the SDK then reports storage
+ * as degraded and runs the session in memory.
+ */
+export function sdkStorage(nodeNum?: number): StorageJs {
+  return sqlocalStorage(
+    async () => (await getStorageDb()).db,
+    nodeNum ?? UNKNOWN_NODE_SCOPE,
+  );
+}
 
 /**
  * Opens the message, draft, node and telemetry repositories against the

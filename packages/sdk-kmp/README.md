@@ -10,6 +10,11 @@ auto-reconnect, node DB, admin); this package owns only the glue:
   `MeshtasticClient`, `ConnectionStateJs`). Only plain objects, `Promise`s,
   `Uint8Array`s and unsubscribe functions cross into TypeScript; protobuf
   messages cross as bytes and are decoded with `@meshtastic/protobufs`.
+  Sends return a `SendHandleJs` (the packet id now, the outcome later).
+- `Storage.kt`: `StorageJs` / `DeviceStorageJs`, the SDK's `StorageProvider`
+  and `DeviceStorage` as a host-implemented object the factories accept, so
+  the web keeps the SDK's node DB, config bundle, channels and heartbeats in
+  its own sqlocal database.
 - Browser transports implementing the SDK's `RadioTransport`: `HttpTransport.kt`
   (device HTTP API with Chrome Local Network Access handling in `Lna.kt`),
   `WebSerialTransport.kt` (stream framing from `Framing.kt`) and

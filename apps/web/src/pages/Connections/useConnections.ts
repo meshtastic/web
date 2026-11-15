@@ -10,6 +10,7 @@ import {
 } from "@app/core/connections/browserDevices.ts";
 import {
   openRepositories,
+  sdkStorage,
   UNKNOWN_NODE_SCOPE,
 } from "@app/core/connections/repositories.ts";
 import type {
@@ -369,18 +370,18 @@ export function useConnections() {
         switch (conn.type) {
           case "http":
             return await connectThroughKmp(id, () =>
-              createHttpClient(conn.url, allowPrompt),
+              createHttpClient(conn.url, allowPrompt, sdkStorage(conn.nodeNum)),
             );
           case "serial": {
             const target = await serialTarget(conn, allowPrompt);
             return await connectThroughKmp(id, () =>
-              createSerialClient(target),
+              createSerialClient(target, sdkStorage(conn.nodeNum)),
             );
           }
           case "bluetooth": {
             const target = await bluetoothTarget(conn, allowPrompt);
             return await connectThroughKmp(id, () =>
-              createBluetoothClient(target),
+              createBluetoothClient(target, sdkStorage(conn.nodeNum)),
             );
           }
         }

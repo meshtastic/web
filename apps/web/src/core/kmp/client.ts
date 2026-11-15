@@ -1,6 +1,10 @@
-import type { MeshtasticClient } from "@meshtastic/sdk-kmp";
+import type { MeshtasticClient, StorageJs } from "@meshtastic/sdk-kmp";
 
-export type { ConnectionStateJs, MeshtasticClient } from "@meshtastic/sdk-kmp";
+export type {
+  ConnectionStateJs,
+  MeshtasticClient,
+  StorageJs,
+} from "@meshtastic/sdk-kmp";
 
 /** Reconnect attempts the SDK makes before giving up, as the user approved. */
 export const MAX_RECONNECT_ATTEMPTS = 10;
@@ -21,9 +25,15 @@ export function loadKmp(): Promise<KmpModule> {
 export async function createHttpClient(
   url: string,
   allowPrompt: boolean,
+  storage?: StorageJs,
 ): Promise<MeshtasticClient> {
   const kmp = await loadKmp();
-  return kmp.createHttpClient(url, allowPrompt, MAX_RECONNECT_ATTEMPTS);
+  return kmp.createHttpClient(
+    url,
+    allowPrompt,
+    MAX_RECONNECT_ATTEMPTS,
+    storage,
+  );
 }
 
 export interface SerialTarget {
@@ -41,6 +51,7 @@ export interface BluetoothTarget {
 
 export async function createSerialClient(
   target: SerialTarget,
+  storage?: StorageJs,
 ): Promise<MeshtasticClient> {
   const kmp = await loadKmp();
   return kmp.createSerialClient(
@@ -48,16 +59,19 @@ export async function createSerialClient(
     target.usbVendorId,
     target.usbProductId,
     MAX_RECONNECT_ATTEMPTS,
+    storage,
   );
 }
 
 export async function createBluetoothClient(
   target: BluetoothTarget,
+  storage?: StorageJs,
 ): Promise<MeshtasticClient> {
   const kmp = await loadKmp();
   return kmp.createBluetoothClient(
     target.device,
     target.deviceId,
     MAX_RECONNECT_ATTEMPTS,
+    storage,
   );
 }
