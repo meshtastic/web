@@ -286,7 +286,7 @@ describe("MeshSession", () => {
     expect(channel.value[0]?.state).toBe(MessageState.Delivered);
   });
 
-  it("mirrors the SDK's node DB and refuses a node presenting another node's key", () => {
+  it("mirrors the SDK's node DB and refuses a node presenting another node's key", async () => {
     const { kmp, session } = connected();
     const key = new Uint8Array([1, 2, 3]);
     kmp.emitNodeChange({
@@ -314,6 +314,7 @@ describe("MeshSession", () => {
       node: null,
       nodeNum: 0x99,
     });
+    await Promise.resolve();
     expect(session.nodes.list.value.map((n) => n.num)).toEqual([PEER]);
   });
 

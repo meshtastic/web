@@ -99,6 +99,7 @@ export interface NodesAdmin {
 export class NodesClient {
   private readonly nodes = signal<ReadonlyMap<number, Node>>(new Map());
   private readonly errorMap = signal<ReadonlyMap<number, NodeError>>(new Map());
+  private pending: Map<number, Node> | undefined;
   private epoch = 0;
 
   readonly list: ReadonlySignal<ReadonlyArray<Node>>;
@@ -119,12 +120,9 @@ export class NodesClient {
         const next = new Map<number, Node>();
         for (const bytes of change.nodes ?? []) {
           const info = fromBinary(Protobuf.Mesh.NodeInfoSchema, bytes);
-          next.set(
-            info.num,
-            this.merged(info, this.nodes.peek().get(info.num)),
-          );
+          next.set(info.num, this.merged(info, this.current().get(info.num)));
         }
-        this.nodes.value = next;
+        this.replace(next);
         return;
       }
       case "added":
@@ -146,10 +144,10 @@ export class NodesClient {
   }
 
   private handleIncoming(info: Protobuf.Mesh.NodeInfo): void {
-    const verdict = validateIncomingNode(info, this.nodes.peek());
+    const verdict = validateIncomingNode(info, this.current());
     if (verdict.error) this.setError(info.num, verdict.error);
     if (!verdict.accepted) return;
-    const node = this.merged(verdict.accepted, this.nodes.peek().get(info.num));
+    const node = this.merged(verdict.accepted, this.current().get(info.num));
     this.set(node);
     if (this.errorMap.peek().has(node.num)) this.clearError(node.num);
   }
@@ -188,7 +186,7 @@ export class NodesClient {
 
   patch(nodeNum: number, partial: Partial<Node>): void {
     if (nodeNum === 0) return;
-    const existing = this.nodes.peek().get(nodeNum);
+    const existing = this.current().get(nodeNum);
     const next: Node = existing
       ? { ...existing, ...partial }
       : { num: nodeNum, isFavorite: false, isIgnored: false, ...partial };
@@ -207,15 +205,35 @@ export class NodesClient {
     }
   }
 
-  private set(node: Node): void {
-    const next = new Map(this.nodes.peek());
-    next.set(node.num, node);
+  private current(): ReadonlyMap<number, Node> {
+    return this.pending ?? this.nodes.peek();
+  }
+
+  private draft(): Map<number, Node> {
+    if (!this.pending) {
+      this.pending = new Map(this.nodes.peek());
+      queueMicrotask(() => this.publish());
+    }
+    return this.pending;
+  }
+
+  private publish(): void {
+    if (!this.pending) return;
+    this.nodes.value = this.pending;
+    this.pending = undefined;
+  }
+
+  private replace(next: Map<number, Node>): void {
+    this.pending = undefined;
     this.nodes.value = next;
   }
 
+  private set(node: Node): void {
+    this.draft().set(node.num, node);
+  }
+
   private delete(nodeNum: number): void {
-    const next = new Map(this.nodes.peek());
-    if (next.delete(nodeNum)) this.nodes.value = next;
+    if (this.current().has(nodeNum)) this.draft().delete(nodeNum);
     this.clearError(nodeNum);
     void this.repository?.remove(nodeNum).catch(() => {});
   }
@@ -226,11 +244,10 @@ export class NodesClient {
     try {
       const persisted = await this.repository.loadAll();
       if (epoch !== this.epoch) return;
-      const next = new Map(this.nodes.peek());
+      const next = this.draft();
       for (const node of persisted) {
         if (!next.has(node.num)) next.set(node.num, node);
       }
-      this.nodes.value = next;
     } catch {
       // nothing stored yet
     }
@@ -239,13 +256,13 @@ export class NodesClient {
   rescope(scope: number): void {
     this.repository?.setScope?.(scope);
     this.epoch++;
-    this.nodes.value = new Map();
+    this.replace(new Map());
     this.errorMap.value = new Map();
     void this.hydrate();
   }
 
   byNum(nodeNum: number): Node | undefined {
-    return this.nodes.peek().get(nodeNum);
+    return this.current().get(nodeNum);
   }
 
   errorFor(nodeNum: number): NodeError | undefined {
@@ -319,9 +336,9 @@ export class NodesClient {
     const myNodeNum = this.admin.myNodeNum();
     const me =
       options.keepMyNode && myNodeNum !== undefined
-        ? this.nodes.peek().get(myNodeNum)
+        ? this.current().get(myNodeNum)
         : undefined;
-    this.nodes.value = me ? new Map([[me.num, me]]) : new Map();
+    this.replace(me ? new Map([[me.num, me]]) : new Map());
     this.errorMap.value = new Map();
     try {
       await this.repository?.clear();
