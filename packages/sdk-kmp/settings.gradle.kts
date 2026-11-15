@@ -12,10 +12,20 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         google()
-        // Until meshtastic-sdk publishes its js artifacts (meshtastic/meshtastic-sdk#215),
-        // sdk-core-js comes from `./gradlew publishToMavenLocal` in that repo.
-        mavenLocal()
     }
 }
 
 rootProject.name = "sdk-kmp"
+
+// Until meshtastic-sdk publishes its js artifacts (meshtastic/meshtastic-sdk#215),
+// the SDK compiles from source out of the pinned submodule in vendor/. Once a release
+// carries them, delete the submodule and this block, and resolve meshtasticSdkVersion
+// from Maven Central.
+includeBuild("vendor/meshtastic-sdk") {
+    dependencySubstitution {
+        substitute(module("org.meshtastic:sdk-core")).using(project(":core"))
+        substitute(module("org.meshtastic:sdk-core-js")).using(project(":core"))
+        substitute(module("org.meshtastic:sdk-testing")).using(project(":testing"))
+        substitute(module("org.meshtastic:sdk-testing-js")).using(project(":testing"))
+    }
+}

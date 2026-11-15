@@ -94,13 +94,16 @@ Expected domain errors are returned as `Result<T, E>` via [`better-result`](http
   the Kotlin meshtastic-sdk compiled to JavaScript that the web client
   connects through. `pnpm --filter meshtastic-web dev` builds it on first
   run (its `predev` hook); on macOS `brew install openjdk@21` and
-  `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`. See
-  `packages/sdk-kmp/README.md` for how the SDK version is pinned.
+  `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`. Until the SDK's `js`
+  artifacts are released, it compiles from the `packages/sdk-kmp/vendor/meshtastic-sdk`
+  git submodule (clone with `--recurse-submodules`, or let the build run
+  `git submodule update --init`). See `packages/sdk-kmp/README.md` for how
+  the SDK version is pinned and how to switch to the release.
 
 ### Setup
 
 ```bash
-git clone https://github.com/meshtastic/web.git
+git clone --recurse-submodules https://github.com/meshtastic/web.git
 cd web
 pnpm install
 ```

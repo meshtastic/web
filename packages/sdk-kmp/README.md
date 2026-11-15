@@ -41,8 +41,9 @@ fakes.
 - **JDK 21.** On macOS: `brew install openjdk@21` and
   `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`. The Gradle wrapper is
   committed; Gradle itself is downloaded on first use.
-- Node.js (already required by the workspace); the Kotlin build uses it for
-  its own tooling.
+- Node.js on `PATH` (already required by the workspace); the Kotlin build and
+  the vendored SDK's `js` target use it for their own tooling.
+- The `vendor/meshtastic-sdk` submodule (see "SDK version" below).
 
 ## Building
 
@@ -66,8 +67,17 @@ meshtasticSdkVersion=0.2.1-spike-js-target-SNAPSHOT
 
 Until meshtastic-sdk publishes its `js` artifacts
 ([meshtastic/meshtastic-sdk#215](https://github.com/meshtastic/meshtastic-sdk/pull/215)),
-`org.meshtastic:sdk-core-js` is resolved from `mavenLocal()`; publish it there
-from a checkout of that PR with
-`JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew publishToMavenLocal`.
-Switching to a Maven Central release is a one-line change to
-`meshtasticSdkVersion`, plus dropping `mavenLocal()` from `settings.gradle.kts`.
+the SDK compiles from source: `vendor/meshtastic-sdk` is a git submodule
+pinned to that PR's head (`danditomaso/meshtastic-sdk`, branch
+`feat/js-target`), and `settings.gradle.kts` includes it as a composite build,
+substituting `org.meshtastic:sdk-core` and `sdk-testing` with the included
+`:core` and `:testing` projects. No Maven repository, local or remote, serves
+the SDK. `ensure-dist` and `build` run `git submodule update --init` when the
+submodule is missing; a fresh clone can also use
+`git clone --recurse-submodules`. CI checks it out with
+`actions/checkout`'s `submodules: true`.
+
+Once #215 is released, the switch to Maven Central is: set
+`meshtasticSdkVersion` to the release, delete the `includeBuild` block from
+`settings.gradle.kts`, and remove the submodule
+(`git rm vendor/meshtastic-sdk` and its `.gitmodules` entry).

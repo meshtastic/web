@@ -13,6 +13,21 @@ if (process.argv.includes("--if-missing") && existsSync(entry)) {
   process.exit(0);
 }
 
+const sdkSource = path.join(root, "vendor/meshtastic-sdk/settings.gradle.kts");
+if (!existsSync(sdkSource)) {
+  const submodule = spawnSync(
+    "git",
+    ["submodule", "update", "--init", "--", "vendor/meshtastic-sdk"],
+    { cwd: root, stdio: "inherit" },
+  );
+  if (submodule.error || submodule.status !== 0 || !existsSync(sdkSource)) {
+    console.error(
+      "@meshtastic/sdk-kmp: could not check out vendor/meshtastic-sdk; run `git submodule update --init` and retry.",
+    );
+    process.exit(submodule.status ?? 1);
+  }
+}
+
 const env = { ...process.env };
 const homebrewJdk = "/opt/homebrew/opt/openjdk@21";
 if (!env.JAVA_HOME && existsSync(homebrewJdk)) {
@@ -36,8 +51,8 @@ if (result.error || result.status !== 0) {
     [
       "",
       "@meshtastic/sdk-kmp: the Gradle build failed.",
-      "It needs JDK 21 (set JAVA_HOME, e.g. /opt/homebrew/opt/openjdk@21 on macOS) and",
-      "org.meshtastic:sdk-core-js in a reachable Maven repository; see packages/sdk-kmp/README.md.",
+      "It needs JDK 21 (set JAVA_HOME, e.g. /opt/homebrew/opt/openjdk@21 on macOS), Node on",
+      "PATH and the vendor/meshtastic-sdk submodule checked out; see packages/sdk-kmp/README.md.",
       "",
     ].join("\n"),
   );
