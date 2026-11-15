@@ -138,6 +138,14 @@ async function clientFactory(
   }
 }
 
+function abandonConnect(id: ConnectionId): false {
+  log.info("connect: abandoned, the app was handed to another tab", { id });
+  useDeviceStore
+    .getState()
+    .updateSavedConnection(id, { status: "disconnected", error: undefined });
+  return false;
+}
+
 const savedConnection = (id: ConnectionId): Connection | undefined =>
   useDeviceStore.getState().savedConnections.find((c) => c.id === id);
 
@@ -175,7 +183,13 @@ async function disconnectConnection(id: ConnectionId): Promise<void> {
 }
 
 /** Disconnects every live session, as the drawer's Disconnect does. */
+// Bumped when the app is handed to another tab, so a connect still in
+// flight here stops before it opens the port or registers a session.
+let handovers = 0;
+const handedOver = (seen: number): boolean => seen !== handovers;
+
 export async function disconnectAllConnections(): Promise<void> {
+  handovers += 1;
   for (const id of [...sessionTeardowns.keys()]) {
     await disconnectConnection(id);
   }
@@ -252,12 +266,14 @@ export function useConnections() {
    * this connection reached last time.
    */
   const connectThroughKmp = useCallback(
-    async (id: ConnectionId, makeClient: ClientFactory) => {
+    async (id: ConnectionId, makeClient: ClientFactory, seen: number) => {
       const conn = savedConnection(id);
       const { options, persistent, sdkStorage } = await openRepositories(
         conn?.nodeNum,
       );
+      if (handedOver(seen)) return abandonConnect(id);
       const client = await makeClient(sdkStorage);
+      if (handedOver(seen)) return abandonConnect(id);
       let deviceId = conn?.meshDeviceId;
       if (deviceId && !useDeviceStore.getState().getDevice(deviceId)) {
         deviceId = undefined;
@@ -470,9 +486,11 @@ export function useConnections() {
       });
       updateStatus(id, "connecting");
       const allowPrompt = opts?.allowPrompt ?? false;
+      const seen = handovers;
       try {
         // The picker runs first, while the click's activation is still live.
         const makeClient = await clientFactory(conn, allowPrompt);
+        if (handedOver(seen)) return abandonConnect(id);
         // The app follows one radio at a time: a session still live on
         // another connection would keep its port and poller to itself.
         for (const other of [...sessionTeardowns.keys()]) {
@@ -490,7 +508,7 @@ export function useConnections() {
             error: undefined,
           });
         }
-        return await connectThroughKmp(id, makeClient);
+        return await connectThroughKmp(id, makeClient, seen);
       } catch (error) {
         log.error("connect: no device to connect to", {
           id,

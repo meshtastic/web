@@ -23,10 +23,12 @@ describe("sdkStorage singletons", () => {
   });
 
   it("closes the database on request and reopens a fresh one afterwards", async () => {
-    const { getStorageDb, closeStorageDb } = await import("./sdkStorage.ts");
+    const { getStorageDb, closeStorageDb, resumeStorageDb } =
+      await import("./sdkStorage.ts");
     const first = await getStorageDb();
 
     await closeStorageDb();
+    resumeStorageDb();
     const second = await getStorageDb();
 
     expect(sqlocal.close).toHaveBeenCalledTimes(1);
@@ -45,5 +47,19 @@ describe("sdkStorage singletons", () => {
     const { getStorageDb, closeStorageDb } = await import("./sdkStorage.ts");
     await getStorageDb();
     await expect(closeStorageDb()).resolves.toBeUndefined();
+  });
+
+  it("refuses to reopen after a close until the tab owns the app again", async () => {
+    const { getStorageDb, closeStorageDb, resumeStorageDb } =
+      await import("./sdkStorage.ts");
+    await getStorageDb();
+    await closeStorageDb();
+
+    await expect(getStorageDb()).rejects.toThrow(/another tab/);
+    expect(sqlocal.open).toHaveBeenCalledTimes(1);
+
+    resumeStorageDb();
+    await getStorageDb();
+    expect(sqlocal.open).toHaveBeenCalledTimes(2);
   });
 });

@@ -15,8 +15,11 @@ export function TabLockGate({ lock, children }: TabLockGateProps) {
   useLayoutEffect(applyStoredTheme, []);
 
   if (status === "owner") return children;
-  if (status === "pending") return null;
   return (
-    <TabLockOverlay claiming={status === "claiming"} onUseHere={takeOver} />
+    <TabLockOverlay
+      claiming={status === "claiming"}
+      pending={status === "pending"}
+      onUseHere={takeOver}
+    />
   );
 }

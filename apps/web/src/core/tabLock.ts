@@ -65,6 +65,7 @@ export function createTabLock(env: TabLockEnvironment): TabLock {
   let release: (() => void) | undefined;
   let relinquishing = false;
   let channel: TabChannel | undefined;
+  let current: symbol | undefined;
 
   const setStatus = (next: TabLockStatus) => {
     if (status === next) return;
@@ -85,7 +86,7 @@ export function createTabLock(env: TabLockEnvironment): TabLock {
     }
   };
 
-  const onGranted = async (lock: Lock | null): Promise<void> => {
+  const onGranted = async (lock: Lock | null, grant: symbol): Promise<void> => {
     if (!lock) {
       log.info("another tab owns the app");
       setStatus("other");
@@ -95,15 +96,16 @@ export function createTabLock(env: TabLockEnvironment): TabLock {
     const held = new Promise<void>((resolve) => {
       release = resolve;
     });
+    current = grant;
     setStatus("owner");
     return held;
   };
 
-  const watch = (request: Promise<unknown>) => {
+  const watch = (request: Promise<unknown>, grant: symbol) => {
     request.then(
       () => {},
       (error) => {
-        if (status !== "owner") return;
+        if (status !== "owner" || current !== grant) return;
         log.warn("lock lost", {
           message: error instanceof Error ? error.message : String(error),
         });
@@ -111,6 +113,16 @@ export function createTabLock(env: TabLockEnvironment): TabLock {
         setStatus("other");
         if (!relinquishing) void teardown();
       },
+    );
+  };
+
+  const request = (options: LockOptions, onLock = onGranted) => {
+    const grant = Symbol("grant");
+    watch(
+      env.locks?.request(APP_LOCK_NAME, options, (lock) =>
+        onLock(lock, grant),
+      ) ?? Promise.resolve(),
+      grant,
     );
   };
 
@@ -140,7 +152,7 @@ export function createTabLock(env: TabLockEnvironment): TabLock {
         if (isTakeover(event.data) && status === "owner") void relinquish();
       };
       channel = opened;
-      watch(locks.request(APP_LOCK_NAME, { ifAvailable: true }, onGranted));
+      request({ ifAvailable: true });
     },
     takeOver() {
       const { locks } = env;
@@ -148,17 +160,18 @@ export function createTabLock(env: TabLockEnvironment): TabLock {
       setStatus("claiming");
       channel?.postMessage({ type: "takeover" });
       const waiting = new AbortController();
+      let stealing = false;
       const stealTimer = setTimeout(() => {
         log.warn("owner did not release, stealing the lock");
+        stealing = true;
         waiting.abort();
-        watch(locks.request(APP_LOCK_NAME, { steal: true }, onGranted));
+        request({ steal: true });
       }, STEAL_AFTER_MS);
-      watch(
-        locks.request(APP_LOCK_NAME, { signal: waiting.signal }, (lock) => {
-          clearTimeout(stealTimer);
-          return onGranted(lock);
-        }),
-      );
+      request({ signal: waiting.signal }, async (lock, grant) => {
+        if (stealing) return;
+        clearTimeout(stealTimer);
+        return onGranted(lock, grant);
+      });
     },
     getStatus: () => status,
     subscribe(listener) {

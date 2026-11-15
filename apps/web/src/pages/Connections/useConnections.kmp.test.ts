@@ -17,6 +17,7 @@ const kmp = vi.hoisted(
     clients: FakeKmpClient[];
     storages: Array<StorageJs | undefined>;
     connectError?: Error;
+    holdFactory?: Promise<void>;
   } => ({ clients: [], storages: [] }),
 );
 
@@ -37,6 +38,7 @@ vi.mock("@core/kmp/client.ts", async () => {
       storage?: StorageJs,
     ) => {
       kmp.storages.push(storage);
+      await kmp.holdFactory;
       const client = new FakeKmpClient();
       if (kmp.connectError) {
         const error = kmp.connectError;
@@ -125,6 +127,28 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     expect(saved(conn.id)?.status).toBe("disconnected");
     expect(meshRegistry.get(conn.id)?.kmp).toBe(client);
     expect(storage.close).toHaveBeenCalledTimes(1);
+  });
+
+  it("abandons a connect that was in flight when the app is handed to another tab", async () => {
+    let releaseFactory: () => void = () => {};
+    kmp.holdFactory = new Promise<void>(
+      (resolve) => (releaseFactory = resolve),
+    );
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    const connecting = result.current.connect(conn.id);
+    await act(async () => {});
+
+    await act(() => disconnectAllConnections());
+    releaseFactory();
+    expect(await act(() => connecting)).toBe(false);
+
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+    expect(client.connects).toHaveLength(0);
+    expect(meshRegistry.get(conn.id)).toBeUndefined();
+    expect(saved(conn.id)?.status).toBe("disconnected");
+    kmp.holdFactory = undefined;
   });
 
   it("shows the SDK's reconnect attempts and reports when they run out", async () => {

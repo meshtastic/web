@@ -125,4 +125,24 @@ describe("TabLockGate", () => {
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
     localStorage.removeItem("theme");
   });
+
+  it("shows the overlay, with Use here disabled, while the lock is still being asked for", () => {
+    const pending = {
+      start: () => {},
+      takeOver: () => {},
+      getStatus: () => "pending" as const,
+      subscribe: () => () => {},
+    };
+    render(
+      <TabLockGate lock={pending}>
+        <p>app</p>
+      </TabLockGate>,
+    );
+
+    expect(screen.queryByText("app")).toBeNull();
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByRole("button").hasAttribute("disabled")).toBe(
+      true,
+    );
+  });
 });

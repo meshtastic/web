@@ -4,6 +4,7 @@ import {
 } from "@app/tests/fakeTabEnvironment.ts";
 import {
   APP_LOCK_NAME,
+  type AppLockManager,
   createTabLock,
   STEAL_AFTER_MS,
   TAB_CHANNEL_NAME,
@@ -155,6 +156,52 @@ describe("tabLock", () => {
 
     expect(a.onRelinquish).toHaveBeenCalledTimes(1);
     expect(a.lock.getStatus()).toBe("other");
+  });
+
+  it("does not tear itself down when a late grant and the steal both arrive", async () => {
+    const hub = createFakeChannelHub();
+    const requests: Array<{
+      options: LockOptions;
+      callback: (lock: Lock | null) => Promise<unknown>;
+      resolve: (value: unknown) => void;
+      reject: (reason: unknown) => void;
+    }> = [];
+    const locks: AppLockManager = {
+      request: (_name, options, callback) =>
+        new Promise((resolve, reject) => {
+          requests.push({ options, callback, resolve, reject });
+        }),
+    };
+    const onRelinquish = vi.fn(async () => {});
+    const lock = createTabLock({
+      locks,
+      openChannel: (name) => hub.open(name),
+      onRelinquish,
+    });
+    lock.start();
+    const [initial] = requests;
+    if (!initial) throw new Error("no initial request");
+    void initial.callback(null);
+    await flush();
+    expect(lock.getStatus()).toBe("other");
+
+    lock.takeOver();
+    const normal = requests[1];
+    if (!normal) throw new Error("no takeover request");
+    vi.advanceTimersByTime(STEAL_AFTER_MS);
+    const steal = requests[2];
+    if (!steal) throw new Error("no steal request");
+    const late = normal.callback({ name: APP_LOCK_NAME, mode: "exclusive" });
+    void steal.callback({ name: APP_LOCK_NAME, mode: "exclusive" });
+    await flush();
+    expect(lock.getStatus()).toBe("owner");
+
+    normal.reject(new DOMException("stolen", "AbortError"));
+    await late;
+    await flush();
+
+    expect(lock.getStatus()).toBe("owner");
+    expect(onRelinquish).not.toHaveBeenCalled();
   });
 
   it("ignores takeover requests while not the owner", async () => {

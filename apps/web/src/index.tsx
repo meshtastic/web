@@ -11,6 +11,7 @@ import { router } from "@app/routes.tsx";
 import { TabLockGate } from "@components/TabLockGate.tsx";
 import { meshRegistry } from "@core/kmp/registry.ts";
 import { useAppStore } from "@core/stores";
+import { resumeStorageDb } from "@core/sdkStorage.ts";
 import { createBrowserTabLock } from "@core/tabLock.ts";
 import { disconnectAllConnections } from "@app/pages/Connections/useConnections.ts";
 import { MeshRegistryProvider } from "@core/kmp/hooks";
@@ -25,6 +26,9 @@ declare module "@tanstack/react-router" {
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);
 const tabLock = createBrowserTabLock(disconnectAllConnections);
+tabLock.subscribe(() => {
+  if (tabLock.getStatus() === "owner") resumeStorageDb();
+});
 tabLock.start();
 
 function IndexPage() {

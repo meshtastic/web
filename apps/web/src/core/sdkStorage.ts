@@ -17,8 +17,14 @@ const log = createLogger("sdkStorage");
  * stay fast and headless-safe.
  */
 let dbPromise: Promise<OpenedSqlocalDb> | undefined;
+let relinquished = false;
 
 export function getStorageDb(): Promise<OpenedSqlocalDb> {
+  if (relinquished) {
+    return Promise.reject(
+      new Error("storage was handed to another tab; not reopening"),
+    );
+  }
   if (!dbPromise) {
     log.debug("getStorageDb: creating sqlocal DB", { path: "meshtastic.db" });
     const t0 = Date.now();
@@ -49,6 +55,7 @@ export function getStorageDb(): Promise<OpenedSqlocalDb> {
  * logged, not thrown: the caller is giving the app away and must finish.
  */
 export async function closeStorageDb(): Promise<void> {
+  relinquished = true;
   const pending = dbPromise;
   if (!pending) return;
   dbPromise = undefined;
@@ -62,6 +69,11 @@ export async function closeStorageDb(): Promise<void> {
       message: err instanceof Error ? err.message : String(err),
     });
   }
+}
+
+/** This tab owns the app again: `getStorageDb()` may open the database. */
+export function resumeStorageDb(): void {
+  relinquished = false;
 }
 
 export const coordinator = new MultiTabCoordinator();

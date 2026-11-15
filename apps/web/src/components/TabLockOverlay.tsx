@@ -3,16 +3,22 @@ import { useTranslation } from "react-i18next";
 
 export interface TabLockOverlayProps {
   claiming: boolean;
+  /** The lock has not been answered yet: nothing to act on. */
+  pending?: boolean;
   onUseHere: () => void;
 }
 
-export function TabLockOverlay({ claiming, onUseHere }: TabLockOverlayProps) {
+export function TabLockOverlay({
+  claiming,
+  pending = false,
+  onUseHere,
+}: TabLockOverlayProps) {
   const { t } = useTranslation("ui");
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    buttonRef.current?.focus();
-  }, []);
+    if (!pending) buttonRef.current?.focus();
+  }, [pending]);
 
   return (
     <div
@@ -38,7 +44,7 @@ export function TabLockOverlay({ claiming, onUseHere }: TabLockOverlayProps) {
         <button
           ref={buttonRef}
           type="button"
-          disabled={claiming}
+          disabled={claiming || pending}
           onClick={onUseHere}
           className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md bg-primary px-4 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
