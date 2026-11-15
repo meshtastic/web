@@ -70,7 +70,15 @@ class MeshtasticClient internal constructor(
 
     val connectionState: ConnectionStateJs get() = client.connection.value.toJs(maxAttempts)
 
-    val myNodeNum: Int? get() = client.ownNode.value?.num
+    /** The local node number as an unsigned value, from the handshake's `my_info` or the own node. */
+    val myNodeNum: Double?
+        get() {
+            val num = client.configBundle.value?.myInfo?.my_node_num?.takeIf { it != 0 } ?: client.ownNode.value?.num
+            return num?.toUInt()?.toDouble()
+        }
+
+    /** The local node's `NodeInfo` as the SDK holds it, encoded; null before the handshake names it. */
+    val ownNode: Uint8Array? get() = client.ownNode.value?.encodeJs()
 
     fun onConnectionState(cb: (ConnectionStateJs) -> Unit): () -> Unit =
         client.connection.onEach { cb(it.toJs(maxAttempts)) }.subscribe()

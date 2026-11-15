@@ -104,6 +104,58 @@ function connected(): { kmp: FakeKmpClient; session: MeshSession } {
 }
 
 describe("MeshSession", () => {
+  it("resolves the own node from the SDK's state when its handshake frames did not reach the web", () => {
+    const kmp = new FakeKmpClient();
+    const session = new MeshSession(kmp);
+    kmp.myNodeNum = ME;
+    kmp.ownNode = toBinary(
+      Protobuf.Mesh.NodeInfoSchema,
+      create(Protobuf.Mesh.NodeInfoSchema, {
+        num: ME,
+        user: { longName: "Me", shortName: "ME" },
+      }),
+    );
+    kmp.setState(state("configuring"));
+
+    kmp.setState(state("connected"));
+
+    expect(session.device.myNodeNum.peek()).toBe(ME);
+    expect(session.nodes.byNum(ME)?.user?.longName).toBe("Me");
+  });
+
+  it("fills in the own node's user from the owner the SDK fetched at Ready", () => {
+    const { kmp, session } = connected();
+    const owner = create(Protobuf.Admin.AdminMessageSchema, {
+      payloadVariant: {
+        case: "getOwnerResponse",
+        value: create(Protobuf.Mesh.UserSchema, {
+          id: "!0a0b0c0d",
+          longName: "Owner",
+          shortName: "OWN",
+        }),
+      },
+    });
+    kmp.emitPacket(
+      toBinary(
+        Protobuf.Mesh.MeshPacketSchema,
+        create(Protobuf.Mesh.MeshPacketSchema, {
+          from: ME,
+          to: ME,
+          id: 7,
+          payloadVariant: {
+            case: "decoded",
+            value: create(Protobuf.Mesh.DataSchema, {
+              portnum: Protobuf.Portnums.PortNum.ADMIN_APP,
+              payload: toBinary(Protobuf.Admin.AdminMessageSchema, owner),
+            }),
+          },
+        }),
+      ),
+    );
+
+    expect(session.nodes.byNum(ME)?.user?.longName).toBe("Owner");
+  });
+
   it("reads the handshake into the device view and the progress counters", () => {
     const kmp = new FakeKmpClient();
     const session = new MeshSession(kmp);

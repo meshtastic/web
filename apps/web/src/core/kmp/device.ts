@@ -125,6 +125,13 @@ export class DeviceClient {
     }
   }
 
+  /** Names the local node from the SDK's state when no `my_info` frame did. */
+  applyMyNodeNum(myNodeNum: number): void {
+    if (this.myNodeNumStore.peek() === undefined) {
+      this.myNodeNumStore.value = myNodeNum;
+    }
+  }
+
   applyMyNodeInfo(info: Protobuf.Mesh.MyNodeInfo): void {
     this.myNodeInfoStore.value = info;
     this.myNodeNumStore.value = info.myNodeNum;

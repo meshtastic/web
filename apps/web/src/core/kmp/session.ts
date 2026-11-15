@@ -362,6 +362,7 @@ export class MeshSession {
           received:
             current.phase === "idle" ? { ...EMPTY_COUNTERS } : current.received,
         };
+        this.adoptSdkIdentity();
         return;
       }
       default:
@@ -381,6 +382,27 @@ export class MeshSession {
         [field]: typeof value === "number" ? value + 1 : true,
       },
     };
+  }
+
+  /**
+   * The SDK keeps the handshake's own-node state itself; a `my_info` or own
+   * `node_info` frame the web failed to decode must not leave the session
+   * without its node.
+   */
+  private adoptSdkIdentity(): void {
+    const myNodeNum = this.kmp.myNodeNum;
+    if (!myNodeNum || myNodeNum <= 0) return;
+    this.device.applyMyNodeNum(myNodeNum);
+    if (this.nodes.byNum(myNodeNum)) return;
+    const own = this.kmp.ownNode;
+    if (own) {
+      this.nodes.applyChange({
+        kind: "added",
+        node: own,
+        nodes: null,
+        nodeNum: myNodeNum,
+      });
+    }
   }
 
   private handleFromRadio(bytes: Uint8Array): void {
@@ -550,10 +572,11 @@ export class MeshSession {
             data.payload,
           );
           const response = admin.payloadVariant;
-          if (
-            response.case === "getDeviceMetadataResponse" &&
-            (meta.from === 0 || meta.from === this.myNodeNum)
-          ) {
+          const fromSelf = meta.from === 0 || meta.from === this.myNodeNum;
+          if (response.case === "getOwnerResponse" && fromSelf) {
+            this.nodes.patch(this.myNodeNum, { user: response.value });
+          }
+          if (response.case === "getDeviceMetadataResponse" && fromSelf) {
             this.device.applyMetadata(response.value);
             this.events.onDeviceMetadataPacket.dispatch({
               from: meta.from,

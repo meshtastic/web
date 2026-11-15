@@ -64,6 +64,7 @@ export class FakeAdmin implements AdminJs {
 export class FakeKmpClient implements MeshtasticClient {
   connectionState: ConnectionStateJs = state("disconnected");
   myNodeNum: number | null = null;
+  ownNode: Uint8Array | null = null;
   readonly texts: Array<{
     text: string;
     to: number;

@@ -1,8 +1,11 @@
 // @vitest-environment node
+import { create, toBinary } from "@bufbuild/protobuf";
+import { Protobuf } from "@core/protobuf.ts";
 import type { ConnectionStateJs } from "@meshtastic/sdk-kmp";
 import {
   FakeRadio,
   FakeSerialPort,
+  framed,
   installSerial,
   uninstallBrowserDevices,
 } from "@app/tests/fakeBrowserDevices.ts";
@@ -159,6 +162,54 @@ describe("createSerialClient (Kotlin facade over a fake navigator.serial)", () =
       );
     }, 15_000);
   }
+
+  it("decodes frames the port delivers as views into a larger buffer, several per chunk and split", async () => {
+    const radio = new FakeRadio();
+    const port = new FakeSerialPort(ids, radio);
+    installSerial([port]);
+    const client = await createSerialClient(ids);
+    clients.push(client);
+    const session = new MeshSession(client);
+    const seen: string[] = [];
+    session.events.onFromRadio.subscribe((frame) => {
+      seen.push(frame.payloadVariant.case ?? "none");
+    });
+    await client.connect();
+    await connected(client);
+    seen.length = 0;
+
+    const first = toBinary(
+      Protobuf.Mesh.FromRadioSchema,
+      create(Protobuf.Mesh.FromRadioSchema, {
+        payloadVariant: {
+          case: "nodeInfo",
+          value: create(Protobuf.Mesh.NodeInfoSchema, {
+            num: 0x2000,
+            user: { longName: "x".repeat(200) },
+          }),
+        },
+      }),
+    );
+    const second = toBinary(
+      Protobuf.Mesh.FromRadioSchema,
+      create(Protobuf.Mesh.FromRadioSchema, {
+        payloadVariant: { case: "configCompleteId", value: 5 },
+      }),
+    );
+    const wire = new Uint8Array([...framed(first), ...framed(second)]);
+    const padded = new Uint8Array(wire.length + 32);
+    padded.set(wire, 16);
+    const view = padded.subarray(16, 16 + wire.length);
+    port.push(view.subarray(0, 100));
+    port.push(view.subarray(100, wire.length - 3));
+    port.push(view.subarray(wire.length - 3));
+
+    await vi.waitFor(() =>
+      expect(seen).toEqual(["nodeInfo", "configCompleteId"]),
+    );
+    expect(session.nodes.byNum(0x2000)?.user?.longName).toBe("x".repeat(200));
+    session.close();
+  }, 15_000);
 
   it("hands the session its own node and channels again after an auto-reconnect", async () => {
     const radio = new FakeRadio(0x0a0b0c0d, { nodes: 3, channels: 2 });
