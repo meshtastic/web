@@ -69,21 +69,9 @@ importers:
       '@meshtastic/protobufs':
         specifier: workspace:*
         version: link:../../packages/protobufs
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../../packages/sdk
       '@meshtastic/sdk-kmp':
         specifier: workspace:*
         version: link:../../packages/sdk-kmp
-      '@meshtastic/sdk-react':
-        specifier: workspace:*
-        version: link:../../packages/sdk-react
-      '@meshtastic/sdk-storage-sqlocal':
-        specifier: workspace:*
-        version: link:../../packages/sdk-storage-sqlocal
-      '@meshtastic/transport-http':
-        specifier: workspace:*
-        version: link:../../packages/transport-http
       '@noble/curves':
         specifier: ^2.4.0
         version: 2.4.0
@@ -183,6 +171,9 @@ importers:
       crypto-random-string:
         specifier: ^6.0.0
         version: 6.0.0
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0)
       i18next:
         specifier: ^26.4.5
         version: 26.4.5(typescript@7.0.2)
@@ -231,6 +222,9 @@ importers:
       rfc4648:
         specifier: ^1.5.4
         version: 1.5.4
+      sqlocal:
+        specifier: ^0.18.0
+        version: 0.18.0(drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0))(react@19.3.1)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
       tslog:
         specifier: ^5.2.0
         version: 5.2.0
@@ -283,6 +277,9 @@ importers:
       '@types/serviceworker':
         specifier: ^0.0.203
         version: 0.0.203
+      '@types/sql.js':
+        specifier: ^1.4.11
+        version: 1.4.11
       '@types/w3c-web-serial':
         specifier: ^1.0.8
         version: 1.0.8
@@ -307,6 +304,9 @@ importers:
       oxlint:
         specifier: ^1.88.0
         version: 1.88.0
+      sql.js:
+        specifier: ^1.15.0
+        version: 1.15.0
       tailwind-merge:
         specifier: ^3.7.0
         version: 3.7.0
