@@ -13,11 +13,11 @@ import {
 } from "@core/kmp/connectionState.ts";
 import { kmpTransport } from "@core/kmp/transport.ts";
 import { toast } from "@core/hooks/useToast.ts";
+import { createLogger } from "@core/log.ts";
+import { MIN_FIRMWARE_VERSION } from "@core/utils/firmware.ts";
 import {
-  createLogger,
   DeviceStatusEnum,
   FirmwareTooOldError,
-  MIN_FIRMWARE_VERSION,
   type Transport,
 } from "@meshtastic/sdk";
 import { t } from "i18next";

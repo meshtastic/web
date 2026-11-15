@@ -1,6 +1,7 @@
 import type { Connection } from "@core/stores/deviceStore/types";
 import { httpErrorMessage, testHttpReachable } from "@pages/Connections/utils";
-import { createLogger, type Transport } from "@meshtastic/sdk";
+import { createLogger } from "@core/log.ts";
+import type { Transport } from "@meshtastic/sdk";
 import {
   BluetoothConnectError,
   TransportWebBluetooth,

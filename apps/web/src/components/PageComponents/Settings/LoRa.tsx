@@ -24,7 +24,7 @@ import {
   getLicensedOnlyRegions,
   pickEnumValues,
 } from "@core/utils/loraPresets.ts";
-import { firmwareAtLeast } from "@meshtastic/sdk";
+import { firmwareAtLeast } from "@core/utils/firmware.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { useEffect, useMemo, useState } from "react";

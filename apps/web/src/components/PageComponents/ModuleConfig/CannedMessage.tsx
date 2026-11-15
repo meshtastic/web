@@ -9,7 +9,7 @@ import {
 } from "@components/Form/DynamicForm.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
-import { firmwareAtLeast } from "@meshtastic/sdk";
+import { firmwareAtLeast } from "@core/utils/firmware.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useCannedMessages, useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { useMemo } from "react";

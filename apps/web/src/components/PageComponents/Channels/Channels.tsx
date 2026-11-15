@@ -2,7 +2,7 @@ import { BeaconOffers } from "@app/components/PageComponents/Channels/BeaconOffe
 import { Button } from "@components/UI/Button.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
-import { firmwareAtLeast } from "@meshtastic/sdk";
+import { firmwareAtLeast } from "@core/utils/firmware.ts";
 import type { Protobuf } from "@core/protobuf.ts";
 import { useChannels } from "@meshtastic/sdk-react";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";

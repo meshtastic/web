@@ -1,6 +1,7 @@
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
 import type { ConnectionId } from "@core/stores/deviceStore/types";
-import { createLogger, MeshDevice, type Transport } from "@meshtastic/sdk";
+import { createLogger } from "@core/log.ts";
+import { MeshDevice, type Transport } from "@meshtastic/sdk";
 import {
   SqlocalDraftRepository,
   SqlocalMessageRepository,

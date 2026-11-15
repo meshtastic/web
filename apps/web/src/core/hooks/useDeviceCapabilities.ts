@@ -1,5 +1,5 @@
 import { useDevice } from "@core/stores";
-import { firmwareAtLeast } from "@meshtastic/sdk";
+import { firmwareAtLeast } from "@core/utils/firmware.ts";
 import type { Protobuf } from "@core/protobuf.ts";
 import { useActiveClient } from "@meshtastic/sdk-react";
 import { useSignal } from "@core/kmp/hooks";

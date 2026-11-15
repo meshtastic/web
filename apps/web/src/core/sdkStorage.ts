@@ -1,4 +1,4 @@
-import { createLogger } from "@meshtastic/sdk";
+import { createLogger } from "@core/log.ts";
 import {
   MultiTabCoordinator,
   type OpenedSqlocalDb,
