@@ -3,7 +3,7 @@ import { meshRegistry } from "@core/kmp/registry.ts";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { Protobuf, Types } from "@core/protobuf.ts";
-import { type Draft, produce } from "immer";
+import { enableMapSet, produce, type Draft } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import {
   type PersistOptions,
@@ -19,6 +19,8 @@ import type {
   ValidModuleConfigType,
   WaypointWithMetadata,
 } from "./types.ts";
+
+enableMapSet();
 
 const IDB_KEY_NAME = "meshtastic-device-store";
 const CURRENT_STORE_VERSION = 0;

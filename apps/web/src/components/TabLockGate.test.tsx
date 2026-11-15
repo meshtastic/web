@@ -102,4 +102,27 @@ describe("TabLockGate", () => {
     expect(await within(first.container).findByRole("dialog")).toBeTruthy();
     expect(within(first.container).queryByText("owner A")).toBeNull();
   });
+
+  it("paints the overlay in the stored theme before the app mounts", async () => {
+    localStorage.setItem("theme", "dark");
+    document.documentElement.removeAttribute("data-theme");
+    const { tab, App } = environment();
+    const a = tab();
+    render(
+      <TabLockGate lock={a.lock}>
+        <App />
+      </TabLockGate>,
+    );
+    await screen.findByText("app");
+    const b = tab();
+    render(
+      <TabLockGate lock={b.lock}>
+        <App />
+      </TabLockGate>,
+    );
+    await screen.findByRole("dialog");
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    localStorage.removeItem("theme");
+  });
 });

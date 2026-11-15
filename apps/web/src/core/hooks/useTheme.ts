@@ -4,16 +4,27 @@ type Theme = "light" | "dark" | "system";
 
 const THEME_CHANGE_EVENT = "meshtastic:theme-change";
 
-export function useTheme() {
-  const getSystemTheme = () =>
-    globalThis.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+const getSystemTheme = (): Theme =>
+  globalThis.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 
-  const getStoredPreference = useCallback(
-    (): Theme => (localStorage.getItem("theme") as Theme) || "system",
-    [],
+const readStoredPreference = (): Theme => {
+  const stored = localStorage.getItem("theme");
+  return stored === "light" || stored === "dark" ? stored : "system";
+};
+
+/** Puts the stored (or system) theme on the document, for anything painted before `useTheme` runs. */
+export function applyStoredTheme(): void {
+  const preference = readStoredPreference();
+  document.documentElement.setAttribute(
+    "data-theme",
+    preference === "system" ? getSystemTheme() : preference,
   );
+}
+
+export function useTheme() {
+  const getStoredPreference = useCallback(readStoredPreference, []);
 
   const [preference, setPreference] = useState<Theme>(() =>
     typeof window !== "undefined" ? getStoredPreference() : "light",

@@ -3,7 +3,6 @@ import "@app/index.css";
 
 // Import feature flags and dev overrides
 import "@core/services/dev-overrides.ts";
-import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
@@ -29,7 +28,6 @@ const tabLock = createBrowserTabLock(disconnectAllConnections);
 tabLock.start();
 
 function IndexPage() {
-  enableMapSet();
   const appStore = useAppStore();
   const translation = useTranslation();
 
