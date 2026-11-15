@@ -116,6 +116,46 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
     await act(() => result.current.disconnect(conn.id));
   });
 
+  it("connects a click through the port found when the drawer refreshed, without the picker", async () => {
+    const radio = fakePort(ids);
+    const requestPort = installSerial([radio], radio);
+    const { result, rerender } = renderHook(() => useConnections());
+    const conn = result.current.addConnection({
+      type: "serial",
+      name: "Serial",
+      ...ids,
+    });
+    rerender();
+
+    await act(() => result.current.refreshStatuses());
+    await act(() => result.current.connect(conn.id, { allowPrompt: true }));
+
+    expect(requestPort).not.toHaveBeenCalled();
+    expect(kmp.serialTargets).toEqual([{ port: radio, ...ids }]);
+    await act(() => result.current.disconnect(conn.id));
+  });
+
+  it("connects a click through the Bluetooth device found when the drawer refreshed, without the picker", async () => {
+    const radio = new FakeBluetoothDevice("radio-1");
+    const requestDevice = installBluetooth([radio], radio);
+    const { result, rerender } = renderHook(() => useConnections());
+    const conn = result.current.addConnection({
+      type: "bluetooth",
+      name: "Radio",
+      deviceId: "radio-1",
+    });
+    rerender();
+
+    await act(() => result.current.refreshStatuses());
+    await act(() => result.current.connect(conn.id, { allowPrompt: true }));
+
+    expect(requestDevice).not.toHaveBeenCalled();
+    expect(kmp.bluetoothTargets).toEqual([
+      { device: radio, deviceId: "radio-1" },
+    ]);
+    await act(() => result.current.disconnect(conn.id));
+  });
+
   it("shows the port picker on a click and saves the picked ids", async () => {
     const newIds = { usbVendorId: 0x10c4, usbProductId: 0xea60 };
     const picked = fakePort(newIds);

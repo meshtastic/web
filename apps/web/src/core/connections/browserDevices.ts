@@ -115,6 +115,8 @@ export type ProbeResult = {
   status: "online" | "configured" | "disconnected" | "error";
   error?: string;
   errorKind?: Connection["errorKind"];
+  port?: SerialPort;
+  device?: BluetoothDevice;
 };
 
 /**
@@ -144,8 +146,10 @@ export async function probeConnection(conn: Connection): Promise<ProbeResult> {
     }
     case "bluetooth": {
       try {
-        const known = await knownBluetoothDevice(conn);
-        return { status: known ? "online" : "disconnected" };
+        const device = await knownBluetoothDevice(conn);
+        return device
+          ? { status: "online", device }
+          : { status: "disconnected" };
       } catch {
         return { status: "disconnected" };
       }
@@ -156,9 +160,15 @@ export async function probeConnection(conn: Connection): Promise<ProbeResult> {
         return { status: "disconnected" };
       }
       try {
-        const ports = await serial.getPorts();
-        const permitted = ports.some((port) => matchesSavedPort(port, conn));
-        return { status: permitted ? "online" : "disconnected" };
+        const matching = (await serial.getPorts()).filter((port) =>
+          matchesSavedPort(port, conn),
+        );
+        if (matching.length === 0) {
+          return { status: "disconnected" };
+        }
+        return matching.length === 1
+          ? { status: "online", port: matching[0] }
+          : { status: "online" };
       } catch {
         return { status: "disconnected" };
       }

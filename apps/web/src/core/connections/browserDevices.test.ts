@@ -156,7 +156,16 @@ describe("probeConnection", () => {
   });
 
   it("reports a permitted serial port as online", async () => {
-    installSerial([fakePort(ids)]);
+    const radio = fakePort(ids);
+    installSerial([radio]);
+    await expect(probeConnection(savedSerial)).resolves.toEqual({
+      status: "online",
+      port: radio,
+    });
+  });
+
+  it("hands over no port when several permitted ports share the saved ids", async () => {
+    installSerial([fakePort(ids), fakePort(ids)]);
     await expect(probeConnection(savedSerial)).resolves.toEqual({
       status: "online",
     });
@@ -164,9 +173,9 @@ describe("probeConnection", () => {
 
   it("reports a known Bluetooth device as online and an unknown one as disconnected", async () => {
     installBluetooth(["radio-1"]);
-    await expect(probeConnection(savedBluetooth)).resolves.toEqual({
-      status: "online",
-    });
+    const probed = await probeConnection(savedBluetooth);
+    expect(probed.status).toBe("online");
+    expect(probed.device?.id).toBe("radio-1");
     const other: Connection = { ...savedBluetooth, deviceId: "radio-2" };
     await expect(probeConnection(other)).resolves.toEqual({
       status: "disconnected",

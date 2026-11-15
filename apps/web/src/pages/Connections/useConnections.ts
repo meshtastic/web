@@ -502,7 +502,14 @@ export function useConnections() {
     );
     await Promise.all(
       candidates.map(async (c) => {
-        const { status, error, errorKind } = await probeConnection(c);
+        const { status, error, errorKind, port, device } =
+          await probeConnection(c);
+        if (port) {
+          heldSerialPorts.set(c.id, port);
+        }
+        if (device) {
+          heldBluetoothDevices.set(c.id, device);
+        }
         updateSavedConnection(c.id, { status, error, errorKind });
       }),
     );
