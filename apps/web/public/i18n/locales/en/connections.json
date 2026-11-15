@@ -89,7 +89,11 @@
     "httpsNotReachable": "HTTPS endpoint not reachable. Check that the device is online.",
     "httpNotReachable": "HTTP endpoint not reachable (may be blocked by CORS or a network issue)",
     "openInNewTab": "Open in new tab →",
-    "firmwareTooOld": "Firmware {{version}} is too old for the web client. Update the radio to {{minimum}} or newer."
+    "firmwareTooOld": "Firmware {{version}} is too old for the web client. Update the radio to {{minimum}} or newer.",
+    "localNetworkDenied": "Chrome blocked local network access for this site. Click the site-info icon in the address bar, allow Local network, then Connect.",
+    "localNetworkPrompt": "Chrome needs your permission to reach the local network. Click Connect to allow it.",
+    "handshakeTimeout": "The radio stopped responding during the handshake. It may be in CLI or bootloader mode, or its firmware isn't answering config requests.",
+    "reconnectFailed": "Could not reconnect after {{attempts}} attempts."
   },
   "httpTest": {
     "certNotTrusted": "Certificate not trusted. <0>Open in new tab</0> and accept the warning, then test again."

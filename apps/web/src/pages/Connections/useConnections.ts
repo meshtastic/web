@@ -4,6 +4,14 @@ import {
   openTransport,
   probeConnection,
 } from "@app/core/connections/transports.ts";
+import { createHttpClient } from "@core/kmp/client.ts";
+import {
+  connectFailure,
+  reconnectAttempt,
+  toConnectionStatus,
+} from "@core/kmp/connectionState.ts";
+import { isKmpEnabled } from "@core/kmp/flag.ts";
+import { kmpTransport } from "@core/kmp/transport.ts";
 import { toast } from "@core/hooks/useToast.ts";
 import {
   createLogger,
@@ -11,6 +19,7 @@ import {
   FirmwareTooOldError,
   HandshakeTimeoutError,
   MIN_FIRMWARE_VERSION,
+  type Transport,
 } from "@meshtastic/sdk";
 import { t } from "i18next";
 
@@ -33,6 +42,8 @@ import { useCallback, useEffect, useRef } from "react";
 //   - configSubscriptions: handshake status / reboot unsubscribers.
 const cachedTransports = new Map<ConnectionId, BluetoothDevice | SerialPort>();
 const configSubscriptions = new Map<ConnectionId, () => void>();
+// Kotlin SDK connection-state subscriptions for connections it owns.
+const kmpSubscriptions = new Map<ConnectionId, () => void>();
 // Handshake attempts per connection. A stalled handshake is retried by
 // reopening the transport with backoff, as the Android app does, instead of
 // re-sending want_config in the same session.
@@ -86,6 +97,8 @@ export function useConnections() {
       { keepHandle = false }: { keepHandle?: boolean } = {},
     ) => {
       log.debug("teardown: enter", { id });
+      kmpSubscriptions.get(id)?.();
+      kmpSubscriptions.delete(id);
       configSubscriptions.get(id)?.();
       configSubscriptions.delete(id);
 
@@ -148,7 +161,7 @@ export function useConnections() {
   const setupMeshDevice = useCallback(
     async (
       id: ConnectionId,
-      transport: Awaited<ReturnType<typeof openTransport>>["transport"],
+      transport: Transport,
       bluetoothDevice?: BluetoothDevice,
       serialPort?: SerialPort,
     ): Promise<number> => {
@@ -236,6 +249,10 @@ export function useConnections() {
         (s) => {
           if (s === DeviceStatusEnum.DeviceConfigured)
             markConfigured("device.status");
+          // The Kotlin SDK reconnected the transport; the next handshake
+          // must be able to mark the connection configured again.
+          if (s === DeviceStatusEnum.DeviceReconnecting)
+            configuredHandled = false;
         },
       );
       // Catch-up: signal subscribe doesn't fire for the current value, so
@@ -334,6 +351,84 @@ export function useConnections() {
     ],
   );
 
+  /**
+   * Connects over the device HTTP API through the Kotlin SDK, which owns
+   * the handshake and reconnects. The existing MeshDevice is fed from the
+   * SDK's frames so the rest of the app is unchanged.
+   */
+  const connectThroughKmp = useCallback(
+    async (id: ConnectionId, url: string, allowPrompt: boolean) => {
+      const client = await createHttpClient(url, allowPrompt);
+      let reconnecting = false;
+      kmpSubscriptions.get(id)?.();
+      kmpSubscriptions.set(
+        id,
+        client.onConnectionState((state) => {
+          const saved = useDeviceStore
+            .getState()
+            .savedConnections.find((c) => c.id === id);
+          if (!saved) return;
+          const reconnect = reconnectAttempt(state);
+          if (reconnect) {
+            reconnecting = true;
+            log.warn("kmp: reconnecting", { id, ...reconnect });
+            updateSavedConnection(id, {
+              status: "connecting",
+              reconnect,
+              error: undefined,
+              errorKind: undefined,
+            });
+            return;
+          }
+          if (!reconnecting) return;
+          if (state.kind === "connected") {
+            reconnecting = false;
+            log.info("kmp: reconnected, re-running the handshake", { id });
+            updateSavedConnection(id, {
+              status: "configuring",
+              reconnect: undefined,
+            });
+            const device = saved.meshDeviceId
+              ? useDeviceStore.getState().getDevice(saved.meshDeviceId)
+              : undefined;
+            device?.connection?.configure().catch((error: unknown) => {
+              updateSavedConnection(id, connectFailure(error));
+            });
+          } else if (state.kind === "disconnected") {
+            reconnecting = false;
+            log.error("kmp: reconnect attempts exhausted", { id });
+            updateSavedConnection(id, {
+              status: "error",
+              reconnect: undefined,
+              error: t("connections:errors.reconnectFailed", {
+                attempts: state.maxAttempts,
+              }),
+              errorKind: "network",
+            });
+          } else {
+            updateSavedConnection(id, { status: toConnectionStatus(state) });
+          }
+        }),
+      );
+      try {
+        await client.connect();
+        await setupMeshDevice(id, kmpTransport(client));
+        return true;
+      } catch (error) {
+        log.error("kmp: connect failed", {
+          id,
+          name: error instanceof Error ? error.name : undefined,
+          message: error instanceof Error ? error.message : String(error),
+        });
+        kmpSubscriptions.get(id)?.();
+        kmpSubscriptions.delete(id);
+        updateSavedConnection(id, connectFailure(error));
+        return false;
+      }
+    },
+    [setupMeshDevice, updateSavedConnection],
+  );
+
   const connect = useCallback(
     async (id: ConnectionId, opts?: { allowPrompt?: boolean }) => {
       // Read from the live store, not the memoized `connections` closure: callers
@@ -357,6 +452,9 @@ export function useConnections() {
         allowPrompt: !!opts?.allowPrompt,
       });
       updateStatus(id, "connecting");
+      if (conn.type === "http" && isKmpEnabled()) {
+        return connectThroughKmp(conn.id, conn.url, opts?.allowPrompt ?? false);
+      }
       try {
         const cached = cachedTransports.get(id);
         const result = await openTransport(conn, {
@@ -402,7 +500,7 @@ export function useConnections() {
         return false;
       }
     },
-    [updateStatus, setupMeshDevice],
+    [updateStatus, setupMeshDevice, connectThroughKmp],
   );
 
   useEffect(() => {

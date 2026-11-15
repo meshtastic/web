@@ -1,6 +1,6 @@
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
 import type { ConnectionId } from "@core/stores/deviceStore/types";
-import { createLogger, MeshDevice } from "@meshtastic/sdk";
+import { createLogger, MeshDevice, type Transport } from "@meshtastic/sdk";
 import {
   SqlocalDraftRepository,
   SqlocalMessageRepository,
@@ -61,7 +61,7 @@ export const UNKNOWN_NODE_SCOPE = -1;
 export async function buildMeshDevice(
   connectionId: ConnectionId,
   deviceId: number,
-  transport: AnyTransport,
+  transport: Transport,
   nodeNum?: number,
 ): Promise<{ meshDevice: MeshDevice; persistent: boolean }> {
   log.debug("buildMeshDevice: enter", { connectionId, deviceId, nodeNum });
