@@ -30,7 +30,7 @@ vi.mock("@core/hooks/useLockdown.ts", () => ({
   useLockdown: () => ({ client: undefined, status: undefined }),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({
     radio: { value: {} },
     setRadioSection: vi.fn(),

@@ -23,7 +23,7 @@ import { useDevice } from "@core/stores";
 import type { BeaconJoinPlan } from "@core/utils/beaconJoin.ts";
 import { channelSetFromUrl } from "@core/utils/channelUrl.ts";
 import { Protobuf } from "@core/protobuf.ts";
-import { useConfigEditor } from "@meshtastic/sdk-react";
+import { useConfigEditor } from "@core/kmp/hooks";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";

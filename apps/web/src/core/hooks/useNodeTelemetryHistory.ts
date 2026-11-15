@@ -1,5 +1,6 @@
 import type { ReadonlySignal, TelemetryReading } from "@meshtastic/sdk";
-import { useActiveClient, useSignal } from "@meshtastic/sdk-react";
+import { useActiveClient } from "@meshtastic/sdk-react";
+import { useSignal } from "@core/kmp/hooks";
 import { useMemo } from "react";
 
 const EMPTY_HISTORY: TelemetryReading[] = [];

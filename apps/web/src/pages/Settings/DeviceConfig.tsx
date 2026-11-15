@@ -7,7 +7,7 @@ import { Power } from "@components/PageComponents/Settings/Power.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import type { ValidConfigType } from "@core/stores";
 import type { Protobuf } from "@core/protobuf.ts";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { dirtyDeviceTabs } from "./dirtySections.ts";

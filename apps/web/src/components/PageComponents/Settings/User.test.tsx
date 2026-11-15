@@ -41,7 +41,7 @@ vi.mock("@core/hooks/useDeviceCapabilities.ts", () => ({
   }),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({
     owner: { value: undefined },
     modules: { value: {} },

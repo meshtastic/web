@@ -22,13 +22,10 @@ import {
   profileContents,
   selectProfileFields,
 } from "@core/utils/profileExport.ts";
-import type { ConfigEditor } from "@meshtastic/sdk";
+import type { ConfigEditor } from "@core/kmp/configEditor.ts";
 import { Protobuf } from "@core/protobuf.ts";
-import {
-  useActiveClient,
-  useConfigEditor,
-  useSignal,
-} from "@meshtastic/sdk-react";
+import { useActiveClient } from "@meshtastic/sdk-react";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { Result } from "better-result";
 import { DownloadIcon, UploadIcon } from "lucide-react";
 import { type ChangeEvent, useMemo, useRef, useState } from "react";

@@ -17,7 +17,8 @@ import {
   nodesToClean,
 } from "@core/utils/cleanNodes.ts";
 import type { Node } from "@meshtastic/sdk";
-import { useActiveClient, useSignal } from "@meshtastic/sdk-react";
+import { useActiveClient } from "@meshtastic/sdk-react";
+import { useSignal } from "@core/kmp/hooks";
 import { EraserIcon } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";

@@ -11,11 +11,7 @@ import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
 import { firmwareAtLeast } from "@meshtastic/sdk";
 import { Protobuf } from "@core/protobuf.ts";
-import {
-  useCannedMessages,
-  useConfigEditor,
-  useSignal,
-} from "@meshtastic/sdk-react";
+import { useCannedMessages, useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useStagedAdminString } from "./useStagedAdminString.ts";

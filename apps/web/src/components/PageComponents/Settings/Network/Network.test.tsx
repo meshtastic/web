@@ -25,7 +25,7 @@ vi.mock("@core/hooks/useDeviceCapabilities.ts", () => ({
   useDeviceCapabilities: () => ({ metadata }),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({ radio: { value: {} }, setRadioSection }),
   useSignal: (signal: { value: unknown }) => signal.value,
 }));

@@ -18,7 +18,7 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
 import { STAGED_FIXED_POSITION } from "@core/utils/stagedAdminKeys.ts";
 import { Protobuf } from "@core/protobuf.ts";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { LocateFixed } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";

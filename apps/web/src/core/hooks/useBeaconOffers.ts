@@ -7,7 +7,8 @@ import {
   planBeaconJoin,
 } from "@core/utils/beaconJoin.ts";
 import type { MeshBeaconOffer } from "@meshtastic/sdk";
-import { useActiveClient, useChannels, useSignal } from "@meshtastic/sdk-react";
+import { useActiveClient, useChannels } from "@meshtastic/sdk-react";
+import { useSignal } from "@core/kmp/hooks";
 import { useCallback, useMemo } from "react";
 
 export interface JoinableBeaconOffer {

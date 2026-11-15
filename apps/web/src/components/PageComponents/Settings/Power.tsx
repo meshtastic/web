@@ -13,7 +13,7 @@ import {
 import type { FieldProps } from "@components/Form/DynamicFormField.tsx";
 import { useDevice } from "@core/stores";
 import type { Protobuf } from "@core/protobuf.ts";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";

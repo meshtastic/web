@@ -1,3 +1,4 @@
+import { editorFor } from "@core/kmp/configEditorIo.ts";
 import { CurrentDeviceContext, useDeviceStore } from "@core/stores";
 import { MeshClient, MeshRegistry } from "@meshtastic/sdk";
 import type { Protobuf } from "@core/protobuf.ts";
@@ -37,6 +38,7 @@ export function renderSettingsForm(
   registry.register(id, client);
   registry.setActive(id);
   const radio = interceptAdminMessages(client);
+  const editor = editorFor(client);
 
   const stored = useDeviceStore.getState().addDevice(id);
   for (const config of device.config ?? []) {
@@ -61,5 +63,5 @@ export function renderSettingsForm(
     </CurrentDeviceContext.Provider>,
   );
 
-  return { client, editor: client.config.editor, radio };
+  return { client, editor, radio };
 }

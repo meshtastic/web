@@ -17,7 +17,7 @@ vi.mock("@core/stores", () => ({
   }),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({
     radio: { value: {} },
     setRadioSection: vi.fn(),

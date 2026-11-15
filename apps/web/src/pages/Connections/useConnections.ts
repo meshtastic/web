@@ -5,6 +5,7 @@ import {
   probeConnection,
 } from "@app/core/connections/transports.ts";
 import { createHttpClient } from "@core/kmp/client.ts";
+import { editorFor } from "@core/kmp/configEditorIo.ts";
 import {
   connectFailure,
   reconnectAttempt,
@@ -184,6 +185,8 @@ export function useConnections() {
       if (meshRegistry.has(id)) meshRegistry.unregister(id);
       meshRegistry.register(id, meshDevice.meshClient);
       meshRegistry.setActive(id);
+      // Created now so it sees the handshake's config, not on first render.
+      editorFor(meshDevice.meshClient);
 
       setSelectedDevice(deviceId);
       device.addConnection(meshDevice);

@@ -14,7 +14,7 @@ import { useDevice } from "@core/stores";
 import { isModuleExcluded } from "@core/utils/excludedModules.ts";
 import { firmwareAtLeast } from "@meshtastic/sdk";
 import { Protobuf } from "@core/protobuf.ts";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
