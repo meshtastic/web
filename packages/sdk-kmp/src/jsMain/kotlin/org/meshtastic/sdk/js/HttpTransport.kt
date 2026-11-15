@@ -14,14 +14,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import okio.ByteString.Companion.toByteString
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
 import org.meshtastic.sdk.Frame
 import org.meshtastic.sdk.RadioTransport
 import org.meshtastic.sdk.TransportIdentity
 import org.meshtastic.sdk.TransportState
-import org.meshtastic.sdk.WireFraming
 import kotlin.js.Promise
 
 internal class HttpTransport(
@@ -71,7 +69,7 @@ internal class HttpTransport(
             val response = request("$baseUrl/api/v1/fromradio?all=false", "GET")
             val buffer = (response.arrayBuffer() as Promise<ArrayBuffer>).await()
             if (buffer.byteLength == 0) return
-            inbound.trySend(Frame(WireFraming.frame(Uint8Array(buffer).toByteArray())))
+            inbound.trySend(Frame(framed(Uint8Array(buffer).toByteArray())))
         }
     }
 
@@ -83,7 +81,7 @@ internal class HttpTransport(
 
     override suspend fun send(frame: Frame) {
         val init = Lna.requestInit(baseUrl, "PUT")
-        init.body = WireFraming.payload(frame.bytes.toByteArray()).toUint8Array()
+        init.body = payloadOf(frame).toUint8Array()
         val response = fetch("$baseUrl/api/v1/toradio", init).await()
         if (response.ok != true) throw ClientException("transport", "toradio ${response.status}")
     }
@@ -96,15 +94,3 @@ internal class HttpTransport(
         return response
     }
 }
-
-private fun WireFraming.frame(payload: ByteArray): okio.ByteString {
-    val framed = ByteArray(HEADER_SIZE + payload.size)
-    framed[0] = MAGIC_0
-    framed[1] = MAGIC_1
-    framed[2] = (payload.size shr 8).toByte()
-    framed[3] = (payload.size and 0xFF).toByte()
-    payload.copyInto(framed, HEADER_SIZE)
-    return framed.toByteString()
-}
-
-private fun WireFraming.payload(framed: ByteArray): ByteArray = framed.copyOfRange(HEADER_SIZE, framed.size)

@@ -24,6 +24,7 @@
   "scripts": {
     "build": "node ./scripts/build.mjs",
     "ensure-dist": "node ./scripts/build.mjs --if-missing",
-    "clean": "rm -rf dist build"
+    "clean": "rm -rf dist build",
+    "test": "./gradlew jsNodeTest --console=plain -q"
   }
 }

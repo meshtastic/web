@@ -6,12 +6,30 @@ The SDK owns all mesh and connection behaviour (handshake, connection state,
 auto-reconnect, node DB, admin); this package owns only the glue:
 
 - `src/jsMain/kotlin/org/meshtastic/sdk/js/Client.kt`: the `@JsExport` surface
-  (`createHttpClient`, `MeshtasticClient`, `ConnectionStateJs`). Only plain
-  objects, `Promise`s, `Uint8Array`s and unsubscribe functions cross into
-  TypeScript; protobuf messages cross as bytes and are decoded with
-  `@meshtastic/protobufs`.
+  (`createHttpClient`, `createSerialClient`, `createBluetoothClient`,
+  `MeshtasticClient`, `ConnectionStateJs`). Only plain objects, `Promise`s,
+  `Uint8Array`s and unsubscribe functions cross into TypeScript; protobuf
+  messages cross as bytes and are decoded with `@meshtastic/protobufs`.
 - Browser transports implementing the SDK's `RadioTransport`: `HttpTransport.kt`
-  (device HTTP API with Chrome Local Network Access handling in `Lna.kt`).
+  (device HTTP API with Chrome Local Network Access handling in `Lna.kt`),
+  `WebSerialTransport.kt` (stream framing from `Framing.kt`) and
+  `WebBluetoothTransport.kt` (the Meshtastic GATT service). Neither prompts:
+  `requestPort` / `requestDevice` are the web client's job, inside a click
+  handler, and the chosen handle is passed to the factory; every automatic
+  connect and reconnect reopens through `navigator.serial.getPorts()` (matched
+  on the saved USB ids) or `navigator.bluetooth.getDevices()`. The SDK's
+  `BleTransport` (Kable) is not used because `transport-ble` has no `js`
+  target in the published artifacts.
+
+## Tests
+
+```bash
+pnpm --filter @meshtastic/sdk-kmp test
+```
+
+runs the `jsTest` suite on Node (`./gradlew jsNodeTest`): the frame assembler
+and both transports against scripted `navigator.serial` / `navigator.bluetooth`
+fakes.
 
 ## Prerequisites
 

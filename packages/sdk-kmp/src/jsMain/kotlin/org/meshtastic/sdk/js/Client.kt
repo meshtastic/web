@@ -176,3 +176,21 @@ class MeshtasticClient internal constructor(transport: RadioTransport, private v
 @JsExport
 fun createHttpClient(url: String, allowPrompt: Boolean = false, maxAttempts: Int = 10): MeshtasticClient =
     MeshtasticClient(HttpTransport(url.trimEnd('/'), allowPrompt), maxAttempts)
+
+/**
+ * A client over Web Serial. `port` is a `SerialPort` picked inside a user
+ * gesture, or null to reopen the permitted port matching the USB ids
+ * without prompting.
+ */
+@JsExport
+fun createSerialClient(port: dynamic, usbVendorId: Int?, usbProductId: Int?, maxAttempts: Int = 10): MeshtasticClient =
+    MeshtasticClient(WebSerialTransport(port, usbVendorId, usbProductId), maxAttempts)
+
+/**
+ * A client over Web Bluetooth. `device` is a `BluetoothDevice` picked inside
+ * a user gesture, or null to look `deviceId` up through `getDevices()`
+ * without prompting.
+ */
+@JsExport
+fun createBluetoothClient(device: dynamic, deviceId: String?, maxAttempts: Int = 10): MeshtasticClient =
+    MeshtasticClient(WebBluetoothTransport(device, deviceId), maxAttempts)

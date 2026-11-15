@@ -7,7 +7,6 @@ import org.meshtastic.sdk.Frame
 import org.meshtastic.sdk.RadioTransport
 import org.meshtastic.sdk.TransportIdentity
 import org.meshtastic.sdk.TransportState
-import org.meshtastic.sdk.WireFraming
 
 internal class TappingTransport(
     private val inner: RadioTransport,
@@ -23,7 +22,7 @@ internal class TappingTransport(
     override suspend fun send(frame: Frame) = inner.send(frame)
 
     override fun frames(): Flow<Frame> = inner.frames().onEach { frame ->
-        val bytes = frame.bytes.toByteArray()
-        if (bytes.size > WireFraming.HEADER_SIZE) tap(bytes.copyOfRange(WireFraming.HEADER_SIZE, bytes.size))
+        val payload = payloadOf(frame)
+        if (payload.isNotEmpty()) tap(payload)
     }
 }

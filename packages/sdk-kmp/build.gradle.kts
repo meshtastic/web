@@ -12,6 +12,7 @@ val sdkVersion = providers.gradleProperty("meshtasticSdkVersion").get()
 kotlin {
     js {
         browser()
+        nodejs()
         binaries.library()
         generateTypeScriptDefinitions()
         useEsModules()
@@ -19,6 +20,9 @@ kotlin {
     sourceSets {
         jsMain.dependencies {
             api("org.meshtastic:sdk-core:$sdkVersion")
+        }
+        jsTest.dependencies {
+            implementation(kotlin("test"))
         }
     }
 }
