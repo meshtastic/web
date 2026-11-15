@@ -1,4 +1,3 @@
-import { SupportBadge } from "@app/components/Badge/SupportedBadge.tsx";
 import { Switch } from "@app/components/UI/Switch.tsx";
 import type {
   ConnectionType,
@@ -9,6 +8,7 @@ import {
   testHttpReachable,
 } from "@app/pages/Connections/utils";
 import { CertificateGuide } from "@components/CertificateGuide.tsx";
+import { cn } from "@core/utils/cn.ts";
 import { useLocalNetworkAccess } from "@core/hooks/useLocalNetworkAccess.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
@@ -39,10 +39,16 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { DialogWrapper } from "../DialogWrapper.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
 
 type TabKey = ConnectionType;
+
+const secondaryButtonClasses =
+  "h-auto min-h-11 gap-2 rounded-xl bg-background px-4 text-foreground ring-1 ring-border ring-inset hover:bg-muted focus:ring-ring dark:bg-background dark:text-foreground dark:hover:bg-muted";
+
+const TAB_KEYS: readonly TabKey[] = ["http", "bluetooth", "serial"];
+const isTabKey = (value: string): value is TabKey =>
+  TAB_KEYS.some((key) => key === value);
 
 /** A .local test slower than this was mostly spent looking the name up. */
 const SLOW_LOCAL_NAME_MS = 2000;
@@ -144,11 +150,11 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
   }
 
   return (
-    <div className="flex flex-col items-start gap-2 bg-red-500 p-4 rounded-md text-sm mt-4">
+    <div className="mt-4 flex flex-col items-start gap-2 rounded-xl bg-destructive/10 p-4 text-sm text-destructive ring-1 ring-destructive/30 ring-inset">
       <div className="flex items-center gap-2 w-full">
-        <AlertCircle size={40} className="mr-2 shrink-0 text-white" />
+        <AlertCircle className="mr-2 size-8 shrink-0" aria-hidden="true" />
         <div className="flex flex-col gap-3">
-          <div className="text-sm text-white">
+          <div className="text-sm">
             {needsFeature && (
               <Trans
                 i18nKey={featureErrors[needsFeature].i18nKey}
@@ -156,7 +162,7 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
                   <Link
                     key="0"
                     href={featureErrors[needsFeature].href}
-                    className="underline hover:text-slate-200 text-white dark:text-white dark:hover:text-slate-300"
+                    className="font-medium text-destructive underline hover:text-destructive/80 dark:text-destructive dark:hover:text-destructive/80"
                   />,
                 ]}
               />
@@ -173,7 +179,7 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
                   "0": (
                     <Link
                       href={featureErrors["Secure Context"].href}
-                      className="underline hover:text-slate-200 text-white dark:text-white dark:hover:text-slate-300"
+                      className="font-medium text-destructive underline hover:text-destructive/80 dark:text-destructive dark:hover:text-destructive/80"
                     />
                   ),
                 }}
@@ -294,22 +300,44 @@ function PickerRow({
       <Label>{label}</Label>
       <div className="flex items-center gap-2">
         <Button
-          variant="subtle"
-          className="gap-2"
+          className={secondaryButtonClasses}
           onClick={onPick}
           disabled={disabled}
         >
           <MousePointerClick className="h-4 w-4" />
           {buttonText}
         </Button>
-        <div className="text-sm text-slate-500 dark:text-slate-400 truncate">
+        <div className="min-w-0 break-words text-sm text-muted-foreground">
           {display}
         </div>
       </div>
       {helper ? (
-        <p className="text-xs text-slate-500 dark:text-slate-400">{helper}</p>
+        <p className="text-sm text-muted-foreground">{helper}</p>
       ) : null}
     </div>
+  );
+}
+
+function SupportPill({
+  supported,
+  labelSupported,
+  labelUnsupported,
+}: {
+  supported: boolean;
+  labelSupported: string;
+  labelUnsupported: string;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-background px-2.5 py-0.5 text-sm font-medium text-muted-foreground ring-1 ring-border ring-inset">
+      <span
+        className={cn(
+          "size-2 rounded-full",
+          supported ? "bg-emerald-500" : "bg-red-500",
+        )}
+        aria-hidden="true"
+      />
+      {supported ? labelSupported : labelUnsupported}
+    </span>
   );
 }
 
@@ -319,15 +347,16 @@ const TAB_META: Array<{ key: TabKey; label: string; Icon: LucideIcon }> = [
   { key: "serial", label: "Serial", Icon: Cable },
 ];
 
-export default function AddConnectionDialog({
-  open = false,
-  onOpenChange = () => {},
-  onSave = async () => {},
+/**
+ * The "Add connection" form: HTTP, Bluetooth and Serial panes with their
+ * reachability test, validation and certificate guide. Rendered as a view
+ * inside the Connections drawer; it resets by unmounting.
+ */
+export function AddConnectionForm({
+  onSave,
   isHTTPS = false,
 }: {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onSave?: (conn: NewConnection, device?: BluetoothDevice) => Promise<void>;
+  onSave: (conn: NewConnection, device?: BluetoothDevice) => Promise<void>;
   isHTTPS?: boolean;
 }) {
   const { toast } = useToast();
@@ -336,7 +365,9 @@ export default function AddConnectionDialog({
   );
   // Lets an async test check whether the form changed while it ran.
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
   const { unsupported } = useBrowserFeatureDetection();
   const { t } = useTranslation();
 
@@ -368,20 +399,10 @@ export default function AddConnectionDialog({
     });
   }, [isHTTPS, localNetworkAccess, httpAllowed, isLocalHost]);
 
-  const reset = useCallback(() => {
-    dispatch({ type: "RESET", payload: { isHTTPS } });
-  }, [isHTTPS]);
-
-  useEffect(() => {
-    if (!open) {
-      reset();
-    }
-  }, [reset, open]);
-
   const makeToastErrorHandler = useCallback(
     (titlePrefix: string) =>
       (err: unknown): void => {
-        if (err && (err as { name?: string }).name === "NotFoundError") {
+        if (err instanceof Error && err.name === "NotFoundError") {
           return; // user canceled
         }
         const message = err instanceof Error ? err.message : String(err);
@@ -438,19 +459,8 @@ export default function AddConnectionDialog({
       return;
     }
     try {
-      const port = await (
-        navigator as Navigator & {
-          serial: {
-            requestPort: (o: Record<string, unknown>) => Promise<SerialPort>;
-          };
-        }
-      ).serial.requestPort({});
-      const info =
-        (
-          port as SerialPort & {
-            getInfo?: () => { usbVendorId?: number; usbProductId?: number };
-          }
-        ).getInfo?.() ?? {};
+      const port = await navigator.serial.requestPort({});
+      const info = port.getInfo();
       dispatch({
         type: "SET_SERIAL_SELECTED",
         payload: {
@@ -533,6 +543,7 @@ export default function AddConnectionDialog({
 
             <Input
               id={"url"}
+              className="h-auto min-h-11 rounded-xl border-input bg-muted/40 text-base text-foreground placeholder:text-muted-foreground focus:ring-ring dark:border-input dark:text-foreground dark:focus:ring-ring"
               inputMode="url"
               placeholder={t("addConnection.httpConnection.inputPlaceholder")}
               prefix={`${state.protocol}://`}
@@ -562,19 +573,18 @@ export default function AddConnectionDialog({
             {isHTTPS &&
               state.protocol === "http" &&
               localNetworkAccess === "denied" && (
-                <p className="text-sm text-amber-600 dark:text-amber-400">
+                <p className="text-sm text-amber-700 dark:text-amber-400">
                   {t("addConnection.httpConnection.localNetwork.denied")}
                 </p>
               )}
             {isHTTPS && !httpAllowed && (
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-muted-foreground">
                 {t("addConnection.httpConnection.localNetwork.unsupported")}
               </p>
             )}
             <div className="flex items-center gap-2 mt-4">
               <Button
-                variant="subtle"
-                className="gap-2"
+                className={secondaryButtonClasses}
                 onClick={handleTestHttp}
                 disabled={
                   urlOrIpv4Schema.safeParse(`${state.protocol}://${state.url}`)
@@ -598,7 +608,7 @@ export default function AddConnectionDialog({
                 )}
               </Button>
               {state.testStatus === "success" && (
-                <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                <div className="flex items-center gap-1 text-sm text-green-700 dark:text-green-400">
                   <CheckCircle2 className="h-4 w-4" />
                   {t("addConnection.httpConnection.connectionTest.reachable")}
                 </div>
@@ -631,11 +641,11 @@ export default function AddConnectionDialog({
               />
             )}
             {state.testStatus === "success" && state.slowLocalName && (
-              <p className="text-xs text-amber-600 dark:text-amber-400">
+              <p className="text-sm text-amber-700 dark:text-amber-400">
                 {t("addConnection.httpConnection.connectionTest.slowLocalName")}
               </p>
             )}
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-muted-foreground">
               {t("addConnection.httpConnection.connectionTest.description")}
             </p>
           </div>
@@ -653,7 +663,7 @@ export default function AddConnectionDialog({
         placeholder: "My Bluetooth Node",
         children: () => (
           <>
-            <SupportBadge
+            <SupportPill
               supported={bluetoothSupported}
               labelSupported={t(
                 "addConnection.bluetoothConnection.supported.title",
@@ -693,7 +703,7 @@ export default function AddConnectionDialog({
         placeholder: t("addConnection.serialConnection.namePlaceholder"),
         children: () => (
           <>
-            <SupportBadge
+            <SupportPill
               supported={serialSupported}
               labelSupported={t(
                 "addConnection.serialConnection.supported.title",
@@ -768,24 +778,30 @@ export default function AddConnectionDialog({
     };
 
   return (
-    <DialogWrapper
-      variant="default"
-      type="custom"
-      title={t("addConnection.title")}
-      description={t("addConnection.description")}
-      cancelText={t("button.cancel")}
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <div className="flex flex-col gap-4">
+      <p className="text-sm text-muted-foreground">
+        {t("addConnection.description")}
+      </p>
       <Tabs
         value={state.tab}
-        onValueChange={(v) =>
-          dispatch({ type: "SET_TAB", payload: v as TabKey })
-        }
+        onValueChange={(v) => {
+          if (isTabKey(v)) {
+            dispatch({ type: "SET_TAB", payload: v });
+          }
+        }}
       >
-        <TabsList className="grid grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 gap-1 rounded-xl border-0 bg-muted p-1 shadow-none dark:bg-muted">
           {TAB_META.map(({ key, label, Icon }) => (
-            <TabsTrigger key={key} value={key} className="gap-2">
+            <TabsTrigger
+              key={key}
+              value={key}
+              className={cn(
+                "min-h-11 min-w-0 gap-2 rounded-lg border-0 bg-transparent text-muted-foreground shadow-none",
+                "hover:bg-background/60 hover:text-foreground",
+                "data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:hover:bg-background",
+                "dark:data-[state=active]:bg-background dark:data-[state=active]:text-foreground dark:data-[state=active]:hover:bg-background dark:data-[state=active]:hover:text-foreground",
+              )}
+            >
               <Icon className="h-4 w-4" />
               {label}
             </TabsTrigger>
@@ -793,13 +809,18 @@ export default function AddConnectionDialog({
         </TabsList>
 
         {TAB_META.map(({ key }) => (
-          <TabsContent key={key} value={key}>
+          <TabsContent
+            key={key}
+            value={key}
+            className="rounded-xl border-border bg-muted/40 p-4 @md:p-5"
+          >
             {state.tab === key ? (
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-4">
                   <Label htmlFor={`name-${state.tab}`}>Name</Label>
                   <Input
                     id={`name-${state.tab}`}
+                    className="h-auto min-h-11 rounded-xl border-input bg-muted/40 text-base text-foreground placeholder:text-muted-foreground focus:ring-ring dark:border-input dark:text-foreground dark:focus:ring-ring"
                     value={state.name}
                     onChange={(evt) =>
                       dispatch({ type: "SET_NAME", payload: evt.target.value })
@@ -809,21 +830,19 @@ export default function AddConnectionDialog({
                 </div>
                 {PANES[key].children()}
                 <div className="flex justify-end">
-                  <div className="inline-flex rounded-md shadow-sm overflow-hidden border">
-                    <Button
-                      onClick={submit(onSave)}
-                      disabled={!canCreate}
-                      className="rounded-none"
-                    >
-                      {t("button.saveConnection")}
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={submit(onSave)}
+                    disabled={!canCreate}
+                    className="h-auto min-h-11 rounded-xl bg-primary px-5 text-primary-foreground hover:bg-primary/90 focus:ring-ring"
+                  >
+                    {t("button.saveConnection")}
+                  </Button>
                 </div>
               </div>
             ) : null}
           </TabsContent>
         ))}
       </Tabs>
-    </DialogWrapper>
+    </div>
   );
 }

@@ -5,8 +5,8 @@ export interface RasterSource {
   tileSize: number;
 }
 
-/** Which screen the Connections drawer shows; `edit` carries the connection id. */
-export type ConnectionsView = "list" | "add" | { edit: string };
+/** Which screen the Connections drawer shows. */
+export type ConnectionsView = "list" | "add";
 
 export interface ConnectionsDrawerState {
   open: boolean;

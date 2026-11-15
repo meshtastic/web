@@ -95,7 +95,8 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  /* Stock 0.556 is 4.34:1 on --muted; 0.5 gives 5.5:1 (WCAG 1.4.3). */
+  --muted-foreground: oklch(0.5 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.922 0 0);

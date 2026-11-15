@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createInitialDialogState,
   dialogReducer,
-} from "./AddConnectionDialog.tsx";
+} from "./AddConnectionForm.tsx";
 
 const testing = createInitialDialogState({
   protocol: "https",

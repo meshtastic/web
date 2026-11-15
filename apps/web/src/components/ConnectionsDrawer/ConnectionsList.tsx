@@ -1,6 +1,4 @@
-import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
 import { TimeAgo } from "@app/components/generic/TimeAgo";
-import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { useConnections } from "@app/pages/Connections/useConnections";
 import {
@@ -8,51 +6,47 @@ import {
   formatConnectionSubtext,
   testHttpReachable,
 } from "@app/pages/Connections/utils";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@components/UI/AlertDialog.tsx";
 import { CertificateGuide } from "@components/CertificateGuide.tsx";
-import { Badge } from "@components/UI/Badge.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@components/UI/Card.tsx";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
-import { useToast } from "@core/hooks/useToast.ts";
 import { useAppStore } from "@core/stores";
+import { useToast } from "@core/hooks/useToast.ts";
+import { cn } from "@core/utils/cn.ts";
 import {
   LinkIcon,
   MoreHorizontal,
+  PlusIcon,
   RotateCw,
-  RouterIcon,
   Star,
   StarOff,
   Trash2,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { createElement, type Ref, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-export const ConnectionsList = () => {
+/** Tonal, rounded surface shared by cards and the empty state. */
+const surfaceClasses =
+  "rounded-xl bg-muted/50 ring-1 ring-border ring-inset dark:bg-muted/30";
+
+const primaryButtonClasses =
+  "h-auto min-h-11 gap-2 rounded-xl bg-primary px-4 text-primary-foreground hover:bg-primary/90 focus:ring-ring dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90";
+
+const secondaryButtonClasses =
+  "h-auto min-h-11 gap-2 rounded-xl bg-background px-4 text-foreground ring-1 ring-border ring-inset hover:bg-muted focus:ring-ring dark:bg-background dark:text-foreground dark:hover:bg-muted";
+
+export interface ConnectionsListProps {
+  /** The "Add connection" button, so the drawer can return focus to it. */
+  addButtonRef?: Ref<HTMLButtonElement>;
+}
+
+export const ConnectionsList = ({ addButtonRef }: ConnectionsListProps) => {
   const {
     connections,
-    addConnectionAndConnect,
     connect,
     disconnect,
     removeConnection,
@@ -62,8 +56,7 @@ export const ConnectionsList = () => {
   } = useConnections();
   const { toast } = useToast();
   const closeConnections = useAppStore((s) => s.closeConnections);
-  const [addOpen, setAddOpen] = useState(false);
-  const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
+  const setConnectionsView = useAppStore((s) => s.setConnectionsView);
   const { t } = useTranslation("connections");
 
   // On first mount, sync statuses and refresh
@@ -91,140 +84,147 @@ export const ConnectionsList = () => {
     });
   }, [connections]);
 
+  const connectAndClose = async (c: Connection, failureKey: string) => {
+    const ok = await connect(c.id, { allowPrompt: true });
+    // Success needs no toast: the connecting overlay shows it.
+    if (ok) {
+      closeConnections();
+    } else {
+      toast({
+        title: t("toasts.failed"),
+        description: t(failureKey),
+      });
+    }
+  };
+
   return (
-    <div className="space-y-4 py-2">
-      <div className="flex items-center justify-end gap-2">
-        <Button onClick={() => setAddOpen(true)} className="gap-2">
-          <RouterIcon className="size-5" />
+    <div className="flex flex-col gap-4 py-1">
+      {/* Toolbar: description beside the primary action once there is room. */}
+      <div className="flex flex-col gap-3 @sm:flex-row @sm:items-center @sm:justify-between">
+        <p className="min-w-0 text-sm text-muted-foreground @sm:flex-1">
+          {t("page.description")}
+        </p>
+        <Button
+          ref={addButtonRef}
+          onClick={() => setConnectionsView("add")}
+          className={cn(primaryButtonClasses, "shrink-0")}
+        >
+          <PlusIcon className="size-5" />
           {t("drawer.addConnection")}
         </Button>
       </div>
 
       {sorted.length === 0 ? (
-        <Card className="border-dashed">
-          <CardHeader>
-            <CardTitle className="text-lg">
-              {t("noConnections.title")}{" "}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-slate-500 dark:text-slate-400">
+        <div
+          className={cn(
+            surfaceClasses,
+            "flex flex-col items-start gap-3 p-5 @md:p-6",
+          )}
+        >
+          <h3 className="text-base font-semibold @md:text-lg">
+            {t("noConnections.title")}
+          </h3>
+          <p className="text-sm text-muted-foreground">
             {t("noConnections.description")}
-          </CardContent>
-          <CardFooter>
-            <Button onClick={() => setAddOpen(true)} className="gap-2">
-              <RouterIcon className="size-5" />
-              {t("button.addConnection")}
-            </Button>
-          </CardFooter>
-        </Card>
-      ) : (
-        <div className="grid gap-3 grid-cols-1 @lg:grid-cols-2 @3xl:grid-cols-3">
-          {sorted.map((c) => (
-            <ConnectionCard
-              key={c.id}
-              connection={c}
-              onConnect={async () => {
-                const ok = await connect(c.id, { allowPrompt: true });
-                // Success needs no toast: the connecting overlay shows it.
-                if (ok) {
-                  closeConnections();
-                } else {
-                  toast({
-                    title: t("toasts.failed"),
-                    description: t("toasts.checkConnection"),
-                  });
-                }
-              }}
-              onDisconnect={async () => {
-                await disconnect(c.id);
-                toast({
-                  title: t("toasts.disconnected"),
-                  description: t("toasts.nowDisconnected", {
-                    name: c.name,
-                    interpolation: { escapeValue: false },
-                  }),
-                });
-              }}
-              onSetDefault={() => {
-                setDefaultConnection(c.id);
-                toast({
-                  title: t("toasts.defaultSet"),
-                  description: t("toasts.defaultConnection", {
-                    name: c.name,
-                    interpolation: { escapeValue: false },
-                  }),
-                });
-              }}
-              onDelete={async () => {
-                await disconnect(c.id);
-                removeConnection(c.id);
-                toast({
-                  title: t("toasts.deleted"),
-                  description: t("toasts.deletedByName", {
-                    name: c.name,
-                    interpolation: { escapeValue: false },
-                  }),
-                });
-              }}
-              onRetry={async () => {
-                const ok = await connect(c.id, { allowPrompt: true });
-                // Success needs no toast: the connecting overlay shows it.
-                if (ok) {
-                  closeConnections();
-                } else {
-                  toast({
-                    title: t("toasts.failed"),
-                    description: t("toasts.pickConnectionAgain"),
-                  });
-                }
-              }}
-            />
-          ))}
+          </p>
         </div>
+      ) : (
+        <ul className="grid grid-cols-1 gap-3 @lg:grid-cols-2 @3xl:grid-cols-3">
+          {sorted.map((c) => (
+            <li key={c.id} className="min-w-0">
+              <ConnectionCard
+                connection={c}
+                onConnect={() => connectAndClose(c, "toasts.checkConnection")}
+                onRetry={() => connectAndClose(c, "toasts.pickConnectionAgain")}
+                onDisconnect={async () => {
+                  await disconnect(c.id);
+                  toast({
+                    title: t("toasts.disconnected"),
+                    description: t("toasts.nowDisconnected", {
+                      name: c.name,
+                      interpolation: { escapeValue: false },
+                    }),
+                  });
+                }}
+                onSetDefault={() => {
+                  setDefaultConnection(c.id);
+                  toast({
+                    title: t("toasts.defaultSet"),
+                    description: t("toasts.defaultConnection", {
+                      name: c.name,
+                      interpolation: { escapeValue: false },
+                    }),
+                  });
+                }}
+                onDelete={async () => {
+                  await disconnect(c.id);
+                  removeConnection(c.id);
+                  toast({
+                    title: t("toasts.deleted"),
+                    description: t("toasts.deletedByName", {
+                      name: c.name,
+                      interpolation: { escapeValue: false },
+                    }),
+                  });
+                }}
+              />
+            </li>
+          ))}
+        </ul>
       )}
-
-      <AddConnectionDialog
-        open={addOpen}
-        onOpenChange={setAddOpen}
-        isHTTPS={isURLHTTPS}
-        onSave={async (partial, btDevice) => {
-          const created = await addConnectionAndConnect(partial, btDevice);
-          if (created) {
-            setAddOpen(false);
-            toast({
-              title: t("toasts.added"),
-              description: t("toasts.savedByName", {
-                name: created.name,
-                interpolation: { escapeValue: false },
-              }),
-            });
-            if (
-              created.status === "connected" ||
-              created.status === "configured"
-            ) {
-              closeConnections();
-            }
-          } else {
-            toast({
-              title: "Unable to connect",
-              description: "savedCantConnect",
-            });
-          }
-        }}
-      />
     </div>
   );
 };
 
-function TypeBadge({ type }: { type: Connection["type"] }) {
-  const Icon = connectionTypeIcon(type);
-  const label =
-    type === "http" ? "HTTP" : type === "bluetooth" ? "Bluetooth" : "Serial";
+type StatusTone = "connected" | "busy" | "online" | "error" | "idle";
+
+function statusTone(status: Connection["status"]): StatusTone {
+  switch (status) {
+    case "connected":
+    case "configured":
+      return "connected";
+    case "connecting":
+    case "configuring":
+      return "busy";
+    case "online":
+      return "online";
+    case "error":
+      return "error";
+    default:
+      return "idle";
+  }
+}
+
+const statusDot: Record<StatusTone, string> = {
+  connected: "bg-emerald-500",
+  busy: "bg-amber-500",
+  online: "bg-sky-500",
+  error: "bg-red-500",
+  idle: "bg-muted-foreground/40",
+};
+
+function StatusPill({
+  status,
+  className,
+}: {
+  status: Connection["status"];
+  className?: string;
+}) {
+  const tone = statusTone(status);
+  const label = tone === "connected" ? "connected" : status;
   return (
-    <Badge variant="default" className="gap-1.5">
-      <Icon className="h-3.5 w-3.5" />
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-center gap-1.5 rounded-full bg-background px-2.5 py-0.5 text-sm font-medium capitalize text-muted-foreground ring-1 ring-border ring-inset",
+        className,
+      )}
+    >
+      <span
+        className={cn("size-2 rounded-full", statusDot[tone])}
+        aria-hidden="true"
+      />
       {label}
-    </Badge>
+    </span>
   );
 }
 
@@ -237,15 +237,14 @@ function ConnectionCard({
   onRetry,
 }: {
   connection: Connection;
-  onConnect: () => Promise<boolean> | Promise<void>;
-  onDisconnect: () => Promise<void> | Promise<void>;
+  onConnect: () => Promise<void>;
+  onDisconnect: () => Promise<void>;
   onSetDefault: () => void;
-  onDelete: () => void;
-  onRetry: () => Promise<boolean> | Promise<void>;
+  onDelete: () => void | Promise<void>;
+  onRetry: () => Promise<void>;
 }) {
   const { t } = useTranslation("connections");
 
-  const Icon = connectionTypeIcon(connection.type);
   const isBusy =
     connection.status === "connecting" || connection.status === "configuring";
   const isConnected =
@@ -253,94 +252,88 @@ function ConnectionCard({
   const isError = connection.status === "error";
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <CardTitle className="flex items-center gap-2">
-              <Icon className="size-4 text-slate-500 dark:text-slate-400" />
-              <span className="truncate">{connection.name}</span>
-              {connection.isDefault ? (
-                <Badge variant="secondary" className="gap-1">
-                  <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
-                  {t("default")}
-                </Badge>
-              ) : null}
-            </CardTitle>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-              <TypeBadge type={connection.type} />
-              <span className="text-slate-500 dark:text-slate-400 truncate">
-                {formatConnectionSubtext(connection)}
+    <article
+      className={cn(
+        surfaceClasses,
+        "flex h-full flex-col divide-y divide-border p-3 @md:p-4",
+      )}
+      aria-label={connection.name}
+    >
+      <div className="flex items-start gap-3 pb-3">
+        {/* Avatar steps up with the drawer. */}
+        <span
+          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-background text-muted-foreground ring-1 ring-border ring-inset @md:size-10 @xl:size-11"
+          aria-hidden="true"
+        >
+          {createElement(connectionTypeIcon(connection.type), {
+            className: "size-4 @md:size-5",
+          })}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <h3 className="min-w-0 break-words text-base font-semibold @md:text-lg">
+              {connection.name}
+            </h3>
+            {connection.isDefault ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-background px-2.5 py-0.5 text-sm font-medium text-muted-foreground ring-1 ring-border ring-inset">
+                <Star className="size-3.5 fill-amber-500 text-amber-500" />
+                {t("default")}
               </span>
-            </div>
+            ) : null}
+            {/* At wide sizes the status sits inline with the name. */}
+            <StatusPill
+              status={connection.status}
+              className="hidden @xl:flex"
+            />
           </div>
-          <div className="flex items-center gap-2">
-            <ConnectionStatusBadge status={connection.status} />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="size-4" />
-                  <span className="sr-only">{t("moreActions")}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {connection.type === "http" && connection.isDefault && (
-                  <DropdownMenuItem
-                    className="gap-2"
-                    onClick={() => onSetDefault()}
-                  >
-                    <StarOff className="size-4" />
-                    {t("button.unsetDefault")}
-                  </DropdownMenuItem>
-                )}
-                {connection.type === "http" && !connection.isDefault && (
-                  <DropdownMenuItem
-                    className="gap-2"
-                    onClick={() => onSetDefault()}
-                  >
-                    <Star className="size-4" />
-                    {t("button.setDefault")}
-                  </DropdownMenuItem>
-                )}
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem
-                      className="gap-2 text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
-                      onSelect={(e) => e.preventDefault()}
-                    >
-                      <Trash2 className="size-4" />
-                      {t("button.delete")}
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        {t("deleteConnection")}
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {t("areYouSure", { name: connection.name })}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>
-                        {t("button.cancel")}
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-red-600 hover:bg-red-700"
-                        onClick={() => onDelete()}
-                      >
-                        {t("button.delete")}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <p className="mt-0.5 break-all text-sm text-muted-foreground">
+            {formatConnectionSubtext(connection)}
+          </p>
+          <StatusPill status={connection.status} className="mt-2 @xl:hidden" />
         </div>
-      </CardHeader>
-      <CardContent className="pt-0">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-11 w-11 shrink-0 rounded-full text-muted-foreground hover:bg-background hover:text-foreground focus:ring-ring dark:text-muted-foreground dark:hover:bg-background dark:hover:text-foreground"
+            >
+              <MoreHorizontal className="size-5" />
+              <span className="sr-only">{t("moreActions")}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            data-shadcn-scope=""
+            className="min-w-44 rounded-xl border-border bg-popover p-1 text-popover-foreground shadow-lg dark:border-border dark:bg-popover dark:text-popover-foreground"
+          >
+            {connection.type === "http" ? (
+              <DropdownMenuItem
+                className="min-h-11 gap-2 rounded-lg px-3 focus:bg-muted dark:focus:bg-muted"
+                onClick={() => onSetDefault()}
+              >
+                {connection.isDefault ? (
+                  <StarOff className="size-4" />
+                ) : (
+                  <Star className="size-4" />
+                )}
+                {connection.isDefault
+                  ? t("button.unsetDefault")
+                  : t("button.setDefault")}
+              </DropdownMenuItem>
+            ) : null}
+            <DropdownMenuItem
+              className="min-h-11 gap-2 rounded-lg px-3 text-destructive focus:bg-destructive/10 focus:text-destructive dark:focus:bg-destructive/10"
+              onClick={() => void onDelete()}
+            >
+              <Trash2 className="size-4" />
+              {t("button.delete")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="py-3 text-sm text-muted-foreground">
         {connection.error ? (
           <div className="space-y-1">
             <p className="text-sm text-red-600 dark:text-red-400">
@@ -359,33 +352,31 @@ function ConnectionCard({
               )}
           </div>
         ) : connection.lastConnectedAt ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p>
             {t("lastConnectedAt", { date: "" })}{" "}
             <TimeAgo
               timestamp={connection.lastConnectedAt}
-              className="text-sm text-slate-500 dark:text-slate-400"
+              className="text-sm text-muted-foreground"
             />
           </p>
         ) : (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            {t("neverConnected")}
-          </p>
+          <p>{t("neverConnected")}</p>
         )}
-      </CardContent>
-      <CardFooter className="flex items-center gap-2 mt-auto">
+      </div>
+
+      <div className="mt-auto flex items-center gap-2 pt-3">
         {isConnected ? (
           <Button
-            variant="subtle"
-            className="gap-2"
-            onClick={() => onDisconnect()}
+            className={secondaryButtonClasses}
+            onClick={() => void onDisconnect()}
             disabled={isBusy}
           >
             {t("button.disconnect")}
           </Button>
         ) : (
           <Button
-            className="gap-2"
-            onClick={() => (isError ? onRetry() : onConnect())}
+            className={primaryButtonClasses}
+            onClick={() => void (isError ? onRetry() : onConnect())}
             disabled={isBusy}
           >
             {isError ? (
@@ -401,7 +392,7 @@ function ConnectionCard({
             )}
           </Button>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+    </article>
   );
 }

@@ -67,10 +67,10 @@ describe("AppStore – basic state & actions", () => {
       open: true,
       view: "add",
     });
-    state.setConnectionsView({ edit: "abc" });
+    state.setConnectionsView("list");
     expect(useAppStore.getState().connectionsDrawer).toEqual({
       open: true,
-      view: { edit: "abc" },
+      view: "list",
     });
     state.closeConnections();
     expect(useAppStore.getState().connectionsDrawer).toEqual({
