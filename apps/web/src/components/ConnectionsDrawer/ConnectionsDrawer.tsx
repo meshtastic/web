@@ -58,7 +58,11 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
         data-shadcn-scope=""
         aria-describedby={undefined}
         onEscapeKeyDown={(event) => {
-          if (forced) {
+          // Escape inside an inline delete strip cancels the strip only.
+          const inInlineConfirm =
+            event.target instanceof Element &&
+            event.target.closest("[data-inline-confirm]") !== null;
+          if (forced || inInlineConfirm) {
             event.preventDefault();
           }
         }}

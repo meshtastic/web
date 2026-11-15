@@ -4,7 +4,8 @@
     "close": "Close connections",
     "back": "Back to connections",
     "addConnection": "Add connection",
-    "resize": "Resize connections drawer"
+    "resize": "Resize connections drawer",
+    "deleteConfirm": "Delete {{name}}?"
   },
   "page": {
     "title": "Connect to a Meshtastic device",
