@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
 import org.meshtastic.sdk.Frame
@@ -45,6 +47,8 @@ internal class WebBluetoothTransport(
     private var fromRadio: dynamic = null
     private var fromNum: dynamic = null
     private var closing = false
+    /** Chrome rejects overlapping GATT operations on one device, so reads and writes take turns. */
+    private val gatt = Mutex()
     private var draining = false
     private var drainWanted = false
 
@@ -99,6 +103,7 @@ internal class WebBluetoothTransport(
         scope?.cancel()
         scope = null
         release()
+        discardQueued()
         _state.value = TransportState.Disconnected
     }
 
@@ -107,12 +112,14 @@ internal class WebBluetoothTransport(
         val payload = payloadOf(frame).toUint8Array()
         val buffer: ArrayBuffer = payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.length)
         try {
-            val write = if (characteristic.writeValueWithResponse != null) {
-                characteristic.writeValueWithResponse(buffer)
-            } else {
-                characteristic.writeValue(buffer)
+            gatt.withLock {
+                val write = if (characteristic.writeValueWithResponse != null) {
+                    characteristic.writeValueWithResponse(buffer)
+                } else {
+                    characteristic.writeValue(buffer)
+                }
+                (write as Promise<Unit>).await()
             }
-            (write as Promise<Unit>).await()
         } catch (e: Throwable) {
             dropped(e.message ?: "Bluetooth write failed")
             throw ClientException("transport", e.message ?: "Bluetooth write failed")
@@ -121,6 +128,12 @@ internal class WebBluetoothTransport(
     }
 
     override fun frames(): Flow<Frame> = inbound.receiveAsFlow()
+
+    /** Frames the old link queued after the engine stopped reading must not reach the next handshake. */
+    private fun discardQueued() {
+        while (inbound.tryReceive().isSuccess) {
+        }
+    }
 
     private suspend fun findDevice(bluetooth: dynamic): dynamic {
         val id = wantedId ?: return null
@@ -160,7 +173,7 @@ internal class WebBluetoothTransport(
                 drainWanted = false
                 while (!closing) {
                     val characteristic = fromRadio ?: return
-                    val value = (characteristic.readValue() as Promise<dynamic>).await()
+                    val value = gatt.withLock { (characteristic.readValue() as Promise<dynamic>).await() }
                     if (value.byteLength == 0) break
                     val bytes = Uint8Array(value.buffer as ArrayBuffer, value.byteOffset as Int, value.byteLength as Int)
                     inbound.trySend(Frame(framed(bytes.toByteArray())))

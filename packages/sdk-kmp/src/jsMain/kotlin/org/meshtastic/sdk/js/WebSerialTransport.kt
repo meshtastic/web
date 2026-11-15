@@ -73,10 +73,8 @@ internal class WebSerialTransport(
                 serial.addEventListener("connect", onOsConnect)
                 listening = true
             }
-        } catch (e: CancellationException) {
-            _state.value = TransportState.Disconnected
-            throw e
         } catch (e: Throwable) {
+            stopListening()
             _state.value = TransportState.Disconnected
             throw e
         }
@@ -88,8 +86,18 @@ internal class WebSerialTransport(
         closing = true
         scope?.cancel()
         scope = null
+        stopListening()
         release()
+        discardQueued()
         _state.value = TransportState.Disconnected
+    }
+
+    private fun stopListening() {
+        if (!listening) return
+        listening = false
+        val serial = serialApi() ?: return
+        serial.removeEventListener("disconnect", onOsDisconnect)
+        serial.removeEventListener("connect", onOsConnect)
     }
 
     override suspend fun send(frame: Frame) {
@@ -103,6 +111,12 @@ internal class WebSerialTransport(
     }
 
     override fun frames(): Flow<Frame> = inbound.receiveAsFlow()
+
+    /** Frames the old link queued after the engine stopped reading must not reach the next handshake. */
+    private fun discardQueued() {
+        while (inbound.tryReceive().isSuccess) {
+        }
+    }
 
     private fun matches(candidate: dynamic): Boolean {
         if (usbVendorId == null || usbProductId == null) return false

@@ -1,6 +1,8 @@
 package org.meshtastic.sdk.js
 
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -42,10 +44,18 @@ class WebBluetoothTransportTest {
         return bluetooth
     }
 
-    private fun fakeDevice(id: String, hasService: Boolean = true): dynamic {
+    private fun fakeDevice(id: String, hasService: Boolean = true, gattMillis: Int = 0): dynamic {
         val device = js(
             """({
-                listeners: {}, queued: [], written: [], connects: 0, notifying: false,
+                listeners: {}, queued: [], written: [], connects: 0, notifying: false, busy: 0, overlaps: 0,
+                gatt_: function (work) {
+                    var self = this;
+                    if (self.busy > 0) self.overlaps++;
+                    self.busy++;
+                    return new Promise(function (resolve) {
+                        setTimeout(function () { self.busy--; resolve(work()); }, self.gattMillis);
+                    });
+                },
                 addEventListener: function (type, cb) { (this.listeners[type] = this.listeners[type] || []).push(cb); },
                 removeEventListener: function () {},
                 dispatch: function (type) { (this.listeners[type] || []).forEach(function (cb) { cb({}); }); },
@@ -53,12 +63,13 @@ class WebBluetoothTransportTest {
             })""",
         )
         device.id = id
+        device.gattMillis = gattMillis
         val chars = js("({})")
         chars.fromradio = js(
-            """({ readValue: function () { var next = device.queued.shift(); return Promise.resolve(new DataView(next ? next.buffer : new ArrayBuffer(0))); } })""",
+            """({ readValue: function () { return device.gatt_(function () { var next = device.queued.shift(); return new DataView(next ? next.buffer : new ArrayBuffer(0)); }); } })""",
         )
         chars.toradio = js(
-            """({ writeValueWithResponse: function (buffer) { device.written.push(new Uint8Array(buffer)); return Promise.resolve(); } })""",
+            """({ writeValueWithResponse: function (buffer) { return device.gatt_(function () { device.written.push(new Uint8Array(buffer)); }); } })""",
         )
         chars.fromnum = js(
             """({
@@ -181,6 +192,40 @@ class WebBluetoothTransportTest {
 
         assertEquals(1, radio.written.length as Int)
         assertEquals(listOf<Byte>(0x10, 0x20), (radio.written[0] as Uint8Array).toByteArray().toList())
+        transport.disconnect()
+    }
+
+    @Test
+    fun a_send_during_a_drain_waits_for_the_read_in_flight() = GlobalScope.promise {
+        val radio = fakeDevice("radio-1", gattMillis = 20)
+        installBluetooth(arrayOf(radio))
+        val transport = WebBluetoothTransport(null, "radio-1")
+        transport.connect()
+
+        radio.queue(byteArrayOf(0x08, 0x01).toUint8Array())
+        radio.dispatch("characteristicvaluechanged")
+        transport.send(Frame(framed(byteArrayOf(0x10))))
+        withTimeout(1_000) { transport.frames().first() }
+
+        assertEquals(1, radio.written.length as Int)
+        assertEquals(0, radio.overlaps as Int)
+        transport.disconnect()
+    }
+
+    @Test
+    fun frames_queued_by_the_old_link_do_not_reach_the_next_connect() = GlobalScope.promise {
+        val radio = fakeDevice("radio-1")
+        installBluetooth(arrayOf(radio))
+        val transport = WebBluetoothTransport(null, "radio-1")
+        transport.connect()
+        radio.queue(byteArrayOf(0x08, 0x01).toUint8Array())
+        radio.dispatch("characteristicvaluechanged")
+        delay(50)
+
+        transport.disconnect()
+        transport.connect()
+
+        assertEquals(null, withTimeoutOrNull(100) { transport.frames().first() })
         transport.disconnect()
     }
 

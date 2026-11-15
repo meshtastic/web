@@ -2,6 +2,8 @@ package org.meshtastic.sdk.js
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.promise
 import kotlinx.coroutines.withTimeout
 import org.meshtastic.sdk.Frame
@@ -34,7 +36,8 @@ class WebSerialTransportTest {
                 requested: 0,
                 listeners: {},
                 addEventListener: function (type, cb) { (this.listeners[type] = this.listeners[type] || []).push(cb); },
-                removeEventListener: function () {},
+                removeEventListener: function (type, cb) { this.listeners[type] = (this.listeners[type] || []).filter(function (l) { return l !== cb; }); },
+                listenerCount: function () { var n = 0; for (var k in this.listeners) n += this.listeners[k].length; return n; },
                 dispatch: function (type, port) { (this.listeners[type] || []).forEach(function (cb) { cb({ target: port }); }); },
                 requestPort: function () { this.requested++; return Promise.reject(new Error('prompted')); }
             })""",
@@ -170,6 +173,42 @@ class WebSerialTransportTest {
         assertEquals(TransportState.Connected, transport.state.value)
         assertEquals(1, replugged.opens)
         assertEquals(0, serial.requested)
+        transport.disconnect()
+    }
+
+    @Test
+    fun releases_its_serial_listeners_on_disconnect_and_on_a_failed_connect() = GlobalScope.promise {
+        val radio = fakePort(0x303a, 0x1001)
+        val serial = installSerial(arrayOf(radio))
+        val transport = WebSerialTransport(null, 0x303a, 0x1001)
+
+        transport.connect()
+        assertEquals(2, serial.listenerCount() as Int)
+        transport.disconnect()
+        assertEquals(0, serial.listenerCount() as Int)
+
+        transport.connect()
+        transport.disconnect()
+        assertEquals(0, serial.listenerCount() as Int)
+
+        serial.ports = arrayOf<dynamic>()
+        assertFailsWith<ClientException> { WebSerialTransport(null, 0x303a, 0x1001).connect() }
+        assertEquals(0, serial.listenerCount() as Int)
+    }
+
+    @Test
+    fun frames_read_by_the_old_link_do_not_reach_the_next_connect() = GlobalScope.promise {
+        val radio = fakePort(0x303a, 0x1001)
+        installSerial(arrayOf(radio))
+        val transport = WebSerialTransport(null, 0x303a, 0x1001)
+        transport.connect()
+        radio.push(framed(byteArrayOf(0x08, 0x01)).toByteArray().toUint8Array())
+        delay(50)
+
+        transport.disconnect()
+        transport.connect()
+
+        assertEquals(null, withTimeoutOrNull(100) { transport.frames().first() })
         transport.disconnect()
     }
 

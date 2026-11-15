@@ -55,7 +55,8 @@ internal class HttpTransport(
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Throwable) {
-                        _state.value = TransportState.Error(Lna.classify(baseUrl, e), recoverable = true)
+                        val cause = Lna.classify(baseUrl, e)
+                        _state.value = TransportState.Error(cause, recoverable = cause.kind() != Lna.DENIED)
                         return@launch
                     }
                     delay(pollMillis)
@@ -76,6 +77,7 @@ internal class HttpTransport(
     override suspend fun disconnect() {
         scope?.cancel()
         scope = null
+        discardQueued()
         _state.value = TransportState.Disconnected
     }
 
@@ -87,6 +89,12 @@ internal class HttpTransport(
     }
 
     override fun frames(): Flow<Frame> = inbound.receiveAsFlow()
+
+    /** Frames the old link queued after the engine stopped reading must not reach the next handshake. */
+    private fun discardQueued() {
+        while (inbound.tryReceive().isSuccess) {
+        }
+    }
 
     private suspend fun request(url: String, method: String): dynamic {
         val response = fetch(url, Lna.requestInit(baseUrl, method)).await()
