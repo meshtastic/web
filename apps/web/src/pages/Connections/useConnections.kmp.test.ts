@@ -184,6 +184,27 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     });
   });
 
+  it("keeps the connection while the session runs its own handshake again", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+    const statuses: string[] = [];
+    const off = useDeviceStore.subscribe(() => {
+      const status = saved(conn.id)?.status;
+      if (status && statuses.at(-1) !== status) statuses.push(status);
+    });
+
+    await act(() => meshRegistry.get(conn.id)?.rehandshake());
+
+    off();
+    expect(statuses).not.toContain("error");
+    expect(saved(conn.id)?.status).toBe("configured");
+    expect(client.disconnects).toHaveLength(1);
+    expect(client.connects).toHaveLength(2);
+  });
+
   it("disconnects the old client before connecting the same connection again", async () => {
     const { result } = renderHook(() => useConnections());
     const conn = addRadio(result);

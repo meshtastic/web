@@ -12,6 +12,7 @@ import {
   loadKmp,
   type MeshtasticClient,
 } from "./client.ts";
+import { MeshSession } from "./session.ts";
 
 const ids = { usbVendorId: 0x303a, usbProductId: 0x1001 };
 
@@ -158,6 +159,41 @@ describe("createSerialClient (Kotlin facade over a fake navigator.serial)", () =
       );
     }, 15_000);
   }
+
+  it("hands the session its own node and channels again after an auto-reconnect", async () => {
+    const radio = new FakeRadio(0x0a0b0c0d, { nodes: 3, channels: 2 });
+    const port = new FakeSerialPort(ids, radio);
+    const serial = installSerial([port]);
+    const client = await createSerialClient(ids);
+    clients.push(client);
+    const session = new MeshSession(client);
+    await client.connect();
+    await connected(client);
+    const mine = () =>
+      session.nodes.list.peek().some((n) => n.num === session.myNodeNum);
+    expect(session.device.myNodeNum.peek()).toBe(0x0a0b0c0d);
+    expect(mine()).toBe(true);
+    expect(session.channels.list.peek()).toHaveLength(2);
+
+    port.unplug();
+    serial.dispatch("disconnect", port);
+    await vi.waitFor(
+      () => expect(client.connectionState.kind).toBe("reconnecting"),
+      { timeout: 2_000, interval: 10 },
+    );
+    port.replug();
+    serial.dispatch("connect", port);
+    await connected(client);
+    await vi.waitFor(() =>
+      expect(session.progress.peek()).toMatchObject({ phase: "configured" }),
+    );
+
+    expect(session.device.myNodeNum.peek()).toBe(0x0a0b0c0d);
+    expect(session.nodes.list.peek()).toHaveLength(4);
+    expect(mine()).toBe(true);
+    expect(session.channels.list.peek()).toHaveLength(2);
+    session.close();
+  }, 15_000);
 
   it("reconnects when a write fails before the OS reports the loss", async () => {
     const radio = new FakeRadio();

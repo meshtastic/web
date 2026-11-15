@@ -297,6 +297,7 @@ export function useConnections() {
           }
           if (state.kind === "disconnected") {
             if (!reconnecting) {
+              if (session.isRehandshaking) return;
               log.error("kmp: dropped without retrying", { id });
               updateSavedConnection(id, {
                 status: "error",
@@ -391,6 +392,7 @@ export function useConnections() {
         });
         sessionTeardowns.get(id)?.();
         sessionTeardowns.delete(id);
+        meshRegistry.unregister(id);
         if (
           error instanceof Error &&
           (error.name === "serial-unavailable" ||
@@ -425,6 +427,10 @@ export function useConnections() {
       }
       if (conn.status === "configured" || conn.status === "connected") {
         log.debug("connect: already connected", { id, status: conn.status });
+        return true;
+      }
+      if (conn.status === "connecting" && sessionTeardowns.has(id)) {
+        log.debug("connect: already connecting", { id, ...conn.reconnect });
         return true;
       }
 
@@ -515,6 +521,7 @@ export function useConnections() {
   const refreshStatuses = useCallback(async () => {
     const candidates = connections.filter(
       (c) =>
+        !sessionTeardowns.has(c.id) &&
         c.status !== "connected" &&
         c.status !== "configured" &&
         c.status !== "configuring",

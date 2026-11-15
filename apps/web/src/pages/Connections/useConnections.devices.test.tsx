@@ -9,7 +9,13 @@ import {
   installSerial as installFakeSerial,
   uninstallBrowserDevices,
 } from "@app/tests/fakeBrowserDevices.ts";
+import { create, toBinary } from "@bufbuild/protobuf";
+import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
+import { MeshRegistryProvider, useChannels } from "@core/kmp/hooks";
+import { meshRegistry } from "@core/kmp/registry.ts";
+import { Protobuf } from "@core/protobuf.ts";
 import { act, renderHook } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useConnections } from "./useConnections.ts";
 
@@ -54,6 +60,61 @@ const saved = (id: number): Connection | undefined =>
 function fakePort(info: SerialPortInfo): SerialPort {
   return new FakeSerialPort(info);
 }
+
+const MY_NODE = 0x0a0b0c0d;
+
+const fromRadio = (
+  payloadVariant: Protobuf.Mesh.FromRadio["payloadVariant"],
+): Uint8Array =>
+  toBinary(
+    Protobuf.Mesh.FromRadioSchema,
+    create(Protobuf.Mesh.FromRadioSchema, { payloadVariant }),
+  );
+
+/** The frames and node snapshot a handshake hands the session. */
+function handshake(client: FakeKmpClient): void {
+  act(() =>
+    client.emitFrame(
+      fromRadio({
+        case: "myInfo",
+        value: create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum: MY_NODE }),
+      }),
+    ),
+  );
+  act(() =>
+    client.emitFrame(
+      fromRadio({
+        case: "channel",
+        value: create(Protobuf.Channel.ChannelSchema, {
+          index: 0,
+          role: Protobuf.Channel.Channel_Role.PRIMARY,
+        }),
+      }),
+    ),
+  );
+  act(() =>
+    client.emitNodeChange({
+      kind: "snapshot",
+      nodes: [
+        toBinary(
+          Protobuf.Mesh.NodeInfoSchema,
+          create(Protobuf.Mesh.NodeInfoSchema, {
+            num: MY_NODE,
+            user: { longName: "Me" },
+          }),
+        ),
+      ],
+      node: null,
+      nodeNum: 0,
+    }),
+  );
+}
+
+const withRegistry = ({ children }: { children: ReactNode }) => (
+  <MeshRegistryProvider registry={meshRegistry}>
+    {children}
+  </MeshRegistryProvider>
+);
 
 function installSerial(ports: SerialPort[], picked?: SerialPort) {
   const serial = installFakeSerial(ports);
@@ -346,6 +407,69 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
     expect(requestDevice).not.toHaveBeenCalled();
     expect(kmp.bluetoothTargets).toEqual([{ device, deviceId: "radio-3" }]);
     await act(() => result.current.disconnect(conn.id));
+  });
+
+  it("keeps the live session through an SDK reconnect while the drawer refreshes and Connect is clicked", async () => {
+    installSerial([fakePort(ids)]);
+    const { result } = renderHook(() => useConnections());
+    const conn = result.current.addConnection({
+      type: "serial",
+      name: "Serial",
+      ...ids,
+    });
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+    handshake(client);
+    const view = renderHook(
+      () => ({ me: useMyNodeAsProto(), channels: useChannels() }),
+      { wrapper: withRegistry },
+    );
+    expect(view.result.current.me?.num).toBe(MY_NODE);
+    expect(view.result.current.channels).toHaveLength(1);
+
+    act(() =>
+      client.setState(
+        state("reconnecting", { attempt: 2, errorKind: "serial-unavailable" }),
+      ),
+    );
+    await act(() => result.current.refreshStatuses());
+    expect(saved(conn.id)).toMatchObject({
+      status: "connecting",
+      reconnect: { attempt: 2, maxAttempts: 10 },
+    });
+
+    await act(() => result.current.connect(conn.id, { allowPrompt: true }));
+    expect(kmp.client).toBe(client);
+    expect(client.disconnects).toHaveLength(0);
+
+    act(() => client.setState(state("configuring", { phase: "Stage1" })));
+    handshake(client);
+    act(() => client.setState(state("connected")));
+    expect(saved(conn.id)?.status).toBe("configured");
+    expect(meshRegistry.active.value?.kmp).toBe(client);
+    expect(view.result.current.me?.num).toBe(MY_NODE);
+    expect(view.result.current.channels).toHaveLength(1);
+    await act(() => result.current.disconnect(conn.id));
+  });
+
+  it("drops the session of a connect that failed, so the app does not read a dead one", async () => {
+    installSerial([fakePort(ids)]);
+    kmp.connectError = Object.assign(new Error("busy"), {
+      name: "serial-busy",
+    });
+    const { result } = renderHook(() => useConnections());
+    const conn = result.current.addConnection({
+      type: "serial",
+      name: "Serial",
+      ...ids,
+    });
+
+    expect(await act(() => result.current.connect(conn.id))).toBe(false);
+
+    expect(meshRegistry.get(conn.id)).toBeUndefined();
+    expect(meshRegistry.active.value).toBeUndefined();
+    expect(saved(conn.id)?.status).toBe("error");
   });
 
   it("shows the SDK's reconnect attempts after the device drops", async () => {

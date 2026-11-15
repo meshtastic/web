@@ -59,7 +59,10 @@ export class FrameSplitter {
 export class FakeRadio {
   readonly received: Protobuf.Mesh.ToRadio[] = [];
 
-  constructor(readonly myNodeNum = 0x0a0b0c0d) {}
+  constructor(
+    readonly myNodeNum = 0x0a0b0c0d,
+    readonly mesh: { nodes?: number; channels?: number } = {},
+  ) {}
 
   respond(toRadio: Uint8Array): Uint8Array[] {
     const message = fromBinary(Protobuf.Mesh.ToRadioSchema, toRadio);
@@ -67,6 +70,30 @@ export class FakeRadio {
     switch (message.payloadVariant.case) {
       case "wantConfigId": {
         const nonce = message.payloadVariant.value;
+        const others = Array.from({ length: this.mesh.nodes ?? 0 }, (_, i) =>
+          fromRadio({
+            case: "nodeInfo",
+            value: create(Protobuf.Mesh.NodeInfoSchema, {
+              num: 0x1000 + i,
+              user: { longName: `Node ${i}`, shortName: `N${i}` },
+            }),
+          }),
+        );
+        const channels = Array.from(
+          { length: this.mesh.channels ?? 0 },
+          (_, index) =>
+            fromRadio({
+              case: "channel",
+              value: create(Protobuf.Channel.ChannelSchema, {
+                index,
+                role:
+                  index === 0
+                    ? Protobuf.Channel.Channel_Role.PRIMARY
+                    : Protobuf.Channel.Channel_Role.SECONDARY,
+                settings: { name: `ch${index}` },
+              }),
+            }),
+        );
         return [
           fromRadio({
             case: "myInfo",
@@ -81,6 +108,8 @@ export class FakeRadio {
               user: { longName: "Fake radio", shortName: "FAKE" },
             }),
           }),
+          ...channels,
+          ...others,
           fromRadio({ case: "configCompleteId", value: nonce }),
         ];
       }

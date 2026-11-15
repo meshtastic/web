@@ -139,6 +139,7 @@ export class MeshSession {
   private readonly unsubscribes: Array<() => void> = [];
   private closed = false;
   private rehandshaking: Promise<void> | undefined;
+  private cycling = false;
 
   constructor(
     readonly kmp: MeshtasticClient,
@@ -298,15 +299,24 @@ export class MeshSession {
    * closed while the cycle is under way stays disconnected.
    */
   rehandshake(): Promise<void> {
-    this.rehandshaking ??= (async () => {
-      try {
-        await this.kmp.disconnect();
-        if (!this.closed) await this.kmp.connect();
-      } finally {
-        this.rehandshaking = undefined;
-      }
-    })();
+    this.rehandshaking ??= this.cycleConnection();
     return this.rehandshaking;
+  }
+
+  private async cycleConnection(): Promise<void> {
+    this.cycling = true;
+    try {
+      await this.kmp.disconnect();
+      if (!this.closed) await this.kmp.connect();
+    } finally {
+      this.cycling = false;
+      this.rehandshaking = undefined;
+    }
+  }
+
+  /** True while `rehandshake` is cycling the SDK connection. */
+  get isRehandshaking(): boolean {
+    return this.cycling;
   }
 
   /** Disconnects the SDK client once any handshake cycle has settled. */
