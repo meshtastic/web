@@ -1,0 +1,29 @@
+{
+  "name": "@meshtastic/sdk-kmp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kotlin Multiplatform meshtastic-sdk compiled to JavaScript, with a TypeScript-facing facade and browser transports.",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meshtastic/web.git",
+    "directory": "packages/sdk-kmp"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/sdk-kmp.mjs",
+  "types": "./dist/sdk-kmp.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/sdk-kmp.d.mts",
+      "default": "./dist/sdk-kmp.mjs"
+    }
+  },
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "ensure-dist": "node ./scripts/build.mjs --if-missing",
+    "clean": "rm -rf dist build"
+  }
+}

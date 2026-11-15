@@ -15,6 +15,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "setup:certs": "mkcert localhost 127.0.0.1 ::1",
+    "prebuild": "pnpm --filter @meshtastic/sdk-kmp ensure-dist",
     "build": "vite build",
     "build:analyze": "BUNDLE_ANALYZE=true pnpm run build",
     "lint": "oxlint",
@@ -23,6 +24,7 @@
     "format:fix": "oxfmt .",
     "check": "pnpm lint && pnpm format",
     "check:fix": "pnpm lint:fix && pnpm format:fix",
+    "predev": "pnpm --filter @meshtastic/sdk-kmp ensure-dist",
     "dev": "vite",
     "dev:https": "USE_HTTPS=true vite",
     "test": "vitest",
@@ -34,6 +36,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
     "@meshtastic/sdk": "workspace:*",
+    "@meshtastic/sdk-kmp": "workspace:*",
     "@meshtastic/sdk-react": "workspace:*",
     "@meshtastic/sdk-storage-sqlocal": "workspace:*",
     "@meshtastic/transport-http": "workspace:*",

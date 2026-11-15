@@ -47,6 +47,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Setup JDK 21 (for @meshtastic/sdk-kmp)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build @meshtastic/sdk-kmp
+        run: pnpm --filter @meshtastic/sdk-kmp build
+
       - name: Run linter
         run: pnpm run lint
 

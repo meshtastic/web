@@ -23,6 +23,7 @@ Libraries live under `packages/`; the reference web client lives under `apps/`.
 | Package | Purpose |
 | --- | --- |
 | `packages/sdk` | Framework-agnostic TypeScript SDK. Domain-driven feature slices (device, chat, nodes, channels, config, telemetry, position, traceroute, files) built around a `MeshClient` orchestrator with `@preact/signals-core` reactive state. |
+| `packages/sdk-kmp` | The Kotlin Multiplatform [meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk) compiled to JavaScript (Gradle, JDK 21) with a small `@JsExport` facade and browser transports. The web client's connection and mesh behaviour comes from here. |
 | `packages/sdk-react` | React hooks + `MeshProvider` on top of `@meshtastic/sdk`. Wraps signals in `useSyncExternalStore` for concurrent-safe renders. |
 | `apps/web` | Reference React web client. Hosted at [client.meshtastic.org](https://client.meshtastic.org). |
 | `packages/ui` | Shared Radix + Tailwind component library. |
@@ -89,6 +90,12 @@ Expected domain errors are returned as `Result<T, E>` via [`better-result`](http
   `pnpm -r build`, since it runs `buf generate`). If you only want to run
   the web client in dev, `pnpm --filter meshtastic-web dev` does not need
   Buf as long as the protobuf stubs are already generated.
+- [JDK 21](https://adoptium.net/) — required to build `@meshtastic/sdk-kmp`,
+  the Kotlin meshtastic-sdk compiled to JavaScript that the web client
+  connects through. `pnpm --filter meshtastic-web dev` builds it on first
+  run (its `predev` hook); on macOS `brew install openjdk@21` and
+  `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`. See
+  `packages/sdk-kmp/README.md` for how the SDK version is pinned.
 
 ### Setup
 

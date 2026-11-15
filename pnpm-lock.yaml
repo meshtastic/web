@@ -66,6 +66,9 @@ importers:
       '@meshtastic/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@meshtastic/sdk-kmp':
+        specifier: workspace:*
+        version: link:../../packages/sdk-kmp
       '@meshtastic/sdk-react':
         specifier: workspace:*
         version: link:../../packages/sdk-react
@@ -356,6 +359,8 @@ importers:
       tslog:
         specifier: ^5.2.0
         version: 5.2.0
+
+  packages/sdk-kmp: {}
 
   packages/sdk-react:
     dependencies:
