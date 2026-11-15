@@ -54,10 +54,11 @@ class WebSerialTransportTest {
         val port = js(
             """({
                 readable: null, writable: null, written: [], opens: 0, closes: 0,
+                stale: null,
                 open: function () {
                     var self = this;
                     self.opens++;
-                    self.readable = new ReadableStream({ start: function (c) { self.reader = c; } });
+                    self.readable = new ReadableStream({ start: function (c) { self.reader = c; if (self.stale) c.enqueue(self.stale); } });
                     self.writable = new WritableStream({ start: function (c) { self.writer = c; }, write: function (chunk) { self.written.push(chunk); } });
                     return Promise.resolve();
                 },
@@ -242,6 +243,22 @@ class WebSerialTransportTest {
         transport.connect()
 
         assertEquals(null, withTimeoutOrNull(100) { transport.frames().first() })
+        transport.disconnect()
+    }
+
+    @Test
+    fun bytes_left_in_the_port_before_connect_never_become_frames() = GlobalScope.promise {
+        val radio = fakePort(0x303a, 0x1001)
+        radio.stale = (byteArrayOf(0x41, 0x94.toByte(), 0xC3.toByte(), 0x00, 0x03, 0x7F) + "INFO | boot\n".encodeToByteArray()).toUint8Array()
+        installSerial(arrayOf(radio))
+        val transport = WebSerialTransport(null, 0x303a, 0x1001)
+        transport.connect()
+
+        val payload = byteArrayOf(0x08, 0x01)
+        radio.push(framed(payload).toByteArray().toUint8Array())
+        val frame = withTimeout(1_000) { transport.frames().first() }
+
+        assertEquals(Frame(framed(payload)), frame)
         transport.disconnect()
     }
 

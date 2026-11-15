@@ -410,7 +410,7 @@ export class MeshSession {
     try {
       frame = decodeFromRadio(bytes);
     } catch (e) {
-      log.warn("undecodable FromRadio frame", e);
+      log.debug("undecodable FromRadio frame", e);
       return;
     }
     this.events.onFromRadio.dispatch(frame);

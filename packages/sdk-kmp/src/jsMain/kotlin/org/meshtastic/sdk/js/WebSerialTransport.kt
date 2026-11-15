@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.khronos.webgl.Uint8Array
 import org.meshtastic.sdk.Frame
 import org.meshtastic.sdk.RadioTransport
@@ -72,6 +73,7 @@ internal class WebSerialTransport(
             )
             port = opened
             open(opened)
+            discardStale(opened)
             if (!listening) {
                 serial.addEventListener("disconnect", onOsDisconnect)
                 serial.addEventListener("connect", onOsConnect)
@@ -185,6 +187,29 @@ internal class WebSerialTransport(
         writer = p.writable.getWriter()
     }
 
+    /**
+     * Drops whatever the device had queued before the port opened (its log
+     * text, the tail of an earlier frame), as the native transports purge
+     * their input buffers, so the framer starts at a quiet boundary. Reads
+     * until the line is silent for [DRAIN_QUIET_MS], or [DRAIN_MAX_MS] at most.
+     */
+    private suspend fun discardStale(p: dynamic) {
+        val r = p.readable.getReader()
+        try {
+            withTimeoutOrNull(DRAIN_MAX_MS) {
+                while (true) {
+                    val result = withTimeoutOrNull(DRAIN_QUIET_MS) { (r.read() as Promise<dynamic>).await() } ?: break
+                    if (result.done == true) break
+                }
+            }
+        } finally {
+            try {
+                r.releaseLock()
+            } catch (_: Throwable) {
+            }
+        }
+    }
+
     private suspend fun readLoop(p: dynamic) {
         val assembler = FrameAssembler { inbound.trySend(it) }
         val r = p.readable.getReader()
@@ -236,6 +261,8 @@ internal class WebSerialTransport(
         const val DISCONNECTED = "serial-disconnected"
         const val READ_BUFFER_SIZE = 64 * 1024
         const val POST_CLOSE_DELAY_MS = 200L
+        const val DRAIN_QUIET_MS = 50L
+        const val DRAIN_MAX_MS = 300L
         val OPEN_RETRY_DELAYS_MS = longArrayOf(250, 500, 750)
 
         fun serialApi(): dynamic {
