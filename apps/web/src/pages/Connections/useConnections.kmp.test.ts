@@ -1,17 +1,15 @@
 import { fromBinary } from "@bufbuild/protobuf";
 import { FakeKmpClient, state } from "@core/kmp/fakeClient.ts";
-import { KMP_FLAG_KEY } from "@core/kmp/flag.ts";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { useDeviceStore } from "@core/stores";
 import { Protobuf } from "@meshtastic/sdk";
 import { act, renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useConnections } from "./useConnections.ts";
 
-const kmp = vi.hoisted(() => ({
-  client: undefined as FakeKmpClient | undefined,
-  connectError: undefined as Error | undefined,
-}));
+const kmp = vi.hoisted(
+  (): { client?: FakeKmpClient; connectError?: Error } => ({}),
+);
 
 vi.mock("@core/sdkStorage.ts", () => ({
   getStorageDb: async () => {
@@ -48,12 +46,8 @@ function named(name: string): Error {
 
 describe("useConnections over the Kotlin SDK (HTTP)", () => {
   beforeEach(() => {
-    localStorage.setItem(KMP_FLAG_KEY, "1");
     kmp.client = undefined;
     kmp.connectError = undefined;
-  });
-  afterEach(() => {
-    localStorage.removeItem(KMP_FLAG_KEY);
   });
 
   it("connects through the SDK and asks the radio for its config", async () => {

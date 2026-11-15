@@ -79,14 +79,20 @@ export const ConnectingOverlay = (): ReactElement | null => {
   const isConnecting = active.status === "connecting";
   // A connection that has been connected before is being reconnected.
   const title =
-    active.lastConnectedAt !== undefined
+    active.reconnect || active.lastConnectedAt !== undefined
       ? t("overlay.title.reconnecting")
       : t("overlay.title.connecting");
-  const phaseLabel = isConnecting
-    ? t("overlay.phase.connecting", { defaultValue: "Opening transport…" })
-    : t("overlay.phase.configuring", {
-        defaultValue: "Streaming configuration…",
-      });
+  // The SDK reports which reconnect attempt it is on.
+  const phaseLabel = active.reconnect
+    ? t("overlay.phase.reconnecting", {
+        attempt: active.reconnect.attempt,
+        max: active.reconnect.maxAttempts,
+      })
+    : isConnecting
+      ? t("overlay.phase.connecting", { defaultValue: "Opening transport…" })
+      : t("overlay.phase.configuring", {
+          defaultValue: "Streaming configuration…",
+        });
 
   return (
     <Dialog open>

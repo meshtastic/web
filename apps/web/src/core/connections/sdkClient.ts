@@ -7,16 +7,8 @@ import {
 } from "@meshtastic/sdk-storage-sqlocal/chat";
 import { SqlocalNodesRepository } from "@meshtastic/sdk-storage-sqlocal/nodes";
 import { SqlocalTelemetryRepository } from "@meshtastic/sdk-storage-sqlocal/telemetry";
-import type { TransportHTTP } from "@meshtastic/transport-http";
-import type { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
-import type { TransportWebSerial } from "@meshtastic/transport-web-serial";
 
 const log = createLogger("sdkClient");
-
-export type AnyTransport =
-  | TransportHTTP
-  | TransportWebBluetooth
-  | TransportWebSerial;
 
 const CHAT_RETENTION = {
   maxPerBucket: 1000,
@@ -63,6 +55,7 @@ export async function buildMeshDevice(
   deviceId: number,
   transport: Transport,
   nodeNum?: number,
+  { heartbeat = true }: { heartbeat?: boolean } = {},
 ): Promise<{ meshDevice: MeshDevice; persistent: boolean }> {
   log.debug("buildMeshDevice: enter", { connectionId, deviceId, nodeNum });
   const scope = nodeNum ?? UNKNOWN_NODE_SCOPE;
@@ -119,6 +112,7 @@ export async function buildMeshDevice(
 
   const meshDevice = new MeshDevice(transport, {
     configId: deviceId,
+    heartbeatIntervalMs: heartbeat ? undefined : false,
     storageScope: "node",
     storageNodeNum: nodeNum,
     chat:

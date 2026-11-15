@@ -1,7 +1,6 @@
 import type { Connection } from "@core/stores/deviceStore/types";
 import { httpErrorMessage, testHttpReachable } from "@pages/Connections/utils";
-import { createLogger } from "@meshtastic/sdk";
-import { TransportHTTP } from "@meshtastic/transport-http";
+import { createLogger, type Transport } from "@meshtastic/sdk";
 import {
   BluetoothConnectError,
   TransportWebBluetooth,
@@ -11,7 +10,6 @@ import {
   TransportWebSerial,
 } from "@meshtastic/transport-web-serial";
 import { Result } from "better-result";
-import type { AnyTransport } from "./sdkClient.ts";
 
 const log = createLogger("transports");
 
@@ -30,8 +28,11 @@ export interface OpenTransportOptions {
   cachedSerialPort?: SerialPort;
 }
 
+/** HTTP connections are opened by the Kotlin SDK (see `core/kmp`). */
+export type BrowserConnection = Exclude<Connection, { type: "http" }>;
+
 export interface OpenTransportResult {
-  transport: AnyTransport;
+  transport: Transport;
   /** BT device (when type=bluetooth) so caller can cache for cleanup + reconnect. */
   bluetoothDevice?: BluetoothDevice;
   /** Serial port (when type=serial) so caller can cache for cleanup + reconnect. */
@@ -39,12 +40,10 @@ export interface OpenTransportResult {
 }
 
 export async function openTransport(
-  conn: Connection,
+  conn: BrowserConnection,
   opts: OpenTransportOptions = {},
 ): Promise<OpenTransportResult> {
   switch (conn.type) {
-    case "http":
-      return openHttp(conn);
     case "bluetooth":
       return openBluetooth(conn, opts);
     case "serial":
@@ -57,19 +56,6 @@ export async function openTransport(
       );
     }
   }
-}
-
-async function openHttp(
-  conn: Connection & { type: "http"; url: string },
-): Promise<OpenTransportResult> {
-  const { reachable, certError } = await testHttpReachable(conn.url);
-  if (!reachable) {
-    throw new Error(httpErrorMessage(conn.url, certError));
-  }
-  const url = new URL(conn.url);
-  const isTLS = url.protocol === "https:";
-  const transport = await TransportHTTP.create(url.host, isTLS);
-  return { transport };
 }
 
 async function openBluetooth(

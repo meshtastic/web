@@ -72,6 +72,20 @@ describe("ConnectionsList inline delete", () => {
     });
   });
 
+  it("shows the SDK's reconnect attempt on the status pill", () => {
+    connectionsMock.connections = [
+      {
+        ...http(1, "Alpha"),
+        status: "connecting",
+        reconnect: { attempt: 2, maxAttempts: 10 },
+      },
+    ];
+    render(<ConnectionsList />);
+    expect(
+      within(row("Alpha")).getAllByText("reconnecting 2/10").length,
+    ).toBeGreaterThan(0);
+  });
+
   it("swaps the row's actions for a strip and focuses Cancel", async () => {
     render(<ConnectionsList />);
     expect(within(row("Bravo")).getByRole("button", { name: "Connect" }));

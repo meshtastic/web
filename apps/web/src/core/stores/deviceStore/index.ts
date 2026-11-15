@@ -42,16 +42,9 @@ type DeviceData = {
   waypoints: WaypointWithMetadata[];
   neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
 };
-export type ConnectionPhase =
-  | "disconnected"
-  | "connecting"
-  | "configuring"
-  | "configured";
-
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
   status: Types.DeviceStatusEnum;
-  connectionPhase: ConnectionPhase;
   connectionId: ConnectionId | null;
   channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
   config: Protobuf.LocalOnly.LocalConfig;
@@ -66,7 +59,6 @@ export interface Device extends DeviceData {
   clientNotifications: Protobuf.Mesh.ClientNotification[];
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
-  setConnectionPhase: (phase: ConnectionPhase) => void;
   setConnectionId: (id: ConnectionId | null) => void;
   setConfig: (config: Protobuf.Config.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
@@ -170,7 +162,6 @@ function deviceFactory(
     neighborInfo,
 
     status: Types.DeviceStatusEnum.DeviceDisconnected,
-    connectionPhase: "disconnected",
     connectionId: null,
     channels: new Map(),
     config: create(Protobuf.LocalOnly.LocalConfigSchema),
@@ -207,16 +198,6 @@ function deviceFactory(
           const device = draft.devices.get(id);
           if (device) {
             device.status = status;
-          }
-        }),
-      );
-    },
-    setConnectionPhase: (phase: ConnectionPhase) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (device) {
-            device.connectionPhase = phase;
           }
         }),
       );

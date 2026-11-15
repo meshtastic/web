@@ -44,6 +44,15 @@ describe("ConnectingOverlay", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows the SDK's reconnect attempt", () => {
+    savedConnections = [
+      connection({ reconnect: { attempt: 3, maxAttempts: 10 } }),
+    ];
+    render(<ConnectingOverlay />);
+    expect(screen.getByRole("heading", { name: "Reconnecting" })).toBeDefined();
+    expect(screen.getByText("Reconnect attempt 3 of 10…")).toBeDefined();
+  });
+
   it("shows nothing when no connection is in progress", () => {
     savedConnections = [connection({ status: "configured" })];
     const { container } = render(<ConnectingOverlay />);

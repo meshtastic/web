@@ -73,6 +73,7 @@
     },
     "phase": {
       "connecting": "Opening transport…",
+      "reconnecting": "Reconnect attempt {{attempt}} of {{max}}…",
       "configuring": "Streaming configuration…"
     },
     "chip": {
@@ -83,6 +84,9 @@
     },
     "stuckHint": "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
     "cancel": "Cancel"
+  },
+  "status": {
+    "reconnecting": "reconnecting {{attempt}}/{{max}}"
   },
   "errors": {
     "certNotTrusted": "Self-signed certificate not trusted. Open {{url}} in a new tab, accept the security warning, then return here and try again.",

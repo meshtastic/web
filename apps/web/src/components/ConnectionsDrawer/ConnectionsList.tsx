@@ -260,13 +260,23 @@ const statusDot: Record<StatusTone, string> = {
 
 function StatusPill({
   status,
+  reconnect,
   className,
 }: {
   status: Connection["status"];
+  reconnect?: Connection["reconnect"];
   className?: string;
 }) {
+  const { t } = useTranslation("connections");
   const tone = statusTone(status);
-  const label = tone === "connected" ? "connected" : status;
+  const label = reconnect
+    ? t("status.reconnecting", {
+        attempt: reconnect.attempt,
+        max: reconnect.maxAttempts,
+      })
+    : tone === "connected"
+      ? "connected"
+      : status;
   return (
     <span
       className={cn(
@@ -364,13 +374,18 @@ function ConnectionCard({
             {/* At wide sizes the status sits inline with the name. */}
             <StatusPill
               status={connection.status}
+              reconnect={connection.reconnect}
               className="hidden @xl:flex"
             />
           </div>
           <p className="mt-0.5 break-all text-sm text-muted-foreground">
             {formatConnectionSubtext(connection)}
           </p>
-          <StatusPill status={connection.status} className="mt-2 @xl:hidden" />
+          <StatusPill
+            status={connection.status}
+            reconnect={connection.reconnect}
+            className="mt-2 @xl:hidden"
+          />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
