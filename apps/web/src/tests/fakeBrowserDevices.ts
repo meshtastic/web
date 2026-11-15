@@ -165,6 +165,7 @@ export class FakeSerialPort extends EventTarget implements SerialPort {
   closes = 0;
   readonly written: Uint8Array[] = [];
   private reader?: ReadableStreamDefaultController<Uint8Array>;
+  private writer?: WritableStreamDefaultController;
   private readonly splitter = new FrameSplitter();
 
   constructor(
@@ -178,7 +179,15 @@ export class FakeSerialPort extends EventTarget implements SerialPort {
     return this.info;
   }
 
-  async open(): Promise<void> {
+  open(): Promise<void> {
+    if (this.readable || this.writable) {
+      throw new DOMException("The port is already open.", "InvalidStateError");
+    }
+    if (!this.connected) {
+      return Promise.reject(
+        new DOMException("Failed to open serial port.", "NetworkError"),
+      );
+    }
     this.opens += 1;
     this.readable = new ReadableStream<Uint8Array>({
       start: (controller) => {
@@ -186,6 +195,9 @@ export class FakeSerialPort extends EventTarget implements SerialPort {
       },
     });
     this.writable = new WritableStream<Uint8Array>({
+      start: (controller) => {
+        this.writer = controller;
+      },
       write: (chunk) => {
         this.written.push(chunk);
         for (const payload of this.splitter.feed(chunk)) {
@@ -195,15 +207,23 @@ export class FakeSerialPort extends EventTarget implements SerialPort {
         }
       },
     });
+    return Promise.resolve();
   }
 
-  async close(): Promise<void> {
+  close(): Promise<void> {
+    if (!this.readable && !this.writable) {
+      throw new DOMException(
+        "The port is already closed.",
+        "InvalidStateError",
+      );
+    }
     this.closes += 1;
     try {
       this.reader?.close();
     } catch {}
     this.readable = null;
     this.writable = null;
+    return Promise.resolve();
   }
 
   async forget(): Promise<void> {}
@@ -218,13 +238,36 @@ export class FakeSerialPort extends EventTarget implements SerialPort {
     this.reader?.enqueue(bytes);
   }
 
-  /** The OS lost the device: the read stream errors, as Chrome's does. */
+  /**
+   * The OS lost the device. As in Chromium, the port stays permitted and
+   * keeps its identity, `connected` flips, both streams error with a
+   * NetworkError and the getters go null; a later `open()` fails until
+   * `replug()`.
+   */
   unplug(): void {
+    this.connected = false;
+    const lost = new DOMException("The device has been lost.", "NetworkError");
     try {
-      this.reader?.error(new Error("The device has been lost."));
+      this.reader?.error(lost);
+    } catch {}
+    try {
+      this.writer?.error(lost);
     } catch {}
     this.readable = null;
     this.writable = null;
+  }
+
+  replug(): void {
+    this.connected = true;
+  }
+
+  /** The device is gone but the OS has not said so yet: only writes fail. */
+  failWrites(): void {
+    try {
+      this.writer?.error(
+        new DOMException("The device has been lost.", "NetworkError"),
+      );
+    } catch {}
   }
 }
 

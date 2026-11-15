@@ -296,7 +296,16 @@ export function useConnections() {
             return;
           }
           if (state.kind === "disconnected") {
-            if (!reconnecting) return;
+            if (!reconnecting) {
+              log.error("kmp: dropped without retrying", { id });
+              updateSavedConnection(id, {
+                status: "error",
+                reconnect: undefined,
+                error: t("connections:errors.connectionLost"),
+                errorKind: "network",
+              });
+              return;
+            }
             const last = reconnecting;
             reconnecting = undefined;
             // The SDK gives up before its first attempt on a drop it

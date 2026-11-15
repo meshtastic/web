@@ -58,7 +58,7 @@ class WebSerialTransportTest {
                     var self = this;
                     self.opens++;
                     self.readable = new ReadableStream({ start: function (c) { self.reader = c; } });
-                    self.writable = new WritableStream({ write: function (chunk) { self.written.push(chunk); } });
+                    self.writable = new WritableStream({ start: function (c) { self.writer = c; }, write: function (chunk) { self.written.push(chunk); } });
                     return Promise.resolve();
                 },
                 close: function () { this.closes++; this.readable = null; this.writable = null; return Promise.resolve(); },
@@ -173,6 +173,39 @@ class WebSerialTransportTest {
         assertEquals(TransportState.Connected, transport.state.value)
         assertEquals(1, replugged.opens)
         assertEquals(0, serial.requested)
+        transport.disconnect()
+    }
+
+    @Test
+    fun a_failed_write_is_a_recoverable_error_and_does_not_throw() = GlobalScope.promise {
+        val radio = fakePort(0x303a, 0x1001)
+        installSerial(arrayOf(radio))
+        val transport = WebSerialTransport(null, 0x303a, 0x1001)
+        transport.connect()
+        radio.writer.error(js("new DOMException('The device has been lost.', 'NetworkError')"))
+
+        transport.send(Frame(framed(byteArrayOf(0x10))))
+
+        val error = transport.state.value as TransportState.Error
+        assertTrue(error.recoverable)
+        assertEquals("serial-disconnected", (error.cause as ClientException).kind)
+        transport.disconnect()
+    }
+
+    @Test
+    fun an_os_disconnect_closes_the_lost_port_and_forgets_it() = GlobalScope.promise {
+        val radio = fakePort(0x303a, 0x1001)
+        val serial = installSerial(arrayOf(radio))
+        val transport = WebSerialTransport(radio, 0x303a, 0x1001)
+        transport.connect()
+
+        serial.dispatch("disconnect", radio)
+        withTimeout(1_000) { transport.state.first { it is TransportState.Error } }
+        delay(10)
+
+        assertEquals(1, radio.closes)
+        serial.ports = arrayOf<dynamic>()
+        assertFailsWith<ClientException> { transport.connect() }
         transport.disconnect()
     }
 

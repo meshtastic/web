@@ -7,7 +7,11 @@ import {
   uninstallBrowserDevices,
 } from "@app/tests/fakeBrowserDevices.ts";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createSerialClient, type MeshtasticClient } from "./client.ts";
+import {
+  createSerialClient,
+  loadKmp,
+  type MeshtasticClient,
+} from "./client.ts";
 
 const ids = { usbVendorId: 0x303a, usbProductId: 0x1001 };
 
@@ -92,10 +96,73 @@ describe("createSerialClient (Kotlin facade over a fake navigator.serial)", () =
     });
   });
 
-  it("reconnects through the SDK after an unplug, and reopens the replugged port", async () => {
+  for (const order of ["read error first", "disconnect event first"]) {
+    it(`reconnects after Chrome's unplug sequence (${order}) and reopens the same port once it is back`, async () => {
+      const radio = new FakeRadio();
+      const port = new FakeSerialPort(ids, radio);
+      const serial = installSerial([port]);
+      const client = await createSerialClient(ids);
+      clients.push(client);
+      const states: ConnectionStateJs[] = [];
+      client.onConnectionState((state) => states.push(state));
+      const lines: string[] = [];
+      (await loadKmp()).setSdkLogger((level, tag, message) =>
+        lines.push(`${level} ${tag}: ${message}`),
+      );
+      await client.connect();
+      await connected(client);
+
+      if (order === "disconnect event first") {
+        serial.dispatch("disconnect", port);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        port.unplug();
+      } else {
+        port.unplug();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        serial.dispatch("disconnect", port);
+      }
+
+      await vi.waitFor(
+        () => expect(client.connectionState.kind).toBe("reconnecting"),
+        { timeout: 2_000, interval: 10 },
+      );
+      expect(client.connectionState).toMatchObject({
+        attempt: 1,
+        maxAttempts: 10,
+        errorKind: "serial-disconnected",
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 1_500));
+      port.replug();
+      serial.dispatch("connect", port);
+
+      await connected(client);
+      expect(port.opens).toBe(2);
+      expect(serial.requestPort).not.toHaveBeenCalled();
+      expect(states.map((s) => s.kind)).toEqual(
+        expect.arrayContaining(["connected", "reconnecting", "connected"]),
+      );
+      expect(lines).toEqual(
+        expect.arrayContaining([
+          expect.stringMatching(
+            /^warn MeshEngine: Transport error: (Serial device disconnected|The device has been lost\.)$/,
+          ),
+          expect.stringMatching(
+            /^info MeshEngine: Auto-reconnect attempt 1 scheduled in \d+ ms$/,
+          ),
+          expect.stringMatching(
+            /^info Client: Connection state: reconnecting \(attempt 1\): /,
+          ),
+          "info MeshEngine: Auto-reconnect attempt 1 succeeded",
+        ]),
+      );
+    }, 15_000);
+  }
+
+  it("reconnects when a write fails before the OS reports the loss", async () => {
     const radio = new FakeRadio();
     const port = new FakeSerialPort(ids, radio);
-    const serial = installSerial([port]);
+    installSerial([port]);
     const client = await createSerialClient(ids);
     clients.push(client);
     const states: ConnectionStateJs[] = [];
@@ -103,28 +170,19 @@ describe("createSerialClient (Kotlin facade over a fake navigator.serial)", () =
     await client.connect();
     await connected(client);
 
-    port.unplug();
-    serial.dispatch("disconnect", port);
+    port.failWrites();
+    const outcome = await client.sendText("hi", 0xffffffff, 0).outcome;
+    expect(outcome.ok).toBe(false);
 
     await vi.waitFor(
       () => expect(client.connectionState.kind).toBe("reconnecting"),
       { timeout: 2_000, interval: 10 },
     );
-    expect(client.connectionState).toMatchObject({
-      attempt: 1,
-      maxAttempts: 10,
-      errorKind: "serial-disconnected",
-    });
-
-    const replugged = new FakeSerialPort(ids, radio);
-    serial.ports = [replugged];
-    serial.dispatch("connect", replugged);
-
     await connected(client);
-    expect(replugged.opens).toBe(1);
-    expect(serial.requestPort).not.toHaveBeenCalled();
-    expect(states.map((s) => s.kind)).toEqual(
-      expect.arrayContaining(["connected", "reconnecting", "connected"]),
+    expect(port.opens).toBe(2);
+    const kinds = states.map((s) => s.kind);
+    expect(kinds.slice(kinds.indexOf("connected"))).not.toContain(
+      "disconnected",
     );
   }, 15_000);
 });

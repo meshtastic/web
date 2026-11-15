@@ -97,7 +97,8 @@
     "localNetworkDenied": "Chrome blocked local network access for this site. Click the site-info icon in the address bar, allow Local network, then Connect.",
     "localNetworkPrompt": "Chrome needs your permission to reach the local network. Click Connect to allow it.",
     "handshakeTimeout": "The radio stopped responding during the handshake. It may be in CLI or bootloader mode, or its firmware isn't answering config requests.",
-    "reconnectFailed": "Could not reconnect after {{attempts}} attempts."
+    "reconnectFailed": "Could not reconnect after {{attempts}} attempts.",
+    "connectionLost": "The connection to the radio was lost."
   },
   "httpTest": {
     "certNotTrusted": "Certificate not trusted. <0>Open in new tab</0> and accept the warning, then test again."

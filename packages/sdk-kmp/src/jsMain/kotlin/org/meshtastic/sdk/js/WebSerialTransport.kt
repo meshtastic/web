@@ -25,6 +25,10 @@ import kotlin.js.Promise
  * the host obtained from `navigator.serial.requestPort()` inside a user
  * gesture, or null, in which case every connect (first or reconnect) reopens
  * the one permitted port whose USB ids match through `getPorts()`.
+ *
+ * A lost link is reported through [state] as a recoverable
+ * [TransportState.Error] and never thrown from [send]: the engine treats a
+ * throwing send as fatal and tears the session down instead of reconnecting.
  */
 internal class WebSerialTransport(
     private var port: dynamic,
@@ -46,8 +50,8 @@ internal class WebSerialTransport(
     private val onOsDisconnect: (dynamic) -> Unit = { event ->
         val gone = event.target ?: event.port
         if (gone != null && gone === port) {
-            port = null
             dropped("Serial device disconnected")
+            port = null
         }
     }
 
@@ -104,9 +108,10 @@ internal class WebSerialTransport(
         val w = writer ?: throw ClientException("transport", "Serial port is not open")
         try {
             (w.write(frame.bytes.toByteArray().toUint8Array()) as Promise<Unit>).await()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Throwable) {
             dropped(e.message ?: "Serial write failed")
-            throw ClientException("transport", e.message ?: "Serial write failed")
         }
     }
 
@@ -201,11 +206,11 @@ internal class WebSerialTransport(
     private fun dropped(reason: String) {
         if (closing || _state.value !is TransportState.Connected) return
         _state.value = TransportState.Error(ClientException(DISCONNECTED, reason), recoverable = true)
-        scope?.launch { release() }
+        val p = port
+        scope?.launch { release(p) }
     }
 
-    private suspend fun release() {
-        val p = port
+    private suspend fun release(p: dynamic = port) {
         try {
             (reader?.cancel() as? Promise<Unit>)?.await()
         } catch (_: Throwable) {

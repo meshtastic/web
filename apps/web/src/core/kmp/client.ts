@@ -1,3 +1,4 @@
+import { createLogger } from "@core/log.ts";
 import type { MeshtasticClient, StorageJs } from "@meshtastic/sdk-kmp";
 
 export type {
@@ -13,12 +14,39 @@ type KmpModule = typeof import("@meshtastic/sdk-kmp");
 
 let loading: Promise<KmpModule> | undefined;
 
+const sdkLog = createLogger("sdk");
+
+/** Routes the SDK's own log lines into the web logger, prefixed with their tag. */
+function routeSdkLogs(kmp: KmpModule): KmpModule {
+  kmp.setSdkLogger((level, tag, message, error) => {
+    const args: unknown[] = error ? [{ error }] : [];
+    const line = `${tag}: ${message}`;
+    switch (level) {
+      case "verbose":
+        sdkLog.trace(line, ...args);
+        return;
+      case "debug":
+        sdkLog.debug(line, ...args);
+        return;
+      case "warn":
+        sdkLog.warn(line, ...args);
+        return;
+      case "error":
+        sdkLog.error(line, ...args);
+        return;
+      default:
+        sdkLog.info(line, ...args);
+    }
+  });
+  return kmp;
+}
+
 /**
  * The Kotlin SDK is ~240 KB gzipped, so it is loaded on first connect
  * rather than with the app shell.
  */
 export function loadKmp(): Promise<KmpModule> {
-  loading ??= import("@meshtastic/sdk-kmp");
+  loading ??= import("@meshtastic/sdk-kmp").then(routeSdkLogs);
   return loading;
 }
 

@@ -27,6 +27,7 @@ import org.meshtastic.proto.TrafficManagementStats
 import org.meshtastic.sdk.AutoReconnectConfig
 import org.meshtastic.sdk.ChannelIndex
 import org.meshtastic.sdk.InMemoryStorageProvider
+import org.meshtastic.sdk.LogLevel
 import org.meshtastic.sdk.MessageHandle
 import org.meshtastic.sdk.NodeId
 import org.meshtastic.sdk.RadioClient
@@ -48,6 +49,13 @@ class MeshtasticClient internal constructor(
         transport(TappingTransport(transport) { bytes -> frameListeners.toList().forEach { it(bytes.toUint8Array()) } })
         storage(if (storage == null) InMemoryStorageProvider() else JsStorageProvider(storage))
         autoReconnect(AutoReconnectConfig(maxAttempts = maxAttempts))
+        logger(JsLogSink)
+    }
+
+    init {
+        client.connection
+            .onEach { JsLogSink.log(LogLevel.INFO, "Client", "Connection state: ${it.describe()}", null) }
+            .launchIn(scope)
     }
 
     fun connect(): Promise<Unit> = scope.promise {

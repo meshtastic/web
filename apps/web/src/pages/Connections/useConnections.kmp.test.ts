@@ -166,6 +166,24 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     });
   });
 
+  it("reports a drop the SDK gave up on without any reconnect attempt", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+    expect(saved(conn.id)?.status).toBe("configured");
+
+    act(() => client.setState(state("disconnected")));
+
+    expect(saved(conn.id)).toMatchObject({
+      status: "error",
+      error: "The connection to the radio was lost.",
+      errorKind: "network",
+      reconnect: undefined,
+    });
+  });
+
   it("disconnects the old client before connecting the same connection again", async () => {
     const { result } = renderHook(() => useConnections());
     const conn = addRadio(result);

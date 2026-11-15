@@ -120,9 +120,11 @@ internal class WebBluetoothTransport(
                 }
                 (write as Promise<Unit>).await()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Throwable) {
             dropped(e.message ?: "Bluetooth write failed")
-            throw ClientException("transport", e.message ?: "Bluetooth write failed")
+            return
         }
         wakeDrain()
     }
