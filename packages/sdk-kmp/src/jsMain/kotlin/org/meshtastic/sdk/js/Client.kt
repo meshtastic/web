@@ -46,10 +46,16 @@ class MeshtasticClient internal constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val frameListeners = mutableSetOf<(Uint8Array) -> Unit>()
     private val client: RadioClient = RadioClient {
-        transport(TappingTransport(transport) { bytes -> frameListeners.toList().forEach { it(bytes.toUint8Array()) } })
+        transport(TappingTransport(transport) { bytes -> forwardFrame(bytes) })
         storage(if (storage == null) InMemoryStorageProvider() else JsStorageProvider(storage))
         autoReconnect(AutoReconnectConfig(maxAttempts = maxAttempts))
         logger(JsLogSink)
+    }
+
+    private fun forwardFrame(bytes: ByteArray) {
+        if (frameListeners.isEmpty() || carriesMeshPacket(bytes)) return
+        val frame = bytes.toUint8Array()
+        frameListeners.toList().forEach { it(frame) }
     }
 
     init {
@@ -93,6 +99,7 @@ class MeshtasticClient internal constructor(
     fun onTelemetry(nodeNum: Int, cb: (Uint8Array) -> Unit): () -> Unit =
         client.telemetry.observe(NodeId(nodeNum)).onEach { cb(Telemetry.ADAPTER.encode(it).toUint8Array()) }.subscribe()
 
+    /** Every `FromRadio` frame except those carrying a `MeshPacket`, which arrive through [onPacket]. */
     fun onFromRadio(cb: (Uint8Array) -> Unit): () -> Unit {
         frameListeners.add(cb)
         return { frameListeners.remove(cb) }

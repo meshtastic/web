@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { create, toBinary } from "@bufbuild/protobuf";
+import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
 import type { ConnectionStateJs } from "@meshtastic/sdk-kmp";
 import {
@@ -209,6 +209,71 @@ describe("createSerialClient (Kotlin facade over a fake navigator.serial)", () =
     );
     expect(session.nodes.byNum(0x2000)?.user?.longName).toBe("x".repeat(200));
     session.close();
+  }, 15_000);
+
+  it("delivers a mesh packet once, through onPacket and not the raw frame stream", async () => {
+    const radio = new FakeRadio();
+    const port = new FakeSerialPort(ids, radio);
+    installSerial([port]);
+    const client = await createSerialClient(ids);
+    clients.push(client);
+    await client.connect();
+    await connected(client);
+    const frames: Uint8Array[] = [];
+    const packets: Uint8Array[] = [];
+    client.onFromRadio((bytes) => frames.push(bytes));
+    client.onPacket((bytes) => packets.push(bytes));
+
+    const text = toBinary(
+      Protobuf.Mesh.FromRadioSchema,
+      create(Protobuf.Mesh.FromRadioSchema, {
+        id: 41,
+        payloadVariant: {
+          case: "packet",
+          value: create(Protobuf.Mesh.MeshPacketSchema, {
+            from: 0x2000,
+            to: 0xffffffff,
+            id: 7,
+            payloadVariant: {
+              case: "decoded",
+              value: create(Protobuf.Mesh.DataSchema, {
+                portnum: Protobuf.Portnums.PortNum.TEXT_MESSAGE_APP,
+                payload: new TextEncoder().encode("hi"),
+              }),
+            },
+          }),
+        },
+      }),
+    );
+    const notice = toBinary(
+      Protobuf.Mesh.FromRadioSchema,
+      create(Protobuf.Mesh.FromRadioSchema, {
+        id: 42,
+        payloadVariant: {
+          case: "clientNotification",
+          value: create(Protobuf.Mesh.ClientNotificationSchema, {
+            message: "ok",
+          }),
+        },
+      }),
+    );
+    port.push(new Uint8Array([...framed(text), ...framed(notice)]));
+
+    await vi.waitFor(() => {
+      expect(frames).toHaveLength(1);
+      expect(packets).toHaveLength(1);
+    });
+    expect(
+      frames.map(
+        (bytes) =>
+          fromBinary(Protobuf.Mesh.FromRadioSchema, bytes).payloadVariant.case,
+      ),
+    ).toEqual(["clientNotification"]);
+    expect(
+      packets.map(
+        (bytes) => fromBinary(Protobuf.Mesh.MeshPacketSchema, bytes).id,
+      ),
+    ).toEqual([7]);
   }, 15_000);
 
   it("hands the session its own node and channels again after an auto-reconnect", async () => {

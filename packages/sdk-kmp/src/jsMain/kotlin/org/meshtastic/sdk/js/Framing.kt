@@ -1,5 +1,6 @@
 package org.meshtastic.sdk.js
 
+import com.squareup.wire.ProtoReader
 import okio.Buffer
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
@@ -88,4 +89,23 @@ internal class FrameAssembler(private val onFrame: (Frame) -> Unit) {
             }
         }
     }
+}
+
+private const val FROM_RADIO_PACKET_FIELD = 2
+
+/** Whether a `FromRadio` payload holds a `MeshPacket`, read from its field tags without decoding it. */
+internal fun carriesMeshPacket(payload: ByteArray): Boolean {
+    val reader = ProtoReader(Buffer().write(payload))
+    try {
+        reader.beginMessage()
+        var tag = reader.nextTag()
+        while (tag != -1) {
+            if (tag == FROM_RADIO_PACKET_FIELD) return true
+            reader.skip()
+            tag = reader.nextTag()
+        }
+    } catch (_: Exception) {
+        return false
+    }
+    return false
 }
