@@ -1,4 +1,12 @@
-import type { ConnectionStateJs, MeshtasticClient } from "@meshtastic/sdk-kmp";
+import type {
+  AdminJs,
+  AdminResultJs,
+  ConfigBundleJs,
+  ConnectionStateJs,
+  MeshtasticClient,
+  NodeChangeJs,
+  SendOutcomeJs,
+} from "@meshtastic/sdk-kmp";
 
 export function state(
   kind: string,
@@ -16,17 +24,64 @@ export function state(
   };
 }
 
+export function adminOk(value?: Uint8Array, text?: string): AdminResultJs {
+  return { ok: true, reason: null, value: value ?? null, text: text ?? null };
+}
+
+export function adminFailed(reason: string): AdminResultJs {
+  return { ok: false, reason, value: null, text: null };
+}
+
+type Listeners<T> = Set<(value: T) => void>;
+
+/**
+ * A scripted stand-in for the facade's admin API: records every message
+ * and answers from `results`, or `ok` once that runs out.
+ */
+export class FakeAdmin implements AdminJs {
+  readonly sent: Uint8Array[] = [];
+  readonly transactions: Uint8Array[][] = [];
+  readonly results: AdminResultJs[] = [];
+
+  constructor(readonly dest: number) {}
+
+  async send(adminMessage: Uint8Array): Promise<AdminResultJs> {
+    this.sent.push(adminMessage);
+    return this.results.shift() ?? adminOk();
+  }
+
+  async editSettings(adminMessages: Uint8Array[]): Promise<AdminResultJs> {
+    this.transactions.push(adminMessages);
+    this.sent.push(...adminMessages);
+    return this.results.shift() ?? adminOk();
+  }
+}
+
 /**
  * A scripted stand-in for the facade's client, for tests: callers push
- * frames and states and record what the web client sent.
+ * frames, states, nodes and packets, and record what the web client sent.
  */
 export class FakeKmpClient implements MeshtasticClient {
   connectionState: ConnectionStateJs = state("disconnected");
   myNodeNum: number | null = null;
+  configBundle: ConfigBundleJs | null = null;
+  channels: Uint8Array[] | null = null;
+  nodeList: Uint8Array[] = [];
   readonly sent: Uint8Array[] = [];
+  readonly texts: Array<{ text: string; to: number; channel: number }> = [];
+  readonly packets: Uint8Array[] = [];
+  readonly requests: Array<{ kind: string; nodeNum: number }> = [];
   readonly disconnects: number[] = [];
-  private frameListeners = new Set<(bytes: Uint8Array) => void>();
-  private stateListeners = new Set<(s: ConnectionStateJs) => void>();
+  readonly admins = new Map<number, FakeAdmin>();
+  sendOutcome: SendOutcomeJs = { id: 1, ok: true, reason: null };
+  adminResult: AdminResultJs = adminOk();
+  private frameListeners: Listeners<Uint8Array> = new Set();
+  private stateListeners: Listeners<ConnectionStateJs> = new Set();
+  private bundleListeners: Listeners<ConfigBundleJs | null> = new Set();
+  private channelListeners: Listeners<Uint8Array[] | null> = new Set();
+  private nodeListeners: Listeners<NodeChangeJs> = new Set();
+  private packetListeners: Listeners<Uint8Array> = new Set();
+  private telemetryListeners = new Map<number, Listeners<Uint8Array>>();
 
   async connect(): Promise<void> {
     this.setState(state("connected"));
@@ -43,9 +98,84 @@ export class FakeKmpClient implements MeshtasticClient {
     return () => this.stateListeners.delete(cb);
   }
 
+  onConfigBundle(cb: (bundle: ConfigBundleJs | null) => void): () => void {
+    this.bundleListeners.add(cb);
+    cb(this.configBundle);
+    return () => this.bundleListeners.delete(cb);
+  }
+
+  onChannels(cb: (channels: Uint8Array[] | null) => void): () => void {
+    this.channelListeners.add(cb);
+    cb(this.channels);
+    return () => this.channelListeners.delete(cb);
+  }
+
+  onNodeChange(cb: (change: NodeChangeJs) => void): () => void {
+    this.nodeListeners.add(cb);
+    return () => this.nodeListeners.delete(cb);
+  }
+
+  onPacket(cb: (bytes: Uint8Array) => void): () => void {
+    this.packetListeners.add(cb);
+    return () => this.packetListeners.delete(cb);
+  }
+
+  onTelemetry(nodeNum: number, cb: (bytes: Uint8Array) => void): () => void {
+    const listeners = this.telemetryListeners.get(nodeNum) ?? new Set();
+    listeners.add(cb);
+    this.telemetryListeners.set(nodeNum, listeners);
+    return () => listeners.delete(cb);
+  }
+
   onFromRadio(cb: (bytes: Uint8Array) => void): () => void {
     this.frameListeners.add(cb);
     return () => this.frameListeners.delete(cb);
+  }
+
+  async nodes(): Promise<Uint8Array[]> {
+    return this.nodeList;
+  }
+
+  admin(dest = 0): FakeAdmin {
+    const existing = this.admins.get(dest);
+    if (existing) return existing;
+    const created = new FakeAdmin(dest);
+    this.admins.set(dest, created);
+    return created;
+  }
+
+  async sendText(
+    text: string,
+    to: number,
+    channel: number,
+  ): Promise<SendOutcomeJs> {
+    this.texts.push({ text, to, channel });
+    return this.sendOutcome;
+  }
+
+  async sendPacket(meshPacket: Uint8Array): Promise<SendOutcomeJs> {
+    this.packets.push(meshPacket);
+    return this.sendOutcome;
+  }
+
+  async requestNodeInfo(nodeNum: number): Promise<SendOutcomeJs> {
+    this.requests.push({ kind: "nodeInfo", nodeNum });
+    return this.sendOutcome;
+  }
+
+  async requestPosition(nodeNum: number): Promise<SendOutcomeJs> {
+    this.requests.push({ kind: "position", nodeNum });
+    return this.sendOutcome;
+  }
+
+  async traceRoute(dest: number): Promise<AdminResultJs> {
+    this.requests.push({ kind: "traceRoute", nodeNum: dest });
+    return this.adminResult;
+  }
+
+  async requestTelemetry(kind: string, nodeNum = 0): Promise<AdminResultJs> {
+    this.requests.push({ kind: `telemetry:${kind}`, nodeNum });
+    return this.adminResult;
   }
 
   sendRaw(toRadio: Uint8Array): void {
@@ -60,6 +190,38 @@ export class FakeKmpClient implements MeshtasticClient {
   emitFrame(bytes: Uint8Array): void {
     for (const cb of this.frameListeners) {
       cb(bytes);
+    }
+  }
+
+  emitPacket(bytes: Uint8Array): void {
+    for (const cb of this.packetListeners) {
+      cb(bytes);
+    }
+  }
+
+  emitNodeChange(change: NodeChangeJs): void {
+    for (const cb of this.nodeListeners) {
+      cb(change);
+    }
+  }
+
+  emitTelemetry(nodeNum: number, bytes: Uint8Array): void {
+    for (const cb of this.telemetryListeners.get(nodeNum) ?? []) {
+      cb(bytes);
+    }
+  }
+
+  setConfigBundle(bundle: ConfigBundleJs | null): void {
+    this.configBundle = bundle;
+    for (const cb of this.bundleListeners) {
+      cb(bundle);
+    }
+  }
+
+  setChannels(channels: Uint8Array[] | null): void {
+    this.channels = channels;
+    for (const cb of this.channelListeners) {
+      cb(channels);
     }
   }
 
