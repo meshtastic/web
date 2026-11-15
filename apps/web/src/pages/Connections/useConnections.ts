@@ -117,6 +117,26 @@ async function bluetoothTarget(
   return { device, deviceId: device.id };
 }
 
+type ClientFactory = (storage?: StorageJs) => Promise<MeshtasticClient>;
+
+async function clientFactory(
+  conn: Connection,
+  allowPrompt: boolean,
+): Promise<ClientFactory> {
+  switch (conn.type) {
+    case "http":
+      return (storage) => createHttpClient(conn.url, allowPrompt, storage);
+    case "serial": {
+      const target = await serialTarget(conn, allowPrompt);
+      return (storage) => createSerialClient(target, storage);
+    }
+    case "bluetooth": {
+      const target = await bluetoothTarget(conn, allowPrompt);
+      return (storage) => createBluetoothClient(target, storage);
+    }
+  }
+}
+
 const savedConnection = (id: ConnectionId): Connection | undefined =>
   useDeviceStore.getState().savedConnections.find((c) => c.id === id);
 
@@ -203,10 +223,7 @@ export function useConnections() {
    * this connection reached last time.
    */
   const connectThroughKmp = useCallback(
-    async (
-      id: ConnectionId,
-      makeClient: (storage?: StorageJs) => Promise<MeshtasticClient>,
-    ) => {
+    async (id: ConnectionId, makeClient: ClientFactory) => {
       const conn = savedConnection(id);
       const { options, persistent, sdkStorage } = await openRepositories(
         conn?.nodeNum,
@@ -365,6 +382,14 @@ export function useConnections() {
         });
         sessionTeardowns.get(id)?.();
         sessionTeardowns.delete(id);
+        if (
+          error instanceof Error &&
+          (error.name === "serial-unavailable" ||
+            error.name === "bluetooth-unavailable")
+        ) {
+          heldSerialPorts.delete(id);
+          heldBluetoothDevices.delete(id);
+        }
         updateSavedConnection(id, connectFailure(error));
         return false;
       }
@@ -400,43 +425,28 @@ export function useConnections() {
         allowPrompt: !!opts?.allowPrompt,
       });
       updateStatus(id, "connecting");
-      // The app follows one radio at a time: a session still live on
-      // another connection would keep its port and poller to itself.
-      for (const other of [...sessionTeardowns.keys()]) {
-        if (other === id) continue;
-        await teardown(other);
-        const otherDevice = savedConnection(other)?.meshDeviceId;
-        if (otherDevice) {
-          useDeviceStore
-            .getState()
-            .getDevice(otherDevice)
-            ?.setConnectionId(null);
-        }
-        updateSavedConnection(other, {
-          status: "disconnected",
-          error: undefined,
-        });
-      }
       const allowPrompt = opts?.allowPrompt ?? false;
       try {
-        switch (conn.type) {
-          case "http":
-            return await connectThroughKmp(id, (storage) =>
-              createHttpClient(conn.url, allowPrompt, storage),
-            );
-          case "serial": {
-            const target = await serialTarget(conn, allowPrompt);
-            return await connectThroughKmp(id, (storage) =>
-              createSerialClient(target, storage),
-            );
+        // The picker runs first, while the click's activation is still live.
+        const makeClient = await clientFactory(conn, allowPrompt);
+        // The app follows one radio at a time: a session still live on
+        // another connection would keep its port and poller to itself.
+        for (const other of [...sessionTeardowns.keys()]) {
+          if (other === id) continue;
+          await teardown(other);
+          const otherDevice = savedConnection(other)?.meshDeviceId;
+          if (otherDevice) {
+            useDeviceStore
+              .getState()
+              .getDevice(otherDevice)
+              ?.setConnectionId(null);
           }
-          case "bluetooth": {
-            const target = await bluetoothTarget(conn, allowPrompt);
-            return await connectThroughKmp(id, (storage) =>
-              createBluetoothClient(target, storage),
-            );
-          }
+          updateSavedConnection(other, {
+            status: "disconnected",
+            error: undefined,
+          });
         }
+        return await connectThroughKmp(id, makeClient);
       } catch (error) {
         log.error("connect: no device to connect to", {
           id,
@@ -509,6 +519,10 @@ export function useConnections() {
         }
         if (device) {
           heldBluetoothDevices.set(c.id, device);
+        }
+        if (status === "disconnected") {
+          heldSerialPorts.delete(c.id);
+          heldBluetoothDevices.delete(c.id);
         }
         updateSavedConnection(c.id, { status, error, errorKind });
       }),

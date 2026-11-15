@@ -16,6 +16,7 @@ import { useConnections } from "./useConnections.ts";
 const kmp = vi.hoisted(
   (): {
     client?: FakeKmpClient;
+    connectError?: Error;
     serialTargets: SerialTarget[];
     bluetoothTargets: BluetoothTarget[];
   } => ({ serialTargets: [], bluetoothTargets: [] }),
@@ -34,6 +35,7 @@ vi.mock("@core/kmp/client.ts", async () => {
     createSerialClient: async (target: SerialTarget) => {
       kmp.serialTargets.push(target);
       kmp.client = new FakeKmpClient();
+      kmp.client.connectError = kmp.connectError;
       return kmp.client;
     },
     createBluetoothClient: async (target: BluetoothTarget) => {
@@ -71,6 +73,7 @@ function installBluetooth(
 describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
   beforeEach(() => {
     kmp.client = undefined;
+    kmp.connectError = undefined;
     kmp.serialTargets.length = 0;
     kmp.bluetoothTargets.length = 0;
   });
@@ -154,6 +157,87 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
       { device: radio, deviceId: "radio-1" },
     ]);
     await act(() => result.current.disconnect(conn.id));
+  });
+
+  it("forgets a port whose permission is gone, so the next click shows the picker", async () => {
+    const radio = fakePort(ids);
+    const serial = installFakeSerial([radio]);
+    serial.requestPort.mockResolvedValue(radio);
+    const { result, rerender } = renderHook(() => useConnections());
+    const conn = result.current.addConnection({
+      type: "serial",
+      name: "Serial",
+      ...ids,
+    });
+    rerender();
+    await act(() => result.current.refreshStatuses());
+
+    serial.ports = [];
+    await act(() => result.current.refreshStatuses());
+    await act(() => result.current.connect(conn.id, { allowPrompt: true }));
+
+    expect(serial.requestPort).toHaveBeenCalledTimes(1);
+    await act(() => result.current.disconnect(conn.id));
+  });
+
+  it("forgets a held port the SDK could not open, so the next click shows the picker", async () => {
+    const radio = fakePort(ids);
+    const requestPort = installSerial([radio], radio);
+    const { result, rerender } = renderHook(() => useConnections());
+    const conn = result.current.addConnection({
+      type: "serial",
+      name: "Serial",
+      ...ids,
+    });
+    rerender();
+    await act(() => result.current.refreshStatuses());
+    kmp.connectError = Object.assign(new Error("port gone"), {
+      name: "serial-unavailable",
+    });
+
+    const first = await act(() =>
+      result.current.connect(conn.id, { allowPrompt: true }),
+    );
+    kmp.connectError = undefined;
+    await act(() => result.current.connect(conn.id, { allowPrompt: true }));
+
+    expect(first).toBe(false);
+    expect(requestPort).toHaveBeenCalledTimes(1);
+    await act(() => result.current.disconnect(conn.id));
+  });
+
+  it("shows the picker for a new radio before disconnecting the live one", async () => {
+    const order: string[] = [];
+    installSerial([fakePort(ids)]);
+    const picked = new FakeBluetoothDevice("radio-1");
+    const requestDevice = installBluetooth([], picked);
+    requestDevice.mockImplementation(async () => {
+      order.push("picker");
+      return picked;
+    });
+    const { result } = renderHook(() => useConnections());
+    const serial = result.current.addConnection({
+      type: "serial",
+      name: "Serial",
+      ...ids,
+    });
+    await act(() => result.current.connect(serial.id));
+    const live = kmp.client;
+    if (!live) throw new Error("no serial client");
+    const disconnect = live.disconnect.bind(live);
+    vi.spyOn(live, "disconnect").mockImplementation(async () => {
+      order.push("disconnect");
+      await disconnect();
+    });
+    const radio = result.current.addConnection({
+      type: "bluetooth",
+      name: "Radio",
+    });
+
+    await act(() => result.current.connect(radio.id, { allowPrompt: true }));
+
+    expect(order).toEqual(["picker", "disconnect"]);
+    await act(() => result.current.disconnect(radio.id));
   });
 
   it("shows the port picker on a click and saves the picked ids", async () => {

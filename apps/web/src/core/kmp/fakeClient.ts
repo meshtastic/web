@@ -91,8 +91,12 @@ export class FakeKmpClient implements MeshtasticClient {
   private packetListeners: Listeners<Uint8Array> = new Set();
   private telemetryListeners = new Map<number, Listeners<Uint8Array>>();
 
+  /** When set, `connect` rejects with it. */
+  connectError: Error | undefined;
+
   async connect(): Promise<void> {
     this.connects.push(Date.now());
+    if (this.connectError) throw this.connectError;
     this.setState(state("connected"));
   }
 
