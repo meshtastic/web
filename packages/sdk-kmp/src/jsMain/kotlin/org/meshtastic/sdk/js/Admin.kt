@@ -110,6 +110,7 @@ private suspend fun AdminApi.dispatch(message: AdminMessage): AdminResultJs {
     if (message.nodedb_reset == true) return nodeDbReset().toJs()
     if (message.enter_dfu_mode_request == true) return enterDfuMode().toJs()
     message.set_time_only?.let { return setTimeOnly(it).toJs() }
+    message.lockdown_auth?.let { return lockdown(it).toJs() }
     return failure("unsupported")
 }
 

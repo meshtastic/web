@@ -38,12 +38,16 @@ import kotlin.js.JsExport
 import kotlin.js.Promise
 
 @JsExport
-class MeshtasticClient internal constructor(transport: RadioTransport, private val maxAttempts: Int) {
+class MeshtasticClient internal constructor(
+    transport: RadioTransport,
+    private val maxAttempts: Int,
+    storage: StorageJs? = null,
+) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val frameListeners = mutableSetOf<(Uint8Array) -> Unit>()
     private val client: RadioClient = RadioClient {
         transport(TappingTransport(transport) { bytes -> frameListeners.toList().forEach { it(bytes.toUint8Array()) } })
-        storage(InMemoryStorageProvider())
+        storage(if (storage == null) InMemoryStorageProvider() else JsStorageProvider(storage))
         autoReconnect(AutoReconnectConfig(maxAttempts = maxAttempts))
     }
 
@@ -100,16 +104,16 @@ class MeshtasticClient internal constructor(transport: RadioTransport, private v
     fun admin(dest: Int = 0): AdminJs =
         AdminJs(if (dest == 0) client.admin else client.admin.forNode(NodeId(dest)), scope)
 
-    fun sendText(text: String, to: Int, channel: Int, replyId: Int = 0): Promise<SendOutcomeJs> =
+    fun sendText(text: String, to: Int, channel: Int, replyId: Int = 0): SendHandleJs =
         sending { client.sendText(text, NodeId(to), ChannelIndex(channel), replyId) }
 
     /** Sends an encoded `MeshPacket`; the SDK assigns the id and reports the outcome. */
-    fun sendPacket(meshPacket: Uint8Array): Promise<SendOutcomeJs> =
+    fun sendPacket(meshPacket: Uint8Array): SendHandleJs =
         sending { client.send(MeshPacket.ADAPTER.decode(meshPacket.toByteArray())) }
 
-    fun requestNodeInfo(nodeNum: Int): Promise<SendOutcomeJs> = sending { client.requestNodeInfo(NodeId(nodeNum)) }
+    fun requestNodeInfo(nodeNum: Int): SendHandleJs = sending { client.requestNodeInfo(NodeId(nodeNum)) }
 
-    fun requestPosition(nodeNum: Int): Promise<SendOutcomeJs> = sending {
+    fun requestPosition(nodeNum: Int): SendHandleJs = sending {
         client.send(
             MeshPacket.Builder().also { packet ->
                 packet.to = nodeNum
@@ -158,13 +162,16 @@ class MeshtasticClient internal constructor(transport: RadioTransport, private v
         }
     }
 
-    private fun sending(send: suspend () -> MessageHandle): Promise<SendOutcomeJs> = scope.promise {
+    private fun sending(send: () -> MessageHandle): SendHandleJs {
         val handle = try {
             send()
         } catch (e: Throwable) {
             throw e.toJsError().unsafeCast<Throwable>()
         }
-        handle.await().toJs(handle.id.raw)
+        val js = jso<dynamic>()
+        js.id = handle.id.raw
+        js.outcome = scope.promise { handle.await().toJs(handle.id.raw) }
+        return js.unsafeCast<SendHandleJs>()
     }
 
     private fun <T> Flow<T>.subscribe(): () -> Unit {
@@ -174,8 +181,12 @@ class MeshtasticClient internal constructor(transport: RadioTransport, private v
 }
 
 @JsExport
-fun createHttpClient(url: String, allowPrompt: Boolean = false, maxAttempts: Int = 10): MeshtasticClient =
-    MeshtasticClient(HttpTransport(url.trimEnd('/'), allowPrompt), maxAttempts)
+fun createHttpClient(
+    url: String,
+    allowPrompt: Boolean = false,
+    maxAttempts: Int = 10,
+    storage: StorageJs? = null,
+): MeshtasticClient = MeshtasticClient(HttpTransport(url.trimEnd('/'), allowPrompt), maxAttempts, storage)
 
 /**
  * A client over Web Serial. `port` is a `SerialPort` picked inside a user
@@ -183,8 +194,13 @@ fun createHttpClient(url: String, allowPrompt: Boolean = false, maxAttempts: Int
  * without prompting.
  */
 @JsExport
-fun createSerialClient(port: dynamic, usbVendorId: Int?, usbProductId: Int?, maxAttempts: Int = 10): MeshtasticClient =
-    MeshtasticClient(WebSerialTransport(port, usbVendorId, usbProductId), maxAttempts)
+fun createSerialClient(
+    port: dynamic,
+    usbVendorId: Int?,
+    usbProductId: Int?,
+    maxAttempts: Int = 10,
+    storage: StorageJs? = null,
+): MeshtasticClient = MeshtasticClient(WebSerialTransport(port, usbVendorId, usbProductId), maxAttempts, storage)
 
 /**
  * A client over Web Bluetooth. `device` is a `BluetoothDevice` picked inside
@@ -192,5 +208,9 @@ fun createSerialClient(port: dynamic, usbVendorId: Int?, usbProductId: Int?, max
  * without prompting.
  */
 @JsExport
-fun createBluetoothClient(device: dynamic, deviceId: String?, maxAttempts: Int = 10): MeshtasticClient =
-    MeshtasticClient(WebBluetoothTransport(device, deviceId), maxAttempts)
+fun createBluetoothClient(
+    device: dynamic,
+    deviceId: String?,
+    maxAttempts: Int = 10,
+    storage: StorageJs? = null,
+): MeshtasticClient = MeshtasticClient(WebBluetoothTransport(device, deviceId), maxAttempts, storage)

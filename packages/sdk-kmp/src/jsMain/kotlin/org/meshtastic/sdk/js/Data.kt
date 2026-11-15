@@ -6,6 +6,7 @@ import org.khronos.webgl.Uint8Array
 import org.meshtastic.proto.Channel
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetadata
+import org.meshtastic.proto.DeviceUIConfig
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.MyNodeInfo
 import org.meshtastic.proto.NodeInfo
@@ -15,6 +16,7 @@ import org.meshtastic.sdk.SendFailure
 import org.meshtastic.sdk.SendOutcome
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
+import kotlin.js.Promise
 
 /** The device's config as the handshake delivered it; every field is an encoded protobuf. */
 @JsExport
@@ -23,6 +25,7 @@ external interface ConfigBundleJs {
     val metadata: Uint8Array
     val configs: Array<Uint8Array>
     val moduleConfigs: Array<Uint8Array>
+    val deviceUiConfig: Uint8Array?
 }
 
 /**
@@ -46,14 +49,30 @@ external interface SendOutcomeJs {
     val reason: String?
 }
 
+/** A packet handed to the SDK: its id straight away, its outcome once the mesh answers. */
+@JsExport
+external interface SendHandleJs {
+    val id: Int
+    val outcome: Promise<SendOutcomeJs>
+}
+
 internal fun ConfigBundle.toJs(): ConfigBundleJs {
     val bundle = jso<dynamic>()
     bundle.myInfo = MyNodeInfo.ADAPTER.encode(myInfo).toUint8Array()
     bundle.metadata = DeviceMetadata.ADAPTER.encode(metadata).toUint8Array()
     bundle.configs = configs.map { Config.ADAPTER.encode(it).toUint8Array() }.toTypedArray()
     bundle.moduleConfigs = moduleConfigs.map { ModuleConfig.ADAPTER.encode(it).toUint8Array() }.toTypedArray()
+    bundle.deviceUiConfig = deviceUIConfig?.let { DeviceUIConfig.ADAPTER.encode(it).toUint8Array() }
     return bundle.unsafeCast<ConfigBundleJs>()
 }
+
+internal fun ConfigBundleJs.toKotlin(): ConfigBundle = ConfigBundle(
+    myInfo = MyNodeInfo.ADAPTER.decode(myInfo.toByteArray()),
+    metadata = DeviceMetadata.ADAPTER.decode(metadata.toByteArray()),
+    configs = configs.map { Config.ADAPTER.decode(it.toByteArray()) },
+    moduleConfigs = moduleConfigs.map { ModuleConfig.ADAPTER.decode(it.toByteArray()) },
+    deviceUIConfig = deviceUiConfig?.let { DeviceUIConfig.ADAPTER.decode(it.toByteArray()) },
+)
 
 internal fun List<Channel>.toJs(): Array<Uint8Array> = map { Channel.ADAPTER.encode(it).toUint8Array() }.toTypedArray()
 

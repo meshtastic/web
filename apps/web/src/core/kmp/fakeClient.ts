@@ -5,6 +5,7 @@ import type {
   ConnectionStateJs,
   MeshtasticClient,
   NodeChangeJs,
+  SendHandleJs,
   SendOutcomeJs,
 } from "@meshtastic/sdk-kmp";
 
@@ -68,12 +69,22 @@ export class FakeKmpClient implements MeshtasticClient {
   channels: Uint8Array[] | null = null;
   nodeList: Uint8Array[] = [];
   readonly sent: Uint8Array[] = [];
-  readonly texts: Array<{ text: string; to: number; channel: number }> = [];
+  readonly texts: Array<{
+    text: string;
+    to: number;
+    channel: number;
+    id: number;
+  }> = [];
   readonly packets: Uint8Array[] = [];
   readonly requests: Array<{ kind: string; nodeNum: number }> = [];
   readonly disconnects: number[] = [];
   readonly admins = new Map<number, FakeAdmin>();
-  sendOutcome: SendOutcomeJs = { id: 1, ok: true, reason: null };
+  /** Outcome every send resolves with; `settleSends` resolves the pending ones. */
+  sendOutcome: Omit<SendOutcomeJs, "id"> = { ok: true, reason: null };
+  /** When set, sends stay pending until `settleSends` is called. */
+  holdSends = false;
+  private nextSendId = 1;
+  private readonly pendingSends: Array<(outcome: SendOutcomeJs) => void> = [];
   adminResult: AdminResultJs = adminOk();
   private frameListeners: Listeners<Uint8Array> = new Set();
   private stateListeners: Listeners<ConnectionStateJs> = new Set();
@@ -144,28 +155,48 @@ export class FakeKmpClient implements MeshtasticClient {
     return created;
   }
 
-  async sendText(
-    text: string,
-    to: number,
-    channel: number,
-  ): Promise<SendOutcomeJs> {
-    this.texts.push({ text, to, channel });
-    return this.sendOutcome;
+  sendText(text: string, to: number, channel: number): SendHandleJs {
+    const handle = this.handle();
+    this.texts.push({ text, to, channel, id: handle.id });
+    return handle;
   }
 
-  async sendPacket(meshPacket: Uint8Array): Promise<SendOutcomeJs> {
+  sendPacket(meshPacket: Uint8Array): SendHandleJs {
     this.packets.push(meshPacket);
-    return this.sendOutcome;
+    return this.handle();
   }
 
-  async requestNodeInfo(nodeNum: number): Promise<SendOutcomeJs> {
+  requestNodeInfo(nodeNum: number): SendHandleJs {
     this.requests.push({ kind: "nodeInfo", nodeNum });
-    return this.sendOutcome;
+    return this.handle();
   }
 
-  async requestPosition(nodeNum: number): Promise<SendOutcomeJs> {
+  requestPosition(nodeNum: number): SendHandleJs {
     this.requests.push({ kind: "position", nodeNum });
-    return this.sendOutcome;
+    return this.handle();
+  }
+
+  /** Resolves every held send with `outcome`, or with `sendOutcome`. */
+  settleSends(outcome?: Omit<SendOutcomeJs, "id">): void {
+    const settled = this.pendingSends.splice(0);
+    const result = outcome ?? this.sendOutcome;
+    for (const resolve of settled) {
+      resolve({ id: 0, ...result });
+    }
+  }
+
+  private handle(): SendHandleJs {
+    const id = this.nextSendId++;
+    const outcome = new Promise<SendOutcomeJs>((resolve) => {
+      const settle = (result: SendOutcomeJs): void =>
+        resolve({ ...result, id });
+      if (this.holdSends) {
+        this.pendingSends.push(settle);
+      } else {
+        settle({ id, ...this.sendOutcome });
+      }
+    });
+    return { id, outcome };
   }
 
   async traceRoute(dest: number): Promise<AdminResultJs> {
