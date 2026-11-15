@@ -39,20 +39,25 @@ function recording<T extends object>(kind: string, make: () => T) {
   };
 }
 
-vi.mock("@meshtastic/sdk-storage-sqlocal/chat", async () => {
+vi.mock("@core/storage/messages.ts", async () => {
   const sdk = await import("@meshtastic/sdk");
   return {
     SqlocalMessageRepository: recording(
       "messages",
       () => new sdk.InMemoryMessageRepository(),
     ),
+  };
+});
+vi.mock("@core/storage/drafts.ts", async () => {
+  const sdk = await import("@meshtastic/sdk");
+  return {
     SqlocalDraftRepository: recording(
       "drafts",
       () => new sdk.InMemoryDraftRepository(),
     ),
   };
 });
-vi.mock("@meshtastic/sdk-storage-sqlocal/nodes", async () => {
+vi.mock("@core/storage/nodes.ts", async () => {
   const sdk = await import("@meshtastic/sdk");
   return {
     SqlocalNodesRepository: recording(
@@ -61,7 +66,7 @@ vi.mock("@meshtastic/sdk-storage-sqlocal/nodes", async () => {
     ),
   };
 });
-vi.mock("@meshtastic/sdk-storage-sqlocal/telemetry", async () => {
+vi.mock("@core/storage/telemetry.ts", async () => {
   const sdk = await import("@meshtastic/sdk");
   return {
     SqlocalTelemetryRepository: recording(

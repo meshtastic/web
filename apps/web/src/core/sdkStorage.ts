@@ -1,9 +1,6 @@
 import { createLogger } from "@core/log.ts";
-import {
-  MultiTabCoordinator,
-  type OpenedSqlocalDb,
-  openSqlocalDb,
-} from "@meshtastic/sdk-storage-sqlocal";
+import { MultiTabCoordinator } from "@core/storage/coordinator.ts";
+import { type OpenedSqlocalDb, openSqlocalDb } from "@core/storage/db.ts";
 
 const log = createLogger("sdkStorage");
 

@@ -2,12 +2,10 @@ import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
 import type { ConnectionId } from "@core/stores/deviceStore/types";
 import { createLogger } from "@core/log.ts";
 import { MeshDevice, type Transport } from "@meshtastic/sdk";
-import {
-  SqlocalDraftRepository,
-  SqlocalMessageRepository,
-} from "@meshtastic/sdk-storage-sqlocal/chat";
-import { SqlocalNodesRepository } from "@meshtastic/sdk-storage-sqlocal/nodes";
-import { SqlocalTelemetryRepository } from "@meshtastic/sdk-storage-sqlocal/telemetry";
+import { SqlocalDraftRepository } from "@core/storage/drafts.ts";
+import { SqlocalMessageRepository } from "@core/storage/messages.ts";
+import { SqlocalNodesRepository } from "@core/storage/nodes.ts";
+import { SqlocalTelemetryRepository } from "@core/storage/telemetry.ts";
 
 const log = createLogger("sdkClient");
 

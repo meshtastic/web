@@ -1,2 +1,2 @@
 export * as Protobuf from "@meshtastic/protobufs";
-export { Types } from "@meshtastic/sdk";
+export * as Types from "./types.ts";
