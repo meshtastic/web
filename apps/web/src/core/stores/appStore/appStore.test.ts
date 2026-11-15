@@ -57,8 +57,26 @@ describe("AppStore – basic state & actions", () => {
     state.setCommandPaletteOpen(true);
     expect(useAppStore.getState().commandPaletteOpen).toBe(true);
 
-    state.setConnectDialogOpen(true);
-    expect(useAppStore.getState().connectDialogOpen).toBe(true);
+    state.openConnections();
+    expect(useAppStore.getState().connectionsDrawer).toEqual({
+      open: true,
+      view: "list",
+    });
+    state.openConnections("add");
+    expect(useAppStore.getState().connectionsDrawer).toEqual({
+      open: true,
+      view: "add",
+    });
+    state.setConnectionsView({ edit: "abc" });
+    expect(useAppStore.getState().connectionsDrawer).toEqual({
+      open: true,
+      view: { edit: "abc" },
+    });
+    state.closeConnections();
+    expect(useAppStore.getState().connectionsDrawer).toEqual({
+      open: false,
+      view: "list",
+    });
 
     state.setNodeNumToBeRemoved(123);
     expect(useAppStore.getState().nodeNumToBeRemoved).toBe(123);
@@ -129,7 +147,7 @@ describe("AppStore – persistence: partialize + rehydrate", () => {
       // ephemeral fields reset to defaults:
       expect(state.selectedDeviceId).toBe(0);
       expect(state.commandPaletteOpen).toBe(false);
-      expect(state.connectDialogOpen).toBe(false);
+      expect(state.connectionsDrawer).toEqual({ open: false, view: "list" });
       expect(state.nodeNumToBeRemoved).toBe(0);
       expect(state.nodeNumDetails).toBe(0);
 

@@ -75,7 +75,7 @@ export const CommandPalette = () => {
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
-    setConnectDialogOpen,
+    openConnections,
     setSelectedDevice,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
@@ -204,7 +204,8 @@ export const CommandPalette = () => {
           label: t("manage.command.connectNewNode"),
           icon: PlusIcon,
           action() {
-            setConnectDialogOpen(true);
+            openConnections("add");
+            setCommandPaletteOpen(false);
           },
         },
       ],

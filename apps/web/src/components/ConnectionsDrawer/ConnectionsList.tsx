@@ -1,6 +1,5 @@
 import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
 import { TimeAgo } from "@app/components/generic/TimeAgo";
-import LanguageSwitcher from "@app/components/LanguageSwitcher";
 import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { useConnections } from "@app/pages/Connections/useConnections";
@@ -36,11 +35,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
-import { Separator } from "@components/UI/Separator.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useNavigate } from "@tanstack/react-router";
+import { useAppStore } from "@core/stores";
 import {
-  ArrowLeft,
   LinkIcon,
   MoreHorizontal,
   RotateCw,
@@ -52,7 +49,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export const Connections = () => {
+export const ConnectionsList = () => {
   const {
     connections,
     addConnectionAndConnect,
@@ -64,7 +61,7 @@ export const Connections = () => {
     syncConnectionStatuses,
   } = useConnections();
   const { toast } = useToast();
-  const navigate = useNavigate({ from: "/" });
+  const closeConnections = useAppStore((s) => s.closeConnections);
   const [addOpen, setAddOpen] = useState(false);
   const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
   const { t } = useTranslation("connections");
@@ -95,36 +92,13 @@ export const Connections = () => {
   }, [connections]);
 
   return (
-    <div className="space-y-6 p-6">
-      <header className="flex items-start justify-between max-md:flex-col max-md:gap-4">
-        <div className="flex items-stretch gap-3">
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/" })}
-            className="flex items-center justify-center w-9 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="size-5" />
-          </button>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-              {t("page.title")}
-            </h1>
-            <p className="lg:w-4/6 md:w-5/6 text-slate-500 dark:text-slate-400 mt-1">
-              {t("page.description")}
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col items-end ml-2 gap-2 max-md:w-full max-md:flex-row max-md:flex-wrap max-md:items-center max-md:ml-0">
-          <Button onClick={() => setAddOpen(true)} className="gap-2">
-            <RouterIcon className="size-5" />
-            {t("button.addConnection")}
-          </Button>
-          <LanguageSwitcher />
-        </div>
-      </header>
-
-      <Separator />
+    <div className="space-y-4 py-2">
+      <div className="flex items-center justify-end gap-2">
+        <Button onClick={() => setAddOpen(true)} className="gap-2">
+          <RouterIcon className="size-5" />
+          {t("drawer.addConnection")}
+        </Button>
+      </div>
 
       {sorted.length === 0 ? (
         <Card className="border-dashed">
@@ -144,7 +118,7 @@ export const Connections = () => {
           </CardFooter>
         </Card>
       ) : (
-        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 @lg:grid-cols-2 @3xl:grid-cols-3">
           {sorted.map((c) => (
             <ConnectionCard
               key={c.id}
@@ -153,7 +127,7 @@ export const Connections = () => {
                 const ok = await connect(c.id, { allowPrompt: true });
                 // Success needs no toast: the connecting overlay shows it.
                 if (ok) {
-                  navigate({ to: "/" });
+                  closeConnections();
                 } else {
                   toast({
                     title: t("toasts.failed"),
@@ -196,7 +170,7 @@ export const Connections = () => {
                 const ok = await connect(c.id, { allowPrompt: true });
                 // Success needs no toast: the connecting overlay shows it.
                 if (ok) {
-                  navigate({ to: "/" });
+                  closeConnections();
                 } else {
                   toast({
                     title: t("toasts.failed"),
@@ -228,7 +202,7 @@ export const Connections = () => {
               created.status === "connected" ||
               created.status === "configured"
             ) {
-              navigate({ to: "/" });
+              closeConnections();
             }
           } else {
             toast({

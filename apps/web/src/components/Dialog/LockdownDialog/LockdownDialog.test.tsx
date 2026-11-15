@@ -9,7 +9,7 @@ const State = Protobuf.Mesh.LockdownStatus_State;
 
 const unlockMock = vi.fn(() => Promise.resolve(1));
 const disconnectMock = vi.fn(() => Promise.resolve());
-const navigateMock = vi.fn();
+const openConnectionsMock = vi.fn();
 
 const signal = <T,>(value: T) => ({
   value,
@@ -42,13 +42,11 @@ vi.mock("@app/pages/Connections/useConnections", () => ({
   useConnections: () => ({ disconnect: disconnectMock }),
 }));
 
-vi.mock("@tanstack/react-router", () => ({
-  useNavigate: () => navigateMock,
-}));
-
 vi.mock("@core/stores", () => ({
   useDeviceStore: (selector: (s: { activeConnectionId: number }) => unknown) =>
     selector({ activeConnectionId: 7 }),
+  useAppStore: (selector: (s: { openConnections: () => void }) => unknown) =>
+    selector({ openConnections: openConnectionsMock }),
 }));
 
 vi.mock("@components/UI/Dialog.tsx", () => ({
@@ -91,7 +89,7 @@ describe("LockdownGate", () => {
   beforeEach(() => {
     unlockMock.mockClear();
     disconnectMock.mockClear();
-    navigateMock.mockClear();
+    openConnectionsMock.mockClear();
     lockdownStatus = undefined;
   });
 
@@ -251,6 +249,6 @@ describe("LockdownGate", () => {
     });
 
     expect(disconnectMock).toHaveBeenCalledWith(7);
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/connections" });
+    expect(openConnectionsMock).toHaveBeenCalledWith();
   });
 });
