@@ -78,6 +78,10 @@ export class FakeKmpClient implements MeshtasticClient {
   readonly packets: Uint8Array[] = [];
   readonly requests: Array<{ kind: string; nodeNum: number }> = [];
   readonly disconnects: number[] = [];
+  readonly connects: number[] = [];
+  /** When set, `disconnect` resolves only when `settleDisconnects` is called. */
+  holdDisconnects = false;
+  private readonly pendingDisconnects: Array<() => void> = [];
   readonly admins = new Map<number, FakeAdmin>();
   /** Outcome every send resolves with; `settleSends` resolves the pending ones. */
   sendOutcome: Omit<SendOutcomeJs, "id"> = { ok: true, reason: null };
@@ -95,12 +99,22 @@ export class FakeKmpClient implements MeshtasticClient {
   private telemetryListeners = new Map<number, Listeners<Uint8Array>>();
 
   async connect(): Promise<void> {
+    this.connects.push(Date.now());
     this.setState(state("connected"));
   }
 
   async disconnect(): Promise<void> {
     this.disconnects.push(Date.now());
+    if (this.holdDisconnects) {
+      await new Promise<void>((resolve) =>
+        this.pendingDisconnects.push(resolve),
+      );
+    }
     this.setState(state("disconnected"));
+  }
+
+  settleDisconnects(): void {
+    for (const resolve of this.pendingDisconnects.splice(0)) resolve();
   }
 
   onConnectionState(cb: (s: ConnectionStateJs) => void): () => void {

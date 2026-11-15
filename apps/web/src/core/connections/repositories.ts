@@ -28,28 +28,20 @@ const STORAGE_OPEN_TIMEOUT_MS = 5000;
 export const UNKNOWN_NODE_SCOPE = -1;
 
 /**
- * The SDK's own storage (node DB, config bundle, channels, heartbeats) over
- * the same DB and key. Opening fails loudly: the SDK then reports storage
- * as degraded and runs the session in memory.
- */
-export function sdkStorage(nodeNum?: number): StorageJs {
-  return sqlocalStorage(
-    async () => (await getStorageDb()).db,
-    nodeNum ?? UNKNOWN_NODE_SCOPE,
-  );
-}
-
-/**
- * Opens the message, draft, node and telemetry repositories against the
+ * Opens the message, draft, node and telemetry repositories, and the SDK's
+ * own storage (node DB, config bundle, channels, heartbeats), against the
  * shared OPFS-backed SQLite DB, scoped to `nodeNum` (the node this
  * connection reached last time) so every connection to the same radio
  * shares one history. If sqlocal is unavailable, hangs longer than
  * `STORAGE_OPEN_TIMEOUT_MS`, or fails, the session runs without
- * persistence and `persistent` is false.
+ * persistence, `persistent` is false and `sdkStorage` is undefined so the
+ * SDK keeps its state in memory too.
  */
-export async function openRepositories(
-  nodeNum?: number,
-): Promise<{ options: SessionOptions; persistent: boolean }> {
+export async function openRepositories(nodeNum?: number): Promise<{
+  options: SessionOptions;
+  persistent: boolean;
+  sdkStorage: StorageJs | undefined;
+}> {
   const scope = nodeNum ?? UNKNOWN_NODE_SCOPE;
   try {
     const t0 = Date.now();
@@ -73,6 +65,7 @@ export async function openRepositories(
     });
     return {
       persistent,
+      sdkStorage: sqlocalStorage(async () => db, scope),
       options: {
         messages: new SqlocalMessageRepository(db, {
           deviceId: scope,
@@ -90,6 +83,6 @@ export async function openRepositories(
       name: err instanceof Error ? err.name : undefined,
       message: err instanceof Error ? err.message : String(err),
     });
-    return { persistent: false, options: {} };
+    return { persistent: false, sdkStorage: undefined, options: {} };
   }
 }

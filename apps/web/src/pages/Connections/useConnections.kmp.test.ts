@@ -4,12 +4,18 @@ import type { Connection } from "@app/core/stores/deviceStore/types";
 import { meshRegistry } from "@core/kmp/registry.ts";
 import { useDeviceStore } from "@core/stores";
 import { Protobuf } from "@core/protobuf.ts";
+import type { StorageJs } from "@meshtastic/sdk-kmp";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useConnections } from "./useConnections.ts";
 
 const kmp = vi.hoisted(
-  (): { client?: FakeKmpClient; connectError?: Error } => ({}),
+  (): {
+    client?: FakeKmpClient;
+    clients: FakeKmpClient[];
+    storages: Array<StorageJs | undefined>;
+    connectError?: Error;
+  } => ({ clients: [], storages: [] }),
 );
 
 vi.mock("@core/sdkStorage.ts", () => ({
@@ -22,7 +28,12 @@ vi.mock("@core/sdkStorage.ts", () => ({
 vi.mock("@core/kmp/client.ts", async () => {
   const { FakeKmpClient } = await import("@core/kmp/fakeClient.ts");
   return {
-    createHttpClient: async () => {
+    createHttpClient: async (
+      _url: string,
+      _allowPrompt: boolean,
+      storage?: StorageJs,
+    ) => {
+      kmp.storages.push(storage);
       const client = new FakeKmpClient();
       if (kmp.connectError) {
         const error = kmp.connectError;
@@ -31,6 +42,7 @@ vi.mock("@core/kmp/client.ts", async () => {
         };
       }
       kmp.client = client;
+      kmp.clients.push(client);
       return client;
     },
   };
@@ -59,8 +71,21 @@ function named(name: string): Error {
 describe("useConnections over the Kotlin SDK (HTTP)", () => {
   beforeEach(() => {
     kmp.client = undefined;
+    kmp.clients = [];
+    kmp.storages = [];
     kmp.connectError = undefined;
+    useDeviceStore.setState({ savedConnections: [] });
   });
+
+  const addRadio = (
+    result: { current: ReturnType<typeof useConnections> },
+    name = "Radio",
+  ) =>
+    result.current.addConnection({
+      type: "http",
+      name,
+      url: `http://192.168.1.${name.length}`,
+    });
 
   it("connects through the SDK and reads the handshake it ran", async () => {
     const { result } = renderHook(() => useConnections());
@@ -114,6 +139,101 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
       errorKind: "network",
       reconnect: undefined,
     });
+  });
+
+  it("disconnects the old client before connecting the same connection again", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const first = kmp.clients[0];
+    if (!first) throw new Error("no client created");
+
+    act(() => result.current.syncConnectionStatuses());
+    act(() =>
+      useDeviceStore
+        .getState()
+        .updateSavedConnection(conn.id, { status: "disconnected" }),
+    );
+    await act(() => result.current.connect(conn.id));
+
+    expect(kmp.clients).toHaveLength(2);
+    expect(first.disconnects).toHaveLength(1);
+    expect(meshRegistry.get(conn.id)?.kmp).toBe(kmp.clients[1]);
+  });
+
+  it("tears down the session on another connection before connecting", async () => {
+    const { result } = renderHook(() => useConnections());
+    const a = addRadio(result, "A");
+    const b = addRadio(result, "Bee");
+    await act(() => result.current.connect(a.id));
+    const clientA = kmp.clients[0];
+    if (!clientA) throw new Error("no client created");
+
+    await act(() => result.current.connect(b.id));
+
+    expect(clientA.disconnects).toHaveLength(1);
+    expect(saved(a.id)?.status).toBe("disconnected");
+    expect(saved(b.id)?.status).toBe("configured");
+  });
+
+  it("stops reconnecting when the local network permission is revoked", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+
+    await act(async () => {
+      client.setState(
+        state("reconnecting", {
+          attempt: 1,
+          error: "Local network access denied",
+          errorKind: "lna-denied",
+        }),
+      );
+    });
+
+    expect(saved(conn.id)).toMatchObject({
+      status: "error",
+      errorKind: "lna-denied",
+      reconnect: undefined,
+    });
+    expect(client.disconnects).toHaveLength(1);
+
+    await act(async () => {
+      client.setState(state("reconnecting", { attempt: 2 }));
+      client.setState(state("disconnected"));
+    });
+    expect(saved(conn.id)?.status).toBe("error");
+    expect(saved(conn.id)?.errorKind).toBe("lna-denied");
+  });
+
+  it("stays disconnected when the local network prompt was dismissed mid-session", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+
+    await act(async () => {
+      client.setState(
+        state("reconnecting", { attempt: 1, errorKind: "lna-prompt" }),
+      );
+    });
+
+    expect(saved(conn.id)).toMatchObject({
+      status: "disconnected",
+      reconnect: undefined,
+    });
+    expect(client.disconnects).toHaveLength(1);
+  });
+
+  it("runs the SDK in memory when the web's storage could not be opened", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+
+    expect(kmp.storages).toEqual([undefined]);
   });
 
   it("marks a denied Local Network Access permission as a terminal error", async () => {

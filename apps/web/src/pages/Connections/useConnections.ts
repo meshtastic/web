@@ -10,7 +10,6 @@ import {
 } from "@app/core/connections/browserDevices.ts";
 import {
   openRepositories,
-  sdkStorage,
   UNKNOWN_NODE_SCOPE,
 } from "@app/core/connections/repositories.ts";
 import type {
@@ -28,6 +27,7 @@ import {
   createSerialClient,
   type MeshtasticClient,
   type SerialTarget,
+  type StorageJs,
 } from "@core/kmp/client.ts";
 import { editorFor } from "@core/kmp/configEditorIo.ts";
 import {
@@ -205,9 +205,15 @@ export function useConnections() {
    * this connection reached last time.
    */
   const connectThroughKmp = useCallback(
-    async (id: ConnectionId, makeClient: () => Promise<MeshtasticClient>) => {
-      const client = await makeClient();
+    async (
+      id: ConnectionId,
+      makeClient: (storage?: StorageJs) => Promise<MeshtasticClient>,
+    ) => {
       const conn = savedConnection(id);
+      const { options, persistent, sdkStorage } = await openRepositories(
+        conn?.nodeNum,
+      );
+      const client = await makeClient(sdkStorage);
       let deviceId = conn?.meshDeviceId;
       if (deviceId && !useDeviceStore.getState().getDevice(deviceId)) {
         deviceId = undefined;
@@ -215,7 +221,6 @@ export function useConnections() {
       deviceId = deviceId ?? randId();
       const device = addDevice(deviceId);
 
-      const { options, persistent } = await openRepositories(conn?.nodeNum);
       if (!persistent) {
         toast({
           title: t("toasts.storageUnavailable", { ns: "connections" }),
@@ -228,9 +233,9 @@ export function useConnections() {
       const session = new MeshSession(client, options);
 
       // Replace any session left from an earlier attempt, so the app reads
-      // this session's state rather than the dead one's.
-      sessionTeardowns.get(id)?.();
-      meshRegistry.get(id)?.close();
+      // this session's state rather than the dead one's, and its client
+      // releases the port before this one opens it.
+      await teardown(id);
       meshRegistry.unregister(id);
       meshRegistry.register(id, session);
       meshRegistry.setActive(id);
@@ -249,6 +254,21 @@ export function useConnections() {
         session.events.onConnectionState.subscribe((state) => {
           if (!savedConnection(id)) return;
           const reconnect = reconnectAttempt(state);
+          if (
+            reconnect &&
+            (state.errorKind === "lna-denied" ||
+              state.errorKind === "lna-prompt")
+          ) {
+            log.warn("kmp: local network access lost", { id, ...reconnect });
+            void teardown(id);
+            const cause = new Error(state.error ?? "");
+            cause.name = state.errorKind;
+            updateSavedConnection(id, {
+              ...connectFailure(cause),
+              reconnect: undefined,
+            });
+            return;
+          }
           if (reconnect) {
             reconnecting = true;
             log.warn("kmp: reconnecting", { id, ...reconnect });
@@ -339,6 +359,7 @@ export function useConnections() {
       addDevice,
       setSelectedDevice,
       setActiveConnectionId,
+      teardown,
       updateSavedConnection,
       updateStatus,
     ],
@@ -365,23 +386,40 @@ export function useConnections() {
         allowPrompt: !!opts?.allowPrompt,
       });
       updateStatus(id, "connecting");
+      // The app follows one radio at a time: a session still live on
+      // another connection would keep its port and poller to itself.
+      for (const other of [...sessionTeardowns.keys()]) {
+        if (other === id) continue;
+        await teardown(other);
+        const otherDevice = savedConnection(other)?.meshDeviceId;
+        if (otherDevice) {
+          useDeviceStore
+            .getState()
+            .getDevice(otherDevice)
+            ?.setConnectionId(null);
+        }
+        updateSavedConnection(other, {
+          status: "disconnected",
+          error: undefined,
+        });
+      }
       const allowPrompt = opts?.allowPrompt ?? false;
       try {
         switch (conn.type) {
           case "http":
-            return await connectThroughKmp(id, () =>
-              createHttpClient(conn.url, allowPrompt, sdkStorage(conn.nodeNum)),
+            return await connectThroughKmp(id, (storage) =>
+              createHttpClient(conn.url, allowPrompt, storage),
             );
           case "serial": {
             const target = await serialTarget(conn, allowPrompt);
-            return await connectThroughKmp(id, () =>
-              createSerialClient(target, sdkStorage(conn.nodeNum)),
+            return await connectThroughKmp(id, (storage) =>
+              createSerialClient(target, storage),
             );
           }
           case "bluetooth": {
             const target = await bluetoothTarget(conn, allowPrompt);
-            return await connectThroughKmp(id, () =>
-              createBluetoothClient(target, sdkStorage(conn.nodeNum)),
+            return await connectThroughKmp(id, (storage) =>
+              createBluetoothClient(target, storage),
             );
           }
         }
@@ -395,7 +433,7 @@ export function useConnections() {
         return false;
       }
     },
-    [updateStatus, updateSavedConnection, connectThroughKmp],
+    [updateStatus, updateSavedConnection, connectThroughKmp, teardown],
   );
 
   const disconnect = useCallback(

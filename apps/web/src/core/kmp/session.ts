@@ -137,7 +137,8 @@ export class MeshSession {
   });
   private readonly regionUnset = signal(false);
   private readonly unsubscribes: Array<() => void> = [];
-  private rehandshaking = false;
+  private closed = false;
+  private rehandshaking: Promise<void> | undefined;
 
   constructor(
     readonly kmp: MeshtasticClient,
@@ -196,11 +197,6 @@ export class MeshSession {
   /** The local node number, or 0 before the handshake names it. */
   get myNodeNum(): number {
     return this.device.myNodeNum.peek() ?? this.kmp.myNodeNum ?? 0;
-  }
-
-  /** True while a deliberate disconnect/connect cycle is running. */
-  get isRehandshaking(): boolean {
-    return this.rehandshaking;
   }
 
   sendAdmin(
@@ -297,23 +293,31 @@ export class MeshSession {
     if (!outcome.ok) throw new Error(outcome.reason ?? "factory reset failed");
   }
 
-  /** Runs the handshake again by cycling the SDK connection. */
-  async rehandshake(): Promise<void> {
-    this.rehandshaking = true;
-    try {
-      await this.kmp.disconnect();
-      await this.kmp.connect();
-    } finally {
-      this.rehandshaking = false;
-    }
+  /**
+   * Runs the handshake again by cycling the SDK connection. A session
+   * closed while the cycle is under way stays disconnected.
+   */
+  rehandshake(): Promise<void> {
+    this.rehandshaking ??= (async () => {
+      try {
+        await this.kmp.disconnect();
+        if (!this.closed) await this.kmp.connect();
+      } finally {
+        this.rehandshaking = undefined;
+      }
+    })();
+    return this.rehandshaking;
   }
 
-  disconnect(): Promise<void> {
-    return this.kmp.disconnect();
+  /** Disconnects the SDK client once any handshake cycle has settled. */
+  async disconnect(): Promise<void> {
+    await this.rehandshaking?.catch(() => {});
+    await this.kmp.disconnect();
   }
 
   /** Stops feeding the session; the SDK client is left to its owner. */
   close(): void {
+    this.closed = true;
     for (const off of this.unsubscribes.splice(0)) off();
   }
 

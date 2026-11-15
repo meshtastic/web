@@ -389,6 +389,23 @@ describe("MeshSession", () => {
     await Promise.resolve();
     expect(kmp.disconnects).toHaveLength(1);
   });
+
+  it("does not reconnect when closed and disconnected during a handshake cycle", async () => {
+    const { kmp, session } = connected();
+    kmp.holdDisconnects = true;
+    const cycle = session.rehandshake();
+    expect(kmp.disconnects).toHaveLength(1);
+
+    session.close();
+    const closing = session.disconnect();
+    kmp.holdDisconnects = false;
+    kmp.settleDisconnects();
+    await cycle;
+    await closing;
+
+    expect(kmp.connects).toHaveLength(0);
+    expect(kmp.connectionState.kind).toBe("disconnected");
+  });
 });
 
 describe("validateIncomingNode", () => {
