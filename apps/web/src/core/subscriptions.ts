@@ -1,116 +1,69 @@
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
+import type { MeshSession } from "@core/kmp/session.ts";
 import { type Device } from "@core/stores";
-import type { MeshDevice } from "@meshtastic/sdk";
 import { Protobuf } from "@core/protobuf.ts";
 
 /**
- * Wires up the legacy MeshDevice event stream into the web's Zustand stores.
- *
- * Note: the SDK now owns chat persistence (via SqlocalMessageRepository) and
- * the entire NodesClient surface — node info, user, position, lastHeard /
- * snr, favourite / ignored flags, and PKI-error tracking. This handler no
- * longer mirrors any of that into the legacy stores; what remains is
- * device-store-only state (waypoints, traceroutes, neighbour info, dialog
- * open triggers, unread counts).
+ * Feeds a session's events into the web's device store: what the SDK and
+ * the session don't keep themselves (waypoints, traceroutes, neighbour
+ * info, dialog triggers, the config mirror the settings forms read).
  */
-export const subscribeAll = (device: Device, connection: MeshDevice) => {
-  connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {
-    device.addMetadata(metadataPacket.from, metadataPacket.data);
-  });
-
-  connection.events.onRoutingPacket.subscribe((routingPacket) => {
-    switch (routingPacket.data.variant.case) {
-      case "errorReason": {
-        if (
-          routingPacket.data.variant.value === Protobuf.Mesh.Routing_Error.NONE
-        ) {
+export const subscribeAll = (
+  device: Device,
+  session: MeshSession,
+): (() => void) => {
+  const { events } = session;
+  const unsubscribes = [
+    events.onDeviceMetadataPacket.subscribe(({ from, data }) => {
+      device.addMetadata(from, data);
+    }),
+    events.onRoutingPacket.subscribe((packet) => {
+      if (packet.data.variant.case !== "errorReason") return;
+      switch (packet.data.variant.value) {
+        case Protobuf.Mesh.Routing_Error.NONE:
           return;
-        }
-        console.info(`Routing Error: ${routingPacket.data.variant.value}`);
-        break;
-      }
-      case "routeReply": {
-        console.info(`Route Reply: ${routingPacket.data.variant.value}`);
-        break;
-      }
-      case "routeRequest": {
-        console.info(`Route Request: ${routingPacket.data.variant.value}`);
-        break;
-      }
-    }
-  });
-
-  connection.events.onDeviceStatus.subscribe((status) => {
-    device.setStatus(status);
-  });
-
-  connection.events.onWaypointPacket.subscribe((waypoint) => {
-    const { data, channel, from, rxTime } = waypoint;
-    device.addWaypoint(data, channel, from, rxTime);
-  });
-
-  connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
-    useNewNodeNum(device.id, nodeInfo);
-  });
-
-  // onUserPacket / onPositionPacket / onNodeInfoPacket and device-metrics
-  // telemetry (battery / channel utilisation / voltage) are folded into nodes by
-  // the SDK NodesClient (see packages/sdk/src/features/nodes/NodesClient.ts).
-
-  connection.events.onChannelPacket.subscribe((channel) => {
-    device.addChannel(channel);
-  });
-  connection.events.onConfigPacket.subscribe((config) => {
-    device.setConfig(config);
-  });
-  connection.events.onModuleConfigPacket.subscribe((moduleConfig) => {
-    device.setModuleConfig(moduleConfig);
-  });
-
-  // Inbound message handling (persistence, unread counts) lives entirely on
-  // the SDK ChatClient now — see ChatClient + chat.unread.
-
-  connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
-    device.addTraceRoute({
-      ...traceRoutePacket,
-    });
-  });
-
-  connection.events.onPendingSettingsChange.subscribe((state) => {
-    device.setPendingSettingsChanges(state);
-  });
-
-  // onMeshPacket → lastHeard / snr per-node updates are handled by the SDK
-  // NodesClient.
-
-  connection.events.onClientNotificationPacket.subscribe(
-    (clientNotificationPacket) => {
-      device.addClientNotification(clientNotificationPacket);
-      device.setDialogOpen("clientNotification", true);
-    },
-  );
-
-  connection.events.onNeighborInfoPacket.subscribe((neighborInfo) => {
-    device.addNeighborInfo(neighborInfo.from, neighborInfo.data);
-  });
-
-  connection.events.onRoutingPacket.subscribe((routingPacket) => {
-    if (routingPacket.data.variant.case === "errorReason") {
-      switch (routingPacket.data.variant.value) {
-        case Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT:
-          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
-          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          // Per-node error tracking lives on the SDK NodesClient
-          // (client.nodes.errors); the dialog open trigger stays here so the
-          // legacy device-store-driven dialog manager keeps working.
+          console.error(`Routing Error: ${packet.data.variant.value}`);
           device.setDialogOpen("refreshKeys", true);
-          break;
+          return;
         default:
-          break;
+          console.info(`Routing Error: ${packet.data.variant.value}`);
       }
-    }
-  });
+    }),
+    events.onDeviceStatus.subscribe((status) => {
+      device.setStatus(status);
+    }),
+    events.onWaypointPacket.subscribe(({ data, channel, from, rxTime }) => {
+      device.addWaypoint(data, channel, from, rxTime);
+    }),
+    events.onMyNodeInfo.subscribe((info) => {
+      useNewNodeNum(device.id, info);
+    }),
+    events.onChannelPacket.subscribe((channel) => {
+      device.addChannel(channel);
+    }),
+    events.onConfigPacket.subscribe((config) => {
+      device.setConfig(config);
+    }),
+    events.onModuleConfigPacket.subscribe((moduleConfig) => {
+      device.setModuleConfig(moduleConfig);
+    }),
+    events.onTraceRoutePacket.subscribe((packet) => {
+      device.addTraceRoute(packet);
+    }),
+    events.onPendingSettingsChange.subscribe((pending) => {
+      device.setPendingSettingsChanges(pending);
+    }),
+    events.onClientNotificationPacket.subscribe((notification) => {
+      device.addClientNotification(notification);
+      device.setDialogOpen("clientNotification", true);
+    }),
+    events.onNeighborInfoPacket.subscribe((packet) => {
+      device.addNeighborInfo(packet.from, packet.data);
+    }),
+  ];
+  return () => {
+    for (const off of unsubscribes) off();
+  };
 };

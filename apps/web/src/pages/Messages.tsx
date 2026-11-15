@@ -18,7 +18,7 @@ import {
   useChannels,
   useNodeErrors,
   useUnreadByKey,
-} from "@meshtastic/sdk-react";
+} from "@core/kmp/hooks";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import {
@@ -52,10 +52,7 @@ export const MessagesPage = () => {
     unreadByKey.get(`channel:${idx}`) ?? 0;
   const markChannelRead = useCallback(
     (idx: number) =>
-      meshClient?.chat.unread.markRead({
-        kind: "channel",
-        channel: idx as Types.ChannelNumber,
-      }),
+      meshClient?.chat.unread.markRead({ kind: "channel", channel: idx }),
     [meshClient],
   );
   const markDirectRead = useCallback(

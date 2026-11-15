@@ -62,7 +62,7 @@ describe("Device settings", () => {
     );
     expect((await editor.commit()).status).toBe("ok");
 
-    const wire = radio.sentConfig("device");
+    const wire = radio.sentConfig("device")?.value;
     expect(wire?.doubleTapAsButtonPress).toBe(true);
     expect(wire?.buttonGpio).toBe(4);
     expect(wire?.buzzerGpio).toBe(2);
@@ -94,7 +94,7 @@ describe("Device settings", () => {
     expect(editor.dirtyRadioSections.value).toContain("device");
 
     expect((await editor.commit()).status).toBe("ok");
-    expect(radio.sentConfig("device")?.doubleTapAsButtonPress).toBe(true);
+    expect(radio.sentConfig("device")?.value.doubleTapAsButtonPress).toBe(true);
     expect(editor.isDirty.value).toBe(false);
   });
 
@@ -111,7 +111,7 @@ describe("Device settings", () => {
     );
     expect((await editor.commit()).status).toBe("ok");
 
-    expect(radio.sentConfig("bluetooth")?.enabled).toBe(true);
+    expect(radio.sentConfig("bluetooth")?.value.enabled).toBe(true);
   });
 
   it("still requires a six-digit PIN for FIXED_PIN pairing", () => {

@@ -51,6 +51,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useActiveClient } from "@core/kmp/hooks";
 
 export interface Group {
   id: string;
@@ -79,7 +80,8 @@ export const CommandPalette = () => {
     setSelectedDevice,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
-  const { setDialogOpen, connection } = useDevice();
+  const { setDialogOpen } = useDevice();
+  const connection = useActiveClient();
   const allNodes = useNodesAsProto();
   const getNode = (n: number) => allNodes.find((node) => node.num === n);
   const { pinnedItems, togglePinnedItem } = usePinnedItems({
@@ -297,7 +299,7 @@ export const CommandPalette = () => {
           label: t("debug.command.reconfigure"),
           icon: RefreshCwIcon,
           action() {
-            void connection?.configure();
+            void connection?.rehandshake();
           },
         },
         {

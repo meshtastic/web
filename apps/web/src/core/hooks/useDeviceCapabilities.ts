@@ -1,8 +1,7 @@
 import { useDevice } from "@core/stores";
 import { firmwareAtLeast } from "@core/utils/firmware.ts";
 import type { Protobuf } from "@core/protobuf.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
-import { useSignal } from "@core/kmp/hooks";
+import { useActiveClient, useSignal } from "@core/kmp/hooks";
 
 const EMPTY_REGION_PRESETS_SIGNAL = {
   value: undefined as Protobuf.Mesh.LoRaRegionPresetMap | undefined,

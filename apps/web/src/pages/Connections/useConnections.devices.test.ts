@@ -93,7 +93,7 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
     expect(ok).toBe(true);
     expect(requestPort).not.toHaveBeenCalled();
     expect(kmp.serialTargets).toEqual([{ port: undefined, ...ids }]);
-    expect(saved(conn.id)?.status).toBe("configuring");
+    expect(saved(conn.id)?.status).toBe("configured");
     await act(() => result.current.disconnect(conn.id));
   });
 
@@ -241,7 +241,7 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
 
     act(() => client.setState(state("connected")));
     expect(saved(conn.id)).toMatchObject({
-      status: "configuring",
+      status: "configured",
       reconnect: undefined,
     });
     await act(() => result.current.disconnect(conn.id));

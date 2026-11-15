@@ -9,11 +9,11 @@ vi.mock("@core/stores", () => ({
   CurrentDeviceContext: {
     _currentValue: { deviceId: 1234 },
   },
-  useDevice: () => ({
-    connection: {
-      factoryResetConfig: mockFactoryReset,
-    },
-  }),
+  useDevice: () => ({}),
+}));
+
+vi.mock("@core/kmp/hooks", () => ({
+  useActiveClient: () => ({ factoryResetConfig: mockFactoryReset }),
 }));
 
 vi.mock("@core/hooks/useToast.ts", () => ({

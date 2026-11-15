@@ -14,7 +14,8 @@ vi.mock("@app/pages/Connections/useConnections", () => ({
 vi.mock("@core/hooks/useLockdown.ts", () => ({
   useLockdown: () => ({ isLocked: false }),
 }));
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@core/kmp/hooks")>()),
   useConnectionProgress: () => ({ phase: "connecting" }),
 }));
 

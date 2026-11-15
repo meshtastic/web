@@ -21,10 +21,8 @@ let mockConnection:
   rebootOta: rebootOtaMock,
 };
 
-vi.mock("@core/stores", () => ({
-  useDevice: () => ({
-    connection: mockConnection,
-  }),
+vi.mock("@core/kmp/hooks", () => ({
+  useActiveClient: () => mockConnection,
 }));
 
 vi.mock("@components/UI/Button.tsx", async () => {

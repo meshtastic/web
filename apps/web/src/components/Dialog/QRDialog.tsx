@@ -12,7 +12,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { channelSetToUrl } from "@core/utils/channelUrl.ts";
 import { Protobuf } from "@core/protobuf.ts";
-import { useChannels } from "@meshtastic/sdk-react";
+import { useChannels } from "@core/kmp/hooks";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QRCode } from "react-qrcode-logo";

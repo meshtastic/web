@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import type { TelemetryReading } from "@meshtastic/sdk";
+import type { TelemetryReading } from "@core/storage/types.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import {

@@ -1,6 +1,6 @@
 import { CurrentDeviceContext, useDeviceStore } from "@core/stores";
-import { MeshRegistry } from "@meshtastic/sdk";
-import { MeshRegistryProvider } from "@meshtastic/sdk-react";
+import { MeshRegistryProvider } from "@core/kmp/hooks";
+import { MeshRegistry } from "@core/kmp/registry.ts";
 import { render } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { RefreshKeysDialog } from "./RefreshKeysDialog.tsx";

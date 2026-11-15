@@ -12,7 +12,7 @@ import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { cn } from "@core/utils/cn.ts";
 import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
-import { useTotalUnread } from "@meshtastic/sdk-react";
+import { useTotalUnread } from "@core/kmp/hooks";
 import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect, useRef } from "react";

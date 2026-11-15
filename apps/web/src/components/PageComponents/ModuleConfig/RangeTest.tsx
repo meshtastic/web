@@ -9,7 +9,7 @@ import {
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@core/protobuf.ts";
-import { useChannel } from "@meshtastic/sdk-react";
+import { useChannel } from "@core/kmp/hooks";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { useTranslation } from "react-i18next";
 

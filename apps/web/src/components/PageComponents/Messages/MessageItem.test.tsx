@@ -29,7 +29,8 @@ vi.mock("@core/hooks/useNodesAsProto.ts", () => ({
 vi.mock("@components/UI/Avatar.tsx", () => ({ Avatar: () => null }));
 
 const resend = vi.fn(() => Promise.resolve({ status: "ok", value: 2 }));
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@core/kmp/hooks")>()),
   useActiveClient: () => ({ chat: { resend } }),
 }));
 

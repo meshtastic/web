@@ -1,7 +1,7 @@
 import type { Protobuf } from "@core/protobuf.ts";
-import { DeviceStatusEnum, type MeshClient } from "@meshtastic/sdk";
 import { signal } from "@preact/signals-core";
-import type { Result } from "better-result";
+import { Result } from "better-result";
+import type { MeshSession } from "./session.ts";
 import { type ReadonlySignal, toReadonly } from "./signals.ts";
 
 export type ModuleMessageKind = "cannedMessages" | "ringtone";
@@ -21,29 +21,22 @@ export interface ModuleMessages {
   applySent(message: Protobuf.Admin.AdminMessage): void;
 }
 
-const stores = new WeakMap<MeshClient, ModuleMessages>();
+const stores = new WeakMap<MeshSession, ModuleMessages>();
 
-export function moduleMessagesFor(client: MeshClient): ModuleMessages {
-  const existing = stores.get(client);
+export function moduleMessagesFor(session: MeshSession): ModuleMessages {
+  const existing = stores.get(session);
   if (existing) return existing;
 
   const cannedMessages = signal<string | undefined>(undefined);
   const ringtone = signal<string | undefined>(undefined);
   const listeners = new Set<(kind: ModuleMessageKind) => void>();
+  const answered = (kind: ModuleMessageKind, value: string): void => {
+    (kind === "cannedMessages" ? cannedMessages : ringtone).value = value;
+    for (const cb of listeners) cb(kind);
+  };
 
-  client.events.onAdminPacket.subscribe((packet) => {
-    if (packet.from !== client.myNodeNum) return;
-    const variant = packet.data.payloadVariant;
-    if (variant.case === "getCannedMessageModuleMessagesResponse") {
-      cannedMessages.value = variant.value;
-      for (const cb of listeners) cb("cannedMessages");
-    } else if (variant.case === "getRingtoneResponse") {
-      ringtone.value = variant.value;
-      for (const cb of listeners) cb("ringtone");
-    }
-  });
-  client.events.onDeviceStatus.subscribe((status) => {
-    if (status === DeviceStatusEnum.DeviceDisconnected) {
+  session.events.onConnectionState.subscribe((state) => {
+    if (state.kind === "disconnected") {
       cannedMessages.value = undefined;
       ringtone.value = undefined;
     }
@@ -52,10 +45,14 @@ export function moduleMessagesFor(client: MeshClient): ModuleMessages {
   const store: ModuleMessages = {
     cannedMessages: toReadonly(cannedMessages),
     ringtone: toReadonly(ringtone),
-    request: (kind) =>
-      kind === "cannedMessages"
-        ? client.config.requestCannedMessages()
-        : client.config.requestRingtone(),
+    request: async (kind) => {
+      const result =
+        kind === "cannedMessages"
+          ? await session.config.requestCannedMessages()
+          : await session.config.requestRingtone();
+      if (Result.isOk(result)) answered(kind, result.value);
+      return result;
+    },
     onResponse: (cb) => {
       listeners.add(cb);
       return () => listeners.delete(cb);
@@ -69,6 +66,6 @@ export function moduleMessagesFor(client: MeshClient): ModuleMessages {
       }
     },
   };
-  stores.set(client, store);
+  stores.set(session, store);
   return store;
 }

@@ -12,7 +12,7 @@ import {
   formatLogEntry,
 } from "@core/utils/logRecords.ts";
 import { Protobuf } from "@core/protobuf.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient } from "@core/kmp/hooks";
 import { useNavigate } from "@tanstack/react-router";
 import { DownloadIcon, ShieldIcon, Trash2Icon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";

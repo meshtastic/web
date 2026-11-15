@@ -1,7 +1,6 @@
-import type { MeshClient } from "@meshtastic/sdk";
+import type { MeshSession } from "@core/kmp/session.ts";
 import type { Protobuf } from "@core/protobuf.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
-import { useSignal } from "@core/kmp/hooks";
+import { useActiveClient, useSignal } from "@core/kmp/hooks";
 
 type LockdownStatus = Protobuf.Mesh.LockdownStatus | undefined;
 
@@ -19,7 +18,7 @@ const NOT_LOCKED = {
 };
 
 export interface UseLockdownResult {
-  client: MeshClient | undefined;
+  client: MeshSession | undefined;
   /** Latest lockdown status; undefined when the firmware has no lockdown. */
   status: LockdownStatus;
   /** True while the device withholds its config until it is unlocked. */

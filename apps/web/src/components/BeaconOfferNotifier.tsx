@@ -6,7 +6,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { useBeaconOffers } from "@core/hooks/useBeaconOffers.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useBeaconJoinStore } from "@core/stores/beaconJoinStore.ts";
-import { useNodes } from "@meshtastic/sdk-react";
+import { useNodes } from "@core/kmp/hooks";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 

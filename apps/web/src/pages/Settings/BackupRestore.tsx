@@ -24,7 +24,7 @@ import {
 } from "@core/utils/profileExport.ts";
 import type { ConfigEditor } from "@core/kmp/configEditor.ts";
 import { Protobuf } from "@core/protobuf.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient } from "@core/kmp/hooks";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { Result } from "better-result";
 import { DownloadIcon, UploadIcon } from "lucide-react";

@@ -38,7 +38,7 @@ describe("MQTT module config", () => {
     );
     expect((await editor.commit()).status).toBe("ok");
 
-    const wire = radio.sentModuleConfig("mqtt");
+    const wire = radio.sentModuleConfig("mqtt")?.value;
     expect(wire?.enabled).toBe(true);
     // Fields the user didn't touch still round-trip.
     expect(wire?.address).toBe("mqtt.example.org");
@@ -81,7 +81,7 @@ describe("MQTT module config", () => {
     expect(editor.dirtyModuleSections.value).toContain("mqtt");
 
     expect((await editor.commit()).status).toBe("ok");
-    expect(radio.sentModuleConfig("mqtt")?.enabled).toBe(true);
+    expect(radio.sentModuleConfig("mqtt")?.value.enabled).toBe(true);
     expect(editor.isDirty.value).toBe(false);
   });
 });

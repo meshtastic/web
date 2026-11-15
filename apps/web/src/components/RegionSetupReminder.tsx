@@ -1,6 +1,6 @@
 import { Button } from "@components/UI/Button.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useIsRegionUnset } from "@meshtastic/sdk-react";
+import { useIsRegionUnset } from "@core/kmp/hooks";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";

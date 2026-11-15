@@ -80,10 +80,8 @@ export function connectFailure(error: unknown): ConnectFailure {
 
 /**
  * Maps the SDK's connection state onto the saved-connection status the
- * drawer and overlay already render. `configuring` is the SDK handshake;
- * `configured` is only reached once the web client has its own config
- * stream (see `useConnections`), so the SDK's `connected` maps to
- * `connected` here.
+ * drawer and overlay render. `configuring` is the SDK handshake and
+ * `connected` means it finished, which the app calls `configured`.
  */
 export function toConnectionStatus(state: ConnectionStateJs): ConnectionStatus {
   switch (state.kind) {
@@ -93,7 +91,7 @@ export function toConnectionStatus(state: ConnectionStateJs): ConnectionStatus {
     case "configuring":
       return "configuring";
     case "connected":
-      return "connected";
+      return "configured";
     default:
       return "disconnected";
   }

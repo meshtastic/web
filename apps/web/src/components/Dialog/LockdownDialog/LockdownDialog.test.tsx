@@ -33,11 +33,8 @@ const fakeClient = () => ({
   disconnect: vi.fn(),
 });
 
-vi.mock("@meshtastic/sdk-react", () => ({
-  useActiveClient: () => fakeClient(),
-}));
-
 vi.mock("@core/kmp/hooks", () => ({
+  useActiveClient: () => fakeClient(),
   useSignal: (sig: { value: unknown }) => sig.value,
 }));
 

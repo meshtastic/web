@@ -2,7 +2,7 @@ import { MessageState, MessageType } from "@core/stores/messageStore";
 import {
   type Message as SdkMessage,
   MessageState as SdkMessageState,
-} from "@meshtastic/sdk";
+} from "@core/storage/types.ts";
 import { Protobuf, type Types } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import { toLegacy } from "./useChatAsLegacyMessages.ts";

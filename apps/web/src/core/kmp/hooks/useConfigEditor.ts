@@ -1,6 +1,6 @@
 import type { ConfigEditor } from "@core/kmp/configEditor.ts";
 import { editorFor } from "@core/kmp/configEditorIo.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient } from "./registry.tsx";
 
 /**
  * The active connection's `ConfigEditor`, or `undefined` when none is

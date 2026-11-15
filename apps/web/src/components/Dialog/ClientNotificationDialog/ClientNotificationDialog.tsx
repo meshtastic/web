@@ -13,6 +13,7 @@ import { useDevice } from "@core/stores";
 import { Protobuf } from "@core/protobuf.ts";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useActiveClient } from "@core/kmp/hooks";
 
 const MessageType = Protobuf.Admin.KeyVerificationAdmin_MessageType;
 
@@ -26,8 +27,8 @@ export const ClientNotificationDialog = ({
   onOpenChange,
 }: ClientNotificationDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection, getClientNotification, removeClientNotification } =
-    useDevice();
+  const { getClientNotification, removeClientNotification } = useDevice();
+  const connection = useActiveClient();
   const [securityNumber, setSecurityNumber] = useState("");
 
   const notification = getClientNotification(0);

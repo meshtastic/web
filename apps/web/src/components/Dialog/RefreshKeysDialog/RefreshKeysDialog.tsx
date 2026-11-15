@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { useNodeErrors } from "@meshtastic/sdk-react";
+import { useNodeErrors } from "@core/kmp/hooks";
 import { LockKeyholeOpenIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";

@@ -3,7 +3,7 @@ import {
   moduleMessagesFor,
 } from "@core/kmp/moduleMessages.ts";
 import { constantSignal } from "@core/kmp/signals.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient } from "./registry.tsx";
 import { Result } from "better-result";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSignal } from "./useSignal.ts";

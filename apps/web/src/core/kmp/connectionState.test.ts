@@ -24,7 +24,7 @@ describe("toConnectionStatus", () => {
     expect(toConnectionStatus(state("configuring", { phase: "Stage2" }))).toBe(
       "configuring",
     );
-    expect(toConnectionStatus(state("connected"))).toBe("connected");
+    expect(toConnectionStatus(state("connected"))).toBe("configured");
     expect(toConnectionStatus(state("reconnecting", { attempt: 3 }))).toBe(
       "connecting",
     );

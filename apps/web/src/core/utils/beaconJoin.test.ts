@@ -1,5 +1,5 @@
 import { create, type MessageInitShape } from "@bufbuild/protobuf";
-import type { Channel, MeshBeaconOffer } from "@meshtastic/sdk";
+import type { Channel, MeshBeaconOffer } from "@core/kmp/channels.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import {

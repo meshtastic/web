@@ -4,7 +4,7 @@ import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
 import { firmwareAtLeast } from "@core/utils/firmware.ts";
 import type { Protobuf } from "@core/protobuf.ts";
-import { useChannels } from "@meshtastic/sdk-react";
+import { useChannels } from "@core/kmp/hooks";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import i18next from "i18next";
 import { PlusIcon, QrCodeIcon, UploadIcon } from "lucide-react";

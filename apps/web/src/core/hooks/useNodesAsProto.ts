@@ -1,9 +1,8 @@
 import { create } from "@bufbuild/protobuf";
-import type { Node as SdkNode } from "@meshtastic/sdk";
+import type { Node as SdkNode } from "@core/storage/types.ts";
 import { Protobuf } from "@core/protobuf.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
-import { useSignal } from "@core/kmp/hooks";
 import { useMemo } from "react";
+import { useActiveClient, useSignal } from "@core/kmp/hooks";
 
 /**
  * Adapter hooks that surface SDK-managed nodes in the

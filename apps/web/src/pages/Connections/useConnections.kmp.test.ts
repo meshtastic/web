@@ -1,6 +1,7 @@
-import { fromBinary } from "@bufbuild/protobuf";
+import { create, toBinary } from "@bufbuild/protobuf";
 import { FakeKmpClient, state } from "@core/kmp/fakeClient.ts";
 import type { Connection } from "@app/core/stores/deviceStore/types";
+import { meshRegistry } from "@core/kmp/registry.ts";
 import { useDeviceStore } from "@core/stores";
 import { Protobuf } from "@core/protobuf.ts";
 import { act, renderHook } from "@testing-library/react";
@@ -38,6 +39,17 @@ vi.mock("@core/kmp/client.ts", async () => {
 const saved = (id: number): Connection | undefined =>
   useDeviceStore.getState().savedConnections.find((c) => c.id === id);
 
+const myInfo = (myNodeNum: number): Uint8Array =>
+  toBinary(
+    Protobuf.Mesh.FromRadioSchema,
+    create(Protobuf.Mesh.FromRadioSchema, {
+      payloadVariant: {
+        case: "myInfo",
+        value: create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum }),
+      },
+    }),
+  );
+
 function named(name: string): Error {
   const error = new Error(name);
   error.name = name;
@@ -50,7 +62,7 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     kmp.connectError = undefined;
   });
 
-  it("connects through the SDK and asks the radio for its config", async () => {
+  it("connects through the SDK and reads the handshake it ran", async () => {
     const { result } = renderHook(() => useConnections());
     const conn = result.current.addConnection({
       type: "http",
@@ -60,17 +72,12 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
 
     const ok = await act(() => result.current.connect(conn.id));
     expect(ok).toBe(true);
-    expect(saved(conn.id)?.status).toBe("configuring");
+    expect(saved(conn.id)?.status).toBe("configured");
     const client = kmp.client;
     if (!client) throw new Error("no client created");
-    await vi.waitFor(() => {
-      const sent = client.sent.map((bytes) =>
-        fromBinary(Protobuf.Mesh.ToRadioSchema, bytes),
-      );
-      expect(sent.some((m) => m.payloadVariant.case === "wantConfigId")).toBe(
-        true,
-      );
-    });
+    expect(meshRegistry.get(conn.id)?.kmp).toBe(client);
+    act(() => client.emitFrame(myInfo(0x0a0b0c0d)));
+    expect(saved(conn.id)?.nodeNum).toBe(0x0a0b0c0d);
 
     await act(() => result.current.disconnect(conn.id));
     expect(client.disconnects).toHaveLength(1);
@@ -96,7 +103,7 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
 
     act(() => client.setState(state("connected")));
     expect(saved(conn.id)).toMatchObject({
-      status: "configuring",
+      status: "configured",
       reconnect: undefined,
     });
 

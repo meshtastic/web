@@ -9,9 +9,9 @@ import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
-import { meshRegistry } from "@core/meshRegistry.ts";
+import { meshRegistry } from "@core/kmp/registry.ts";
 import { useAppStore } from "@core/stores";
-import { MeshRegistryProvider } from "@meshtastic/sdk-react";
+import { MeshRegistryProvider } from "@core/kmp/hooks";
 import { type createRouter, RouterProvider } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 

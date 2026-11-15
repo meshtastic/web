@@ -4,7 +4,7 @@ import { useDeviceStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useConnections } from "@app/pages/Connections/useConnections";
 import { useLockdown } from "@core/hooks/useLockdown.ts";
-import { useConnectionProgress } from "@meshtastic/sdk-react";
+import { useConnectionProgress } from "@core/kmp/hooks";
 import { Bluetooth, Cable, CheckCircle2, Globe, Loader2 } from "lucide-react";
 import type { ComponentType, ReactElement } from "react";
 import { useEffect, useState } from "react";

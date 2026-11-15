@@ -30,6 +30,7 @@ import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
 import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
 import { toast } from "@core/hooks/useToast.ts";
 import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
+import { useActiveClient } from "@core/kmp/hooks";
 import { useAppStore, useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@core/protobuf.ts";
@@ -59,7 +60,8 @@ export const NodeDetailsDialog = ({
   onOpenChange,
 }: NodeDetailsDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { setDialogOpen, connection } = useDevice();
+  const { setDialogOpen } = useDevice();
+  const connection = useActiveClient();
   const navigate = useNavigate();
   const { setNodeNumToBeRemoved, nodeNumDetails } = useAppStore();
   const { updateFavorite } = useFavoriteNode();

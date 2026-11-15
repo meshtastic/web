@@ -2,6 +2,7 @@ import { toast } from "@core/hooks/useToast.ts";
 import { useDevice, useDeviceStore } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
+import { useActiveClient } from "@core/kmp/hooks";
 
 export interface FactoryResetDeviceDialogProps {
   open: boolean;
@@ -13,7 +14,8 @@ export const FactoryResetDeviceDialog = ({
   onOpenChange,
 }: FactoryResetDeviceDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection, id } = useDevice();
+  const { id } = useDevice();
+  const connection = useActiveClient();
 
   const handleFactoryResetDevice = () => {
     connection?.factoryResetDevice().catch((error) => {

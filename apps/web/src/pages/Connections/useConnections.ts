@@ -1,4 +1,3 @@
-import { buildMeshDevice } from "@app/core/connections/sdkClient.ts";
 import {
   type BluetoothConnection,
   type ConnectionHandle,
@@ -9,6 +8,18 @@ import {
   probeConnection,
   type SerialConnection,
 } from "@app/core/connections/browserDevices.ts";
+import {
+  openRepositories,
+  UNKNOWN_NODE_SCOPE,
+} from "@app/core/connections/repositories.ts";
+import type {
+  Connection,
+  ConnectionId,
+  ConnectionStatus,
+  NewConnection,
+} from "@app/core/stores/deviceStore/types";
+import { createConnectionFromInput } from "@app/pages/Connections/utils";
+import { toast } from "@core/hooks/useToast.ts";
 import {
   type BluetoothTarget,
   createBluetoothClient,
@@ -23,40 +34,25 @@ import {
   reconnectAttempt,
   toConnectionStatus,
 } from "@core/kmp/connectionState.ts";
-import { kmpTransport } from "@core/kmp/transport.ts";
-import { toast } from "@core/hooks/useToast.ts";
+import { meshRegistry } from "@core/kmp/registry.ts";
+import { MeshSession } from "@core/kmp/session.ts";
 import { createLogger } from "@core/log.ts";
-import { MIN_FIRMWARE_VERSION } from "@core/utils/firmware.ts";
-import {
-  DeviceStatusEnum,
-  FirmwareTooOldError,
-  type Transport,
-} from "@meshtastic/sdk";
-import { t } from "i18next";
-
-const log = createLogger("useConnections");
-import type {
-  Connection,
-  ConnectionId,
-  ConnectionStatus,
-  NewConnection,
-} from "@app/core/stores/deviceStore/types";
-import { createConnectionFromInput } from "@app/pages/Connections/utils";
-import { meshRegistry } from "@core/meshRegistry.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
+import { MIN_FIRMWARE_VERSION } from "@core/utils/firmware.ts";
 import { randId } from "@core/utils/randId.ts";
+import { t } from "i18next";
 import { useCallback } from "react";
+
+const log = createLogger("useConnections");
 
 // Per-connection out-of-band handles tracked outside Zustand:
 //   - heldSerialPorts / heldBluetoothDevices: the port or device the user
 //     picked, so later connects reuse it without prompting.
-//   - configSubscriptions: handshake status / reboot unsubscribers.
+//   - sessionTeardowns: the session's subscriptions, released on teardown.
 const heldSerialPorts = new Map<ConnectionId, SerialPort>();
 const heldBluetoothDevices = new Map<ConnectionId, BluetoothDevice>();
-const configSubscriptions = new Map<ConnectionId, () => void>();
-// Kotlin SDK connection-state subscriptions for connections it owns.
-const kmpSubscriptions = new Map<ConnectionId, () => void>();
+const sessionTeardowns = new Map<ConnectionId, () => void>();
 
 /**
  * What the SDK opens for a serial connection. Automatic connects pass only
@@ -122,6 +118,9 @@ async function bluetoothTarget(
   return { device, deviceId: device.id };
 }
 
+const savedConnection = (id: ConnectionId): Connection | undefined =>
+  useDeviceStore.getState().savedConnections.find((c) => c.id === id);
+
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
   const addSavedConnection = useDeviceStore((s) => s.addSavedConnection);
@@ -151,28 +150,17 @@ export function useConnections() {
     [updateSavedConnection],
   );
 
-  const teardown = useCallback(async (id: ConnectionId, conn?: Connection) => {
+  const teardown = useCallback(async (id: ConnectionId) => {
     log.debug("teardown: enter", { id });
-    kmpSubscriptions.get(id)?.();
-    kmpSubscriptions.delete(id);
-    configSubscriptions.get(id)?.();
-    configSubscriptions.delete(id);
-
-    if (conn?.meshDeviceId) {
-      const device = useDeviceStore.getState().getDevice(conn.meshDeviceId);
-      try {
-        // Await the underlying transport's close so the port is fully
-        // released before the user clicks reconnect — otherwise port.open()
-        // can race the close and throw "port already open".
-        await device?.connection?.disconnect();
-        log.debug("teardown: transport disconnect awaited");
-      } catch (e) {
-        const err = e as Error;
-        log.warn("teardown: transport disconnect threw", {
-          name: err?.name,
-          message: err?.message,
-        });
-      }
+    sessionTeardowns.get(id)?.();
+    sessionTeardowns.delete(id);
+    try {
+      await meshRegistry.get(id)?.disconnect();
+    } catch (e) {
+      log.warn("teardown: disconnect threw", {
+        name: e instanceof Error ? e.name : undefined,
+        message: e instanceof Error ? e.message : String(e),
+      });
     }
     log.debug("teardown: done", { id });
   }, []);
@@ -180,19 +168,17 @@ export function useConnections() {
   const removeConnection = useCallback(
     async (id: ConnectionId) => {
       const conn = connections.find((c) => c.id === id);
-      await teardown(id, conn);
+      await teardown(id);
       heldSerialPorts.delete(id);
       heldBluetoothDevices.delete(id);
       if (conn?.meshDeviceId) {
         try {
           useDeviceStore.getState().removeDevice(conn.meshDeviceId);
         } catch (e) {
-          const err = e as Error;
           log.error("removeConnection: removeDevice threw", {
             id,
             meshDeviceId: conn.meshDeviceId,
-            name: err?.name,
-            message: err?.message,
+            message: e instanceof Error ? e.message : String(e),
           });
         }
       }
@@ -211,42 +197,24 @@ export function useConnections() {
     [connections, updateSavedConnection],
   );
 
-  const setupMeshDevice = useCallback(
-    async (
-      id: ConnectionId,
-      transport: Transport,
-      { sdkOwnsConnection = false }: { sdkOwnsConnection?: boolean } = {},
-    ): Promise<number> => {
-      // Reuse existing meshDeviceId if the device entry still exists; otherwise mint a new one.
-      const conn = connections.find((c) => c.id === id);
+  /**
+   * Connects through the Kotlin SDK, which owns the transport, the
+   * handshake and reconnects. A session over the client decodes what the
+   * SDK delivers into the app's stores, with history opened for the node
+   * this connection reached last time.
+   */
+  const connectThroughKmp = useCallback(
+    async (id: ConnectionId, makeClient: () => Promise<MeshtasticClient>) => {
+      const client = await makeClient();
+      const conn = savedConnection(id);
       let deviceId = conn?.meshDeviceId;
       if (deviceId && !useDeviceStore.getState().getDevice(deviceId)) {
         deviceId = undefined;
       }
       deviceId = deviceId ?? randId();
-
       const device = addDevice(deviceId);
 
-      // Flip status to "configuring" up front. buildMeshDevice awaits the
-      // OPFS DB open which can take a beat (or stall under multi-tab
-      // contention); we don't want the UI looking stuck at "connecting"
-      // while persistence is spinning up.
-      updateStatus(id, "configuring");
-      log.debug("setupMeshDevice: building MeshDevice", { id, deviceId });
-
-      // Read the node number from the live store: the `connections` closure
-      // can predate the last handshake's update.
-      const nodeNum = useDeviceStore
-        .getState()
-        .savedConnections.find((c) => c.id === id)?.nodeNum;
-      const { meshDevice, persistent } = await buildMeshDevice(
-        id,
-        deviceId,
-        transport,
-        nodeNum,
-        { heartbeat: !sdkOwnsConnection },
-      );
-      log.debug("setupMeshDevice: MeshDevice built", { id, persistent });
+      const { options, persistent } = await openRepositories(conn?.nodeNum);
       if (!persistent) {
         toast({
           title: t("toasts.storageUnavailable", { ns: "connections" }),
@@ -255,152 +223,30 @@ export function useConnections() {
           }),
         });
       }
+      let scope = conn?.nodeNum ?? UNKNOWN_NODE_SCOPE;
+      const session = new MeshSession(client, options);
 
-      // Replace any client left from an earlier attempt, so the app reads
+      // Replace any session left from an earlier attempt, so the app reads
       // this session's state rather than the dead one's.
-      if (meshRegistry.has(id)) meshRegistry.unregister(id);
-      meshRegistry.register(id, meshDevice.meshClient);
+      sessionTeardowns.get(id)?.();
+      meshRegistry.get(id)?.close();
+      meshRegistry.unregister(id);
+      meshRegistry.register(id, session);
       meshRegistry.setActive(id);
       // Created now so it sees the handshake's config, not on first render.
-      editorFor(meshDevice.meshClient);
-
+      editorFor(session);
       setSelectedDevice(deviceId);
-      device.addConnection(meshDevice);
-      subscribeAll(device, meshDevice);
-
+      const unsubscribeStore = subscribeAll(device, session);
       setActiveConnectionId(id);
       device.setConnectionId(id);
-
-      // MeshClient flips device.status to DeviceConfigured once both
-      // handshake stages (config, then NodeDB) are done, and starts its own
-      // heartbeat. onConfigComplete also fires after the config stage, so it
-      // can't be used here. `markConfigured` is idempotent.
-      let configuredHandled = false;
-      const markConfigured = (source: string): void => {
-        if (configuredHandled) return;
-        configuredHandled = true;
-        log.info("connect transitioned to configured", { id, source });
-        updateStatus(id, "configured");
-        const client = meshDevice.meshClient;
-        if (client.device.firmwareSupport.value === "shouldUpdate") {
-          toast({
-            title: t("toasts.firmwareOutdated", { ns: "connections" }),
-            description: t("toasts.firmwareOutdatedDescription", {
-              ns: "connections",
-              version: client.device.metadata.value?.firmwareVersion,
-              minimum: MIN_FIRMWARE_VERSION,
-            }),
-          });
-        }
-      };
-
-      const unsubStatusSignal = meshDevice.meshClient.device.status.subscribe(
-        (s) => {
-          if (s === DeviceStatusEnum.DeviceConfigured)
-            markConfigured("device.status");
-          // The Kotlin SDK reconnected the transport; the next handshake
-          // must be able to mark the connection configured again.
-          if (s === DeviceStatusEnum.DeviceReconnecting)
-            configuredHandled = false;
-        },
-      );
-      // Catch-up: signal subscribe doesn't fire for the current value, so
-      // check synchronously if the device is already past the gate.
-      if (
-        meshDevice.meshClient.device.status.value ===
-        DeviceStatusEnum.DeviceConfigured
-      ) {
-        markConfigured("initial-check");
-      }
-
-      // Reboot: firmware emits `rebooted` after a soft reset (config write,
-      // OTA, manual reboot). The SDK re-runs the handshake, but the
-      // saved-connection status is already "configured" — so the overlay
-      // would stay hidden. Flip status back to "configuring" and reset
-      // `configuredHandled` so the next DeviceConfigured re-marks.
-      const unsubRebooted = meshDevice.events.onRebooted.subscribe(() => {
-        log.info("device rebooted — re-entering configuring", { id });
-        configuredHandled = false;
-        updateStatus(id, "configuring");
-      });
-
-      // History is stored per radio. The SDK switches this session to the
-      // node my_info names; saving it on the connection lets the next connect
-      // open that node's history straight away.
-      const unsubMyNodeInfo = meshDevice.events.onMyNodeInfo.subscribe(
-        ({ myNodeNum }) => {
-          if (myNodeNum <= 0) return;
-          const saved = useDeviceStore
-            .getState()
-            .savedConnections.find((c) => c.id === id);
-          if (saved && saved.nodeNum !== myNodeNum) {
-            updateSavedConnection(id, { nodeNum: myNodeNum });
-          }
-        },
-      );
-
-      configSubscriptions.set(id, () => {
-        unsubStatusSignal();
-        unsubRebooted();
-        unsubMyNodeInfo();
-      });
-
-      log.debug("setupMeshDevice: calling configure()", { id });
-      meshDevice
-        .configure()
-        .then(() => {
-          log.debug("setupMeshDevice: configure() resolved", { id });
-        })
-        .catch((error) => {
-          const e = error as Error;
-          log.error("setupMeshDevice: configure() rejected", {
-            id,
-            name: e?.name,
-            message: e?.message,
-          });
-          updateStatus(
-            id,
-            "error",
-            error instanceof FirmwareTooOldError
-              ? t("errors.firmwareTooOld", {
-                  ns: "connections",
-                  version: error.firmwareVersion,
-                  minimum: MIN_FIRMWARE_VERSION,
-                })
-              : (error?.message ?? String(error)),
-          );
-        });
-
       updateSavedConnection(id, { meshDeviceId: deviceId });
-      return deviceId;
-    },
-    [
-      connections,
-      addDevice,
-      setSelectedDevice,
-      setActiveConnectionId,
-      updateSavedConnection,
-      updateStatus,
-    ],
-  );
 
-  /**
-   * Connects through the Kotlin SDK, which owns the transport, the
-   * handshake and reconnects. The existing MeshDevice is fed from the SDK's
-   * frames so the rest of the app is unchanged.
-   */
-  const connectThroughKmp = useCallback(
-    async (id: ConnectionId, makeClient: () => Promise<MeshtasticClient>) => {
-      const client = await makeClient();
       let reconnecting = false;
-      kmpSubscriptions.get(id)?.();
-      kmpSubscriptions.set(
-        id,
-        client.onConnectionState((state) => {
-          const saved = useDeviceStore
-            .getState()
-            .savedConnections.find((c) => c.id === id);
-          if (!saved) return;
+      let firmwareChecked = false;
+      const unsubscribes = [
+        unsubscribeStore,
+        session.events.onConnectionState.subscribe((state) => {
+          if (!savedConnection(id)) return;
           const reconnect = reconnectAttempt(state);
           if (reconnect) {
             reconnecting = true;
@@ -413,21 +259,8 @@ export function useConnections() {
             });
             return;
           }
-          if (!reconnecting) return;
-          if (state.kind === "connected") {
-            reconnecting = false;
-            log.info("kmp: reconnected, re-running the handshake", { id });
-            updateSavedConnection(id, {
-              status: "configuring",
-              reconnect: undefined,
-            });
-            const device = saved.meshDeviceId
-              ? useDeviceStore.getState().getDevice(saved.meshDeviceId)
-              : undefined;
-            device?.connection?.configure().catch((error: unknown) => {
-              updateSavedConnection(id, connectFailure(error));
-            });
-          } else if (state.kind === "disconnected") {
+          if (state.kind === "disconnected") {
+            if (!reconnecting) return;
             reconnecting = false;
             log.error("kmp: reconnect attempts exhausted", { id });
             updateSavedConnection(id, {
@@ -438,16 +271,56 @@ export function useConnections() {
               }),
               errorKind: "network",
             });
+            return;
+          }
+          reconnecting = false;
+          updateSavedConnection(id, {
+            status: toConnectionStatus(state),
+            reconnect: undefined,
+          });
+          if (state.kind === "connected") {
+            if (firmwareChecked) return;
+            firmwareChecked = true;
+            if (session.device.firmwareSupport.peek() === "shouldUpdate") {
+              toast({
+                title: t("toasts.firmwareOutdated", { ns: "connections" }),
+                description: t("toasts.firmwareOutdatedDescription", {
+                  ns: "connections",
+                  version: session.device.metadata.peek()?.firmwareVersion,
+                  minimum: MIN_FIRMWARE_VERSION,
+                }),
+              });
+            }
           } else {
-            updateSavedConnection(id, { status: toConnectionStatus(state) });
+            firmwareChecked = false;
           }
         }),
-      );
+        // History is stored per radio. Saving the node on the connection lets
+        // the next connect open that node's history straight away.
+        session.events.onMyNodeInfo.subscribe(({ myNodeNum }) => {
+          if (myNodeNum <= 0) return;
+          if (savedConnection(id)?.nodeNum !== myNodeNum) {
+            updateSavedConnection(id, { nodeNum: myNodeNum });
+          }
+          if (scope !== myNodeNum) {
+            scope = myNodeNum;
+            session.rescope(myNodeNum);
+          }
+        }),
+        // Firmware emits `rebooted` after a soft reset; the SDK reconnects
+        // and runs the handshake again, so the overlay should show again.
+        session.events.onRebooted.subscribe(() => {
+          log.info("device rebooted, re-entering configuring", { id });
+          updateStatus(id, "configuring");
+        }),
+      ];
+      sessionTeardowns.set(id, () => {
+        for (const off of unsubscribes) off();
+        session.close();
+      });
+
       try {
         await client.connect();
-        await setupMeshDevice(id, kmpTransport(client), {
-          sdkOwnsConnection: true,
-        });
         return true;
       } catch (error) {
         log.error("kmp: connect failed", {
@@ -455,23 +328,27 @@ export function useConnections() {
           name: error instanceof Error ? error.name : undefined,
           message: error instanceof Error ? error.message : String(error),
         });
-        kmpSubscriptions.get(id)?.();
-        kmpSubscriptions.delete(id);
+        sessionTeardowns.get(id)?.();
+        sessionTeardowns.delete(id);
         updateSavedConnection(id, connectFailure(error));
         return false;
       }
     },
-    [setupMeshDevice, updateSavedConnection],
+    [
+      addDevice,
+      setSelectedDevice,
+      setActiveConnectionId,
+      updateSavedConnection,
+      updateStatus,
+    ],
   );
 
   const connect = useCallback(
     async (id: ConnectionId, opts?: { allowPrompt?: boolean }) => {
-      // Read from the live store, not the memoized `connections` closure: callers
-      // such as addConnectionAndConnect() add a connection and connect to it in the
-      // same tick, before this hook re-renders, so the closure would be stale.
-      const conn = useDeviceStore
-        .getState()
-        .savedConnections.find((c) => c.id === id);
+      // Read from the live store, not the memoized `connections` closure:
+      // addConnectionAndConnect() adds a connection and connects to it in
+      // the same tick, before this hook re-renders.
+      const conn = savedConnection(id);
       if (!conn) {
         log.warn("connect: unknown connection id", { id });
         return false;
@@ -525,7 +402,7 @@ export function useConnections() {
       const conn = connections.find((c) => c.id === id);
       if (!conn) return;
       try {
-        await teardown(id, conn);
+        await teardown(id);
         if (conn.meshDeviceId) {
           useDeviceStore
             .getState()

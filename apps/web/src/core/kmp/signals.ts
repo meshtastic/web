@@ -37,3 +37,31 @@ export function toReadonly<T>(
 export function constantSignal<T>(value: T): ReadonlySignal<T> {
   return { value, peek: () => value, subscribe: () => () => {} };
 }
+
+/** A read-only view of `pick(source.value)`, recomputed only when the source changes. */
+export function deriveSignal<T, U>(
+  source: ReadonlySignal<T>,
+  pick: (value: T) => U,
+): ReadonlySignal<U> {
+  let last: { from: T; to: U } | undefined;
+  const memo = (from: T): U => {
+    if (!last || last.from !== from) last = { from, to: pick(from) };
+    return last.to;
+  };
+  return {
+    get value() {
+      return memo(source.value);
+    },
+    peek: () => memo(source.peek()),
+    subscribe: (listener) => {
+      let first = true;
+      return source.subscribe((v) => {
+        if (first) {
+          first = false;
+          return;
+        }
+        listener(memo(v));
+      });
+    },
+  };
+}
