@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import type { Node as SdkNode } from "@meshtastic/sdk";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { useActiveClient, useSignal } from "@meshtastic/sdk-react";
 import { useMemo } from "react";
 

@@ -1,7 +1,8 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
-import { type MeshDevice, Protobuf, Types } from "@meshtastic/sdk";
+import type { MeshDevice } from "@meshtastic/sdk";
+import { Protobuf, Types } from "@core/protobuf.ts";
 import { type Draft, produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import {

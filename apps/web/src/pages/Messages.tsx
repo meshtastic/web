@@ -12,7 +12,7 @@ import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { MessageType, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import { Protobuf, Types } from "@meshtastic/sdk";
+import { Protobuf, Types } from "@core/protobuf.ts";
 import {
   useActiveClient,
   useChannels,

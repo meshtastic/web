@@ -17,7 +17,7 @@ import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
 import { channelSettingsByIndex } from "@core/utils/beaconJoin.ts";
 import { getRegionPresetGroup } from "@core/utils/loraPresets.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { useChannels, useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";

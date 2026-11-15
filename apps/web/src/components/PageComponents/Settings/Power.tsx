@@ -12,7 +12,7 @@ import {
 } from "@components/Form/DynamicForm.tsx";
 import type { FieldProps } from "@components/Form/DynamicFormField.tsx";
 import { useDevice } from "@core/stores";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";

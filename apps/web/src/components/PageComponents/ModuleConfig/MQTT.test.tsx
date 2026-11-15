@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import { renderSettingsForm } from "@app/tests/renderSettingsForm.tsx";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";

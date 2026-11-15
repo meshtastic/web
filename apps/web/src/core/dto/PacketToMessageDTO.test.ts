@@ -1,4 +1,4 @@
-import type { Types } from "@meshtastic/sdk";
+import type { Types } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import PacketToMessageDTO from "./PacketToMessageDTO.ts";
 

@@ -11,7 +11,7 @@ import {
   filterLogEntries,
   formatLogEntry,
 } from "@core/utils/logRecords.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { useActiveClient } from "@meshtastic/sdk-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DownloadIcon, ShieldIcon, Trash2Icon } from "lucide-react";

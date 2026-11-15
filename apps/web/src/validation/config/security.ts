@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { type ZodType, z } from "zod/v4";
 import { makePskHelpers } from "./../pskSchema.ts";
 

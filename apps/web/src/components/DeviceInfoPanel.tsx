@@ -1,7 +1,7 @@
 import type { ConnectionStatus } from "@app/core/stores/deviceStore/types.ts";
 import { useAppStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import {
   ChevronRight,
   CpuIcon,

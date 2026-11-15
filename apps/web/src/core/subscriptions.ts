@@ -1,6 +1,7 @@
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
 import { type Device } from "@core/stores";
-import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
+import type { MeshDevice } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 
 /**
  * Wires up the legacy MeshDevice event stream into the web's Zustand stores.

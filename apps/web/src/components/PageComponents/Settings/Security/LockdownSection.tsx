@@ -4,7 +4,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useLockdown } from "@core/hooks/useLockdown.ts";
 import { useToast } from "@core/hooks/useToast.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 

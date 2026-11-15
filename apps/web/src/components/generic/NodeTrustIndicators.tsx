@@ -6,7 +6,8 @@ import {
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
 import { cn } from "@core/utils/cn.ts";
-import { isUnheardOnCurrentLora, type Protobuf } from "@meshtastic/sdk";
+import { isUnheardOnCurrentLora } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import type { LucideIcon } from "lucide-react";
 import { RadioTowerIcon, SignatureIcon, VolumeXIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";

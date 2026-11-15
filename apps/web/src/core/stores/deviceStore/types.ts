@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 
 type ValidConfigType = Exclude<
   keyof Protobuf.LocalOnly.LocalConfig,

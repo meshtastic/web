@@ -11,7 +11,7 @@ import {
   mercatorToLngLat,
   toLngLat,
 } from "@core/utils/geo";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import type { Feature, FeatureCollection } from "geojson";
 import { useTranslation } from "react-i18next";
 import { Layer, Source } from "react-map-gl/maplibre";

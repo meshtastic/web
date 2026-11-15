@@ -1,5 +1,5 @@
 import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
-import type { Protobuf, Types } from "@meshtastic/sdk";
+import type { Protobuf, Types } from "@core/protobuf.ts";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { useTranslation } from "react-i18next";
 

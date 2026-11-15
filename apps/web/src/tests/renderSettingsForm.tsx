@@ -1,5 +1,6 @@
 import { CurrentDeviceContext, useDeviceStore } from "@core/stores";
-import { MeshClient, MeshRegistry, type Protobuf } from "@meshtastic/sdk";
+import { MeshClient, MeshRegistry } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import {
   createFakeTransport,
   interceptAdminMessages,

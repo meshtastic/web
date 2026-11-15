@@ -16,7 +16,7 @@ import {
   convertIntToIpAddress,
   convertIpAddressToInt,
 } from "@core/utils/ip.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { useTranslation } from "react-i18next";
 

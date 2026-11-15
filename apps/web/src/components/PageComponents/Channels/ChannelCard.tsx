@@ -1,5 +1,5 @@
 import { cn } from "@core/utils/cn.ts";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import {
   CloudDownloadIcon,
   CloudUploadIcon,

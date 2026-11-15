@@ -3,7 +3,7 @@ import {
   isRegionAllowed,
   type LoRaCapabilities,
 } from "@core/utils/loraPresets.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { z } from "zod/v4";
 
 const ModemPresetEnum = z.enum(Protobuf.Config.Config_LoRaConfig_ModemPreset);

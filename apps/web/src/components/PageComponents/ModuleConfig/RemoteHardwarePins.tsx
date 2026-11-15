@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { PlusIcon, TrashIcon } from "lucide-react";
 import {
   Controller,

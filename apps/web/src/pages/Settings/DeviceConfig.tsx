@@ -6,7 +6,7 @@ import { Position } from "@components/PageComponents/Settings/Position.tsx";
 import { Power } from "@components/PageComponents/Settings/Power.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import type { ValidConfigType } from "@core/stores";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";

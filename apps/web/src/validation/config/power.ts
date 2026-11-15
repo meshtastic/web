@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { z } from "zod/v4";
 
 export const PowerValidationSchema = z.object({

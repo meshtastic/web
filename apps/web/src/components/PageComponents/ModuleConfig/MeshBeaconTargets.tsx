@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { PlusIcon } from "lucide-react";
 import {
   type SubmitHandler,

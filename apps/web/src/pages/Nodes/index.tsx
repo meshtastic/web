@@ -23,7 +23,7 @@ import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice } from "@core/stores";
-import { Protobuf, type Types } from "@meshtastic/sdk";
+import { Protobuf, type Types } from "@core/protobuf.ts";
 import { useNodeErrors } from "@meshtastic/sdk-react";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { LockIcon, LockOpenIcon } from "lucide-react";

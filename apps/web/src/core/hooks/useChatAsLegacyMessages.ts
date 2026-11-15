@@ -4,7 +4,8 @@ import {
   MessageType,
 } from "@core/stores/messageStore";
 import type { Message as SdkMessage } from "@meshtastic/sdk";
-import { MessageState as SdkMessageState, type Types } from "@meshtastic/sdk";
+import { MessageState as SdkMessageState } from "@meshtastic/sdk";
+import type { Types } from "@core/protobuf.ts";
 import { useChat, useDirectChat } from "@meshtastic/sdk-react";
 import { useMemo } from "react";
 

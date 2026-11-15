@@ -7,7 +7,7 @@ import {
   type SignalQuality,
   snrQuality,
 } from "@core/utils/signalQuality.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import type { LucideIcon } from "lucide-react";
 import { Cable, Cloud, Network, Route, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";

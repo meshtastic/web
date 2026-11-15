@@ -1,5 +1,6 @@
 import { validateMaxByteLength } from "@core/utils/string.ts";
-import { CANNED_MESSAGES_MAX_BYTES, Protobuf } from "@meshtastic/sdk";
+import { CANNED_MESSAGES_MAX_BYTES } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { z } from "zod/v4";
 
 const InputEventCharEnum = z.enum(

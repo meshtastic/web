@@ -22,7 +22,8 @@ import {
   profileContents,
   selectProfileFields,
 } from "@core/utils/profileExport.ts";
-import { type ConfigEditor, Protobuf } from "@meshtastic/sdk";
+import type { ConfigEditor } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import {
   useActiveClient,
   useConfigEditor,

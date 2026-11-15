@@ -7,8 +7,8 @@ import {
   type Channel,
   isBeaconAlreadyJoined,
   type MeshBeaconOffer,
-  Protobuf,
 } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 
 type ChannelSettings = Protobuf.Channel.ChannelSettings;
 

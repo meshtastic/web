@@ -12,7 +12,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { useLockdown } from "@core/hooks/useLockdown.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { LockIcon } from "lucide-react";
 import { type FormEvent, useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";

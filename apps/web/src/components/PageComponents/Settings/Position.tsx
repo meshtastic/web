@@ -17,7 +17,7 @@ import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
 import { STAGED_FIXED_POSITION } from "@core/utils/stagedAdminKeys.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
 import { LocateFixed } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";

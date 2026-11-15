@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 
 /** A device log record as kept by the debug panel. */
 export interface DeviceLogEntry {

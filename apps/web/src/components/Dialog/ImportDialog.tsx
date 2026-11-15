@@ -22,7 +22,7 @@ import { Switch } from "@components/UI/Switch.tsx";
 import { useDevice } from "@core/stores";
 import type { BeaconJoinPlan } from "@core/utils/beaconJoin.ts";
 import { channelSetFromUrl } from "@core/utils/channelUrl.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor } from "@meshtastic/sdk-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";

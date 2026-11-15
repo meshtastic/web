@@ -1,5 +1,5 @@
 import { useDevice } from "@core/stores";
-import { Types } from "@meshtastic/sdk";
+import { Types } from "@core/protobuf.ts";
 
 /** True once the active node is connected and configured. */
 export function useDeviceConnected(): boolean {

@@ -3,7 +3,7 @@ import {
   MessageState,
   MessageType,
 } from "@core/stores/messageStore";
-import { Protobuf, type Types } from "@meshtastic/sdk";
+import { Protobuf, type Types } from "@core/protobuf.ts";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { MessageItem } from "./MessageItem.tsx";

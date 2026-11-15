@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 
 function createDefaultUser(num: number): Protobuf.Mesh.User {
   const userIdHex = num.toString(16).toUpperCase().padStart(2, "0");

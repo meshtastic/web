@@ -1,6 +1,7 @@
 import { create } from "@bufbuild/protobuf";
 import { TelemetrySections } from "@components/Dialog/NodeDetailsDialog/NodeTelemetry.tsx";
-import { Protobuf, type TelemetryReading } from "@meshtastic/sdk";
+import type { TelemetryReading } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 

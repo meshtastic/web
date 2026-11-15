@@ -1,6 +1,6 @@
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { channelSetFromUrl, channelSetToUrl } from "@core/utils/channelUrl.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { Result } from "better-result";
 
 /**

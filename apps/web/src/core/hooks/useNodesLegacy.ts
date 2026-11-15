@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { useMeshDevice, useNodes } from "@meshtastic/sdk-react";
 import { useMemo } from "react";
 import { toNodeInfo } from "./useNodesAsProto.ts";

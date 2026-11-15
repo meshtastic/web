@@ -34,7 +34,9 @@
     "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.16.0",
     "@hookform/resolvers": "^5.9.1",
+    "@meshtastic/protobufs": "workspace:*",
     "@meshtastic/sdk": "workspace:*",
     "@meshtastic/sdk-kmp": "workspace:*",
     "@meshtastic/sdk-react": "workspace:*",

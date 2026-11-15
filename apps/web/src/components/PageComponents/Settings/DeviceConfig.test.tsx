@@ -3,7 +3,7 @@ import { renderSettingsForm } from "@app/tests/renderSettingsForm.tsx";
 import { BluetoothValidationSchema } from "@app/validation/config/bluetooth.ts";
 import { Bluetooth } from "@components/PageComponents/Settings/Bluetooth.tsx";
 import { Device } from "@components/PageComponents/Settings/Device/index.tsx";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";

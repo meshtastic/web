@@ -1,5 +1,6 @@
 import { useDevice } from "@core/stores";
-import { firmwareAtLeast, type Protobuf } from "@meshtastic/sdk";
+import { firmwareAtLeast } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { useActiveClient, useSignal } from "@meshtastic/sdk-react";
 
 const EMPTY_REGION_PRESETS_SIGNAL = {

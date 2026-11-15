@@ -1,6 +1,6 @@
 import { getColorFromNodeNum, isLightColor } from "@app/core/utils/color";
 import { precisionBitsToMeters, toLngLat } from "@core/utils/geo.ts";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { circle } from "@turf/turf";
 import type { Feature, FeatureCollection, Polygon } from "geojson";
 import { Layer, Source } from "react-map-gl/maplibre";

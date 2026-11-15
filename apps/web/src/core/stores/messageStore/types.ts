@@ -1,5 +1,5 @@
 import type { MessageState, MessageType } from "@core/stores";
-import type { Protobuf, Types } from "@meshtastic/sdk";
+import type { Protobuf, Types } from "@core/protobuf.ts";
 
 type NodeNum = number;
 type MessageId = number;

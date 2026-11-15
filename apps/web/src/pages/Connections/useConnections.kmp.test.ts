@@ -2,7 +2,7 @@ import { fromBinary } from "@bufbuild/protobuf";
 import { FakeKmpClient, state } from "@core/kmp/fakeClient.ts";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { useDeviceStore } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useConnections } from "./useConnections.ts";

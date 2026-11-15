@@ -1,4 +1,5 @@
-import type { MeshClient, Protobuf } from "@meshtastic/sdk";
+import type { MeshClient } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { useActiveClient, useSignal } from "@meshtastic/sdk-react";
 
 type LockdownStatus = Protobuf.Mesh.LockdownStatus | undefined;

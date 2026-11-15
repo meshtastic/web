@@ -1,5 +1,6 @@
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
-import { DeviceStatusEnum, type DeviceOutput, Protobuf } from "@meshtastic/sdk";
+import { DeviceStatusEnum, type DeviceOutput } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import { FakeKmpClient, state } from "./fakeClient.ts";
 import { kmpTransport } from "./transport.ts";

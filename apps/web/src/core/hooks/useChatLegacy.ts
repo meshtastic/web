@@ -2,7 +2,7 @@ import {
   type Message as LegacyMessage,
   MessageType,
 } from "@core/stores/messageStore";
-import type { Types } from "@meshtastic/sdk";
+import type { Types } from "@core/protobuf.ts";
 import { useChat, useDirectChat } from "@meshtastic/sdk-react";
 import { useMemo } from "react";
 import { toLegacy } from "./useChatAsLegacyMessages.ts";

@@ -8,7 +8,7 @@ import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { formatQuantity } from "@core/utils/string.ts";
 import type { NodeInfoWithStatus } from "@core/hooks/useNodesAsProto.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import {
   Tooltip,
   TooltipContent,
