@@ -25,6 +25,8 @@ export interface OpenedSqlocalDb {
   storageType: string;
   /** True when the database is saved to OPFS. */
   persistent: boolean;
+  /** Disconnects from the database and stops its worker, releasing the OPFS handle. */
+  close: () => Promise<void>;
 }
 
 /**
@@ -47,7 +49,12 @@ export async function openSqlocalDb(
   await applyMigrations(sql);
 
   const { storageType = "memory" } = await client.getDatabaseInfo();
-  return { db, storageType, persistent: storageType === "opfs" };
+  return {
+    db,
+    storageType,
+    persistent: storageType === "opfs",
+    close: () => client.destroy(),
+  };
 }
 
 type RawSql = (

@@ -43,4 +43,25 @@ export function getStorageDb(): Promise<OpenedSqlocalDb> {
   return dbPromise;
 }
 
+/**
+ * Closes the database and forgets it, so another tab can take the OPFS
+ * handle and the next `getStorageDb()` here opens afresh. A failing close is
+ * logged, not thrown: the caller is giving the app away and must finish.
+ */
+export async function closeStorageDb(): Promise<void> {
+  const pending = dbPromise;
+  if (!pending) return;
+  dbPromise = undefined;
+  try {
+    const opened = await pending;
+    await opened.close();
+    log.info("closeStorageDb: sqlocal DB closed");
+  } catch (err) {
+    log.warn("closeStorageDb: close failed", {
+      name: err instanceof Error ? err.name : undefined,
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
+
 export const coordinator = new MultiTabCoordinator();

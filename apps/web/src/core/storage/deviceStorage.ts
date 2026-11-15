@@ -1,4 +1,5 @@
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
+import { createLogger } from "@core/log.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import type {
   ConfigBundleJs,
@@ -25,6 +26,8 @@ import { base64Decode, base64Encode } from "./types.ts";
  * the same radio shares them: the scope starts as the node this connection
  * reached last time and moves to the node the handshake names.
  */
+const log = createLogger("deviceStorage");
+
 export class SqlocalDeviceStorage implements DeviceStorageJs {
   private scope: number;
 
@@ -257,11 +260,91 @@ function decodeList(json: string): Uint8Array[] {
 }
 
 /** A `StorageJs` for the facade's factories, opening the DB on activation. */
+const STORAGE_CALL_TIMEOUT_MS = 5000;
+
+function bounded<T>(
+  call: () => Promise<T>,
+  fallback: T,
+  what: string,
+  timeoutMs: number,
+): Promise<T> {
+  return new Promise<T>((resolve) => {
+    const timer = setTimeout(() => {
+      log.warn(`${what} did not answer within ${timeoutMs}ms, continuing`);
+      resolve(fallback);
+    }, timeoutMs);
+    call().then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        log.warn(`${what} failed, continuing`, {
+          message: err instanceof Error ? err.message : String(err),
+        });
+        resolve(fallback);
+      },
+    );
+  });
+}
+
+/**
+ * The same storage, with every call answered within `timeoutMs`: a read
+ * falls back to its empty value and a write is treated as done. A database
+ * whose OPFS handle another tab still holds can then never stall the SDK's
+ * connect.
+ */
+export function boundedDeviceStorage(
+  inner: DeviceStorageJs,
+  timeoutMs = STORAGE_CALL_TIMEOUT_MS,
+): DeviceStorageJs {
+  const run = <T>(what: string, call: () => Promise<T>, fallback: T) =>
+    bounded(call, fallback, what, timeoutMs);
+  return {
+    loadNodes: () => run("loadNodes", () => inner.loadNodes(), []),
+    saveNode: (node) => run("saveNode", () => inner.saveNode(node), undefined),
+    removeNode: (nodeNum) =>
+      run("removeNode", () => inner.removeNode(nodeNum), undefined),
+    loadConfig: () => run("loadConfig", () => inner.loadConfig(), null),
+    saveConfig: (bundle) =>
+      run("saveConfig", () => inner.saveConfig(bundle), undefined),
+    loadChannels: () => run("loadChannels", () => inner.loadChannels(), []),
+    saveChannels: (channels) =>
+      run("saveChannels", () => inner.saveChannels(channels), undefined),
+    recordOwnNode: (nodeNum, firmwareVersion) =>
+      run(
+        "recordOwnNode",
+        () => inner.recordOwnNode(nodeNum, firmwareVersion),
+        undefined,
+      ),
+    clear: () => run("clear", () => inner.clear(), undefined),
+    close: () => inner.close(),
+    saveSessionPasskey: (passkey) =>
+      run(
+        "saveSessionPasskey",
+        () => inner.saveSessionPasskey(passkey),
+        undefined,
+      ),
+    loadSessionPasskey: () =>
+      run("loadSessionPasskey", () => inner.loadSessionPasskey(), null),
+    saveHeartbeat: (nodeNum, epochMillis) =>
+      run(
+        "saveHeartbeat",
+        () => inner.saveHeartbeat(nodeNum, epochMillis),
+        undefined,
+      ),
+    loadHeartbeats: () =>
+      run("loadHeartbeats", () => inner.loadHeartbeats(), []),
+  };
+}
+
 export function sqlocalStorage(
   openDb: () => Promise<SqlocalDb>,
   scope: number,
 ): StorageJs {
   return {
-    activate: async () => new SqlocalDeviceStorage(await openDb(), scope),
+    activate: async () =>
+      boundedDeviceStorage(new SqlocalDeviceStorage(await openDb(), scope)),
   };
 }

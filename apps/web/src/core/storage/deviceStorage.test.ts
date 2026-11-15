@@ -1,8 +1,9 @@
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SqlocalDb } from "./db.ts";
-import { SqlocalDeviceStorage } from "./deviceStorage.ts";
+import type { DeviceStorageJs } from "@meshtastic/sdk-kmp";
+import { boundedDeviceStorage, SqlocalDeviceStorage } from "./deviceStorage.ts";
 import { createMemoryDb } from "./memoryDb.ts";
 import { SqlocalNodesRepository } from "./nodes.ts";
 
@@ -124,5 +125,54 @@ describe("SqlocalDeviceStorage", () => {
 
     await unknown.clear();
     expect(await storage.loadNodes()).toEqual([]);
+  });
+});
+
+describe("boundedDeviceStorage", () => {
+  const hanging = (): DeviceStorageJs => ({
+    loadNodes: () => new Promise(() => {}),
+    saveNode: () => new Promise(() => {}),
+    removeNode: () => new Promise(() => {}),
+    loadConfig: () => new Promise(() => {}),
+    saveConfig: () => new Promise(() => {}),
+    loadChannels: () => new Promise(() => {}),
+    saveChannels: () => new Promise(() => {}),
+    recordOwnNode: () => new Promise(() => {}),
+    clear: () => new Promise(() => {}),
+    close: () => {},
+    saveSessionPasskey: () => new Promise(() => {}),
+    loadSessionPasskey: () => new Promise(() => {}),
+    saveHeartbeat: () => new Promise(() => {}),
+    loadHeartbeats: () => new Promise(() => {}),
+  });
+
+  it("answers every read with its empty value when the database never responds", async () => {
+    vi.useFakeTimers();
+    try {
+      const storage = boundedDeviceStorage(hanging(), 50);
+      const reads = Promise.all([
+        storage.loadConfig(),
+        storage.loadNodes(),
+        storage.loadChannels(),
+        storage.loadSessionPasskey(),
+        storage.loadHeartbeats(),
+      ]);
+      await vi.advanceTimersByTimeAsync(60);
+      expect(await reads).toEqual([null, [], [], null, []]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("lets a write that never responds complete, so connect is not held up", async () => {
+    vi.useFakeTimers();
+    try {
+      const storage = boundedDeviceStorage(hanging(), 50);
+      const write = storage.saveChannels([]);
+      await vi.advanceTimersByTimeAsync(60);
+      await expect(write).resolves.toBeUndefined();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

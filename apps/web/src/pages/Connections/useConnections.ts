@@ -37,6 +37,7 @@ import {
 import { meshRegistry } from "@core/kmp/registry.ts";
 import { MeshSession } from "@core/kmp/session.ts";
 import { createLogger } from "@core/log.ts";
+import { closeStorageDb } from "@core/sdkStorage.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { MIN_FIRMWARE_VERSION } from "@core/utils/firmware.ts";
@@ -178,6 +179,7 @@ export async function disconnectAllConnections(): Promise<void> {
   for (const id of [...sessionTeardowns.keys()]) {
     await disconnectConnection(id);
   }
+  await closeStorageDb();
 }
 
 export function useConnections() {

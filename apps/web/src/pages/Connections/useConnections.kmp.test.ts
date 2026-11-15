@@ -9,6 +9,8 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { disconnectAllConnections, useConnections } from "./useConnections.ts";
 
+const storage = vi.hoisted(() => ({ close: vi.fn(async () => {}) }));
+
 const kmp = vi.hoisted(
   (): {
     client?: FakeKmpClient;
@@ -22,6 +24,7 @@ vi.mock("@core/sdkStorage.ts", () => ({
   getStorageDb: async () => {
     throw new Error("no storage in tests");
   },
+  closeStorageDb: storage.close,
   coordinator: undefined,
 }));
 
@@ -116,10 +119,12 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     const client = kmp.client;
     if (!client) throw new Error("no client created");
 
+    storage.close.mockClear();
     await act(() => disconnectAllConnections());
     expect(client.disconnects).toHaveLength(1);
     expect(saved(conn.id)?.status).toBe("disconnected");
     expect(meshRegistry.get(conn.id)?.kmp).toBe(client);
+    expect(storage.close).toHaveBeenCalledTimes(1);
   });
 
   it("shows the SDK's reconnect attempts and reports when they run out", async () => {
