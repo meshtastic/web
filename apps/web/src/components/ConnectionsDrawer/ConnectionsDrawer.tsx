@@ -7,14 +7,17 @@ import {
   DrawerTitle,
 } from "@components/shadcn/drawer.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
+import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useConnections } from "@app/pages/Connections/useConnections";
 import { ArrowLeft, XIcon } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AddConnectionForm } from "./AddConnectionForm.tsx";
 import { ConnectionsList } from "./ConnectionsList.tsx";
+import { DrawerResizeHandle } from "./DrawerResizeHandle.tsx";
+import { useDrawerWidth } from "./useDrawerWidth.ts";
 
 export interface ConnectionsDrawerProps {
   /**
@@ -35,6 +38,10 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
   const storeOpen = useAppStore((s) => s.connectionsDrawer.open);
   const closeConnections = useAppStore((s) => s.closeConnections);
   const open = forced || storeOpen;
+  // Below md the drawer is min(100vw - 16px, 440px) wide and not resizable.
+  const isMobile = useIsMobile();
+  const drawerWidth = useDrawerWidth();
+  const [draftWidth, setDraftWidth] = useState<number | undefined>(undefined);
 
   return (
     <Drawer
@@ -55,6 +62,9 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
             event.preventDefault();
           }
         }}
+        style={
+          isMobile ? undefined : { width: draftWidth ?? drawerWidth.width }
+        }
         className={cn(
           // Floating inset panel on the right at every size.
           "inset-y-2 right-2 h-auto rounded-2xl border border-border bg-background text-foreground shadow-2xl",
@@ -62,6 +72,12 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
           "data-[vaul-drawer-direction=right]:w-[min(calc(100vw-16px),440px)] data-[vaul-drawer-direction=right]:sm:max-w-none",
         )}
       >
+        {isMobile ? null : (
+          <DrawerResizeHandle
+            drawerWidth={drawerWidth}
+            onDraft={setDraftWidth}
+          />
+        )}
         <DrawerBody forced={forced} />
       </DrawerContent>
     </Drawer>

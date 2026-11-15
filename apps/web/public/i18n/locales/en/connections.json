@@ -3,7 +3,8 @@
     "title": "Connections",
     "close": "Close connections",
     "back": "Back to connections",
-    "addConnection": "Add connection"
+    "addConnection": "Add connection",
+    "resize": "Resize connections drawer"
   },
   "page": {
     "title": "Connect to a Meshtastic device",
