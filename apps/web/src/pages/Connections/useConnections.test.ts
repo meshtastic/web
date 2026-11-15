@@ -20,17 +20,10 @@ vi.mock("@core/sdkStorage.ts", () => ({
   coordinator: undefined,
 }));
 
-vi.mock("@app/core/connections/transports.ts", () => ({
-  openTransport: async () => ({
-    transport: {
-      toDevice: new WritableStream<Uint8Array>(),
-      fromDevice: new ReadableStream(),
-      disconnect: async () => {},
-    },
-  }),
-  closeTransport: () => {},
-  probeConnection: async () => ({ status: "disconnected" }),
-}));
+vi.mock("@core/kmp/client.ts", async () => {
+  const { FakeKmpClient } = await import("@core/kmp/fakeClient.ts");
+  return { createSerialClient: async () => new FakeKmpClient() };
+});
 
 // The sqlocal repositories, replaced by the SDK's in-memory ones that record
 // the scopes they are given. Called with `new`; the returned object is the

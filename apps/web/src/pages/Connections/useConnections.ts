@@ -1,10 +1,22 @@
 import { buildMeshDevice } from "@app/core/connections/sdkClient.ts";
 import {
-  closeTransport,
-  openTransport,
+  type BluetoothConnection,
+  type ConnectionHandle,
+  knownBluetoothDevice,
+  permittedSerialPort,
+  pickBluetoothDevice,
+  pickSerialPort,
   probeConnection,
-} from "@app/core/connections/transports.ts";
-import { createHttpClient } from "@core/kmp/client.ts";
+  type SerialConnection,
+} from "@app/core/connections/browserDevices.ts";
+import {
+  type BluetoothTarget,
+  createBluetoothClient,
+  createHttpClient,
+  createSerialClient,
+  type MeshtasticClient,
+  type SerialTarget,
+} from "@core/kmp/client.ts";
 import { editorFor } from "@core/kmp/configEditorIo.ts";
 import {
   connectFailure,
@@ -37,12 +49,78 @@ import { randId } from "@core/utils/randId.ts";
 import { useCallback } from "react";
 
 // Per-connection out-of-band handles tracked outside Zustand:
-//   - cachedTransports: held BT device / serial port for reconnect + cleanup.
+//   - heldSerialPorts / heldBluetoothDevices: the port or device the user
+//     picked, so later connects reuse it without prompting.
 //   - configSubscriptions: handshake status / reboot unsubscribers.
-const cachedTransports = new Map<ConnectionId, BluetoothDevice | SerialPort>();
+const heldSerialPorts = new Map<ConnectionId, SerialPort>();
+const heldBluetoothDevices = new Map<ConnectionId, BluetoothDevice>();
 const configSubscriptions = new Map<ConnectionId, () => void>();
 // Kotlin SDK connection-state subscriptions for connections it owns.
 const kmpSubscriptions = new Map<ConnectionId, () => void>();
+
+/**
+ * What the SDK opens for a serial connection. Automatic connects pass only
+ * the saved USB ids and the SDK reopens the permitted port itself; a click
+ * (`allowPrompt`) may show the port picker when no permitted port matches,
+ * and hands the chosen port over.
+ */
+async function serialTarget(
+  conn: SerialConnection,
+  allowPrompt: boolean,
+): Promise<SerialTarget> {
+  const ids = {
+    usbVendorId: conn.usbVendorId,
+    usbProductId: conn.usbProductId,
+  };
+  const held = heldSerialPorts.get(conn.id);
+  if (held) {
+    return { port: held, ...ids };
+  }
+  if (!allowPrompt) {
+    return ids;
+  }
+  const port =
+    (await permittedSerialPort(conn)) ?? (await pickSerialPort(conn));
+  heldSerialPorts.set(conn.id, port);
+  const info = port.getInfo();
+  if (
+    info.usbVendorId !== conn.usbVendorId ||
+    info.usbProductId !== conn.usbProductId
+  ) {
+    useDeviceStore.getState().updateSavedConnection(conn.id, {
+      usbVendorId: info.usbVendorId,
+      usbProductId: info.usbProductId,
+    });
+  }
+  return {
+    port,
+    usbVendorId: info.usbVendorId,
+    usbProductId: info.usbProductId,
+  };
+}
+
+async function bluetoothTarget(
+  conn: BluetoothConnection,
+  allowPrompt: boolean,
+): Promise<BluetoothTarget> {
+  const held = heldBluetoothDevices.get(conn.id);
+  if (held) {
+    return { device: held, deviceId: conn.deviceId };
+  }
+  if (!allowPrompt) {
+    return { deviceId: conn.deviceId };
+  }
+  const device =
+    (await knownBluetoothDevice(conn)) ?? (await pickBluetoothDevice());
+  heldBluetoothDevices.set(conn.id, device);
+  if (device.id !== conn.deviceId) {
+    useDeviceStore.getState().updateSavedConnection(conn.id, {
+      deviceId: device.id,
+      deviceName: device.name,
+    });
+  }
+  return { device, deviceId: device.id };
+}
 
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
@@ -96,8 +174,6 @@ export function useConnections() {
         });
       }
     }
-    closeTransport(cachedTransports.get(id));
-    cachedTransports.delete(id);
     log.debug("teardown: done", { id });
   }, []);
 
@@ -105,6 +181,8 @@ export function useConnections() {
     async (id: ConnectionId) => {
       const conn = connections.find((c) => c.id === id);
       await teardown(id, conn);
+      heldSerialPorts.delete(id);
+      heldBluetoothDevices.delete(id);
       if (conn?.meshDeviceId) {
         try {
           useDeviceStore.getState().removeDevice(conn.meshDeviceId);
@@ -138,8 +216,6 @@ export function useConnections() {
       id: ConnectionId,
       transport: Transport,
       { sdkOwnsConnection = false }: { sdkOwnsConnection?: boolean } = {},
-      bluetoothDevice?: BluetoothDevice,
-      serialPort?: SerialPort,
     ): Promise<number> => {
       // Reuse existing meshDeviceId if the device entry still exists; otherwise mint a new one.
       const conn = connections.find((c) => c.id === id);
@@ -191,9 +267,6 @@ export function useConnections() {
       setSelectedDevice(deviceId);
       device.addConnection(meshDevice);
       subscribeAll(device, meshDevice);
-
-      const cached = bluetoothDevice ?? serialPort;
-      if (cached) cachedTransports.set(id, cached);
 
       setActiveConnectionId(id);
       device.setConnectionId(id);
@@ -312,13 +385,13 @@ export function useConnections() {
   );
 
   /**
-   * Connects over the device HTTP API through the Kotlin SDK, which owns
-   * the handshake and reconnects. The existing MeshDevice is fed from the
-   * SDK's frames so the rest of the app is unchanged.
+   * Connects through the Kotlin SDK, which owns the transport, the
+   * handshake and reconnects. The existing MeshDevice is fed from the SDK's
+   * frames so the rest of the app is unchanged.
    */
   const connectThroughKmp = useCallback(
-    async (id: ConnectionId, url: string, allowPrompt: boolean) => {
-      const client = await createHttpClient(url, allowPrompt);
+    async (id: ConnectionId, makeClient: () => Promise<MeshtasticClient>) => {
+      const client = await makeClient();
       let reconnecting = false;
       kmpSubscriptions.get(id)?.();
       kmpSubscriptions.set(
@@ -414,56 +487,37 @@ export function useConnections() {
         allowPrompt: !!opts?.allowPrompt,
       });
       updateStatus(id, "connecting");
-      if (conn.type === "http") {
-        return connectThroughKmp(conn.id, conn.url, opts?.allowPrompt ?? false);
-      }
+      const allowPrompt = opts?.allowPrompt ?? false;
       try {
-        const cached = cachedTransports.get(id);
-        const result = await openTransport(conn, {
-          allowPrompt: opts?.allowPrompt,
-          cachedBluetoothDevice:
-            conn.type === "bluetooth"
-              ? (cached as BluetoothDevice | undefined)
-              : undefined,
-          cachedSerialPort:
-            conn.type === "serial"
-              ? (cached as SerialPort | undefined)
-              : undefined,
-        });
-        log.debug("connect: openTransport ok", { id });
-        await setupMeshDevice(
+        switch (conn.type) {
+          case "http":
+            return await connectThroughKmp(id, () =>
+              createHttpClient(conn.url, allowPrompt),
+            );
+          case "serial": {
+            const target = await serialTarget(conn, allowPrompt);
+            return await connectThroughKmp(id, () =>
+              createSerialClient(target),
+            );
+          }
+          case "bluetooth": {
+            const target = await bluetoothTarget(conn, allowPrompt);
+            return await connectThroughKmp(id, () =>
+              createBluetoothClient(target),
+            );
+          }
+        }
+      } catch (error) {
+        log.error("connect: no device to connect to", {
           id,
-          result.transport,
-          {},
-          result.bluetoothDevice,
-          result.serialPort,
-        );
-        log.info("connect: setupMeshDevice resolved, awaiting handshake", {
-          id,
+          name: error instanceof Error ? error.name : undefined,
+          message: error instanceof Error ? error.message : String(error),
         });
-
-        // BT-specific: catch device-side disconnect to flip status.
-        result.bluetoothDevice?.addEventListener(
-          "gattserverdisconnected",
-          () => {
-            log.warn("BT gattserverdisconnected", { id });
-            updateStatus(id, "disconnected");
-          },
-        );
-        return true;
-      } catch (err) {
-        const e = err as Error;
-        log.error("connect: failed", {
-          id,
-          name: e?.name,
-          message: e?.message,
-        });
-        const message = err instanceof Error ? err.message : String(err);
-        updateStatus(id, "error", message);
+        updateSavedConnection(id, connectFailure(error));
         return false;
       }
     },
-    [updateStatus, setupMeshDevice, connectThroughKmp],
+    [updateStatus, updateSavedConnection, connectThroughKmp],
   );
 
   const disconnect = useCallback(
@@ -495,10 +549,14 @@ export function useConnections() {
   );
 
   const addConnectionAndConnect = useCallback(
-    async (input: NewConnection, btDevice?: BluetoothDevice) => {
+    async (input: NewConnection, handle?: ConnectionHandle) => {
       const conn = addConnection(input);
-      if (btDevice && conn.type === "bluetooth")
-        cachedTransports.set(conn.id, btDevice);
+      if (handle?.bluetoothDevice && conn.type === "bluetooth") {
+        heldBluetoothDevices.set(conn.id, handle.bluetoothDevice);
+      }
+      if (handle?.serialPort && conn.type === "serial") {
+        heldSerialPorts.set(conn.id, handle.serialPort);
+      }
       await connect(conn.id, { allowPrompt: true });
       return conn;
     },

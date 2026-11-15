@@ -25,3 +25,39 @@ export async function createHttpClient(
   const kmp = await loadKmp();
   return kmp.createHttpClient(url, allowPrompt, MAX_RECONNECT_ATTEMPTS);
 }
+
+export interface SerialTarget {
+  /** A port picked inside a click handler; otherwise the SDK reopens by USB ids. */
+  port?: SerialPort;
+  usbVendorId?: number;
+  usbProductId?: number;
+}
+
+export interface BluetoothTarget {
+  /** A device picked inside a click handler; otherwise the SDK looks `deviceId` up. */
+  device?: BluetoothDevice;
+  deviceId?: string;
+}
+
+export async function createSerialClient(
+  target: SerialTarget,
+): Promise<MeshtasticClient> {
+  const kmp = await loadKmp();
+  return kmp.createSerialClient(
+    target.port,
+    target.usbVendorId,
+    target.usbProductId,
+    MAX_RECONNECT_ATTEMPTS,
+  );
+}
+
+export async function createBluetoothClient(
+  target: BluetoothTarget,
+): Promise<MeshtasticClient> {
+  const kmp = await loadKmp();
+  return kmp.createBluetoothClient(
+    target.device,
+    target.deviceId,
+    MAX_RECONNECT_ATTEMPTS,
+  );
+}

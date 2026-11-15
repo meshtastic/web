@@ -166,8 +166,8 @@ function DrawerBody({ forced }: { forced: boolean }) {
         ) : (
           <AddConnectionForm
             isHTTPS={isURLHTTPS}
-            onSave={async (partial, btDevice) => {
-              const created = await addConnectionAndConnect(partial, btDevice);
+            onSave={async (partial, handle) => {
+              const created = await addConnectionAndConnect(partial, handle);
               if (!created) {
                 toast({
                   title: t("toasts.failed"),

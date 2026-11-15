@@ -84,12 +84,6 @@ importers:
       '@meshtastic/transport-http':
         specifier: workspace:*
         version: link:../../packages/transport-http
-      '@meshtastic/transport-web-bluetooth':
-        specifier: workspace:*
-        version: link:../../packages/transport-web-bluetooth
-      '@meshtastic/transport-web-serial':
-        specifier: workspace:*
-        version: link:../../packages/transport-web-serial
       '@noble/curves':
         specifier: ^2.4.0
         version: 2.4.0

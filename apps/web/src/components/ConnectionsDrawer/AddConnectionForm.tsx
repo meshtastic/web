@@ -7,6 +7,10 @@ import {
   isLocalNetworkHost,
   testHttpReachable,
 } from "@app/pages/Connections/utils";
+import {
+  type ConnectionHandle,
+  MESHTASTIC_BLE_SERVICE,
+} from "@core/connections/browserDevices.ts";
 import { CertificateGuide } from "@components/CertificateGuide.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { useLocalNetworkAccess } from "@core/hooks/useLocalNetworkAccess.ts";
@@ -25,7 +29,6 @@ import {
   useBrowserFeatureDetection,
 } from "@core/hooks/useBrowserFeatureDetection.ts";
 import { useToast } from "@core/hooks/useToast.ts";
-import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import {
   AlertCircle,
   Bluetooth,
@@ -66,7 +69,9 @@ type DialogState = {
   btSelected:
     | { id: string; name?: string; device?: BluetoothDevice }
     | undefined;
-  serialSelected: { vendorId?: number; productId?: number } | undefined;
+  serialSelected:
+    | { vendorId?: number; productId?: number; port?: SerialPort }
+    | undefined;
 };
 
 type DialogAction =
@@ -96,7 +101,9 @@ type DialogAction =
     }
   | {
       type: "SET_SERIAL_SELECTED";
-      payload: { vendorId?: number; productId?: number } | undefined;
+      payload:
+        | { vendorId?: number; productId?: number; port?: SerialPort }
+        | undefined;
     }
   | { type: "SET_URL_AND_RESET_TEST"; payload: string };
 
@@ -356,7 +363,7 @@ export function AddConnectionForm({
   onSave,
   isHTTPS = false,
 }: {
-  onSave: (conn: NewConnection, device?: BluetoothDevice) => Promise<void>;
+  onSave: (conn: NewConnection, handle?: ConnectionHandle) => Promise<void>;
   isHTTPS?: boolean;
 }) {
   const { toast } = useToast();
@@ -423,7 +430,7 @@ export function AddConnectionForm({
     }
     try {
       const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [TransportWebBluetooth.ServiceUuid] }],
+        filters: [{ services: [MESHTASTIC_BLE_SERVICE] }],
       });
       dispatch({
         type: "SET_BT_SELECTED",
@@ -466,6 +473,7 @@ export function AddConnectionForm({
         payload: {
           vendorId: info.usbVendorId,
           productId: info.usbProductId,
+          port,
         },
       });
       if (!state.name || state.name === "") {
@@ -696,7 +704,7 @@ export function AddConnectionForm({
           name: state.name.trim(),
           deviceId: state.btSelected?.id,
           deviceName: state.btSelected?.name,
-          gattServiceUUID: TransportWebBluetooth.ServiceUuid,
+          gattServiceUUID: MESHTASTIC_BLE_SERVICE,
         }),
       },
       serial: {
@@ -762,7 +770,7 @@ export function AddConnectionForm({
   const canCreate = useMemo(() => currentPane.validate(), [currentPane]);
 
   const submit =
-    (fn: (p: NewConnection, device?: BluetoothDevice) => Promise<void>) =>
+    (fn: (p: NewConnection, handle?: ConnectionHandle) => Promise<void>) =>
     async () => {
       if (!canCreate) {
         return;
@@ -772,9 +780,13 @@ export function AddConnectionForm({
       if (!payload) {
         return;
       }
-      const btDevice =
-        state.tab === "bluetooth" ? state.btSelected?.device : undefined;
-      await fn(payload, btDevice);
+      const handle: ConnectionHandle = {
+        bluetoothDevice:
+          state.tab === "bluetooth" ? state.btSelected?.device : undefined,
+        serialPort:
+          state.tab === "serial" ? state.serialSelected?.port : undefined,
+      };
+      await fn(payload, handle);
     };
 
   return (
