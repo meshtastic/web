@@ -9,8 +9,11 @@ import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
+import { TabLockGate } from "@components/TabLockGate.tsx";
 import { meshRegistry } from "@core/kmp/registry.ts";
 import { useAppStore } from "@core/stores";
+import { createBrowserTabLock } from "@core/tabLock.ts";
+import { disconnectAllConnections } from "@app/pages/Connections/useConnections.ts";
 import { MeshRegistryProvider } from "@core/kmp/hooks";
 import { type createRouter, RouterProvider } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -22,6 +25,8 @@ declare module "@tanstack/react-router" {
 }
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);
+const tabLock = createBrowserTabLock(disconnectAllConnections);
+tabLock.start();
 
 function IndexPage() {
   enableMapSet();
@@ -49,4 +54,8 @@ function IndexPage() {
   );
 }
 
-root.render(<IndexPage />);
+root.render(
+  <TabLockGate lock={tabLock}>
+    <IndexPage />
+  </TabLockGate>,
+);

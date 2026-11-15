@@ -7,7 +7,7 @@ import { Protobuf } from "@core/protobuf.ts";
 import type { StorageJs } from "@meshtastic/sdk-kmp";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useConnections } from "./useConnections.ts";
+import { disconnectAllConnections, useConnections } from "./useConnections.ts";
 
 const kmp = vi.hoisted(
   (): {
@@ -107,6 +107,19 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     await act(() => result.current.disconnect(conn.id));
     expect(client.disconnects).toHaveLength(1);
     expect(saved(conn.id)?.status).toBe("disconnected");
+  });
+
+  it("disconnects every live session through the drawer's teardown", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+
+    await act(() => disconnectAllConnections());
+    expect(client.disconnects).toHaveLength(1);
+    expect(saved(conn.id)?.status).toBe("disconnected");
+    expect(meshRegistry.get(conn.id)?.kmp).toBe(client);
   });
 
   it("shows the SDK's reconnect attempts and reports when they run out", async () => {

@@ -140,6 +140,46 @@ async function clientFactory(
 const savedConnection = (id: ConnectionId): Connection | undefined =>
   useDeviceStore.getState().savedConnections.find((c) => c.id === id);
 
+async function teardownSession(id: ConnectionId): Promise<void> {
+  log.debug("teardown: enter", { id });
+  sessionTeardowns.get(id)?.();
+  sessionTeardowns.delete(id);
+  try {
+    await meshRegistry.get(id)?.disconnect();
+  } catch (e) {
+    log.warn("teardown: disconnect threw", {
+      name: e instanceof Error ? e.name : undefined,
+      message: e instanceof Error ? e.message : String(e),
+    });
+  }
+  log.debug("teardown: done", { id });
+}
+
+async function disconnectConnection(id: ConnectionId): Promise<void> {
+  const conn = savedConnection(id);
+  if (!conn) return;
+  try {
+    await teardownSession(id);
+    if (conn.meshDeviceId) {
+      useDeviceStore
+        .getState()
+        .getDevice(conn.meshDeviceId)
+        ?.setConnectionId(null);
+    }
+  } finally {
+    useDeviceStore
+      .getState()
+      .updateSavedConnection(id, { status: "disconnected", error: undefined });
+  }
+}
+
+/** Disconnects every live session, as the drawer's Disconnect does. */
+export async function disconnectAllConnections(): Promise<void> {
+  for (const id of [...sessionTeardowns.keys()]) {
+    await disconnectConnection(id);
+  }
+}
+
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
   const addSavedConnection = useDeviceStore((s) => s.addSavedConnection);
@@ -169,20 +209,7 @@ export function useConnections() {
     [updateSavedConnection],
   );
 
-  const teardown = useCallback(async (id: ConnectionId) => {
-    log.debug("teardown: enter", { id });
-    sessionTeardowns.get(id)?.();
-    sessionTeardowns.delete(id);
-    try {
-      await meshRegistry.get(id)?.disconnect();
-    } catch (e) {
-      log.warn("teardown: disconnect threw", {
-        name: e instanceof Error ? e.name : undefined,
-        message: e instanceof Error ? e.message : String(e),
-      });
-    }
-    log.debug("teardown: done", { id });
-  }, []);
+  const teardown = teardownSession;
 
   const removeConnection = useCallback(
     async (id: ConnectionId) => {
@@ -472,27 +499,10 @@ export function useConnections() {
         return false;
       }
     },
-    [updateStatus, updateSavedConnection, connectThroughKmp, teardown],
+    [updateStatus, updateSavedConnection, connectThroughKmp],
   );
 
-  const disconnect = useCallback(
-    async (id: ConnectionId) => {
-      const conn = connections.find((c) => c.id === id);
-      if (!conn) return;
-      try {
-        await teardown(id);
-        if (conn.meshDeviceId) {
-          useDeviceStore
-            .getState()
-            .getDevice(conn.meshDeviceId)
-            ?.setConnectionId(null);
-        }
-      } finally {
-        updateSavedConnection(id, { status: "disconnected", error: undefined });
-      }
-    },
-    [connections, updateSavedConnection, teardown],
-  );
+  const disconnect = disconnectConnection;
 
   const addConnection = useCallback(
     (input: NewConnection) => {
