@@ -1,6 +1,7 @@
 {
   "name": "@meshtastic/ui",
   "version": "0.1.0",
+  "private": true,
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
