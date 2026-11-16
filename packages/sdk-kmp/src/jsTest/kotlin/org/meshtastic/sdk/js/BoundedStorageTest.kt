@@ -1,5 +1,6 @@
 package org.meshtastic.sdk.js
 
+import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
@@ -17,9 +18,11 @@ import org.meshtastic.sdk.TransportIdentity
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 private class FakeDeviceStorage : DeviceStorage {
     var hangLoadNodes = false
+    var hangLoadConfig = false
     var failSaveConfig = false
     val calls = mutableListOf<String>()
 
@@ -39,6 +42,7 @@ private class FakeDeviceStorage : DeviceStorage {
 
     override suspend fun loadConfig(): ConfigBundle? {
         calls += "loadConfig"
+        if (hangLoadConfig) awaitCancellation()
         return null
     }
 
@@ -88,7 +92,12 @@ private class FakeDeviceStorage : DeviceStorage {
 }
 
 private class FakeProvider(val storage: FakeDeviceStorage? = null) : StorageProvider {
-    override suspend fun activate(identity: TransportIdentity): DeviceStorage = storage ?: awaitCancellation()
+    var activations = 0
+
+    override suspend fun activate(identity: TransportIdentity): DeviceStorage {
+        activations++
+        return storage ?: awaitCancellation()
+    }
 }
 
 private fun node(num: Int) = NodeInfo.Builder().also { it.num = num }.build()
@@ -176,6 +185,47 @@ class BoundedStorageTest {
             inner.calls,
         )
         assertEquals(0, warnings.size)
+    }
+
+    @Test
+    fun degradedStorageKeepsLaterActivationsInMemory() = runTest {
+        val inner = FakeDeviceStorage().apply { hangLoadConfig = true }
+        val provider = FakeProvider(inner)
+        val bounded = bounded(provider)
+        assertNull(bounded.activate(identity).loadConfig())
+        assertEquals(5000, currentTime)
+        val second = bounded.activate(identity)
+        assertEquals(5000, currentTime)
+        assertEquals(1, provider.activations)
+        val node = node(8)
+        second.saveNode(node)
+        assertEquals(mapOf(NodeId(8) to node), second.loadNodes())
+        assertEquals(listOf("loadConfig"), inner.calls)
+        assertEquals(1, warnings.size)
+    }
+
+    @Test
+    fun concurrentHungCallsWarnOnce() = runTest {
+        val inner = FakeDeviceStorage().apply {
+            hangLoadNodes = true
+            hangLoadConfig = true
+        }
+        val storage = bounded(FakeProvider(inner)).activate(identity)
+        val nodes = async { storage.loadNodes() }
+        val config = async { storage.loadConfig() }
+        assertEquals(emptyMap<NodeId, NodeInfo>(), nodes.await())
+        assertNull(config.await())
+        assertEquals(1, warnings.size)
+    }
+
+    @Test
+    fun failedActivationLogsItsCause() = runTest {
+        val failing = object : StorageProvider {
+            override suspend fun activate(identity: TransportIdentity): DeviceStorage = error("no opfs")
+        }
+        bounded(failing).activate(identity)
+        assertEquals(1, warnings.size)
+        assertTrue("no opfs" in warnings.single())
     }
 
     @Test

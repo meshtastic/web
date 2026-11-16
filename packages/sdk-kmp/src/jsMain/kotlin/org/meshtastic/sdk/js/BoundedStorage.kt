@@ -11,38 +11,49 @@ import org.meshtastic.sdk.SessionPasskey
 import org.meshtastic.sdk.StorageProvider
 import org.meshtastic.sdk.TransportIdentity
 
-/**
- * Wraps [inner] so a storage backend that hangs or fails can never stall the client: activation that
- * does not finish within [timeoutMs] falls back to [fallback], and the first call on an activated
- * store that times out or throws switches that store to answering immediately with empty results.
- */
 internal class BoundedStorageProvider(
     private val inner: StorageProvider,
     private val timeoutMs: Long,
     private val fallback: StorageProvider = InMemoryStorageProvider(),
-    private val log: (String) -> Unit,
+    log: (String) -> Unit,
 ) : StorageProvider {
+    private val health = StorageHealth(log)
+
     override suspend fun activate(identity: TransportIdentity): DeviceStorage {
-        val activated = withTimeoutOrNull(timeoutMs) { runCatching { inner.activate(identity) } }?.getOrNull()
-        if (activated != null) return BoundedDeviceStorage(activated, timeoutMs, log)
-        log("Storage did not activate within ${timeoutMs}ms; continuing in memory")
+        if (health.degraded) return fallback.activate(identity)
+        val attempt = withTimeoutOrNull(timeoutMs) { runCatching { inner.activate(identity) } }
+        val activated = attempt?.getOrNull()
+        if (activated != null) return BoundedDeviceStorage(activated, timeoutMs, health)
+        val cause = attempt?.exceptionOrNull()?.message ?: "did not answer within ${timeoutMs}ms"
+        health.degrade("Storage did not activate ($cause); continuing in memory")
         return fallback.activate(identity)
+    }
+}
+
+private class StorageHealth(private val log: (String) -> Unit) {
+    var degraded = false
+        private set
+
+    fun degrade(message: String) {
+        if (!degraded) {
+            degraded = true
+            log(message)
+        }
     }
 }
 
 private class BoundedDeviceStorage(
     private val inner: DeviceStorage,
     private val timeoutMs: Long,
-    private val log: (String) -> Unit,
+    private val health: StorageHealth,
 ) : DeviceStorage {
-    private var degraded = false
-
     private suspend fun <T> bounded(default: T, block: suspend () -> T): T {
-        if (degraded) return default
+        if (health.degraded) return default
         val result = withTimeoutOrNull(timeoutMs) { runCatching { block() } }
         if (result == null || result.isFailure) {
-            degraded = true
-            log("Storage stopped responding (${result?.exceptionOrNull()?.message ?: "timed out"}); continuing without it")
+            health.degrade(
+                "Storage stopped responding (${result?.exceptionOrNull()?.message ?: "timed out"}); continuing without it",
+            )
             return default
         }
         return result.getOrThrow()

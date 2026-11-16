@@ -8,8 +8,13 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const gradleOut = path.join(root, "build/dist/js/productionLibrary");
 const entry = path.join(dist, "sdk-kmp.mjs");
+const workerCore = path.join(dist, "sqlite-opfs-worker-core.mjs");
 
-if (process.argv.includes("--if-missing") && existsSync(entry)) {
+if (
+  process.argv.includes("--if-missing") &&
+  existsSync(entry) &&
+  existsSync(workerCore)
+) {
   process.exit(0);
 }
 
