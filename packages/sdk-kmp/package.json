@@ -19,6 +19,10 @@
     ".": {
       "types": "./dist/sdk-kmp.d.mts",
       "default": "./dist/sdk-kmp.mjs"
+    },
+    "./sqlite-worker-core": {
+      "types": "./dist/sqlite-opfs-worker-core.d.mts",
+      "default": "./dist/sqlite-opfs-worker-core.mjs"
     }
   },
   "scripts": {

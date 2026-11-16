@@ -65,6 +65,28 @@ for (const name of readdirSync(gradleOut)) {
   if (name === "package.json") continue;
   cpSync(path.join(gradleOut, name), path.join(dist, name));
 }
+const workerCoreFiles = [
+  [
+    path.join(
+      root,
+      "vendor/meshtastic-sdk/storage-sqldelight/src/jsMain/resources/sqlite-opfs-worker-core.mjs",
+    ),
+    "sqlite-opfs-worker-core.mjs",
+  ],
+  [
+    path.join(root, "types/sqlite-opfs-worker-core.d.mts"),
+    "sqlite-opfs-worker-core.d.mts",
+  ],
+];
+for (const [source, name] of workerCoreFiles) {
+  if (!existsSync(source)) {
+    console.error(
+      `@meshtastic/sdk-kmp: missing ${source}; the SQLite worker core must be copied into dist/.`,
+    );
+    process.exit(1);
+  }
+  cpSync(source, path.join(dist, name));
+}
 console.log(
   `@meshtastic/sdk-kmp: wrote ${readdirSync(dist).length} files to dist/`,
 );

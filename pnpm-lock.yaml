@@ -126,6 +126,9 @@ importers:
       '@radix-ui/react-visually-hidden':
         specifier: ^1.2.13
         version: 1.2.13(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@sqlite.org/sqlite-wasm':
+        specifier: 3.51.2-build9
+        version: 3.51.2-build9
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
