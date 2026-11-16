@@ -189,16 +189,7 @@ export const ConnectionsList = ({ addButtonRef }: ConnectionsListProps) => {
                 onCancelDelete={() => setConfirmingId(undefined)}
                 onConnect={() => connectAndClose(c, "toasts.checkConnection")}
                 onRetry={() => connectAndClose(c, "toasts.pickConnectionAgain")}
-                onDisconnect={async () => {
-                  await disconnect(c.id);
-                  toast({
-                    title: t("toasts.disconnected"),
-                    description: t("toasts.nowDisconnected", {
-                      name: c.name,
-                      interpolation: { escapeValue: false },
-                    }),
-                  });
-                }}
+                onDisconnect={() => disconnect(c.id)}
                 onSetDefault={() => {
                   setDefaultConnection(c.id);
                   toast({
