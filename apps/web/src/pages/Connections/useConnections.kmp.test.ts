@@ -17,6 +17,8 @@ const sdkStorage = vi.hoisted(() => ({
   reset: vi.fn((): void => {}),
 }));
 
+const sdkOpened = vi.hoisted((): { storage?: SdkStorage } => ({}));
+
 const kmp = vi.hoisted(
   (): {
     client?: FakeKmpClient;
@@ -37,7 +39,8 @@ vi.mock("@core/sdkStorage.ts", () => ({
 
 vi.mock("@core/kmp/browserStorage.ts", () => ({
   getSdkStorage: async () => {
-    throw new Error("no SDK storage in tests");
+    if (!sdkOpened.storage) throw new Error("no SDK storage in tests");
+    return sdkOpened.storage;
   },
   resetSdkStorage: sdkStorage.reset,
 }));
@@ -92,6 +95,7 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     kmp.clients = [];
     kmp.storages = [];
     kmp.connectError = undefined;
+    sdkOpened.storage = undefined;
     useDeviceStore.setState({ savedConnections: [] });
   });
 
@@ -376,6 +380,17 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     await act(() => result.current.connect(conn.id));
 
     expect(kmp.storages).toEqual([undefined]);
+  });
+
+  it("hands the client factory the SDK storage it opened", async () => {
+    const opened: SdkStorage = Object.freeze({});
+    sdkOpened.storage = opened;
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+
+    expect(kmp.storages).toHaveLength(1);
+    expect(kmp.storages[0]).toBe(opened);
   });
 
   it("marks a denied Local Network Access permission as a terminal error", async () => {

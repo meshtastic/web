@@ -25,7 +25,7 @@ vi.mock("@core/sdkStorage.ts", () => ({
   coordinator: undefined,
 }));
 
-const sentinel: SdkStorage = Object.create(null);
+const sentinel: SdkStorage = Object.freeze({});
 
 describe("openRepositories", () => {
   beforeEach(() => {
@@ -37,7 +37,7 @@ describe("openRepositories", () => {
     vi.useRealTimers();
   });
 
-  it("hands the SDK the its own storage next to the repositories", async () => {
+  it("hands the SDK its own storage next to the repositories", async () => {
     const db = await createMemoryDb();
     storage.open = async () => ({ db, persistent: true });
 
