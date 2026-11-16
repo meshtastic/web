@@ -6,7 +6,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.await
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
 import org.meshtastic.sdk.Frame
@@ -31,6 +31,7 @@ internal class HttpTransport(
     private val _state = MutableStateFlow<TransportState>(TransportState.Disconnected)
     override val state: StateFlow<TransportState> = _state.asStateFlow()
     private val inbound = Channel<Frame>(Channel.UNLIMITED)
+    private val wake = Channel<Unit>(Channel.CONFLATED)
     private var scope: CoroutineScope? = null
 
     override suspend fun connect() {
@@ -59,7 +60,7 @@ internal class HttpTransport(
                         _state.value = TransportState.Error(cause, recoverable = cause.kind() != Lna.DENIED)
                         return@launch
                     }
-                    delay(pollMillis)
+                    withTimeoutOrNull(pollMillis) { wake.receive() }
                 }
             }
         }
@@ -67,10 +68,12 @@ internal class HttpTransport(
 
     private suspend fun drain() {
         while (true) {
-            val response = request("$baseUrl/api/v1/fromradio?all=false", "GET")
+            val response = request("$baseUrl/api/v1/fromradio?all=true", "GET")
             val buffer = (response.arrayBuffer() as Promise<ArrayBuffer>).await()
             if (buffer.byteLength == 0) return
-            inbound.trySend(Frame(framed(Uint8Array(buffer).toByteArray())))
+            for (payload in splitFromRadio(Uint8Array(buffer).toByteArray())) {
+                inbound.trySend(Frame(framed(payload)))
+            }
         }
     }
 
@@ -86,6 +89,7 @@ internal class HttpTransport(
         init.body = payloadOf(frame).toUint8Array()
         val response = fetch("$baseUrl/api/v1/toradio", init).await()
         if (response.ok != true) throw ClientException("transport", "toradio ${response.status}")
+        wake.trySend(Unit)
     }
 
     override fun frames(): Flow<Frame> = inbound.receiveAsFlow()

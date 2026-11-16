@@ -109,3 +109,47 @@ internal fun carriesMeshPacket(payload: ByteArray): Boolean {
     }
     return false
 }
+
+private const val FROM_RADIO_ID_FIELD = 1
+
+/**
+ * Splits a `fromradio?all=true` body into its `FromRadio` payloads. The firmware
+ * writes them back to back with no length prefix; each carries one payload field,
+ * optionally preceded by its `id`, so every field other than `id` ends a message.
+ */
+internal fun splitFromRadio(body: ByteArray): List<ByteArray> {
+    val messages = mutableListOf<ByteArray>()
+    var start = 0
+    var pos = 0
+    fun varint(): Long {
+        var result = 0L
+        var shift = 0
+        while (pos < body.size && shift < 64) {
+            val b = body[pos++].toInt() and 0xFF
+            result = result or ((b and 0x7F).toLong() shl shift)
+            if (b < 0x80) return result
+            shift += 7
+        }
+        throw ClientException("transport", "truncated fromradio body")
+    }
+    while (pos < body.size) {
+        val tag = varint()
+        when ((tag and 7).toInt()) {
+            0 -> varint()
+            1 -> pos += 8
+            2 -> {
+                val length = varint().toInt()
+                pos += length
+            }
+            5 -> pos += 4
+            else -> throw ClientException("transport", "unreadable fromradio body")
+        }
+        if (pos > body.size) throw ClientException("transport", "truncated fromradio body")
+        if ((tag ushr 3).toInt() != FROM_RADIO_ID_FIELD) {
+            messages.add(body.copyOfRange(start, pos))
+            start = pos
+        }
+    }
+    if (start != body.size) throw ClientException("transport", "truncated fromradio body")
+    return messages
+}
