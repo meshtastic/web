@@ -92,14 +92,14 @@ export interface NodesAdmin {
 /**
  * The device's node DB as the SDK reports it, plus the per-node errors the
  * web tracks (PKI collisions and routing failures) and the stored snapshot
- * shown until the handshake's node DB arrives. The SDK's storage writes
- * every node column this reads, so nothing is written back here except
- * removals and resets.
+ * shown until the handshake's node DB arrives. Every batch of changed nodes
+ * is written back to the repository so the stored snapshot stays current.
  */
 export class NodesClient {
   private readonly nodes = signal<ReadonlyMap<number, Node>>(new Map());
   private readonly errorMap = signal<ReadonlyMap<number, NodeError>>(new Map());
   private pending: Map<number, Node> | undefined;
+  private changed = new Set<number>();
   private epoch = 0;
 
   readonly list: ReadonlySignal<ReadonlyArray<Node>>;
@@ -123,6 +123,7 @@ export class NodesClient {
           next.set(info.num, this.merged(info, this.current().get(info.num)));
         }
         this.replace(next);
+        this.persist([...next.values()]);
         return;
       }
       case "added":
@@ -218,18 +219,32 @@ export class NodesClient {
   }
 
   private publish(): void {
-    if (!this.pending) return;
-    this.nodes.value = this.pending;
+    const published = this.pending;
+    if (!published) return;
+    this.nodes.value = published;
     this.pending = undefined;
+    const changed = [...this.changed].flatMap((num) => {
+      const node = published.get(num);
+      return node ? [node] : [];
+    });
+    this.changed = new Set();
+    this.persist(changed);
+  }
+
+  private persist(nodes: ReadonlyArray<Node>): void {
+    if (nodes.length === 0) return;
+    void this.repository?.upsertBatch(nodes).catch(() => {});
   }
 
   private replace(next: Map<number, Node>): void {
     this.pending = undefined;
+    this.changed = new Set();
     this.nodes.value = next;
   }
 
   private set(node: Node): void {
     this.draft().set(node.num, node);
+    this.changed.add(node.num);
   }
 
   private delete(nodeNum: number): void {
