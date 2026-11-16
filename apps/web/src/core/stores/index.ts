@@ -17,6 +17,7 @@ export {
   useConnectionStatus,
   useDefaultConnection,
   useDeviceForConnection,
+  useDisplayedConnection,
   useFirstSavedConnection,
   useIsConnected,
   useIsConnecting,

@@ -1,4 +1,3 @@
-import { useFirstSavedConnection } from "@app/core/stores/deviceStore/selectors.ts";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
@@ -9,10 +8,9 @@ import {
 } from "@core/hooks/useNodesAsProto.ts";
 import {
   type Page,
-  useActiveConnection,
   useAppStore,
-  useDefaultConnection,
   useDevice,
+  useDisplayedConnection,
   useSidebar,
 } from "@core/stores";
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
@@ -88,13 +86,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const { t } = useTranslation("ui");
   const navigate = useNavigate({ from: "/" });
 
-  // Get the active connection from selector (connected > default > first)
-  const activeConnection =
-    useActiveConnection() ||
-    // biome-ignore lint/correctness/useHookAtTopLevel: not a react hook
-    useDefaultConnection() ||
-    // biome-ignore lint/correctness/useHookAtTopLevel: not a hook
-    useFirstSavedConnection();
+  const activeConnection = useDisplayedConnection();
 
   const pathname = useLocation({
     select: (location) => location.pathname.replace(/^\//, ""),

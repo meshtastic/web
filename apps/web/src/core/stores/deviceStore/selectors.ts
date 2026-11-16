@@ -23,6 +23,17 @@ export function useFirstSavedConnection(): Connection | undefined {
   return useDeviceStore((s) => s.savedConnections.at(0));
 }
 
+/**
+ * Hook to get the connection to show for this device: the active one, else
+ * the default, else the first saved.
+ */
+export function useDisplayedConnection(): Connection | undefined {
+  const active = useActiveConnection();
+  const fallback = useDefaultConnection();
+  const first = useFirstSavedConnection();
+  return active ?? fallback ?? first;
+}
+
 export function useAddSavedConnection() {
   return useDeviceStore((s) => s.addSavedConnection);
 }
