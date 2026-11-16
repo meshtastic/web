@@ -26,7 +26,7 @@ import {
   createSerialClient,
   type MeshtasticClient,
   type SerialTarget,
-  type StorageJs,
+  type SdkStorage,
 } from "@core/kmp/client.ts";
 import { editorFor } from "@core/kmp/configEditorIo.ts";
 import {
@@ -34,6 +34,7 @@ import {
   reconnectAttempt,
   toConnectionStatus,
 } from "@core/kmp/connectionState.ts";
+import { resetSdkStorage } from "@core/kmp/browserStorage.ts";
 import { meshRegistry } from "@core/kmp/registry.ts";
 import { MeshSession } from "@core/kmp/session.ts";
 import { createLogger } from "@core/log.ts";
@@ -118,7 +119,7 @@ async function bluetoothTarget(
   return { device, deviceId: device.id };
 }
 
-type ClientFactory = (storage?: StorageJs) => Promise<MeshtasticClient>;
+type ClientFactory = (storage?: SdkStorage) => Promise<MeshtasticClient>;
 
 async function clientFactory(
   conn: Connection,
@@ -193,6 +194,7 @@ export async function disconnectAllConnections(): Promise<void> {
   for (const id of [...sessionTeardowns.keys()]) {
     await disconnectConnection(id);
   }
+  resetSdkStorage();
   await closeStorageDb();
 }
 

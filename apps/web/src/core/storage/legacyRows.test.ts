@@ -1,10 +1,9 @@
-import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
+import { create, toBinary } from "@bufbuild/protobuf";
 import { Protobuf, Types } from "@core/protobuf.ts";
 import { drizzle } from "drizzle-orm/sql-js";
 import initSqlJs from "sql.js";
 import { describe, expect, it } from "vitest";
 import type { SqlocalDb } from "./db.ts";
-import { SqlocalDeviceStorage } from "./deviceStorage.ts";
 import { SqlocalDraftRepository } from "./drafts.ts";
 import { SqlocalMessageRepository } from "./messages.ts";
 import { SqlocalNodesRepository } from "./nodes.ts";
@@ -138,17 +137,6 @@ describe("rows written by the TypeScript SDK storage", () => {
         ? readings[0].value.batteryLevel
         : undefined,
     ).toBe(88);
-
-    // The SDK's node DB sees the old row as a NodeInfo until it rewrites it.
-    const storage = new SqlocalDeviceStorage(db, NODE);
-    const infos = (await storage.loadNodes()).map((bytes) =>
-      fromBinary(Protobuf.Mesh.NodeInfoSchema, bytes),
-    );
-    expect(infos.map((n) => [n.num, n.user?.shortName, n.snr])).toEqual([
-      [PEER, "PR", 7],
-    ]);
-    expect(await storage.loadConfig()).toBeNull();
-    expect(await storage.loadHeartbeats()).toEqual([]);
   });
 
   it("is not visible under another node's key", async () => {

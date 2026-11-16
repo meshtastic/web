@@ -4,18 +4,24 @@ import type { Connection } from "@app/core/stores/deviceStore/types";
 import { meshRegistry } from "@core/kmp/registry.ts";
 import { useDeviceStore } from "@core/stores";
 import { Protobuf } from "@core/protobuf.ts";
-import type { StorageJs } from "@meshtastic/sdk-kmp";
+import type { SdkStorage } from "@meshtastic/sdk-kmp";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { disconnectAllConnections, useConnections } from "./useConnections.ts";
 
+const calls = vi.hoisted((): string[] => []);
+
 const storage = vi.hoisted(() => ({ close: vi.fn(async () => {}) }));
+
+const sdkStorage = vi.hoisted(() => ({
+  reset: vi.fn((): void => {}),
+}));
 
 const kmp = vi.hoisted(
   (): {
     client?: FakeKmpClient;
     clients: FakeKmpClient[];
-    storages: Array<StorageJs | undefined>;
+    storages: Array<SdkStorage | undefined>;
     connectError?: Error;
     holdFactory?: Promise<void>;
   } => ({ clients: [], storages: [] }),
@@ -29,13 +35,20 @@ vi.mock("@core/sdkStorage.ts", () => ({
   coordinator: undefined,
 }));
 
+vi.mock("@core/kmp/browserStorage.ts", () => ({
+  getSdkStorage: async () => {
+    throw new Error("no SDK storage in tests");
+  },
+  resetSdkStorage: sdkStorage.reset,
+}));
+
 vi.mock("@core/kmp/client.ts", async () => {
   const { FakeKmpClient } = await import("@core/kmp/fakeClient.ts");
   return {
     createHttpClient: async (
       _url: string,
       _allowPrompt: boolean,
-      storage?: StorageJs,
+      storage?: SdkStorage,
     ) => {
       kmp.storages.push(storage);
       await kmp.holdFactory;
@@ -127,6 +140,29 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     expect(saved(conn.id)?.status).toBe("disconnected");
     expect(meshRegistry.get(conn.id)?.kmp).toBe(client);
     expect(storage.close).toHaveBeenCalledTimes(1);
+  });
+
+  it("takeover forgets the SDK storage", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+    const disconnect = client.disconnect.bind(client);
+    client.disconnect = async () => {
+      await disconnect();
+      calls.push("disconnected");
+    };
+    sdkStorage.reset.mockReset();
+    sdkStorage.reset.mockImplementation(() => {
+      calls.push("reset");
+    });
+    calls.length = 0;
+
+    await act(() => disconnectAllConnections());
+
+    expect(sdkStorage.reset).toHaveBeenCalledTimes(1);
+    expect(calls).toEqual(["disconnected", "reset"]);
   });
 
   it("abandons a connect that was in flight when the app is handed to another tab", async () => {
@@ -334,7 +370,7 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     expect(client.disconnects).toHaveLength(1);
   });
 
-  it("runs the SDK in memory when the web's storage could not be opened", async () => {
+  it("runs the SDK in memory when its storage could not be created", async () => {
     const { result } = renderHook(() => useConnections());
     const conn = addRadio(result);
     await act(() => result.current.connect(conn.id));

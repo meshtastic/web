@@ -1,8 +1,8 @@
 import type { SessionOptions } from "@core/kmp/session.ts";
-import type { StorageJs } from "@meshtastic/sdk-kmp";
+import { getSdkStorage } from "@core/kmp/browserStorage.ts";
+import type { SdkStorage } from "@meshtastic/sdk-kmp";
 import { createLogger } from "@core/log.ts";
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
-import { sqlocalStorage } from "@core/storage/deviceStorage.ts";
 import { SqlocalDraftRepository } from "@core/storage/drafts.ts";
 import { SqlocalMessageRepository } from "@core/storage/messages.ts";
 import { SqlocalNodesRepository } from "@core/storage/nodes.ts";
@@ -28,20 +28,27 @@ const STORAGE_OPEN_TIMEOUT_MS = 5000;
 export const UNKNOWN_NODE_SCOPE = -1;
 
 /**
- * Opens the message, draft, node and telemetry repositories, and the SDK's
- * own storage (node DB, config bundle, channels, heartbeats), against the
+ * Opens the message, draft, node and telemetry repositories against the
  * shared OPFS-backed SQLite DB, scoped to `nodeNum` (the node this
  * connection reached last time) so every connection to the same radio
  * shares one history. If sqlocal is unavailable, hangs longer than
  * `STORAGE_OPEN_TIMEOUT_MS`, or fails, the session runs without
- * persistence, `persistent` is false and `sdkStorage` is undefined so the
- * SDK keeps its state in memory too.
+ * persistence and `persistent` is false. The SDK's own storage comes from
+ * `getSdkStorage()` independently of that; `sdkStorage` is undefined only
+ * when it cannot be created, so the SDK keeps its state in memory.
  */
 export async function openRepositories(nodeNum?: number): Promise<{
   options: SessionOptions;
   persistent: boolean;
-  sdkStorage: StorageJs | undefined;
+  sdkStorage: SdkStorage | undefined;
 }> {
+  const sdkStorage = await getSdkStorage().catch((err: unknown) => {
+    log.warn("openRepositories: SDK storage unavailable, running in memory", {
+      name: err instanceof Error ? err.name : undefined,
+      message: err instanceof Error ? err.message : String(err),
+    });
+    return undefined;
+  });
   const scope = nodeNum ?? UNKNOWN_NODE_SCOPE;
   try {
     const t0 = Date.now();
@@ -65,7 +72,7 @@ export async function openRepositories(nodeNum?: number): Promise<{
     });
     return {
       persistent,
-      sdkStorage: sqlocalStorage(async () => db, scope),
+      sdkStorage,
       options: {
         messages: new SqlocalMessageRepository(db, {
           deviceId: scope,
@@ -83,6 +90,6 @@ export async function openRepositories(nodeNum?: number): Promise<{
       name: err instanceof Error ? err.name : undefined,
       message: err instanceof Error ? err.message : String(err),
     });
-    return { persistent: false, sdkStorage: undefined, options: {} };
+    return { persistent: false, sdkStorage, options: {} };
   }
 }
