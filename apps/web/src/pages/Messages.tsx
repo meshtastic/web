@@ -8,6 +8,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useChatAsLegacyMessages } from "@core/hooks/useChatAsLegacyMessages.ts";
+import { useDocumentVisible } from "@core/hooks/useDocumentVisible.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { MessageType, useSidebar } from "@core/stores";
@@ -50,16 +51,6 @@ export const MessagesPage = () => {
     unreadByKey.get(`direct:${peer}`) ?? 0;
   const channelUnread = (idx: number): number =>
     unreadByKey.get(`channel:${idx}`) ?? 0;
-  const markChannelRead = useCallback(
-    (idx: number) =>
-      meshClient?.chat.unread.markRead({ kind: "channel", channel: idx }),
-    [meshClient],
-  );
-  const markDirectRead = useCallback(
-    (peer: number) =>
-      meshClient?.chat.unread.markRead({ kind: "direct", peer }),
-    [meshClient],
-  );
   const allNodes = useNodesAsProto();
   const getNode = (n: number) => allNodes.find((node) => node.num === n);
   const errors = useNodeErrors();
@@ -89,6 +80,21 @@ export const MessagesPage = () => {
   const chatType =
     type === "direct" ? MessageType.Direct : MessageType.Broadcast;
   const numericChatId = Number(chatId);
+  const documentVisible = useDocumentVisible();
+
+  // The open conversation is read, however it was opened, and stays read as
+  // text arrives, except while the tab is in the background.
+  useEffect(() => {
+    if (!meshClient || !type || !chatId || Number.isNaN(numericChatId)) return;
+    if (!documentVisible) return;
+    const unread = meshClient.chat.unread;
+    unread.setActive(
+      type === "direct"
+        ? { kind: "direct", peer: numericChatId }
+        : { kind: "channel", channel: numericChatId },
+    );
+    return () => unread.setActive(undefined);
+  }, [meshClient, type, chatId, numericChatId, documentVisible]);
 
   const filteredChannels = useMemo(
     () =>
@@ -204,10 +210,9 @@ export const MessagesPage = () => {
                 numericChatId === channel.index &&
                 chatType === MessageType.Broadcast
               }
-              onClick={() => {
-                navigateToChat(MessageType.Broadcast, channel.index.toString());
-                markChannelRead(channel.index);
-              }}
+              onClick={() =>
+                navigateToChat(MessageType.Broadcast, channel.index.toString())
+              }
             >
               <HashIcon
                 size={16}
@@ -225,7 +230,6 @@ export const MessagesPage = () => {
       isCollapsed,
       channelUnread,
       navigateToChat,
-      markChannelRead,
       t,
     ],
   );
@@ -260,10 +264,9 @@ export const MessagesPage = () => {
             active={
               numericChatId === node.num && chatType === MessageType.Direct
             }
-            onClick={() => {
-              navigateToChat(MessageType.Direct, node.num.toString());
-              markDirectRead(node.num);
-            }}
+            onClick={() =>
+              navigateToChat(MessageType.Direct, node.num.toString())
+            }
           >
             <Avatar
               nodeNum={node.num}

@@ -236,6 +236,23 @@ describe("MeshSession", () => {
     expect(session.chat.unread.total.value).toBe(1);
   });
 
+  it("clears the active conversation and doesn't count text arriving in it", () => {
+    const { kmp, session } = connected();
+    kmp.emitPacket(text(PEER, ME, "before", 10));
+    kmp.emitPacket(text(PEER, BROADCAST_NUM, "all", 11));
+
+    session.chat.unread.setActive({ kind: "direct", peer: PEER });
+    expect(session.chat.unread.byKey.value.has(`direct:${PEER}`)).toBe(false);
+
+    kmp.emitPacket(text(PEER, ME, "while open", 12));
+    expect(session.chat.unread.byKey.value.has(`direct:${PEER}`)).toBe(false);
+    expect(session.chat.unread.byKey.value.get("channel:0")).toBe(1);
+
+    session.chat.unread.setActive(undefined);
+    kmp.emitPacket(text(PEER, ME, "after", 13));
+    expect(session.chat.unread.byKey.value.get(`direct:${PEER}`)).toBe(1);
+  });
+
   it("sends text under the SDK's packet id and settles it from the routing ack", async () => {
     const { kmp, session } = connected();
     kmp.holdSends = true;

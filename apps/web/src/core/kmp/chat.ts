@@ -163,6 +163,11 @@ export interface ChatUnread {
   readonly total: ReadonlySignal<number>;
   count(key: ConversationKey): ReadonlySignal<number>;
   markRead(key: ConversationKey): void;
+  /**
+   * The conversation the user is looking at, or `undefined` for none. Setting
+   * it marks the conversation read, and text arriving in it isn't counted.
+   */
+  setActive(key: ConversationKey | undefined): void;
 }
 
 export interface ChatTransport {
@@ -213,6 +218,7 @@ export class ChatClient {
   private readonly hydrated = new Set<string>();
   private readonly draftsHydrated = new Set<string>();
   private readonly unreadByKey = signal<ReadonlyMap<string, number>>(new Map());
+  private activeKey: string | undefined;
   /** Routing acks that arrived before the send they answer settled. */
   private readonly earlyAcks = new Map<number, RoutingAck[]>();
   private epoch = 0;
@@ -238,6 +244,7 @@ export class ChatClient {
       total: this.deriveTotalUnread(),
       count: (key) => this.deriveUnreadCount(key),
       markRead: (key) => this.markRead(key),
+      setActive: (key) => this.setActive(key),
     };
   }
 
@@ -276,7 +283,9 @@ export class ChatClient {
     if (this.store.hasMessage(key, message.id)) return;
     this.store.append(key, message);
     void this.persistAppend(message, conv);
-    if (packet.from !== myNodeNum) this.bumpUnread(key);
+    if (packet.from !== myNodeNum && key !== this.activeKey) {
+      this.bumpUnread(key);
+    }
   }
 
   /**
@@ -522,6 +531,11 @@ export class ChatClient {
     const next = new Map(current);
     next.delete(k);
     this.unreadByKey.value = next;
+  }
+
+  private setActive(key: ConversationKey | undefined): void {
+    this.activeKey = key ? conversationKeyString(key) : undefined;
+    if (key) this.markRead(key);
   }
 
   private deriveTotalUnread(): ReadonlySignal<number> {
