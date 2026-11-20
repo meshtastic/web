@@ -71,12 +71,13 @@
 }
 
 /*
- * shadcn/ui neutral token set.
+ * shadcn/ui tokens mapped onto the app's slate palette.
  *
- * The raw tokens are scoped to `[data-shadcn-scope]` rather than `:root` so
- * the generated utilities (`bg-background`, `text-foreground`, ...) only paint
- * inside shadcn-styled surfaces such as the Connections drawer. Elsewhere they
- * stay unresolved exactly as before. Two names are deliberately left out:
+ * The values mirror the slate classes the rest of the UI uses (Dialog, Button,
+ * Input, Sidebar) so shadcn surfaces such as the Connections drawer match the
+ * other screens. The raw tokens are scoped to `[data-shadcn-scope]` rather than
+ * `:root` so the generated utilities (`bg-background`, `text-foreground`, ...)
+ * only paint inside those surfaces. Two names are deliberately left out:
  *   - `--accent` / `--accent-foreground`: the app already maps
  *     `--color-accent: var(--accent)` for `ring-accent`; defining `--accent`
  *     would recolour those focus rings. Drawer hover surfaces use `bg-muted`.
@@ -84,71 +85,45 @@
  *     app-wide, so the stock scale is kept.
  */
 [data-shadcn-scope] {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  /* Stock 0.556 is 4.34:1 on --muted; 0.5 gives 5.5:1 (WCAG 1.4.3). */
-  --muted-foreground: oklch(0.5 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: var(--backgroundPrimary);
+  --foreground: var(--color-slate-900);
+  --card: var(--color-white);
+  --card-foreground: var(--color-slate-900);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-slate-900);
+  --primary: var(--color-slate-900);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-slate-100);
+  --secondary-foreground: var(--color-slate-700);
+  --muted: var(--color-slate-100);
+  /* slate-500 is 4.3:1 on slate-100; slate-600 keeps WCAG 1.4.3 AA. */
+  --muted-foreground: var(--color-slate-600);
+  --destructive: var(--color-red-600);
+  --destructive-foreground: var(--color-white);
+  --border: var(--color-slate-300);
+  /* Control outlines need more weight than decorative borders on white. */
+  --input: var(--color-slate-400);
+  --ring: var(--color-slate-400);
 }
 
 [data-theme="dark"] [data-shadcn-scope],
 [data-theme="dark"][data-shadcn-scope] {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --foreground: var(--color-slate-100);
+  --card: var(--color-slate-800);
+  --card-foreground: var(--color-slate-200);
+  --popover: var(--color-slate-800);
+  --popover-foreground: var(--color-slate-200);
+  --primary: var(--color-slate-50);
+  --primary-foreground: var(--color-slate-900);
+  --secondary: var(--color-slate-700);
+  --secondary-foreground: var(--color-slate-100);
+  --muted: var(--color-slate-800);
+  --muted-foreground: var(--color-slate-400);
+  --destructive: var(--color-red-400);
+  --destructive-foreground: var(--color-slate-900);
+  --border: var(--color-slate-700);
+  --input: var(--color-slate-700);
+  --ring: var(--color-slate-500);
 }
 
 @theme inline {
@@ -169,19 +144,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 /* Accordion Animations */

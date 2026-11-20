@@ -48,7 +48,7 @@ const primaryButtonClasses =
   "h-auto min-h-11 gap-2 rounded-xl bg-primary px-4 text-primary-foreground hover:bg-primary/90 focus:ring-ring dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90";
 
 const secondaryButtonClasses =
-  "h-auto min-h-11 gap-2 rounded-xl bg-background px-4 text-foreground ring-1 ring-border ring-inset hover:bg-muted focus:ring-ring dark:bg-background dark:text-foreground dark:hover:bg-muted";
+  "h-auto min-h-11 gap-2 rounded-xl bg-background px-4 text-foreground ring-1 ring-input ring-inset hover:bg-muted focus:ring-ring dark:bg-background dark:text-foreground dark:hover:bg-muted";
 
 const destructiveButtonClasses =
   "h-auto min-h-11 gap-2 rounded-xl bg-destructive px-4 text-destructive-foreground hover:bg-destructive/90 focus:ring-ring dark:bg-destructive dark:text-destructive-foreground dark:hover:bg-destructive/90";

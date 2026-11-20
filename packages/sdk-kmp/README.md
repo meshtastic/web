@@ -65,19 +65,21 @@ The SDK version is pinned once, in `gradle.properties`:
 meshtasticSdkVersion=0.2.1-spike-js-target-SNAPSHOT
 ```
 
-Until meshtastic-sdk publishes its `js` artifacts
-([meshtastic/meshtastic-sdk#215](https://github.com/meshtastic/meshtastic-sdk/pull/215)),
-the SDK compiles from source: `vendor/meshtastic-sdk` is a git submodule
-pinned to that PR's head (`danditomaso/meshtastic-sdk`, branch
-`feat/js-target`), and `settings.gradle.kts` includes it as a composite build,
+The SDK's `js` target landed in
+[meshtastic/meshtastic-sdk#215](https://github.com/meshtastic/meshtastic-sdk/pull/215)
+but no release carries it yet, so the SDK compiles from source:
+`vendor/meshtastic-sdk` is a git submodule of `meshtastic/meshtastic-sdk`
+(branch `main`), and `settings.gradle.kts` includes it as a composite build,
 substituting `org.meshtastic:sdk-core` and `sdk-testing` with the included
 `:core` and `:testing` projects. No Maven repository, local or remote, serves
 the SDK. `ensure-dist` and `build` run `git submodule update --init` when the
 submodule is missing; a fresh clone can also use
 `git clone --recurse-submodules`. CI checks it out with
-`actions/checkout`'s `submodules: true`.
+`actions/checkout`'s `submodules: true`. Dependabot proposes submodule bumps as
+the SDK's `main` moves; the version above is ignored while the submodule
+substitutes the SDK.
 
-Once #215 is released, the switch to Maven Central is: set
+Once a release carries the `js` artifacts, the switch to Maven Central is: set
 `meshtasticSdkVersion` to the release, delete the `includeBuild` block from
 `settings.gradle.kts`, and remove the submodule
 (`git rm vendor/meshtastic-sdk` and its `.gitmodules` entry).

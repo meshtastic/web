@@ -47,7 +47,7 @@ import { urlOrIpv4Schema } from "./validation.ts";
 type TabKey = ConnectionType;
 
 const secondaryButtonClasses =
-  "h-auto min-h-11 gap-2 rounded-xl bg-background px-4 text-foreground ring-1 ring-border ring-inset hover:bg-muted focus:ring-ring dark:bg-background dark:text-foreground dark:hover:bg-muted";
+  "h-auto min-h-11 gap-2 rounded-xl bg-background px-4 text-foreground ring-1 ring-input ring-inset hover:bg-muted focus:ring-ring dark:bg-background dark:text-foreground dark:hover:bg-muted";
 
 const TAB_KEYS: readonly TabKey[] = ["http", "bluetooth", "serial"];
 const isTabKey = (value: string): value is TabKey =>
@@ -551,7 +551,7 @@ export function AddConnectionForm({
 
             <Input
               id={"url"}
-              className="h-auto min-h-11 rounded-xl border-input bg-muted/40 text-base text-foreground placeholder:text-muted-foreground focus:ring-ring dark:border-input dark:text-foreground dark:focus:ring-ring"
+              className="h-auto min-h-11 rounded-xl border-input bg-background text-base text-foreground placeholder:text-slate-500 dark:bg-muted/40 dark:placeholder:text-muted-foreground focus:ring-ring dark:border-input dark:text-foreground dark:focus:ring-ring"
               inputMode="url"
               placeholder={t("addConnection.httpConnection.inputPlaceholder")}
               prefix={`${state.protocol}://`}
@@ -802,7 +802,7 @@ export function AddConnectionForm({
           }
         }}
       >
-        <TabsList className="grid w-full grid-cols-3 gap-1 rounded-xl border-0 bg-muted p-1 shadow-none dark:bg-muted">
+        <TabsList className="grid w-full grid-cols-3 gap-1 rounded-xl border-0 bg-slate-200 p-1 shadow-none dark:bg-muted">
           {TAB_META.map(({ key, label, Icon }) => (
             <TabsTrigger
               key={key}
@@ -832,7 +832,7 @@ export function AddConnectionForm({
                   <Label htmlFor={`name-${state.tab}`}>Name</Label>
                   <Input
                     id={`name-${state.tab}`}
-                    className="h-auto min-h-11 rounded-xl border-input bg-muted/40 text-base text-foreground placeholder:text-muted-foreground focus:ring-ring dark:border-input dark:text-foreground dark:focus:ring-ring"
+                    className="h-auto min-h-11 rounded-xl border-input bg-background text-base text-foreground placeholder:text-slate-500 dark:bg-muted/40 dark:placeholder:text-muted-foreground focus:ring-ring dark:border-input dark:text-foreground dark:focus:ring-ring"
                     value={state.name}
                     onChange={(evt) =>
                       dispatch({ type: "SET_NAME", payload: evt.target.value })
@@ -845,7 +845,7 @@ export function AddConnectionForm({
                   <Button
                     onClick={submit(onSave)}
                     disabled={!canCreate}
-                    className="h-auto min-h-11 rounded-xl bg-primary px-5 text-primary-foreground hover:bg-primary/90 focus:ring-ring"
+                    className="h-auto min-h-11 rounded-xl bg-primary px-5 text-primary-foreground hover:bg-primary/90 focus:ring-ring disabled:bg-slate-200 disabled:text-muted-foreground disabled:opacity-100 dark:disabled:bg-muted"
                   >
                     {t("button.saveConnection")}
                   </Button>
