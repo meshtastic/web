@@ -101,7 +101,8 @@
   --destructive: var(--color-red-600);
   --destructive-foreground: var(--color-white);
   --border: var(--color-slate-300);
-  --input: var(--color-slate-300);
+  /* Control outlines need more weight than decorative borders on white. */
+  --input: var(--color-slate-400);
   --ring: var(--color-slate-400);
 }
 
