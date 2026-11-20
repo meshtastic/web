@@ -130,6 +130,7 @@ internal fun SendFailure.kind(): String = when (this) {
     SendFailure.MaxRetransmit -> "max-retransmit"
     SendFailure.Timeout -> "timeout"
     SendFailure.DutyCycleLimit -> "duty-cycle-limit"
+    SendFailure.RateLimited -> "rate-limited"
     SendFailure.Disconnected -> "disconnected"
     SendFailure.HandshakeFailed -> "handshake-failed"
     SendFailure.Cancelled -> "cancelled"
