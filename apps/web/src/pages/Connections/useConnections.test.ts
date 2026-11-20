@@ -21,6 +21,13 @@ vi.mock("@core/sdkStorage.ts", () => ({
   coordinator: undefined,
 }));
 
+vi.mock("@core/kmp/browserStorage.ts", () => ({
+  getSdkStorage: async () => {
+    throw new Error("no SDK storage in tests");
+  },
+  resetSdkStorage: () => {},
+}));
+
 vi.mock("@core/kmp/client.ts", async () => {
   const { FakeKmpClient } = await import("@core/kmp/fakeClient.ts");
   return { createSerialClient: async () => new FakeKmpClient() };

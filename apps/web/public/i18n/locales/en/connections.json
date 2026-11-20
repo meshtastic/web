@@ -45,8 +45,6 @@
   },
   "toasts": {
     "connected": "Connected",
-    "nowDisconnected": "{{name}} is now disconnected",
-    "disconnected": "Disconnected",
     "failed": "Failed to connect",
     "checkConnection": "Check your device or settings and try again",
     "defaultSet": "Default set",

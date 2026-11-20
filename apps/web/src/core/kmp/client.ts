@@ -1,10 +1,10 @@
 import { createLogger } from "@core/log.ts";
-import type { MeshtasticClient, StorageJs } from "@meshtastic/sdk-kmp";
+import type { MeshtasticClient, SdkStorage } from "@meshtastic/sdk-kmp";
 
 export type {
   ConnectionStateJs,
   MeshtasticClient,
-  StorageJs,
+  SdkStorage,
 } from "@meshtastic/sdk-kmp";
 
 /** Reconnect attempts the SDK makes before giving up, as the user approved. */
@@ -53,7 +53,7 @@ export function loadKmp(): Promise<KmpModule> {
 export async function createHttpClient(
   url: string,
   allowPrompt: boolean,
-  storage?: StorageJs,
+  storage?: SdkStorage,
 ): Promise<MeshtasticClient> {
   const kmp = await loadKmp();
   return kmp.createHttpClient(
@@ -79,7 +79,7 @@ export interface BluetoothTarget {
 
 export async function createSerialClient(
   target: SerialTarget,
-  storage?: StorageJs,
+  storage?: SdkStorage,
 ): Promise<MeshtasticClient> {
   const kmp = await loadKmp();
   return kmp.createSerialClient(
@@ -93,7 +93,7 @@ export async function createSerialClient(
 
 export async function createBluetoothClient(
   target: BluetoothTarget,
-  storage?: StorageJs,
+  storage?: SdkStorage,
 ): Promise<MeshtasticClient> {
   const kmp = await loadKmp();
   return kmp.createBluetoothClient(

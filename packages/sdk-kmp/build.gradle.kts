@@ -20,9 +20,11 @@ kotlin {
     sourceSets {
         jsMain.dependencies {
             api("org.meshtastic:sdk-core:$sdkVersion")
+            api("org.meshtastic:sdk-storage-sqldelight:$sdkVersion")
         }
         jsTest.dependencies {
             implementation(kotlin("test"))
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
         }
     }
 }

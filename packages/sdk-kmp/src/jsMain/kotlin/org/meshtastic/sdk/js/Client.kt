@@ -41,13 +41,13 @@ import kotlin.js.Promise
 class MeshtasticClient internal constructor(
     transport: RadioTransport,
     private val maxAttempts: Int,
-    storage: StorageJs? = null,
+    storage: SdkStorage? = null,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val frameListeners = mutableSetOf<(Uint8Array) -> Unit>()
     private val client: RadioClient = RadioClient {
         transport(TappingTransport(transport) { bytes -> forwardFrame(bytes) })
-        storage(if (storage == null) InMemoryStorageProvider() else JsStorageProvider(storage))
+        storage(storage?.provider ?: InMemoryStorageProvider())
         autoReconnect(AutoReconnectConfig(maxAttempts = maxAttempts))
         logger(JsLogSink)
     }
@@ -182,7 +182,7 @@ fun createHttpClient(
     url: String,
     allowPrompt: Boolean = false,
     maxAttempts: Int = 10,
-    storage: StorageJs? = null,
+    storage: SdkStorage? = null,
 ): MeshtasticClient = MeshtasticClient(HttpTransport(url.trimEnd('/'), allowPrompt), maxAttempts, storage)
 
 /**
@@ -196,7 +196,7 @@ fun createSerialClient(
     usbVendorId: Int?,
     usbProductId: Int?,
     maxAttempts: Int = 10,
-    storage: StorageJs? = null,
+    storage: SdkStorage? = null,
 ): MeshtasticClient = MeshtasticClient(WebSerialTransport(port, usbVendorId, usbProductId), maxAttempts, storage)
 
 /**
@@ -209,5 +209,5 @@ fun createBluetoothClient(
     device: dynamic,
     deviceId: String?,
     maxAttempts: Int = 10,
-    storage: StorageJs? = null,
+    storage: SdkStorage? = null,
 ): MeshtasticClient = MeshtasticClient(WebBluetoothTransport(device, deviceId), maxAttempts, storage)

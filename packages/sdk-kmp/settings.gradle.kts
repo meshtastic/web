@@ -27,5 +27,7 @@ includeBuild("vendor/meshtastic-sdk") {
         substitute(module("org.meshtastic:sdk-core-js")).using(project(":core"))
         substitute(module("org.meshtastic:sdk-testing")).using(project(":testing"))
         substitute(module("org.meshtastic:sdk-testing-js")).using(project(":testing"))
+        substitute(module("org.meshtastic:sdk-storage-sqldelight")).using(project(":storage-sqldelight"))
+        substitute(module("org.meshtastic:sdk-storage-sqldelight-js")).using(project(":storage-sqldelight"))
     }
 }

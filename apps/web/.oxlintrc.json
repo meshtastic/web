@@ -20,6 +20,12 @@
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-non-null-assertion": "off"
       }
+    },
+    {
+      "files": ["src/core/kmp/browserStorage.ts"],
+      "rules": {
+        "import/default": "off"
+      }
     }
   ]
 }

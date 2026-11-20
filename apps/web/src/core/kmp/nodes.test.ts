@@ -1,5 +1,6 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
+import type { Node, NodesRepository } from "@core/storage/types.ts";
 import { Result } from "better-result";
 import { describe, expect, it } from "vitest";
 import { type NodesAdmin, NodesClient } from "./nodes.ts";
@@ -22,6 +23,44 @@ function nodeBytes(num: number): Uint8Array {
 
 function heardFrom(from: number, rxTime: number): Protobuf.Mesh.MeshPacket {
   return create(Protobuf.Mesh.MeshPacketSchema, { from, rxTime, rxSnr: 5 });
+}
+
+class FakeNodesRepository implements NodesRepository {
+  readonly rows = new Map<number, Node>();
+  readonly batches: Node[][] = [];
+
+  loadAll(): Promise<Node[]> {
+    return Promise.resolve([...this.rows.values()]);
+  }
+
+  get(nodeNum: number): Promise<Node | undefined> {
+    return Promise.resolve(this.rows.get(nodeNum));
+  }
+
+  upsert(node: Node): Promise<void> {
+    this.rows.set(node.num, node);
+    return Promise.resolve();
+  }
+
+  upsertBatch(nodes: ReadonlyArray<Node>): Promise<void> {
+    this.batches.push([...nodes]);
+    for (const node of nodes) this.rows.set(node.num, node);
+    return Promise.resolve();
+  }
+
+  remove(nodeNum: number): Promise<void> {
+    this.rows.delete(nodeNum);
+    return Promise.resolve();
+  }
+
+  clear(): Promise<void> {
+    this.rows.clear();
+    return Promise.resolve();
+  }
+}
+
+function settle(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
 function countPublishes(client: NodesClient): () => number {
@@ -94,5 +133,85 @@ describe("NodesClient publishing", () => {
     await Promise.resolve();
 
     expect(client.list.value.map((node) => node.num)).toEqual([4]);
+  });
+});
+
+describe("NodesClient persistence", () => {
+  it("writes a handshake's worth of added nodes in one batch", async () => {
+    const repository = new FakeNodesRepository();
+    const client = new NodesClient(admin, repository);
+    await settle();
+
+    for (let num = 2; num <= 501; num++) {
+      client.applyChange({
+        kind: "added",
+        node: nodeBytes(num),
+        nodes: null,
+        nodeNum: num,
+      });
+    }
+    await settle();
+
+    expect(repository.batches).toHaveLength(1);
+    expect(repository.batches[0]).toHaveLength(500);
+  });
+
+  it("writes a burst of heard packets as one node with the latest lastHeard", async () => {
+    const repository = new FakeNodesRepository();
+    const client = new NodesClient(admin, repository);
+    await settle();
+    client.applyChange({
+      kind: "added",
+      node: nodeBytes(7),
+      nodes: null,
+      nodeNum: 7,
+    });
+    await settle();
+    repository.batches.length = 0;
+
+    for (let t = 1; t <= 200; t++) client.heard(heardFrom(7, t));
+    await settle();
+
+    expect(repository.batches).toHaveLength(1);
+    expect(repository.batches[0]?.map((node) => node.num)).toEqual([7]);
+    expect(repository.batches[0]?.[0]?.lastHeard).toBe(200);
+  });
+
+  it("writes every node of a snapshot in one batch", async () => {
+    const repository = new FakeNodesRepository();
+    const client = new NodesClient(admin, repository);
+    await settle();
+
+    client.applyChange({
+      kind: "snapshot",
+      nodes: [nodeBytes(4), nodeBytes(5), nodeBytes(6)],
+      node: null,
+      nodeNum: 0,
+    });
+    await settle();
+
+    expect(repository.batches).toHaveLength(1);
+    expect(repository.batches[0]?.map((node) => node.num)).toEqual([4, 5, 6]);
+  });
+
+  it("hydrates a fresh client from the nodes a previous client wrote", async () => {
+    const repository = new FakeNodesRepository();
+    const first = new NodesClient(admin, repository);
+    await settle();
+    first.applyChange({
+      kind: "added",
+      node: nodeBytes(11),
+      nodes: null,
+      nodeNum: 11,
+    });
+    first.heard(heardFrom(11, 77));
+    await settle();
+
+    const second = new NodesClient(admin, repository);
+    await settle();
+
+    expect(second.list.value.map((node) => node.num)).toEqual([11]);
+    expect(second.byNum(11)?.lastHeard).toBe(77);
+    expect(second.byNum(11)?.user?.longName).toBe("Node 11");
   });
 });

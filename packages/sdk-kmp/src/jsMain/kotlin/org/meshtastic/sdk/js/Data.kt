@@ -3,30 +3,13 @@
 package org.meshtastic.sdk.js
 
 import org.khronos.webgl.Uint8Array
-import org.meshtastic.proto.Channel
-import org.meshtastic.proto.Config
-import org.meshtastic.proto.DeviceMetadata
-import org.meshtastic.proto.DeviceUIConfig
-import org.meshtastic.proto.ModuleConfig
-import org.meshtastic.proto.MyNodeInfo
 import org.meshtastic.proto.NodeInfo
-import org.meshtastic.sdk.ConfigBundle
 import org.meshtastic.sdk.NodeChange
 import org.meshtastic.sdk.SendFailure
 import org.meshtastic.sdk.SendOutcome
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 import kotlin.js.Promise
-
-/** The device's config as the handshake delivered it; every field is an encoded protobuf. */
-@JsExport
-external interface ConfigBundleJs {
-    val myInfo: Uint8Array
-    val metadata: Uint8Array
-    val configs: Array<Uint8Array>
-    val moduleConfigs: Array<Uint8Array>
-    val deviceUiConfig: Uint8Array?
-}
 
 /**
  * One change to the node database. `snapshot` carries `nodes`, `added` and
@@ -55,26 +38,6 @@ external interface SendHandleJs {
     val id: Int
     val outcome: Promise<SendOutcomeJs>
 }
-
-internal fun ConfigBundle.toJs(): ConfigBundleJs {
-    val bundle = jso<dynamic>()
-    bundle.myInfo = MyNodeInfo.ADAPTER.encode(myInfo).toUint8Array()
-    bundle.metadata = DeviceMetadata.ADAPTER.encode(metadata).toUint8Array()
-    bundle.configs = configs.map { Config.ADAPTER.encode(it).toUint8Array() }.toTypedArray()
-    bundle.moduleConfigs = moduleConfigs.map { ModuleConfig.ADAPTER.encode(it).toUint8Array() }.toTypedArray()
-    bundle.deviceUiConfig = deviceUIConfig?.let { DeviceUIConfig.ADAPTER.encode(it).toUint8Array() }
-    return bundle.unsafeCast<ConfigBundleJs>()
-}
-
-internal fun ConfigBundleJs.toKotlin(): ConfigBundle = ConfigBundle(
-    myInfo = MyNodeInfo.ADAPTER.decode(myInfo.toByteArray()),
-    metadata = DeviceMetadata.ADAPTER.decode(metadata.toByteArray()),
-    configs = configs.map { Config.ADAPTER.decode(it.toByteArray()) },
-    moduleConfigs = moduleConfigs.map { ModuleConfig.ADAPTER.decode(it.toByteArray()) },
-    deviceUIConfig = deviceUiConfig?.let { DeviceUIConfig.ADAPTER.decode(it.toByteArray()) },
-)
-
-internal fun List<Channel>.toJs(): Array<Uint8Array> = map { Channel.ADAPTER.encode(it).toUint8Array() }.toTypedArray()
 
 internal fun NodeInfo.encodeJs(): Uint8Array = NodeInfo.ADAPTER.encode(this).toUint8Array()
 
@@ -130,7 +93,7 @@ internal fun SendFailure.kind(): String = when (this) {
     SendFailure.MaxRetransmit -> "max-retransmit"
     SendFailure.Timeout -> "timeout"
     SendFailure.DutyCycleLimit -> "duty-cycle-limit"
-    SendFailure.RateLimited -> "rate-limited"
+    SendFailure.RateLimited -> "RATE_LIMIT_EXCEEDED"
     SendFailure.Disconnected -> "disconnected"
     SendFailure.HandshakeFailed -> "handshake-failed"
     SendFailure.Cancelled -> "cancelled"
