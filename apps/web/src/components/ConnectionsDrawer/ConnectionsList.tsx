@@ -42,7 +42,7 @@ import { useTranslation } from "react-i18next";
 
 /** Tonal, rounded surface shared by cards and the empty state. */
 const surfaceClasses =
-  "rounded-xl bg-muted/50 ring-1 ring-border ring-inset dark:bg-muted/30";
+  "rounded-xl bg-slate-100 ring-1 ring-border ring-inset dark:bg-slate-800";
 
 const primaryButtonClasses =
   "h-auto min-h-11 gap-2 rounded-xl bg-primary px-4 text-primary-foreground hover:bg-primary/90 focus:ring-ring dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90";
@@ -435,7 +435,7 @@ function ConnectionCard({
       <div className="py-3 text-sm text-muted-foreground">
         {connection.error ? (
           <div className="space-y-1">
-            <p className="text-sm text-red-600 dark:text-red-400">
+            <p className="text-sm text-red-700 dark:text-red-400">
               {connection.error}
             </p>
             {connection.type === "http" &&
