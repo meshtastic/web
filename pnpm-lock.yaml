@@ -170,7 +170,7 @@ importers:
         version: 6.0.0
       drizzle-orm:
         specifier: ^0.45.4
-        version: 0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0)
+        version: 0.45.4(@types/sql.js@1.4.11)(sql.js@1.16.0)
       i18next:
         specifier: ^26.4.5
         version: 26.4.5(typescript@7.0.2)
@@ -221,7 +221,7 @@ importers:
         version: 1.5.4
       sqlocal:
         specifier: ^0.18.0
-        version: 0.18.0(drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0))(react@19.3.1)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+        version: 0.18.0(drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.16.0))(react@19.3.1)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
       tslog:
         specifier: ^5.2.0
         version: 5.2.0
@@ -302,8 +302,8 @@ importers:
         specifier: ^1.88.0
         version: 1.88.0
       sql.js:
-        specifier: ^1.15.0
-        version: 1.15.0
+        specifier: ^1.16.0
+        version: 1.16.0
       tailwind-merge:
         specifier: ^3.7.0
         version: 3.7.0
@@ -5234,8 +5234,8 @@ packages:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
     engines: {node: '>=0.10.0'}
 
-  sql.js@1.15.0:
-    resolution: {integrity: sha512-54VT5h9/VGlLaQan5pX/Zx8k6Vbykwl5hRUtl4h4+VYnaZCTraUs4P1i2WLz21O6oPVp6Gvg+d1OyPo01ZG5ig==}
+  sql.js@1.16.0:
+    resolution: {integrity: sha512-q/JOZuJfmVh8Zf8Eo+cMJvtxAWeWBqTfJ6AQYGXZmcaLGHMwhA2niH3fQYHrBtPeOss1ttzHec07K5+rHaMRMw==}
 
   sqlocal@0.18.0:
     resolution: {integrity: sha512-AJvbSe7W52YeI3KWt3TOl6Xf4oH/72JdQ0oig78G6v6Hrk906dIVP0vT9uIx7HmJaYHU/G+AgyqCW12W2IJ1OA==}
@@ -9824,10 +9824,10 @@ snapshots:
 
   dotenv@16.6.1: {}
 
-  drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0):
+  drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.16.0):
     optionalDependencies:
       '@types/sql.js': 1.4.11
-      sql.js: 1.15.0
+      sql.js: 1.16.0
 
   dts-resolver@3.0.0: {}
 
@@ -11282,14 +11282,14 @@ snapshots:
     dependencies:
       extend-shallow: 3.0.2
 
-  sql.js@1.15.0: {}
+  sql.js@1.16.0: {}
 
-  sqlocal@0.18.0(drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0))(react@19.3.1)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)):
+  sqlocal@0.18.0(drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.16.0))(react@19.3.1)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)):
     dependencies:
       '@sqlite.org/sqlite-wasm': 3.51.2-build9
       coincident: 1.2.3
     optionalDependencies:
-      drizzle-orm: 0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0)
+      drizzle-orm: 0.45.4(@types/sql.js@1.4.11)(sql.js@1.16.0)
       react: 19.3.1
       vite: 8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)
     transitivePeerDependencies:

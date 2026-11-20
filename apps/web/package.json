@@ -117,7 +117,7 @@
     "happy-dom": "^21.0.1",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
-    "sql.js": "^1.15.0",
+    "sql.js": "^1.16.0",
     "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.3",
     "tailwindcss-animate": "^1.0.7",
