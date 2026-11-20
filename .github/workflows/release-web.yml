@@ -36,17 +36,11 @@ jobs:
           ref: ${{ inputs.ref != '' && inputs.ref || github.ref }}
           submodules: true
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
+      - name: Setup pnpm + Node.js
+        uses: pnpm/setup@v3
         with:
-          # Pinned here, not read from .nvmrc: inputs.ref can check out a
-          # revision from before .nvmrc existed. Keep in sync with .nvmrc.
-          node-version: 24
-          cache: pnpm
-          cache-dependency-path: "**/pnpm-lock.yaml"
+          cache: true
+          # Automatically uses the Node.js version specified in .nvmrc
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

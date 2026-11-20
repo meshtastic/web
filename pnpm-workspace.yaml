@@ -2,7 +2,7 @@ allowBuilds:
   "@tailwindcss/oxide": false
   "core-js": false
   esbuild: false
-minimumReleaseAge: 2880 # package dependency library must be at least 2 days old
+minimumReleaseAge: 0 # Disabled (temporarily?); pnpm 12 also enforces this against existing lockfile entries
 packages:
   - "packages/*"
   - "apps/*"

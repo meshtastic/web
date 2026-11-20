@@ -68,8 +68,11 @@ jobs:
         with:
           github_token: ${{ github.token }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup pnpm + Node.js
+        uses: pnpm/setup@v3
+        with:
+          cache: true
+          # Automatically uses the Node.js version specified in .nvmrc
 
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
