@@ -106,6 +106,14 @@ pnpm check
 pnpm check:fix
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow, branch and
+commit conventions, and i18n guidance. Translations live in the
+[Translation Contribution Guide](./CONTRIBUTING_TRANSLATIONS.md); adding
+new user-facing strings is covered by the
+[i18n Developer Guide](./CONTRIBUTING_I18N_DEVELOPER_GUIDE.md).
+
 ## Developing
 
 ### Testing

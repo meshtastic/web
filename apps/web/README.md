@@ -150,6 +150,6 @@ requests:
     Meshtastic nodes.
 
 Please review our
-[Contribution Guidelines](https://github.com/meshtastic/web/blob/main/apps/web/CONTRIBUTING.md)
+[Contribution Guidelines](https://github.com/meshtastic/web/blob/main/CONTRIBUTING.md)
 before submitting a pull request. We appreciate your help in making the project
 better!
