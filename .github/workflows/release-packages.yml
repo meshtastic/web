@@ -18,22 +18,15 @@ jobs:
     permissions:
       contents: write # we commit the bumped versions back
       id-token: write # required for JSR OIDC
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
+      - name: Setup pnpm + Node.js
+        uses: pnpm/setup@v3
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
-          cache-dependency-path: "**/pnpm-lock.yaml"
-          registry-url: "https://registry.npmjs.org"
+          cache: true
+          # Automatically uses the Node.js version specified in .nvmrc
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -139,14 +132,22 @@ jobs:
           done
 
       - name: Configure npm auth
-        run: |
-          pnpm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
-          pnpm config set registry https://registry.npmjs.org/
-
-      - name: Publish to npm
         shell: bash
         run: |
           set -euo pipefail
+          # pnpm/setup writes no ~/.npmrc and npm ignores pnpm's config, so write one for `npm publish`.
+          # The token stays an unexpanded ${NODE_AUTH_TOKEN} placeholder; steps using npm auth must set it.
+          npm config set --location=user registry https://registry.npmjs.org/
+          # shellcheck disable=SC2016 # intentionally unexpanded
+          echo '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}' >> ~/.npmrc
+
+      - name: Publish to npm
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          npm whoami --registry https://registry.npmjs.org/
           IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
           for dir in "${TARGETS[@]}"; do
             if [ -f "$dir/package.json" ]; then

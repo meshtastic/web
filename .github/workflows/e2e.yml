@@ -24,12 +24,11 @@ jobs:
         with:
           submodules: true
 
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
+      - name: Setup pnpm + Node.js
+        uses: pnpm/setup@v3
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
+          cache: true
+          # Automatically uses the Node.js version specified in .nvmrc
 
       - name: Install workspace deps
         run: pnpm install --frozen-lockfile
