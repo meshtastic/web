@@ -1,61 +1,96 @@
-# Meshtastic Web Monorepo
+<h1 align="center">Meshtastic Web</h1>
+
+<p align="center">
+  <strong>The Meshtastic client for your browser</strong><br>
+  Talk to your Meshtastic radio over Bluetooth, USB serial or Wi-Fi, with nothing to install
+</p>
+
+<p align="center">
+  <a href="https://client.meshtastic.org">Open the client</a> •
+  <a href="https://meshtastic.org/docs/introduction/">Meshtastic docs</a> •
+  <a href="#how-it-works">How it works</a> •
+  <a href="./CONTRIBUTING.md">Contributing</a>
+</p>
+
+<p align="center">
 
 [![CI](https://img.shields.io/github/actions/workflow/status/meshtastic/web/ci.yml?branch=main&label=Web%20CI&logo=github&color=yellow)](https://github.com/meshtastic/web/actions/workflows/ci.yml)
 [![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/web)](https://cla-assistant.io/meshtastic/web)
 [![Fiscal Contributors](https://opencollective.com/meshtastic/tiers/badge.svg?label=Fiscal%20Contributors&color=deeppink)](https://opencollective.com/meshtastic/)
 [![Vercel](https://img.shields.io/static/v1?label=Powered%20by&message=Vercel&style=flat&logo=vercel&color=000000)](https://vercel.com?utm_source=meshtastic&utm_campaign=oss)
 
+</p>
+
 ## Overview
 
-This monorepo contains the official [Meshtastic](https://meshtastic.org) web
-client, the shared UI library it uses, the generated protobuf stubs, and
-`sdk-kmp`, a thin JavaScript facade over the Kotlin
-[meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk) that handles
-device connections and mesh state.
+Meshtastic Web is the official [Meshtastic](https://meshtastic.org) client for the browser, hosted at [client.meshtastic.org](https://client.meshtastic.org). It connects to a radio over the device's HTTP API, Web Serial or Web Bluetooth (Web Serial and Web Bluetooth need a Chromium-based browser). The device-side code lives in the [firmware repository](https://github.com/meshtastic/firmware).
 
-> [!NOTE]
-> You can find the main Meshtastic documentation at https://meshtastic.org/docs/introduction/.
+It speaks to radios through the same Kotlin Multiplatform [meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk) as the Android, iOS and Desktop apps, compiled to JavaScript. Connection handling, the node database and the protocol behave the same way across every Meshtastic app.
 
-## Packages
+If you have questions or feedback, join the [discussion forum](https://github.com/orgs/meshtastic/discussions) or [Discord](https://discord.gg/meshtastic).
+
+## Features
+
+- **Messaging**: channel and direct messages, with unread counts per conversation.
+- **Map**: node positions and waypoints.
+- **Nodes**: node list with signal, hops, telemetry and device details.
+- **Radio configuration**: device, LoRa, channel, security and module settings, plus config backup and restore.
+- **Connections**: save several radios and switch between them; the SDK reconnects automatically.
+- **Offline-friendly**: the node database, config and channels are kept in browser storage between sessions.
+- **Translations**: the UI is translated by the community on [Crowdin](./CONTRIBUTING_TRANSLATIONS.md).
+
+## How it works
+
+The web client never speaks the Meshtastic protocol itself. Everything between the UI and the radio runs inside the Kotlin SDK:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ apps/web                React UI                              │
+│   src/core/kmp          sessions, chat, nodes, config editor  │
+└───────────────┬──────────────────────────────────────────────┘
+                │  plain JS objects, Promises, Uint8Array protobufs
+┌───────────────▼──────────────────────────────────────────────┐
+│ packages/sdk-kmp        @meshtastic/sdk-kmp  (Kotlin/JS)      │
+│   @JsExport facade      createHttpClient / createSerialClient │
+│                         / createBluetoothClient, admin, sends │
+│   browser transports    HTTP API, Web Serial, Web Bluetooth   │
+│   browser storage       SQLDelight on SQLite in a worker      │
+├──────────────────────────────────────────────────────────────┤
+│ vendor/meshtastic-sdk   meshtastic-sdk `core` (Kotlin)        │
+│                         handshake, node DB, ACKs, retries,    │
+│                         channel decryption, reconnect         │
+└───────────────┬──────────────────────────────────────────────┘
+                ▼
+            Meshtastic radio
+```
+
+- **One SDK, every platform.** [meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk) is a Kotlin Multiplatform library. Android, iOS and Desktop compile it for their own platforms; its `core` module also has a Kotlin/JS target, which is what the web client uses. A protocol fix in the SDK reaches every app.
+- **Compiled to JavaScript at build time.** `packages/sdk-kmp` is a small Gradle project. The Kotlin/JS compiler builds the SDK together with a thin facade and writes an ES module with TypeScript declarations (`dist/sdk-kmp.mjs` and `dist/sdk-kmp.d.mts`). Vite imports it like any other package. The SDK isn't on Maven Central with JS artifacts yet, so it compiles from source out of the `packages/sdk-kmp/vendor/meshtastic-sdk` git submodule.
+- **A narrow boundary.** Only plain objects, Promises, `Uint8Array`s and unsubscribe functions cross into TypeScript. Protobuf messages cross as bytes and are decoded on the TypeScript side with `@meshtastic/protobufs`, so both sides agree on the wire types.
+- **The browser supplies transports and storage.** The SDK leaves I/O to its host. `sdk-kmp` provides `RadioTransport` implementations for the device HTTP API, Web Serial and Web Bluetooth, and SQLDelight storage that runs SQLite in a web worker. If storage can't be opened, it falls back to memory rather than stalling the client.
+- **The UI stays in TypeScript.** `apps/web/src/core/kmp` wraps each connected radio in a session object with signals for nodes, chat, channels and config, and exposes them to React through hooks.
+
+See [`packages/sdk-kmp/README.md`](./packages/sdk-kmp/README.md) for the facade surface, how the SDK version is pinned, and the switch to released artifacts.
+
+## Repository layout
 
 | Package | Purpose |
 | --- | --- |
-| `apps/web` | Reference React web client. Hosted at [client.meshtastic.org](https://client.meshtastic.org). |
-| `packages/sdk-kmp` | Wraps the Kotlin Multiplatform [meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk), compiled to JavaScript with Gradle (JDK 21), behind a small `@JsExport` facade plus browser transports. The web client's connection and mesh behaviour comes from here. The SDK source is pinned as a git submodule at `packages/sdk-kmp/vendor/meshtastic-sdk`. |
+| `apps/web` | The React web client. |
+| `packages/sdk-kmp` | The Kotlin meshtastic-sdk compiled to JavaScript, behind a small `@JsExport` facade plus browser transports and storage. Built with Gradle (JDK 21). |
 | `packages/ui` | Shared Radix + Tailwind component library. |
-| `packages/protobufs` | Generated TypeScript stubs from [`meshtastic/protobufs`](https://github.com/meshtastic/protobufs), produced via `buf generate`. Source of truth for every wire-level type. |
+| `packages/protobufs` | TypeScript stubs generated from [`meshtastic/protobufs`](https://github.com/meshtastic/protobufs) with `buf generate`. The source of truth for every wire-level type. |
 
-All packages under `packages/` are private workspace packages; none are
-published to npm or JSR from this repository.
-
-## Architecture
-
-The web client never speaks the Meshtastic protocol itself. `apps/web` calls
-the facade in `packages/sdk-kmp`, which drives the Kotlin SDK (framing, packet
-queue, state, persistence) over a browser transport (Web Serial, Web Bluetooth,
-or HTTP). Wire-level types come from `packages/protobufs`. See
-`packages/sdk-kmp/README.md` for the facade surface and how the SDK version is
-pinned.
+All packages under `packages/` are private workspace packages; none are published to npm or JSR from this repository.
 
 ## Getting Started
 
 ### Prerequisites
 
-- [pnpm](https://pnpm.io/) — package manager for the workspace.
-- [Buf CLI](https://buf.build/docs/cli/installation/) — required whenever
-  `@meshtastic/protobufs` needs to build (which happens on a full
-  `pnpm -r build`, since it runs `buf generate`). If you only want to run
-  the web client in dev, `pnpm --filter meshtastic-web dev` does not need
-  Buf as long as the protobuf stubs are already generated.
-- [JDK 21](https://adoptium.net/) — required to build `@meshtastic/sdk-kmp`,
-  the Kotlin meshtastic-sdk compiled to JavaScript that the web client
-  connects through. `pnpm --filter meshtastic-web dev` builds it on first
-  run (its `predev` hook); on macOS `brew install openjdk@21` and
-  `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`. Until the SDK's `js`
-  artifacts are released, it compiles from the `packages/sdk-kmp/vendor/meshtastic-sdk`
-  git submodule (clone with `--recurse-submodules`, or let the build run
-  `git submodule update --init`). See `packages/sdk-kmp/README.md` for how
-  the SDK version is pinned and how to switch to the release.
+- [Node.js](https://nodejs.org/) 24 (see `.nvmrc`)
+- [pnpm](https://pnpm.io/), the version pinned in `package.json`'s `packageManager` field (Corepack picks it up)
+- [JDK 21](https://adoptium.net/), to build `@meshtastic/sdk-kmp`. On macOS: `brew install openjdk@21` and `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`.
+- [Buf CLI](https://buf.build/docs/cli/installation/), only for a full build that regenerates `@meshtastic/protobufs`. Not needed to run the dev server.
 
 ### Setup
 
@@ -65,73 +100,49 @@ cd web
 pnpm install
 ```
 
+If you cloned without `--recurse-submodules`, the SDK build runs `git submodule update --init` for you.
+
 ### Run the web client
 
 ```bash
 pnpm --filter meshtastic-web dev
 ```
 
-### Build everything
+The first run builds `@meshtastic/sdk-kmp`, which takes a few minutes; later runs reuse it. The client is then at http://localhost:3000.
 
-Requires the Buf CLI (see Prerequisites) — `@meshtastic/protobufs` runs
-`buf generate` as part of its `build` script.
-
-```bash
-pnpm -r build
-```
-
-`pnpm -r` sorts packages by their `workspace:` dependencies (dependencies
-before dependents) and runs up to `--workspace-concurrency` packages in
-parallel. Packages linked over other protocols (for example `jsr:`) are
-not sequenced against workspace peers, so run `pnpm --filter
-@meshtastic/protobufs build` first if you are iterating on generated
-stubs consumed via a non-workspace protocol.
-
-If you only need the web client, build it and its dependency graph:
+### Build
 
 ```bash
-pnpm --filter meshtastic-web... build
+pnpm --filter meshtastic-web... build   # the web client and the packages it depends on
+pnpm -r build                           # everything, including protobufs (needs Buf)
 ```
 
-### Run tests
+### Test, lint and format
 
 ```bash
-pnpm -r test
+pnpm test                                # all Vitest suites
+pnpm --filter @meshtastic/sdk-kmp test   # the Kotlin/JS facade and transports
+pnpm check                               # oxlint + oxfmt --check
+pnpm check:fix                           # fix lint and formatting
 ```
 
-### Lint + format
-
-```bash
-pnpm check
-pnpm check:fix
-```
+See [TESTING.md](./TESTING.md) for the testing strategy, and [`e2e/README.md`](./e2e/README.md) for end-to-end tests against simulated nodes.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow, branch and
-commit conventions, and i18n guidance. Translations live in the
-[Translation Contribution Guide](./CONTRIBUTING_TRANSLATIONS.md); adding
-new user-facing strings is covered by the
-[i18n Developer Guide](./CONTRIBUTING_I18N_DEVELOPER_GUIDE.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the workflow, branch and commit conventions, and PR guidelines. Translators can start with the [Translation Contribution Guide](./CONTRIBUTING_TRANSLATIONS.md); developers adding user-facing strings should read the [i18n Developer Guide](./CONTRIBUTING_I18N_DEVELOPER_GUIDE.md).
 
-## Developing
+Changes to protocol or connection behaviour usually belong in [meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk), so every Meshtastic app benefits.
 
-### Testing
+## Feedback
 
-Vitest is wired at the repo root (`pnpm test`) and picks up the `packages/*` and
-`apps/*` projects. See `TESTING.md` for the testing strategy.
+If you run into a problem, please report it in the [issue tracker](https://github.com/meshtastic/web/issues). Your feedback helps improve the stability of future releases.
 
 ## Repository activity
 
 | Project        | Repobeats                                                                                                             |
 | :------------- | :-------------------------------------------------------------------------------------------------------------------- |
 | Meshtastic Web | ![Alt](https://repobeats.axiom.co/api/embed/e5b062db986cb005d83e81724c00cb2b9cce8e4c.svg "Repobeats analytics image") |
-
-## Feedback
-
-If you encounter any issues, please report them in our
-[issues tracker](https://github.com/meshtastic/web/issues). Your feedback helps
-improve the stability of future releases.
 
 ## Star history
 
