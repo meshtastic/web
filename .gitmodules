@@ -1,4 +1,4 @@
 [submodule "packages/sdk-kmp/vendor/meshtastic-sdk"]
 	path = packages/sdk-kmp/vendor/meshtastic-sdk
-	url = https://github.com/danditomaso/meshtastic-sdk.git
-	branch = feat/js-target
+	url = https://github.com/meshtastic/meshtastic-sdk.git
+	branch = main

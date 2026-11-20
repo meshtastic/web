@@ -17,7 +17,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "sdk-kmp"
 
-// Until meshtastic-sdk publishes its js artifacts (meshtastic/meshtastic-sdk#215),
+// Until a meshtastic-sdk release carries its js artifacts (meshtastic/meshtastic-sdk#215),
 // the SDK compiles from source out of the pinned submodule in vendor/. Once a release
 // carries them, delete the submodule and this block, and resolve meshtasticSdkVersion
 // from Maven Central.
