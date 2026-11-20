@@ -3,5 +3,5 @@
   "useTabs": false,
   "tabWidth": 2,
   "printWidth": 80,
-  "ignorePatterns": ["*.md"]
+  "ignorePatterns": ["*.md", "packages/sdk-kmp/vendor/**"]
 }

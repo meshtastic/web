@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import { validateMaxByteLength } from "@core/utils/string.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { z } from "zod/v4";
 
 /** nanopb max_count for available_pins. */

@@ -1,7 +1,7 @@
 import type { ConnectionStatus } from "@app/core/stores/deviceStore/types.ts";
+import { useAppStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import type { Protobuf } from "@meshtastic/sdk";
-import { useNavigate } from "@tanstack/react-router";
+import type { Protobuf } from "@core/protobuf.ts";
 import {
   ChevronRight,
   CpuIcon,
@@ -57,7 +57,7 @@ export const DeviceInfoPanel = ({
   connectionName,
 }: DeviceInfoPanelProps) => {
   const { t } = useTranslation();
-  const navigate = useNavigate({ from: "/" });
+  const openConnections = useAppStore((s) => s.openConnections);
   const { batteryLevel, voltage } = deviceMetrics;
 
   const getStatusColor = (status?: ConnectionStatus): string => {
@@ -154,7 +154,7 @@ export const DeviceInfoPanel = ({
       {connectionStatus && (
         <button
           type="button"
-          onClick={() => navigate({ to: "/connections" })}
+          onClick={() => openConnections()}
           aria-label={t("navigation.manageConnections", "Manage connections")}
           className={cn(
             "group flex items-center gap-2 px-1 py-2 flex-shrink-0 rounded-md w-full",

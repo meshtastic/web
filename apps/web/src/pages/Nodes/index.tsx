@@ -23,8 +23,8 @@ import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore, useDevice } from "@core/stores";
-import { Protobuf, type Types } from "@meshtastic/sdk";
-import { useNodeErrors } from "@meshtastic/sdk-react";
+import { Protobuf, type Types } from "@core/protobuf.ts";
+import { useActiveClient, useNodeErrors } from "@core/kmp/hooks";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { LockIcon, LockOpenIcon } from "lucide-react";
 import {
@@ -46,7 +46,8 @@ export interface DeleteNoteDialogProps {
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { current } = useLang();
-  const { hardware, connection, setDialogOpen } = useDevice();
+  const { hardware, setDialogOpen } = useDevice();
+  const connection = useActiveClient();
 
   const { setNodeNumDetails } = useAppStore();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
@@ -111,20 +112,14 @@ const NodesPage = (): JSX.Element => {
     if (!connection) {
       return;
     }
-    connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
-    return () => {
-      connection.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
-    };
+    return connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
   }, [connection, handleTraceroute]);
 
   useEffect(() => {
     if (!connection) {
       return;
     }
-    connection.events.onPositionPacket.subscribe(handleLocation);
-    return () => {
-      connection.events.onPositionPacket.unsubscribe(handleLocation);
-    };
+    return connection.events.onPositionPacket.subscribe(handleLocation);
   }, [connection, handleLocation]);
 
   const tableHeadings: Heading[] = [

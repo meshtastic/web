@@ -1,0 +1,5 @@
+.gradle/
+.kotlin/
+build/
+dist/
+kotlin-js-store/

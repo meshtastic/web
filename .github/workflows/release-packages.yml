@@ -44,10 +44,24 @@ jobs:
         run: |
           set -euo pipefail
           if [ "${{ github.event.inputs.packages }}" = "all" ] || [ -z "${{ github.event.inputs.packages }}" ]; then
-            mapfile -t TARGETS < <(ls -d packages/*)
+            mapfile -t ALL < <(ls -d packages/*)
           else
-            IFS=',' read -ra TARGETS <<< "${{ github.event.inputs.packages }}"
-            TARGETS=("${TARGETS[@]/#/packages/}")
+            IFS=',' read -ra ALL <<< "${{ github.event.inputs.packages }}"
+            ALL=("${ALL[@]/#/packages/}")
+          fi
+          # Only publish packages that are not marked "private": true
+          # (protobufs, sdk-kmp and ui are all private workspace packages).
+          TARGETS=()
+          for dir in "${ALL[@]}"; do
+            if [ -f "$dir/package.json" ] && [ "$(node -p "require('./$dir/package.json').private === true")" = "false" ]; then
+              TARGETS+=("$dir")
+            else
+              echo "Skipping $dir (private or no package.json)"
+            fi
+          done
+          if [ "${#TARGETS[@]}" -eq 0 ]; then
+            echo "::error::No publishable (non-private) packages selected."
+            exit 1
           fi
           printf '%s\n' "${TARGETS[@]}" | paste -sd, - > targets.txt
           echo "list=$(cat targets.txt)" >> "$GITHUB_OUTPUT"

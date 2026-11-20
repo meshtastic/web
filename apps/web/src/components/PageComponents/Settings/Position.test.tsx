@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import { STAGED_FIXED_POSITION } from "@core/utils/stagedAdminKeys.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Position } from "./Position.tsx";
@@ -31,7 +31,7 @@ vi.mock("@core/stores", () => ({
   }),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({
     radio: { value: {} },
     stagedAdminMessages: { value: staged },

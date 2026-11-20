@@ -15,13 +15,14 @@ vi.mock("@core/stores", () => {
     CurrentDeviceContext: {
       _currentValue: { deviceId: 1234 },
     },
-    useDevice: () => ({
-      id: 42,
-      connection: { factoryResetDevice: mockFactoryResetDevice },
-    }),
+    useDevice: () => ({ id: 42 }),
     useDeviceStore,
   };
 });
+
+vi.mock("@core/kmp/hooks", () => ({
+  useActiveClient: () => ({ factoryResetDevice: mockFactoryResetDevice }),
+}));
 
 vi.mock("@core/hooks/useToast.ts", () => ({
   toast: (...args: unknown[]) => mockToast(...args),

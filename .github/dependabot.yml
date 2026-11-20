@@ -23,3 +23,7 @@ updates:
           - react
           - react-dom
           - "@types/react*"
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "daily"

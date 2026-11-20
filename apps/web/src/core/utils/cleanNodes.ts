@@ -1,4 +1,4 @@
-import type { Node } from "@meshtastic/sdk";
+import type { Node } from "@core/storage/types.ts";
 
 export const MIN_DAYS_KNOWN = 7;
 export const MIN_DAYS_UNKNOWN = 0;

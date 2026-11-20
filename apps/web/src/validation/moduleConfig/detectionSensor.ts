@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { z } from "zod/v4";
 
 const detectionTriggerTypeEnum = z.enum(

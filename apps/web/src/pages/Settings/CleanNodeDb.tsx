@@ -16,12 +16,12 @@ import {
   minDays,
   nodesToClean,
 } from "@core/utils/cleanNodes.ts";
-import type { Node } from "@meshtastic/sdk";
-import { useActiveClient, useSignal } from "@meshtastic/sdk-react";
+import type { Node } from "@core/storage/types.ts";
 import { EraserIcon } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type ConfigProps, SettingsCard } from "./SettingsTabs.tsx";
+import { useActiveClient, useSignal } from "@core/kmp/hooks";
 
 const EMPTY_NODES: ReadonlyArray<Node> = [];
 const EMPTY_NODES_SIGNAL = {

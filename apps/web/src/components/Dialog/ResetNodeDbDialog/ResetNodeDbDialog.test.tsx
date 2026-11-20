@@ -9,7 +9,8 @@ const { mockUseActiveClient } = vi.hoisted(() => ({
   mockUseActiveClient: vi.fn(),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@core/kmp/hooks")>()),
   useActiveClient: mockUseActiveClient,
 }));
 

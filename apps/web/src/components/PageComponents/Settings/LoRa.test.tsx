@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LoRa } from "./LoRa.tsx";
@@ -36,7 +36,7 @@ vi.mock("@core/hooks/useNodesAsProto.ts", () => ({
     hwModel === undefined ? undefined : { user: { hwModel } },
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({
     radio: { value: {} },
     setRadioSection: vi.fn(),

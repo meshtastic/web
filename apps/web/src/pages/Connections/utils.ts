@@ -7,7 +7,7 @@ import type {
 import { randId } from "@app/core/utils/randId";
 import { t } from "i18next";
 import { Bluetooth, Cable, Globe, type LucideIcon } from "lucide-react";
-import { withLocalNetworkTarget } from "@meshtastic/transport-http";
+import { withLocalNetworkTarget } from "@app/core/connections/lna.ts";
 
 export function createConnectionFromInput(input: NewConnection): Connection {
   const base = {

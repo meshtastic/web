@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { z } from "zod/v4";
 
 const RoleEnum = z.enum(Protobuf.Config.Config_DeviceConfig_Role);

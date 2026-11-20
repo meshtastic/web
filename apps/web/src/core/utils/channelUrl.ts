@@ -1,5 +1,5 @@
 import { fromBinary, toBinary } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { fromByteArray, toByteArray } from "base64-js";
 
 /**

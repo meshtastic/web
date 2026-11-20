@@ -1,9 +1,6 @@
-import { createLogger } from "@meshtastic/sdk";
-import {
-  MultiTabCoordinator,
-  type OpenedSqlocalDb,
-  openSqlocalDb,
-} from "@meshtastic/sdk-storage-sqlocal";
+import { createLogger } from "@core/log.ts";
+import { MultiTabCoordinator } from "@core/storage/coordinator.ts";
+import { type OpenedSqlocalDb, openSqlocalDb } from "@core/storage/db.ts";
 
 const log = createLogger("sdkStorage");
 
@@ -20,8 +17,14 @@ const log = createLogger("sdkStorage");
  * stay fast and headless-safe.
  */
 let dbPromise: Promise<OpenedSqlocalDb> | undefined;
+let relinquished = false;
 
 export function getStorageDb(): Promise<OpenedSqlocalDb> {
+  if (relinquished) {
+    return Promise.reject(
+      new Error("storage was handed to another tab; not reopening"),
+    );
+  }
   if (!dbPromise) {
     log.debug("getStorageDb: creating sqlocal DB", { path: "meshtastic.db" });
     const t0 = Date.now();
@@ -44,6 +47,33 @@ export function getStorageDb(): Promise<OpenedSqlocalDb> {
       });
   }
   return dbPromise;
+}
+
+/**
+ * Closes the database and forgets it, so another tab can take the OPFS
+ * handle and the next `getStorageDb()` here opens afresh. A failing close is
+ * logged, not thrown: the caller is giving the app away and must finish.
+ */
+export async function closeStorageDb(): Promise<void> {
+  relinquished = true;
+  const pending = dbPromise;
+  if (!pending) return;
+  dbPromise = undefined;
+  try {
+    const opened = await pending;
+    await opened.close();
+    log.info("closeStorageDb: sqlocal DB closed");
+  } catch (err) {
+    log.warn("closeStorageDb: close failed", {
+      name: err instanceof Error ? err.name : undefined,
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
+
+/** This tab owns the app again: `getStorageDb()` may open the database. */
+export function resumeStorageDb(): void {
+  relinquished = false;
 }
 
 export const coordinator = new MultiTabCoordinator();

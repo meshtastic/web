@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import { toDeviceConfig, toDeviceFormValues } from "./device.ts";
 

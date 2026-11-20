@@ -1,5 +1,5 @@
 import { toast } from "@core/hooks/useToast.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient } from "@core/kmp/hooks";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 

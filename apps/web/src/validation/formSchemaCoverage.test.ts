@@ -1,5 +1,5 @@
 import { create, type DescMessage } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import { BluetoothValidationSchema } from "./config/bluetooth.ts";
 import { DeviceValidationSchema, toDeviceFormValues } from "./config/device.ts";

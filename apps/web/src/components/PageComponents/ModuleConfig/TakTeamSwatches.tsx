@@ -1,7 +1,7 @@
 import type { TakValidation } from "@app/validation/moduleConfig/tak.ts";
 import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { cn } from "@core/utils/cn.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { type SubmitHandler, useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 

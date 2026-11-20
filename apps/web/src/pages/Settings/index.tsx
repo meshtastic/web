@@ -8,7 +8,7 @@ import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { cn } from "@core/utils/cn.ts";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { About } from "@pages/Settings/About.tsx";
 import { Administration } from "@pages/Settings/Administration.tsx";
 import { AppSettings } from "@pages/Settings/AppSettings.tsx";

@@ -1,4 +1,12 @@
 {
+  "drawer": {
+    "title": "Connections",
+    "close": "Close connections",
+    "back": "Back to connections",
+    "addConnection": "Add connection",
+    "resize": "Resize connections drawer",
+    "deleteConfirm": "Delete {{name}}?"
+  },
   "page": {
     "title": "Connect to a Meshtastic device",
     "description": "Add a device connection via HTTP, Bluetooth, or Serial. Your saved connections will be saved in your browser."
@@ -65,6 +73,7 @@
     },
     "phase": {
       "connecting": "Opening transport…",
+      "reconnecting": "Reconnect attempt {{attempt}} of {{max}}…",
       "configuring": "Streaming configuration…"
     },
     "chip": {
@@ -76,12 +85,20 @@
     "stuckHint": "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
     "cancel": "Cancel"
   },
+  "status": {
+    "reconnecting": "reconnecting {{attempt}}/{{max}}"
+  },
   "errors": {
     "certNotTrusted": "Self-signed certificate not trusted. Open {{url}} in a new tab, accept the security warning, then return here and try again.",
     "httpsNotReachable": "HTTPS endpoint not reachable. Check that the device is online.",
     "httpNotReachable": "HTTP endpoint not reachable (may be blocked by CORS or a network issue)",
     "openInNewTab": "Open in new tab →",
-    "firmwareTooOld": "Firmware {{version}} is too old for the web client. Update the radio to {{minimum}} or newer."
+    "firmwareTooOld": "Firmware {{version}} is too old for the web client. Update the radio to {{minimum}} or newer.",
+    "localNetworkDenied": "Chrome blocked local network access for this site. Click the site-info icon in the address bar, allow Local network, then Connect.",
+    "localNetworkPrompt": "Chrome needs your permission to reach the local network. Click Connect to allow it.",
+    "handshakeTimeout": "The radio stopped responding during the handshake. It may be in CLI or bootloader mode, or its firmware isn't answering config requests.",
+    "reconnectFailed": "Could not reconnect after {{attempts}} attempts.",
+    "connectionLost": "The connection to the radio was lost."
   },
   "httpTest": {
     "certNotTrusted": "Certificate not trusted. <0>Open in new tab</0> and accept the warning, then test again."

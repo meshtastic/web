@@ -31,7 +31,8 @@ import {
 } from "@core/hooks/useNodesAsProto.ts";
 import { cn } from "@core/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
-import { createLogger, type Protobuf } from "@meshtastic/sdk";
+import { createLogger } from "@core/log.ts";
+import type { Protobuf } from "@core/protobuf.ts";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {

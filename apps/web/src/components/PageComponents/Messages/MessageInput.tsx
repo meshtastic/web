@@ -1,7 +1,7 @@
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import type { ConversationKey } from "@meshtastic/sdk";
-import { useDraft } from "@meshtastic/sdk-react";
+import type { ConversationKey } from "@core/storage/types.ts";
+import { useDraft } from "@core/kmp/hooks";
 import { SendIcon } from "lucide-react";
 import { startTransition, useState } from "react";
 import { useTranslation } from "react-i18next";

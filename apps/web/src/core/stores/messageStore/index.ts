@@ -5,7 +5,7 @@
  * persistence is owned by the SDK ChatClient + SqlocalMessageRepository.
  */
 
-import type { Protobuf, Types } from "@meshtastic/sdk";
+import type { Protobuf, Types } from "@core/protobuf.ts";
 
 export enum MessageState {
   /** The addressed node acked it (and every inbound message). */

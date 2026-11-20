@@ -1,5 +1,5 @@
 import type { ValidModuleConfigType } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 
 const Excluded = Protobuf.Mesh.ExcludedModules;
 

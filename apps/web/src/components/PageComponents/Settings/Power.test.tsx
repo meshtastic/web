@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Power } from "./Power.tsx";
@@ -17,7 +17,7 @@ vi.mock("@core/stores", () => ({
   }),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({
     radio: { value: {} },
     setRadioSection: vi.fn(),

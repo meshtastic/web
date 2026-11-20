@@ -70,6 +70,82 @@
   --brightnessDisabled: 0.75;
 }
 
+/*
+ * shadcn/ui tokens mapped onto the app's slate palette.
+ *
+ * The values mirror the slate classes the rest of the UI uses (Dialog, Button,
+ * Input, Sidebar) so shadcn surfaces such as the Connections drawer match the
+ * other screens. The raw tokens are scoped to `[data-shadcn-scope]` rather than
+ * `:root` so the generated utilities (`bg-background`, `text-foreground`, ...)
+ * only paint inside those surfaces. Two names are deliberately left out:
+ *   - `--accent` / `--accent-foreground`: the app already maps
+ *     `--color-accent: var(--accent)` for `ring-accent`; defining `--accent`
+ *     would recolour those focus rings. Drawer hover surfaces use `bg-muted`.
+ *   - `--radius-*`: shadcn's remap would override Tailwind's `rounded-*` scale
+ *     app-wide, so the stock scale is kept.
+ */
+[data-shadcn-scope] {
+  --background: var(--backgroundPrimary);
+  --foreground: var(--color-slate-900);
+  --card: var(--color-white);
+  --card-foreground: var(--color-slate-900);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-slate-900);
+  --primary: var(--color-slate-900);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-slate-100);
+  --secondary-foreground: var(--color-slate-700);
+  --muted: var(--color-slate-100);
+  /* slate-500 is 4.3:1 on slate-100; slate-600 keeps WCAG 1.4.3 AA. */
+  --muted-foreground: var(--color-slate-600);
+  --destructive: var(--color-red-600);
+  --destructive-foreground: var(--color-white);
+  --border: var(--color-slate-300);
+  /* Control outlines need more weight than decorative borders on white. */
+  --input: var(--color-slate-400);
+  --ring: var(--color-slate-400);
+}
+
+[data-theme="dark"] [data-shadcn-scope],
+[data-theme="dark"][data-shadcn-scope] {
+  --foreground: var(--color-slate-100);
+  --card: var(--color-slate-800);
+  --card-foreground: var(--color-slate-200);
+  --popover: var(--color-slate-800);
+  --popover-foreground: var(--color-slate-200);
+  --primary: var(--color-slate-50);
+  --primary-foreground: var(--color-slate-900);
+  --secondary: var(--color-slate-700);
+  --secondary-foreground: var(--color-slate-100);
+  --muted: var(--color-slate-800);
+  --muted-foreground: var(--color-slate-400);
+  --destructive: var(--color-red-400);
+  --destructive-foreground: var(--color-slate-900);
+  --border: var(--color-slate-700);
+  --input: var(--color-slate-700);
+  --ring: var(--color-slate-500);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
 /* Accordion Animations */
 @keyframes accordion-down {
   from {

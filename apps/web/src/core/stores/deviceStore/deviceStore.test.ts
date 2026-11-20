@@ -1,8 +1,21 @@
-import { create, toBinary } from "@bufbuild/protobuf";
-import { Protobuf, type Types } from "@meshtastic/sdk";
+import { create } from "@bufbuild/protobuf";
+import { Protobuf, type Types } from "@core/protobuf.ts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const idbMem = new Map<string, string>();
+const registry = vi.hoisted(() => ({
+  session: undefined as
+    | {
+        sendWaypoint: (...args: unknown[]) => unknown;
+        sendAdmin: (...args: unknown[]) => unknown;
+      }
+    | undefined,
+}));
+
+vi.mock("@core/kmp/registry.ts", () => ({
+  meshRegistry: { active: { peek: () => registry.session } },
+}));
+
 vi.mock("idb-keyval", () => ({
   get: vi.fn((key: string) => Promise.resolve(idbMem.get(key))),
   set: vi.fn((key: string, val: string) => {
@@ -181,7 +194,7 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
     // Old device with myNodeNum=777 and some waypoints (one expired)
     const oldDevice = state.addDevice(1);
     const mockSendWaypoint = vi.fn();
-    oldDevice.addConnection({ sendWaypoint: mockSendWaypoint } as any);
+    registry.session = { sendWaypoint: mockSendWaypoint, sendAdmin: vi.fn() };
 
     oldDevice.setHardware(makeHardware(777));
     oldDevice.addWaypoint(
@@ -349,33 +362,24 @@ describe("DeviceStore – persistence partialize & rehydrate", () => {
   });
 });
 
-describe("DeviceStore – connection & sendAdminMessage", () => {
+describe("DeviceStore – sendAdminMessage", () => {
   beforeEach(() => {
     idbMem.clear();
     vi.clearAllMocks();
   });
 
-  it("sendAdminMessage calls through to connection.sendPacket with correct args", async () => {
+  it("sendAdminMessage hands the message's variant to the active session", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
     const device = state.addDevice(77);
 
-    const sendPacket = vi.fn();
-    device.addConnection({ sendPacket } as any);
+    const sendAdmin = vi.fn();
+    registry.session = { sendWaypoint: vi.fn(), sendAdmin };
 
     const message = makeAdminMessage({ logVerbosity: 1 });
     device.sendAdminMessage(message);
 
-    expect(sendPacket).toHaveBeenCalledTimes(1);
-    const [bytes, port, dest] = sendPacket.mock.calls[0]!;
-    expect(port).toBe(Protobuf.Portnums.PortNum.ADMIN_APP);
-    expect(dest).toBe("self");
-
-    // sanity: encoded bytes match toBinary on the same schema
-    const expected = toBinary(Protobuf.Admin.AdminMessageSchema, message);
-    expect(bytes).toBeInstanceOf(Uint8Array);
-
-    // compare content length as minimal assertion (exact byte-for-byte is fine too)
-    expect((bytes as Uint8Array).length).toBe(expected.length);
+    expect(sendAdmin).toHaveBeenCalledTimes(1);
+    expect(sendAdmin).toHaveBeenCalledWith(message.payloadVariant);
   });
 });

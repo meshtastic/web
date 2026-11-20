@@ -1,5 +1,6 @@
 import { create } from "@bufbuild/protobuf";
-import { type Node, Protobuf } from "@meshtastic/sdk";
+import type { Node } from "@core/storage/types.ts";
+import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import { minDays, nodesToClean } from "./cleanNodes.ts";
 

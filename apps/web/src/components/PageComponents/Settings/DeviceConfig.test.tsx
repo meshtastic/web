@@ -3,7 +3,7 @@ import { renderSettingsForm } from "@app/tests/renderSettingsForm.tsx";
 import { BluetoothValidationSchema } from "@app/validation/config/bluetooth.ts";
 import { Bluetooth } from "@components/PageComponents/Settings/Bluetooth.tsx";
 import { Device } from "@components/PageComponents/Settings/Device/index.tsx";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
@@ -62,7 +62,7 @@ describe("Device settings", () => {
     );
     expect((await editor.commit()).status).toBe("ok");
 
-    const wire = radio.sentConfig("device");
+    const wire = radio.sentConfig("device")?.value;
     expect(wire?.doubleTapAsButtonPress).toBe(true);
     expect(wire?.buttonGpio).toBe(4);
     expect(wire?.buzzerGpio).toBe(2);
@@ -94,7 +94,7 @@ describe("Device settings", () => {
     expect(editor.dirtyRadioSections.value).toContain("device");
 
     expect((await editor.commit()).status).toBe("ok");
-    expect(radio.sentConfig("device")?.doubleTapAsButtonPress).toBe(true);
+    expect(radio.sentConfig("device")?.value.doubleTapAsButtonPress).toBe(true);
     expect(editor.isDirty.value).toBe(false);
   });
 
@@ -111,7 +111,7 @@ describe("Device settings", () => {
     );
     expect((await editor.commit()).status).toBe("ok");
 
-    expect(radio.sentConfig("bluetooth")?.enabled).toBe(true);
+    expect(radio.sentConfig("bluetooth")?.value.enabled).toBe(true);
   });
 
   it("still requires a six-digit PIN for FIXED_PIN pairing", () => {

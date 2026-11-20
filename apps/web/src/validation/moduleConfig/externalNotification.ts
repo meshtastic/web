@@ -1,5 +1,5 @@
 import { validateMaxByteLength } from "@core/utils/string.ts";
-import { RINGTONE_MAX_BYTES } from "@meshtastic/sdk";
+import { RINGTONE_MAX_BYTES } from "@core/constants.ts";
 import { z } from "zod/v4";
 
 export const ExternalNotificationValidationSchema = z.object({

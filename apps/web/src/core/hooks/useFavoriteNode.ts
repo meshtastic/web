@@ -1,5 +1,5 @@
 import { useToast } from "@core/hooks/useToast.ts";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient } from "@core/kmp/hooks";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 

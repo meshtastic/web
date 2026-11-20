@@ -1,6 +1,6 @@
 import { clone, create } from "@bufbuild/protobuf";
 import { validateMaxByteLength } from "@core/utils/string.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { z } from "zod/v4";
 
 type MeshBeaconConfig = Protobuf.ModuleConfig.ModuleConfig_MeshBeaconConfig;

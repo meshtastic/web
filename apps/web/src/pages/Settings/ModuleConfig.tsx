@@ -16,8 +16,8 @@ import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice, type ValidModuleConfigType } from "@core/stores";
 import { isModuleExcluded } from "@core/utils/excludedModules.ts";
-import { Protobuf } from "@meshtastic/sdk";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { Protobuf } from "@core/protobuf.ts";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { type ComponentType, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { dirtyModuleTabs } from "./dirtySections.ts";

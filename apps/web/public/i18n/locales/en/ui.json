@@ -368,5 +368,11 @@
       "copyright": "Meshtastic® Copyright Meshtastic LLC",
       "licenseNotice": "Free software under the GNU General Public License v3, with no warranty. You may redistribute it under the same license."
     }
+  },
+  "tabLock": {
+    "title": "Meshtastic is open in another tab",
+    "description": "Only one tab can use your radio and saved data at a time. Use it here to move Meshtastic to this tab and disconnect the other one.",
+    "useHere": "Use here",
+    "claiming": "Switching to this tab…"
   }
 }

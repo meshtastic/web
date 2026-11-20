@@ -1,14 +1,13 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import { channelSetToUrl } from "@core/utils/channelUrl.ts";
+import type { Channel, MeshBeaconOffer } from "@core/kmp/channels.ts";
 import {
   type BeaconJoinOption,
   beaconJoinChannelSet,
   beaconJoinOption,
-  type Channel,
   isBeaconAlreadyJoined,
-  type MeshBeaconOffer,
-  Protobuf,
-} from "@meshtastic/sdk";
+} from "@core/utils/meshBeacon.ts";
+import { Protobuf } from "@core/protobuf.ts";
 
 type ChannelSettings = Protobuf.Channel.ChannelSettings;
 

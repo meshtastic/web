@@ -1,7 +1,7 @@
 import { Label } from "@components/UI/Label.tsx";
 import { useNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore } from "@core/stores";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient } from "@core/kmp/hooks";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
 

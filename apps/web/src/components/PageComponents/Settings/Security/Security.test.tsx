@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Security } from "./Security.tsx";
@@ -30,7 +30,7 @@ vi.mock("@core/hooks/useLockdown.ts", () => ({
   useLockdown: () => ({ client: undefined, status: undefined }),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({
     radio: { value: {} },
     setRadioSection: vi.fn(),

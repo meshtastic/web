@@ -11,10 +11,10 @@ import {
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Separator } from "@components/UI/Separator.tsx";
-import { useDevice } from "@core/stores";
 import { ClockIcon, OctagonXIcon, RefreshCwIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useActiveClient } from "@core/kmp/hooks";
 
 export interface RebootDialogProps {
   open: boolean;
@@ -25,7 +25,7 @@ const DEFAULT_REBOOT_DELAY = 5; // seconds
 
 export const RebootDialog = ({ open, onOpenChange }: RebootDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection } = useDevice();
+  const connection = useActiveClient();
   const [time, setTime] = useState<number>(DEFAULT_REBOOT_DELAY);
   const [isScheduled, setIsScheduled] = useState(false);
   const [isOTA, setIsOTA] = useState(false);

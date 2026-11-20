@@ -1,5 +1,5 @@
 import { useDevice } from "@core/stores";
-import { useActiveClient, useNodeErrors } from "@meshtastic/sdk-react";
+import { useActiveClient, useNodeErrors } from "@core/kmp/hooks";
 import { useCallback } from "react";
 
 export function useRefreshKeysDialog() {

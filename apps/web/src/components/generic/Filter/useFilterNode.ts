@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { useCallback, useMemo } from "react";
 

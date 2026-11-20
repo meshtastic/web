@@ -17,7 +17,7 @@ import {
 } from "@core/stores";
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { cn } from "@core/utils/cn.ts";
-import { useTotalUnread } from "@meshtastic/sdk-react";
+import { useTotalUnread } from "@core/kmp/hooks";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CircleChevronLeft,
