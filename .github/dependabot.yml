@@ -23,6 +23,16 @@ updates:
           - react
           - react-dom
           - "@types/react*"
+      # Every npm update rewrites pnpm-lock.yaml, so separate PRs conflict
+      # with each other as soon as one merges. Batch the rest of the minor
+      # and patch bumps into one PR; majors still arrive one per PR.
+      # A dependency goes to the first group it matches, so this stays last.
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
