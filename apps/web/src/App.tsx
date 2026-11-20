@@ -2,6 +2,7 @@ import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { BeaconOfferNotifier } from "@components/BeaconOfferNotifier.tsx";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { ConnectingOverlay } from "@components/ConnectingOverlay.tsx";
+import { ConnectionsDrawer } from "@components/ConnectionsDrawer/ConnectionsDrawer.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { LockdownGate } from "@components/Dialog/LockdownDialog/LockdownDialog.tsx";
 import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
@@ -11,8 +12,7 @@ import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { cn } from "@core/utils/cn.ts";
 import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
-import { useTotalUnread } from "@meshtastic/sdk-react";
-import { Connections } from "@pages/Connections/index.tsx";
+import { useTotalUnread } from "@core/kmp/hooks";
 import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect, useRef } from "react";
@@ -50,6 +50,9 @@ export function App() {
             during a first-time connect from the Connections screen as
             well as reconnects from inside the app. */}
         <ConnectingOverlay />
+        {/* The Connections drawer overlays whatever page is showing. With no
+            device it is forced open and replaces the old full-page screen. */}
+        <ConnectionsDrawer forced={!device} />
         <div
           className="flex h-screen flex-col bg-background-primary text-text-primary"
           style={{ scrollbarWidth: "thin" }}
@@ -69,10 +72,7 @@ export function App() {
                   </MapProvider>
                 </div>
               ) : (
-                <>
-                  <Connections />
-                  <Footer />
-                </>
+                <Footer />
               )}
             </div>
           </SidebarProvider>

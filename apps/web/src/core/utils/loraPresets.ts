@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 
 type ModemPreset = Protobuf.Config.Config_LoRaConfig_ModemPreset;
 type RegionCode = Protobuf.Config.Config_LoRaConfig_RegionCode;

@@ -1,8 +1,10 @@
-import { create } from "@bufbuild/protobuf";
-import { UNKNOWN_NODE_SCOPE } from "@app/core/connections/sdkClient.ts";
+import { UNKNOWN_NODE_SCOPE } from "@app/core/connections/repositories.ts";
 import type { Connection } from "@app/core/stores/deviceStore/types";
+import { create, toBinary } from "@bufbuild/protobuf";
+import { FakeKmpClient } from "@core/kmp/fakeClient.ts";
+import { meshRegistry } from "@core/kmp/registry.ts";
+import { Protobuf } from "@core/protobuf.ts";
 import { useDeviceStore } from "@core/stores";
-import { type MeshDevice, Protobuf } from "@meshtastic/sdk";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useConnections } from "./useConnections.ts";
@@ -19,63 +21,43 @@ vi.mock("@core/sdkStorage.ts", () => ({
   coordinator: undefined,
 }));
 
-vi.mock("@app/core/connections/transports.ts", () => ({
-  openTransport: async () => ({
-    transport: {
-      toDevice: new WritableStream<Uint8Array>(),
-      fromDevice: new ReadableStream(),
-      disconnect: async () => {},
-    },
-  }),
-  closeTransport: () => {},
-  probeConnection: async () => ({ status: "disconnected" }),
-}));
+vi.mock("@core/kmp/client.ts", async () => {
+  const { FakeKmpClient } = await import("@core/kmp/fakeClient.ts");
+  return { createSerialClient: async () => new FakeKmpClient() };
+});
 
-// The sqlocal repositories, replaced by the SDK's in-memory ones that record
-// the scopes they are given. Called with `new`; the returned object is the
-// instance.
-function recording<T extends object>(kind: string, make: () => T) {
+// The sqlocal repositories, replaced by empty ones that record the scopes
+// they are given. Called with `new`; the returned object is the instance.
+function recording(kind: string) {
   return function Recording(_db: unknown, options: { deviceId: number }) {
     scopes.opened.push([kind, options.deviceId]);
-    return Object.assign(make(), {
+    return {
       setScope(scope: number): void {
         scopes.switched.push([kind, scope]);
       },
-    });
+      loadAll: async () => [],
+      loadRecent: async () => [],
+      load: async () => "",
+      append: async () => {},
+      upsert: async () => {},
+      upsertBatch: async () => {},
+      prune: async () => {},
+    };
   };
 }
 
-vi.mock("@meshtastic/sdk-storage-sqlocal/chat", async () => {
-  const sdk = await import("@meshtastic/sdk");
-  return {
-    SqlocalMessageRepository: recording(
-      "messages",
-      () => new sdk.InMemoryMessageRepository(),
-    ),
-    SqlocalDraftRepository: recording(
-      "drafts",
-      () => new sdk.InMemoryDraftRepository(),
-    ),
-  };
-});
-vi.mock("@meshtastic/sdk-storage-sqlocal/nodes", async () => {
-  const sdk = await import("@meshtastic/sdk");
-  return {
-    SqlocalNodesRepository: recording(
-      "nodes",
-      () => new sdk.InMemoryNodesRepository(),
-    ),
-  };
-});
-vi.mock("@meshtastic/sdk-storage-sqlocal/telemetry", async () => {
-  const sdk = await import("@meshtastic/sdk");
-  return {
-    SqlocalTelemetryRepository: recording(
-      "telemetry",
-      () => new sdk.InMemoryTelemetryRepository(),
-    ),
-  };
-});
+vi.mock("@core/storage/messages.ts", () => ({
+  SqlocalMessageRepository: recording("messages"),
+}));
+vi.mock("@core/storage/drafts.ts", () => ({
+  SqlocalDraftRepository: recording("drafts"),
+}));
+vi.mock("@core/storage/nodes.ts", () => ({
+  SqlocalNodesRepository: recording("nodes"),
+}));
+vi.mock("@core/storage/telemetry.ts", () => ({
+  SqlocalTelemetryRepository: recording("telemetry"),
+}));
 
 const NODE = 0x0a0b0c0d;
 const KINDS = ["messages", "drafts", "nodes", "telemetry"];
@@ -83,14 +65,22 @@ const KINDS = ["messages", "drafts", "nodes", "telemetry"];
 const saved = (id: number): Connection | undefined =>
   useDeviceStore.getState().savedConnections.find((c) => c.id === id);
 
-function meshDeviceFor(id: number): MeshDevice {
-  const meshDeviceId = saved(id)?.meshDeviceId;
-  const device = meshDeviceId
-    ? useDeviceStore.getState().getDevice(meshDeviceId)
-    : undefined;
-  if (!device?.connection) throw new Error("no MeshDevice for connection");
-  return device.connection;
+function kmpFor(id: number): FakeKmpClient {
+  const kmp = meshRegistry.get(id)?.kmp;
+  if (!(kmp instanceof FakeKmpClient)) throw new Error("no session");
+  return kmp;
 }
+
+const myInfo = (myNodeNum: number): Uint8Array =>
+  toBinary(
+    Protobuf.Mesh.FromRadioSchema,
+    create(Protobuf.Mesh.FromRadioSchema, {
+      payloadVariant: {
+        case: "myInfo",
+        value: create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum }),
+      },
+    }),
+  );
 
 describe("useConnections storage scope", () => {
   afterEach(() => {
@@ -111,13 +101,9 @@ describe("useConnections storage scope", () => {
       KINDS.map((kind) => [kind, UNKNOWN_NODE_SCOPE]),
     );
 
-    act(() => {
-      meshDeviceFor(conn.id).events.onMyNodeInfo.dispatch(
-        create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum: NODE }),
-      );
-    });
+    act(() => kmpFor(conn.id).emitFrame(myInfo(NODE)));
     expect(saved(conn.id)?.nodeNum).toBe(NODE);
-    // The SDK moves this session to the node straight away.
+    // The session moves to the node's history straight away.
     expect(scopes.switched).toEqual(KINDS.map((kind) => [kind, NODE]));
 
     await act(() => result.current.disconnect(conn.id));
@@ -128,11 +114,7 @@ describe("useConnections storage scope", () => {
     expect(scopes.opened).toEqual(KINDS.map((kind) => [kind, NODE]));
 
     // my_info for the same node changes nothing.
-    act(() => {
-      meshDeviceFor(conn.id).events.onMyNodeInfo.dispatch(
-        create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum: NODE }),
-      );
-    });
+    act(() => kmpFor(conn.id).emitFrame(myInfo(NODE)));
     expect(scopes.switched).toEqual([]);
     expect(saved(conn.id)?.nodeNum).toBe(NODE);
 

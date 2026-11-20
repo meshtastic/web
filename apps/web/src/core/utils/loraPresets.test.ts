@@ -1,6 +1,6 @@
 import { makeLoRaValidationSchema } from "@app/validation/config/lora.ts";
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import {
   getAllowedPresets,

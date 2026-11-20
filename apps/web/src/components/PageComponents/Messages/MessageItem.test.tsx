@@ -3,7 +3,7 @@ import {
   MessageState,
   MessageType,
 } from "@core/stores/messageStore";
-import { Protobuf, type Types } from "@meshtastic/sdk";
+import { Protobuf, type Types } from "@core/protobuf.ts";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { MessageItem } from "./MessageItem.tsx";
@@ -29,7 +29,8 @@ vi.mock("@core/hooks/useNodesAsProto.ts", () => ({
 vi.mock("@components/UI/Avatar.tsx", () => ({ Avatar: () => null }));
 
 const resend = vi.fn(() => Promise.resolve({ status: "ok", value: 2 }));
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@core/kmp/hooks")>()),
   useActiveClient: () => ({ chat: { resend } }),
 }));
 

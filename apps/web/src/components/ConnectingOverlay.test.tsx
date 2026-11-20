@@ -14,7 +14,8 @@ vi.mock("@app/pages/Connections/useConnections", () => ({
 vi.mock("@core/hooks/useLockdown.ts", () => ({
   useLockdown: () => ({ isLocked: false }),
 }));
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@core/kmp/hooks")>()),
   useConnectionProgress: () => ({ phase: "connecting" }),
 }));
 
@@ -42,6 +43,15 @@ describe("ConnectingOverlay", () => {
     expect(
       screen.getByRole("heading", { name: "Reconnecting" }),
     ).toBeInTheDocument();
+  });
+
+  it("shows the SDK's reconnect attempt", () => {
+    savedConnections = [
+      connection({ reconnect: { attempt: 3, maxAttempts: 10 } }),
+    ];
+    render(<ConnectingOverlay />);
+    expect(screen.getByRole("heading", { name: "Reconnecting" })).toBeDefined();
+    expect(screen.getByText("Reconnect attempt 3 of 10…")).toBeDefined();
   });
 
   it("shows nothing when no connection is in progress", () => {

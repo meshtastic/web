@@ -1,10 +1,10 @@
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import { useDevice } from "@core/stores";
 import { ClockIcon, PowerIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
+import { useActiveClient } from "@core/kmp/hooks";
 
 export interface ShutdownDialogProps {
   open: boolean;
@@ -13,7 +13,7 @@ export interface ShutdownDialogProps {
 
 export const ShutdownDialog = ({ open, onOpenChange }: ShutdownDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection } = useDevice();
+  const connection = useActiveClient();
   const [time, setTime] = useState<number>(5);
 
   const handleScheduledShutdown = () => {

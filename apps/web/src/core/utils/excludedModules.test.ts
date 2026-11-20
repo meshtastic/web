@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import { isModuleExcluded, MODULE_EXCLUSION_BITS } from "./excludedModules.ts";
 

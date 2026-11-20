@@ -3,9 +3,12 @@ import {
   MessageState as LegacyMessageState,
   MessageType,
 } from "@core/stores/messageStore";
-import type { Message as SdkMessage } from "@meshtastic/sdk";
-import { MessageState as SdkMessageState, type Types } from "@meshtastic/sdk";
-import { useChat, useDirectChat } from "@meshtastic/sdk-react";
+import { useChat, useDirectChat } from "@core/kmp/hooks";
+import type { Types } from "@core/protobuf.ts";
+import {
+  type Message as SdkMessage,
+  MessageState as SdkMessageState,
+} from "@core/storage/types.ts";
 import { useMemo } from "react";
 
 /**
@@ -34,9 +37,7 @@ export function useChatAsLegacyMessages(
   params: UseChatAsLegacyMessagesParams,
 ): LegacyMessage[] {
   const broadcast = useChat(
-    params.type === MessageType.Broadcast
-      ? params.channelId
-      : (0 as Types.ChannelNumber),
+    params.type === MessageType.Broadcast ? params.channelId : 0,
   );
   const direct = useDirectChat(
     params.type === MessageType.Direct ? params.peer : 0,
@@ -56,8 +57,7 @@ export function toLegacy(
   message: SdkMessage,
   params: UseChatAsLegacyMessagesParams,
 ): LegacyMessage {
-  const legacy = {
-    type: params.type,
+  const base = {
     channel: message.channel,
     to: message.to,
     from: message.from,
@@ -65,7 +65,11 @@ export function toLegacy(
     messageId: message.id,
     state: mapState(message.state),
     message: message.text,
-  } as LegacyMessage;
+  };
+  const legacy: LegacyMessage =
+    params.type === MessageType.Direct
+      ? { ...base, type: MessageType.Direct }
+      : { ...base, type: MessageType.Broadcast };
   if (message.signed !== undefined) {
     legacy.signed = message.signed;
   }

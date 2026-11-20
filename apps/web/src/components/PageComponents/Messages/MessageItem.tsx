@@ -6,7 +6,7 @@ import {
 import { useAppStore, useDevice } from "@core/stores";
 import type { Message } from "@core/stores/messageStore";
 import { cn } from "@core/utils/cn.ts";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { useMemo } from "react";
 import { MessageDiagnostics } from "./MessageDiagnostics.tsx";
 import { MessageStatus } from "./MessageStatus.tsx";

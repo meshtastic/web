@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import { CannedMessageValidationSchema } from "./cannedMessage.ts";
 import { ExternalNotificationValidationSchema } from "./externalNotification.ts";

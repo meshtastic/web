@@ -1,5 +1,4 @@
 allowBuilds:
-  "@serialport/bindings-cpp": false
   "@tailwindcss/oxide": false
   "core-js": false
   esbuild: false
@@ -8,8 +7,7 @@ packages:
   - "packages/*"
   - "apps/*"
 
-# Resolve every @meshtastic/protobufs dependency (including the jsr: one in
-# packages/sdk, kept for publishing) to the workspace package, so the app and
-# the SDK share one copy of the generated types.
+# Resolve every @meshtastic/protobufs dependency to the workspace package so
+# the whole repo shares one copy of the generated types.
 overrides:
   "@meshtastic/protobufs": "workspace:*"

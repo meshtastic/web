@@ -4,7 +4,7 @@ import { useDeviceStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useConnections } from "@app/pages/Connections/useConnections";
 import { useLockdown } from "@core/hooks/useLockdown.ts";
-import { useConnectionProgress } from "@meshtastic/sdk-react";
+import { useConnectionProgress } from "@core/kmp/hooks";
 import { Bluetooth, Cable, CheckCircle2, Globe, Loader2 } from "lucide-react";
 import type { ComponentType, ReactElement } from "react";
 import { useEffect, useState } from "react";
@@ -79,14 +79,20 @@ export const ConnectingOverlay = (): ReactElement | null => {
   const isConnecting = active.status === "connecting";
   // A connection that has been connected before is being reconnected.
   const title =
-    active.lastConnectedAt !== undefined
+    active.reconnect || active.lastConnectedAt !== undefined
       ? t("overlay.title.reconnecting")
       : t("overlay.title.connecting");
-  const phaseLabel = isConnecting
-    ? t("overlay.phase.connecting", { defaultValue: "Opening transport…" })
-    : t("overlay.phase.configuring", {
-        defaultValue: "Streaming configuration…",
-      });
+  // The SDK reports which reconnect attempt it is on.
+  const phaseLabel = active.reconnect
+    ? t("overlay.phase.reconnecting", {
+        attempt: active.reconnect.attempt,
+        max: active.reconnect.maxAttempts,
+      })
+    : isConnecting
+      ? t("overlay.phase.connecting", { defaultValue: "Opening transport…" })
+      : t("overlay.phase.configuring", {
+          defaultValue: "Streaming configuration…",
+        });
 
   return (
     <Dialog open>

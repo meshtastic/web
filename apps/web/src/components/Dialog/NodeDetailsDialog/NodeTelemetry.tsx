@@ -1,7 +1,7 @@
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { useNodeTelemetryHistory } from "@core/hooks/useNodeTelemetryHistory.ts";
 import { telemetrySections } from "@core/utils/telemetry.ts";
-import type { TelemetryReading } from "@meshtastic/sdk";
+import type { TelemetryReading } from "@core/storage/types.ts";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 

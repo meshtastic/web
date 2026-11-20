@@ -1,4 +1,4 @@
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { fromByteArray } from "base64-js";
 import { describe, expect, it } from "vitest";
 import { ParsedSecuritySchema, RawSecuritySchema } from "./security.ts";

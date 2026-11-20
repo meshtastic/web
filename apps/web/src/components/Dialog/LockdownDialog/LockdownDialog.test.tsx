@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,7 +9,7 @@ const State = Protobuf.Mesh.LockdownStatus_State;
 
 const unlockMock = vi.fn(() => Promise.resolve(1));
 const disconnectMock = vi.fn(() => Promise.resolve());
-const navigateMock = vi.fn();
+const openConnectionsMock = vi.fn();
 
 const signal = <T,>(value: T) => ({
   value,
@@ -33,7 +33,7 @@ const fakeClient = () => ({
   disconnect: vi.fn(),
 });
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useActiveClient: () => fakeClient(),
   useSignal: (sig: { value: unknown }) => sig.value,
 }));
@@ -42,13 +42,11 @@ vi.mock("@app/pages/Connections/useConnections", () => ({
   useConnections: () => ({ disconnect: disconnectMock }),
 }));
 
-vi.mock("@tanstack/react-router", () => ({
-  useNavigate: () => navigateMock,
-}));
-
 vi.mock("@core/stores", () => ({
   useDeviceStore: (selector: (s: { activeConnectionId: number }) => unknown) =>
     selector({ activeConnectionId: 7 }),
+  useAppStore: (selector: (s: { openConnections: () => void }) => unknown) =>
+    selector({ openConnections: openConnectionsMock }),
 }));
 
 vi.mock("@components/UI/Dialog.tsx", () => ({
@@ -91,7 +89,7 @@ describe("LockdownGate", () => {
   beforeEach(() => {
     unlockMock.mockClear();
     disconnectMock.mockClear();
-    navigateMock.mockClear();
+    openConnectionsMock.mockClear();
     lockdownStatus = undefined;
   });
 
@@ -251,6 +249,6 @@ describe("LockdownGate", () => {
     });
 
     expect(disconnectMock).toHaveBeenCalledWith(7);
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/connections" });
+    expect(openConnectionsMock).toHaveBeenCalledWith();
   });
 });

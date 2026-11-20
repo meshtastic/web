@@ -1,4 +1,4 @@
-import type { TelemetryKind, TelemetryReading } from "@meshtastic/sdk";
+import type { TelemetryKind, TelemetryReading } from "@core/storage/types.ts";
 
 /**
  * Pure helpers that turn SDK telemetry readings into display rows for the

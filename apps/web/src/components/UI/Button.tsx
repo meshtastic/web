@@ -43,6 +43,8 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   icon?: React.ReactNode;
   iconAlignment?: "left" | "right";
+  /** React 19: the ref is an ordinary prop, forwarded to the button. */
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
 const Button = ({

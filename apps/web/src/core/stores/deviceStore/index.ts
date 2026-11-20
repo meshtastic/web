@@ -1,8 +1,9 @@
-import { create, toBinary } from "@bufbuild/protobuf";
+import { create } from "@bufbuild/protobuf";
+import { meshRegistry } from "@core/kmp/registry.ts";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
-import { type MeshDevice, Protobuf, Types } from "@meshtastic/sdk";
-import { type Draft, produce } from "immer";
+import { Protobuf, Types } from "@core/protobuf.ts";
+import { enableMapSet, produce, type Draft } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import {
   type PersistOptions,
@@ -18,6 +19,8 @@ import type {
   ValidModuleConfigType,
   WaypointWithMetadata,
 } from "./types.ts";
+
+enableMapSet();
 
 const IDB_KEY_NAME = "meshtastic-device-store";
 const CURRENT_STORE_VERSION = 0;
@@ -42,23 +45,15 @@ type DeviceData = {
   waypoints: WaypointWithMetadata[];
   neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
 };
-export type ConnectionPhase =
-  | "disconnected"
-  | "connecting"
-  | "configuring"
-  | "configured";
-
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
   status: Types.DeviceStatusEnum;
-  connectionPhase: ConnectionPhase;
   connectionId: ConnectionId | null;
   channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
   config: Protobuf.LocalOnly.LocalConfig;
   moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
   hardware: Protobuf.Mesh.MyNodeInfo;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
-  connection?: MeshDevice;
   activeNode: number;
   pendingSettingsChanges: boolean;
   messageDraft: string;
@@ -66,7 +61,6 @@ export interface Device extends DeviceData {
   clientNotifications: Protobuf.Mesh.ClientNotification[];
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
-  setConnectionPhase: (phase: ConnectionPhase) => void;
   setConnectionId: (id: ConnectionId | null) => void;
   setConfig: (config: Protobuf.Config.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
@@ -88,7 +82,6 @@ export interface Device extends DeviceData {
   ) => void;
   removeWaypoint: (waypointId: number, toMesh: boolean) => Promise<void>;
   getWaypoint: (waypointId: number) => WaypointWithMetadata | undefined;
-  addConnection: (connection: MeshDevice) => void;
   addTraceRoute: (
     traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
   ) => void;
@@ -170,14 +163,12 @@ function deviceFactory(
     neighborInfo,
 
     status: Types.DeviceStatusEnum.DeviceDisconnected,
-    connectionPhase: "disconnected",
     connectionId: null,
     channels: new Map(),
     config: create(Protobuf.LocalOnly.LocalConfigSchema),
     moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
     hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
     metadata: new Map(),
-    connection: undefined,
     activeNode: 0,
     dialog: {
       import: false,
@@ -207,16 +198,6 @@ function deviceFactory(
           const device = draft.devices.get(id);
           if (device) {
             device.status = status;
-          }
-        }),
-      );
-    },
-    setConnectionPhase: (phase: ConnectionPhase) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (device) {
-            device.connectionPhase = phase;
           }
         }),
       );
@@ -488,7 +469,8 @@ function deviceFactory(
       }
 
       if (toMesh) {
-        if (!device.connection) {
+        const session = meshRegistry.active.peek();
+        if (!session) {
           return;
         }
 
@@ -501,7 +483,7 @@ function deviceFactory(
           expire: 1,
         });
 
-        await device.connection.sendWaypoint(
+        await session.sendWaypoint(
           waypointToBroadcast,
           "broadcast",
           waypoint.metadata.channel,
@@ -539,16 +521,6 @@ function deviceFactory(
           const device = draft.devices.get(id);
           if (device) {
             device.activeNode = node;
-          }
-        }),
-      );
-    },
-    addConnection: (connection) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (device) {
-            device.connection = connection as unknown as Draft<MeshDevice>;
           }
         }),
       );
@@ -617,11 +589,7 @@ function deviceFactory(
         return;
       }
 
-      device.connection?.sendPacket(
-        toBinary(Protobuf.Admin.AdminMessageSchema, message),
-        Protobuf.Portnums.PortNum.ADMIN_APP,
-        "self",
-      );
+      void meshRegistry.active.peek()?.sendAdmin(message.payloadVariant);
     },
 
     addClientNotification: (

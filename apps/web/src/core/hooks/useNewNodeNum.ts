@@ -1,5 +1,5 @@
 import { useDeviceStore } from "@core/stores";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 
 export function useNewNodeNum(
   id: number,

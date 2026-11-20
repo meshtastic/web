@@ -6,7 +6,7 @@ import {
   messageStatus,
 } from "@core/utils/messageStatus.ts";
 import { MessageState } from "@core/stores/messageStore";
-import { useActiveClient } from "@meshtastic/sdk-react";
+import { useActiveClient } from "@core/kmp/hooks";
 import type { LucideIcon } from "lucide-react";
 import {
   AlertCircle,

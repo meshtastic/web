@@ -1,5 +1,5 @@
 import { MessageState } from "@core/stores/messageStore";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 
 const RoutingError = Protobuf.Mesh.Routing_Error;
 const AckProof = Protobuf.Mesh.MeshPacket_AckProofStatus;

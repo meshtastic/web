@@ -1,4 +1,4 @@
-import type { ConversationKey } from "@meshtastic/sdk";
+import type { ConversationKey } from "@core/storage/types.ts";
 import {
   act,
   fireEvent,
@@ -40,7 +40,8 @@ const mockSetText = vi.fn();
 const mockClear = vi.fn();
 let mockDraftText = "";
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@core/kmp/hooks")>()),
   useDraft: vi.fn(() => ({
     text: mockDraftText,
     setText: mockSetText,

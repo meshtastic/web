@@ -21,6 +21,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type ConfigProps, SettingsCard } from "./SettingsTabs.tsx";
+import { useActiveClient } from "@core/kmp/hooks";
 
 type AdminAction = {
   key:
@@ -68,7 +69,8 @@ const ACTIONS: AdminAction[] = [
 export const Administration = (_props: ConfigProps) => {
   const { t } = useTranslation("ui");
   const { toast } = useToast();
-  const { setDialogOpen, connection } = useDevice();
+  const { setDialogOpen } = useDevice();
+  const connection = useActiveClient();
   const connected = useDeviceConnected();
   const [dfuConfirmOpen, setDfuConfirmOpen] = useState(false);
 

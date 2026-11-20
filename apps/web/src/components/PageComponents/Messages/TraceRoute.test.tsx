@@ -1,6 +1,6 @@
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

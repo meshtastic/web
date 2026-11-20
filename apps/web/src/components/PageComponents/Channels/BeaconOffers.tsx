@@ -3,8 +3,9 @@ import {
   type JoinableBeaconOffer,
   useBeaconOffers,
 } from "@core/hooks/useBeaconOffers.ts";
-import { type Node, Protobuf } from "@meshtastic/sdk";
-import { useNodes } from "@meshtastic/sdk-react";
+import type { Node } from "@core/storage/types.ts";
+import { Protobuf } from "@core/protobuf.ts";
+import { useNodes } from "@core/kmp/hooks";
 import { RadioTowerIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 

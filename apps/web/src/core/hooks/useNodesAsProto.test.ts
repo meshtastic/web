@@ -1,4 +1,4 @@
-import type { Node as SdkNode } from "@meshtastic/sdk";
+import type { Node as SdkNode } from "@core/storage/types.ts";
 import { describe, expect, it } from "vitest";
 import { toNodeInfo } from "./useNodesAsProto.ts";
 

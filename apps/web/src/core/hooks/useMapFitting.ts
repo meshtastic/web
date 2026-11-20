@@ -1,5 +1,5 @@
 import { boundsFromLngLat, type LngLat, toLngLat } from "@core/utils/geo";
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { useCallback } from "react";
 import type { MapRef } from "react-map-gl/maplibre";
 

@@ -1,0 +1,245 @@
+import { and, desc, eq, lt, ne, sql } from "drizzle-orm";
+import type { MultiTabCoordinator } from "./coordinator.ts";
+import type { SqlocalDb } from "./db.ts";
+import { messages } from "./schema.ts";
+import {
+  type ConversationKey,
+  conversationKeyString,
+  inferConversation,
+  type Message,
+  type MessageDeliveryPatch,
+  type MessageRepository,
+  MessageState,
+  type RetentionPolicy,
+} from "./types.ts";
+
+export interface SqlocalMessageRepositoryOptions {
+  /**
+   * The `device_id` rows are stored and read under: the storage scope, e.g.
+   * the radio's node number. Change it later with `setScope`.
+   */
+  deviceId: number;
+  /** Optional cross-tab coordinator. If omitted, mutations are silent. */
+  coordinator?: MultiTabCoordinator;
+}
+
+export class SqlocalMessageRepository implements MessageRepository {
+  private readonly db: SqlocalDb;
+  private deviceId: number;
+  private readonly coordinator: MultiTabCoordinator | undefined;
+
+  constructor(db: SqlocalDb, options: SqlocalMessageRepositoryOptions) {
+    this.db = db;
+    this.deviceId = options.deviceId;
+    this.coordinator = options.coordinator;
+  }
+
+  /**
+   * Points every later read and write at another `device_id`. Rows under the
+   * old one are left as they are.
+   */
+  setScope(deviceId: number): void {
+    this.deviceId = deviceId;
+  }
+
+  async loadRecent(key: ConversationKey, limit: number): Promise<Message[]> {
+    const rows = await this.db
+      .select()
+      .from(messages)
+      .where(this.scoped(key))
+      .orderBy(desc(messages.rxTime))
+      .limit(limit);
+    return rows.reverse().map(rowToMessage);
+  }
+
+  async loadBefore(
+    key: ConversationKey,
+    cursor: Date,
+    limit: number,
+  ): Promise<Message[]> {
+    const rows = await this.db
+      .select()
+      .from(messages)
+      .where(and(this.scoped(key), lt(messages.rxTime, cursor.getTime())))
+      .orderBy(desc(messages.rxTime))
+      .limit(limit);
+    return rows.reverse().map(rowToMessage);
+  }
+
+  async append(message: Message, key?: ConversationKey): Promise<void> {
+    await this.insert([
+      messageToRow(this.deviceId, message, key ?? inferConversation(message)),
+    ]);
+  }
+
+  async appendBatch(input: ReadonlyArray<Message>): Promise<void> {
+    await this.insert(
+      input.map((m) => messageToRow(this.deviceId, m, inferConversation(m))),
+    );
+  }
+
+  async refileSentDirect(localNodeNum: number): Promise<number> {
+    const moved = await this.db
+      .update(messages)
+      .set({ conversationKey: sql`'direct:' || ${messages.toNode}` })
+      .where(
+        and(
+          eq(messages.deviceId, this.deviceId),
+          eq(messages.type, "direct"),
+          eq(messages.fromNode, localNodeNum),
+          ne(messages.toNode, localNodeNum),
+          eq(
+            messages.conversationKey,
+            conversationKeyString({ kind: "direct", peer: localNodeNum }),
+          ),
+        ),
+      )
+      .returning({ conversationKey: messages.conversationKey });
+    this.notify(moved.map((r) => r.conversationKey));
+    return moved.length;
+  }
+
+  private async insert(rows: MessageRow[]): Promise<void> {
+    if (rows.length === 0) return;
+    await this.db.insert(messages).values(rows).onConflictDoNothing();
+    this.notify(rows.map((r) => r.conversationKey));
+  }
+
+  async updateDelivery(id: number, patch: MessageDeliveryPatch): Promise<void> {
+    const set: Partial<MessageRow> = {};
+    if ("state" in patch) set.state = patch.state;
+    if ("ackProof" in patch) set.ackProof = patch.ackProof ?? null;
+    if ("routingError" in patch) set.routingError = patch.routingError ?? null;
+    if ("relays" in patch) set.relays = patch.relays ?? null;
+    if (Object.keys(set).length === 0) return;
+    await this.db
+      .update(messages)
+      .set(set)
+      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id)));
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.db
+      .delete(messages)
+      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id)));
+  }
+
+  async updateState(id: number, state: MessageState): Promise<void> {
+    await this.db
+      .update(messages)
+      .set({ state })
+      .where(and(eq(messages.deviceId, this.deviceId), eq(messages.id, id)));
+  }
+
+  async prune(policy: RetentionPolicy): Promise<void> {
+    if (policy.olderThanMs !== undefined) {
+      const cutoff = Date.now() - policy.olderThanMs;
+      await this.db
+        .delete(messages)
+        .where(
+          and(
+            eq(messages.deviceId, this.deviceId),
+            lt(messages.rxTime, cutoff),
+          ),
+        );
+    }
+    if (policy.maxPerBucket !== undefined) {
+      // Keep the newest N per (device, conversation_key). SQLite has no
+      // straightforward per-group LIMIT, so use a windowed delete.
+      await this.db.run(sql`
+        DELETE FROM messages
+        WHERE device_id = ${this.deviceId}
+          AND rowid IN (
+            SELECT rowid FROM (
+              SELECT rowid,
+                     row_number() OVER (
+                       PARTITION BY conversation_key
+                       ORDER BY rx_time DESC, id DESC
+                     ) AS rn
+              FROM messages
+              WHERE device_id = ${this.deviceId}
+            )
+            WHERE rn > ${policy.maxPerBucket}
+          )
+      `);
+    }
+  }
+
+  async clearConversation(key: ConversationKey): Promise<void> {
+    await this.db.delete(messages).where(this.scoped(key));
+  }
+
+  async clear(): Promise<void> {
+    await this.db.delete(messages).where(eq(messages.deviceId, this.deviceId));
+  }
+
+  private scoped(key: ConversationKey) {
+    return and(
+      eq(messages.deviceId, this.deviceId),
+      eq(messages.conversationKey, conversationKeyString(key)),
+    );
+  }
+
+  private notify(keys: ReadonlyArray<string>): void {
+    if (!this.coordinator) return;
+    for (const key of new Set(keys)) {
+      this.coordinator.broadcast({
+        kind: "messages-changed",
+        deviceId: this.deviceId,
+        key,
+      });
+    }
+  }
+}
+
+type MessageRow = typeof messages.$inferInsert;
+
+function rowToMessage(row: MessageRow): Message {
+  return {
+    id: row.id,
+    from: row.fromNode,
+    to: row.toNode,
+    channel: row.channel,
+    rxTime: new Date(row.rxTime),
+    type: row.type,
+    text: row.text,
+    state: row.state,
+    signed: row.signed ?? undefined,
+    ackProof: row.ackProof ?? undefined,
+    routingError: row.routingError ?? undefined,
+    relays: row.relays ?? undefined,
+    snr: row.snr ?? undefined,
+    rssi: row.rssi ?? undefined,
+    hopsAway: row.hopsAway ?? undefined,
+    viaMqtt: row.viaMqtt ?? undefined,
+    transport: row.transport ?? undefined,
+  };
+}
+
+function messageToRow(
+  deviceId: number,
+  message: Message,
+  conv: ConversationKey,
+): MessageRow {
+  return {
+    id: message.id,
+    deviceId,
+    conversationKey: conversationKeyString(conv),
+    fromNode: message.from,
+    toNode: message.to,
+    channel: message.channel,
+    rxTime: message.rxTime.getTime(),
+    type: message.type,
+    text: message.text,
+    state: message.state,
+    signed: message.signed ?? null,
+    ackProof: message.ackProof ?? null,
+    routingError: message.routingError ?? null,
+    relays: message.relays ?? null,
+    snr: message.snr ?? null,
+    rssi: message.rssi ?? null,
+    hopsAway: message.hopsAway ?? null,
+    viaMqtt: message.viaMqtt ?? null,
+    transport: message.transport ?? null,
+  };
+}

@@ -5,7 +5,7 @@ import {
   POSITION_PRECISION_PRECISE,
 } from "@app/validation/channel.ts";
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { fromByteArray, toByteArray } from "base64-js";
 
 /** The firmware supports 8 channels: index 0 (primary) and 1-7. */

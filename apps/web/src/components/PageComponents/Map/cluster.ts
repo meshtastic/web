@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 
 export type ClusterKey = string;
 export type PxOffset = [number, number];

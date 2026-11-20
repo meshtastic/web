@@ -14,8 +14,8 @@ import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrap
 import { PopupWrapper } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
-import type { Protobuf } from "@meshtastic/sdk";
-import { useNodeErrors } from "@meshtastic/sdk-react";
+import type { Protobuf } from "@core/protobuf.ts";
+import { useNodeErrors } from "@core/kmp/hooks";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { MapRef } from "react-map-gl/maplibre";

@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/sdk";
+import { Protobuf } from "@core/protobuf.ts";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Network } from "./index.tsx";
@@ -25,7 +25,7 @@ vi.mock("@core/hooks/useDeviceCapabilities.ts", () => ({
   useDeviceCapabilities: () => ({ metadata }),
 }));
 
-vi.mock("@meshtastic/sdk-react", () => ({
+vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({ radio: { value: {} }, setRadioSection }),
   useSignal: (signal: { value: unknown }) => signal.value,
 }));

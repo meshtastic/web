@@ -11,9 +11,8 @@ import {
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { useLockdown } from "@core/hooks/useLockdown.ts";
-import { useDeviceStore } from "@core/stores";
-import { Protobuf } from "@meshtastic/sdk";
-import { useNavigate } from "@tanstack/react-router";
+import { useAppStore, useDeviceStore } from "@core/stores";
+import { Protobuf } from "@core/protobuf.ts";
 import { LockIcon } from "lucide-react";
 import { type FormEvent, useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -328,7 +327,7 @@ export const LockdownGate = () => {
   const { client, status, isLocked } = useLockdown();
   const activeConnectionId = useDeviceStore((s) => s.activeConnectionId);
   const { disconnect } = useConnections();
-  const navigate = useNavigate();
+  const openConnections = useAppStore((s) => s.openConnections);
 
   if (!client || !isLocked) return null;
 
@@ -343,7 +342,7 @@ export const LockdownGate = () => {
           : client.disconnect();
         void Promise.resolve(done)
           .catch(() => {})
-          .finally(() => navigate({ to: "/connections" }));
+          .finally(() => openConnections());
       }}
     />
   );

@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          submodules: true
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -32,6 +34,18 @@ jobs:
 
       - name: Install dependencies (root)
         run: pnpm install --frozen-lockfile
+
+      - name: Setup JDK 21 (for @meshtastic/sdk-kmp)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build @meshtastic/sdk-kmp
+        run: pnpm --filter @meshtastic/sdk-kmp build
 
       - name: Run tests
         run: pnpm run test

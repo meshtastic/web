@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
 import { cn } from "@core/utils/cn.ts";
-import { isUnheardOnCurrentLora, type Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import type { LucideIcon } from "lucide-react";
 import { RadioTowerIcon, SignatureIcon, VolumeXIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -18,16 +18,11 @@ type TrustNode = Pick<
 
 /**
  * True for a node the radio hasn't heard on its current LoRa settings.
- * Wraps the SDK helper so it accepts the proto NodeInfo the web uses.
+ * Nodes seen only over MQTT are never "unheard": LoRa settings don't apply.
+ * Firmware older than 2.8.1 doesn't report it, so every node counts as heard.
  */
 export const isNodeUnheardOnCurrentLora = (node: TrustNode): boolean =>
-  isUnheardOnCurrentLora({
-    num: node.num,
-    isFavorite: false,
-    isIgnored: false,
-    heardOnCurrentLora: node.heardOnCurrentLora,
-    viaMqtt: node.viaMqtt,
-  });
+  node.heardOnCurrentLora === false && !node.viaMqtt;
 
 interface IndicatorProps {
   icon: LucideIcon;

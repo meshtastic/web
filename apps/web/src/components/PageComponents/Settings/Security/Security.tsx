@@ -14,8 +14,8 @@ import {
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useDevice } from "@core/stores";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
-import { Protobuf } from "@meshtastic/sdk";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { Protobuf } from "@core/protobuf.ts";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";

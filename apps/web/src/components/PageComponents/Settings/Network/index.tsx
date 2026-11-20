@@ -16,8 +16,8 @@ import {
   convertIntToIpAddress,
   convertIpAddressToInt,
 } from "@core/utils/ip.ts";
-import { Protobuf } from "@meshtastic/sdk";
-import { useConfigEditor, useSignal } from "@meshtastic/sdk-react";
+import { Protobuf } from "@core/protobuf.ts";
+import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { useTranslation } from "react-i18next";
 
 interface NetworkConfigProps {

@@ -1,20 +1,15 @@
-import { buildMeshDevice } from "@app/core/connections/sdkClient.ts";
 import {
-  closeTransport,
-  openTransport,
+  type BluetoothConnection,
+  type ConnectionHandle,
+  pickBluetoothDevice,
+  pickSerialPort,
   probeConnection,
-} from "@app/core/connections/transports.ts";
-import { toast } from "@core/hooks/useToast.ts";
+  type SerialConnection,
+} from "@app/core/connections/browserDevices.ts";
 import {
-  createLogger,
-  DeviceStatusEnum,
-  FirmwareTooOldError,
-  HandshakeTimeoutError,
-  MIN_FIRMWARE_VERSION,
-} from "@meshtastic/sdk";
-import { t } from "i18next";
-
-const log = createLogger("useConnections");
+  openRepositories,
+  UNKNOWN_NODE_SCOPE,
+} from "@app/core/connections/repositories.ts";
 import type {
   Connection,
   ConnectionId,
@@ -22,29 +17,184 @@ import type {
   NewConnection,
 } from "@app/core/stores/deviceStore/types";
 import { createConnectionFromInput } from "@app/pages/Connections/utils";
-import { meshRegistry } from "@core/meshRegistry.ts";
+import { toast } from "@core/hooks/useToast.ts";
+import {
+  type BluetoothTarget,
+  type ConnectionStateJs,
+  createBluetoothClient,
+  createHttpClient,
+  createSerialClient,
+  type MeshtasticClient,
+  type SerialTarget,
+  type StorageJs,
+} from "@core/kmp/client.ts";
+import { editorFor } from "@core/kmp/configEditorIo.ts";
+import {
+  connectFailure,
+  reconnectAttempt,
+  toConnectionStatus,
+} from "@core/kmp/connectionState.ts";
+import { meshRegistry } from "@core/kmp/registry.ts";
+import { MeshSession } from "@core/kmp/session.ts";
+import { createLogger } from "@core/log.ts";
+import { closeStorageDb } from "@core/sdkStorage.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
+import { MIN_FIRMWARE_VERSION } from "@core/utils/firmware.ts";
 import { randId } from "@core/utils/randId.ts";
-import { useCallback, useEffect, useRef } from "react";
+import { t } from "i18next";
+import { useCallback } from "react";
+
+const log = createLogger("useConnections");
 
 // Per-connection out-of-band handles tracked outside Zustand:
-//   - cachedTransports: held BT device / serial port for reconnect + cleanup.
-//   - configSubscriptions: handshake status / reboot unsubscribers.
-const cachedTransports = new Map<ConnectionId, BluetoothDevice | SerialPort>();
-const configSubscriptions = new Map<ConnectionId, () => void>();
-// Handshake attempts per connection. A stalled handshake is retried by
-// reopening the transport with backoff, as the Android app does, instead of
-// re-sending want_config in the same session.
-const handshakeAttempts = new Map<ConnectionId, number>();
-const HANDSHAKE_RETRY_DELAYS_MS = [2_000, 4_000];
-// The pending retry per connection; disconnect or removal cancels it.
-const pendingRetries = new Map<ConnectionId, symbol>();
+//   - heldSerialPorts / heldBluetoothDevices: the port or device the user
+//     picked, so later connects reuse it without prompting.
+//   - sessionTeardowns: the session's subscriptions, released on teardown.
+const heldSerialPorts = new Map<ConnectionId, SerialPort>();
+const heldBluetoothDevices = new Map<ConnectionId, BluetoothDevice>();
+const sessionTeardowns = new Map<ConnectionId, () => void>();
 
-const cancelHandshakeRetry = (id: ConnectionId): void => {
-  pendingRetries.delete(id);
-  handshakeAttempts.delete(id);
-};
+/**
+ * What the SDK opens for a serial connection. Automatic connects pass only
+ * the saved USB ids and the SDK reopens the permitted port itself; a click
+ * (`allowPrompt`) without a held port shows the picker, filtered to the
+ * saved ids, straight away so the gesture is still live, and hands the
+ * chosen port over.
+ */
+async function serialTarget(
+  conn: SerialConnection,
+  allowPrompt: boolean,
+): Promise<SerialTarget> {
+  const ids = {
+    usbVendorId: conn.usbVendorId,
+    usbProductId: conn.usbProductId,
+  };
+  const held = heldSerialPorts.get(conn.id);
+  if (held) {
+    return { port: held, ...ids };
+  }
+  if (!allowPrompt) {
+    return ids;
+  }
+  const port = await pickSerialPort(conn);
+  heldSerialPorts.set(conn.id, port);
+  const info = port.getInfo();
+  if (
+    info.usbVendorId !== conn.usbVendorId ||
+    info.usbProductId !== conn.usbProductId
+  ) {
+    useDeviceStore.getState().updateSavedConnection(conn.id, {
+      usbVendorId: info.usbVendorId,
+      usbProductId: info.usbProductId,
+    });
+  }
+  return {
+    port,
+    usbVendorId: info.usbVendorId,
+    usbProductId: info.usbProductId,
+  };
+}
+
+async function bluetoothTarget(
+  conn: BluetoothConnection,
+  allowPrompt: boolean,
+): Promise<BluetoothTarget> {
+  const held = heldBluetoothDevices.get(conn.id);
+  if (held) {
+    return { device: held, deviceId: conn.deviceId };
+  }
+  if (!allowPrompt) {
+    return { deviceId: conn.deviceId };
+  }
+  const device = await pickBluetoothDevice();
+  heldBluetoothDevices.set(conn.id, device);
+  if (device.id !== conn.deviceId) {
+    useDeviceStore.getState().updateSavedConnection(conn.id, {
+      deviceId: device.id,
+      deviceName: device.name,
+    });
+  }
+  return { device, deviceId: device.id };
+}
+
+type ClientFactory = (storage?: StorageJs) => Promise<MeshtasticClient>;
+
+async function clientFactory(
+  conn: Connection,
+  allowPrompt: boolean,
+): Promise<ClientFactory> {
+  switch (conn.type) {
+    case "http":
+      return (storage) => createHttpClient(conn.url, allowPrompt, storage);
+    case "serial": {
+      const target = await serialTarget(conn, allowPrompt);
+      return (storage) => createSerialClient(target, storage);
+    }
+    case "bluetooth": {
+      const target = await bluetoothTarget(conn, allowPrompt);
+      return (storage) => createBluetoothClient(target, storage);
+    }
+  }
+}
+
+function abandonConnect(id: ConnectionId): false {
+  log.info("connect: abandoned, the app was handed to another tab", { id });
+  useDeviceStore
+    .getState()
+    .updateSavedConnection(id, { status: "disconnected", error: undefined });
+  return false;
+}
+
+const savedConnection = (id: ConnectionId): Connection | undefined =>
+  useDeviceStore.getState().savedConnections.find((c) => c.id === id);
+
+async function teardownSession(id: ConnectionId): Promise<void> {
+  log.debug("teardown: enter", { id });
+  sessionTeardowns.get(id)?.();
+  sessionTeardowns.delete(id);
+  try {
+    await meshRegistry.get(id)?.disconnect();
+  } catch (e) {
+    log.warn("teardown: disconnect threw", {
+      name: e instanceof Error ? e.name : undefined,
+      message: e instanceof Error ? e.message : String(e),
+    });
+  }
+  log.debug("teardown: done", { id });
+}
+
+async function disconnectConnection(id: ConnectionId): Promise<void> {
+  const conn = savedConnection(id);
+  if (!conn) return;
+  try {
+    await teardownSession(id);
+    if (conn.meshDeviceId) {
+      useDeviceStore
+        .getState()
+        .getDevice(conn.meshDeviceId)
+        ?.setConnectionId(null);
+    }
+  } finally {
+    useDeviceStore
+      .getState()
+      .updateSavedConnection(id, { status: "disconnected", error: undefined });
+  }
+}
+
+/** Disconnects every live session, as the drawer's Disconnect does. */
+// Bumped when the app is handed to another tab, so a connect still in
+// flight here stops before it opens the port or registers a session.
+let handovers = 0;
+const handedOver = (seen: number): boolean => seen !== handovers;
+
+export async function disconnectAllConnections(): Promise<void> {
+  handovers += 1;
+  for (const id of [...sessionTeardowns.keys()]) {
+    await disconnectConnection(id);
+  }
+  await closeStorageDb();
+}
 
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
@@ -57,10 +207,6 @@ export function useConnections() {
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
-  // Set below once connect() exists; used by setupMeshDevice to retry.
-  const retryHandshakeRef = useRef<
-    ((id: ConnectionId, delayMs: number) => Promise<void>) | undefined
-  >(undefined);
 
   const updateStatus = useCallback(
     (
@@ -79,54 +225,22 @@ export function useConnections() {
     [updateSavedConnection],
   );
 
-  const teardown = useCallback(
-    async (
-      id: ConnectionId,
-      conn?: Connection,
-      { keepHandle = false }: { keepHandle?: boolean } = {},
-    ) => {
-      log.debug("teardown: enter", { id });
-      configSubscriptions.get(id)?.();
-      configSubscriptions.delete(id);
-
-      if (conn?.meshDeviceId) {
-        const device = useDeviceStore.getState().getDevice(conn.meshDeviceId);
-        try {
-          // Await the underlying transport's close so the port is fully
-          // released before the user clicks reconnect — otherwise port.open()
-          // can race the close and throw "port already open".
-          await device?.connection?.disconnect();
-          log.debug("teardown: transport disconnect awaited");
-        } catch (e) {
-          const err = e as Error;
-          log.warn("teardown: transport disconnect threw", {
-            name: err?.name,
-            message: err?.message,
-          });
-        }
-      }
-      closeTransport(cachedTransports.get(id));
-      if (!keepHandle) cachedTransports.delete(id);
-      log.debug("teardown: done", { id });
-    },
-    [],
-  );
+  const teardown = teardownSession;
 
   const removeConnection = useCallback(
     async (id: ConnectionId) => {
       const conn = connections.find((c) => c.id === id);
-      cancelHandshakeRetry(id);
-      await teardown(id, conn);
+      await teardown(id);
+      heldSerialPorts.delete(id);
+      heldBluetoothDevices.delete(id);
       if (conn?.meshDeviceId) {
         try {
           useDeviceStore.getState().removeDevice(conn.meshDeviceId);
         } catch (e) {
-          const err = e as Error;
           log.error("removeConnection: removeDevice threw", {
             id,
             meshDeviceId: conn.meshDeviceId,
-            name: err?.name,
-            message: err?.message,
+            message: e instanceof Error ? e.message : String(e),
           });
         }
       }
@@ -145,43 +259,28 @@ export function useConnections() {
     [connections, updateSavedConnection],
   );
 
-  const setupMeshDevice = useCallback(
-    async (
-      id: ConnectionId,
-      transport: Awaited<ReturnType<typeof openTransport>>["transport"],
-      bluetoothDevice?: BluetoothDevice,
-      serialPort?: SerialPort,
-    ): Promise<number> => {
-      // Reuse existing meshDeviceId if the device entry still exists; otherwise mint a new one.
-      const conn = connections.find((c) => c.id === id);
+  /**
+   * Connects through the Kotlin SDK, which owns the transport, the
+   * handshake and reconnects. A session over the client decodes what the
+   * SDK delivers into the app's stores, with history opened for the node
+   * this connection reached last time.
+   */
+  const connectThroughKmp = useCallback(
+    async (id: ConnectionId, makeClient: ClientFactory, seen: number) => {
+      const conn = savedConnection(id);
+      const { options, persistent, sdkStorage } = await openRepositories(
+        conn?.nodeNum,
+      );
+      if (handedOver(seen)) return abandonConnect(id);
+      const client = await makeClient(sdkStorage);
+      if (handedOver(seen)) return abandonConnect(id);
       let deviceId = conn?.meshDeviceId;
       if (deviceId && !useDeviceStore.getState().getDevice(deviceId)) {
         deviceId = undefined;
       }
       deviceId = deviceId ?? randId();
-
       const device = addDevice(deviceId);
 
-      // Flip status to "configuring" up front. buildMeshDevice awaits the
-      // OPFS DB open which can take a beat (or stall under multi-tab
-      // contention); we don't want the UI looking stuck at "connecting"
-      // while persistence is spinning up.
-      device.setConnectionPhase("configuring");
-      updateStatus(id, "configuring");
-      log.debug("setupMeshDevice: building MeshDevice", { id, deviceId });
-
-      // Read the node number from the live store: the `connections` closure
-      // can predate the last handshake's update.
-      const nodeNum = useDeviceStore
-        .getState()
-        .savedConnections.find((c) => c.id === id)?.nodeNum;
-      const { meshDevice, persistent } = await buildMeshDevice(
-        id,
-        deviceId,
-        transport,
-        nodeNum,
-      );
-      log.debug("setupMeshDevice: MeshDevice built", { id, persistent });
       if (!persistent) {
         toast({
           title: t("toasts.storageUnavailable", { ns: "connections" }),
@@ -190,145 +289,172 @@ export function useConnections() {
           }),
         });
       }
+      let scope = conn?.nodeNum ?? UNKNOWN_NODE_SCOPE;
+      const session = new MeshSession(client, options);
 
-      // Replace any client left from an earlier attempt, so the app reads
-      // this session's state rather than the dead one's.
-      if (meshRegistry.has(id)) meshRegistry.unregister(id);
-      meshRegistry.register(id, meshDevice.meshClient);
+      // Replace any session left from an earlier attempt, so the app reads
+      // this session's state rather than the dead one's, and its client
+      // releases the port before this one opens it.
+      await teardown(id);
+      meshRegistry.unregister(id);
+      meshRegistry.register(id, session);
       meshRegistry.setActive(id);
-
+      // Created now so it sees the handshake's config, not on first render.
+      editorFor(session);
       setSelectedDevice(deviceId);
-      device.addConnection(meshDevice);
-      subscribeAll(device, meshDevice);
-
-      const cached = bluetoothDevice ?? serialPort;
-      if (cached) cachedTransports.set(id, cached);
-
+      const unsubscribeStore = subscribeAll(device, session);
       setActiveConnectionId(id);
       device.setConnectionId(id);
+      updateSavedConnection(id, { meshDeviceId: deviceId });
 
-      // MeshClient flips device.status to DeviceConfigured once both
-      // handshake stages (config, then NodeDB) are done, and starts its own
-      // heartbeat. onConfigComplete also fires after the config stage, so it
-      // can't be used here. `markConfigured` is idempotent.
-      let configuredHandled = false;
-      const markConfigured = (source: string): void => {
-        if (configuredHandled) return;
-        configuredHandled = true;
-        handshakeAttempts.delete(id);
-        log.info("connect transitioned to configured", { id, source });
-        device.setConnectionPhase("configured");
-        updateStatus(id, "configured");
-        const client = meshDevice.meshClient;
-        if (client.device.firmwareSupport.value === "shouldUpdate") {
-          toast({
-            title: t("toasts.firmwareOutdated", { ns: "connections" }),
-            description: t("toasts.firmwareOutdatedDescription", {
-              ns: "connections",
-              version: client.device.metadata.value?.firmwareVersion,
-              minimum: MIN_FIRMWARE_VERSION,
-            }),
-          });
-        }
-      };
-
-      const unsubStatusSignal = meshDevice.meshClient.device.status.subscribe(
-        (s) => {
-          if (s === DeviceStatusEnum.DeviceConfigured)
-            markConfigured("device.status");
-        },
-      );
-      // Catch-up: signal subscribe doesn't fire for the current value, so
-      // check synchronously if the device is already past the gate.
-      if (
-        meshDevice.meshClient.device.status.value ===
-        DeviceStatusEnum.DeviceConfigured
-      ) {
-        markConfigured("initial-check");
-      }
-
-      // Reboot: firmware emits `rebooted` after a soft reset (config write,
-      // OTA, manual reboot). The SDK re-runs the handshake, but the
-      // saved-connection status is already "configured" — so the overlay
-      // would stay hidden. Flip status back to "configuring" and reset
-      // `configuredHandled` so the next DeviceConfigured re-marks.
-      const unsubRebooted = meshDevice.events.onRebooted.subscribe(() => {
-        log.info("device rebooted — re-entering configuring", { id });
-        configuredHandled = false;
-        device.setConnectionPhase("configuring");
-        updateStatus(id, "configuring");
-      });
-
-      // History is stored per radio. The SDK switches this session to the
-      // node my_info names; saving it on the connection lets the next connect
-      // open that node's history straight away.
-      const unsubMyNodeInfo = meshDevice.events.onMyNodeInfo.subscribe(
-        ({ myNodeNum }) => {
-          if (myNodeNum <= 0) return;
-          const saved = useDeviceStore
-            .getState()
-            .savedConnections.find((c) => c.id === id);
-          if (saved && saved.nodeNum !== myNodeNum) {
-            updateSavedConnection(id, { nodeNum: myNodeNum });
+      let reconnecting: ConnectionStateJs | undefined;
+      let firmwareChecked = false;
+      const unsubscribes = [
+        unsubscribeStore,
+        session.events.onConnectionState.subscribe((state) => {
+          if (!savedConnection(id)) return;
+          const reconnect = reconnectAttempt(state);
+          if (
+            reconnect &&
+            (state.errorKind === "lna-denied" ||
+              state.errorKind === "lna-prompt")
+          ) {
+            log.warn("kmp: local network access lost", { id, ...reconnect });
+            void teardown(id);
+            const cause = new Error(state.error ?? "");
+            cause.name = state.errorKind;
+            updateSavedConnection(id, {
+              ...connectFailure(cause),
+              reconnect: undefined,
+            });
+            return;
           }
-        },
-      );
-
-      configSubscriptions.set(id, () => {
-        unsubStatusSignal();
-        unsubRebooted();
-        unsubMyNodeInfo();
-      });
-
-      log.debug("setupMeshDevice: calling configure()", { id });
-      meshDevice
-        .configure()
-        .then(() => {
-          log.debug("setupMeshDevice: configure() resolved", { id });
-        })
-        .catch((error) => {
-          const e = error as Error;
-          log.error("setupMeshDevice: configure() rejected", {
-            id,
-            name: e?.name,
-            message: e?.message,
-          });
-          if (error instanceof HandshakeTimeoutError) {
-            const attempt = handshakeAttempts.get(id) ?? 0;
-            const delayMs = HANDSHAKE_RETRY_DELAYS_MS[attempt];
-            if (delayMs !== undefined && retryHandshakeRef.current) {
-              handshakeAttempts.set(id, attempt + 1);
-              log.warn("handshake stalled, reopening the transport", {
-                id,
-                attempt: attempt + 1,
-                delayMs,
+          if (reconnect) {
+            reconnecting = state;
+            log.warn("kmp: reconnecting", { id, ...reconnect });
+            updateSavedConnection(id, {
+              status: "connecting",
+              reconnect,
+              error: undefined,
+              errorKind: undefined,
+            });
+            return;
+          }
+          if (state.kind === "disconnected") {
+            if (!reconnecting) {
+              if (session.isRehandshaking) return;
+              log.error("kmp: dropped without retrying", { id });
+              updateSavedConnection(id, {
+                status: "error",
+                reconnect: undefined,
+                error: t("connections:errors.connectionLost"),
+                errorKind: "network",
               });
-              void retryHandshakeRef.current(id, delayMs);
               return;
             }
+            const last = reconnecting;
+            reconnecting = undefined;
+            // The SDK gives up before its first attempt on a drop it
+            // cannot retry; that cause is the error, not the attempt cap.
+            if (last.attempt === 1 && last.error) {
+              log.error("kmp: dropped without retrying", {
+                id,
+                errorKind: last.errorKind,
+              });
+              const cause = new Error(last.error);
+              cause.name = last.errorKind ?? "transport";
+              updateSavedConnection(id, {
+                ...connectFailure(cause),
+                reconnect: undefined,
+              });
+              return;
+            }
+            log.error("kmp: reconnect attempts exhausted", { id });
+            updateSavedConnection(id, {
+              status: "error",
+              reconnect: undefined,
+              error: t("connections:errors.reconnectFailed", {
+                attempts: state.maxAttempts,
+              }),
+              errorKind: "network",
+            });
+            return;
           }
-          handshakeAttempts.delete(id);
-          updateStatus(
-            id,
-            "error",
-            error instanceof FirmwareTooOldError
-              ? t("errors.firmwareTooOld", {
+          reconnecting = undefined;
+          updateSavedConnection(id, {
+            status: toConnectionStatus(state),
+            reconnect: undefined,
+          });
+          if (state.kind === "connected") {
+            if (firmwareChecked) return;
+            firmwareChecked = true;
+            if (session.device.firmwareSupport.peek() === "shouldUpdate") {
+              toast({
+                title: t("toasts.firmwareOutdated", { ns: "connections" }),
+                description: t("toasts.firmwareOutdatedDescription", {
                   ns: "connections",
-                  version: error.firmwareVersion,
+                  version: session.device.metadata.peek()?.firmwareVersion,
                   minimum: MIN_FIRMWARE_VERSION,
-                })
-              : (error?.message ?? String(error)),
-          );
-        });
+                }),
+              });
+            }
+          } else {
+            firmwareChecked = false;
+          }
+        }),
+        // History is stored per radio. Saving the node on the connection lets
+        // the next connect open that node's history straight away.
+        session.events.onMyNodeInfo.subscribe(({ myNodeNum }) => {
+          if (myNodeNum <= 0) return;
+          if (savedConnection(id)?.nodeNum !== myNodeNum) {
+            updateSavedConnection(id, { nodeNum: myNodeNum });
+          }
+          if (scope !== myNodeNum) {
+            scope = myNodeNum;
+            session.rescope(myNodeNum);
+          }
+        }),
+        // Firmware emits `rebooted` after a soft reset; the SDK reconnects
+        // and runs the handshake again, so the overlay should show again.
+        session.events.onRebooted.subscribe(() => {
+          log.info("device rebooted, re-entering configuring", { id });
+          updateStatus(id, "configuring");
+        }),
+      ];
+      sessionTeardowns.set(id, () => {
+        for (const off of unsubscribes) off();
+        session.close();
+      });
 
-      updateSavedConnection(id, { meshDeviceId: deviceId });
-      return deviceId;
+      try {
+        await client.connect();
+        return true;
+      } catch (error) {
+        log.error("kmp: connect failed", {
+          id,
+          name: error instanceof Error ? error.name : undefined,
+          message: error instanceof Error ? error.message : String(error),
+        });
+        sessionTeardowns.get(id)?.();
+        sessionTeardowns.delete(id);
+        meshRegistry.unregister(id);
+        if (
+          error instanceof Error &&
+          (error.name === "serial-unavailable" ||
+            error.name === "bluetooth-unavailable")
+        ) {
+          heldSerialPorts.delete(id);
+          heldBluetoothDevices.delete(id);
+        }
+        updateSavedConnection(id, connectFailure(error));
+        return false;
+      }
     },
     [
-      connections,
       addDevice,
       setSelectedDevice,
       setActiveConnectionId,
+      teardown,
       updateSavedConnection,
       updateStatus,
     ],
@@ -336,18 +462,20 @@ export function useConnections() {
 
   const connect = useCallback(
     async (id: ConnectionId, opts?: { allowPrompt?: boolean }) => {
-      // Read from the live store, not the memoized `connections` closure: callers
-      // such as addConnectionAndConnect() add a connection and connect to it in the
-      // same tick, before this hook re-renders, so the closure would be stale.
-      const conn = useDeviceStore
-        .getState()
-        .savedConnections.find((c) => c.id === id);
+      // Read from the live store, not the memoized `connections` closure:
+      // addConnectionAndConnect() adds a connection and connects to it in
+      // the same tick, before this hook re-renders.
+      const conn = savedConnection(id);
       if (!conn) {
         log.warn("connect: unknown connection id", { id });
         return false;
       }
       if (conn.status === "configured" || conn.status === "connected") {
         log.debug("connect: already connected", { id, status: conn.status });
+        return true;
+      }
+      if (conn.status === "connecting" && sessionTeardowns.has(id)) {
+        log.debug("connect: already connecting", { id, ...conn.reconnect });
         return true;
       }
 
@@ -357,95 +485,44 @@ export function useConnections() {
         allowPrompt: !!opts?.allowPrompt,
       });
       updateStatus(id, "connecting");
+      const allowPrompt = opts?.allowPrompt ?? false;
+      const seen = handovers;
       try {
-        const cached = cachedTransports.get(id);
-        const result = await openTransport(conn, {
-          allowPrompt: opts?.allowPrompt,
-          cachedBluetoothDevice:
-            conn.type === "bluetooth"
-              ? (cached as BluetoothDevice | undefined)
-              : undefined,
-          cachedSerialPort:
-            conn.type === "serial"
-              ? (cached as SerialPort | undefined)
-              : undefined,
-        });
-        log.debug("connect: openTransport ok", { id });
-        await setupMeshDevice(
+        // The picker runs first, while the click's activation is still live.
+        const makeClient = await clientFactory(conn, allowPrompt);
+        if (handedOver(seen)) return abandonConnect(id);
+        // The app follows one radio at a time: a session still live on
+        // another connection would keep its port and poller to itself.
+        for (const other of [...sessionTeardowns.keys()]) {
+          if (other === id) continue;
+          await teardown(other);
+          const otherDevice = savedConnection(other)?.meshDeviceId;
+          if (otherDevice) {
+            useDeviceStore
+              .getState()
+              .getDevice(otherDevice)
+              ?.setConnectionId(null);
+          }
+          updateSavedConnection(other, {
+            status: "disconnected",
+            error: undefined,
+          });
+        }
+        return await connectThroughKmp(id, makeClient, seen);
+      } catch (error) {
+        log.error("connect: no device to connect to", {
           id,
-          result.transport,
-          result.bluetoothDevice,
-          result.serialPort,
-        );
-        log.info("connect: setupMeshDevice resolved, awaiting handshake", {
-          id,
+          name: error instanceof Error ? error.name : undefined,
+          message: error instanceof Error ? error.message : String(error),
         });
-
-        // BT-specific: catch device-side disconnect to flip status.
-        result.bluetoothDevice?.addEventListener(
-          "gattserverdisconnected",
-          () => {
-            log.warn("BT gattserverdisconnected", { id });
-            updateStatus(id, "disconnected");
-          },
-        );
-        return true;
-      } catch (err) {
-        const e = err as Error;
-        log.error("connect: failed", {
-          id,
-          name: e?.name,
-          message: e?.message,
-        });
-        const message = err instanceof Error ? err.message : String(err);
-        updateStatus(id, "error", message);
+        updateSavedConnection(id, connectFailure(error));
         return false;
       }
     },
-    [updateStatus, setupMeshDevice],
+    [updateStatus, updateSavedConnection, connectThroughKmp],
   );
 
-  useEffect(() => {
-    retryHandshakeRef.current = async (id, delayMs) => {
-      const token = Symbol();
-      pendingRetries.set(id, token);
-      const conn = useDeviceStore
-        .getState()
-        .savedConnections.find((c) => c.id === id);
-      // Keep the port or BT device: rediscovering it can need a prompt.
-      await teardown(id, conn, { keepHandle: true });
-      await new Promise((r) => setTimeout(r, delayMs));
-      if (pendingRetries.get(id) !== token) return;
-      pendingRetries.delete(id);
-      // connect() skips configured/connected connections; this one is still
-      // "configuring", so it reopens the transport and runs a fresh handshake.
-      await connect(id);
-    };
-    return () => {
-      retryHandshakeRef.current = undefined;
-    };
-  }, [connect, teardown]);
-
-  const disconnect = useCallback(
-    async (id: ConnectionId) => {
-      const conn = connections.find((c) => c.id === id);
-      if (!conn) return;
-      cancelHandshakeRetry(id);
-      try {
-        await teardown(id, conn);
-        if (conn.meshDeviceId) {
-          const device = useDeviceStore.getState().getDevice(conn.meshDeviceId);
-          if (device) {
-            device.setConnectionId(null);
-            device.setConnectionPhase("disconnected");
-          }
-        }
-      } finally {
-        updateSavedConnection(id, { status: "disconnected", error: undefined });
-      }
-    },
-    [connections, updateSavedConnection, teardown],
-  );
+  const disconnect = disconnectConnection;
 
   const addConnection = useCallback(
     (input: NewConnection) => {
@@ -457,10 +534,14 @@ export function useConnections() {
   );
 
   const addConnectionAndConnect = useCallback(
-    async (input: NewConnection, btDevice?: BluetoothDevice) => {
+    async (input: NewConnection, handle?: ConnectionHandle) => {
       const conn = addConnection(input);
-      if (btDevice && conn.type === "bluetooth")
-        cachedTransports.set(conn.id, btDevice);
+      if (handle?.bluetoothDevice && conn.type === "bluetooth") {
+        heldBluetoothDevices.set(conn.id, handle.bluetoothDevice);
+      }
+      if (handle?.serialPort && conn.type === "serial") {
+        heldSerialPorts.set(conn.id, handle.serialPort);
+      }
       await connect(conn.id, { allowPrompt: true });
       return conn;
     },
@@ -470,13 +551,25 @@ export function useConnections() {
   const refreshStatuses = useCallback(async () => {
     const candidates = connections.filter(
       (c) =>
+        !sessionTeardowns.has(c.id) &&
         c.status !== "connected" &&
         c.status !== "configured" &&
         c.status !== "configuring",
     );
     await Promise.all(
       candidates.map(async (c) => {
-        const { status, error, errorKind } = await probeConnection(c);
+        const { status, error, errorKind, port, device } =
+          await probeConnection(c);
+        if (port) {
+          heldSerialPorts.set(c.id, port);
+        }
+        if (device) {
+          heldBluetoothDevices.set(c.id, device);
+        }
+        if (status === "disconnected") {
+          heldSerialPorts.delete(c.id);
+          heldBluetoothDevices.delete(c.id);
+        }
         updateSavedConnection(c.id, { status, error, errorKind });
       }),
     );

@@ -1,13 +1,14 @@
+import { editorFor } from "@core/kmp/configEditorIo.ts";
+import { FakeKmpClient } from "@core/kmp/fakeClient.ts";
+import { MeshRegistryProvider } from "@core/kmp/hooks";
+import { MeshRegistry } from "@core/kmp/registry.ts";
+import { MeshSession } from "@core/kmp/session.ts";
+import type { Protobuf } from "@core/protobuf.ts";
 import { CurrentDeviceContext, useDeviceStore } from "@core/stores";
-import { MeshClient, MeshRegistry, type Protobuf } from "@meshtastic/sdk";
-import {
-  createFakeTransport,
-  interceptAdminMessages,
-} from "@meshtastic/sdk/testing";
-import { MeshRegistryProvider } from "@meshtastic/sdk-react";
 import { cleanup, render } from "@testing-library/react";
 import { type ReactElement, Suspense } from "react";
 import { afterEach } from "vitest";
+import { interceptAdmin } from "./adminInterceptor.ts";
 
 let nextDeviceId = 1000;
 const teardowns: (() => void)[] = [];
@@ -29,13 +30,14 @@ export function renderSettingsForm(
     moduleConfig?: Protobuf.ModuleConfig.ModuleConfig[];
   },
 ) {
-  const { transport } = createFakeTransport();
+  const kmp = new FakeKmpClient();
   const registry = new MeshRegistry();
-  const client = new MeshClient({ transport });
+  const client = new MeshSession(kmp);
   const id = nextDeviceId++;
   registry.register(id, client);
   registry.setActive(id);
-  const radio = interceptAdminMessages(client);
+  const radio = interceptAdmin(kmp);
+  const editor = editorFor(client);
 
   const stored = useDeviceStore.getState().addDevice(id);
   for (const config of device.config ?? []) {
@@ -49,6 +51,7 @@ export function renderSettingsForm(
 
   teardowns.push(() => {
     registry.unregister(id);
+    client.close();
     useDeviceStore.getState().removeDevice(id);
   });
 
@@ -60,5 +63,5 @@ export function renderSettingsForm(
     </CurrentDeviceContext.Provider>,
   );
 
-  return { client, editor: client.config.editor, radio };
+  return { client, editor, radio };
 }

@@ -24,9 +24,6 @@ importers:
         specifier: ^5.2.0
         version: 5.2.0
     devDependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:packages/sdk
       '@playwright/test':
         specifier: ^1.64.1
         version: 1.64.1
@@ -60,27 +57,18 @@ importers:
 
   apps/web:
     dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.16.0
+        version: 2.16.0
       '@hookform/resolvers':
         specifier: ^5.9.1
         version: 5.9.1(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)
-      '@meshtastic/sdk':
+      '@meshtastic/protobufs':
         specifier: workspace:*
-        version: link:../../packages/sdk
-      '@meshtastic/sdk-react':
+        version: link:../../packages/protobufs
+      '@meshtastic/sdk-kmp':
         specifier: workspace:*
-        version: link:../../packages/sdk-react
-      '@meshtastic/sdk-storage-sqlocal':
-        specifier: workspace:*
-        version: link:../../packages/sdk-storage-sqlocal
-      '@meshtastic/transport-http':
-        specifier: workspace:*
-        version: link:../../packages/transport-http
-      '@meshtastic/transport-web-bluetooth':
-        specifier: workspace:*
-        version: link:../../packages/transport-web-bluetooth
-      '@meshtastic/transport-web-serial':
-        specifier: workspace:*
-        version: link:../../packages/transport-web-serial
+        version: link:../../packages/sdk-kmp
       '@noble/curves':
         specifier: ^2.4.0
         version: 2.4.0
@@ -90,9 +78,6 @@ importers:
       '@radix-ui/react-accordion':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@radix-ui/react-alert-dialog':
-        specifier: ^1.2.1
-        version: 1.2.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@radix-ui/react-checkbox':
         specifier: ^1.4.1
         version: 1.4.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -183,6 +168,9 @@ importers:
       crypto-random-string:
         specifier: ^6.0.0
         version: 6.0.0
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0)
       i18next:
         specifier: ^26.4.5
         version: 26.4.5(typescript@7.0.2)
@@ -231,6 +219,15 @@ importers:
       rfc4648:
         specifier: ^1.5.4
         version: 1.5.4
+      sqlocal:
+        specifier: ^0.18.0
+        version: 0.18.0(drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0))(react@19.3.1)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+      tslog:
+        specifier: ^5.2.0
+        version: 5.2.0
+      vaul:
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       vite:
         specifier: ^8.3.4
         version: 8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)
@@ -277,6 +274,9 @@ importers:
       '@types/serviceworker':
         specifier: ^0.0.203
         version: 0.0.203
+      '@types/sql.js':
+        specifier: ^1.4.11
+        version: 1.4.11
       '@types/w3c-web-serial':
         specifier: ^1.0.8
         version: 1.0.8
@@ -301,6 +301,9 @@ importers:
       oxlint:
         specifier: ^1.88.0
         version: 1.88.0
+      sql.js:
+        specifier: ^1.15.0
+        version: 1.15.0
       tailwind-merge:
         specifier: ^3.7.0
         version: 3.7.0
@@ -333,121 +336,7 @@ importers:
         specifier: ^6.1.3
         version: 6.1.3
 
-  packages/sdk:
-    dependencies:
-      '@bufbuild/protobuf':
-        specifier: ^2.16.0
-        version: 2.16.0
-      '@meshtastic/protobufs':
-        specifier: workspace:*
-        version: link:../protobufs
-      '@preact/signals-core':
-        specifier: ^1.14.4
-        version: 1.14.4
-      better-result:
-        specifier: ^3.0.1
-        version: 3.0.1
-      crc:
-        specifier: npm:crc@^4.3.2
-        version: 4.3.2
-      ste-simple-events:
-        specifier: ^4.0.0
-        version: 4.0.0
-      tslog:
-        specifier: ^5.2.0
-        version: 5.2.0
-
-  packages/sdk-react:
-    dependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-      better-result:
-        specifier: ^3.0.1
-        version: 3.0.1
-    devDependencies:
-      '@testing-library/react':
-        specifier: ^16.3.3
-        version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      jsdom:
-        specifier: ^30.1.3
-        version: 30.1.3(@noble/hashes@2.4.0)
-      react:
-        specifier: ^19.3.1
-        version: 19.3.1
-      react-dom:
-        specifier: ^19.3.1
-        version: 19.3.1(react@19.3.1)
-
-  packages/sdk-storage-sqlocal:
-    dependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-      drizzle-orm:
-        specifier: ^0.45.4
-        version: 0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0)
-      sqlocal:
-        specifier: ^0.18.0
-        version: 0.18.0(drizzle-orm@0.45.4(@types/sql.js@1.4.11)(sql.js@1.15.0))(react@19.3.1)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
-    devDependencies:
-      '@types/sql.js':
-        specifier: ^1.4.11
-        version: 1.4.11
-      sql.js:
-        specifier: ^1.15.0
-        version: 1.15.0
-
-  packages/transport-deno:
-    dependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-
-  packages/transport-http:
-    dependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-
-  packages/transport-node:
-    dependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-
-  packages/transport-node-serial:
-    dependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-      serialport:
-        specifier: ^13.0.0
-        version: 13.0.0
-
-  packages/transport-web-bluetooth:
-    dependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-      '@types/web-bluetooth':
-        specifier: npm:@types/web-bluetooth@^0.0.21
-        version: 0.0.21
-
-  packages/transport-web-serial:
-    dependencies:
-      '@meshtastic/sdk':
-        specifier: workspace:*
-        version: link:../sdk
-      '@types/w3c-web-serial':
-        specifier: npm:@types/w3c-web-serial@^1.0.8
-        version: 1.0.8
-      better-result:
-        specifier: ^3.0.1
-        version: 3.0.1
+  packages/sdk-kmp: {}
 
   packages/ui:
     dependencies:
@@ -1588,19 +1477,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-alert-dialog@1.2.1':
-    resolution: {integrity: sha512-MWC4N7RY+qsbNrFNo7yQ9ZbdoZEW+B5DtpWxJfUnVCqcQxxqqg3qis3RMPTDbCNaTIdHJSn5XDkl9ZdVWXknLg==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
   '@radix-ui/react-arrow@1.1.17':
     resolution: {integrity: sha512-67jjcVvxjXCCStnTW3Z+M7jmaFMuMR7M2JgpDzH4w7JSRrikmzhjfYgP/09ECb8n7whnsgh1ifJ+Ie96qEj+pQ==}
     peerDependencies:
@@ -2374,70 +2250,6 @@ packages:
     resolution: {integrity: sha512-EhX6N3XPMEnVU5cRfNgzPOKcSucsbu3nNNWuoAaEuKIqmddBKHN5b9d4rPe65T1I+FaOT176JKiZNsUBp3rqbA==}
     cpu: [x64]
     os: [win32]
-
-  '@serialport/binding-mock@10.2.2':
-    resolution: {integrity: sha512-HAFzGhk9OuFMpuor7aT5G1ChPgn5qSsklTFOTUX72Rl6p0xwcSVsRtG/xaGp6bxpN7fI9D/S8THLBWbBgS6ldw==}
-    engines: {node: '>=12.0.0'}
-
-  '@serialport/bindings-cpp@13.0.0':
-    resolution: {integrity: sha512-r25o4Bk/vaO1LyUfY/ulR6hCg/aWiN6Wo2ljVlb4Pj5bqWGcSRC4Vse4a9AcapuAu/FeBzHCbKMvRQeCuKjzIQ==}
-    engines: {node: '>=18.0.0'}
-
-  '@serialport/bindings-interface@1.2.2':
-    resolution: {integrity: sha512-CJaUd5bLvtM9c5dmO9rPBHPXTa9R2UwpkJ0wdh9JCYcbrPWsKz+ErvR0hBLeo7NPeiFdjFO4sonRljiw4d2XiA==}
-    engines: {node: ^12.22 || ^14.13 || >=16}
-
-  '@serialport/parser-byte-length@13.0.0':
-    resolution: {integrity: sha512-32yvqeTAqJzAEtX5zCrN1Mej56GJ5h/cVFsCDPbF9S1ZSC9FWjOqNAgtByseHfFTSTs/4ZBQZZcZBpolt8sUng==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/parser-cctalk@13.0.0':
-    resolution: {integrity: sha512-RErAe57g9gvnlieVYGIn1xymb1bzNXb2QtUQd14FpmbQQYlcrmuRnJwKa1BgTCujoCkhtaTtgHlbBWOxm8U2uA==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/parser-delimiter@12.0.0':
-    resolution: {integrity: sha512-gu26tVt5lQoybhorLTPsH2j2LnX3AOP2x/34+DUSTNaUTzu2fBXw+isVjQJpUBFWu6aeQRZw5bJol5X9Gxjblw==}
-    engines: {node: '>=12.0.0'}
-
-  '@serialport/parser-delimiter@13.0.0':
-    resolution: {integrity: sha512-Qqyb0FX1avs3XabQqNaZSivyVbl/yl0jywImp7ePvfZKLwx7jBZjvL+Hawt9wIG6tfq6zbFM24vzCCK7REMUig==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/parser-inter-byte-timeout@13.0.0':
-    resolution: {integrity: sha512-a0w0WecTW7bD2YHWrpTz1uyiWA2fDNym0kjmPeNSwZ2XCP+JbirZt31l43m2ey6qXItTYVuQBthm75sPVeHnGA==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/parser-packet-length@13.0.0':
-    resolution: {integrity: sha512-60ZDDIqYRi0Xs2SPZUo4Jr5LLIjtb+rvzPKMJCohrO6tAqSDponcNpcB1O4W21mKTxYjqInSz+eMrtk0LLfZIg==}
-    engines: {node: '>=8.6.0'}
-
-  '@serialport/parser-readline@12.0.0':
-    resolution: {integrity: sha512-O7cywCWC8PiOMvo/gglEBfAkLjp/SENEML46BXDykfKP5mTPM46XMaX1L0waWU6DXJpBgjaL7+yX6VriVPbN4w==}
-    engines: {node: '>=12.0.0'}
-
-  '@serialport/parser-readline@13.0.0':
-    resolution: {integrity: sha512-dov3zYoyf0dt1Sudd1q42VVYQ4WlliF0MYvAMA3MOyiU1IeG4hl0J6buBA2w4gl3DOCC05tGgLDN/3yIL81gsA==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/parser-ready@13.0.0':
-    resolution: {integrity: sha512-JNUQA+y2Rfs4bU+cGYNqOPnNMAcayhhW+XJZihSLQXOHcZsFnOa2F9YtMg9VXRWIcnHldHYtisp62Etjlw24bw==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/parser-regex@13.0.0':
-    resolution: {integrity: sha512-m7HpIf56G5XcuDdA3DB34Z0pJiwxNRakThEHjSa4mG05OnWYv0IG8l2oUyYfuGMowQWaVnQ+8r+brlPxGVH+eA==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/parser-slip-encoder@13.0.0':
-    resolution: {integrity: sha512-fUHZEExm6izJ7rg0A1yjXwu4sOzeBkPAjDZPfb+XQoqgtKAk+s+HfICiYn7N2QU9gyaeCO8VKgWwi+b/DowYOg==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/parser-spacepacket@13.0.0':
-    resolution: {integrity: sha512-DoXJ3mFYmyD8X/8931agJvrBPxqTaYDsPoly9/cwQSeh/q4EjQND9ySXBxpWz5WcpyCU4jOuusqCSAPsbB30Eg==}
-    engines: {node: '>=20.0.0'}
-
-  '@serialport/stream@13.0.0':
-    resolution: {integrity: sha512-F7xLJKsjGo2WuEWMSEO1SimRcOA+WtWICsY13r0ahx8s2SecPQH06338g28OT7cW7uRXI7oEQAk62qh5gHJW3g==}
-    engines: {node: '>=20.0.0'}
 
   '@sqlite.org/sqlite-wasm@3.51.2-build9':
     resolution: {integrity: sha512-tj2Sa6X4gVZqS9SiT2xlEeChSUklSGq8Hz6zKNbHW6NRiGyrSXiFcspnrWru1wPBT76RX/VxweESKxawCxfDxg==}
@@ -3639,15 +3451,6 @@ packages:
     resolution: {integrity: sha512-XGpFGbMLHwSt74YLTKho7Ib242qi6O8MSX+sRokV4oz7iKXvQWGYZthjIhjRGMxjzVkAubBO512dKGYcefmX3Q==}
     engines: {node: '>=6.4.0'}
 
-  crc@4.3.2:
-    resolution: {integrity: sha512-uGDHf4KLLh2zsHa8D8hIQ1H/HtFQhyHrc0uhHBcoKGol/Xnb+MPYfUMw7cvON6ze/GUESTudKayDcJC5HnJv1A==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      buffer: '>=6.0.3'
-    peerDependenciesMeta:
-      buffer:
-        optional: true
-
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
@@ -3701,15 +3504,6 @@ packages:
   data-view-byte-offset@1.0.1:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
-
-  debug@4.4.0:
-    resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -4704,14 +4498,6 @@ packages:
   no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
 
-  node-addon-api@8.3.0:
-    resolution: {integrity: sha512-8VOpLHFrOQlAH+qA0ZzuGRlALRA6/LVh8QJldbrC4DY0hXoMP0l4Acq8TzFC018HztWiRqyCEj2aTWY2UvnJUg==}
-    engines: {node: ^18 || ^20 || >= 21}
-
-  node-gyp-build@4.8.4:
-    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
-    hasBin: true
-
   node-html-parser@5.4.2:
     resolution: {integrity: sha512-RaBPP3+51hPne/OolXxcz89iYvQvKOydaqoePpOgXcrOKZhjVIzmpKZz+Hd/RBO2/zN2q6CNJhQzucVz+u3Jyw==}
 
@@ -5165,10 +4951,6 @@ packages:
 
   serialize-javascript@7.1.2:
     resolution: {integrity: sha512-GL2BWwVa6JydKO6l/ljVgjAZF4QJ3S7dWDWi53s5GZT8PJzD2fNxi67HANQGKAqPrwEpL5ba7gUBGi0Ls/sEoQ==}
-    engines: {node: '>=20.0.0'}
-
-  serialport@13.0.0:
-    resolution: {integrity: sha512-PHpnTd8isMGPfFTZNCzOZp9m4mAJSNWle9Jxu6BPTcWq7YXl5qN7tp8Sgn0h+WIGcD6JFz5QDgixC2s4VW7vzg==}
     engines: {node: '>=20.0.0'}
 
   seroval-plugins@1.6.9:
@@ -5687,6 +5469,12 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  vaul@1.1.2:
+    resolution: {integrity: sha512-ZFkClGpWyI2WUQjdLJ/BaGuV6AVQiJ3uELGk3OYtP+B6yCO7Cmn9vPFXVJkRaGkOJu3m8bQMgtyzNHixULceQA==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
+
   verkit@0.5.0:
     resolution: {integrity: sha512-u4J1hr6Y+C/hit34GwL3eIcUf3wngT8TlYUjK7tk0jxydKLAq3sYvifjdTDA6U3KCKRcQCQDGf/srjxfZF3l7g==}
     engines: {node: '>=18.12.0'}
@@ -6000,6 +5788,7 @@ snapshots:
       '@csstools/css-parser-algorithms': 4.0.2(@csstools/css-tokenizer@4.0.2)
       '@csstools/css-tokenizer': 4.0.2
       lru-cache: 11.5.3
+    optional: true
 
   '@asamuzakjp/dom-selector@10.0.3':
     dependencies:
@@ -6007,6 +5796,7 @@ snapshots:
       css-tree: 3.2.1
       is-potential-custom-element-name: 1.0.1
       lru-cache: 11.5.3
+    optional: true
 
   '@babel/code-frame@7.29.7':
     dependencies:
@@ -6674,6 +6464,7 @@ snapshots:
   '@bramus/specificity@2.4.3':
     dependencies:
       css-tree: 3.2.1
+    optional: true
 
   '@bufbuild/protobuf@2.16.0': {}
 
@@ -6693,12 +6484,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@csstools/color-helpers@6.1.2': {}
+  '@csstools/color-helpers@6.1.2':
+    optional: true
 
   '@csstools/css-calc@3.4.3(@csstools/css-parser-algorithms@4.0.2(@csstools/css-tokenizer@4.0.2))(@csstools/css-tokenizer@4.0.2)':
     dependencies:
       '@csstools/css-parser-algorithms': 4.0.2(@csstools/css-tokenizer@4.0.2)
       '@csstools/css-tokenizer': 4.0.2
+    optional: true
 
   '@csstools/css-color-parser@4.2.6(@csstools/css-parser-algorithms@4.0.2(@csstools/css-tokenizer@4.0.2))(@csstools/css-tokenizer@4.0.2)':
     dependencies:
@@ -6706,20 +6499,25 @@ snapshots:
       '@csstools/css-calc': 3.4.3(@csstools/css-parser-algorithms@4.0.2(@csstools/css-tokenizer@4.0.2))(@csstools/css-tokenizer@4.0.2)
       '@csstools/css-parser-algorithms': 4.0.2(@csstools/css-tokenizer@4.0.2)
       '@csstools/css-tokenizer': 4.0.2
+    optional: true
 
   '@csstools/css-parser-algorithms@4.0.2(@csstools/css-tokenizer@4.0.2)':
     dependencies:
       '@csstools/css-tokenizer': 4.0.2
+    optional: true
 
   '@csstools/css-syntax-patches-for-csstree@1.1.15(css-tree@3.2.1)':
     optionalDependencies:
       css-tree: 3.2.1
+    optional: true
 
-  '@csstools/css-tokenizer@4.0.2': {}
+  '@csstools/css-tokenizer@4.0.2':
+    optional: true
 
   '@exodus/bytes@1.16.0(@noble/hashes@2.4.0)':
     optionalDependencies:
       '@noble/hashes': 2.4.0
+    optional: true
 
   '@floating-ui/core@1.8.0':
     dependencies:
@@ -6995,19 +6793,6 @@ snapshots:
       '@radix-ui/react-id': 1.1.4(@types/react@19.3.0)(react@19.3.1)
       '@radix-ui/react-primitive': 2.2.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@radix-ui/react-use-controllable-state': 1.3.0(@types/react@19.3.0)(react@19.3.1)
-      react: 19.3.1
-      react-dom: 19.3.1(react@19.3.1)
-    optionalDependencies:
-      '@types/react': 19.3.0
-      '@types/react-dom': 19.3.0(@types/react@19.3.0)
-
-  '@radix-ui/react-alert-dialog@1.2.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
-    dependencies:
-      '@radix-ui/primitive': 1.2.0
-      '@radix-ui/react-compose-refs': 1.1.5(@types/react@19.3.0)(react@19.3.1)
-      '@radix-ui/react-context': 1.3.0(@types/react@19.3.0)(react@19.3.1)
-      '@radix-ui/react-dialog': 1.3.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@radix-ui/react-primitive': 2.2.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
     optionalDependencies:
@@ -7710,60 +7495,6 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.64.7':
     optional: true
-
-  '@serialport/binding-mock@10.2.2':
-    dependencies:
-      '@serialport/bindings-interface': 1.2.2
-      debug: 4.4.0
-    transitivePeerDependencies:
-      - supports-color
-
-  '@serialport/bindings-cpp@13.0.0':
-    dependencies:
-      '@serialport/bindings-interface': 1.2.2
-      '@serialport/parser-readline': 12.0.0
-      debug: 4.4.0
-      node-addon-api: 8.3.0
-      node-gyp-build: 4.8.4
-    transitivePeerDependencies:
-      - supports-color
-
-  '@serialport/bindings-interface@1.2.2': {}
-
-  '@serialport/parser-byte-length@13.0.0': {}
-
-  '@serialport/parser-cctalk@13.0.0': {}
-
-  '@serialport/parser-delimiter@12.0.0': {}
-
-  '@serialport/parser-delimiter@13.0.0': {}
-
-  '@serialport/parser-inter-byte-timeout@13.0.0': {}
-
-  '@serialport/parser-packet-length@13.0.0': {}
-
-  '@serialport/parser-readline@12.0.0':
-    dependencies:
-      '@serialport/parser-delimiter': 12.0.0
-
-  '@serialport/parser-readline@13.0.0':
-    dependencies:
-      '@serialport/parser-delimiter': 13.0.0
-
-  '@serialport/parser-ready@13.0.0': {}
-
-  '@serialport/parser-regex@13.0.0': {}
-
-  '@serialport/parser-slip-encoder@13.0.0': {}
-
-  '@serialport/parser-spacepacket@13.0.0': {}
-
-  '@serialport/stream@13.0.0':
-    dependencies:
-      '@serialport/bindings-interface': 1.2.2
-      debug: 4.4.0
-    transitivePeerDependencies:
-      - supports-color
 
   '@sqlite.org/sqlite-wasm@3.51.2-build9': {}
 
@@ -9644,8 +9375,6 @@ snapshots:
     dependencies:
       browserslist: 4.29.3
 
-  crc@4.3.2: {}
-
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -9671,6 +9400,7 @@ snapshots:
     dependencies:
       mdn-data: 2.27.1
       source-map-js: 1.2.2
+    optional: true
 
   css-what@6.2.2: {}
 
@@ -9694,6 +9424,7 @@ snapshots:
       whatwg-url: 17.3.0(@noble/hashes@2.4.0)
     transitivePeerDependencies:
       - '@noble/hashes'
+    optional: true
 
   data-view-buffer@1.0.2:
     dependencies:
@@ -9713,15 +9444,12 @@ snapshots:
       es-errors: 1.3.0
       is-data-view: 1.0.2
 
-  debug@4.4.0:
-    dependencies:
-      ms: 2.1.3
-
   debug@4.4.3:
     dependencies:
       ms: 2.1.3
 
-  decimal.js@10.6.0: {}
+  decimal.js@10.6.0:
+    optional: true
 
   deepmerge@4.3.1: {}
 
@@ -9812,7 +9540,8 @@ snapshots:
 
   entities@7.0.1: {}
 
-  entities@8.1.0: {}
+  entities@8.1.0:
+    optional: true
 
   es-abstract-get@1.0.0:
     dependencies:
@@ -10136,6 +9865,7 @@ snapshots:
       '@exodus/bytes': 1.16.0(@noble/hashes@2.4.0)
     transitivePeerDependencies:
       - '@noble/hashes'
+    optional: true
 
   html-minifier-terser@6.1.0:
     dependencies:
@@ -10270,7 +10000,8 @@ snapshots:
     dependencies:
       isobject: 3.0.1
 
-  is-potential-custom-element-name@1.0.1: {}
+  is-potential-custom-element-name@1.0.1:
+    optional: true
 
   is-regex@1.2.1:
     dependencies:
@@ -10365,6 +10096,7 @@ snapshots:
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - '@noble/hashes'
+    optional: true
 
   jsesc@3.1.0: {}
 
@@ -10555,7 +10287,8 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mdn-data@2.27.1: {}
+  mdn-data@2.27.1:
+    optional: true
 
   merge2@1.4.1: {}
 
@@ -10601,10 +10334,6 @@ snapshots:
     dependencies:
       lower-case: 2.0.2
       tslib: 2.8.1
-
-  node-addon-api@8.3.0: {}
-
-  node-gyp-build@4.8.4: {}
 
   node-html-parser@5.4.2:
     dependencies:
@@ -10701,6 +10430,7 @@ snapshots:
   parse5@8.0.1:
     dependencies:
       entities: 8.1.0
+    optional: true
 
   pascal-case@3.1.2:
     dependencies:
@@ -10796,7 +10526,8 @@ snapshots:
       picocolors: 1.1.1
       sade: 1.8.1
 
-  punycode@2.3.1: {}
+  punycode@2.3.1:
+    optional: true
 
   qrcode-generator@2.0.4: {}
 
@@ -11076,31 +10807,13 @@ snapshots:
   saxes@6.0.0:
     dependencies:
       xmlchars: 2.2.0
+    optional: true
 
   scheduler@0.28.0: {}
 
   semver@6.3.1: {}
 
   serialize-javascript@7.1.2: {}
-
-  serialport@13.0.0:
-    dependencies:
-      '@serialport/binding-mock': 10.2.2
-      '@serialport/bindings-cpp': 13.0.0
-      '@serialport/parser-byte-length': 13.0.0
-      '@serialport/parser-cctalk': 13.0.0
-      '@serialport/parser-delimiter': 13.0.0
-      '@serialport/parser-inter-byte-timeout': 13.0.0
-      '@serialport/parser-packet-length': 13.0.0
-      '@serialport/parser-readline': 13.0.0
-      '@serialport/parser-ready': 13.0.0
-      '@serialport/parser-regex': 13.0.0
-      '@serialport/parser-slip-encoder': 13.0.0
-      '@serialport/parser-spacepacket': 13.0.0
-      '@serialport/stream': 13.0.0
-      debug: 4.4.0
-    transitivePeerDependencies:
-      - supports-color
 
   seroval-plugins@1.6.9(seroval@1.6.9):
     dependencies:
@@ -11349,11 +11062,13 @@ snapshots:
 
   tinyqueue@3.0.0: {}
 
-  tldts-core@7.4.18: {}
+  tldts-core@7.4.18:
+    optional: true
 
   tldts@7.4.18:
     dependencies:
       tldts-core: 7.4.18
+    optional: true
 
   tmp-promise@3.0.3:
     dependencies:
@@ -11376,10 +11091,12 @@ snapshots:
   tough-cookie@6.0.2:
     dependencies:
       tldts: 7.4.18
+    optional: true
 
   tr46@7.0.0:
     dependencies:
       punycode: 2.3.1
+    optional: true
 
   tree-kill@1.2.2: {}
 
@@ -11504,7 +11221,8 @@ snapshots:
 
   undici-types@8.9.0: {}
 
-  undici@8.12.2: {}
+  undici@8.12.2:
+    optional: true
 
   unicode-canonical-property-names-ecmascript@2.0.1: {}
 
@@ -11592,6 +11310,15 @@ snapshots:
   use-sync-external-store@1.7.0(react@19.3.1):
     dependencies:
       react: 19.3.1
+
+  vaul@1.1.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+    dependencies:
+      '@radix-ui/react-dialog': 1.3.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
 
   verkit@0.5.0: {}
 
@@ -11687,14 +11414,17 @@ snapshots:
   w3c-xmlserializer@6.0.0:
     dependencies:
       xml-name-validator: 5.0.0
+    optional: true
 
-  webidl-conversions@8.0.1: {}
+  webidl-conversions@8.0.1:
+    optional: true
 
   webpack-virtual-modules@0.6.2: {}
 
   whatwg-mimetype@3.0.0: {}
 
-  whatwg-mimetype@5.0.0: {}
+  whatwg-mimetype@5.0.0:
+    optional: true
 
   whatwg-url@17.3.0(@noble/hashes@2.4.0):
     dependencies:
@@ -11703,6 +11433,7 @@ snapshots:
       webidl-conversions: 8.0.1
     transitivePeerDependencies:
       - '@noble/hashes'
+    optional: true
 
   which-boxed-primitive@1.1.1:
     dependencies:
@@ -11866,9 +11597,11 @@ snapshots:
 
   ws@8.22.0: {}
 
-  xml-name-validator@5.0.0: {}
+  xml-name-validator@5.0.0:
+    optional: true
 
-  xmlchars@2.2.0: {}
+  xmlchars@2.2.0:
+    optional: true
 
   yallist@3.1.1: {}
 

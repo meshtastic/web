@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 import { vi } from "vitest";
 import type { Device } from "./index.ts";
 
@@ -16,7 +16,6 @@ export const mockDeviceStore: Device = {
   id: 0,
   myNodeNum: 123456,
   status: 5 as const,
-  connectionPhase: "disconnected",
   connectionId: null,
   channels: new Map(),
   config: {} as Protobuf.LocalOnly.LocalConfig,
@@ -24,7 +23,6 @@ export const mockDeviceStore: Device = {
   hardware: {} as Protobuf.Mesh.MyNodeInfo,
   metadata: new Map(),
   traceroutes: new Map(),
-  connection: undefined,
   activeNode: 0,
   waypoints: [],
   pendingSettingsChanges: false,
@@ -51,7 +49,6 @@ export const mockDeviceStore: Device = {
   neighborInfo: new Map(),
 
   setStatus: vi.fn(),
-  setConnectionPhase: vi.fn(),
   setConnectionId: vi.fn(),
   setConfig: vi.fn(),
   setModuleConfig: vi.fn(),
@@ -64,7 +61,6 @@ export const mockDeviceStore: Device = {
   addWaypoint: vi.fn(),
   removeWaypoint: vi.fn(),
   getWaypoint: vi.fn(),
-  addConnection: vi.fn(),
   addTraceRoute: vi.fn(),
   addMetadata: vi.fn(),
   setDialogOpen: vi.fn(),

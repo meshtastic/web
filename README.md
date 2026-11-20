@@ -1,83 +1,41 @@
 # Meshtastic Web Monorepo
 
 [![CI](https://img.shields.io/github/actions/workflow/status/meshtastic/web/ci.yml?branch=main&label=Web%20CI&logo=github&color=yellow)](https://github.com/meshtastic/web/actions/workflows/ci.yml)
-[![CI](https://img.shields.io/github/actions/workflow/status/meshtastic/js/ci.yml?branch=master&label=JS%20CI&logo=github&color=yellow)](https://github.com/meshtastic/js/actions/workflows/ci.yml)
 [![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/web)](https://cla-assistant.io/meshtastic/web)
 [![Fiscal Contributors](https://opencollective.com/meshtastic/tiers/badge.svg?label=Fiscal%20Contributors&color=deeppink)](https://opencollective.com/meshtastic/)
 [![Vercel](https://img.shields.io/static/v1?label=Powered%20by&message=Vercel&style=flat&logo=vercel&color=000000)](https://vercel.com?utm_source=meshtastic&utm_campaign=oss)
 
 ## Overview
 
-This monorepo consolidates the official [Meshtastic](https://meshtastic.org) web
-interface, the domain-driven JavaScript SDK that drives it, and a set of
-runtime-specific transport packages. Everything you need to read state from or
-send commands to a Meshtastic device lives here.
+This monorepo contains the official [Meshtastic](https://meshtastic.org) web
+client, the shared UI library it uses, the generated protobuf stubs, and
+`sdk-kmp`, a thin JavaScript facade over the Kotlin
+[meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk) that handles
+device connections and mesh state.
 
 > [!NOTE]
 > You can find the main Meshtastic documentation at https://meshtastic.org/docs/introduction/.
 
 ## Packages
 
-Libraries live under `packages/`; the reference web client lives under `apps/`.
-
 | Package | Purpose |
 | --- | --- |
-| `packages/sdk` | Framework-agnostic TypeScript SDK. Domain-driven feature slices (device, chat, nodes, channels, config, telemetry, position, traceroute, files) built around a `MeshClient` orchestrator with `@preact/signals-core` reactive state. |
-| `packages/sdk-react` | React hooks + `MeshProvider` on top of `@meshtastic/sdk`. Wraps signals in `useSyncExternalStore` for concurrent-safe renders. |
 | `apps/web` | Reference React web client. Hosted at [client.meshtastic.org](https://client.meshtastic.org). |
+| `packages/sdk-kmp` | Wraps the Kotlin Multiplatform [meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk), compiled to JavaScript with Gradle (JDK 21), behind a small `@JsExport` facade plus browser transports. The web client's connection and mesh behaviour comes from here. The SDK source is pinned as a git submodule at `packages/sdk-kmp/vendor/meshtastic-sdk`. |
 | `packages/ui` | Shared Radix + Tailwind component library. |
 | `packages/protobufs` | Generated TypeScript stubs from [`meshtastic/protobufs`](https://github.com/meshtastic/protobufs), produced via `buf generate`. Source of truth for every wire-level type. |
-| `packages/transport-http` | HTTP transport for devices exposing a network interface. |
-| `packages/transport-web-bluetooth` | Web Bluetooth transport for BLE-capable devices (browsers). |
-| `packages/transport-web-serial` | Web Serial transport for USB-serial devices (browsers). |
-| `packages/transport-node` | TCP transport for Node.js. |
-| `packages/transport-node-serial` | Serial transport for Node.js. |
-| `packages/transport-deno` | TCP transport for Deno. |
-| `packages/transport-mock` | In-memory transport for tests. |
 
-All publishable packages ship to both [JSR](https://jsr.io/@meshtastic) and [NPM](https://www.npmjs.com/org/meshtastic).
+All packages under `packages/` are private workspace packages; none are
+published to npm or JSR from this repository.
 
 ## Architecture
 
-`@meshtastic/sdk` organises its source by feature slice. Each slice follows the
-same DDD layout:
-
-```
-features/<slice>/
-  domain/          # entities & value objects — pure TypeScript types
-  application/     # use-cases (SendTextUseCase, FavoriteNodeUseCase, …)
-  infrastructure/  # protobuf ↔ domain mappers, admin-message adapters
-  state/           # signals-backed reactive stores
-  <Slice>Client.ts # public facade exposing readable signals + command methods
-  index.ts
-```
-
-The shared kernel under `packages/sdk/src/core/` owns:
-
-- **`client/`** — `MeshClient`, the thin orchestrator that owns the transport, queue, event bus, and one instance of every slice client.
-- **`transport/`** — the `Transport` interface every `transport-*` package implements.
-- **`event-bus/`** — typed pub/sub channels populated by the packet codec.
-- **`packet-codec/`** — frame parser (0x94 0xC3), `FromRadio` decoder, portnum router.
-- **`queue/`**, **`xmodem/`** — packet ack/timeout pipeline and file-transfer protocol.
-- **`signals/`** — signal and keyed-collection helpers consumed by every slice.
-- **`logging/`** — `tslog` factory used consistently by every class.
-- **`identifiers/`**, **`errors/`** — small primitives shared across slices.
-
-The protobuf boundary is strict: wire messages enter through the packet codec,
-get mapped into domain entities inside `features/*/infrastructure/*Mapper.ts`,
-and signals only ever expose the domain shape.
-
-```
- Transport   ─▶   Packet codec   ─▶   EventBus   ─▶   Slice infrastructure
-                                                            │
-                                                            ▼
-                                                    Signals (state)  ─▶  sdk-react hooks  ─▶  UI
-                                                            ▲
-                                                            │
- Slice application (use-cases)  ─▶   MeshClient.sendPacket  ─▶   Queue   ─▶   Transport
-```
-
-Expected domain errors are returned as `Result<T, E>` via [`better-result`](https://www.npmjs.com/package/better-result); exceptions are reserved for programmer errors and truly exceptional conditions.
+The web client never speaks the Meshtastic protocol itself. `apps/web` calls
+the facade in `packages/sdk-kmp`, which drives the Kotlin SDK (framing, packet
+queue, state, persistence) over a browser transport (Web Serial, Web Bluetooth,
+or HTTP). Wire-level types come from `packages/protobufs`. See
+`packages/sdk-kmp/README.md` for the facade surface and how the SDK version is
+pinned.
 
 ## Getting Started
 
@@ -89,11 +47,20 @@ Expected domain errors are returned as `Result<T, E>` via [`better-result`](http
   `pnpm -r build`, since it runs `buf generate`). If you only want to run
   the web client in dev, `pnpm --filter meshtastic-web dev` does not need
   Buf as long as the protobuf stubs are already generated.
+- [JDK 21](https://adoptium.net/) — required to build `@meshtastic/sdk-kmp`,
+  the Kotlin meshtastic-sdk compiled to JavaScript that the web client
+  connects through. `pnpm --filter meshtastic-web dev` builds it on first
+  run (its `predev` hook); on macOS `brew install openjdk@21` and
+  `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`. Until the SDK's `js`
+  artifacts are released, it compiles from the `packages/sdk-kmp/vendor/meshtastic-sdk`
+  git submodule (clone with `--recurse-submodules`, or let the build run
+  `git submodule update --init`). See `packages/sdk-kmp/README.md` for how
+  the SDK version is pinned and how to switch to the release.
 
 ### Setup
 
 ```bash
-git clone https://github.com/meshtastic/web.git
+git clone --recurse-submodules https://github.com/meshtastic/web.git
 cd web
 pnpm install
 ```
@@ -120,8 +87,7 @@ not sequenced against workspace peers, so run `pnpm --filter
 @meshtastic/protobufs build` first if you are iterating on generated
 stubs consumed via a non-workspace protocol.
 
-If you only need the web client, build it and its dependency graph without
-touching every publishable package:
+If you only need the web client, build it and its dependency graph:
 
 ```bash
 pnpm --filter meshtastic-web... build
@@ -142,39 +108,10 @@ pnpm check:fix
 
 ## Developing
 
-### Adding a new feature slice to `@meshtastic/sdk`
-
-1. Create `packages/sdk/src/features/<slice>/` with `domain/`, `application/`, `infrastructure/`, `state/` subdirectories plus an `index.ts` barrel.
-2. Implement a signals-backed store in `state/`.
-3. Subscribe to the relevant `EventBus` channel(s) inside a `<Slice>Client.ts` class and write mapped domain entities to the store.
-4. Wire the new client into `MeshClient` and re-export types from `packages/sdk/mod.ts`.
-5. Add vitest coverage: domain invariants, use-cases against `createFakeTransport()`, and round-trip mapper fixtures.
-6. If the slice has React callers, add a matching hook under `packages/sdk-react/src/hooks/`.
-
-### Adding a new transport
-
-Implement the `Transport` interface exported from `@meshtastic/sdk/transport`:
-
-```ts
-interface Transport {
-  toDevice: WritableStream<Uint8Array>;
-  fromDevice: ReadableStream<DeviceOutput>;
-  disconnect(): Promise<void>;
-}
-```
-
-The SDK does the framing and decoding — transports only supply raw bytes.
-
 ### Testing
 
-Vitest is wired at the repo root and picks up `packages/*` projects. The SDK
-ships `@meshtastic/sdk/testing` with `createFakeTransport()` for wiring tests
-without real hardware.
-
-## Publishing
-
-Each publishable package has `build:npm` / `publish:npm` / `prepare:jsr` /
-`publish:jsr` scripts. See each package's `package.json` for details.
+Vitest is wired at the repo root (`pnpm test`) and picks up the `packages/*` and
+`apps/*` projects. See `TESTING.md` for the testing strategy.
 
 ## Repository activity
 

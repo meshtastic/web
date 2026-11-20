@@ -1,4 +1,4 @@
-import type { Protobuf } from "@meshtastic/sdk";
+import type { Protobuf } from "@core/protobuf.ts";
 
 type ValidConfigType = Exclude<
   keyof Protobuf.LocalOnly.LocalConfig,
@@ -53,7 +53,9 @@ export type Connection = {
   isDefault?: boolean;
   status: ConnectionStatus;
   error?: string;
-  errorKind?: "cert" | "network";
+  errorKind?: "cert" | "network" | "lna-denied";
+  /** The SDK's current reconnect attempt, while it is reconnecting. */
+  reconnect?: { attempt: number; maxAttempts: number };
   meshDeviceId?: number;
   /**
    * Node number of the radio this connection last reached, from the

@@ -7,7 +7,11 @@ import {
   persist,
   subscribeWithSelector,
 } from "zustand/middleware";
-import type { RasterSource } from "./types.ts";
+import type {
+  ConnectionsDrawerState,
+  ConnectionsView,
+  RasterSource,
+} from "./types.ts";
 
 const IDB_KEY_NAME = "meshtastic-app-store";
 const CURRENT_STORE_VERSION = 0;
@@ -21,7 +25,7 @@ export interface AppState extends AppData {
   // Ephemeral state (not persisted)
   selectedDeviceId: number;
   nodeNumToBeRemoved: number;
-  connectDialogOpen: boolean;
+  connectionsDrawer: ConnectionsDrawerState;
   nodeNumDetails: number;
   commandPaletteOpen: boolean;
 
@@ -31,7 +35,9 @@ export interface AppState extends AppData {
   setSelectedDevice: (deviceId: number) => void;
   setCommandPaletteOpen: (open: boolean) => void;
   setNodeNumToBeRemoved: (nodeNum: number) => void;
-  setConnectDialogOpen: (open: boolean) => void;
+  openConnections: (view?: ConnectionsView) => void;
+  closeConnections: () => void;
+  setConnectionsView: (view: ConnectionsView) => void;
   setNodeNumDetails: (nodeNum: number) => void;
 }
 
@@ -39,7 +45,7 @@ export const deviceStoreInitializer: StateCreator<AppState> = (set, _get) => ({
   selectedDeviceId: 0,
   rasterSources: [],
   commandPaletteOpen: false,
-  connectDialogOpen: false,
+  connectionsDrawer: { open: false, view: "list" },
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
 
@@ -79,13 +85,14 @@ export const deviceStoreInitializer: StateCreator<AppState> = (set, _get) => ({
     set(() => ({
       nodeNumToBeRemoved: nodeNum,
     })),
-  setConnectDialogOpen: (open: boolean) => {
-    set(
-      produce<AppState>((draft) => {
-        draft.connectDialogOpen = open;
-      }),
-    );
-  },
+  openConnections: (view = "list") =>
+    set(() => ({ connectionsDrawer: { open: true, view } })),
+  closeConnections: () =>
+    set(() => ({ connectionsDrawer: { open: false, view: "list" } })),
+  setConnectionsView: (view) =>
+    set((state) => ({
+      connectionsDrawer: { ...state.connectionsDrawer, view },
+    })),
   setNodeNumDetails: (nodeNum) =>
     set(() => ({
       nodeNumDetails: nodeNum,
