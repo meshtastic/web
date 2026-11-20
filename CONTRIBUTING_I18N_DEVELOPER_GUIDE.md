@@ -71,7 +71,17 @@ appropriate file based on these rules:
   - All text specific to modal dialogs (titles, body text, prompts).
 - `messages.json`:
   - Text specifically related to the messaging interface.
-- `deviceConfig.json` & `moduleConfig.json`:
+- `nodes.json`:
+  - The node list, node details and node-related actions.
+- `map.json`:
+  - The map page, its layers and popups.
+- `channels.json`:
+  - Channel settings, sharing and mesh beacon offers.
+- `connections.json`:
+  - The connections drawer, connecting states and the certificate guide.
+- `commandPalette.json`:
+  - Command palette entries.
+- `config.json` & `moduleConfig.json`:
   - Labels and descriptions for the settings on the Device and Module
     configuration pages.
 
@@ -88,15 +98,21 @@ specify these namespaces when calling the hook. The system will automatically
 check these files for your key.
 
 For any keys in `common.json`, `ui.json`, or `dialog.json`, you can instantiate
-the hook simply:
+the hook without a namespace:
 
 ```typescript
 import { useTranslation } from "react-i18next";
 
-// In your component
-const { t } = useTranslation(["messages"]);
+const { t } = useTranslation();
 
-// Usage
+return <button type="button">{t("button.save")}</button>;
+```
+
+For keys in any other namespace, name it when you create the hook:
+
+```typescript
+const { t } = useTranslation("messages");
+
 return <p>{t("someMessageLabel")}</p>;
 ```
 

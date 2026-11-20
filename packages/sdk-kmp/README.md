@@ -11,10 +11,13 @@ auto-reconnect, node DB, admin); this package owns only the glue:
   `Uint8Array`s and unsubscribe functions cross into TypeScript; protobuf
   messages cross as bytes and are decoded with `@meshtastic/protobufs`.
   Sends return a `SendHandleJs` (the packet id now, the outcome later).
-- `Storage.kt`: `StorageJs` / `DeviceStorageJs`, the SDK's `StorageProvider`
-  and `DeviceStorage` as a host-implemented object the factories accept, so
-  the web keeps the SDK's node DB, config bundle, channels and heartbeats in
-  its own sqlocal database.
+- `Storage.kt` and `BoundedStorage.kt`: `createBrowserStorage`, the SDK's
+  SQLDelight storage running SQLite in a web worker (one database per radio),
+  which keeps the node DB, config bundle, channels and heartbeats across
+  sessions. Every storage call is bounded by a timeout; a backend that fails
+  or hangs degrades to in-memory instead of stalling the client. The web side
+  starts the workers in `apps/web/src/core/kmp/browserStorage.ts` and
+  `sqliteWorker.ts`.
 - Browser transports implementing the SDK's `RadioTransport`: `HttpTransport.kt`
   (device HTTP API with Chrome Local Network Access handling in `Lna.kt`),
   `WebSerialTransport.kt` (stream framing from `Framing.kt`) and
@@ -69,7 +72,8 @@ The SDK's `js` target landed in
 [meshtastic/meshtastic-sdk#215](https://github.com/meshtastic/meshtastic-sdk/pull/215)
 but no release carries it yet, so the SDK compiles from source:
 `vendor/meshtastic-sdk` is a git submodule of `meshtastic/meshtastic-sdk`
-(branch `main`), and `settings.gradle.kts` includes it as a composite build,
+(see `.gitmodules` for the URL and branch it currently tracks; while an SDK
+change the web needs is in review, it can point at that change's branch), and `settings.gradle.kts` includes it as a composite build,
 substituting `org.meshtastic:sdk-core` and `sdk-testing` with the included
 `:core` and `:testing` projects. No Maven repository, local or remote, serves
 the SDK. `ensure-dist` and `build` run `git submodule update --init` when the
