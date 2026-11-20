@@ -32,7 +32,7 @@
     "@bufbuild/protobuf": "^2.16.0",
     "@meshtastic/protobufs": "workspace:*",
     "ste-simple-events": "^4.0.0",
-    "tslog": "^5.2.0"
+    "tslog": "^5.5.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
