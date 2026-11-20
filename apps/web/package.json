@@ -115,7 +115,7 @@
     "autoprefixer": "^10.6.1",
     "gzipper": "^8.3.0",
     "happy-dom": "^21.0.1",
-    "oxfmt": "^0.73.0",
+    "oxfmt": "^0.79.0",
     "oxlint": "^1.88.0",
     "sql.js": "^1.15.0",
     "tailwind-merge": "^3.7.0",
