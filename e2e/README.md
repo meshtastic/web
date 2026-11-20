@@ -100,8 +100,8 @@ pnpm test:e2e
   `ignoreHTTPSErrors` + `--ignore-certificate-errors`; the dialog's HTTPS toggle
   is on. The app is served over plain HTTP to avoid mixed-content.
 - **Send readiness**: the composer renders before the SDK chat client is ready
-  (the SQLite/OPFS `sqlocal` store times out in headless Chromium and falls back
-  to in-memory). `MessagesPage.waitReady()` gates on the "Connected" status so an
+  (browser storage, SQLite on OPFS in a worker, can time out in headless
+  Chromium and falls back to in-memory). `MessagesPage.waitReady()` gates on the "Connected" status so an
   immediate send isn't silently dropped.
 
 ## Known limitations
@@ -119,15 +119,3 @@ pnpm test:e2e
   web app needs, so the two are mutually exclusive. The app behaves correctly
   (key-refresh dialog). Broadcast covers bidirectional messaging; re-enable
   against real hardware, where real LoRa carries PKC fine.
-
-## App bugs surfaced by this suite (fixed on this branch)
-
-1. **Connect-on-save race** (`apps/web/src/pages/Connections/useConnections.ts`):
-   `connect()` read the just-added connection from a stale memoized closure, so
-   "Save" never actually connected ("unknown connection id"). Fixed to read from
-   the live store.
-2. **`ReferenceError: nodeDB is not defined`** (`apps/web/src/core/subscriptions.ts`):
-   the device-metrics telemetry handler called a node store the #1050 migration
-   removed, throwing on every telemetry packet. Fixed by folding device metrics
-   into the node inside the SDK `NodesClient` (`onTelemetryPacket`) and dropping
-   the dead app-side handler.

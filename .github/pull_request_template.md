@@ -5,7 +5,7 @@ Thank you for your contribution to our project!
 ## Description
 
 <!--
-Provide a clear and concise description of what this PR does. Explain the problem it solves or the feature it adds.
+Lead with why: one or two sentences on the problem this solves or the feature it adds, before listing what changed.
 -->
 
 ## Related Issues
@@ -18,7 +18,8 @@ If there are no related issues, you can remove this section.
 ## Changes Made
 
 <!--
-List the key changes you've made. Focus on the most important aspects that reviewers should understand.
+List the key changes, grouped under whichever apply: New Features, Refactoring & Architecture, Bug Fixes, Chores.
+Call out architecture moves explicitly, such as logic moving into the Kotlin SDK or changes to the sdk-kmp facade.
 -->
 
 -
@@ -28,14 +29,19 @@ List the key changes you've made. Focus on the most important aspects that revie
 ## Testing Done
 
 <!--
-Describe how you tested these changes (added new tests, etc).
+List the tests you added or changed, and how to test or reproduce the change if it isn't obvious.
+If the change is hard to test, say why. Paste logs as a fenced code block, not a screenshot.
 -->
 
 ## Screenshots (if applicable)
 
 <!--
-If your changes affect the UI, include screenshots or screencasts showing the before and after.
+If your changes affect the UI, show the before and after. Paste or drag images in so GitHub hosts them.
 -->
+
+| Before | After |
+|--------|-------|
+|        |       |
 
 ## Checklist
 
@@ -48,3 +54,4 @@ Check all that apply. If an item doesn't apply to your PR, you can leave it unch
 - [ ] Tests have been added or updated
 - [ ] All i18n translation labels have been added (read
       CONTRIBUTING_I18N_DEVELOPER_GUIDE.md for more details)
+- [ ] `pnpm check` and `pnpm test` pass locally
