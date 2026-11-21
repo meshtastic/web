@@ -1,18 +1,18 @@
 /**
- * Shared look for segmented controls (Tabs, ToggleGroup): a light grey
- * track whose selected segment is a solid grey that fills it edge to edge.
- * Covers both Radix selected states: `active` (Tabs) and `on` (ToggleGroup).
+ * Shared look for segmented controls (Tabs, ToggleGroup, Segmented): an
+ * inset track whose selected segment is an accent pill. Covers the Radix
+ * selected states `active` (Tabs) and `on` (ToggleGroup), and
+ * `aria-checked` (Segmented's radios).
  */
 export const segmentedTrackClasses =
-  "overflow-hidden rounded-md bg-neutral-200 dark:bg-neutral-100";
+  "gap-0.5 rounded-control border border-input bg-app p-[3px]";
 
 export const segmentedItemClasses = [
-  "rounded-none text-sm font-medium text-neutral-600 transition-colors cursor-pointer",
-  "hover:bg-neutral-300/60 hover:text-neutral-900",
+  "rounded-[7px] text-help font-semibold text-secondary transition-colors cursor-pointer",
+  "hover:bg-raised hover:text-primary",
+  "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus",
   "disabled:pointer-events-none disabled:opacity-50",
-  // Selected: white on mid grey; black on a lighter grey in dark mode.
-  "data-[state=active]:bg-neutral-600 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:hover:bg-neutral-600",
-  "dark:data-[state=active]:bg-neutral-400 dark:data-[state=active]:text-black dark:data-[state=active]:hover:bg-neutral-400 dark:data-[state=active]:hover:text-black",
-  "data-[state=on]:bg-neutral-600 data-[state=on]:text-white data-[state=on]:shadow-sm data-[state=on]:hover:bg-neutral-600",
-  "dark:data-[state=on]:bg-neutral-400 dark:data-[state=on]:text-black dark:data-[state=on]:hover:bg-neutral-400 dark:data-[state=on]:hover:text-black",
+  "data-[state=active]:bg-accent data-[state=active]:text-on-accent data-[state=active]:hover:bg-accent",
+  "data-[state=on]:bg-accent data-[state=on]:text-on-accent data-[state=on]:hover:bg-accent",
+  "aria-checked:bg-accent aria-checked:text-on-accent aria-checked:hover:bg-accent",
 ].join(" ");

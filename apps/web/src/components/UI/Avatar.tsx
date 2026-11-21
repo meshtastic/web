@@ -1,14 +1,13 @@
 import { useNodeAsProto } from "@app/core/hooks/useNodesAsProto.ts";
-import { getColorFromNodeNum, isLightColor } from "@app/core/utils/color";
+import { NodeAvatar } from "@components/UI/NodeAvatar.tsx";
 import {
   Tooltip,
-  TooltipArrow,
   TooltipContent,
   TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { cn } from "@core/utils/cn.ts";
+import { initialsFor, nodeDisplayName } from "@core/utils/nodeIdentity.ts";
 import { LockKeyholeOpenIcon, StarIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -18,13 +17,23 @@ interface AvatarProps {
   className?: string;
   showError?: boolean;
   showFavorite?: boolean;
+  /**
+   * Leave the name out when it is shown next to the avatar, so it isn't
+   * read twice. Favourite / lock status is still announced.
+   */
+  decorative?: boolean;
 }
 
+/**
+ * Avatar for a node looked up by number. A thin wrapper over the
+ * presentational NodeAvatar for existing callers.
+ */
 export const Avatar = ({
   nodeNum,
   size = "sm",
   showError = false,
   showFavorite = false,
+  decorative = false,
   className,
 }: AvatarProps) => {
   const { t } = useTranslation();
@@ -34,78 +43,64 @@ export const Avatar = ({
     return null;
   }
 
-  const sizes = {
-    sm: "size-10 text-xs font-light",
-    lg: "size-16 text-lg",
+  const names = {
+    shortName: node?.user?.shortName,
+    longName: node?.user?.longName,
   };
-
-  const shortName = node?.user?.shortName ?? "";
-  const longName = node?.user?.longName ?? "";
-  const displayName = shortName || longName;
-
-  const bgColor = getColorFromNodeNum(nodeNum);
-  const isLight = isLightColor(bgColor);
-  const textColor = isLight ? "#000000" : "#FFFFFF";
-  const initials = displayName.slice(0, 4) || t("unknown.shortName");
+  const favoriteText = t("nodeDetail.favorite.label", { ns: "nodes" });
+  const errorText = t("nodeDetail.error.label", { ns: "nodes" });
+  // Overlay icons are hidden inside the avatar; their meaning goes in text.
+  const statuses = [
+    showFavorite ? favoriteText : undefined,
+    showError ? errorText : undefined,
+  ].filter((status) => status !== undefined);
+  const name = nodeDisplayName(names, nodeNum, (last4) =>
+    t("fallbackName", { last4 }),
+  );
 
   return (
-    <div
-      className={cn(
-        `relative flex items-center justify-center rounded-full font-semibold 
-`,
-        sizes[size],
-        "bg-[rgb(var(--bg-r),var(--bg-g),var(--bg-b))]", // allow override with className
-        className,
-      )}
-      style={
-        {
-          "--bg-r": bgColor.r,
-          "--bg-g": bgColor.g,
-          "--bg-b": bgColor.b,
-          color: textColor,
-        } as React.CSSProperties
-      }
-    >
-      {showFavorite ? (
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <StarIcon
-                className="absolute -top-0.5 -right-0.5 z-10 size-4 stroke-1 fill-yellow-400"
-                aria-hidden="true"
-                style={{
-                  color: `rgb(${bgColor.r}, ${bgColor.g}, ${bgColor.b})`,
-                }}
-              />
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                {t("nodeDetail.favorite.label", { ns: "nodes" })}
-                <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
-              </TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-        </TooltipProvider>
+    <>
+      <NodeAvatar
+        initials={initialsFor(names, nodeNum)}
+        tone={{ kind: "node", nodeNum }}
+        size={size === "lg" ? "xl" : "md"}
+        label={decorative ? undefined : [name, ...statuses].join(", ")}
+        className={className}
+      >
+        {showFavorite ? (
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <StarIcon
+                  className="absolute -top-0.5 -right-0.5 z-10 size-4 stroke-1 fill-dirty text-warning"
+                  aria-hidden="true"
+                />
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>{favoriteText}</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          </TooltipProvider>
+        ) : null}
+        {showError ? (
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <LockKeyholeOpenIcon
+                  className="absolute -bottom-0.5 -right-0.5 z-10 size-4 stroke-3 text-danger-strong"
+                  aria-hidden="true"
+                />
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>{errorText}</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          </TooltipProvider>
+        ) : null}
+      </NodeAvatar>
+      {decorative && statuses.length > 0 ? (
+        <span className="sr-only">{statuses.join(", ")}</span>
       ) : null}
-      {showError ? (
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <LockKeyholeOpenIcon
-                className="absolute -bottom-0.5 -right-0.5 z-10 size-4 text-red-500 stroke-3"
-                aria-hidden="true"
-              />
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                {t("nodeDetail.error.label", { ns: "nodes" })}
-                <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
-              </TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-        </TooltipProvider>
-      ) : null}
-      <p className="p-1 text-nowrap">{initials}</p>
-    </div>
+    </>
   );
 };

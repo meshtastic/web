@@ -41,6 +41,7 @@ export const colorTokenNames = [
   "on-accent-tint",
   "toggle-on",
   "toggle-knob",
+  "toggle-off",
   "bubble-sent",
   "on-bubble-sent",
   "bubble-pending",
@@ -64,6 +65,8 @@ export const colorTokenNames = [
   "online",
   "offline",
   "focus",
+  "avatar-ink-dark",
+  "avatar-ink-light",
 ] as const;
 export type ColorTokenName = (typeof colorTokenNames)[number];
 
@@ -106,6 +109,7 @@ export const colorTokens = {
     "on-accent-tint": "#d1fae5",
     "toggle-on": "#22a35a",
     "toggle-knob": "#ffffff",
+    "toggle-off": "#334155",
     "bubble-sent": "#1b4332",
     "on-bubble-sent": "#ecfdf5",
     "bubble-pending": "#18352a",
@@ -129,6 +133,8 @@ export const colorTokens = {
     online: "#67ea94",
     offline: "#64748b",
     focus: "#67ea94",
+    "avatar-ink-dark": "#000000",
+    "avatar-ink-light": "#ffffff",
   },
   light: {
     "bg-rail": "#e8edf4",
@@ -154,6 +160,7 @@ export const colorTokens = {
     "on-accent-tint": "#052e16",
     "toggle-on": "#11743a",
     "toggle-knob": "#ffffff",
+    "toggle-off": "#7b8aa0",
     "bubble-sent": "#cdeed9",
     "on-bubble-sent": "#052e16",
     "bubble-pending": "#e3f4e9",
@@ -177,6 +184,8 @@ export const colorTokens = {
     online: "#15803d",
     offline: "#64748b",
     focus: "#11743a",
+    "avatar-ink-dark": "#000000",
+    "avatar-ink-light": "#ffffff",
   },
 } as const satisfies Readonly<Record<ThemeName, ColorPalette>>;
 
@@ -289,6 +298,7 @@ export const contrastRequirements: readonly ContrastRequirement[] = [
   ),
   ...ui("toggle-on", ["bg-surface"], "switch track (on)"),
   ...ui("toggle-knob", ["toggle-on"], "switch knob on track"),
+  ...ui("toggle-knob", ["toggle-off"], "switch knob on track (off)"),
   ...ui("border-input", ["bg-surface", "bg-app"], "text input outline"),
 ];
 

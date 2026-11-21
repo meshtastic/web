@@ -1,4 +1,5 @@
 import { validateMaxByteLength } from "@core/utils/string.ts";
+import { utf8ByteLength } from "@core/utils/textLimit.ts";
 import { t } from "i18next";
 import { z } from "zod/v4";
 
@@ -8,6 +9,12 @@ import { z } from "zod/v4";
  * characters.
  */
 export const LONG_NAME_MAX_BYTES = 24;
+
+/**
+ * User.short_name is a 5-byte field (mesh.options max_size:5): 4 bytes of
+ * UTF-8 plus the terminator. One emoji fills it.
+ */
+export const SHORT_NAME_MAX_BYTES = 4;
 
 /**
  * ModuleConfig.statusmessage.node_status, shown on the User page from
@@ -38,7 +45,9 @@ export const UserValidationSchema = z.object({
   shortName: z
     .string()
     .min(1, t("user.shortName.validation.min"))
-    .max(4, t("user.shortName.validation.max")),
+    .refine((value) => utf8ByteLength(value) <= SHORT_NAME_MAX_BYTES, {
+      message: t("user.shortName.validation.max"),
+    }),
   // Status Message module's node_status; not part of the owner.
   nodeStatus: z
     .string()

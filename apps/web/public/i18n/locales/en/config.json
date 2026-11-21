@@ -605,10 +605,10 @@
     },
     "shortName": {
       "label": "Short Name",
-      "description": "Your abbreviated name (2-4 characters)",
+      "description": "Your abbreviated name, up to 4 bytes (2–4 letters; one emoji fills it)",
       "validation": {
         "min": "Short name must be at least 2 characters",
-        "max": "Short name must be at most 4 characters"
+        "max": "Short name must be at most 4 bytes. Emoji and accented letters use more than one byte each."
       }
     },
     "isUnmessageable": {

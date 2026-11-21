@@ -138,6 +138,7 @@
   --mt-on-accent-tint: #d1fae5;
   --mt-toggle-on: #22a35a;
   --mt-toggle-knob: #ffffff;
+  --mt-toggle-off: #334155;
 
   --mt-bubble-sent: #1b4332;
   --mt-on-bubble-sent: #ecfdf5;
@@ -165,6 +166,9 @@
   --mt-online: #67ea94;
   --mt-offline: #64748b;
   --mt-focus: #67ea94;
+  /* Initials on per-node avatar colours; the same in both themes. */
+  --mt-avatar-ink-dark: #000000;
+  --mt-avatar-ink-light: #ffffff;
 
   --mt-scrim: rgba(4, 8, 16, 0.92);
   --mt-overlay: rgba(15, 23, 42, 0.92);
@@ -206,6 +210,7 @@
   --mt-on-accent-tint: #052e16;
   --mt-toggle-on: #11743a;
   --mt-toggle-knob: #ffffff;
+  --mt-toggle-off: #7b8aa0;
 
   --mt-bubble-sent: #cdeed9;
   --mt-on-bubble-sent: #052e16;
@@ -233,6 +238,8 @@
   --mt-online: #15803d;
   --mt-offline: #64748b;
   --mt-focus: #11743a;
+  --mt-avatar-ink-dark: #000000;
+  --mt-avatar-ink-light: #ffffff;
 
   --mt-scrim: rgba(15, 23, 42, 0.4);
   --mt-overlay: rgba(255, 255, 255, 0.92);
@@ -272,6 +279,9 @@
   --color-danger-strong: var(--mt-danger-strong);
   --color-toggle-on: var(--mt-toggle-on);
   --color-toggle-knob: var(--mt-toggle-knob);
+  --color-toggle-off: var(--mt-toggle-off);
+  --color-avatar-ink-dark: var(--mt-avatar-ink-dark);
+  --color-avatar-ink-light: var(--mt-avatar-ink-light);
   --color-device-avatar: var(--mt-device-avatar);
 
   /* bg-* */
@@ -291,6 +301,14 @@
   --background-color-danger: var(--mt-danger-bg);
   --background-color-scrim: var(--mt-scrim);
   --background-color-overlay: var(--mt-overlay);
+  /* Inactive step / track marks drawn in the control-border shade. */
+  --background-color-control: var(--mt-border-control);
+
+  /* ring-* cut-outs matching the surface an indicator sits on. */
+  --ring-color-surface: var(--mt-bg-surface);
+  --ring-color-app: var(--mt-bg-app);
+  --ring-color-rail: var(--mt-bg-rail);
+  --ring-color-selected: var(--mt-bg-selected);
 
   /* text-* */
   --text-color-primary: var(--mt-fg-primary);

@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
+import { getRelativeTimeParts } from "@core/utils/timeFormat.ts";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -14,30 +15,6 @@ export interface TimeAgoProps {
   tooltipOptions?: Intl.DateTimeFormatOptions;
   className?: string;
 }
-
-const TIME_UNITS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
-  ["year", 31536000],
-  ["month", 2592000],
-  ["day", 86400],
-  ["hour", 3600],
-  ["minute", 60],
-  ["second", 1],
-];
-
-const getRelativeTimeParts = (
-  date: Date | number,
-): { value: number; unit: Intl.RelativeTimeFormatUnit } => {
-  const diffInSeconds = (new Date(date).getTime() - Date.now()) / 1000;
-
-  for (const [unit, secondsInUnit] of TIME_UNITS) {
-    if (Math.abs(diffInSeconds) >= secondsInUnit) {
-      const value = Math.round(diffInSeconds / secondsInUnit);
-      return { value, unit };
-    }
-  }
-
-  return { value: Math.round(diffInSeconds), unit: "second" };
-};
 
 const UPDATE_INTERVALS: Partial<Record<Intl.RelativeTimeFormatUnit, number>> = {
   // For long-term units, an hourly update is more than sufficient.
@@ -93,7 +70,7 @@ export const TimeAgo = ({
     let timerId: ReturnType<typeof setTimeout>;
 
     const update = () => {
-      const { value, unit } = getRelativeTimeParts(date);
+      const { value, unit } = getRelativeTimeParts(date, Date.now());
       setTimeAgo(rtf.format(value, unit));
 
       const interval = UPDATE_INTERVALS[unit] || 60000;
