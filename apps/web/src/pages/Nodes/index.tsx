@@ -1,336 +1,299 @@
-import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
-import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
-import { Mono } from "@components/generic/Mono.tsx";
+import { NodeDetailsPanel } from "@components/Nodes/NodeDetailsPanel.tsx";
+import { NodeFilterBar } from "@components/Nodes/NodeFilterBar.tsx";
+import { NodeList } from "@components/Nodes/NodeList.tsx";
+import { NodeResponseDialogs } from "@components/Nodes/NodeResponseDialogs.tsx";
+import { NodesTable } from "@components/Nodes/NodesTable.tsx";
+import { useCollator } from "@components/Nodes/useCollator.ts";
+import { useNodeActions } from "@components/Nodes/useNodeActions.ts";
+import { useNodeLabels } from "@components/Nodes/useNodeLabels.ts";
+import { useNodeRows } from "@components/Nodes/useNodeRows.ts";
 import {
-  isNodeUnheardOnCurrentLora,
-  NodeTrustIndicators,
-} from "@components/generic/NodeTrustIndicators.tsx";
+  DETAILS_PANEL_STORAGE_KEY,
+  ShellPage,
+} from "@components/Shell/ShellPage.tsx";
+import { Button } from "@components/UI/Button.tsx";
+import { EmptyState } from "@components/UI/EmptyState.tsx";
+import { useIsMobile } from "@core/hooks/useIsMobile.ts";
+import useLocalStorage from "@core/hooks/useLocalStorage.ts";
+import { useNodeErrors } from "@core/kmp/hooks";
 import {
-  type DataRow,
-  type Heading,
-  Table,
-} from "@components/generic/Table/index.tsx";
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { ShellPage } from "@components/Shell/ShellPage.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
-import { Input } from "@components/UI/Input.tsx";
-import useLang from "@core/hooks/useLang.ts";
-import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { useAppStore, useDevice } from "@core/stores";
-import { Protobuf, type Types } from "@core/protobuf.ts";
-import { useActiveClient, useNodeErrors } from "@core/kmp/hooks";
-import { numberToHexUnpadded } from "@noble/curves/utils.js";
-import { LockIcon, LockOpenIcon } from "lucide-react";
+  countByQuickFilter,
+  matchesNodeSearch,
+  matchesQuickFilter,
+  type NodeQuickFilter,
+  toggleQuickFilter,
+} from "@core/nodes/nodeFilters.ts";
+import { summarizeNodes } from "@core/nodes/nodeRow.ts";
+import {
+  DEFAULT_NODE_SORT,
+  NODE_SORT_INITIAL_DIRECTION,
+  type NodeSortKey,
+  sortNodeRows,
+} from "@core/nodes/nodeSort.ts";
+import { nextSortState, type SortState } from "@core/nodes/sort.ts";
+import { useNavigate } from "@tanstack/react-router";
+import { FunnelIcon, InfoIcon, UsersIcon } from "lucide-react";
 import {
   type JSX,
   useCallback,
   useDeferredValue,
-  useEffect,
   useMemo,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { base16 } from "rfc4648";
 
-export interface DeleteNoteDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+const readBoolean = (value: string): boolean => value === "true";
 
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
-  const { current } = useLang();
-  const { hardware, setDialogOpen } = useDevice();
-  const connection = useActiveClient();
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  const { rows, sources, now } = useNodeRows();
+  const labels = useNodeLabels(now);
+  const errors = useNodeErrors();
 
-  const { setNodeNumDetails } = useAppStore();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
-
-  const [selectedTraceroute, setSelectedTraceroute] = useState<
-    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
-  >();
-  const [selectedLocation, setSelectedLocation] = useState<
-    Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
-  >();
-
   const [filterState, setFilterState] = useState<FilterState>(
     () => defaultFilterValues,
   );
+  const [search, setSearch] = useState("");
+  const [quickFilter, setQuickFilter] = useState<NodeQuickFilter>("all");
+  const [sort, setSort] = useState<SortState<NodeSortKey>>(DEFAULT_NODE_SORT);
+  const [selectedNum, setSelectedNum] = useState<number | undefined>();
+  // Row to focus when the mobile list comes back from a node's details.
+  const [returnFocusNum, setReturnFocusNum] = useState<number | undefined>();
+  // Shared with ShellPage: selecting a node reopens a hidden details column.
+  const [, setDetailsOpen] = useLocalStorage<boolean>(
+    DETAILS_PANEL_STORAGE_KEY,
+    true,
+    { serializer: String, deserializer: readBoolean },
+  );
+
   const deferredFilterState = useDeferredValue(filterState);
+  const deferredSearch = useDeferredValue(search);
+  const filtersDirty = isFilterDirty(filterState);
 
-  // stable predicate so the selector identity doesn’t thrash
-  const predicate = useCallback(
-    (node: Protobuf.Mesh.NodeInfo) => nodeFilter(node, deferredFilterState),
-    [nodeFilter, deferredFilterState],
+  const errorNums = useMemo(
+    () => new Set(errors.map((error) => error.node)),
+    [errors],
   );
+  const collator = useCollator();
 
-  // Nodes come from the SDK NodesClient (signals + sqlocal-backed history).
-  // PKI / node-error tracking lives on the SDK NodesClient too.
-  const allSdkNodes = useNodesAsProto();
-  const filteredNodes = useMemo(
-    () => allSdkNodes.filter(predicate),
-    [allSdkNodes, predicate],
-  );
-  const errors = useNodeErrors();
-  const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
-  const hasNodeError = useCallback(
-    (num: number) => errorSet.has(num),
-    [errorSet],
-  );
-  const handleTraceroute = useCallback(
-    (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
-      setSelectedTraceroute(traceroute);
-    },
-    [],
-  );
+  // Search and the advanced filters narrow the set the chips count.
+  const searchedRows = useMemo(() => {
+    const passing = new Set(
+      sources
+        .filter((node) => nodeFilter(node, deferredFilterState))
+        .map((node) => node.num),
+    );
+    return rows.filter(
+      (row) => passing.has(row.num) && matchesNodeSearch(row, deferredSearch),
+    );
+  }, [rows, sources, nodeFilter, deferredFilterState, deferredSearch]);
 
-  const handleLocation = useCallback(
-    (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
-      if (
-        location.to.valueOf() !== hardware.myNodeNum ||
-        location.from.valueOf() === hardware.myNodeNum
-      ) {
-        return;
+  const counts = useMemo(
+    () => countByQuickFilter(searchedRows),
+    [searchedRows],
+  );
+  const visibleRows = useMemo(
+    () =>
+      sortNodeRows(
+        searchedRows.filter((row) => matchesQuickFilter(row, quickFilter)),
+        sort,
+        collator,
+      ),
+    [searchedRows, quickFilter, sort, collator],
+  );
+  const summary = useMemo(() => summarizeNodes(rows), [rows]);
+
+  // Looked up among all nodes, so the selection survives filtering.
+  const selectedRow = rows.find((row) => row.num === selectedNum);
+  const actions = useNodeActions(selectedRow);
+
+  // Stable, so the memoised table rows don't re-render on every update.
+  const selectNode = useCallback(
+    (num: number) => {
+      setSelectedNum(num);
+      if (!isMobile) {
+        setDetailsOpen(true);
       }
-      setSelectedLocation(location);
     },
-    [hardware.myNodeNum],
+    [isMobile, setDetailsOpen],
   );
 
-  function handleNodeInfoDialog(nodeNum: number): void {
-    setNodeNumDetails(nodeNum);
-    setDialogOpen("nodeDetails", true);
-  }
-
-  useEffect(() => {
-    if (!connection) {
-      return;
-    }
-    return connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
-  }, [connection, handleTraceroute]);
-
-  useEffect(() => {
-    if (!connection) {
-      return;
-    }
-    return connection.events.onPositionPacket.subscribe(handleLocation);
-  }, [connection, handleLocation]);
-
-  const tableHeadings: Heading[] = [
-    { title: "", sortable: false },
-    { title: t("nodesTable.headings.longName"), sortable: true },
-    { title: t("nodesTable.headings.connection"), sortable: true },
-    { title: t("nodesTable.headings.lastHeard"), sortable: true },
-    { title: t("nodesTable.headings.encryption"), sortable: false },
-    { title: t("unit.snr"), sortable: true },
-    { title: t("nodesTable.headings.model"), sortable: true },
-    { title: t("nodesTable.headings.macAddress"), sortable: true },
-  ];
-
-  const tableRows: DataRow[] = filteredNodes.map((node) => {
-    const macAddress =
-      base16
-        .stringify(node.user?.macaddr ?? [])
-        .match(/.{1,2}/g)
-        ?.join(":") ?? t("unknown.shortName");
-
-    const shortName =
-      node.user?.shortName ??
-      numberToHexUnpadded(node.num).slice(-4).toUpperCase();
-    const longName =
-      node.user?.longName ??
-      t("fallbackName", {
-        last4: shortName,
+  // Direct-message route; keep in step with useNodeActions.message.
+  const messageNode = useCallback(
+    (num: number) => {
+      void navigate({
+        to: "/messages/$type/$chatId",
+        params: { type: "direct", chatId: num },
       });
+    },
+    [navigate],
+  );
 
-    // SNR is reported in dB. Map it to a 0–100% signal-quality heuristic
-    // (-10 dB → 0%, +10 dB → 100%) for an at-a-glance read, and pick a tone.
-    const snr = node.snr ?? 0;
-    const snrQuality = Math.min(Math.max(Math.round((snr + 10) * 5), 0), 100);
-    const snrTone =
-      snrQuality >= 67
-        ? "text-green-500"
-        : snrQuality >= 34
-          ? "text-yellow-500"
-          : "text-red-500";
+  const backToList = () => {
+    setReturnFocusNum(selectedNum);
+    setSelectedNum(undefined);
+  };
 
-    return {
-      id: node.num,
-      isFavorite: node.isFavorite,
-      isDimmed: isNodeUnheardOnCurrentLora(node),
-      cells: [
-        {
-          content: (
-            <Avatar
-              nodeNum={node.num}
-              showFavorite={node.isFavorite}
-              showError={hasNodeError(node.num)}
-            />
-          ),
-          sortValue: shortName, // Non-sortable column
-        },
-        {
-          content: (
-            <div className="ml-2 flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <h1
-                  onMouseDown={() => handleNodeInfoDialog(node.num)}
-                  onKeyUp={(evt) => {
-                    if (evt.key === "Enter") {
-                      handleNodeInfoDialog(node.num);
-                    }
-                  }}
-                  className="cursor-pointer underline whitespace-break-spaces"
-                >
-                  {longName}
-                </h1>
-                <NodeTrustIndicators node={node} />
-              </div>
-              {node.status && (
-                <span
-                  className="max-w-xs truncate text-xs text-slate-500 dark:text-slate-400"
-                  title={node.status}
-                >
-                  <span className="sr-only">
-                    {t("trust.statusMessage.label")}:{" "}
-                  </span>
-                  {node.status}
-                </span>
-              )}
-            </div>
-          ),
-          sortValue: longName,
-        },
-        {
-          content: (
-            <Mono className="w-16">
-              {node.hopsAway !== undefined
-                ? node?.viaMqtt === false && node.hopsAway === 0
-                  ? t("nodesTable.connectionStatus.direct")
-                  : `${node.hopsAway?.toString()} ${
-                      (node.hopsAway ?? 0) > 1
-                        ? t("unit.hop.plural")
-                        : t("unit.hop.one")
-                    } ${t("nodesTable.connectionStatus.away")}`
-                : t("unknown.longName")}
-              {node?.viaMqtt === true
-                ? t("nodesTable.connectionStatus.viaMqtt")
-                : ""}
-            </Mono>
-          ),
-          sortValue: node.hopsAway ?? Number.MAX_SAFE_INTEGER,
-        },
-        {
-          content: (
-            <Mono>
-              {node.lastHeard === 0 ? (
-                t("unknown.longName")
-              ) : (
-                <TimeAgo
-                  timestamp={node.lastHeard * 1000}
-                  locale={current?.code}
-                />
-              )}
-            </Mono>
-          ),
-          sortValue: node.lastHeard,
-        },
-        {
-          content: (
-            <Mono>
-              {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
-                <LockIcon className="text-green-600 mx-auto" />
-              ) : (
-                <LockOpenIcon className="text-yellow-300 mx-auto" />
-              )}
-            </Mono>
-          ),
-          sortValue: "", // Non-sortable column
-        },
-        {
-          content: (
-            <Mono className="flex items-baseline gap-1.5">
-              <span className={snrTone}>
-                {Number(snr.toFixed(1))} {t("unit.db")}
-              </span>
-              <span className="text-gray-500 dark:text-gray-400/70">
-                {snrQuality}%
-              </span>
-            </Mono>
-          ),
-          sortValue: node.snr,
-        },
-        {
-          content: (
-            <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>
-          ),
-          sortValue:
-            Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ?? "UNSET",
-        },
-        {
-          content: <Mono>{macAddress}</Mono>,
-          sortValue: macAddress,
-        },
-      ],
-    };
-  });
+  const clearFilters = () => {
+    setSearch("");
+    setQuickFilter("all");
+    setFilterState(defaultFilterValues);
+  };
+
+  const title = t("navigation.nodes", { ns: "ui" });
+
+  const details = isMobile ? undefined : selectedRow ? (
+    <NodeDetailsPanel
+      row={selectedRow}
+      labels={labels}
+      actions={actions}
+      hasError={errorNums.has(selectedRow.num)}
+    />
+  ) : (
+    <EmptyState
+      icon={<InfoIcon className="size-8" />}
+      title={t("details.label")}
+      description={t("page.selectPrompt")}
+      className="px-4 pt-16"
+    />
+  );
+
+  const moreFilters = (
+    <FilterControl
+      filterState={filterState}
+      defaultFilterValues={defaultFilterValues}
+      setFilterState={setFilterState}
+      isDirty={filtersDirty}
+      parameters={{
+        popoverContentProps: { side: "bottom", align: "end", sideOffset: 8 },
+        popoverTriggerClassName: [
+          "flex size-9 items-center justify-center rounded-control border border-control",
+          "bg-app text-muted hover:bg-raised hover:text-primary active:bg-raised",
+          "dark:bg-app dark:text-muted hover:dark:bg-raised hover:dark:text-primary dark:active:bg-raised",
+          "focus-visible:outline-2 focus-visible:outline-focus",
+          filtersDirty
+            ? "border-accent bg-accent-tint text-accent dark:bg-accent-tint dark:text-accent hover:bg-accent-tint hover:dark:bg-accent-tint"
+            : "",
+        ].join(" "),
+        triggerIcon: <FunnelIcon aria-hidden="true" className="size-4" />,
+        showTextSearch: false,
+      }}
+    />
+  );
+
+  const list =
+    rows.length === 0 ? (
+      <EmptyState
+        icon={<UsersIcon className="size-8" />}
+        title={t("page.noNodes")}
+        description={t("page.noNodesDescription")}
+        className="pt-16"
+      />
+    ) : visibleRows.length === 0 ? (
+      <EmptyState
+        title={t("page.noMatches")}
+        description={t("page.noMatchesDescription")}
+        className="pt-16"
+      >
+        <Button variant="secondary" onClick={clearFilters}>
+          {t("page.clearFilters")}
+        </Button>
+      </EmptyState>
+    ) : isMobile ? (
+      <NodeList
+        rows={visibleRows}
+        selectedNum={selectedNum}
+        onSelect={selectNode}
+        labels={labels}
+        label={t("page.tableLabel")}
+        errorNums={errorNums}
+        focusNum={returnFocusNum}
+      />
+    ) : (
+      <NodesTable
+        rows={visibleRows}
+        sort={sort}
+        onSort={(key) =>
+          setSort((current) =>
+            nextSortState(current, key, NODE_SORT_INITIAL_DIRECTION),
+          )
+        }
+        selectedNum={selectedNum}
+        onSelect={selectNode}
+        onMessage={messageNode}
+        labels={labels}
+        errorNums={errorNums}
+        label={t("page.tableLabel")}
+        className="flex-1 px-1 pb-3 md:px-3"
+      />
+    );
 
   return (
-    <ShellPage label={t("navigation.nodes", { ns: "ui" })}>
-      <div className="pl-2 pt-2 flex flex-row">
-        <div className="flex-1 mr-2">
-          <Input
-            placeholder={t("search.nodes")}
-            value={filterState.nodeName}
-            className="bg-transparent"
-            showClearButton={!!filterState.nodeName}
-            onChange={(e) =>
-              setFilterState((prev) => ({
-                ...prev,
-                nodeName: e.target.value,
-              }))
-            }
+    <ShellPage
+      label={title}
+      details={details}
+      detailsLabel={t("details.label")}
+      noPadding
+    >
+      <h1 className="sr-only">{title}</h1>
+      {/* The details column changes without moving focus; say so. */}
+      <output aria-live="polite" className="sr-only">
+        {!isMobile && selectedRow
+          ? t("page.detailsShown", { name: selectedRow.name })
+          : ""}
+      </output>
+      {isMobile && selectedRow ? (
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
+          <NodeDetailsPanel
+            row={selectedRow}
+            labels={labels}
+            actions={actions}
+            hasError={errorNums.has(selectedRow.num)}
+            onBack={backToList}
           />
         </div>
-        <div className="flex items-center pr-2 text-sm text-slate-500 dark:text-slate-400 tabular-nums">
-          {filteredNodes.length}/{allSdkNodes.length}
-        </div>
-        <div className="flex justify-end">
-          <FilterControl
-            filterState={filterState}
-            defaultFilterValues={defaultFilterValues}
-            setFilterState={setFilterState}
-            isDirty={isFilterDirty(filterState)}
-            parameters={{
-              popoverContentProps: {
-                side: "bottom",
-                align: "end",
-                sideOffset: 12,
-              },
-              popoverTriggerClassName: "mr-1 p-2",
-              showTextSearch: false,
-            }}
-          />
-        </div>
-      </div>
-      <div className="overflow-y-auto">
-        <Table headings={tableHeadings} rows={tableRows} />
-        <TracerouteResponseDialog
-          traceroute={selectedTraceroute}
-          open={!!selectedTraceroute}
-          onOpenChange={() => setSelectedTraceroute(undefined)}
-        />
-        <LocationResponseDialog
-          location={selectedLocation}
-          open={!!selectedLocation}
-          onOpenChange={() => setSelectedLocation(undefined)}
-        />
-      </div>
+      ) : (
+        <>
+          <div className="flex flex-col gap-3.5 border-b border-subtle px-3 pt-4 pb-3 md:px-6">
+            <p className="m-0 text-body text-muted">
+              {t("page.summary", {
+                known: summary.known,
+                recent: summary.heardRecently,
+              })}
+            </p>
+            <NodeFilterBar
+              search={search}
+              onSearchChange={setSearch}
+              quickFilter={quickFilter}
+              onQuickFilterChange={(filter) =>
+                setQuickFilter((current) => toggleQuickFilter(current, filter))
+              }
+              counts={counts}
+              sortKey={sort.key}
+              onSortKeyChange={(key) =>
+                setSort({ key, direction: NODE_SORT_INITIAL_DIRECTION[key] })
+              }
+              moreFilters={moreFilters}
+            />
+          </div>
+          {isMobile || visibleRows.length === 0 ? (
+            <div className="min-h-0 flex-1 overflow-auto px-1 pb-3 md:px-3">
+              {list}
+            </div>
+          ) : (
+            list
+          )}
+        </>
+      )}
+      <NodeResponseDialogs />
     </ShellPage>
   );
 };

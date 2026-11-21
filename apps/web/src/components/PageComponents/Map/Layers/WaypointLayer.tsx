@@ -1,4 +1,4 @@
-import { NodeMarker } from "@components/PageComponents/Map/Markers/NodeMarker.tsx";
+import { WaypointMarker } from "@components/PageComponents/Map/Markers/WaypointMarker.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { PopupWrapper } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { WaypointDetail } from "@components/PageComponents/Map/Popups/WaypointDetail.tsx";
@@ -55,15 +55,14 @@ export const WaypointLayer = ({
       longitudeI: waypoint.longitudeI,
     });
     rendered.push(
-      <NodeMarker
+      <WaypointMarker
         key={`waypoint-${waypoint.id}`}
         id={waypoint.id}
         lng={lng}
         lat={lat}
-        label={String.fromCodePoint(waypoint.icon) ?? "📍"}
-        longLabel={waypoint.name}
-        avatarClassName="bg-amber-400 border-amber-500"
-        onClick={(_, e) => onMarkerClick(waypoint, e)}
+        icon={String.fromCodePoint(waypoint.icon || 0x1f4cd)}
+        name={waypoint.name}
+        onClick={(_, event) => onMarkerClick(waypoint, event)}
       />,
     );
   }
@@ -79,7 +78,6 @@ export const WaypointLayer = ({
         key={`popup-waypoint-${popupState.waypoint.id}`}
         lng={lng}
         lat={lat}
-        offset={[0, 25]}
         onClose={() => setPopupState(undefined)}
       >
         <WaypointDetail

@@ -1,63 +1,18 @@
 {
   "nodeDetail": {
-    "publicKeyEnabled": {
-      "label": "Public Key Enabled"
-    },
-    "noPublicKey": {
-      "label": "No Public Key"
-    },
-    "directMessage": {
-      "label": "Direct Message {{shortName}}"
-    },
     "favorite": {
       "label": "Favorite",
       "tooltip": "Add or remove this node from your favorites"
     },
-    "notFavorite": {
-      "label": "Not a Favorite"
-    },
     "error": {
       "label": "Error",
       "text": "An error occurred while fetching node details. Please try again later."
-    },
-    "status": {
-      "heard": "Heard",
-      "mqtt": "MQTT"
-    },
-    "elevation": {
-      "label": "Elevation"
-    },
-    "channelUtil": {
-      "label": "Channel Util"
-    },
-    "airtimeUtil": {
-      "label": "Airtime Util"
     }
   },
   "nodesTable": {
-    "headings": {
-      "longName": "Long Name",
-      "connection": "Connection",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
-      "model": "Model",
-      "macAddress": "MAC Address"
-    },
-    "connectionStatus": {
-      "direct": "Direct",
-      "away": "away",
-      "viaMqtt": ", via MQTT"
-    },
     "lastHeardStatus": {
       "never": "Never"
     }
-  },
-  "actions": {
-    "added": "Added",
-    "removed": "Removed",
-    "ignoreNode": "Ignore Node",
-    "unignoreNode": "Unignore Node",
-    "requestPosition": "Request Position"
   },
   "trust": {
     "signed": {
@@ -75,5 +30,108 @@
     "statusMessage": {
       "label": "Status message"
     }
+  },
+  "page": {
+    "summary": "{{known}} known · {{recent}} heard in the last 2 h",
+    "searchLabel": "Search nodes",
+    "searchPlaceholder": "Search by name, short name or node ID",
+    "filtersLabel": "Filter nodes",
+    "moreFilters": "More filters",
+    "sortLabel": "Sort nodes",
+    "sortBy": "Sort: {{column}}",
+    "tableLabel": "Known nodes",
+    "noMatches": "No nodes match",
+    "noMatchesDescription": "Try another search or filter.",
+    "clearFilters": "Clear filters",
+    "noNodes": "No nodes yet",
+    "noNodesDescription": "Nodes show up here once your radio hears them.",
+    "selectPrompt": "Select a node to see its details and actions.",
+    "back": "Back to nodes",
+    "detailsShown": "Details for {{name}} shown in the side panel"
+  },
+  "quickFilter": {
+    "all": "All",
+    "favorites": "Favorites",
+    "recent": "Heard < 2 h",
+    "direct": "Direct",
+    "hasPosition": "Has position"
+  },
+  "column": {
+    "node": "Node",
+    "role": "Role",
+    "hardware": "Hardware",
+    "hops": "Hops",
+    "snr": "SNR",
+    "battery": "Battery",
+    "distance": "Distance",
+    "lastHeard": "Last heard",
+    "encryption": "Encryption",
+    "actions": "Actions"
+  },
+  "value": {
+    "direct": "Direct",
+    "hops_one": "{{count}} hop",
+    "hops_other": "{{count}} hops",
+    "hopsUnknown": "Unknown hops",
+    "viaMqtt": "via MQTT",
+    "never": "Never",
+    "notAvailable": "—",
+    "pluggedIn": "Plugged in",
+    "db": "{{value}} dB",
+    "volts": "{{value}} V",
+    "thisDevice": "This device",
+    "heardAgo": "heard {{time}}",
+    "neverHeard": "never heard",
+    "favorite": "Favorite",
+    "ignored": "Ignored",
+    "encrypted": "Public key known: direct messages are end-to-end encrypted",
+    "notEncrypted": "No public key: direct messages use the channel key",
+    "messageNode": "Message {{name}}",
+    "selectNode": "Show details for {{name}}"
+  },
+  "details": {
+    "label": "Node details",
+    "message": "Message",
+    "showOnMap": "Show on map",
+    "signal": "Signal",
+    "quickActions": "Quick actions",
+    "traceroute": "Traceroute",
+    "requestPosition": "Request position",
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites",
+    "ignore": "Ignore node",
+    "unignore": "Stop ignoring node",
+    "verifyKey": "Verify key",
+    "remove": "Remove node",
+    "allDetails": "Telemetry and raw data",
+    "about": "About",
+    "nodeId": "Node ID",
+    "nodeNumber": "Node number",
+    "mac": "MAC address",
+    "status": "Status",
+    "messageable": "Accepts direct messages",
+    "power": "Power",
+    "voltage": "Voltage",
+    "channelUtil": "Channel utilization",
+    "airUtil": "Air TX utilization",
+    "uptime": "Uptime",
+    "position": "Position",
+    "coordinates": "Coordinates",
+    "altitude": "Altitude",
+    "noPosition": "No position shared yet.",
+    "security": "Security",
+    "publicKey": "Public key",
+    "noPublicKey": "No public key",
+    "keyVerified": "Verified manually",
+    "keyNotVerified": "Not verified",
+    "signed": "Signs its packets (XEdDSA)",
+    "unheard": "Not heard on the current LoRa settings",
+    "meters": "{{value}} m",
+    "error": "This node reported an error, such as a public key mismatch. Messages to it may fail."
+  },
+  "toast": {
+    "tracerouteFailed": "Traceroute failed",
+    "positionRequestFailed": "Position request failed",
+    "keyVerificationFailed": "Could not start key verification"
   }
 }

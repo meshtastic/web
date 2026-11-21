@@ -1,52 +1,50 @@
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useTheme } from "@core/hooks/useTheme.ts";
-import { useEffect, useMemo, useRef } from "react";
+import type { MapView } from "@core/nodes/mapView.ts";
+import { type ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import MapGl, {
   AttributionControl,
   type MapLayerMouseEvent,
-  type MapRef,
-  NavigationControl,
+  type ViewStateChangeEvent,
   ScaleControl,
 } from "react-map-gl/maplibre";
 
-interface MapProps {
-  children?: React.ReactNode;
-  onLoad?: (map: MapRef) => void;
+const MAP_STYLE =
+  "https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json";
+
+const WORLD_VIEW: MapView = { longitude: 0, latitude: 35, zoom: 1.8 };
+
+export interface MeshMapProps {
+  children?: ReactNode;
+  initialView?: MapView;
+  onLoad?: () => void;
+  onMoveEnd?: (event: ViewStateChangeEvent) => void;
   onMouseMove?: (event: MapLayerMouseEvent) => void;
   onClick?: (event: MapLayerMouseEvent) => void;
   interactiveLayerIds?: string[];
-  initialViewState?: {
-    latitude?: number;
-    longitude?: number;
-    zoom?: number;
-  };
 }
 
-export const BaseMap = ({
+/**
+ * The maplibre map with the app's tiles, locale strings, attribution and
+ * scale. Zoom buttons are drawn by the page as overlay controls, so the
+ * built-in navigation control is left out.
+ */
+export const MeshMap = ({
   children,
+  initialView,
   onLoad,
-  onClick,
+  onMoveEnd,
   onMouseMove,
+  onClick,
   interactiveLayerIds,
-  initialViewState,
-}: MapProps) => {
+}: MeshMapProps) => {
   const { theme } = useTheme();
   const { t } = useTranslation("map");
-
-  const darkMode = theme === "dark";
   const isMobile = useIsMobile();
-  const mapRef = useRef<MapRef | null>(null);
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (map && onLoad) {
-      onLoad(map);
-    }
-  }, [onLoad]);
-
-  const locale = useMemo(() => {
-    return {
+  const locale = useMemo(
+    () => ({
       "GeolocateControl.FindMyLocation": t(
         "maplibre.GeolocateControl.FindMyLocation",
       ),
@@ -63,46 +61,35 @@ export const BaseMap = ({
       "CooperativeGesturesHandler.MobileHelpText": t(
         "maplibre.CooperativeGesturesHandler.MobileHelpText",
       ),
-    };
-  }, [t]);
+    }),
+    [t],
+  );
 
   return (
     <MapGl
-      ref={mapRef}
-      mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
+      mapStyle={MAP_STYLE}
       attributionControl={false}
       renderWorldCopies={false}
       maxPitch={0}
       dragRotate={false}
       touchZoomRotate={isMobile}
-      initialViewState={
-        initialViewState ?? {
-          zoom: 1.8,
-          latitude: 35,
-          longitude: 0,
-        }
-      }
-      style={{ filter: darkMode ? "brightness(0.9)" : undefined }}
+      initialViewState={initialView ?? WORLD_VIEW}
+      // OSM tiles have no dark style; dim them a touch in the dark theme.
+      style={{
+        width: "100%",
+        height: "100%",
+        filter: theme === "dark" ? "brightness(0.9)" : undefined,
+      }}
       locale={locale}
       interactiveLayerIds={interactiveLayerIds}
+      onLoad={onLoad}
+      onMoveEnd={onMoveEnd}
       onMouseMove={onMouseMove}
       onClick={onClick}
     >
-      <AttributionControl
-        style={{
-          background: darkMode ? "#ffffff" : undefined,
-          color: darkMode ? "black" : undefined,
-        }}
-      />
-      {/* { Disabled for now until we can use i18n for the geolocate control} */}
-      {/* <GeolocateControl
-        position="top-right"
-        i18nIsDynamicList
-        positionOptions={{ enableHighAccuracy: true }}
-        trackUserLocation
-      />  */}
-      <NavigationControl position="top-right" showCompass={false} />
-      <ScaleControl />
+      {/* Bottom-right, clear of the node list panel that covers the left. */}
+      <AttributionControl position="bottom-right" compact />
+      <ScaleControl position="bottom-right" />
       {children}
     </MapGl>
   );

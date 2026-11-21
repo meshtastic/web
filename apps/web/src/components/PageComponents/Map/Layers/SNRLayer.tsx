@@ -1,7 +1,6 @@
 import { Mono } from "@app/components/generic/Mono";
-import { cn } from "@app/core/utils/cn";
 import { getSignalColor } from "@app/core/utils/signalColor";
-import type { VisibilityState } from "@components/PageComponents/Map/Tools/MapLayerTool";
+import type { VisibilityState } from "@core/nodes/mapLayers.ts";
 import { useDevice } from "@core/stores";
 import {
   distanceMeters,
@@ -252,31 +251,30 @@ export const SNRTooltip = ({
   from,
   to,
 }: Partial<SNRTooltipProps> = {}) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("map");
 
   if (!pos) {
     return undefined;
   }
   return (
     <div
-      className={cn(
-        "absolute block p-2 px-3 text-sm bg-white dark:bg-slate-800 rounded-lg shadow",
-        "",
-      )}
+      className="pointer-events-none absolute rounded-control border border-elevated bg-raised px-3 py-2 text-meta text-primary shadow-popover"
       style={{ left: `${pos.x + 5}px`, top: `${pos.y + 10}px` }}
-      aria-hidden={!pos}
+      aria-hidden="true"
     >
       <div>
-        <strong className="font-bold">{from ?? ""}</strong>
+        <strong className="font-semibold">{from ?? ""}</strong>
         {to && (
           <>
-            <span className="mx-1">⭢</span>
-            <strong className="font-bold">{to ?? ""}</strong>
+            <span className="mx-1 text-muted">⭢</span>
+            <strong className="font-semibold">{to}</strong>
           </>
         )}
       </div>
-      <div>
-        SNR: <Mono>{snr?.toFixed?.(2) ?? t("unknown.shortName")}</Mono> dB
+      <div className="text-secondary">
+        {t("snrTooltip.label")}{" "}
+        <Mono>{snr?.toFixed?.(2) ?? t("unknown.shortName")}</Mono>{" "}
+        {t("snrTooltip.unit")}
       </div>
     </div>
   );

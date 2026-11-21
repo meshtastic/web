@@ -3,7 +3,28 @@ import type { Protobuf } from "@core/protobuf.ts";
 import { useCallback } from "react";
 import type { MapRef } from "react-map-gl/maplibre";
 
-export function useMapFitting(map: MapRef | undefined) {
+export interface MapFitPadding {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
+const DEFAULT_PADDING: MapFitPadding = {
+  top: 10,
+  bottom: 10,
+  left: 10,
+  right: 10,
+};
+
+/**
+ * `padding` keeps fitted nodes clear of anything floating over the map,
+ * such as the Map screen's node list and layers panels.
+ */
+export function useMapFitting(
+  map: MapRef | undefined,
+  padding: MapFitPadding = DEFAULT_PADDING,
+) {
   const focusLngLat = useCallback(
     (position: LngLat) => {
       if (!map) {
@@ -36,14 +57,14 @@ export function useMapFitting(map: MapRef | undefined) {
       }
 
       const center = map.cameraForBounds(bounds, {
-        padding: { top: 10, bottom: 10, left: 10, right: 10 },
+        padding,
       });
 
       if (center) {
         map.easeTo(center);
       }
     },
-    [map, focusLngLat],
+    [map, focusLngLat, padding],
   );
 
   return { focusLngLat, fitToNodes };

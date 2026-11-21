@@ -1,13 +1,20 @@
-import type { PxOffset } from "@components/PageComponents/Map/cluster.ts";
+import { IconButton } from "@components/UI/IconButton.tsx";
+import type { PxOffset } from "@core/nodes/cluster.ts";
 import type { WaypointWithMetadata } from "@core/stores";
-import { memo } from "react";
-import { Popup } from "react-map-gl/maplibre";
+import { XIcon } from "lucide-react";
+import { memo, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import { Marker } from "react-map-gl/maplibre";
 
 export type PopupState =
   | { type: "node"; num: number; offset: PxOffset }
   | { type: "waypoint"; waypoint: WaypointWithMetadata };
 
-export const PopupWrapper = memo(function SelectedNodePopup({
+/**
+ * A themed card anchored under a map point, with a close button. Drawn as a
+ * marker rather than a maplibre popup so it uses the app's surface tokens.
+ */
+export const PopupWrapper = memo(function PopupWrapper({
   lng,
   lat,
   offset,
@@ -18,21 +25,28 @@ export const PopupWrapper = memo(function SelectedNodePopup({
   lat: number;
   offset?: PxOffset;
   onClose: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
+  const { t } = useTranslation("map");
   return (
-    <Popup
-      anchor="top"
+    <Marker
       longitude={lng}
       latitude={lat}
-      onClose={onClose}
-      className="w-full"
-      style={{
-        left: `${offset?.[0] ?? 0}px`,
-        top: `${(offset?.[1] ?? 0) + 22}px`,
-      }}
+      anchor="top"
+      offset={[offset?.[0] ?? 0, (offset?.[1] ?? 0) + 8]}
+      style={{ zIndex: 4 }}
+      onClick={(event) => event.originalEvent.stopPropagation()}
     >
-      {children}
-    </Popup>
+      <div className="relative w-64 rounded-panel border border-control bg-surface p-3 pr-10 text-primary shadow-dialog">
+        <IconButton
+          aria-label={t("selected.close")}
+          size="sm"
+          icon={<XIcon className="size-4" />}
+          onClick={onClose}
+          className="absolute top-2 right-2"
+        />
+        {children}
+      </div>
+    </Marker>
   );
 });

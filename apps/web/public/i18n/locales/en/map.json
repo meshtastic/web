@@ -7,20 +7,6 @@
     "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
     "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map"
   },
-  "layerTool": {
-    "nodeMarkers": "Show nodes",
-    "directNeighbors": "Show direct connections",
-    "remoteNeighbors": "Show remote connections",
-    "positionPrecision": "Show position precision",
-    "traceroutes": "Show traceroutes",
-    "waypoints": "Show waypoints",
-    "heatmap": "Show heatmap",
-    "density": "Density"
-  },
-  "mapMenu": {
-    "locateAria": "Locate my node",
-    "layersAria": "Change map style"
-  },
   "waypointDetail": {
     "edit": "Edit",
     "description": "Description:",
@@ -34,7 +20,48 @@
     "latitude": "Latitude:",
     "longitude": "Longitude:"
   },
-  "myNode": {
-    "tooltip": "This device"
+  "page": {
+    "title": "Map",
+    "nodesWithPosition_one": "{{count}} node with position",
+    "nodesWithPosition_other": "{{count}} nodes with position",
+    "findLabel": "Find a node on the map",
+    "findPlaceholder": "Find a node",
+    "nodeListLabel": "Nodes on map",
+    "showNodes": "Nodes",
+    "noPositions": "No node has shared a position yet.",
+    "noMatches": "No nodes match."
+  },
+  "layers": {
+    "title": "Layers",
+    "open": "Map layers",
+    "nodeMarkers": "Nodes",
+    "directNeighbors": "Direct links",
+    "remoteNeighbors": "Neighbor links",
+    "waypoints": "Waypoints",
+    "positionPrecision": "Precision circles",
+    "heatmap": "Heatmap",
+    "heatmapMode": "Heatmap mode",
+    "density": "Density",
+    "snr": "SNR"
+  },
+  "controls": {
+    "label": "Map controls",
+    "center": "Center on my device",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
+  },
+  "selected": {
+    "close": "Close",
+    "traceroute": "Traceroute",
+    "moreDetails": "Node details",
+    "altitude": "{{value}} m altitude"
+  },
+  "pins": {
+    "expandStack_one": "Show {{count}} more node here",
+    "expandStack_other": "Show {{count}} more nodes here"
+  },
+  "snrTooltip": {
+    "label": "SNR:",
+    "unit": "dB"
   }
 }

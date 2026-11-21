@@ -1,6 +1,5 @@
 import {
   Tooltip,
-  TooltipArrow,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
@@ -9,7 +8,21 @@ import { cn } from "@core/utils/cn.ts";
 import type { Protobuf } from "@core/protobuf.ts";
 import type { LucideIcon } from "lucide-react";
 import { RadioTowerIcon, SignatureIcon, VolumeXIcon } from "lucide-react";
+import { createContext, type ReactNode, useContext } from "react";
 import { useTranslation } from "react-i18next";
+
+/** True below a `TrustTooltipProvider`; icons then reuse its provider. */
+const SharedProvider = createContext(false);
+
+/**
+ * One tooltip provider for many indicator icons, e.g. above a long table,
+ * instead of one per icon. Icons outside it still bring their own.
+ */
+export const TrustTooltipProvider = ({ children }: { children: ReactNode }) => (
+  <TooltipProvider delayDuration={300}>
+    <SharedProvider.Provider value={true}>{children}</SharedProvider.Provider>
+  </TooltipProvider>
+);
 
 type TrustNode = Pick<
   Protobuf.Mesh.NodeInfo,
@@ -38,26 +51,31 @@ export const IndicatorIcon = ({
   tooltip,
   className,
   size,
-}: IndicatorProps) => (
-  <TooltipProvider delayDuration={300}>
+}: IndicatorProps) => {
+  const shared = useContext(SharedProvider);
+  const tip = (
     <Tooltip>
       <TooltipTrigger asChild>
         {/* A button so keyboard users can focus it to read the tooltip. */}
         <button
           type="button"
           aria-label={label}
-          className="inline-flex shrink-0 cursor-default rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          className="inline-flex shrink-0 cursor-default rounded-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-focus"
         >
           <Icon size={size} className={className} aria-hidden="true" />
         </button>
       </TooltipTrigger>
-      <TooltipContent className="max-w-xs bg-slate-800 dark:bg-slate-600 text-white px-3 py-1 rounded text-xs whitespace-normal">
+      <TooltipContent className="max-w-xs whitespace-normal">
         {tooltip}
-        <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
       </TooltipContent>
     </Tooltip>
-  </TooltipProvider>
-);
+  );
+  return shared ? (
+    tip
+  ) : (
+    <TooltipProvider delayDuration={300}>{tip}</TooltipProvider>
+  );
+};
 
 export interface NodeTrustIndicatorsProps {
   node: TrustNode;
@@ -90,7 +108,7 @@ export const NodeTrustIndicators = ({
           size={size}
           label={t("trust.signed.label")}
           tooltip={t("trust.signed.tooltip")}
-          className="text-green-600 dark:text-green-500"
+          className="text-accent"
         />
       )}
       {unheard && (
@@ -99,7 +117,7 @@ export const NodeTrustIndicators = ({
           size={size}
           label={t("trust.unheard.label")}
           tooltip={t("trust.unheard.tooltip")}
-          className="text-amber-600 dark:text-amber-400"
+          className="text-warning"
         />
       )}
       {node.isMuted && (
@@ -108,7 +126,7 @@ export const NodeTrustIndicators = ({
           size={size}
           label={t("trust.muted.label")}
           tooltip={t("trust.muted.tooltip")}
-          className="text-slate-500 dark:text-slate-400"
+          className="text-muted"
         />
       )}
     </span>
