@@ -22,13 +22,13 @@ const avatarVariants = cva(
   {
     variants: {
       size: {
-        // Sized so four 13px initials fit without truncating.
-        xs: "size-9 text-meta tracking-tight",
-        sm: "size-10 text-meta tracking-tight",
-        md: "size-11 text-meta",
-        lg: "size-12 text-meta",
-        xl: "size-[72px] text-header-lg",
-        "2xl": "size-20 text-header-lg font-bold",
+        // Sized so four 13px initials fit with room inside the squircle.
+        xs: "size-11 text-meta tracking-tight",
+        sm: "size-12 text-meta tracking-tight",
+        md: "size-[52px] text-help",
+        lg: "size-14 text-help",
+        xl: "size-20 text-header-lg",
+        "2xl": "size-24 text-header-lg font-bold",
       },
       shape: {
         squircle: "rounded-squircle",
@@ -94,8 +94,17 @@ export const NodeAvatar = ({
     tone.kind === "node" ? nodeAvatarColors(tone.nodeNum) : undefined;
   // The node fill goes through a custom property so a caller's `bg-*`
   // class can still override it (an inline background-color could not).
-  const style: (CSSProperties & Record<"--avatar-bg", string>) | undefined =
-    nodeColors ? { "--avatar-bg": nodeColors.background } : undefined;
+  const style:
+    | (CSSProperties & Record<"--avatar-bg" | "--avatar-ink", string>)
+    | undefined = nodeColors
+    ? {
+        "--avatar-bg": nodeColors.background,
+        "--avatar-ink":
+          nodeColors.ink === "dark"
+            ? "var(--color-avatar-ink-dark)"
+            : "var(--color-avatar-ink-light)",
+      }
+    : undefined;
   const dot = presence ? (
     <StatusDot
       status={presence}
@@ -119,10 +128,7 @@ export const NodeAvatar = ({
         tone.kind === "channel" &&
           "bg-accent-tint text-accent text-header-lg font-bold",
         nodeColors && "bg-(--avatar-bg)",
-        nodeColors &&
-          (nodeColors.ink === "dark"
-            ? "text-avatar-ink-dark"
-            : "text-avatar-ink-light"),
+        nodeColors && "text-avatar-contrast",
         className,
       )}
       style={style}

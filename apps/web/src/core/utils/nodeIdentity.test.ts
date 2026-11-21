@@ -1,7 +1,6 @@
 import { contrastRatio, parseHexColor } from "@core/theme/contrast.ts";
 import { colorTokens, themeNames } from "@core/theme/tokens.ts";
 import { describe, expect, it } from "vitest";
-import { getColorFromNodeNum } from "./color.ts";
 import {
   AVATAR_INK_DARK,
   AVATAR_INK_LIGHT,
@@ -72,9 +71,16 @@ describe("nodeAvatarColors", () => {
     expect(nodeAvatarColors(0x00ff8000).background).toBe("rgb(255, 128, 0)");
   });
 
-  it("picks ink for contrast", () => {
+  it("picks ink for contrast, white on a tie like contrast-color()", () => {
     expect(nodeAvatarColors(0xffffff).ink).toBe("dark");
     expect(nodeAvatarColors(0x101010).ink).toBe("light");
+  });
+
+  it("moves a mid-tone fill away from its ink, keeping the hue", () => {
+    const grey = parseRgb(nodeAvatarColors(0x7f7f7f).background);
+    expect(grey.r).toBe(grey.g);
+    expect(grey.g).toBe(grey.b);
+    expect(grey.r).toBeGreaterThan(0x7f);
   });
 
   it("matches the avatar ink tokens", () => {
@@ -88,7 +94,7 @@ describe("nodeAvatarColors", () => {
     }
   });
 
-  it("meets 4.5:1 on every sampled node colour", () => {
+  it("meets 7:1 on every sampled node colour, with the ink contrast-color() picks", () => {
     // Every channel step of 15 (18^3 colours), plus colours YIQ misjudges.
     const samples: number[] = [0x0000ff, 0xff0000, 0x808080, 0x7f7f7f];
     for (let r = 0; r <= 255; r += 15) {
@@ -100,16 +106,22 @@ describe("nodeAvatarColors", () => {
     }
     const worst = Math.min(
       ...samples.map((num) => {
-        const { ink, contrast } = nodeAvatarColors(num);
-        const color = getColorFromNodeNum(num);
-        const recomputed = contrastRatio(
-          color,
-          ink === "dark" ? AVATAR_INK_DARK : AVATAR_INK_LIGHT,
-        );
-        expect(recomputed).toBeCloseTo(contrast);
+        const { background, ink, contrast } = nodeAvatarColors(num);
+        const fill = parseRgb(background);
+        const onDark = contrastRatio(fill, AVATAR_INK_DARK);
+        const onLight = contrastRatio(fill, AVATAR_INK_LIGHT);
+        // contrast-color() returns the higher-contrast of the two, white on a tie.
+        expect(ink).toBe(onDark > onLight ? "dark" : "light");
+        expect(Math.max(onDark, onLight)).toBeCloseTo(contrast);
         return contrast;
       }),
     );
-    expect(worst).toBeGreaterThanOrEqual(4.5);
+    expect(worst).toBeGreaterThanOrEqual(7);
   });
 });
+
+function parseRgb(css: string): { r: number; g: number; b: number } {
+  const match = /^rgb\((\d+), (\d+), (\d+)\)$/u.exec(css);
+  if (!match) throw new Error(`not rgb(): ${css}`);
+  return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]) };
+}

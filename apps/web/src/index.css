@@ -534,6 +534,19 @@ body {
   }
 }
 
+/*
+ * Avatar initials: CSS contrast-color() on the avatar fill where supported
+ * (black or white, whichever contrasts more), else the same choice made in
+ * JS (--avatar-ink). Fills are kept clear of mid-tones, see nodeIdentity.ts.
+ */
+@utility text-avatar-contrast {
+  color: var(--avatar-ink);
+
+  @supports (color: contrast-color(red)) {
+    color: contrast-color(var(--avatar-bg));
+  }
+}
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;

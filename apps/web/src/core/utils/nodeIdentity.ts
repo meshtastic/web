@@ -66,23 +66,52 @@ export interface NodeAvatarColors {
   /** CSS colour for the avatar fill, derived from the node number. */
   readonly background: string;
   /**
-   * Which ink token reads best on the fill: whichever of black and white
-   * has the higher WCAG contrast. One of the two always reaches at least
-   * 4.58:1, so initials meet AA on every node colour.
+   * Which ink reads best on the fill: the higher-contrast of black and
+   * white, white on a tie, which is what CSS `contrast-color()` picks.
    */
   readonly ink: "dark" | "light";
   /** WCAG contrast of the chosen ink on the fill. */
   readonly contrast: number;
 }
 
-/** Per-node avatar colour, the same mapping the rest of the client uses. */
+/**
+ * Contrast the initials get on every node colour. Black or white alone only
+ * guarantee about 4.6:1, which reads poorly at avatar sizes on mid-tones
+ * (MDN's caveat for contrast-color()), so fills are moved further from
+ * their ink until they reach this.
+ */
+export const AVATAR_MIN_CONTRAST = 7;
+
+const mixRgb = (from: RGBColor, to: RGBColor, t: number): RGBColor => ({
+  r: Math.round(from.r + (to.r - from.r) * t),
+  g: Math.round(from.g + (to.g - from.g) * t),
+  b: Math.round(from.b + (to.b - from.b) * t),
+});
+
+/**
+ * Per-node avatar colour: the node's colour (as elsewhere in the client),
+ * mixed towards white under dark ink or black under light ink just enough
+ * to reach AVATAR_MIN_CONTRAST, so the hue stays recognisable.
+ */
 export const nodeAvatarColors = (nodeNum: number): NodeAvatarColors => {
-  const color = getColorFromNodeNum(nodeNum);
-  const onDark = contrastRatio(color, AVATAR_INK_DARK);
-  const onLight = contrastRatio(color, AVATAR_INK_LIGHT);
+  const base = getColorFromNodeNum(nodeNum);
+  const dark =
+    contrastRatio(base, AVATAR_INK_DARK) >
+    contrastRatio(base, AVATAR_INK_LIGHT);
+  const ink = dark ? AVATAR_INK_DARK : AVATAR_INK_LIGHT;
+  // Away from the ink: towards white under black text, black under white.
+  const away = dark ? AVATAR_INK_LIGHT : AVATAR_INK_DARK;
+  let fill = base;
+  for (
+    let step = 1;
+    contrastRatio(fill, ink) < AVATAR_MIN_CONTRAST && step <= 50;
+    step++
+  ) {
+    fill = mixRgb(base, away, step / 50);
+  }
   return {
-    background: `rgb(${color.r}, ${color.g}, ${color.b})`,
-    ink: onDark >= onLight ? "dark" : "light",
-    contrast: Math.max(onDark, onLight),
+    background: `rgb(${fill.r}, ${fill.g}, ${fill.b})`,
+    ink: dark ? "dark" : "light",
+    contrast: contrastRatio(fill, ink),
   };
 };

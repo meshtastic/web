@@ -301,7 +301,7 @@ describe("NodeAvatar", () => {
     expect(classes).toContain("bg-amber-400");
     expect(classes).not.toContain("bg-(--avatar-bg)");
     expect(classes).toContain("text-red-500");
-    expect(classes.some((c) => c.startsWith("text-avatar-ink"))).toBe(false);
+    expect(classes).not.toContain("text-avatar-contrast");
   });
 
   it("is hidden from assistive tech without a label", () => {
