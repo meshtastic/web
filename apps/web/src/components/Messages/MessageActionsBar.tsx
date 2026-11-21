@@ -4,15 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@components/UI/Popover.tsx";
-import {
-  nextToolbarIndex,
-  quickReactions,
-} from "@core/messaging/emojiPicker.ts";
+import { nextToolbarIndex } from "@core/messaging/emojiPicker.ts";
 import type { MessageActionsAvailability } from "@core/messaging/messageListView.ts";
 import { cn } from "@core/utils/cn.ts";
 import {
@@ -32,7 +24,8 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { EmojiPicker } from "./EmojiPicker.tsx";
+import { EmojiPickerPopover } from "./EmojiPicker.tsx";
+import type { EmojiPrefs } from "./useEmoji.ts";
 
 export interface MessageActionsBarProps {
   available: MessageActionsAvailability;
@@ -42,6 +35,8 @@ export interface MessageActionsBarProps {
   touch?: boolean;
   /** Move focus into the bar when it opens from the keyboard. */
   focusOnOpen?: boolean;
+  /** Quick row (the six most used emoji) and the picker's memory. */
+  emoji: EmojiPrefs;
   onReact: (emoji: string) => void;
   onReply: () => void;
   onCopy: () => void;
@@ -110,14 +105,17 @@ const ToolButton = ({
 );
 
 /**
- * Quick reactions, more reactions, reply and more actions for one message.
- * A toolbar: one tab stop, arrow keys move between its buttons.
+ * Quick reactions (the six most used emoji, as on Android), the full emoji
+ * picker, reply and more actions for one message. A toolbar: one tab
+ * stop, arrow keys move between its buttons. Tapping a quick reaction
+ * doesn't count as a use; picks in the picker do, as on Android.
  */
 export const MessageActionsBar = ({
   available,
   side,
   touch = false,
   focusOnOpen = false,
+  emoji,
   onReact,
   onReply,
   onCopy,
@@ -143,10 +141,14 @@ export const MessageActionsBar = ({
     }
   }, [focusOnOpen]);
 
-  const reactions = available.react ? quickReactions : [];
+  const reactions = available.react ? emoji.quick : [];
   const moreIndex = reactions.length;
+  // On touch the bar is Android's inline row: six emoji, the picker and
+  // the menu (Reply is in the menu), so every target stays 44px wide on a
+  // phone.
+  const replyButton = available.reply && !touch;
   const replyIndex = available.react ? moreIndex + 1 : 0;
-  const menuIndex = replyIndex + (available.reply ? 1 : 0);
+  const menuIndex = replyIndex + (replyButton ? 1 : 0);
   const count = menuIndex + 1;
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -182,63 +184,57 @@ export const MessageActionsBar = ({
     >
       {reactions.map((reaction, i) => (
         <ToolButton
-          key={reaction.emoji}
+          key={reaction}
           {...shared}
           index={i}
-          label={t("bubble.reactWith", {
-            name: t(`emoji.${reaction.nameKey}`),
-          })}
-          onClick={() => onReact(reaction.emoji)}
+          label={t("bubble.reactWith", { name: reaction })}
+          onClick={() => onReact(reaction)}
         >
           <span aria-hidden="true" className="text-title leading-none">
-            {reaction.emoji}
+            {reaction}
           </span>
         </ToolButton>
       ))}
       {available.react ? (
-        <Popover
+        <EmojiPickerPopover
           open={pickerOpen}
           onOpenChange={(open) => {
             setPickerOpen(open);
             onMenuOpenChange(open || menuOpen);
           }}
+          label={t("bubble.pickReaction")}
+          prefs={emoji}
+          align="center"
+          side="bottom"
+          onCloseAutoFocus={(event) => {
+            // A pick closes the whole bar; dismiss() puts focus back.
+            if (picked.current) {
+              picked.current = false;
+              event.preventDefault();
+            }
+          }}
+          onPick={(choice) => {
+            picked.current = true;
+            setPickerOpen(false);
+            onMenuOpenChange(false);
+            onReact(choice);
+            onDismiss();
+            return true;
+          }}
         >
-          <PopoverTrigger asChild>
-            <ToolButton
-              {...shared}
-              index={moreIndex}
-              label={t("bubble.moreReactions")}
-            >
-              <SmilePlusIcon aria-hidden="true" className={iconClass} />
-            </ToolButton>
-          </PopoverTrigger>
-          <PopoverContent
-            align="center"
-            className="w-auto p-2"
-            onCloseAutoFocus={(event) => {
-              // A pick closes the whole bar; dismiss() puts focus back.
-              if (picked.current) {
-                picked.current = false;
-                event.preventDefault();
-              }
-            }}
+          <ToolButton
+            {...shared}
+            index={moreIndex}
+            label={t("bubble.moreReactions")}
           >
-            <EmojiPicker
-              onPick={(emoji) => {
-                picked.current = true;
-                setPickerOpen(false);
-                onMenuOpenChange(false);
-                onReact(emoji);
-                onDismiss();
-              }}
-            />
-          </PopoverContent>
-        </Popover>
+            <SmilePlusIcon aria-hidden="true" className={iconClass} />
+          </ToolButton>
+        </EmojiPickerPopover>
       ) : null}
-      {available.react && available.reply ? (
+      {available.react && replyButton ? (
         <span aria-hidden="true" className="mx-0.5 h-5 w-px bg-control" />
       ) : null}
-      {available.reply ? (
+      {replyButton ? (
         <ToolButton
           {...shared}
           index={replyIndex}

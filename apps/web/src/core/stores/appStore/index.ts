@@ -4,6 +4,12 @@ import {
   type NodeListSorts,
   parseNodeListSorts,
 } from "@core/nodes/nodeSort.ts";
+import { parseSkinToneIndex } from "@core/emoji/catalog.ts";
+import {
+  type EmojiFrequency,
+  parseEmojiFrequency,
+  recordEmojiUse,
+} from "@core/emoji/frequency.ts";
 import { featureFlags } from "@core/services/featureFlags.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { produce } from "immer";
@@ -23,14 +29,19 @@ const IDB_KEY_NAME = "meshtastic-app-store";
 /**
  * 0: rasterSources only.
  * 1: adds nodeListSorts, the sort each node list keeps.
+ * 2: adds emojiFrequency and skinToneIndex, the emoji picker's memory.
  */
-export const CURRENT_STORE_VERSION = 1;
+export const CURRENT_STORE_VERSION = 2;
 
 export type AppData = {
   // Persisted data
   rasterSources: RasterSource[];
   /** Each node list's sort; always persisted, unlike the raster sources. */
   nodeListSorts: NodeListSorts;
+  /** Emoji picked from the picker and how often, for the quick rows. */
+  emojiFrequency: EmojiFrequency;
+  /** Preferred skin tone, 0 (default) to 5 (dark). */
+  skinToneIndex: number;
 };
 
 export interface AppState extends AppData {
@@ -55,12 +66,16 @@ export interface AppState extends AppData {
     list: L,
     sort: NodeListSorts[L],
   ) => void;
+  recordEmojiUse: (emoji: string) => void;
+  setSkinToneIndex: (index: number) => void;
 }
 
 export const deviceStoreInitializer: StateCreator<AppState> = (set, _get) => ({
   selectedDeviceId: 0,
   rasterSources: [],
   nodeListSorts: DEFAULT_NODE_LIST_SORTS,
+  emojiFrequency: [],
+  skinToneIndex: 0,
   commandPaletteOpen: false,
   connectionsDrawer: { open: false, view: "list" },
   nodeNumToBeRemoved: 0,
@@ -121,6 +136,14 @@ export const deviceStoreInitializer: StateCreator<AppState> = (set, _get) => ({
       nodeListSorts: { ...state.nodeListSorts, [list]: sort },
     }));
   },
+  recordEmojiUse: (emoji) => {
+    set((state) => ({
+      emojiFrequency: recordEmojiUse(state.emojiFrequency, emoji),
+    }));
+  },
+  setSkinToneIndex: (index) => {
+    set(() => ({ skinToneIndex: parseSkinToneIndex(index) }));
+  },
 });
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -143,7 +166,7 @@ const parseRasterSources = (
 /**
  * Persisted state from an older version brought up to date. Version 0 had
  * no list sorts, so they start at their defaults; the raster sources carry
- * over.
+ * over. Before version 2 there was no emoji memory: no uses, default tone.
  */
 export const migrateAppData = (
   persisted: unknown,
@@ -157,6 +180,10 @@ export const migrateAppData = (
       version < 1
         ? DEFAULT_NODE_LIST_SORTS
         : parseNodeListSorts(persisted.nodeListSorts),
+    emojiFrequency:
+      version < 2 ? [] : parseEmojiFrequency(persisted.emojiFrequency),
+    skinToneIndex:
+      version < 2 ? 0 : parseSkinToneIndex(persisted.skinToneIndex),
     ...(Array.isArray(persisted.rasterSources)
       ? { rasterSources: parseRasterSources(persisted.rasterSources, []) }
       : {}),
@@ -165,7 +192,8 @@ export const migrateAppData = (
 
 /**
  * Merges stored data into the store, validating it: each list's sort falls
- * back to its default on its own, and raster sources load only while
+ * back to its default on its own, malformed emoji uses are dropped, and
+ * raster sources load only while
  * `persistApp` is on.
  */
 const mergeAppData =
@@ -177,6 +205,8 @@ const mergeAppData =
     return {
       ...current,
       nodeListSorts: parseNodeListSorts(persisted.nodeListSorts),
+      emojiFrequency: parseEmojiFrequency(persisted.emojiFrequency),
+      skinToneIndex: parseSkinToneIndex(persisted.skinToneIndex),
       ...(withRasterSources
         ? {
             rasterSources: parseRasterSources(
@@ -188,7 +218,8 @@ const mergeAppData =
     };
   };
 
-// Raster sources persist only with the feature flag; list sorts always do.
+// Raster sources persist only with the feature flag; list sorts and the
+// emoji memory always do.
 const persistApps = featureFlags.get("persistApp");
 console.debug(
   `AppStore: Persisting app is ${persistApps ? "enabled" : "disabled"}`,
@@ -198,10 +229,12 @@ const persistOptions: PersistOptions<AppState, Partial<AppData>> = {
   name: IDB_KEY_NAME,
   storage: createStorage<Partial<AppData>>(),
   version: CURRENT_STORE_VERSION,
-  partialize: (s): Partial<AppData> =>
-    persistApps
-      ? { rasterSources: s.rasterSources, nodeListSorts: s.nodeListSorts }
-      : { nodeListSorts: s.nodeListSorts },
+  partialize: (s): Partial<AppData> => ({
+    ...(persistApps ? { rasterSources: s.rasterSources } : {}),
+    nodeListSorts: s.nodeListSorts,
+    emojiFrequency: s.emojiFrequency,
+    skinToneIndex: s.skinToneIndex,
+  }),
   migrate: migrateAppData,
   merge: mergeAppData(persistApps),
   onRehydrateStorage: () => (state) => {

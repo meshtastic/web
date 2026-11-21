@@ -1,70 +1,9 @@
 /**
- * Reaction choices: the five quick tapbacks on the actions bar (the same
- * set the Android app uses) and a small curated grid behind "More
- * reactions". Plus keyboard movement for the bar and the grid.
+ * Keyboard movement for the message actions bar (a one-row toolbar) and
+ * the emoji picker's grid. The emoji themselves come from core/emoji.
  */
 
-export const quickReactions = [
-  { emoji: "👍", nameKey: "thumbsUp" },
-  { emoji: "❤️", nameKey: "heart" },
-  { emoji: "😂", nameKey: "laugh" },
-  { emoji: "😮", nameKey: "surprise" },
-  { emoji: "‼️", nameKey: "important" },
-] as const;
-
-export type QuickReactionName = (typeof quickReactions)[number]["nameKey"];
-
-export const pickerEmoji: readonly string[] = [
-  "😀",
-  "😄",
-  "😁",
-  "😅",
-  "🤣",
-  "😊",
-  "😉",
-  "😍",
-  "😘",
-  "😎",
-  "🤔",
-  "🙄",
-  "😴",
-  "😢",
-  "😭",
-  "😡",
-  "🤯",
-  "🥳",
-  "🙏",
-  "👏",
-  "🙌",
-  "👋",
-  "💪",
-  "🤝",
-  "👎",
-  "👌",
-  "✌️",
-  "🤞",
-  "🔥",
-  "✨",
-  "🎉",
-  "💯",
-  "✅",
-  "❌",
-  "⚠️",
-  "❓",
-  "📡",
-  "📍",
-  "🔋",
-  "⛰️",
-  "🌧️",
-  "☀️",
-  "🚗",
-  "🏠",
-  "☕",
-  "🍺",
-  "📻",
-  "🛰️",
-];
-
+/** Emoji per row in the picker's grid. */
 export const PICKER_COLUMNS = 8;
 
 /**

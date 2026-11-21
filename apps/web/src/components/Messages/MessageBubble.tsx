@@ -20,6 +20,7 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DeliveryStatus } from "./DeliveryStatus.tsx";
 import { MessageActionsBar } from "./MessageActionsBar.tsx";
+import type { EmojiPrefs } from "./useEmoji.ts";
 import { ReactionChips } from "./ReactionChips.tsx";
 import { ReplyQuote, type ReplyQuoteView } from "./ReplyQuote.tsx";
 import { useLongPress } from "./useLongPress.ts";
@@ -69,6 +70,8 @@ export interface MessageBubbleProps {
   highlighted: boolean;
   touch: boolean;
   handlers: BubbleHandlers;
+  /** Quick reactions and the emoji picker's memory. */
+  emoji: EmojiPrefs;
   locale: string;
 }
 
@@ -175,6 +178,7 @@ export const MessageBubble = memo(function MessageBubble({
   highlighted,
   touch,
   handlers,
+  emoji,
   locale,
 }: MessageBubbleProps) {
   const { t } = useTranslation("messages");
@@ -267,6 +271,7 @@ export const MessageBubble = memo(function MessageBubble({
         side={outgoing ? "start" : "end"}
         touch={touch}
         focusOnOpen={active && activeViaKeyboard}
+        emoji={emoji}
         onReact={(emoji) => {
           handlers.react(thread, emoji);
           handlers.setActive(undefined);

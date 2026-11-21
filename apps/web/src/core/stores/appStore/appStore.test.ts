@@ -256,7 +256,7 @@ describe("AppStore – node list sorts", () => {
   it("migrates a version 0 store: raster sources kept, sorts defaulted", async () => {
     seed({ rasterSources: [makeRaster({ title: "old" })] }, 0);
     const { useAppStore, CURRENT_STORE_VERSION } = await hydratedStore(true);
-    expect(CURRENT_STORE_VERSION).toBe(1);
+    expect(CURRENT_STORE_VERSION).toBe(2);
     const state = useAppStore.getState();
     expect(state.rasterSources.map((raster) => raster.title)).toEqual(["old"]);
     expect(state.nodeListSorts.nodes.key).toBe("lastHeard");
@@ -304,8 +304,92 @@ describe("migrateAppData", () => {
           favoritesFirst: false,
         },
       },
+      emojiFrequency: [],
+      skinToneIndex: 0,
       rasterSources: [makeRaster({ title: "ok" })],
     });
     expect(migrateAppData(null, 0)).toEqual({});
+  });
+
+  it("starts the emoji memory empty when coming from version 1", async () => {
+    const { migrateAppData } = await freshStore(false);
+    const migrated = migrateAppData(
+      {
+        nodeListSorts: {},
+        emojiFrequency: [{ emoji: "🔥", count: 2 }],
+        skinToneIndex: 3,
+      },
+      1,
+    );
+    expect(migrated.emojiFrequency).toEqual([]);
+    expect(migrated.skinToneIndex).toBe(0);
+  });
+});
+
+describe("AppStore – emoji memory", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("upgrades a version 1 store with no emoji memory", async () => {
+    seed(
+      {
+        nodeListSorts: {
+          nodes: { key: "snr", direction: "asc", favoritesFirst: false },
+        },
+      },
+      1,
+    );
+    const { useAppStore } = await hydratedStore(false);
+    const state = useAppStore.getState();
+    expect(state.emojiFrequency).toEqual([]);
+    expect(state.skinToneIndex).toBe(0);
+    expect(state.nodeListSorts.nodes.key).toBe("snr");
+  });
+
+  it("keeps counts and the skin tone across reloads, even with persistApp off", async () => {
+    {
+      const { useAppStore } = await hydratedStore(false);
+      const state = useAppStore.getState();
+      state.recordEmojiUse("🔥");
+      state.recordEmojiUse("👋🏽");
+      state.recordEmojiUse("🔥");
+      state.setSkinToneIndex(3);
+    }
+    {
+      const { useAppStore } = await hydratedStore(false);
+      const state = useAppStore.getState();
+      expect(state.emojiFrequency).toEqual([
+        { emoji: "🔥", count: 2 },
+        { emoji: "👋🏽", count: 1 },
+      ]);
+      expect(state.skinToneIndex).toBe(3);
+    }
+  });
+
+  it("drops malformed stored emoji uses and an out-of-range tone", async () => {
+    seed(
+      {
+        emojiFrequency: [
+          { emoji: "🔥", count: 2 },
+          { emoji: "", count: 1 },
+          { emoji: "😂", count: -1 },
+          "👍=3",
+        ],
+        skinToneIndex: 9,
+      },
+      2,
+    );
+    const { useAppStore } = await hydratedStore(false);
+    const state = useAppStore.getState();
+    expect(state.emojiFrequency).toEqual([{ emoji: "🔥", count: 2 }]);
+    expect(state.skinToneIndex).toBe(0);
+  });
+
+  it("ignores an invalid skin tone", async () => {
+    const { useAppStore } = await hydratedStore(false);
+    useAppStore.getState().setSkinToneIndex(7);
+    expect(useAppStore.getState().skinToneIndex).toBe(0);
   });
 });

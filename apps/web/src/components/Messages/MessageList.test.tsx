@@ -3,6 +3,7 @@ import type { ThreadMessage } from "@core/messaging/thread.ts";
 import { type Message, MessageState } from "@core/storage/types.ts";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { testEmojiPrefs } from "@app/tests/emojiPrefs.ts";
 import { MessageList, type MessageListHandlers } from "./MessageList.tsx";
 
 const renders = vi.hoisted(() => ({ keys: new Array<string>() }));
@@ -132,6 +133,7 @@ const setup = (
     dayLabel,
     loadOlder,
     handlers,
+    emoji: testEmojiPrefs(),
     touch: false,
     locale: "en",
   };

@@ -192,13 +192,6 @@
     "notDeliveredReason": "Not delivered ({{reason}})",
     "fromYou": "You"
   },
-  "emoji": {
-    "thumbsUp": "thumbs up",
-    "heart": "heart",
-    "laugh": "laugh",
-    "surprise": "surprise",
-    "important": "important"
-  },
   "reactions": {
     "label": "Reactions",
     "chip_one": "{{emoji}} {{count}} reaction",
@@ -226,7 +219,8 @@
     "hintKeys": "Enter to send · Shift+Enter for new line",
     "hintDmPki": "Direct messages are encrypted with {{name}}'s public key and wait for an acknowledgement",
     "hintDmPsk": "Direct messages to {{name}} use the channel key and wait for an acknowledgement",
-    "notConnected": "Connect a device to send messages"
+    "notConnected": "Connect a device to send messages",
+    "emoji": "Emoji"
   },
   "channelDetails": {
     "role": "Role",
@@ -271,5 +265,36 @@
     "unknownSnr": "?",
     "snrValue": "{{value}} dB",
     "then": ", then"
+  },
+  "emojiPicker": {
+    "label": "Emoji",
+    "frequent": "Frequently used",
+    "tapbackTo": "Tapback to {{name}}",
+    "sendAsTapback": "Send as tapback",
+    "tapbackOn": "Picks react to {{name}}'s message",
+    "tapbackOff": "Picks go into your reply",
+    "search": "Search emoji",
+    "categories": "Emoji categories",
+    "results": "Search results",
+    "noResults": "No emoji found",
+    "loading": "Loading emoji…",
+    "loadFailed": "Couldn't load the emoji",
+    "noRoom": "No room for that emoji: messages are limited to 200 bytes",
+    "skinTone": "Skin tone",
+    "tone0": "Default skin tone",
+    "tone1": "Light skin tone",
+    "tone2": "Medium-light skin tone",
+    "tone3": "Medium skin tone",
+    "tone4": "Medium-dark skin tone",
+    "tone5": "Dark skin tone",
+    "categorySmileysEmotion": "Smileys & emotion",
+    "categoryPeopleBody": "People & body",
+    "categoryAnimalsNature": "Animals & nature",
+    "categoryFoodDrink": "Food & drink",
+    "categoryTravelPlaces": "Travel & places",
+    "categoryActivities": "Activities",
+    "categoryObjects": "Objects",
+    "categorySymbols": "Symbols",
+    "categoryFlags": "Flags"
   }
 }

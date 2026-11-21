@@ -5,6 +5,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
+import { testEmojiPrefs } from "@app/tests/emojiPrefs.ts";
 import { Composer } from "./Composer.tsx";
 import { type BubbleHandlers, MessageBubble } from "./MessageBubble.tsx";
 import { ReactionChips } from "./ReactionChips.tsx";
@@ -62,6 +63,7 @@ const renderBubble = (
       highlighted={false}
       touch={false}
       handlers={h}
+      emoji={testEmojiPrefs()}
       locale="en"
       {...props}
     />,
@@ -164,12 +166,12 @@ describe("MessageBubble", () => {
     );
     const bar = screen.getByRole("toolbar", { name: "Message actions" });
     const thumbs = within(bar).getByRole("button", {
-      name: "React with thumbs up",
+      name: "React with 👍",
     });
     expect(thumbs).toHaveFocus();
     await user.keyboard("{ArrowRight}");
     expect(
-      within(bar).getByRole("button", { name: "React with heart" }),
+      within(bar).getByRole("button", { name: "React with 👎" }),
     ).toHaveFocus();
     await user.keyboard("{ArrowLeft}{ArrowLeft}");
     expect(
@@ -298,6 +300,8 @@ const ComposerHarness = ({
         ? { replying: { name: "COULLS_BASE", excerpt: "Morning all" } }
         : {})}
       onCancelReply={() => setReply(false)}
+      emoji={testEmojiPrefs()}
+      onTapback={vi.fn()}
     />
   );
 };

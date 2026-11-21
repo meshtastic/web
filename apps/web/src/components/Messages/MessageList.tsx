@@ -46,6 +46,7 @@ import {
   MessageBubble,
 } from "./MessageBubble.tsx";
 import type { ReplyQuoteView } from "./ReplyQuote.tsx";
+import type { EmojiPrefs } from "./useEmoji.ts";
 import { TracerouteCard } from "./TracerouteCard.tsx";
 
 /** Actions on a message; the list adds focus, pinning and jumping itself. */
@@ -66,6 +67,8 @@ export interface MessageListProps {
   /** Loads the page before the oldest message; resolves to how many came. */
   loadOlder: () => Promise<number>;
   handlers: MessageListHandlers;
+  /** Quick reactions and the emoji picker's memory. */
+  emoji: EmojiPrefs;
   touch: boolean;
   locale: string;
   /** LoRa settings, to rate SNR against the decode floor. */
@@ -120,6 +123,7 @@ export const MessageList = ({
   dayLabel,
   loadOlder,
   handlers,
+  emoji,
   touch,
   locale,
   lora,
@@ -530,6 +534,7 @@ export const MessageList = ({
                         highlighted={highlighted === entry.key}
                         touch={touch}
                         handlers={bubbleHandlers}
+                        emoji={emoji}
                         locale={locale}
                       />
                     </li>

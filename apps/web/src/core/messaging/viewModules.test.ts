@@ -17,12 +17,7 @@ import {
 } from "./composer.ts";
 import type { SidebarConversation } from "./conversations.ts";
 import { deliveryLine, deliveryStatus } from "./deliveryView.ts";
-import {
-  nextGridIndex,
-  nextToolbarIndex,
-  pickerEmoji,
-  quickReactions,
-} from "./emojiPicker.ts";
+import { nextGridIndex, nextToolbarIndex } from "./emojiPicker.ts";
 import {
   decideOnAppend,
   diffList,
@@ -156,17 +151,6 @@ describe("scrollAnchor", () => {
 });
 
 describe("emojiPicker", () => {
-  it("has the five quick tapbacks in the Android order", () => {
-    expect(quickReactions.map((q) => q.emoji)).toEqual([
-      "👍",
-      "❤️",
-      "😂",
-      "😮",
-      "‼️",
-    ]);
-    expect(new Set(pickerEmoji).size).toBe(pickerEmoji.length);
-  });
-
   it("moves along a toolbar with wrap-around", () => {
     expect(nextToolbarIndex(0, "ArrowLeft", 4)).toBe(3);
     expect(nextToolbarIndex(3, "ArrowRight", 4)).toBe(0);

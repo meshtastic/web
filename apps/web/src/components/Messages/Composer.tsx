@@ -1,11 +1,14 @@
 import { LimitCounter } from "@components/UI/LimitCounter.tsx";
+import { Switch } from "@components/UI/Switch.tsx";
 import {
   CHAT_TEXT_LIMIT,
+  composerEmojiAction,
   composerKeyAction,
   composerStatus,
+  insertEmoji,
 } from "@core/messaging/composer.ts";
 import { cn } from "@core/utils/cn.ts";
-import { SendIcon } from "lucide-react";
+import { SendIcon, SmileIcon } from "lucide-react";
 import {
   type FormEvent,
   type KeyboardEvent,
@@ -13,9 +16,12 @@ import {
   useId,
   useLayoutEffect,
   useRef,
+  useState,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { type EmojiPickSource, EmojiPickerPopover } from "./EmojiPicker.tsx";
 import { ReplyPreview } from "./ReplyPreview.tsx";
+import type { EmojiPrefs } from "./useEmoji.ts";
 
 export interface ComposerReply {
   /** Author of the message being replied to ("yourself" for mine). */
@@ -37,6 +43,13 @@ export interface ComposerProps {
   disabled?: boolean;
   replying?: ComposerReply;
   onCancelReply: () => void;
+  /** Quick row and memory for the emoji picker. */
+  emoji: EmojiPrefs;
+  /**
+   * Send `emoji` as a tapback on the message being replied to (and end
+   * the reply). Called only while replying.
+   */
+  onTapback: (emoji: string) => void;
   /** Narrow layout: pill field, round send button. */
   touch?: boolean;
   ref?: Ref<HTMLTextAreaElement>;
@@ -48,7 +61,10 @@ const MAX_HEIGHT_PX = 160;
 /**
  * Message field: UTF-8 byte counter against 200 (red and blocking once
  * over), Enter to send, Shift+Enter for a newline, Esc to cancel a reply,
- * and the reply strip above it.
+ * and the reply strip above it. The emoji button opens the picker: its
+ * emoji go in at the caret (refused when they'd go over 200 bytes), or,
+ * while replying, go as a tapback on that message (see
+ * `composerEmojiAction`).
  */
 export const Composer = ({
   label,
@@ -60,6 +76,8 @@ export const Composer = ({
   disabled = false,
   replying,
   onCancelReply,
+  emoji,
+  onTapback,
   touch = false,
   ref,
 }: ComposerProps) => {
@@ -67,9 +85,66 @@ export const Composer = ({
   const fieldId = useId();
   const counterId = useId();
   const hintId = useId();
+  const tapbackId = useId();
   const field = useRef<HTMLTextAreaElement | null>(null);
   const status = composerStatus(value);
   const canSend = status.canSend && !disabled;
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [notice, setNotice] = useState<string | undefined>(undefined);
+  // "Send as tapback" starts on for each reply.
+  const replyKey = replying ? `${replying.name}\n${replying.excerpt}` : "";
+  const [tapback, setTapback] = useState({ key: "", on: true });
+  const tapbackMode = tapback.key === replyKey ? tapback.on : true;
+  // Caret to restore once an inserted emoji is in the field.
+  const pendingCaret = useRef<number | undefined>(undefined);
+  // The picker closed because of a pick: focus goes to the field, not
+  // back to the emoji button.
+  const picked = useRef(false);
+
+  useLayoutEffect(() => {
+    const caret = pendingCaret.current;
+    const el = field.current;
+    if (caret === undefined || !el) {
+      return;
+    }
+    pendingCaret.current = undefined;
+    el.focus();
+    el.setSelectionRange(caret, caret);
+  }, [value]);
+
+  const closePicker = () => {
+    picked.current = true;
+    setNotice(undefined);
+    setPickerOpen(false);
+  };
+
+  const onPickEmoji = (choice: string, source: EmojiPickSource): boolean => {
+    const action = composerEmojiAction({
+      replying: replying !== undefined,
+      tapbackMode,
+      source,
+    });
+    if (action === "tapback") {
+      closePicker();
+      onTapback(choice);
+      return true;
+    }
+    const el = field.current;
+    const result = insertEmoji(
+      value,
+      el?.selectionStart ?? value.length,
+      el?.selectionEnd ?? value.length,
+      choice,
+    );
+    if (!result.ok) {
+      setNotice(t("emojiPicker.noRoom"));
+      return false;
+    }
+    closePicker();
+    pendingCaret.current = result.caret;
+    onChange(result.text);
+    return true;
+  };
 
   useLayoutEffect(() => {
     const el = field.current;
@@ -178,6 +253,66 @@ export const Composer = ({
             limit={CHAT_TEXT_LIMIT}
             className="shrink-0"
           />
+          <EmojiPickerPopover
+            open={pickerOpen}
+            onOpenChange={(open) => {
+              setPickerOpen(open);
+              setNotice(undefined);
+            }}
+            label={t("emojiPicker.label")}
+            prefs={emoji}
+            {...(replying
+              ? {
+                  quickLabel: t("emojiPicker.tapbackTo", {
+                    name: replying.name,
+                  }),
+                  header: (
+                    <div className="flex items-center gap-3 rounded-control border-l-[3px] border-accent bg-inset py-2 pr-2 pl-3">
+                      <label
+                        htmlFor={tapbackId}
+                        className="flex min-w-0 flex-1 cursor-pointer flex-col gap-px"
+                      >
+                        <span className="text-body font-semibold text-primary">
+                          {t("emojiPicker.sendAsTapback")}
+                        </span>
+                        <span className="text-meta text-secondary">
+                          {tapbackMode
+                            ? t("emojiPicker.tapbackOn", {
+                                name: replying.name,
+                              })
+                            : t("emojiPicker.tapbackOff")}
+                        </span>
+                      </label>
+                      <Switch
+                        id={tapbackId}
+                        checked={tapbackMode}
+                        onCheckedChange={(on) =>
+                          setTapback({ key: replyKey, on })
+                        }
+                      />
+                    </div>
+                  ),
+                }
+              : {})}
+            {...(notice ? { notice } : {})}
+            onPick={onPickEmoji}
+            onCloseAutoFocus={(event) => {
+              if (picked.current) {
+                picked.current = false;
+                event.preventDefault();
+                field.current?.focus();
+              }
+            }}
+          >
+            <button
+              type="button"
+              aria-label={t("composer.emoji")}
+              disabled={disabled}
+              className="relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted pointer-coarse:touch-target hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:bg-raised data-[state=open]:text-primary"
+            >
+              <SmileIcon aria-hidden="true" className="size-5" />
+            </button>
+          </EmojiPickerPopover>
         </div>
         <button
           type="submit"

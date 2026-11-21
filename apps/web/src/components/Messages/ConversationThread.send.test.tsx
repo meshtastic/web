@@ -1,10 +1,11 @@
 import { create, toBinary } from "@bufbuild/protobuf";
+import { emojiCatalogLoader } from "@core/emoji/loadCatalog.ts";
 import { FakeKmpClient, state } from "@core/kmp/fakeClient.ts";
 import { MeshSession } from "@core/kmp/session.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ConversationThread } from "./ConversationThread.tsx";
 
 // The real chat client behind the real hooks: only the registry lookup and
@@ -164,5 +165,61 @@ describe("ConversationThread reply → send (real chat client)", () => {
     expect(field).toHaveValue("On my way");
     expect(replyStrip()).toBeInTheDocument();
     expect(env.toast).toHaveBeenCalledWith({ title: "Message not sent" });
+  });
+});
+
+describe("ConversationThread reply → emoji tapback", () => {
+  beforeEach(() => {
+    emojiCatalogLoader.reset();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({
+              version: "16.0",
+              categories: [
+                {
+                  name: "Smileys & Emotion",
+                  icon: "😀",
+                  emojis: [{ b: "😉", k: ["face", "wink"] }],
+                },
+              ],
+            }),
+            { status: 200 },
+          ),
+        ),
+      ),
+    );
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sends the tapback to the message being replied to and ends the reply", async () => {
+    const { kmp, session } = connected();
+    env.session = session;
+    const toggle = vi.spyOn(session.chat, "toggleReaction");
+    renderThread();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Reply" }));
+    await user.click(screen.getByRole("button", { name: "Emoji" }));
+    const dialog = screen.getByRole("dialog", { name: "Emoji" });
+    const row = within(dialog).getByRole("group", {
+      name: "Tapback to Meshtastic A544",
+    });
+    await user.click(within(row).getAllByRole("button")[0] ?? row);
+    await act(() => session.chat.flush());
+
+    expect(toggle).toHaveBeenCalledWith({
+      targetId: 10,
+      emoji: "👍",
+      destination: "broadcast",
+      channel: 0,
+    });
+    expect(replyStrip()).toBeNull();
+    expect(screen.getByLabelText("Message Primary")).toHaveValue("");
+    expect(kmp.texts).toEqual([]);
+    expect(env.toast).not.toHaveBeenCalled();
   });
 });

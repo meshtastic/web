@@ -15,6 +15,7 @@ import { Composer } from "./Composer.tsx";
 import { DeliveryDetailsDialog } from "./DeliveryDetailsDialog.tsx";
 import type { BubbleSender } from "./MessageBubble.tsx";
 import { MessageList, type MessageListHandlers } from "./MessageList.tsx";
+import { useEmojiPrefs } from "./useEmoji.ts";
 
 export interface ConversationThreadProps {
   conversation: ConversationKey;
@@ -77,6 +78,7 @@ export const ConversationThread = ({
   const [reply, setReply] = useState<ReplyTarget | undefined>(undefined);
   const [detailsKey, setDetailsKey] = useState<string | undefined>(undefined);
   const composerRef = useRef<HTMLTextAreaElement>(null);
+  const emoji = useEmojiPrefs();
   // The current draft, for deciding what a failed send restores.
   const draftText = useRef(draft.text);
   useEffect(() => {
@@ -109,22 +111,24 @@ export const ConversationThread = ({
     [actions, failToast, t],
   );
 
+  // Adds my tapback, or takes it back if I'd already sent that one.
+  const toggleReaction = useCallback(
+    (targetId: number, reaction: string) => {
+      void actions
+        .toggleReaction({ targetId, emoji: reaction, destination, channel })
+        .then((result) => {
+          if (Result.isError(result)) {
+            failToast(t("thread.reactionFailed"));
+          }
+        });
+    },
+    [actions, destination, channel, failToast, t],
+  );
+
   const handlers = useMemo<MessageListHandlers>(
     () => ({
-      react: (thread: ThreadMessage, emoji: string) => {
-        void actions
-          .toggleReaction({
-            targetId: thread.message.id,
-            emoji,
-            destination,
-            channel,
-          })
-          .then((result) => {
-            if (Result.isError(result)) {
-              failToast(t("thread.reactionFailed"));
-            }
-          });
-      },
+      react: (thread: ThreadMessage, reaction: string) =>
+        toggleReaction(thread.message.id, reaction),
       reply: (thread: ThreadMessage) => {
         setReply({
           id: thread.message.id,
@@ -152,7 +156,7 @@ export const ConversationThread = ({
       retry: (thread: ThreadMessage) => retry(thread.message.id),
       retryReaction: retry,
     }),
-    [actions, destination, channel, nameOf, failToast, toast, retry, t],
+    [toggleReaction, nameOf, failToast, toast, retry, t],
   );
 
   const send = (text: string) => {
@@ -214,6 +218,7 @@ export const ConversationThread = ({
         dayLabel={dayLabel}
         loadOlder={loadPage}
         handlers={handlers}
+        emoji={emoji}
         touch={touch}
         locale={locale}
         {...(lora ? { lora } : {})}
@@ -240,6 +245,13 @@ export const ConversationThread = ({
         onCancelReply={() => {
           setReply(undefined);
           composerRef.current?.focus();
+        }}
+        emoji={emoji}
+        onTapback={(reaction) => {
+          if (reply) {
+            toggleReaction(reply.id, reaction);
+            setReply(undefined);
+          }
         }}
         touch={touch}
       />

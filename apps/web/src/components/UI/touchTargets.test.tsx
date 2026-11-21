@@ -10,6 +10,7 @@ import { Switch } from "@components/UI/Switch.tsx";
 import { render, screen, within } from "@testing-library/react";
 import { XIcon } from "lucide-react";
 import { describe, expect, it } from "vitest";
+import { testEmojiPrefs } from "@app/tests/emojiPrefs.ts";
 
 // Touch screens get 44px targets. Small controls keep their look and grow
 // their hit area with `relative pointer-coarse:touch-target`; fields grow.
@@ -75,6 +76,7 @@ describe("touch targets", () => {
         }}
         side="end"
         touch
+        emoji={testEmojiPrefs()}
         onReact={() => {}}
         onReply={() => {}}
         onCopy={() => {}}
@@ -100,6 +102,8 @@ describe("touch targets", () => {
         onChange={() => {}}
         onSend={() => {}}
         onCancelReply={() => {}}
+        emoji={testEmojiPrefs()}
+        onTapback={() => {}}
         touch
       />,
     );
