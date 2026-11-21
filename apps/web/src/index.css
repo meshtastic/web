@@ -28,15 +28,49 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
   --font-sans:
-    Inter var, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Inter var", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /*
+   * Type scale. Keys are distinct from Tailwind's xs..9xl steps so both work.
+   * meta 12 · help 13 · body 14 · header 15 · header-lg 16 · title 20 ·
+   * title-lg 26 · display 32 · display-lg 36 (onboarding headings).
+   */
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1rem;
+  --text-help: 0.8125rem;
+  --text-help--line-height: 1.125rem;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.25rem;
+  --text-header: 0.9375rem;
+  --text-header--line-height: 1.375rem;
+  --text-header-lg: 1rem;
+  --text-header-lg--line-height: 1.5rem;
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.75rem;
+  --text-title-lg: 1.625rem;
+  --text-title-lg--line-height: 2rem;
+  --text-display: 2rem;
+  --text-display--line-height: 2.25rem;
+  --text-display-lg: 2.25rem;
+  --text-display-lg--line-height: 2.5rem;
+
+  /*
+   * Radius scale. Small controls use Tailwind's stock `rounded-md` (6px) and
+   * `rounded-lg` (8px), which already match the design, so the stock scale is
+   * left untouched. Named radii are added alongside it.
+   */
+  --radius-control: 10px;
+  --radius-card: 12px;
+  --radius-panel: 14px;
+  --radius-bubble: 16px;
+  --radius-tail: 4px;
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
   --color-background-primary: var(--backgroundPrimary);
   --color-background-secondary: var(--backgroundSecondary);
-  --color-accent: var(--accent);
   --color-accent-muted: var(--accentMuted);
   --color-text-primary: var(--textPrimary);
   --color-text-secondary: var(--textSecondary);
@@ -48,82 +82,281 @@
   --sidebar-width: @apply w-50 lg: w-64;
 }
 
-[data-theme="light"] {
-  --backgroundPrimary: #ffffff;
-  --textPrimary: #111132;
-  --textSecondary: #64748b;
-  --link: #0b69bf;
-
-  --brightnessHover: 0.95;
-  --brightnessPress: 1.05;
-  --brightnessDisabled: 0.75;
-}
-
+/*
+ * ---------------------------------------------------------------------------
+ * Design tokens
+ * ---------------------------------------------------------------------------
+ * Raw values live in `--mt-*` custom properties, one block per theme
+ * (`data-theme` on <html>, set by useTheme). Dark values are the design
+ * mockup values; light values are derived and contrast-checked. The same
+ * values are mirrored in src/core/theme/tokens.ts, and tokens.test.ts fails
+ * when the two drift or when a required text/background pair drops below
+ * WCAG AA.
+ *
+ * Raw names:
+ *   bg-*        page and panel fills (rail, app, surface, chat, raised,
+ *               selected, rail-active, inset)
+ *   border-*    strokes (subtle dividers, control, input, elevated popovers)
+ *   fg-*        text (primary, secondary, muted: the minimum for small text)
+ *   accent*     brand green; `on-accent` is text placed on an accent fill
+ *   on-X        foreground for content placed on fill X
+ *   bubble-*    outgoing message bubble per delivery state
+ *   warning-*, danger-*  status colours (fg / bg / border)
+ *   online, offline, focus  indicator and focus-ring colours
+ *   scrim, overlay, shadow-*  translucent layers and elevation
+ *
+ * Tailwind classes (see `@theme inline` below) use per-utility namespaces,
+ * so one semantic name resolves to the right shade for each utility:
+ *   bg-surface, text-muted, border-control, text-warning / bg-warning /
+ *   border-warning, ring-focus, shadow-popover, rounded-bubble, text-meta.
+ * ---------------------------------------------------------------------------
+ */
 [data-theme="dark"] {
-  --backgroundPrimary: #0f172a;
-  --textPrimary: #ebebeb;
-  --textSecondary: #bdbdbd;
-  --link: #8ec9ff;
+  --mt-bg-rail: #080d18;
+  --mt-bg-app: #0b1220;
+  --mt-bg-surface: #0f172a;
+  --mt-bg-chat: #111a2e;
+  --mt-bg-raised: #1e293b;
+  --mt-bg-selected: #1a2740;
+  --mt-bg-rail-active: #16233b;
+  --mt-bg-inset: #172036;
 
+  --mt-border-subtle: #1a2438;
+  --mt-border-control: #243049;
+  --mt-border-input: #64748b;
+  --mt-border-elevated: #2a3753;
+
+  --mt-fg-primary: #e2e8f0;
+  --mt-fg-secondary: #cbd5e1;
+  --mt-fg-muted: #94a3b8;
+
+  --mt-accent: #67ea94;
+  --mt-accent-hover: #a7f3c4;
+  --mt-on-accent: #052e16;
+  --mt-accent-tint: #13301f;
+  --mt-accent-tint-border: #2f6b47;
+  --mt-on-accent-tint: #d1fae5;
+  --mt-toggle-on: #22a35a;
+  --mt-toggle-knob: #ffffff;
+
+  --mt-bubble-sent: #1b4332;
+  --mt-on-bubble-sent: #ecfdf5;
+  --mt-bubble-pending: #18352a;
+  --mt-on-bubble-pending: #ecfdf5;
+  --mt-bubble-failed: #3a1d22;
+  --mt-on-bubble-failed: #ecfdf5;
+
+  --mt-warning-fg: #fde68a;
+  --mt-warning-bg: #1f1a0e;
+  --mt-warning-border: #4d3b12;
+  --mt-warning-border-subtle: #3f3a1e;
+  --mt-warning-dirty: #fbbf24;
+
+  --mt-danger-fg: #fca5a5;
+  --mt-danger-bg: #2a1215;
+  --mt-danger-border: #7f1d1d;
+  --mt-danger-border-subtle: #4c1d1d;
+  --mt-on-danger: #fecaca;
+  --mt-danger-strong: #f87171;
+  --mt-on-danger-strong: #0b1220;
+
+  --mt-device-avatar: #3b5ba9;
+  --mt-on-device-avatar: #ffffff;
+  --mt-online: #67ea94;
+  --mt-offline: #64748b;
+  --mt-focus: #67ea94;
+
+  --mt-scrim: rgba(4, 8, 16, 0.92);
+  --mt-overlay: rgba(15, 23, 42, 0.92);
+  --mt-shadow-raised: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --mt-shadow-popover: 0 8px 20px rgba(0, 0, 0, 0.45);
+  --mt-shadow-floating: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --mt-shadow-dialog: 0 24px 60px rgba(0, 0, 0, 0.6);
+
+  /* Legacy (pre-token) theme variables. */
   --brightnessHover: 1.1;
   --brightnessPress: 0.9;
   --brightnessDisabled: 0.75;
 }
 
+[data-theme="light"] {
+  --mt-bg-rail: #e8edf4;
+  --mt-bg-app: #f1f5f9;
+  --mt-bg-surface: #ffffff;
+  --mt-bg-chat: #f8fafc;
+  --mt-bg-raised: #e2e8f0;
+  --mt-bg-selected: #e3ebf7;
+  --mt-bg-rail-active: #d9e4f5;
+  --mt-bg-inset: #eef2f7;
+
+  --mt-border-subtle: #e2e8f0;
+  --mt-border-control: #cbd5e1;
+  --mt-border-input: #7b8aa0;
+  --mt-border-elevated: #cbd5e1;
+
+  --mt-fg-primary: #0f172a;
+  --mt-fg-secondary: #334155;
+  --mt-fg-muted: #475569;
+
+  --mt-accent: #11743a;
+  --mt-accent-hover: #0b5a2c;
+  --mt-on-accent: #ffffff;
+  --mt-accent-tint: #dcf5e5;
+  --mt-accent-tint-border: #86d0a2;
+  --mt-on-accent-tint: #052e16;
+  --mt-toggle-on: #11743a;
+  --mt-toggle-knob: #ffffff;
+
+  --mt-bubble-sent: #cdeed9;
+  --mt-on-bubble-sent: #052e16;
+  --mt-bubble-pending: #e3f4e9;
+  --mt-on-bubble-pending: #052e16;
+  --mt-bubble-failed: #fde2e4;
+  --mt-on-bubble-failed: #450a0a;
+
+  --mt-warning-fg: #854d0e;
+  --mt-warning-bg: #fffbeb;
+  --mt-warning-border: #fcd34d;
+  --mt-warning-border-subtle: #fde68a;
+  --mt-warning-dirty: #b45309;
+
+  --mt-danger-fg: #b91c1c;
+  --mt-danger-bg: #fef2f2;
+  --mt-danger-border: #fca5a5;
+  --mt-danger-border-subtle: #fecaca;
+  --mt-on-danger: #991b1b;
+  --mt-danger-strong: #c81e1e;
+  --mt-on-danger-strong: #ffffff;
+
+  --mt-device-avatar: #3b5ba9;
+  --mt-on-device-avatar: #ffffff;
+  --mt-online: #15803d;
+  --mt-offline: #64748b;
+  --mt-focus: #11743a;
+
+  --mt-scrim: rgba(15, 23, 42, 0.4);
+  --mt-overlay: rgba(255, 255, 255, 0.92);
+  --mt-shadow-raised: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --mt-shadow-popover: 0 8px 20px rgba(15, 23, 42, 0.12);
+  --mt-shadow-floating: 0 16px 40px rgba(15, 23, 42, 0.16);
+  --mt-shadow-dialog: 0 24px 60px rgba(15, 23, 42, 0.2);
+
+  /* Legacy (pre-token) theme variables. */
+  --brightnessHover: 0.95;
+  --brightnessPress: 1.05;
+  --brightnessDisabled: 0.75;
+}
+
 /*
- * shadcn/ui tokens mapped onto the app's slate palette.
+ * Legacy variables (`bg-background-primary`, `text-text-primary`,
+ * `text-link`, ...) now point at the tokens so older screens pick up the
+ * palette.
+ */
+:root {
+  --backgroundPrimary: var(--mt-bg-surface);
+  --backgroundSecondary: var(--mt-bg-chat);
+  --textPrimary: var(--mt-fg-primary);
+  --textSecondary: var(--mt-fg-secondary);
+  --link: var(--mt-accent);
+  --accentMuted: var(--mt-accent-tint);
+}
+
+@theme inline {
+  /* Any colour utility (bg-, text-, border-, ring-, outline-, fill-, ...). */
+  --color-accent: var(--mt-accent);
+  --color-accent-foreground: var(--mt-on-accent);
+  --color-online: var(--mt-online);
+  --color-offline: var(--mt-offline);
+  --color-focus: var(--mt-focus);
+  --color-dirty: var(--mt-warning-dirty);
+  --color-danger-strong: var(--mt-danger-strong);
+  --color-toggle-on: var(--mt-toggle-on);
+  --color-toggle-knob: var(--mt-toggle-knob);
+  --color-device-avatar: var(--mt-device-avatar);
+
+  /* bg-* */
+  --background-color-rail: var(--mt-bg-rail);
+  --background-color-app: var(--mt-bg-app);
+  --background-color-surface: var(--mt-bg-surface);
+  --background-color-chat: var(--mt-bg-chat);
+  --background-color-raised: var(--mt-bg-raised);
+  --background-color-selected: var(--mt-bg-selected);
+  --background-color-rail-active: var(--mt-bg-rail-active);
+  --background-color-inset: var(--mt-bg-inset);
+  --background-color-accent-tint: var(--mt-accent-tint);
+  --background-color-bubble-sent: var(--mt-bubble-sent);
+  --background-color-bubble-pending: var(--mt-bubble-pending);
+  --background-color-bubble-failed: var(--mt-bubble-failed);
+  --background-color-warning: var(--mt-warning-bg);
+  --background-color-danger: var(--mt-danger-bg);
+  --background-color-scrim: var(--mt-scrim);
+  --background-color-overlay: var(--mt-overlay);
+
+  /* text-* */
+  --text-color-primary: var(--mt-fg-primary);
+  --text-color-secondary: var(--mt-fg-secondary);
+  --text-color-muted: var(--mt-fg-muted);
+  --text-color-accent-hover: var(--mt-accent-hover);
+  --text-color-on-accent: var(--mt-on-accent);
+  --text-color-on-accent-tint: var(--mt-on-accent-tint);
+  --text-color-on-bubble-sent: var(--mt-on-bubble-sent);
+  --text-color-on-bubble-pending: var(--mt-on-bubble-pending);
+  --text-color-on-bubble-failed: var(--mt-on-bubble-failed);
+  --text-color-warning: var(--mt-warning-fg);
+  --text-color-danger: var(--mt-danger-fg);
+  --text-color-on-danger: var(--mt-on-danger);
+  --text-color-on-danger-strong: var(--mt-on-danger-strong);
+  --text-color-on-device-avatar: var(--mt-on-device-avatar);
+
+  /* border-* (divide-* falls back to these) */
+  --border-color-subtle: var(--mt-border-subtle);
+  --border-color-control: var(--mt-border-control);
+  --border-color-input: var(--mt-border-input);
+  --border-color-elevated: var(--mt-border-elevated);
+  --border-color-accent-tint: var(--mt-accent-tint-border);
+  --border-color-warning: var(--mt-warning-border);
+  --border-color-warning-subtle: var(--mt-warning-border-subtle);
+  --border-color-danger: var(--mt-danger-border);
+  --border-color-danger-subtle: var(--mt-danger-border-subtle);
+
+  /* shadow-* */
+  --shadow-raised: var(--mt-shadow-raised);
+  --shadow-popover: var(--mt-shadow-popover);
+  --shadow-floating: var(--mt-shadow-floating);
+  --shadow-dialog: var(--mt-shadow-dialog);
+}
+
+/*
+ * shadcn/ui tokens mapped onto the design tokens.
  *
- * The values mirror the slate classes the rest of the UI uses (Dialog, Button,
- * Input, Sidebar) so shadcn surfaces such as the Connections drawer match the
- * other screens. The raw tokens are scoped to `[data-shadcn-scope]` rather than
+ * The raw shadcn names are scoped to `[data-shadcn-scope]` rather than
  * `:root` so the generated utilities (`bg-background`, `text-foreground`, ...)
- * only paint inside those surfaces. Two names are deliberately left out:
- *   - `--accent` / `--accent-foreground`: the app already maps
- *     `--color-accent: var(--accent)` for `ring-accent`; defining `--accent`
- *     would recolour those focus rings. Drawer hover surfaces use `bg-muted`.
+ * only paint inside those surfaces. They reference `--mt-*`, which switch per
+ * theme, so one block serves both themes. Two names are deliberately left out:
+ *   - `--accent` / `--accent-foreground`: `--color-accent` is the brand
+ *     accent app-wide (`ring-accent`, `text-accent`). Drawer hover surfaces
+ *     use `bg-muted`.
  *   - `--radius-*`: shadcn's remap would override Tailwind's `rounded-*` scale
  *     app-wide, so the stock scale is kept.
  */
 [data-shadcn-scope] {
-  --background: var(--backgroundPrimary);
-  --foreground: var(--color-slate-900);
-  --card: var(--color-white);
-  --card-foreground: var(--color-slate-900);
-  --popover: var(--color-white);
-  --popover-foreground: var(--color-slate-900);
-  --primary: var(--color-slate-900);
-  --primary-foreground: var(--color-white);
-  --secondary: var(--color-slate-100);
-  --secondary-foreground: var(--color-slate-700);
-  --muted: var(--color-slate-100);
-  /* slate-500 is 4.3:1 on slate-100; slate-600 keeps WCAG 1.4.3 AA. */
-  --muted-foreground: var(--color-slate-600);
-  --destructive: var(--color-red-600);
-  --destructive-foreground: var(--color-white);
-  --border: var(--color-slate-300);
-  /* Control outlines need more weight than decorative borders on white. */
-  --input: var(--color-slate-400);
-  --ring: var(--color-slate-400);
-}
-
-[data-theme="dark"] [data-shadcn-scope],
-[data-theme="dark"][data-shadcn-scope] {
-  --foreground: var(--color-slate-100);
-  --card: var(--color-slate-800);
-  --card-foreground: var(--color-slate-200);
-  --popover: var(--color-slate-800);
-  --popover-foreground: var(--color-slate-200);
-  --primary: var(--color-slate-50);
-  --primary-foreground: var(--color-slate-900);
-  --secondary: var(--color-slate-700);
-  --secondary-foreground: var(--color-slate-100);
-  --muted: var(--color-slate-800);
-  --muted-foreground: var(--color-slate-400);
-  --destructive: var(--color-red-400);
-  --destructive-foreground: var(--color-slate-900);
-  --border: var(--color-slate-700);
-  --input: var(--color-slate-700);
-  --ring: var(--color-slate-500);
+  --background: var(--mt-bg-surface);
+  --foreground: var(--mt-fg-primary);
+  --card: var(--mt-bg-raised);
+  --card-foreground: var(--mt-fg-primary);
+  --popover: var(--mt-bg-surface);
+  --popover-foreground: var(--mt-fg-primary);
+  --primary: var(--mt-accent);
+  --primary-foreground: var(--mt-on-accent);
+  --secondary: var(--mt-bg-raised);
+  --secondary-foreground: var(--mt-fg-primary);
+  --muted: var(--mt-bg-raised);
+  --muted-foreground: var(--mt-fg-muted);
+  --destructive: var(--mt-danger-strong);
+  --destructive-foreground: var(--mt-on-danger-strong);
+  --border: var(--mt-border-control);
+  --input: var(--mt-border-input);
+  --ring: var(--mt-focus);
 }
 
 @theme inline {
@@ -191,7 +424,7 @@ body {
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-slate-200, currentColor);
+    border-color: var(--mt-border-subtle, var(--color-slate-200, currentColor));
   }
 
   ::-webkit-scrollbar {

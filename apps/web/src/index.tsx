@@ -17,6 +17,10 @@ import { disconnectAllConnections } from "@app/pages/Connections/useConnections.
 import { MeshRegistryProvider } from "@core/kmp/hooks";
 import { type createRouter, RouterProvider } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { applyStoredTheme } from "@core/hooks/useTheme.ts";
+
+// Resolve "system" before first paint so the --mt-* tokens exist immediately.
+applyStoredTheme();
 
 declare module "@tanstack/react-router" {
   interface Register {
