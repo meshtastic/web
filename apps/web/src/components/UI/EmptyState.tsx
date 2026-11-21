@@ -8,7 +8,8 @@ export interface EmptyStateProps {
   description?: ReactNode;
   /** Actions or suggestions under the text. */
   children?: ReactNode;
-  headingLevel?: "h2" | "h3";
+  /** h1 when the empty state is the whole page. */
+  headingLevel?: "h1" | "h2" | "h3";
   className?: string;
 }
 

@@ -7,7 +7,7 @@ import { useLockdown } from "@core/hooks/useLockdown.ts";
 import { useConnectionProgress } from "@core/kmp/hooks";
 import { Bluetooth, Cable, CheckCircle2, Globe, Loader2 } from "lucide-react";
 import type { ComponentType, ReactElement } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const STUCK_THRESHOLD_MS = 15_000;
@@ -60,6 +60,12 @@ export const ConnectingOverlay = (): ReactElement | null => {
     const t = setTimeout(() => setShowCancel(true), STUCK_THRESHOLD_MS);
     return () => clearTimeout(t);
   }, [active?.id]);
+  // Cancel appears late, after the dialog took focus; move focus onto it
+  // so keyboard and screen reader users find the way out.
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (showCancel) cancelRef.current?.focus();
+  }, [showCancel]);
 
   if (!active || isLocked) return null;
 
@@ -156,6 +162,7 @@ export const ConnectingOverlay = (): ReactElement | null => {
                 })}
               </p>
               <Button
+                ref={cancelRef}
                 type="button"
                 variant="outline"
                 onClick={() => void disconnect(active.id)}

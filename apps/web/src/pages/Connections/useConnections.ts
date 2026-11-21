@@ -10,6 +10,10 @@ import {
   openRepositories,
   UNKNOWN_NODE_SCOPE,
 } from "@app/core/connections/repositories.ts";
+import {
+  nextConnectionPatch,
+  supersededAttempts,
+} from "@app/core/connections/status.ts";
 import type {
   Connection,
   ConnectionId,
@@ -139,16 +143,29 @@ async function clientFactory(
   }
 }
 
-function abandonConnect(id: ConnectionId): false {
-  log.info("connect: abandoned, the app was handed to another tab", { id });
-  useDeviceStore
-    .getState()
-    .updateSavedConnection(id, { status: "disconnected", error: undefined });
-  return false;
-}
-
 const savedConnection = (id: ConnectionId): Connection | undefined =>
   useDeviceStore.getState().savedConnections.find((c) => c.id === id);
+
+/**
+ * Writes a status change, with the fields that follow from it: when the
+ * radio was last reached, and the end of a pending attempt.
+ */
+function patchConnection(
+  id: ConnectionId,
+  fields: Partial<Connection> & Pick<Connection, "status">,
+): void {
+  const prev = savedConnection(id)?.status;
+  useDeviceStore.getState().updateSavedConnection(id, {
+    ...fields,
+    ...nextConnectionPatch(prev, fields.status, Date.now()),
+  });
+}
+
+function abandonConnect(id: ConnectionId): false {
+  log.info("connect: abandoned, the app was handed to another tab", { id });
+  patchConnection(id, { status: "disconnected", error: undefined });
+  return false;
+}
 
 async function teardownSession(id: ConnectionId): Promise<void> {
   log.debug("teardown: enter", { id });
@@ -168,6 +185,9 @@ async function teardownSession(id: ConnectionId): Promise<void> {
 async function disconnectConnection(id: ConnectionId): Promise<void> {
   const conn = savedConnection(id);
   if (!conn) return;
+  // A connect still in flight (stuck opening the port, say) must not
+  // bring the connection back after the user cancelled it.
+  endAttempts(id);
   try {
     await teardownSession(id);
     if (conn.meshDeviceId) {
@@ -177,9 +197,45 @@ async function disconnectConnection(id: ConnectionId): Promise<void> {
         ?.setConnectionId(null);
     }
   } finally {
-    useDeviceStore
-      .getState()
-      .updateSavedConnection(id, { status: "disconnected", error: undefined });
+    patchConnection(id, { status: "disconnected", error: undefined });
+  }
+}
+
+/** Forgets a saved connection: its session, held port and device data. */
+async function forgetConnection(id: ConnectionId): Promise<void> {
+  const conn = savedConnection(id);
+  await teardownSession(id);
+  heldSerialPorts.delete(id);
+  heldBluetoothDevices.delete(id);
+  if (conn?.meshDeviceId) {
+    try {
+      useDeviceStore.getState().removeDevice(conn.meshDeviceId);
+    } catch (e) {
+      log.error("removeConnection: removeDevice threw", {
+        id,
+        meshDeviceId: conn.meshDeviceId,
+        message: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+  meshRegistry.unregister(id);
+  useDeviceStore.getState().removeSavedConnection(id);
+}
+
+/**
+ * Once `id` reaches its radio, drops the other entries for the same radio
+ * that never reached one (see supersededAttempts).
+ */
+function dropSupersededAttempts(id: ConnectionId): void {
+  const reached = savedConnection(id);
+  if (!reached) return;
+  const { savedConnections } = useDeviceStore.getState();
+  for (const other of supersededAttempts(savedConnections, reached)) {
+    log.info("connect: dropping an unfinished attempt at the same radio", {
+      id,
+      other,
+    });
+    void forgetConnection(other);
   }
 }
 
@@ -188,6 +244,56 @@ async function disconnectConnection(id: ConnectionId): Promise<void> {
 // flight here stops before it opens the port or registers a session.
 let handovers = 0;
 const handedOver = (seen: number): boolean => seen !== handovers;
+
+/**
+ * How long a serial or Bluetooth connect may sit in "connecting" once the
+ * port or device is chosen. Opening a port normally takes well under a
+ * second; past this the browser call is stuck (seen after a reload while
+ * the old page still held the port) and nothing would ever end it.
+ * HTTP is left out: its connect can wait on a Local Network Access prompt.
+ * The handshake after the port opens has the SDK's own timeout.
+ */
+export const OPEN_TIMEOUT_MS = 20_000;
+
+/** One connect attempt; a newer attempt, a cancel or a timeout ends it. */
+interface Attempt {
+  readonly id: ConnectionId;
+  readonly generation: number;
+  readonly seen: number;
+}
+const attemptGenerations = new Map<ConnectionId, number>();
+// Settles the pending connect() of the attempt in flight, if any, so a
+// caller awaiting a stuck connect gets its answer when the attempt ends.
+const attemptSettlers = new Map<ConnectionId, () => void>();
+
+function endAttempts(id: ConnectionId): number {
+  const next = (attemptGenerations.get(id) ?? 0) + 1;
+  attemptGenerations.set(id, next);
+  const settle = attemptSettlers.get(id);
+  attemptSettlers.delete(id);
+  settle?.();
+  return next;
+}
+
+const beginAttempt = (id: ConnectionId): Attempt => ({
+  id,
+  generation: endAttempts(id),
+  seen: handovers,
+});
+
+const isCurrent = (attempt: Attempt): boolean =>
+  !handedOver(attempt.seen) &&
+  attemptGenerations.get(attempt.id) === attempt.generation;
+
+/**
+ * Stops an attempt that was ended while it awaited. A handover resets the
+ * status here; a cancel or timeout already wrote the status it wanted.
+ */
+function abandonAttempt(attempt: Attempt): false {
+  if (handedOver(attempt.seen)) return abandonConnect(attempt.id);
+  log.info("connect: attempt ended while in flight", { id: attempt.id });
+  return false;
+}
 
 export async function disconnectAllConnections(): Promise<void> {
   handovers += 1;
@@ -202,9 +308,6 @@ export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
   const addSavedConnection = useDeviceStore((s) => s.addSavedConnection);
   const updateSavedConnection = useDeviceStore((s) => s.updateSavedConnection);
-  const removeSavedConnectionFromStore = useDeviceStore(
-    (s) => s.removeSavedConnection,
-  );
   const setActiveConnectionId = useDeviceStore((s) => s.setActiveConnectionId);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
@@ -217,40 +320,18 @@ export function useConnections() {
       error?: string,
       errorKind?: Connection["errorKind"],
     ) => {
-      updateSavedConnection(id, {
+      patchConnection(id, {
         status,
         error: error || undefined,
         errorKind: error ? errorKind : undefined,
-        ...(status === "disconnected" ? { lastConnectedAt: Date.now() } : {}),
       });
     },
-    [updateSavedConnection],
+    [],
   );
 
   const teardown = teardownSession;
 
-  const removeConnection = useCallback(
-    async (id: ConnectionId) => {
-      const conn = connections.find((c) => c.id === id);
-      await teardown(id);
-      heldSerialPorts.delete(id);
-      heldBluetoothDevices.delete(id);
-      if (conn?.meshDeviceId) {
-        try {
-          useDeviceStore.getState().removeDevice(conn.meshDeviceId);
-        } catch (e) {
-          log.error("removeConnection: removeDevice threw", {
-            id,
-            meshDeviceId: conn.meshDeviceId,
-            message: e instanceof Error ? e.message : String(e),
-          });
-        }
-      }
-      meshRegistry.unregister(id);
-      removeSavedConnectionFromStore(id);
-    },
-    [connections, removeSavedConnectionFromStore, teardown],
-  );
+  const removeConnection = forgetConnection;
 
   const setDefaultConnection = useCallback(
     (id: ConnectionId) => {
@@ -268,14 +349,16 @@ export function useConnections() {
    * this connection reached last time.
    */
   const connectThroughKmp = useCallback(
-    async (id: ConnectionId, makeClient: ClientFactory, seen: number) => {
+    async (attempt: Attempt, makeClient: ClientFactory) => {
+      const { id } = attempt;
       const conn = savedConnection(id);
       const { options, persistent, sdkStorage } = await openRepositories(
         conn?.nodeNum,
       );
-      if (handedOver(seen)) return abandonConnect(id);
+      if (!isCurrent(attempt)) return abandonAttempt(attempt);
+      log.info("connect: storage ready", { id, persistent });
       const client = await makeClient(sdkStorage);
-      if (handedOver(seen)) return abandonConnect(id);
+      if (!isCurrent(attempt)) return abandonAttempt(attempt);
       let deviceId = conn?.meshDeviceId;
       if (deviceId && !useDeviceStore.getState().getDevice(deviceId)) {
         deviceId = undefined;
@@ -298,6 +381,10 @@ export function useConnections() {
       // this session's state rather than the dead one's, and its client
       // releases the port before this one opens it.
       await teardown(id);
+      if (!isCurrent(attempt)) {
+        session.close();
+        return abandonAttempt(attempt);
+      }
       meshRegistry.unregister(id);
       meshRegistry.register(id, session);
       meshRegistry.setActive(id);
@@ -325,7 +412,7 @@ export function useConnections() {
             void teardown(id);
             const cause = new Error(state.error ?? "");
             cause.name = state.errorKind;
-            updateSavedConnection(id, {
+            patchConnection(id, {
               ...connectFailure(cause),
               reconnect: undefined,
             });
@@ -334,7 +421,7 @@ export function useConnections() {
           if (reconnect) {
             reconnecting = state;
             log.warn("kmp: reconnecting", { id, ...reconnect });
-            updateSavedConnection(id, {
+            patchConnection(id, {
               status: "connecting",
               reconnect,
               error: undefined,
@@ -346,7 +433,7 @@ export function useConnections() {
             if (!reconnecting) {
               if (session.isRehandshaking) return;
               log.error("kmp: dropped without retrying", { id });
-              updateSavedConnection(id, {
+              patchConnection(id, {
                 status: "error",
                 reconnect: undefined,
                 error: t("connections:errors.connectionLost"),
@@ -365,14 +452,14 @@ export function useConnections() {
               });
               const cause = new Error(last.error);
               cause.name = last.errorKind ?? "transport";
-              updateSavedConnection(id, {
+              patchConnection(id, {
                 ...connectFailure(cause),
                 reconnect: undefined,
               });
               return;
             }
             log.error("kmp: reconnect attempts exhausted", { id });
-            updateSavedConnection(id, {
+            patchConnection(id, {
               status: "error",
               reconnect: undefined,
               error: t("connections:errors.reconnectFailed", {
@@ -383,11 +470,12 @@ export function useConnections() {
             return;
           }
           reconnecting = undefined;
-          updateSavedConnection(id, {
+          patchConnection(id, {
             status: toConnectionStatus(state),
             reconnect: undefined,
           });
           if (state.kind === "connected") {
+            dropSupersededAttempts(id);
             if (firmwareChecked) return;
             firmwareChecked = true;
             if (session.device.firmwareSupport.peek() === "shouldUpdate") {
@@ -429,9 +517,12 @@ export function useConnections() {
       });
 
       try {
+        log.info("connect: opening transport", { id });
         await client.connect();
-        return true;
+        // Ended meanwhile: whoever ended it tore the session down.
+        return isCurrent(attempt);
       } catch (error) {
+        if (!isCurrent(attempt)) return abandonAttempt(attempt);
         log.error("kmp: connect failed", {
           id,
           name: error instanceof Error ? error.name : undefined,
@@ -448,7 +539,7 @@ export function useConnections() {
           heldSerialPorts.delete(id);
           heldBluetoothDevices.delete(id);
         }
-        updateSavedConnection(id, connectFailure(error));
+        patchConnection(id, connectFailure(error));
         return false;
       }
     },
@@ -460,6 +551,51 @@ export function useConnections() {
       updateSavedConnection,
       updateStatus,
     ],
+  );
+
+  const connectAttempt = useCallback(
+    async (
+      attempt: Attempt,
+      conn: Connection,
+      allowPrompt: boolean,
+      watch: () => void,
+    ): Promise<boolean> => {
+      const { id } = attempt;
+      try {
+        // The picker runs first, while the click's activation is still live.
+        const makeClient = await clientFactory(conn, allowPrompt);
+        if (!isCurrent(attempt)) return abandonAttempt(attempt);
+        watch();
+        // The app follows one radio at a time: a session still live on
+        // another connection would keep its port and poller to itself.
+        for (const other of [...sessionTeardowns.keys()]) {
+          if (other === id) continue;
+          await teardown(other);
+          const otherDevice = savedConnection(other)?.meshDeviceId;
+          if (otherDevice) {
+            useDeviceStore
+              .getState()
+              .getDevice(otherDevice)
+              ?.setConnectionId(null);
+          }
+          patchConnection(other, {
+            status: "disconnected",
+            error: undefined,
+          });
+        }
+        return await connectThroughKmp(attempt, makeClient);
+      } catch (error) {
+        if (!isCurrent(attempt)) return abandonAttempt(attempt);
+        log.error("connect: no device to connect to", {
+          id,
+          name: error instanceof Error ? error.name : undefined,
+          message: error instanceof Error ? error.message : String(error),
+        });
+        patchConnection(id, connectFailure(error));
+        return false;
+      }
+    },
+    [connectThroughKmp, teardown],
   );
 
   const connect = useCallback(
@@ -488,40 +624,47 @@ export function useConnections() {
       });
       updateStatus(id, "connecting");
       const allowPrompt = opts?.allowPrompt ?? false;
-      const seen = handovers;
-      try {
-        // The picker runs first, while the click's activation is still live.
-        const makeClient = await clientFactory(conn, allowPrompt);
-        if (handedOver(seen)) return abandonConnect(id);
-        // The app follows one radio at a time: a session still live on
-        // another connection would keep its port and poller to itself.
-        for (const other of [...sessionTeardowns.keys()]) {
-          if (other === id) continue;
-          await teardown(other);
-          const otherDevice = savedConnection(other)?.meshDeviceId;
-          if (otherDevice) {
-            useDeviceStore
-              .getState()
-              .getDevice(otherDevice)
-              ?.setConnectionId(null);
-          }
-          updateSavedConnection(other, {
-            status: "disconnected",
-            error: undefined,
+      const attempt = beginAttempt(id);
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      let settle: () => void = () => {};
+      const ended = new Promise<false>((resolve) => {
+        settle = () => resolve(false);
+      });
+      attemptSettlers.set(id, settle);
+      // Ends an attempt stuck opening the port: nothing else would, and
+      // the overlay would spin forever.
+      const watch = () => {
+        if (conn.type === "http") return;
+        timer = setTimeout(() => {
+          const now = savedConnection(id);
+          if (!isCurrent(attempt) || now?.status !== "connecting") return;
+          if (now.reconnect) return;
+          log.error("connect: timed out opening the transport", {
+            id,
+            ms: OPEN_TIMEOUT_MS,
           });
-        }
-        return await connectThroughKmp(id, makeClient, seen);
-      } catch (error) {
-        log.error("connect: no device to connect to", {
-          id,
-          name: error instanceof Error ? error.name : undefined,
-          message: error instanceof Error ? error.message : String(error),
-        });
-        updateSavedConnection(id, connectFailure(error));
-        return false;
+          endAttempts(id);
+          void teardown(id);
+          sessionTeardowns.delete(id);
+          meshRegistry.unregister(id);
+          heldSerialPorts.delete(id);
+          heldBluetoothDevices.delete(id);
+          patchConnection(id, {
+            status: "error",
+            error: t("connections:errors.openTimeout"),
+            errorKind: "network",
+          });
+        }, OPEN_TIMEOUT_MS);
+      };
+      const work = connectAttempt(attempt, conn, allowPrompt, watch);
+      try {
+        return await Promise.race([work, ended]);
+      } finally {
+        clearTimeout(timer);
+        if (attemptSettlers.get(id) === settle) attemptSettlers.delete(id);
       }
     },
-    [updateStatus, updateSavedConnection, connectThroughKmp],
+    [updateStatus, teardown, connectAttempt],
   );
 
   const disconnect = disconnectConnection;
@@ -535,9 +678,24 @@ export function useConnections() {
     [addSavedConnection],
   );
 
+  /**
+   * Saves a connection and connects to it. The entry is saved first, since
+   * the connect needs it, and stays `pending` until it reaches a radio; one
+   * still pending at the next startup is dropped. `keep` ends the pending
+   * state once the connect returns, success or not, for an explicit save
+   * whose entry the user expects to stay even if the radio didn't answer.
+   */
   const addConnectionAndConnect = useCallback(
-    async (input: NewConnection, handle?: ConnectionHandle) => {
-      const conn = addConnection(input);
+    async (
+      input: NewConnection,
+      handle?: ConnectionHandle,
+      opts?: { keep?: boolean },
+    ) => {
+      const conn: Connection = {
+        ...createConnectionFromInput(input),
+        pending: true,
+      };
+      addSavedConnection(conn);
       if (handle?.bluetoothDevice && conn.type === "bluetooth") {
         heldBluetoothDevices.set(conn.id, handle.bluetoothDevice);
       }
@@ -545,9 +703,12 @@ export function useConnections() {
         heldSerialPorts.set(conn.id, handle.serialPort);
       }
       await connect(conn.id, { allowPrompt: true });
+      if (opts?.keep && savedConnection(conn.id)?.pending) {
+        updateSavedConnection(conn.id, { pending: undefined });
+      }
       return conn;
     },
-    [addConnection, connect],
+    [addSavedConnection, connect, updateSavedConnection],
   );
 
   const refreshStatuses = useCallback(async () => {
@@ -588,10 +749,10 @@ export function useConnections() {
         conn.status === "configured" ||
         conn.status === "configuring";
       if (!shouldBeConnected && isConnectedState) {
-        updateSavedConnection(conn.id, { status: "disconnected" });
+        patchConnection(conn.id, { status: "disconnected" });
       }
     });
-  }, [connections, selectedDeviceId, updateSavedConnection]);
+  }, [connections, selectedDeviceId]);
 
   return {
     connections,

@@ -63,6 +63,12 @@ export type Connection = {
    * node, so every connection to the same radio shares it.
    */
   nodeNum?: number;
+  /**
+   * Set while the connect attempt that created this entry is unfinished;
+   * cleared once it reaches a radio. Entries still pending at startup are
+   * dropped (see core/connections/status.ts).
+   */
+  pending?: boolean;
 } & NewConnection;
 
 export type NewConnection =

@@ -1,5 +1,5 @@
 import type { SessionOptions } from "@core/kmp/session.ts";
-import { getSdkStorage } from "@core/kmp/browserStorage.ts";
+import { getSdkStorage, resetSdkStorage } from "@core/kmp/browserStorage.ts";
 import type { SdkStorage } from "@meshtastic/sdk-kmp";
 import { createLogger } from "@core/log.ts";
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
@@ -42,13 +42,30 @@ export async function openRepositories(nodeNum?: number): Promise<{
   persistent: boolean;
   sdkStorage: SdkStorage | undefined;
 }> {
-  const sdkStorage = await getSdkStorage().catch((err: unknown) => {
-    log.warn("openRepositories: SDK storage unavailable, running in memory", {
-      name: err instanceof Error ? err.name : undefined,
-      message: err instanceof Error ? err.message : String(err),
-    });
-    return undefined;
-  });
+  // The SDK bounds each storage call itself, but loading it is a plain
+  // await; a connect must not wait on it forever, nor reuse a stuck one.
+  let sdkTimer: ReturnType<typeof setTimeout> | undefined;
+  const sdkStorage = await Promise.race([
+    getSdkStorage(),
+    new Promise<never>((_, reject) => {
+      sdkTimer = setTimeout(() => {
+        resetSdkStorage();
+        reject(
+          new Error(
+            `SDK storage did not open within ${STORAGE_OPEN_TIMEOUT_MS}ms`,
+          ),
+        );
+      }, STORAGE_OPEN_TIMEOUT_MS);
+    }),
+  ])
+    .catch((err: unknown) => {
+      log.warn("openRepositories: SDK storage unavailable, running in memory", {
+        name: err instanceof Error ? err.name : undefined,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      return undefined;
+    })
+    .finally(() => clearTimeout(sdkTimer));
   const scope = nodeNum ?? UNKNOWN_NODE_SCOPE;
   try {
     const t0 = Date.now();

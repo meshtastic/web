@@ -3,6 +3,7 @@ import { BeaconOfferNotifier } from "@components/BeaconOfferNotifier.tsx";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { ConnectingOverlay } from "@components/ConnectingOverlay.tsx";
 import { ConnectionsDrawer } from "@components/ConnectionsDrawer/ConnectionsDrawer.tsx";
+import { NoRadioScreen } from "@components/NoRadio/NoRadioScreen.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { LockdownGate } from "@components/Dialog/LockdownDialog/LockdownDialog.tsx";
 import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
@@ -83,8 +84,8 @@ export function App() {
             well as reconnects from inside the app. */}
         <ConnectingOverlay />
         {/* The Connections drawer overlays whatever page is showing. With no
-            device it is forced open and replaces the old full-page screen. */}
-        <ConnectionsDrawer forced={!device} />
+            device the page says so and opens it on request. */}
+        <ConnectionsDrawer />
         <div
           className={cn(
             "flex flex-col bg-background-primary text-text-primary",
@@ -110,7 +111,9 @@ export function App() {
                   </MapProvider>
                 </AppShell>
               </div>
-            ) : null}
+            ) : (
+              <NoRadioScreen />
+            )}
           </div>
         </div>
       </DeviceWrapper>

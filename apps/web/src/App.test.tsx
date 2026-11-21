@@ -38,6 +38,9 @@ vi.mock("@components/Shell/AppShell.tsx", () => ({
     <div>{children}</div>
   ),
 }));
+vi.mock("@components/NoRadio/NoRadioScreen.tsx", () => ({
+  NoRadioScreen: () => <div>no radio screen</div>,
+}));
 vi.mock("@tanstack/react-router-devtools", () => ({
   TanStackRouterDevtools: () => null,
 }));
@@ -105,6 +108,8 @@ describe("App welcome routing", () => {
     });
     const router = await renderApp("/messages");
     expect(await screen.findByText("connections drawer")).toBeInTheDocument();
+    // With no radio connected the page says so instead of going blank.
+    expect(screen.getByText("no radio screen")).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/messages");
     expect(screen.queryByText("welcome wizard")).toBeNull();
   });

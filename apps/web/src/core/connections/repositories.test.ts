@@ -7,14 +7,23 @@ const storage = vi.hoisted(
   (): { open?: () => Promise<{ db: unknown; persistent: boolean }> } => ({}),
 );
 
-const sdk = vi.hoisted((): { storage?: SdkStorage; reject?: Error } => ({}));
+const sdk = vi.hoisted(
+  (): {
+    storage?: SdkStorage;
+    reject?: Error;
+    hang?: boolean;
+    reset: ReturnType<typeof vi.fn>;
+  } => ({ reset: vi.fn() }),
+);
 
 vi.mock("@core/kmp/browserStorage.ts", () => ({
   getSdkStorage: async () => {
+    if (sdk.hang) return new Promise<SdkStorage>(() => {});
     if (sdk.reject) throw sdk.reject;
     if (!sdk.storage) throw new Error("unscripted");
     return sdk.storage;
   },
+  resetSdkStorage: sdk.reset,
 }));
 
 vi.mock("@core/sdkStorage.ts", () => ({
@@ -31,6 +40,24 @@ describe("openRepositories", () => {
   beforeEach(() => {
     sdk.storage = sentinel;
     sdk.reject = undefined;
+    sdk.hang = false;
+    sdk.reset.mockClear();
+  });
+
+  it("runs the SDK in memory, and forgets the stuck storage, when it hangs", async () => {
+    vi.useFakeTimers();
+    const db = await createMemoryDb();
+    storage.open = async () => ({ db, persistent: true });
+    sdk.hang = true;
+
+    const pending = openRepositories(42);
+    await vi.advanceTimersByTimeAsync(5_000);
+    const opened = await pending;
+
+    expect(opened.sdkStorage).toBeUndefined();
+    expect(opened.persistent).toBe(true);
+    // The next connect starts afresh rather than awaiting the same promise.
+    expect(sdk.reset).toHaveBeenCalledTimes(1);
   });
 
   afterEach(() => {

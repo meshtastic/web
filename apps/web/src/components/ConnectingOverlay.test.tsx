@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ConnectingOverlay } from "./ConnectingOverlay.tsx";
 
@@ -8,8 +8,9 @@ vi.mock("@core/stores", () => ({
   useDeviceStore: (selector: (s: { savedConnections: unknown }) => unknown) =>
     selector({ savedConnections }),
 }));
+const disconnect = vi.hoisted(() => vi.fn());
 vi.mock("@app/pages/Connections/useConnections", () => ({
-  useConnections: () => ({ disconnect: vi.fn() }),
+  useConnections: () => ({ disconnect }),
 }));
 vi.mock("@core/hooks/useLockdown.ts", () => ({
   useLockdown: () => ({ isLocked: false }),
@@ -58,5 +59,24 @@ describe("ConnectingOverlay", () => {
     savedConnections = [connection({ status: "configured" })];
     const { container } = render(<ConnectingOverlay />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("moves focus to Cancel when a connect takes too long, and cancels it", () => {
+    vi.useFakeTimers();
+    try {
+      savedConnections = [connection()];
+      render(<ConnectingOverlay />);
+      expect(screen.queryByRole("button", { name: "Cancel" })).toBeNull();
+
+      act(() => {
+        vi.advanceTimersByTime(15_000);
+      });
+      const cancel = screen.getByRole("button", { name: "Cancel" });
+      expect(cancel).toHaveFocus();
+      fireEvent.click(cancel);
+      expect(disconnect).toHaveBeenCalledWith(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

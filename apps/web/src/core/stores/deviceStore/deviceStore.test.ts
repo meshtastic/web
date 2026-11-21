@@ -345,6 +345,71 @@ describe("DeviceStore – persistence partialize & rehydrate", () => {
     }
   });
 
+  it("drops connections whose connect attempt never finished and resets live statuses on reload", async () => {
+    {
+      const { useDeviceStore } = await freshStore(true);
+      const state = useDeviceStore.getState();
+      const base = { type: "serial", name: "USB radio", createdAt: 1 } as const;
+      // A connect attempt cut off by a reload before the radio answered.
+      state.addSavedConnection({
+        ...base,
+        id: 1,
+        status: "connecting",
+        pending: true,
+      });
+      // The attempt that worked and was still connected when the tab closed.
+      state.addSavedConnection({
+        ...base,
+        id: 2,
+        status: "configured",
+        lastConnectedAt: 5,
+        nodeNum: 42,
+      });
+      // A pending attempt that got far enough to learn the node.
+      state.addSavedConnection({
+        ...base,
+        id: 3,
+        status: "configuring",
+        pending: true,
+        nodeNum: 43,
+      });
+      // An explicit save that never connected, no longer pending.
+      state.addSavedConnection({ ...base, id: 4, status: "error" });
+    }
+    {
+      const { useDeviceStore } = await freshStore(true);
+      const saved = useDeviceStore.getState().savedConnections;
+      expect(saved.map((c) => c.id)).toEqual([2, 3, 4]);
+      expect(saved.find((c) => c.id === 2)?.status).toBe("disconnected");
+    }
+  });
+
+  it("drops entries older builds left for a radio another entry reached", async () => {
+    {
+      const { useDeviceStore } = await freshStore(true);
+      const state = useDeviceStore.getState();
+      const usb = {
+        type: "serial",
+        name: "USB radio · USB 303a:1001",
+        createdAt: 1,
+        status: "online",
+        usbVendorId: 0x303a,
+        usbProductId: 0x1001,
+      } as const;
+      // Two attempts saved before `pending` existed, then the one that worked.
+      state.addSavedConnection({ ...usb, id: 1 });
+      state.addSavedConnection({ ...usb, id: 2 });
+      state.addSavedConnection({ ...usb, id: 3, nodeNum: 42 });
+      // Never connected, but a different radio: kept.
+      state.addSavedConnection({ ...usb, id: 4, usbProductId: 0x1002 });
+    }
+    {
+      const { useDeviceStore } = await freshStore(true);
+      const saved = useDeviceStore.getState().savedConnections;
+      expect(saved.map((c) => c.id)).toEqual([3, 4]);
+    }
+  });
+
   it("removing a device persists across reload", async () => {
     {
       const { useDeviceStore } = await freshStore(true);

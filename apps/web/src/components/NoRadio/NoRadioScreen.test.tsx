@@ -1,0 +1,52 @@
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { NoRadioEmptyState } from "./NoRadioScreen.tsx";
+
+describe("NoRadioEmptyState", () => {
+  it("offers only Connect a radio when no saved radio was reached", () => {
+    const onConnect = vi.fn();
+    render(
+      <NoRadioEmptyState
+        reconnecting={false}
+        onConnect={onConnect}
+        onReconnect={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("heading", { level: 1, name: "No radio connected" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Reconnect/ })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Connect a radio" }));
+    expect(onConnect).toHaveBeenCalledTimes(1);
+  });
+
+  it("reconnects the most recent radio in one click", () => {
+    const onReconnect = vi.fn();
+    render(
+      <NoRadioEmptyState
+        recent={{ id: 1, name: "USB radio" }}
+        reconnecting={false}
+        onConnect={vi.fn()}
+        onReconnect={onReconnect}
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Reconnect USB radio" }),
+    );
+    expect(onReconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it("disables Reconnect while it is connecting", () => {
+    render(
+      <NoRadioEmptyState
+        recent={{ id: 1, name: "USB radio" }}
+        reconnecting
+        onConnect={vi.fn()}
+        onReconnect={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Connecting to USB radio…" }),
+    ).toBeDisabled();
+  });
+});
