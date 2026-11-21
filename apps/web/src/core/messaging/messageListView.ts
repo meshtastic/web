@@ -27,10 +27,11 @@ export interface MessageEntry {
   readonly at: Date;
   readonly thread: ThreadMessage;
   /**
-   * Start of a run from one sender: draw the name (on channels) and the
-   * avatar. Later bubbles in the run leave both out.
+   * Start of a run from one sender: draw the header above the bubble
+   * (avatar, name and time for incoming, the time for mine). Later bubbles
+   * in the run leave it out.
    */
-  readonly showSender: boolean;
+  readonly startsRun: boolean;
 }
 
 export interface TracerouteEntry {
@@ -42,13 +43,17 @@ export interface TracerouteEntry {
 
 export type TimelineEntry = MessageEntry | TracerouteEntry;
 
-/** Bubbles from one sender closer together than this share one name. */
-export const SENDER_RUN_WINDOW_MS = 5 * 60_000;
+/**
+ * Bubbles from one sender closer together than this share one header, as
+ * on Android (GROUPING_WINDOW_MILLIS). The header carries the run's only
+ * visible time, so a run never spans more than this.
+ */
+export const SENDER_RUN_WINDOW_MS = 10 * 60_000;
 
 /**
- * Whether `current` continues `previous`'s run: both incoming from the same
- * node, on the same day, within `windowMs`. Outgoing bubbles never show a
- * sender, so runs only matter for incoming ones.
+ * Whether `current` continues `previous`'s run: both mine, or both
+ * incoming from the same node; on the same day, within `windowMs`
+ * (inclusive).
  */
 export const continuesRun = (
   previous: TimelineEntry | undefined,
@@ -59,10 +64,10 @@ export const continuesRun = (
     return false;
   }
   const prev = previous.thread;
-  if (prev.outgoing || current.outgoing) {
+  if (prev.outgoing !== current.outgoing) {
     return false;
   }
-  if (prev.message.from !== current.message.from) {
+  if (!current.outgoing && prev.message.from !== current.message.from) {
     return false;
   }
   const gap = current.message.rxTime.getTime() - prev.message.rxTime.getTime();
@@ -110,7 +115,7 @@ export const buildTimeline = (
       key: messageKey(thread.message),
       at,
       thread,
-      showSender: !continuesRun(out.at(-1), thread),
+      startsRun: !continuesRun(out.at(-1), thread),
     });
   }
   for (; t < traces.length; t++) {
@@ -186,6 +191,14 @@ export const incomingMeta = (
     ...(transport ? { transport } : {}),
   };
 };
+
+/**
+ * The line under an incoming bubble shows one reading, as on Android: the
+ * signal when the sender was heard directly (SNR / RSSI present), else
+ * the hop count.
+ */
+export const showsSignal = (meta: IncomingMeta): boolean =>
+  meta.snr !== undefined || meta.rssi !== undefined;
 
 /** Text colour token for a signal rating. */
 export const signalTone = (quality: SignalQuality): string =>

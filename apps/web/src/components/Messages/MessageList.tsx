@@ -39,10 +39,14 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { MessageActionsBar } from "./MessageActionsBar.tsx";
 import {
+  BAR_SLOT_SELECTOR,
   type BubbleHandlers,
   type BubbleSender,
+  bubbleIds,
   MessageBubble,
 } from "./MessageBubble.tsx";
 import type { ReplyQuoteView } from "./ReplyQuote.tsx";
@@ -148,9 +152,23 @@ export const MessageList = ({
   const announceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
+  // The one actions bar: which message it acts on (portalled into that
+  // bubble's slot), whether it is pinned open and whether one of its menus
+  // is open. CSS shows it on hover or keyboard focus, and places it.
+  const [target, setTarget] = useState<
+    { key: string; slot: HTMLElement } | undefined
+  >(undefined);
   const [active, setActive] = useState<
     { key: string; viaKeyboard: boolean } | undefined
   >(undefined);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const lock = useRef<{ active: string | undefined; menuOpen: boolean }>({
+    active: undefined,
+    menuOpen: false,
+  });
+  // Escape puts focus back on the smiley button; that focus mustn't bring
+  // the bar straight back.
+  const skipFocus = useRef(false);
   const [highlighted, setHighlighted] = useState<string | undefined>(undefined);
 
   const [propsCache] = useState(
@@ -228,6 +246,66 @@ export const MessageList = ({
   useLayoutEffect(() => {
     messageKeysRef.current = messageKeys;
   }, [messageKeys]);
+
+  // If the bar's message goes away (cleared, filtered), a menu it had
+  // open went with it (unmounted, without a close event): stop holding.
+  const menuHeld =
+    menuOpen && target !== undefined && messageKeys.has(target.key);
+
+  useLayoutEffect(() => {
+    lock.current = { active: active?.key, menuOpen: menuHeld };
+  }, [active, menuHeld]);
+
+  // A pinned bar closes on a click or tap anywhere outside its message
+  // (the bar is inside it), unless one of its menus is open.
+  useEffect(() => {
+    if (!active || menuHeld) {
+      return;
+    }
+    const onPointerDown = (event: PointerEvent) => {
+      const row = document.getElementById(bubbleIds(active.key).row);
+      if (event.target instanceof Node && row?.contains(event.target)) {
+        return;
+      }
+      setActive(undefined);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [active, menuHeld]);
+
+  /**
+   * Points the bar at the message under the pointer or keyboard focus.
+   * It stays put while a menu of it is open, and while pinned it only
+   * follows keyboard focus (which unpins it).
+   */
+  const retarget = useCallback(
+    (from: EventTarget, via: "pointer" | "focus") => {
+      const row =
+        from instanceof Element ? from.closest("[data-entry-key]") : null;
+      const key = row?.getAttribute("data-entry-key");
+      if (via === "focus" && skipFocus.current) {
+        skipFocus.current = false;
+        return;
+      }
+      if (!row || !key || lock.current.menuOpen) {
+        return;
+      }
+      if (lock.current.active !== undefined && lock.current.active !== key) {
+        if (via === "pointer") {
+          return;
+        }
+        setActive(undefined);
+      }
+      const slot = row.querySelector(BAR_SLOT_SELECTOR);
+      if (!(slot instanceof HTMLElement)) {
+        return;
+      }
+      setTarget((current) =>
+        current?.key === key && current.slot === slot ? current : { key, slot },
+      );
+    },
+    [],
+  );
 
   useLayoutEffect(() => {
     const el = scroller.current;
@@ -367,8 +445,18 @@ export const MessageList = ({
   const bubbleHandlers = useMemo<BubbleHandlers>(
     () => ({
       ...handlers,
-      setActive: (key, viaKeyboard = false) =>
-        setActive(key === undefined ? undefined : { key, viaKeyboard }),
+      setActive: (key, viaKeyboard = false) => {
+        if (key === undefined) {
+          setActive(undefined);
+          return;
+        }
+        const row = document.getElementById(bubbleIds(key).row);
+        const slot = row?.querySelector(BAR_SLOT_SELECTOR);
+        if (slot instanceof HTMLElement) {
+          setTarget({ key, slot });
+        }
+        setActive({ key, viaKeyboard });
+      },
       jumpTo: (key) => {
         if (!messageKeysRef.current.has(key)) {
           return;
@@ -435,9 +523,9 @@ export const MessageList = ({
         ...(thread.outgoing
           ? {}
           : {
-              // "time · hops (· SNR in DMs)": a channel shows hops only.
+              // Under the bubble: SNR when heard directly, else hops.
               meta: incomingMeta(thread.message, {
-                includeSignal: variant === "dm",
+                includeSignal: true,
                 ...(lora ? { lora } : {}),
               }),
             }),
@@ -468,6 +556,77 @@ export const MessageList = ({
     lora,
   ]);
 
+  const threadOf = useMemo(() => {
+    const map = new Map<string, ThreadMessage>();
+    for (const e of entries) {
+      if (e.kind === "message") {
+        map.set(e.key, e.thread);
+      }
+    }
+    return map;
+  }, [entries]);
+
+  const bar = (() => {
+    if (!target) {
+      return null;
+    }
+    const { key, slot } = target;
+    const barThread = threadOf.get(key);
+    const props = bubbleProps.get(key);
+    if (!barThread || !props) {
+      return null;
+    }
+    const { available } = props;
+    if (!available.react && !available.reply && !available.copy) {
+      return null;
+    }
+    const pinned = active?.key === key;
+    const close = () => setActive(undefined);
+    return createPortal(
+      <div
+        id={bubbleIds(key).actions}
+        className="message-actions"
+        data-side={barThread.outgoing ? "start" : "end"}
+        data-pinned={pinned || menuHeld ? "" : undefined}
+      >
+        <MessageActionsBar
+          // A fresh bar per message: its roving focus starts over, and
+          // focusOnOpen fires again when pinned from the keyboard.
+          key={key}
+          available={available}
+          side={barThread.outgoing ? "start" : "end"}
+          touch={touch}
+          focusOnOpen={pinned && active.viaKeyboard}
+          emoji={emoji}
+          onReact={(choice) => {
+            handlers.react(barThread, choice);
+            close();
+          }}
+          onReply={() => {
+            handlers.reply(barThread);
+            close();
+          }}
+          onCopy={() => handlers.copy(barThread)}
+          onDeliveryDetails={() => handlers.deliveryDetails(barThread)}
+          onRetry={() => handlers.retry(barThread)}
+          onMenuOpenChange={setMenuOpen}
+          onDismiss={() => {
+            close();
+            setTarget(undefined);
+            setMenuOpen(false);
+            const pick = document.getElementById(bubbleIds(key).pick);
+            if (pick) {
+              skipFocus.current = true;
+              pick.focus();
+              skipFocus.current = false;
+            }
+          }}
+        />
+      </div>,
+      slot,
+    );
+  })();
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       <section
@@ -475,10 +634,19 @@ export const MessageList = ({
         aria-label={label}
         aria-busy={loadingOlder}
         onScroll={onScroll}
+        data-touch={touch ? "" : undefined}
         className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto"
       >
         <div
           ref={content}
+          // One listener for every message: points the actions bar at the
+          // one under the pointer (touch uses long-press) or focus.
+          onPointerOver={(event) => {
+            if (event.pointerType !== "touch") {
+              retarget(event.target, "pointer");
+            }
+          }}
+          onFocus={(event) => retarget(event.target, "focus")}
           className={cn(
             "flex flex-1 flex-col",
             touch ? "gap-3 px-3 py-4" : "gap-3.5 px-6 py-5",
@@ -520,21 +688,24 @@ export const MessageList = ({
                   if (!props) {
                     return null;
                   }
-                  const isActive = active?.key === entry.key;
                   return (
-                    <li key={entry.key}>
+                    <li
+                      key={entry.key}
+                      // The bar's message: its bubble is the CSS anchor.
+                      data-bar-target={
+                        target?.key === entry.key ? "" : undefined
+                      }
+                      data-entry-key={entry.key}
+                    >
                       <MessageBubble
                         thread={entry.thread}
                         entryKey={entry.key}
-                        showSender={entry.showSender}
-                        variant={variant}
+                        startsRun={entry.startsRun}
                         {...props}
-                        active={isActive}
-                        activeViaKeyboard={isActive && active.viaKeyboard}
+                        active={active?.key === entry.key}
                         highlighted={highlighted === entry.key}
                         touch={touch}
                         handlers={bubbleHandlers}
-                        emoji={emoji}
                         locale={locale}
                       />
                     </li>
@@ -544,6 +715,7 @@ export const MessageList = ({
             </div>
           ))}
         </div>
+        {bar}
       </section>
       {loadingOlder ? (
         <div className="pointer-events-none absolute top-2 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-elevated bg-surface px-3 py-1 text-meta text-muted shadow-popover">

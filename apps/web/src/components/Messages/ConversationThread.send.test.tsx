@@ -80,6 +80,8 @@ const renderThread = () =>
 
 const replyAndSend = async (text: string) => {
   const user = userEvent.setup();
+  // The list's one actions bar opens on a message (here: its smiley).
+  await user.click(screen.getByRole("button", { name: /^React or reply/ }));
   await user.click(screen.getByRole("button", { name: "Reply" }));
   expect(screen.getByText("Replying to Meshtastic A544")).toBeInTheDocument();
   const field = screen.getByLabelText("Message Primary");
@@ -202,6 +204,8 @@ describe("ConversationThread reply → emoji tapback", () => {
     const toggle = vi.spyOn(session.chat, "toggleReaction");
     renderThread();
     const user = userEvent.setup();
+    // The list's one actions bar opens on a message (here: its smiley).
+    await user.click(screen.getByRole("button", { name: /^React or reply/ }));
     await user.click(screen.getByRole("button", { name: "Reply" }));
     await user.click(screen.getByRole("button", { name: "Emoji" }));
     const dialog = screen.getByRole("dialog", { name: "Emoji" });

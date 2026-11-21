@@ -84,6 +84,8 @@ describe("ConversationThread sending", () => {
     const user = userEvent.setup();
     env.sendText.mockResolvedValue(Result.ok(99));
     renderThread();
+    // The list's one actions bar opens on a message (here: its smiley).
+    fireEvent.click(screen.getByRole("button", { name: /^React or reply/ }));
     fireEvent.click(screen.getByRole("button", { name: "Reply" }));
     expect(screen.getByText("Replying to COULLS_BASE")).toBeInTheDocument();
     const field = screen.getByLabelText("Message COULLS_BASE");
@@ -102,6 +104,8 @@ describe("ConversationThread sending", () => {
     const user = userEvent.setup();
     env.sendText.mockImplementation(fail);
     renderThread();
+    // The list's one actions bar opens on a message (here: its smiley).
+    fireEvent.click(screen.getByRole("button", { name: /^React or reply/ }));
     fireEvent.click(screen.getByRole("button", { name: "Reply" }));
     const field = screen.getByLabelText("Message COULLS_BASE");
     await user.type(field, "On my way{Enter}");

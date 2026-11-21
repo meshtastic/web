@@ -1,7 +1,7 @@
 import type { MessageActionsAvailability } from "@core/messaging/messageListView.ts";
 import type { ThreadMessage } from "@core/messaging/thread.ts";
 import { type Message, MessageState } from "@core/storage/types.ts";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -53,17 +53,14 @@ const renderBubble = (
     <MessageBubble
       thread={thread}
       entryKey={`${thread.message.from}:${thread.message.id}`}
-      showSender
-      variant="channel"
+      startsRun
       sender={{ nodeNum: PEER, name: "COULLS_BASE", initials: "0c40" }}
       time="9:21"
       available={ALL}
       active={false}
-      activeViaKeyboard={false}
       highlighted={false}
       touch={false}
       handlers={h}
-      emoji={testEmojiPrefs()}
       locale="en"
       {...props}
     />,
@@ -82,6 +79,58 @@ describe("MessageBubble", () => {
     expect(
       screen.getByRole("button", { name: "React or reply to COULLS_BASE" }),
     ).toBeInTheDocument();
+  });
+
+  it("heads a run with the avatar chip, long name and time above the bubble", () => {
+    renderBubble(
+      { message: message({ hopsAway: 2 }), outgoing: false, reactions: [] },
+      { meta: { hops: 2, viaMqtt: false, signed: false } },
+    );
+    const row = document.getElementById("msg-7:10");
+    const bubble = row?.querySelector("[data-message-bubble]");
+    const name = screen.getByText("COULLS_BASE");
+    // The header sits above the bubble, not inside it.
+    expect(bubble?.contains(name)).toBe(false);
+    expect(screen.getByText("0c40")).toBeInTheDocument();
+    const time = screen.getByText("9:21");
+    expect(time).toHaveAttribute("title", expect.stringContaining("2026"));
+    // Hops and the smiley button sit under the bubble.
+    expect(bubble?.contains(screen.getByText("2 hops"))).toBe(false);
+    expect(row?.contains(screen.getByText("2 hops"))).toBe(true);
+  });
+
+  it("leaves the header off later bubbles of a run, but still names the sender", () => {
+    renderBubble(
+      { message: message(), outgoing: false, reactions: [] },
+      { startsRun: false },
+    );
+    expect(screen.queryByText("COULLS_BASE")).toBeNull();
+    expect(screen.queryByText("9:21")).toBeNull();
+    expect(screen.getByText("COULLS_BASE:")).toHaveClass("sr-only");
+    // The full time stays available to screen readers.
+    expect(screen.getByText(/Saturday, November 21, 2026/)).toBeInTheDocument();
+  });
+
+  it("shows the signal instead of hops when heard directly", () => {
+    renderBubble(
+      { message: message({ hopsAway: 0 }), outgoing: false, reactions: [] },
+      { meta: { hops: 0, snr: 3.5, viaMqtt: false, signed: false } },
+    );
+    expect(screen.getByText("SNR 3.5 dB")).toBeInTheDocument();
+    expect(screen.queryByText("Direct")).toBeNull();
+  });
+
+  it("heads my run with the time only, delivery under the bubble", () => {
+    renderBubble(
+      { message: message({ from: ME }), outgoing: true, reactions: [] },
+      { delivery: { kind: "delivered", proven: false } },
+    );
+    expect(screen.getByText("9:21")).toBeInTheDocument();
+    expect(screen.queryByText("COULLS_BASE")).toBeNull();
+    const bubble = document
+      .getElementById("msg-1:10")
+      ?.querySelector("[data-message-bubble]");
+    expect(bubble?.contains(screen.getByText("Delivered"))).toBe(false);
   });
 
   it.each([
@@ -156,41 +205,6 @@ describe("MessageBubble", () => {
       .focus();
     await user.keyboard("{Enter}");
     expect(h.setActive).toHaveBeenCalledWith("7:10", true);
-  });
-
-  it("focuses the bar when pinned from the keyboard; arrows move, Esc dismisses", async () => {
-    const user = userEvent.setup();
-    const h = renderBubble(
-      { message: message(), outgoing: false, reactions: [] },
-      { active: true, activeViaKeyboard: true },
-    );
-    const bar = screen.getByRole("toolbar", { name: "Message actions" });
-    const thumbs = within(bar).getByRole("button", {
-      name: "React with 👍",
-    });
-    expect(thumbs).toHaveFocus();
-    await user.keyboard("{ArrowRight}");
-    expect(
-      within(bar).getByRole("button", { name: "React with 👎" }),
-    ).toHaveFocus();
-    await user.keyboard("{ArrowLeft}{ArrowLeft}");
-    expect(
-      within(bar).getByRole("button", { name: "More actions" }),
-    ).toHaveFocus();
-    await user.keyboard("{Home}{Enter}");
-    expect(h.react).toHaveBeenCalledWith(expect.anything(), "👍");
-    await user.keyboard("{Escape}");
-    expect(h.setActive).toHaveBeenCalledWith(undefined);
-  });
-
-  it("replies from the bar", async () => {
-    const user = userEvent.setup();
-    const h = renderBubble(
-      { message: message(), outgoing: false, reactions: [] },
-      { active: true },
-    );
-    await user.click(screen.getByRole("button", { name: "Reply" }));
-    expect(h.reply).toHaveBeenCalledTimes(1);
   });
 
   it("renders a reply quote, and an unavailable one", async () => {

@@ -546,6 +546,125 @@ body {
   }
 }
 
+/*
+ * The message list's one actions bar (MessageList portals it into the
+ * target message's [data-bar-slot]). React only says which message it
+ * acts on ([data-bar-target] on that list item) and whether it is pinned;
+ * CSS shows it and places it:
+ * - shown while its message is hovered (real hover only, so a tap on a
+ *   phone doesn't leave it up), holds keyboard focus, or while pinned;
+ * - anchored to the bubble's top corner with CSS anchor positioning,
+ *   overlapping the bubble so the pointer can move onto it; it shifts to
+ *   the other corner when it would leave the list, and flips below the
+ *   bubble at the top of the list. On touch it spans the row, above the
+ *   bubble. The bar's containing block is the list's (unscrolled) frame,
+ *   so it flips at the visible edge, not the scrolled content's.
+ * - Without anchor positioning (Chrome < 128, Safari < 26, Firefox < 147)
+ *   it sits absolutely on the bubble's corner instead.
+ */
+@layer components {
+  .message-actions {
+    position: absolute;
+    z-index: 10;
+    display: none;
+    pointer-events: none;
+  }
+
+  .message-actions > * {
+    pointer-events: auto;
+  }
+
+  .message-actions[data-pinned],
+  [data-bar-target]:has(:focus-visible) .message-actions {
+    display: flex;
+  }
+
+  @media (hover: hover) {
+    [data-bar-target]:hover .message-actions {
+      display: flex;
+    }
+  }
+
+  @supports (anchor-name: --a) and (position-try-fallbacks: flip-block) {
+    [data-bar-target] [data-message-bubble] {
+      anchor-name: --message-actions;
+    }
+
+    .message-actions {
+      position-anchor: --message-actions;
+      position-visibility: anchors-visible;
+      bottom: calc(anchor(top) - 0.75rem);
+      position-try-fallbacks:
+        flip-inline,
+        flip-block,
+        flip-block flip-inline;
+    }
+
+    .message-actions[data-side="end"] {
+      right: calc(anchor(right) - 0.75rem);
+    }
+
+    .message-actions[data-side="start"] {
+      left: calc(anchor(left) - 0.75rem);
+    }
+
+    /* Touch: the row's width (the list's side padding), just above. */
+    [data-touch] .message-actions {
+      left: 0.75rem;
+      right: 0.75rem;
+      bottom: calc(anchor(top) + 0.25rem);
+      position-try-fallbacks: flip-block;
+    }
+
+    [data-touch] .message-actions[data-side="start"] {
+      justify-content: flex-end;
+    }
+  }
+
+  @supports not ((anchor-name: --a) and (position-try-fallbacks: flip-block)) {
+    [data-bar-target] [data-bubble-column] {
+      position: relative;
+    }
+
+    /* On a bubble narrower than the bar, run into the row's open side. */
+    .message-actions {
+      top: -1.5rem;
+      justify-content: safe flex-end;
+    }
+
+    .message-actions[data-side="end"] {
+      left: 0;
+      right: -0.75rem;
+    }
+
+    .message-actions[data-side="start"] {
+      left: -0.75rem;
+      right: 0;
+      flex-direction: row-reverse;
+    }
+
+    [data-touch] [data-bar-target] {
+      position: relative;
+    }
+
+    [data-touch] [data-bar-target] [data-bubble-column] {
+      position: static;
+    }
+
+    [data-touch] .message-actions {
+      top: -2rem;
+      left: 0;
+      right: 0;
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+
+    [data-touch] .message-actions[data-side="start"] {
+      justify-content: flex-end;
+    }
+  }
+}
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
