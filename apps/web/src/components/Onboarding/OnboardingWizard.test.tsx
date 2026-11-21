@@ -104,6 +104,15 @@ describe("OnboardingWizard", () => {
     expect(screen.getByText(/can't use Bluetooth or USB radios/)).toBeVisible();
     expect(screen.getByRole("radio", { name: /Bluetooth/ })).toBeDisabled();
     expect(screen.getByRole("radio", { name: /USB Serial/ })).toBeDisabled();
+    expect(
+      screen.getByText(/doesn't support Web Bluetooth, which Bluetooth/),
+    ).toBeVisible();
+    expect(
+      screen.getByText(/doesn't support Web Serial, which USB/),
+    ).toBeVisible();
+    expect(
+      screen.getAllByRole("link", { name: "Browser support" })[0],
+    ).toHaveAttribute("href", expect.stringContaining("Web_Bluetooth_API"));
     expect(screen.getByRole("radio", { name: /Wi-Fi/ })).toBeChecked();
     expect(screen.getByLabelText("Radio address")).toHaveValue(
       "meshtastic.local",
@@ -179,6 +188,8 @@ describe("OnboardingWizard", () => {
     expect(
       screen.getByRole("heading", { name: "Pick your radio" }),
     ).toBeVisible();
+    expect(screen.getByText("This site wants to pair")).toBeInTheDocument();
+    expect(screen.getByText("Meshtastic_1a2b")).toBeInTheDocument();
     expect(addConnectionAndConnect).not.toHaveBeenCalled();
 
     await user.click(

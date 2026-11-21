@@ -4,6 +4,7 @@ import { useLocalNetworkAccess } from "@core/hooks/useLocalNetworkAccess.ts";
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useConnectionProgress } from "@core/kmp/hooks";
 import {
+  detectBrowserEnvironment,
   detectBrowserFeatures,
   isHttpsRequired,
   transportSupport,
@@ -106,7 +107,13 @@ function sceneOf(state: WizardState): { scene: MeshScene; caption: string } {
             : "caption.connect",
       };
     case "pairing":
-      return { scene: "searching", caption: "caption.pairing" };
+      return {
+        scene: "searching",
+        caption:
+          state.method === "serial"
+            ? "caption.pairingSerial"
+            : "caption.pairing",
+      };
     case "pairingError":
       return { scene: "failed", caption: "caption.pairingError" };
     case "sync":
@@ -132,7 +139,10 @@ export interface OnboardingWizardProps {
  */
 export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
   const { t } = useTranslation("onboarding");
-  const support = useMemo(() => transportSupport(detectBrowserFeatures()), []);
+  const support = useMemo(
+    () => transportSupport(detectBrowserFeatures(), detectBrowserEnvironment()),
+    [],
+  );
   const pageIsHttps = globalThis.location?.protocol === "https:";
   const httpsLocked = isHttpsRequired(pageIsHttps, useLocalNetworkAccess());
 

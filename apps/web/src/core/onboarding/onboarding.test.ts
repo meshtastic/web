@@ -4,6 +4,8 @@ import { channelSetToUrl } from "@core/utils/channelUrl.ts";
 import { Result } from "better-result";
 import { describe, expect, it } from "vitest";
 import {
+  browserFamily,
+  detectBrowserEnvironment,
   detectBrowserFeatures,
   isHttpsRequired,
   transportSupport,
@@ -52,6 +54,87 @@ describe("transportSupport", () => {
     const support = transportSupport({ bluetooth: false, serial: false });
     expect(support.httpOnly).toBe(true);
     expect(support.defaultMethod).toBe("http");
+  });
+});
+
+describe("unavailable transports", () => {
+  it("names the browser when an API is missing on a secure page", () => {
+    const support = transportSupport(
+      { bluetooth: false, serial: true },
+      { browser: "firefox", secureContext: true },
+    );
+    expect(support.unavailable).toEqual({
+      bluetooth: { kind: "notSupported", browser: "firefox" },
+    });
+  });
+
+  it("blames the insecure page rather than the browser", () => {
+    const support = transportSupport(
+      { bluetooth: false, serial: false },
+      { browser: "chrome", secureContext: false },
+    );
+    expect(support.unavailable).toEqual({
+      bluetooth: { kind: "insecureContext" },
+      serial: { kind: "insecureContext" },
+    });
+  });
+
+  it("has no reasons when everything is available", () => {
+    expect(
+      transportSupport({ bluetooth: true, serial: true }).unavailable,
+    ).toEqual({});
+  });
+});
+
+describe("browserFamily", () => {
+  it.each([
+    [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0",
+      "firefox",
+    ],
+    [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15",
+      "safari",
+    ],
+    [
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/138.0.0.0 Mobile/15E148 Safari/604.1",
+      "ios",
+    ],
+    [
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
+      "edge",
+    ],
+    [
+      "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/27.0 Chrome/125.0.0.0 Mobile Safari/537.36",
+      "samsung",
+    ],
+    [
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 OPR/120.0.0.0",
+      "opera",
+    ],
+    [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+      "chrome",
+    ],
+    ["curl/8.0", "unknown"],
+  ] as const)("%s → %s", (userAgent, family) => {
+    expect(browserFamily(userAgent)).toBe(family);
+  });
+
+  it("recognises Brave from navigator.brave despite its Chrome user agent", () => {
+    expect(
+      browserFamily(
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+        true,
+      ),
+    ).toBe("brave");
+  });
+
+  it("treats a missing navigator as an unknown, secure browser", () => {
+    expect(detectBrowserEnvironment(undefined)).toEqual({
+      browser: "unknown",
+      secureContext: true,
+    });
   });
 });
 

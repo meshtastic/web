@@ -5,7 +5,9 @@ import { Switch } from "@components/UI/Switch.tsx";
 import {
   CONNECT_METHODS,
   type ConnectMethod,
+  type DeviceTransport,
   type TransportSupport,
+  type UnavailableReason,
 } from "@core/onboarding/capabilities.ts";
 import type { HttpAddressError } from "@core/onboarding/validation.ts";
 import { cn } from "@core/utils/cn.ts";
@@ -35,6 +37,35 @@ const METHOD_TEXT = {
     body: "connect.httpBody",
   },
 } as const;
+
+const BROWSER_SUPPORT_DOCS = {
+  bluetooth:
+    "https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
+  serial:
+    "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
+} as const satisfies Record<DeviceTransport, string>;
+
+const useUnavailableText = () => {
+  const { t } = useTranslation("onboarding");
+  return (transport: DeviceTransport, reason: UnavailableReason): string => {
+    if (reason.kind === "insecureContext") {
+      return t("connect.unavailableInsecure");
+    }
+    if (reason.browser === "ios") {
+      return t(
+        transport === "bluetooth"
+          ? "connect.unavailableBluetoothIos"
+          : "connect.unavailableSerialIos",
+      );
+    }
+    return t(
+      transport === "bluetooth"
+        ? "connect.unavailableBluetooth"
+        : "connect.unavailableSerial",
+      { browser: t(`browser.${reason.browser}`) },
+    );
+  };
+};
 
 export interface ConnectStepProps {
   actions: StepActionsProps;
@@ -73,19 +104,26 @@ export const ConnectStep = ({
   const addressErrorId = useId();
   const httpsId = useId();
   const groupName = useId();
+  const unavailableText = useUnavailableText();
+  const insecure = Object.values(support.unavailable).some(
+    (reason) => reason.kind === "insecureContext",
+  );
 
   return (
     <StepShell actions={actions}>
       <StepHeading>{t("connect.title")}</StepHeading>
       <StepBody>{t("connect.body")}</StepBody>
       {support.httpOnly ? (
-        <Callout tone="warning">{t("connect.unsupported")}</Callout>
+        <Callout tone="warning">
+          {t(insecure ? "connect.unsupportedInsecure" : "connect.unsupported")}
+        </Callout>
       ) : null}
       <fieldset className="flex flex-col gap-2.5">
         <legend className="sr-only">{t("connect.methodGroup")}</legend>
         {CONNECT_METHODS.map((m) => {
           const checked = m === method;
           const disabled = !support.available[m];
+          const reason = m === "http" ? undefined : support.unavailable[m];
           const text = METHOD_TEXT[m];
           return (
             <label
@@ -97,7 +135,7 @@ export const ConnectStep = ({
                   ? "border-accent bg-accent-tint"
                   : "border-control bg-chat",
                 disabled
-                  ? "cursor-not-allowed opacity-45"
+                  ? "cursor-not-allowed"
                   : "cursor-pointer hover:bg-selected",
               )}
             >
@@ -112,23 +150,46 @@ export const ConnectStep = ({
               />
               <span
                 aria-hidden="true"
-                className="flex size-10 shrink-0 items-center justify-center rounded-control bg-raised text-meta font-bold text-accent"
+                className={cn(
+                  "flex size-10 shrink-0 items-center justify-center rounded-control bg-raised text-meta font-bold text-accent",
+                  disabled && "opacity-45",
+                )}
               >
                 {t(text.badge)}
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-header font-semibold text-primary">
+                <span
+                  className={cn(
+                    "text-header font-semibold",
+                    disabled ? "text-muted" : "text-primary",
+                  )}
+                >
                   {t(text.title)}
                 </span>
-                <span className="text-help text-muted">
-                  {disabled ? t("connect.unavailable") : t(text.body)}
-                </span>
+                {m !== "http" && reason ? (
+                  <span className="text-help text-secondary">
+                    {unavailableText(m, reason)}{" "}
+                    <a
+                      href={BROWSER_SUPPORT_DOCS[m]}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-accent underline-offset-4 hover:underline"
+                    >
+                      {t("connect.browserSupport")}
+                    </a>
+                  </span>
+                ) : (
+                  <span className="text-help text-muted">
+                    {disabled ? t("connect.unavailable") : t(text.body)}
+                  </span>
+                )}
               </span>
               <span
                 aria-hidden="true"
                 className={cn(
                   "size-[18px] shrink-0 rounded-full border-2",
                   checked ? "border-accent bg-accent" : "border-control",
+                  disabled && "opacity-45",
                 )}
               />
             </label>

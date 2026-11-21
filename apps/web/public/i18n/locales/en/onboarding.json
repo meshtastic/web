@@ -40,6 +40,7 @@
     "title": "Connect your radio",
     "body": "Pick how your radio is connected. You can add more radios later from the device menu.",
     "unsupported": "This browser can't use Bluetooth or USB radios. Open this page in Chrome, Edge or Opera on desktop, or connect over Wi-Fi below.",
+    "unsupportedInsecure": "Bluetooth and USB only work on secure pages. Open this site over HTTPS, or connect over Wi-Fi below.",
     "methodGroup": "Connection type",
     "bluetoothBadge": "BT",
     "bluetoothTitle": "Bluetooth",
@@ -51,6 +52,12 @@
     "httpTitle": "Wi-Fi (HTTP)",
     "httpBody": "For a radio on your network. Enter its address.",
     "unavailable": "Not available in this browser",
+    "unavailableBluetooth": "{{browser}} doesn't support Web Bluetooth, which Bluetooth connections need.",
+    "unavailableSerial": "{{browser}} doesn't support Web Serial, which USB connections need.",
+    "unavailableBluetoothIos": "Browsers on iPhone and iPad don't support Web Bluetooth, which Bluetooth connections need.",
+    "unavailableSerialIos": "Browsers on iPhone and iPad don't support Web Serial, which USB connections need.",
+    "unavailableInsecure": "Needs a secure page. Open this site over HTTPS.",
+    "browserSupport": "Browser support",
     "address": "Radio address",
     "addressPlaceholder": "192.168.1.50",
     "addressEmpty": "Enter your radio's address.",
@@ -67,13 +74,13 @@
     "bodyBluetooth": "Your browser is showing a list of nearby radios. Choose yours, then select <strong>Pair</strong>.",
     "bodySerial": "Your browser is showing a list of USB devices. Choose your radio, then select <strong>Connect</strong>.",
     "closed": "The list was closed before a radio was chosen.",
-    "pickerTitle": "This site wants to pair",
-    "pickerYours": "Your radio",
-    "pickerOther": "Another radio",
+    "illustrationNote": "Illustration of the browser's own picker. Its look depends on the browser.",
+    "notListed": "My radio isn't in the list",
+    "pickerTitleBluetooth": "This site wants to pair",
+    "pickerTitleSerial": "This site wants to connect to a serial port",
     "pickerSearching": "Searching…",
     "pickerPair": "Pair",
-    "illustrationNote": "Illustration of the browser's own picker. Its look depends on the browser.",
-    "notListed": "My radio isn't in the list"
+    "pickerConnect": "Connect"
   },
   "error": {
     "title": "Couldn't connect to your radio",
@@ -187,6 +194,18 @@
     "sync": "Your radio remembers every node it has heard, even while this page was closed.",
     "profile": "Your short name appears on avatars and the map, so pick something people will recognise.",
     "channel": "Channels share a key. Only radios with the same channel can read its messages.",
-    "done": "A message can reach you through several hops across other people's radios."
+    "done": "A message can reach you through several hops across other people's radios.",
+    "pairingSerial": "Waiting for you to choose a port…"
+  },
+  "browser": {
+    "firefox": "Firefox",
+    "safari": "Safari",
+    "ios": "Safari",
+    "samsung": "Samsung Internet",
+    "brave": "Brave",
+    "edge": "Edge",
+    "opera": "Opera",
+    "chrome": "Chrome",
+    "unknown": "This browser"
   }
 }
