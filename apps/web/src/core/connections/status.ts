@@ -142,13 +142,16 @@ export function mostRecentConnection(
   return best;
 }
 
-/** The name the welcome wizard gave USB entries before it said "serial". */
-export const LEGACY_SERIAL_NAME = "USB radio";
-export const SERIAL_DEFAULT_NAME = "USB serial radio";
+/** Names earlier builds gave serial entries by default. */
+export const LEGACY_SERIAL_NAMES: readonly string[] = [
+  "USB radio",
+  "USB serial radio",
+];
+export const SERIAL_DEFAULT_NAME = "Serial radio";
 
-/** Gives serial entries still named the old default the current one. */
+/** Gives serial entries still named an old default the current one. */
 export const renameLegacyDefault = (conn: Connection): Connection =>
-  conn.type === "serial" && conn.name === LEGACY_SERIAL_NAME
+  conn.type === "serial" && LEGACY_SERIAL_NAMES.includes(conn.name)
     ? { ...conn, name: SERIAL_DEFAULT_NAME }
     : conn;
 

@@ -103,7 +103,7 @@ describe("OnboardingWizard", () => {
     ).toHaveFocus();
     expect(screen.getByText(/can't use Bluetooth or USB radios/)).toBeVisible();
     expect(screen.getByRole("radio", { name: /Bluetooth/ })).toBeDisabled();
-    expect(screen.getByRole("radio", { name: /USB Serial/ })).toBeDisabled();
+    expect(screen.getByRole("radio", { name: /^Serial/ })).toBeDisabled();
     expect(
       screen.getByText(/doesn't support Web Bluetooth, which Bluetooth/),
     ).toBeVisible();

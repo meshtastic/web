@@ -50,7 +50,7 @@
     "bluetoothTitle": "Bluetooth",
     "bluetoothBody": "Pair wirelessly. Needs Chrome, Edge or Opera.",
     "serialBadge": "USB",
-    "serialTitle": "USB Serial",
+    "serialTitle": "Serial",
     "serialBody": "Plug in with a data cable. Chrome or Edge on desktop.",
     "httpBadge": "IP",
     "httpTitle": "Wi-Fi (HTTP)",
@@ -71,7 +71,7 @@
     "noRadio": "No radio yet?",
     "supportedDevices": "See supported devices",
     "bluetoothName": "Bluetooth radio",
-    "serialName": "USB serial radio"
+    "serialName": "Serial radio"
   },
   "pairing": {
     "title": "Pick your radio",

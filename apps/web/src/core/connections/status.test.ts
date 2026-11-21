@@ -17,7 +17,7 @@ const serial = (
 ): SerialConnection => ({
   id,
   type: "serial",
-  name: "USB serial radio",
+  name: "Serial radio",
   createdAt: id,
   status: "online",
   usbVendorId: 0x303a,
@@ -103,12 +103,15 @@ describe("pruneAtStartup", () => {
     expect(kept.map((c) => c.id)).toEqual([1]);
   });
 
-  it('renames entries still called "USB radio"', () => {
-    const [conn] = pruneAtStartup([
-      serial(1, { name: "USB radio", nodeNum: 1, lastConnectedAt: 1 }),
-    ]);
-    expect(conn?.name).toBe("USB serial radio");
-  });
+  it.each(["USB radio", "USB serial radio"])(
+    'renames entries still called "%s"',
+    (name) => {
+      const [conn] = pruneAtStartup([
+        serial(1, { name, nodeNum: 1, lastConnectedAt: 1 }),
+      ]);
+      expect(conn?.name).toBe("Serial radio");
+    },
+  );
 
   it("drops pending attempts and never-connected duplicates of a reached radio", () => {
     const kept = pruneAtStartup([
