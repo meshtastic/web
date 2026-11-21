@@ -22,16 +22,17 @@ const avatarVariants = cva(
   {
     variants: {
       size: {
-        // Sized so four 13px initials fit with room inside the squircle.
-        xs: "size-11 text-meta tracking-tight",
-        sm: "size-12 text-meta tracking-tight",
-        md: "size-[52px] text-help",
-        lg: "size-14 text-help",
-        xl: "size-20 text-header-lg",
-        "2xl": "size-24 text-header-lg font-bold",
+        // Wider than tall, like the Android app, so a full four-character
+        // short name always shows. Corner radius is a quarter of the height.
+        xs: "h-11 w-14 text-meta [--avatar-r:11px]",
+        sm: "h-12 w-16 text-meta [--avatar-r:12px]",
+        md: "h-[52px] w-[68px] text-help [--avatar-r:13px]",
+        lg: "h-14 w-[72px] text-help [--avatar-r:14px]",
+        xl: "h-20 w-[104px] text-header-lg [--avatar-r:20px]",
+        "2xl": "h-24 w-[124px] text-header-lg font-bold [--avatar-r:24px]",
       },
       shape: {
-        squircle: "rounded-squircle",
+        squircle: "rounded-avatar",
         rounded: "rounded-card",
       },
     },
