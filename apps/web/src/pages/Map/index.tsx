@@ -60,7 +60,7 @@ import {
   pinLabelsAtZoom,
 } from "@core/nodes/mapPins.ts";
 import {
-  DESKTOP_FIT_PADDING,
+  desktopFitPadding,
   type FitPhase,
   initialFitPhase,
   MAP_LAYERS_PANEL_WIDTH,
@@ -69,6 +69,7 @@ import {
   MAP_VIEW_STORAGE_KEY,
   MOBILE_FIT_PADDING,
   nextFitStep,
+  type OverlayReach,
   parseMapView,
   pickInitialView,
   serializeMapView,
@@ -82,6 +83,7 @@ import { hasPos } from "@core/utils/geo.ts";
 import { useParams } from "@tanstack/react-router";
 import { FunnelIcon, LayersIcon, ListIcon } from "lucide-react";
 import {
+  type RefObject,
   useCallback,
   useDeferredValue,
   useEffect,
@@ -117,7 +119,49 @@ const numberProp = (value: unknown): number | undefined => {
   return Number.isFinite(n) ? n : undefined;
 };
 
-/** This device first, then the most recently heard. */
+/**
+ * How far the desktop node list and layers card reach into the map, kept
+ * up to date as they resize, so fitted nodes land clear of both.
+ */
+const useOverlayReach = (
+  leftRef: RefObject<HTMLElement | null>,
+  rightRef: RefObject<HTMLElement | null>,
+  enabled: boolean,
+): OverlayReach | undefined => {
+  const [reach, setReach] = useState<OverlayReach>();
+  useEffect(() => {
+    const left = leftRef.current;
+    const right = rightRef.current;
+    const container = left?.parentElement;
+    if (!enabled || !left || !right || !container) {
+      return;
+    }
+    const measure = () => {
+      const box = container.getBoundingClientRect();
+      const next = {
+        left: Math.round(left.getBoundingClientRect().right - box.left),
+        right: Math.round(box.right - right.getBoundingClientRect().left),
+      };
+      setReach((current) =>
+        current?.left === next.left && current.right === next.right
+          ? current
+          : next,
+      );
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const observer = new ResizeObserver(measure);
+    for (const element of [left, right, container]) {
+      observer.observe(element);
+    }
+    return () => observer.disconnect();
+  }, [leftRef, rightRef, enabled]);
+  return enabled ? reach : undefined;
+};
+
+/** This radio first, then the most recently heard. */
 const orderForList = (
   rows: readonly NodeRow[],
   collator: Intl.Collator,
@@ -140,10 +184,14 @@ const MapPage = () => {
   const labels = useNodeLabels(now);
   const collator = useCollator();
   const { default: mapRef } = useMap();
-  const { focusLngLat, fitToNodes } = useMapFitting(
-    mapRef,
-    isMobile ? MOBILE_FIT_PADDING : DESKTOP_FIT_PADDING,
+  const listRef = useRef<HTMLElement>(null);
+  const layersRef = useRef<HTMLDivElement>(null);
+  const overlayReach = useOverlayReach(listRef, layersRef, !isMobile);
+  const fitPadding = useMemo(
+    () => (isMobile ? MOBILE_FIT_PADDING : desktopFitPadding(overlayReach)),
+    [isMobile, overlayReach],
   );
+  const { focusLngLat, fitToNodes } = useMapFitting(mapRef, fitPadding);
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
   // Where to open: a /map/$long/$lat/$zoom link, else the last view, else fit.
@@ -293,9 +341,9 @@ const MapPage = () => {
     const step = nextFitStep(fitPhase.current, filteredNodes.length);
     fitPhase.current = step.phase;
     if (step.fit) {
-      fitToNodes(filteredNodes);
+      fitToNodes(filteredNodes, myNode?.position);
     }
-  }, [mapLoaded, filteredNodes, fitToNodes]);
+  }, [mapLoaded, filteredNodes, fitToNodes, myNode?.position]);
 
   const handleMoveEnd = useCallback(
     (event: ViewStateChangeEvent) => {
@@ -338,8 +386,6 @@ const MapPage = () => {
     },
     [rowsByNum, focusLngLat],
   );
-
-  const listRef = useRef<HTMLElement>(null);
 
   // Closing the card returns focus to the node's list item, else the map.
   const closeCard = useCallback(() => {
@@ -548,6 +594,7 @@ const MapPage = () => {
               {nodeList}
             </section>
             <div
+              ref={layersRef}
               className="absolute z-10"
               style={{
                 top: MAP_OVERLAY_INSET,

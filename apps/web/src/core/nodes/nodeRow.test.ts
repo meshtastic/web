@@ -4,7 +4,9 @@ import { describe, expect, it } from "vitest";
 import {
   batteryInfo,
   formatMacAddress,
+  hopsDisplay,
   isHeardWithin,
+  knownNodeCount,
   ONLINE_WINDOW_MS,
   summarizeNodes,
   toNodeRow,
@@ -191,5 +193,67 @@ describe("toNodeRow altitude", () => {
     expect(toNodeRow(sea, testContext()).altitude).toBe(0);
     const none = makeNode({ num: 2, lat: 1, lng: 1 });
     expect(toNodeRow(none, testContext()).altitude).toBeUndefined();
+  });
+});
+
+describe("the connected radio's own row", () => {
+  const own = makeRow(
+    {
+      num: 5,
+      longName: "me",
+      heardSecondsAgo: 30,
+      snr: 0,
+      hopsAway: 0,
+    },
+    { myNodeNum: 5 },
+  );
+
+  it("has no SNR or hop count of its own", () => {
+    expect(own.snr).toBeUndefined();
+    expect(own.snrQuality).toBeUndefined();
+    expect(own.hops).toBeUndefined();
+    expect(own.isDirect).toBe(false);
+  });
+
+  it("shows as this radio rather than direct or unknown", () => {
+    expect(hopsDisplay(own)).toEqual({ kind: "self" });
+    expect(
+      hopsDisplay(makeRow({ num: 5, heardSecondsAgo: 30 }, { myNodeNum: 5 })),
+    ).toEqual({ kind: "self" });
+  });
+});
+
+describe("hopsDisplay", () => {
+  it("describes heard nodes by hop count", () => {
+    expect(hopsDisplay(makeRow({ num: 1, hopsAway: 0 }))).toEqual({
+      kind: "direct",
+      viaMqtt: false,
+    });
+    expect(hopsDisplay(makeRow({ num: 1, hopsAway: 2 }))).toEqual({
+      kind: "hops",
+      count: 2,
+      viaMqtt: false,
+    });
+    expect(
+      hopsDisplay(makeRow({ num: 1, hopsAway: 0, viaMqtt: true })),
+    ).toEqual({ kind: "hops", count: 0, viaMqtt: true });
+    expect(hopsDisplay(makeRow({ num: 1 }))).toEqual({
+      kind: "unknown",
+      viaMqtt: false,
+    });
+  });
+});
+
+describe("knownNodeCount", () => {
+  it("counts every node but the connected radio", () => {
+    const ctx = { myNodeNum: 1 };
+    const rows = [1, 2, 3].map((num) => makeRow({ num }, ctx));
+    expect(knownNodeCount(rows)).toBe(2);
+  });
+
+  it("counts every node when the radio isn't among them yet", () => {
+    const rows = [2, 3].map((num) => makeRow({ num }, { myNodeNum: 1 }));
+    expect(knownNodeCount(rows)).toBe(2);
+    expect(knownNodeCount([])).toBe(0);
   });
 });

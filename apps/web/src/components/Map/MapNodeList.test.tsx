@@ -42,7 +42,7 @@ describe("MapNodeList", () => {
       screen.getByRole("list", { name: "Nodes on map" }),
     ).toBeInTheDocument();
     expect(screen.getByText("2 nodes with position")).toBeInTheDocument();
-    expect(screen.getByText("This device")).toBeInTheDocument();
+    expect(screen.getByText("This radio")).toBeInTheDocument();
     expect(screen.getByText("1 hop · heard 1 minute ago")).toBeInTheDocument();
   });
 

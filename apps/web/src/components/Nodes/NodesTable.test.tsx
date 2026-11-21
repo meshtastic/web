@@ -20,7 +20,17 @@ const rows = [
     },
     { myNodeNum: 9 },
   ),
-  makeRow({ num: 9, longName: "My radio", shortName: "ME" }, { myNodeNum: 9 }),
+  makeRow(
+    {
+      num: 9,
+      longName: "My radio",
+      shortName: "ME",
+      heardSecondsAgo: 10,
+      hopsAway: 0,
+      snr: 0,
+    },
+    { myNodeNum: 9 },
+  ),
 ];
 
 const Harness = (
@@ -50,6 +60,19 @@ const setup = (selectedNum?: number) => {
 };
 
 describe("NodesTable", () => {
+  it("shows the connected radio as this radio, without an SNR", () => {
+    setup();
+    const own = screen.getByRole("button", { name: "My radio" }).closest("tr");
+    if (!own) {
+      throw new Error("own row not found");
+    }
+    expect(within(own).getByText("This radio")).toBeInTheDocument();
+    expect(within(own).queryByText(/dB/)).not.toBeInTheDocument();
+    expect(
+      within(own).queryByText(/Unknown hops|Direct/),
+    ).not.toBeInTheDocument();
+  });
+
   it("is a named table with sortable column headers", () => {
     setup();
     const table = screen.getByRole("table", { name: "Known nodes" });

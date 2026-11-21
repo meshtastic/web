@@ -18,8 +18,8 @@ import {
   recentlyHeardOn,
 } from "@core/messaging/channelInfo.ts";
 import { traceroutesForPeer } from "@core/messaging/tracerouteView.ts";
-import { remoteNodeCount } from "@core/navigation/navItems.ts";
 import { formatLastHeard } from "@core/nodes/format.ts";
+import { knownNodeCount } from "@core/nodes/nodeRow.ts";
 import { Types } from "@core/protobuf.ts";
 import {
   type ConversationKey,
@@ -84,6 +84,11 @@ export const ConversationScreen = ({
   const channel = useChannel(channelIndex);
   const peerRow = peer === undefined ? undefined : directory.byNum.get(peer);
   const nodeLabels = useNodeLabels(directory.now);
+  // Same definition as the Nodes screen's "known" count: this radio excluded.
+  const knownNodes = useMemo(
+    () => knownNodeCount(directory.rows),
+    [directory.rows],
+  );
   const nodeActions = useNodeActions(peerRow);
 
   useMarkReadWhileVisible(client?.chat.unread, conversation);
@@ -137,7 +142,7 @@ export const ConversationScreen = ({
             : t("header.encrypted"),
         t("header.channelNumber", { index: channelIndex }),
         t("header.nodesKnown", {
-          count: remoteNodeCount(directory.rows.length),
+          count: knownNodes,
         }),
       ];
   const hopLimit = config.lora?.hopLimit;
@@ -201,7 +206,7 @@ export const ConversationScreen = ({
       encryption={encryption}
       muted={muted}
       heard={heard}
-      totalNodes={remoteNodeCount(directory.rows.length)}
+      totalNodes={knownNodes}
       onShareQr={() => setDialogOpen("QR", true)}
       onOpenNode={(num) =>
         void navigate({

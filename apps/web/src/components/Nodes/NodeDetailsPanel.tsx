@@ -224,11 +224,7 @@ export const NodeDetailsPanel = ({
           <KeyValue
             variant="tile"
             label={t("column.hops")}
-            value={
-              row.isDirect
-                ? t("value.direct")
-                : (row.hops ?? labels.notAvailable)
-            }
+            value={labels.hopsValue(row)}
           />
           <KeyValue
             variant="tile"

@@ -1,3 +1,4 @@
+import type { Bounds, LngLat } from "@core/utils/geo.ts";
 import { z } from "zod/v4";
 
 /** Where the map opens, and what it remembers between visits. */
@@ -13,6 +14,16 @@ export interface MapView {
  * including automatic fits) is not restored over a fresh fit.
  */
 export const MAP_VIEW_STORAGE_KEY = "meshtastic:mapView:v2";
+
+/**
+ * react-map-gl reports a failed `import("maplibre-gl")` (a stale chunk
+ * after a deploy, a 504, being offline) through `onError` before any map
+ * exists, so the event has no target. Tile and style errors come from a
+ * live map and carry it; those are not fatal.
+ */
+export const isMapLoadFailure = (event: {
+  readonly target?: unknown;
+}): boolean => event.target === null || event.target === undefined;
 
 /** Zoom used when jumping to one node ("Show on map"). */
 export const NODE_FOCUS_ZOOM = 14;
@@ -167,14 +178,151 @@ export const MAP_OVERLAY_INSET = 16;
 export const MAP_NODE_PANEL_WIDTH = 300;
 export const MAP_LAYERS_PANEL_WIDTH = 200;
 
+/**
+ * Room for a pin's own body: padding places pin centres, and a pin is about
+ * 40px across, so without this an edge pin half-hides under a panel.
+ */
+export const MAP_PIN_CLEARANCE = 20;
+
 export const DESKTOP_FIT_PADDING = {
-  top: MAP_OVERLAY_INSET * 2,
-  bottom: MAP_OVERLAY_INSET * 2,
-  // 16 + 300 + 16 = 332
-  left: MAP_OVERLAY_INSET * 2 + MAP_NODE_PANEL_WIDTH,
-  // 16 + 200 + 16 = 232
-  right: MAP_OVERLAY_INSET * 2 + MAP_LAYERS_PANEL_WIDTH,
+  top: MAP_OVERLAY_INSET * 2 + MAP_PIN_CLEARANCE,
+  bottom: MAP_OVERLAY_INSET * 2 + MAP_PIN_CLEARANCE,
+  // 16 + 300 + 16 + 20 = 352
+  left: MAP_OVERLAY_INSET * 2 + MAP_NODE_PANEL_WIDTH + MAP_PIN_CLEARANCE,
+  // 16 + 200 + 16 + 20 = 252
+  right: MAP_OVERLAY_INSET * 2 + MAP_LAYERS_PANEL_WIDTH + MAP_PIN_CLEARANCE,
 } as const;
+
+/**
+ * How far (px) the desktop panels reach into the map from each side: the
+ * node list's right edge from the map's left, and the layers card's left
+ * edge from the map's right. Measured from the rendered panels.
+ */
+export interface OverlayReach {
+  readonly left: number;
+  readonly right: number;
+}
+
+/**
+ * Fit padding that clears the measured panels by one inset plus a pin's
+ * half-width. Falls back to
+ * the constants' geometry when nothing was measured (or a panel had no
+ * size yet, e.g. before layout).
+ */
+export const desktopFitPadding = (reach?: OverlayReach): FitPadding => {
+  if (!reach) {
+    return DESKTOP_FIT_PADDING;
+  }
+  const side = (measured: number, fallback: number) =>
+    Number.isFinite(measured) && measured > 0
+      ? Math.ceil(measured) + MAP_OVERLAY_INSET + MAP_PIN_CLEARANCE
+      : fallback;
+  return {
+    top: DESKTOP_FIT_PADDING.top,
+    bottom: DESKTOP_FIT_PADDING.bottom,
+    left: side(reach.left, DESKTOP_FIT_PADDING.left),
+    right: side(reach.right, DESKTOP_FIT_PADDING.right),
+  };
+};
+
+/** What the initial fit frames: one spot, or a box around several. */
+export type FitTarget =
+  | { readonly kind: "point"; readonly center: LngLat }
+  | { readonly kind: "bounds"; readonly bounds: Bounds };
+
+/** A node this many times further out than the median node is an outlier. */
+export const FIT_OUTLIER_FACTOR = 10;
+/**
+ * Nodes within this distance (m) of the anchor are never outliers: about
+ * the reach of a regional LoRa mesh. Without it, a dense core (or many
+ * nodes sharing one spot, median ~0) would cut off the rest of the mesh.
+ */
+export const FIT_OUTLIER_FLOOR_M = 200_000;
+
+const EARTH_MEAN_RADIUS_M = 6_371_008.8;
+const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+/** Great-circle (haversine) distance in metres. */
+export const greatCircleMeters = (
+  [lng1, lat1]: LngLat,
+  [lng2, lat2]: LngLat,
+): number => {
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * EARTH_MEAN_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)));
+};
+
+const median = (values: readonly number[]): number => {
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  const hi = sorted[mid] ?? 0;
+  const lo = sorted[mid - 1] ?? hi;
+  return sorted.length % 2 === 0 ? (lo + hi) / 2 : hi;
+};
+
+const boundsOf = (points: readonly LngLat[]): Bounds => {
+  const lngs = points.map(([lng]) => lng);
+  const lats = points.map(([, lat]) => lat);
+  return [
+    [Math.min(...lngs), Math.min(...lats)],
+    [Math.max(...lngs), Math.max(...lats)],
+  ];
+};
+
+/**
+ * What the initial fit should frame, ignoring far-flung outliers (e.g. an
+ * MQTT node on another continent) so they don't zoom the map out to the
+ * whole world. Outliers stay on the map; they are only left out of the fit.
+ *
+ * Rule:
+ * 1. Anchor on the connected radio's own position when it has one, else on
+ *    the component-wise median longitude/latitude of the points.
+ * 2. Take each point's great-circle distance to the anchor, and the median
+ *    of those distances. The radio's own zero counts: with only a few
+ *    nodes, leaving it out lets a single outlier drag the median out.
+ * 3. Keep points within max(FIT_OUTLIER_FACTOR × median, FIT_OUTLIER_FLOOR_M)
+ *    of the anchor.
+ * 4. Never frame fewer than two points when there were two: if the fence
+ *    leaves fewer, keep the two nearest the anchor.
+ *
+ * One point (or several on one spot) is a `point`, framed at the
+ * single-node zoom; anything else is `bounds`.
+ */
+export const fitBoundsFor = (
+  points: readonly LngLat[],
+  ownPosition?: LngLat,
+): FitTarget | undefined => {
+  if (points.length === 0) {
+    return undefined;
+  }
+  const anchor: LngLat = ownPosition ?? [
+    median(points.map(([lng]) => lng)),
+    median(points.map(([, lat]) => lat)),
+  ];
+  const measured = points
+    .map((point) => ({ point, meters: greatCircleMeters(anchor, point) }))
+    .sort((a, b) => a.meters - b.meters);
+  const fence = Math.max(
+    FIT_OUTLIER_FACTOR * median(measured.map((m) => m.meters)),
+    FIT_OUTLIER_FLOOR_M,
+  );
+  const inside = measured.filter((m) => m.meters <= fence);
+  const kept = (
+    inside.length >= Math.min(2, measured.length)
+      ? inside
+      : measured.slice(0, 2)
+  ).map((m) => m.point);
+
+  const bounds = boundsOf(kept);
+  const [[west, south], [east, north]] = bounds;
+  if (west === east && south === north) {
+    return { kind: "point", center: [west, south] };
+  }
+  return { kind: "bounds", bounds };
+};
 
 export const MOBILE_FIT_PADDING = {
   top: 72,

@@ -64,5 +64,10 @@
   "snrTooltip": {
     "label": "SNR:",
     "unit": "dB"
+  },
+  "loadError": {
+    "title": "The map couldn't load",
+    "description": "Its code failed to download. This can happen after an update or while offline. Reload to try again.",
+    "reload": "Reload"
   }
 }

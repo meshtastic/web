@@ -143,6 +143,18 @@ describe("NodeDetailsPanel", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows this radio's signal tiles without an SNR or hop count", () => {
+    const me = makeRow(
+      { num: 9, longName: "Me", heardSecondsAgo: 5, hopsAway: 0, snr: 0 },
+      { myNodeNum: 9 },
+    );
+    render(<Harness row={me} actions={makeActions()} />);
+    // The summary under the name and the Hops tile.
+    expect(screen.getAllByText("This radio")).toHaveLength(2);
+    expect(screen.queryByText(/dB/)).not.toBeInTheDocument();
+    expect(screen.queryByText("Direct")).not.toBeInTheDocument();
+  });
+
   it("has a back button on mobile", async () => {
     const onBack = vi.fn();
     render(<Harness row={node} actions={makeActions()} onBack={onBack} />);

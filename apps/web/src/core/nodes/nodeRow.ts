@@ -72,11 +72,15 @@ export interface NodeRow {
   readonly role?: string;
   /** Hardware model enum name with spaces; undefined when unset. */
   readonly hardware?: string;
+  /** Undefined when unknown, and for the connected radio. */
   readonly hops?: number;
   readonly viaMqtt: boolean;
   /** Heard directly over LoRa (zero hops, not via MQTT). */
   readonly isDirect: boolean;
-  /** Undefined when the node was never heard (the adapter reports 0 then). */
+  /**
+   * Undefined when the node was never heard (the adapter reports 0 then),
+   * and for the connected radio, which doesn't hear itself.
+   */
   readonly snr?: number;
   readonly snrQuality?: SignalQuality;
   /** Epoch milliseconds; undefined when never heard. */
@@ -149,13 +153,14 @@ export function toNodeRow(node: NodeSource, ctx: NodeRowContext): NodeRow {
   const names = { longName: user?.longName, shortName: user?.shortName };
   const lastHeardMs = node.lastHeard > 0 ? node.lastHeard * 1000 : undefined;
   const heard = lastHeardMs !== undefined;
-  const snr = heard ? node.snr : undefined;
+  const isSelf = ctx.myNodeNum !== undefined && node.num === ctx.myNodeNum;
+  // The radio doesn't hear itself: its stored SNR is a placeholder 0.
+  const snr = heard && !isSelf ? node.snr : undefined;
   const lngLat = hasPos(node.position) ? toLngLat(node.position) : undefined;
   const myLngLat =
     ctx.myPosition && hasPos(ctx.myPosition)
       ? toLngLat(ctx.myPosition)
       : undefined;
-  const isSelf = ctx.myNodeNum !== undefined && node.num === ctx.myNodeNum;
   const hardwareName =
     user && user.hwModel !== Protobuf.Mesh.HardwareModel.UNSET
       ? Protobuf.Mesh.HardwareModel[user.hwModel]
@@ -174,9 +179,9 @@ export function toNodeRow(node: NodeSource, ctx: NodeRowContext): NodeRow {
       ? enumLabel(Protobuf.Config.Config_DeviceConfig_Role[user.role])
       : undefined,
     hardware: enumLabel(hardwareName),
-    hops: definedNumber(node.hopsAway),
+    hops: isSelf ? undefined : definedNumber(node.hopsAway),
     viaMqtt: node.viaMqtt,
-    isDirect: node.hopsAway === 0 && !node.viaMqtt,
+    isDirect: !isSelf && node.hopsAway === 0 && !node.viaMqtt,
     snr,
     snrQuality: snr === undefined ? undefined : snrQuality(snr, ctx.lora),
     lastHeardMs,
@@ -211,6 +216,36 @@ export function toNodeRow(node: NodeSource, ctx: NodeRowContext): NodeRow {
   };
 }
 
+/** How far away a node is, before it's put into words. */
+export type HopsDisplay =
+  /** The connected radio itself. */
+  | { readonly kind: "self" }
+  | { readonly kind: "direct"; readonly viaMqtt: boolean }
+  | { readonly kind: "hops"; readonly count: number; readonly viaMqtt: boolean }
+  | { readonly kind: "unknown"; readonly viaMqtt: boolean };
+
+export const hopsDisplay = (
+  row: Pick<NodeRow, "isSelf" | "isDirect" | "hops" | "viaMqtt">,
+): HopsDisplay => {
+  if (row.isSelf) {
+    return { kind: "self" };
+  }
+  const { viaMqtt } = row;
+  if (row.isDirect) {
+    return { kind: "direct", viaMqtt };
+  }
+  return row.hops === undefined
+    ? { kind: "unknown", viaMqtt }
+    : { kind: "hops", count: row.hops, viaMqtt };
+};
+
+/**
+ * Nodes other than the connected radio: the "known" count on the Nodes
+ * screen and in channel headers.
+ */
+export const knownNodeCount = (rows: readonly NodeRow[]): number =>
+  rows.reduce((count, row) => (row.isSelf ? count : count + 1), 0);
+
 export interface NodeSummary {
   readonly known: number;
   readonly heardRecently: number;
@@ -220,7 +255,7 @@ export interface NodeSummary {
 export const summarizeNodes = (rows: readonly NodeRow[]): NodeSummary => {
   const others = rows.filter((row) => !row.isSelf);
   return {
-    known: others.length,
+    known: knownNodeCount(rows),
     heardRecently: others.filter((row) => row.isOnline).length,
   };
 };

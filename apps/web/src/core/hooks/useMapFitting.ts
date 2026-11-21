@@ -1,10 +1,11 @@
 import {
   clampFitPadding,
   type FitPadding,
+  fitBoundsFor,
   NODE_FOCUS_ZOOM,
 } from "@core/nodes/mapView.ts";
 import type { Protobuf } from "@core/protobuf.ts";
-import { boundsFromLngLat, type LngLat, toLngLat } from "@core/utils/geo";
+import { hasPos, type LngLat, toLngLat } from "@core/utils/geo";
 import { useCallback } from "react";
 import type { MapRef } from "react-map-gl/maplibre";
 
@@ -37,28 +38,34 @@ export function useMapFitting(
     [map],
   );
 
+  /**
+   * Frames the main cluster of `nodes`, anchored on `ownPosition` when the
+   * connected radio has one; far-flung outliers stay on the map but are
+   * left out of the fit (see `fitBoundsFor`).
+   */
   const fitToNodes = useCallback(
-    (nodes: Protobuf.Mesh.NodeInfo[]) => {
-      if (!map || nodes.length === 0) {
+    (
+      nodes: readonly Protobuf.Mesh.NodeInfo[],
+      ownPosition?: Protobuf.Mesh.Position,
+    ) => {
+      if (!map) {
         return;
       }
-
-      const [only] = nodes;
-      if (nodes.length === 1 && only) {
-        const [lng, lat] = toLngLat(only.position);
+      const target = fitBoundsFor(
+        nodes.map((node) => toLngLat(node.position)),
+        hasPos(ownPosition) ? toLngLat(ownPosition) : undefined,
+      );
+      if (!target) {
+        return;
+      }
+      if (target.kind === "point") {
+        const [lng, lat] = target.center;
         map.easeTo({ center: [lng, lat], zoom: NODE_FOCUS_ZOOM });
         return;
       }
 
-      // Build [lng, lat] coords, then let boundsFromLngLat do the turf dance
-      const coords = nodes.map((n) => toLngLat(n.position));
-      const bounds = boundsFromLngLat(coords);
-      if (!bounds) {
-        return;
-      }
-
       const container = map.getContainer();
-      const center = map.cameraForBounds(bounds, {
+      const center = map.cameraForBounds(target.bounds, {
         padding: clampFitPadding(padding, {
           width: container.clientWidth,
           height: container.clientHeight,

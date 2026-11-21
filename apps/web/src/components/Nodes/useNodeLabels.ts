@@ -5,24 +5,26 @@ import {
   formatSnrValue,
   formatVoltageValue,
 } from "@core/nodes/format.ts";
-import type { NodeRow } from "@core/nodes/nodeRow.ts";
+import { hopsDisplay, type NodeRow } from "@core/nodes/nodeRow.ts";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface NodeLabels {
   readonly locale: string;
-  /** "Direct", "2 hops", "1 hop · via MQTT", "Unknown hops". */
+  /** "Direct", "2 hops", "1 hop · via MQTT", "Unknown hops", "This radio". */
   hops: (row: NodeRow) => string;
+  /** The hop count alone for a tile: "Direct", "2", "This radio" or a dash. */
+  hopsValue: (row: NodeRow) => string;
   /** "5 minutes ago" or "Never". */
   lastHeard: (row: NodeRow) => string;
-  /** "-9.0 dB" or a dash. */
+  /** "-9.0 dB" or a dash (never heard, or the connected radio). */
   snr: (row: NodeRow) => string;
   /** "87%", "Plugged in" or a dash. */
   battery: (row: NodeRow) => string;
   voltage: (row: NodeRow) => string | undefined;
   /** "12.3 km" or a dash. */
   distance: (row: NodeRow) => string;
-  /** "2 hops · heard 3 minutes ago"; "This device" for the local node. */
+  /** "2 hops · heard 3 minutes ago"; "This radio" for the local node. */
   summary: (row: NodeRow) => string;
   notAvailable: string;
 }
@@ -34,13 +36,32 @@ export function useNodeLabels(now: number): NodeLabels {
 
   return useMemo<NodeLabels>(() => {
     const notAvailable = t("value.notAvailable");
+    const thisRadio = t("value.thisRadio");
     const hops = (row: NodeRow): string => {
-      const base = row.isDirect
-        ? t("value.direct")
-        : row.hops === undefined
-          ? t("value.hopsUnknown")
-          : t("value.hops", { count: row.hops });
-      return row.viaMqtt ? `${base} · ${t("value.viaMqtt")}` : base;
+      const display = hopsDisplay(row);
+      if (display.kind === "self") {
+        return thisRadio;
+      }
+      const base =
+        display.kind === "direct"
+          ? t("value.direct")
+          : display.kind === "hops"
+            ? t("value.hops", { count: display.count })
+            : t("value.hopsUnknown");
+      return display.viaMqtt ? `${base} · ${t("value.viaMqtt")}` : base;
+    };
+    const hopsValue = (row: NodeRow): string => {
+      const display = hopsDisplay(row);
+      switch (display.kind) {
+        case "self":
+          return thisRadio;
+        case "direct":
+          return t("value.direct");
+        case "hops":
+          return new Intl.NumberFormat(locale).format(display.count);
+        case "unknown":
+          return notAvailable;
+      }
     };
     const lastHeardText = (row: NodeRow): string | undefined =>
       formatLastHeard(row.lastHeardMs, now, locale);
@@ -48,6 +69,7 @@ export function useNodeLabels(now: number): NodeLabels {
       locale,
       notAvailable,
       hops,
+      hopsValue,
       lastHeard: (row) => lastHeardText(row) ?? t("value.never"),
       snr: (row) =>
         row.snr === undefined
@@ -71,7 +93,7 @@ export function useNodeLabels(now: number): NodeLabels {
           : formatDistance(row.distanceMeters, locale),
       summary: (row) => {
         if (row.isSelf) {
-          return t("value.thisDevice");
+          return thisRadio;
         }
         const heard = lastHeardText(row);
         return `${hops(row)} · ${

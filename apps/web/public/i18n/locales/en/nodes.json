@@ -78,7 +78,7 @@
     "pluggedIn": "Plugged in",
     "db": "{{value}} dB",
     "volts": "{{value}} V",
-    "thisDevice": "This device",
+    "thisRadio": "This radio",
     "heardAgo": "heard {{time}}",
     "neverHeard": "never heard",
     "favorite": "Favorite",
