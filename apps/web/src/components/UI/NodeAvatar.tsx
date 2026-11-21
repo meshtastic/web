@@ -22,13 +22,13 @@ const avatarVariants = cva(
   {
     variants: {
       size: {
-        // Four 12px initials only just fit the small sizes.
-        xs: "size-8 text-meta tracking-tight",
-        sm: "size-9 text-meta tracking-tight",
-        md: "size-10 text-meta",
-        lg: "size-11 text-meta",
-        xl: "size-16 text-header-lg",
-        "2xl": "size-[72px] text-header-lg font-bold",
+        // Sized so four 13px initials fit without truncating.
+        xs: "size-9 text-meta tracking-tight",
+        sm: "size-10 text-meta tracking-tight",
+        md: "size-11 text-meta",
+        lg: "size-12 text-meta",
+        xl: "size-[72px] text-header-lg",
+        "2xl": "size-20 text-header-lg font-bold",
       },
       shape: {
         circle: "rounded-full",
