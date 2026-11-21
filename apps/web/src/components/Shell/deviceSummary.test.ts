@@ -8,7 +8,7 @@ import {
   deviceListEntries,
   deviceMenuActions,
   formatPercent,
-  formatVoltage,
+  deviceVoltage,
   isConnectedStatus,
   isInProgress,
   parseFirmwareVersion,
@@ -46,15 +46,16 @@ describe("powerState", () => {
   });
 });
 
-describe("formatVoltage", () => {
-  it("keeps three significant digits", () => {
-    expect(formatVoltage(4.3512)).toBe("4.35");
-    expect(formatVoltage(-3.7)).toBe("3.70");
+describe("deviceVoltage", () => {
+  it("shows two decimals in the locale's format", () => {
+    expect(deviceVoltage(4.3512, "en")).toBe("4.35");
+    expect(deviceVoltage(-3.7, "en")).toBe("3.70");
+    expect(deviceVoltage(3.7, "de")).toBe("3,70");
   });
 
   it("treats zero and missing as unknown", () => {
-    expect(formatVoltage(0)).toBeUndefined();
-    expect(formatVoltage(undefined)).toBeUndefined();
+    expect(deviceVoltage(0, "en")).toBeUndefined();
+    expect(deviceVoltage(undefined, "en")).toBeUndefined();
   });
 });
 
@@ -153,6 +154,7 @@ describe("deriveDeviceSummary", () => {
       connection: serial(),
       fallbackName,
       unknownName: "Unknown",
+      locale: "en",
     });
     expect(summary).toEqual({
       name: "EAO1 base",
@@ -174,6 +176,7 @@ describe("deriveDeviceSummary", () => {
       connection: serial({ status: "configuring" }),
       fallbackName,
       unknownName: "Unknown",
+      locale: "en",
     });
     expect(summary.name).toBe("My radio");
     expect(summary.initials).toBe("My r");
@@ -182,7 +185,11 @@ describe("deriveDeviceSummary", () => {
 
   it("uses the unknown name with nothing to go on", () => {
     expect(
-      deriveDeviceSummary({ fallbackName, unknownName: "Unknown" }).name,
+      deriveDeviceSummary({
+        fallbackName,
+        unknownName: "Unknown",
+        locale: "en",
+      }).name,
     ).toBe("Unknown");
   });
 });

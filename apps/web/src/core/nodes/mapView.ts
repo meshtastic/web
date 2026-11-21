@@ -8,7 +8,11 @@ export interface MapView {
   readonly zoom: number;
 }
 
-export const MAP_VIEW_STORAGE_KEY = "meshtastic:mapView";
+/**
+ * Versioned so a view saved by older builds (which stored every camera move,
+ * including automatic fits) is not restored over a fresh fit.
+ */
+export const MAP_VIEW_STORAGE_KEY = "meshtastic:mapView:v2";
 
 /** Zoom used when jumping to one node ("Show on map"). */
 export const NODE_FOCUS_ZOOM = 14;
@@ -74,6 +78,86 @@ export const pickInitialView = (
     : saved
       ? { kind: "saved", view: saved }
       : { kind: "fitNodes" };
+
+/**
+ * Fitting the camera to the nodes. It fits once when nodes first appear and,
+ * if that first fit only had one node, once more when a second one arrives,
+ * so a lone early node doesn't pin the view. Any user move stops fitting.
+ */
+export type FitPhase =
+  /** Waiting for the first node. */
+  | "pending"
+  /** Fitted to a single node; refit once when there are more. */
+  | "fittedOne"
+  /** Fitted to several nodes, or the user has taken over. */
+  | "done";
+
+export interface FitStep {
+  readonly fit: boolean;
+  readonly phase: FitPhase;
+}
+
+/** What to do now that `nodeCount` nodes are placed. */
+export const nextFitStep = (phase: FitPhase, nodeCount: number): FitStep => {
+  if (phase === "pending" && nodeCount > 0) {
+    return { fit: true, phase: nodeCount > 1 ? "done" : "fittedOne" };
+  }
+  if (phase === "fittedOne" && nodeCount > 1) {
+    return { fit: true, phase: "done" };
+  }
+  return { fit: false, phase };
+};
+
+/** The view to start from decides whether fitting happens at all. */
+export const initialFitPhase = (initial: InitialView): FitPhase =>
+  initial.kind === "fitNodes" ? "pending" : "done";
+
+/**
+ * Only views the user chose are remembered: camera moves made by the app
+ * (fits, link targets, resizes) carry no originating input event, and nothing
+ * is saved until the map has loaded with its initial view in place.
+ */
+export const shouldPersistMove = (move: {
+  readonly userInitiated: boolean;
+  readonly initialViewApplied: boolean;
+}): boolean => move.userInitiated && move.initialViewApplied;
+
+export interface FitPadding {
+  readonly top: number;
+  readonly bottom: number;
+  readonly left: number;
+  readonly right: number;
+}
+
+/** The smallest span (px) left for the nodes after padding. */
+export const MIN_FIT_SPAN = 64;
+
+const scalePair = (a: number, b: number, size: number): [number, number] => {
+  const available = Math.max(0, size - MIN_FIT_SPAN);
+  const total = a + b;
+  if (total <= available) {
+    return [a, b];
+  }
+  const factor = total > 0 ? available / total : 0;
+  return [Math.floor(a * factor), Math.floor(b * factor)];
+};
+
+/**
+ * Shrinks padding that would leave no room for the nodes, keeping each side's
+ * share. maplibre's cameraForBounds gives up when padding exceeds the map.
+ */
+export const clampFitPadding = (
+  padding: FitPadding,
+  container: { readonly width: number; readonly height: number },
+): FitPadding => {
+  const [left, right] = scalePair(padding.left, padding.right, container.width);
+  const [top, bottom] = scalePair(
+    padding.top,
+    padding.bottom,
+    container.height,
+  );
+  return { top, bottom, left, right };
+};
 
 /**
  * Desktop overlay geometry (px), shared by the Map screen's panels and the

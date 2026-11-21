@@ -1,3 +1,4 @@
+import { channelLabel } from "@core/channels/channelLabel.ts";
 import {
   formatNodeId,
   initialsFor,
@@ -73,16 +74,6 @@ type NodeText = Pick<RegistryInput, "t" | "locale" | "now">;
 /** Space-separated translated search words → list. */
 export const splitKeywords = (text: string): string[] =>
   text.split(/\s+/u).filter(Boolean);
-
-export const channelLabel = (channel: ChannelSource, t: Translate): string => {
-  const name = channel.name?.trim();
-  if (name) {
-    return name;
-  }
-  return channel.index === 0
-    ? t("page.broadcastLabel", { ns: "channels" })
-    : t("page.channelIndex", { ns: "channels", index: channel.index });
-};
 
 export const nodeName = (node: NodeSource, t: Translate): string =>
   nodeDisplayName(node, node.num, (last4) => t("fallbackName", { last4 }));

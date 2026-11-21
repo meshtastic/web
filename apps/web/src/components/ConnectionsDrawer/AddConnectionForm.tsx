@@ -42,12 +42,12 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { urlOrIpv4Schema } from "./validation.ts";
+import { urlOrIpv4Schema } from "@core/connections/address.ts";
 
 type TabKey = ConnectionType;
 
 const secondaryButtonClasses =
-  "h-auto min-h-11 gap-2 rounded-xl bg-background px-4 text-foreground ring-1 ring-input ring-inset hover:bg-muted focus:ring-ring dark:bg-background dark:text-foreground dark:hover:bg-muted";
+  "h-auto min-h-11 gap-2 rounded-control border border-control bg-transparent px-4 font-medium text-primary hover:bg-raised hover:opacity-100";
 
 const TAB_KEYS: readonly TabKey[] = ["http", "bluetooth", "serial"];
 const isTabKey = (value: string): value is TabKey =>
@@ -157,7 +157,7 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
   }
 
   return (
-    <div className="mt-4 flex flex-col items-start gap-2 rounded-xl bg-destructive/10 p-4 text-sm text-destructive ring-1 ring-destructive/30 ring-inset">
+    <div className="mt-4 flex flex-col items-start gap-2 rounded-card border border-danger bg-danger p-4 text-sm text-on-danger">
       <div className="flex items-center gap-2 w-full">
         <AlertCircle className="mr-2 size-8 shrink-0" aria-hidden="true" />
         <div className="flex flex-col gap-3">
@@ -169,7 +169,7 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
                   <Link
                     key="0"
                     href={featureErrors[needsFeature].href}
-                    className="font-medium text-destructive underline hover:text-destructive/80 dark:text-destructive dark:hover:text-destructive/80"
+                    className="font-medium text-on-danger underline hover:text-danger"
                   />,
                 ]}
               />
@@ -186,7 +186,7 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
                   "0": (
                     <Link
                       href={featureErrors["Secure Context"].href}
-                      className="font-medium text-destructive underline hover:text-destructive/80 dark:text-destructive dark:hover:text-destructive/80"
+                      className="font-medium text-on-danger underline hover:text-danger"
                     />
                   ),
                 }}
@@ -314,13 +314,9 @@ function PickerRow({
           <MousePointerClick className="h-4 w-4" />
           {buttonText}
         </Button>
-        <div className="min-w-0 break-words text-sm text-muted-foreground">
-          {display}
-        </div>
+        <div className="min-w-0 break-words text-sm text-muted">{display}</div>
       </div>
-      {helper ? (
-        <p className="text-sm text-muted-foreground">{helper}</p>
-      ) : null}
+      {helper ? <p className="text-sm text-muted">{helper}</p> : null}
     </div>
   );
 }
@@ -335,11 +331,11 @@ function SupportPill({
   labelUnsupported: string;
 }) {
   return (
-    <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-background px-2.5 py-0.5 text-sm font-medium text-muted-foreground ring-1 ring-border ring-inset">
+    <span className="inline-flex items-center gap-1.5 self-start rounded-full border border-control bg-surface px-2.5 py-0.5 text-sm font-medium text-secondary">
       <span
         className={cn(
           "size-2 rounded-full",
-          supported ? "bg-emerald-500" : "bg-red-500",
+          supported ? "bg-online" : "bg-danger-strong",
         )}
         aria-hidden="true"
       />
@@ -551,7 +547,7 @@ export function AddConnectionForm({
 
             <Input
               id={"url"}
-              className="h-auto min-h-11 rounded-xl border-input bg-background text-base text-foreground placeholder:text-slate-500 dark:bg-muted/40 dark:placeholder:text-muted-foreground focus:ring-ring dark:border-input dark:text-foreground dark:focus:ring-ring"
+              className="h-auto min-h-11 text-base"
               inputMode="url"
               placeholder={t("addConnection.httpConnection.inputPlaceholder")}
               prefix={`${state.protocol}://`}
@@ -581,12 +577,12 @@ export function AddConnectionForm({
             {isHTTPS &&
               state.protocol === "http" &&
               localNetworkAccess === "denied" && (
-                <p className="text-sm text-amber-700 dark:text-amber-400">
+                <p className="text-sm text-warning">
                   {t("addConnection.httpConnection.localNetwork.denied")}
                 </p>
               )}
             {isHTTPS && !httpAllowed && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted">
                 {t("addConnection.httpConnection.localNetwork.unsupported")}
               </p>
             )}
@@ -616,13 +612,13 @@ export function AddConnectionForm({
                 )}
               </Button>
               {state.testStatus === "success" && (
-                <div className="flex items-center gap-1 text-sm text-green-700 dark:text-green-400">
+                <div className="flex items-center gap-1 text-sm text-accent">
                   <CheckCircle2 className="h-4 w-4" />
                   {t("addConnection.httpConnection.connectionTest.reachable")}
                 </div>
               )}
               {state.testStatus === "failure" && (
-                <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+                <div className="flex items-center gap-1 text-sm text-danger">
                   <XCircle className="h-4 w-4" />
                   {t(
                     "addConnection.httpConnection.connectionTest.notReachable",
@@ -649,11 +645,11 @@ export function AddConnectionForm({
               />
             )}
             {state.testStatus === "success" && state.slowLocalName && (
-              <p className="text-sm text-amber-700 dark:text-amber-400">
+              <p className="text-sm text-warning">
                 {t("addConnection.httpConnection.connectionTest.slowLocalName")}
               </p>
             )}
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted">
               {t("addConnection.httpConnection.connectionTest.description")}
             </p>
           </div>
@@ -791,9 +787,7 @@ export function AddConnectionForm({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-muted-foreground">
-        {t("addConnection.description")}
-      </p>
+      <p className="text-sm text-muted">{t("addConnection.description")}</p>
       <Tabs
         value={state.tab}
         onValueChange={(v) => {
@@ -802,17 +796,12 @@ export function AddConnectionForm({
           }
         }}
       >
-        <TabsList className="grid w-full grid-cols-3 gap-1 rounded-xl border-0 bg-slate-200 p-1 shadow-none dark:bg-muted">
+        <TabsList className="grid w-full grid-cols-3 gap-1">
           {TAB_META.map(({ key, label, Icon }) => (
             <TabsTrigger
               key={key}
               value={key}
-              className={cn(
-                "min-h-11 min-w-0 gap-2 rounded-lg border-0 bg-transparent text-muted-foreground shadow-none",
-                "hover:bg-background/60 hover:text-foreground",
-                "data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:hover:bg-background",
-                "dark:data-[state=active]:bg-background dark:data-[state=active]:text-foreground dark:data-[state=active]:hover:bg-background dark:data-[state=active]:hover:text-foreground",
-              )}
+              className={cn("min-h-11 min-w-0 gap-2")}
             >
               <Icon className="h-4 w-4" />
               {label}
@@ -824,7 +813,7 @@ export function AddConnectionForm({
           <TabsContent
             key={key}
             value={key}
-            className="rounded-xl border-border bg-muted/40 p-4 @md:p-5"
+            className="rounded-card border-subtle bg-inset p-4 @md:p-5"
           >
             {state.tab === key ? (
               <div className="flex flex-col gap-4">
@@ -832,7 +821,7 @@ export function AddConnectionForm({
                   <Label htmlFor={`name-${state.tab}`}>Name</Label>
                   <Input
                     id={`name-${state.tab}`}
-                    className="h-auto min-h-11 rounded-xl border-input bg-background text-base text-foreground placeholder:text-slate-500 dark:bg-muted/40 dark:placeholder:text-muted-foreground focus:ring-ring dark:border-input dark:text-foreground dark:focus:ring-ring"
+                    className="h-auto min-h-11 text-base"
                     value={state.name}
                     onChange={(evt) =>
                       dispatch({ type: "SET_NAME", payload: evt.target.value })
@@ -845,7 +834,7 @@ export function AddConnectionForm({
                   <Button
                     onClick={submit(onSave)}
                     disabled={!canCreate}
-                    className="h-auto min-h-11 rounded-xl bg-primary px-5 text-primary-foreground hover:bg-primary/90 focus:ring-ring disabled:bg-slate-200 disabled:text-muted-foreground disabled:opacity-100 dark:disabled:bg-muted"
+                    className="h-auto min-h-11 px-5"
                   >
                     {t("button.saveConnection")}
                   </Button>

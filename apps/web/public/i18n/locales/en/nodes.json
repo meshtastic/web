@@ -36,7 +36,6 @@
     "searchLabel": "Search nodes",
     "searchPlaceholder": "Search by name, short name or node ID",
     "filtersLabel": "Filter nodes",
-    "moreFilters": "More filters",
     "sortLabel": "Sort nodes",
     "sortBy": "Sort: {{column}}",
     "tableLabel": "Known nodes",
@@ -86,8 +85,7 @@
     "ignored": "Ignored",
     "encrypted": "Public key known: direct messages are end-to-end encrypted",
     "notEncrypted": "No public key: direct messages use the channel key",
-    "messageNode": "Message {{name}}",
-    "selectNode": "Show details for {{name}}"
+    "messageNode": "Message {{name}}"
   },
   "details": {
     "label": "Node details",

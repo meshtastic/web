@@ -3,17 +3,6 @@
     "title": "Messages: {{chatName}}",
     "placeholder": "Enter Message"
   },
-  "emptyState": {
-    "title": "Select a Chat",
-    "text": "No messages yet."
-  },
-  "selectChatPrompt": {
-    "text": "Select a channel or node to start messaging."
-  },
-  "sendMessage": {
-    "placeholder": "Enter your message here...",
-    "sendButton": "Send"
-  },
   "actionsMenu": {
     "addReactionLabel": "Add Reaction",
     "replyLabel": "Reply"
@@ -25,19 +14,6 @@
     }
   },
   "diagnostics": {
-    "snr": {
-      "value": "SNR {{value}} dB",
-      "tooltip": "Signal-to-noise ratio as your radio heard it"
-    },
-    "rssi": {
-      "value": "RSSI {{value}} dBm",
-      "tooltip": "Signal strength as your radio heard it"
-    },
-    "hops": {
-      "value_one": "{{count}} hop away",
-      "value_other": "{{count}} hops away",
-      "unknown": "Hop count unknown"
-    },
     "transport": {
       "mqtt": {
         "label": "Via MQTT",
@@ -137,7 +113,6 @@
   "chats": {
     "title": "Pick a chat to start",
     "description": "Choose a channel or direct message on the left, or start something new.",
-    "descriptionMobile": "Choose a channel or direct message, or start something new.",
     "newDmTitle": "New direct message",
     "newDmHint": "Pick a node you've heard",
     "addChannelTitle": "Add a channel",
@@ -155,9 +130,6 @@
     "nodesKnown_other": "{{count}} nodes known",
     "endToEnd": "End-to-end encrypted",
     "channelKey": "Encrypted with channel key",
-    "hops_one": "{{count}} hop",
-    "hops_other": "{{count}} hops",
-    "direct": "Direct",
     "heardAgo": "heard {{time}}",
     "neverHeard": "never heard",
     "traceroute": "Traceroute",
@@ -192,7 +164,6 @@
     "sendFailed": "Message not sent",
     "reactionFailed": "Reaction not sent",
     "retryFailed": "Couldn't send again",
-    "notConnected": "Connect a device to send messages",
     "copied": "Copied to clipboard",
     "hopsUnknown": "? hops",
     "announceMany_one": "{{count}} new message",
@@ -219,8 +190,7 @@
     "relayedWaiting": "Relayed, waiting for acknowledgement",
     "notDelivered": "Not delivered",
     "notDeliveredReason": "Not delivered ({{reason}})",
-    "fromYou": "You",
-    "sentAt": "Sent {{time}}"
+    "fromYou": "You"
   },
   "emoji": {
     "thumbsUp": "thumbs up",

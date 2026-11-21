@@ -1,7 +1,8 @@
 import { Mono } from "@app/components/generic/Mono";
-import { getSignalColor } from "@app/core/utils/signalColor";
 import type { VisibilityState } from "@core/nodes/mapLayers.ts";
+import { useTheme } from "@core/hooks/useTheme.ts";
 import { useDevice } from "@core/stores";
+import { signalLineColor } from "@core/theme/signalColors.ts";
 import {
   distanceMeters,
   hasPos,
@@ -11,6 +12,7 @@ import {
   toLngLat,
 } from "@core/utils/geo";
 import type { Protobuf } from "@core/protobuf.ts";
+import { snrQuality } from "@core/utils/signalQuality.ts";
 import type { Feature, FeatureCollection } from "geojson";
 import { useTranslation } from "react-i18next";
 import { Layer, Source } from "react-map-gl/maplibre";
@@ -55,6 +57,9 @@ type DirectInfo = {
 };
 
 type NeighborInfos = RemoteInfo | DirectInfo;
+
+/** The line colour for a link's SNR. */
+type LinkColor = (snr: number) => string;
 
 type Pair = {
   a: number;
@@ -145,6 +150,7 @@ function makeFeature(
   toPos: LngLat,
   snr: number,
   curved: boolean,
+  colorFor: LinkColor,
 ): Feature | undefined {
   const segment = arcSegment(fromPos, toPos, curved);
 
@@ -156,7 +162,7 @@ function makeFeature(
     type: "Feature",
     geometry: { type: "LineString", coordinates: segment },
     properties: {
-      color: getSignalColor(snr),
+      color: colorFor(snr),
       snr,
       from: fromId,
       to: toId,
@@ -171,9 +177,10 @@ function pushIfFeature(
   bPos: LngLat,
   snr: number,
   curved: boolean,
+  colorFor: LinkColor,
   features: Feature[],
 ) {
-  const feat = makeFeature(a, b, aPos, bPos, snr, curved);
+  const feat = makeFeature(a, b, aPos, bPos, snr, curved, colorFor);
   if (feat) {
     features.push(feat);
   }
@@ -181,6 +188,7 @@ function pushIfFeature(
 
 function generateNeighborLines(
   neighborInfos: NeighborInfos[],
+  colorFor: LinkColor,
 ): FeatureCollection {
   // Collect positions for all referenced nodes, discard pairs with missing positions
   const idToLngLat = new Map<number, LngLat>();
@@ -229,15 +237,51 @@ function generateNeighborLines(
 
     if (pair.ab && pair.ba) {
       // both directions → two arcs
-      pushIfFeature(pair.a, pair.b, aPos, bPos, pair.ab, true, features);
-      pushIfFeature(pair.b, pair.a, bPos, aPos, pair.ba, true, features);
+      pushIfFeature(
+        pair.a,
+        pair.b,
+        aPos,
+        bPos,
+        pair.ab,
+        true,
+        colorFor,
+        features,
+      );
+      pushIfFeature(
+        pair.b,
+        pair.a,
+        bPos,
+        aPos,
+        pair.ba,
+        true,
+        colorFor,
+        features,
+      );
     } else {
       // only one direction → straight
       if (pair.ab) {
-        pushIfFeature(pair.a, pair.b, aPos, bPos, pair.ab, false, features);
+        pushIfFeature(
+          pair.a,
+          pair.b,
+          aPos,
+          bPos,
+          pair.ab,
+          false,
+          colorFor,
+          features,
+        );
       }
       if (pair.ba) {
-        pushIfFeature(pair.b, pair.a, bPos, aPos, pair.ba, false, features);
+        pushIfFeature(
+          pair.b,
+          pair.a,
+          bPos,
+          aPos,
+          pair.ba,
+          false,
+          colorFor,
+          features,
+        );
       }
     }
   }
@@ -286,7 +330,12 @@ export const SNRLayer = ({
   myNode,
   visibilityState,
 }: SNRLayerProps): React.ReactNode => {
-  const { getNeighborInfo } = useDevice();
+  const { getNeighborInfo, config } = useDevice();
+  const { theme } = useTheme();
+  const lora = config.lora;
+  // Rated against the decode floor of this radio's LoRa settings.
+  const colorFor: LinkColor = (snr) =>
+    signalLineColor(snrQuality(snr, lora), theme);
 
   const remotePairs = visibilityState.remoteNeighbors
     ? filteredNodes.flatMap((node) => {
@@ -323,10 +372,10 @@ export const SNRLayer = ({
           }))
       : [];
 
-  const featureCollection = generateNeighborLines([
-    ...remotePairs,
-    ...directPairs,
-  ]);
+  const featureCollection = generateNeighborLines(
+    [...remotePairs, ...directPairs],
+    colorFor,
+  );
 
   return (
     <Source type="geojson" data={featureCollection}>

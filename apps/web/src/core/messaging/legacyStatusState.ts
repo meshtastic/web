@@ -1,4 +1,4 @@
-import { MessageState } from "@core/stores/messageStore/index.ts";
+import { MessageState } from "@core/messaging/messageEnums.ts";
 
 /**
  * The pre-SDK message state enum that `messageStatus` (the delivery

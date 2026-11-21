@@ -9,6 +9,7 @@ import {
   formatRelativeTime,
   getRelativeTimeParts,
   groupByDay,
+  relativeRefreshMs,
   startOfDay,
 } from "./timeFormat.ts";
 
@@ -84,6 +85,16 @@ describe("formatRelativeTime", () => {
     expect(formatRelativeTime(yesterday, NOW, "de")).toBe("gestern");
     expect(formatRelativeTime(yesterday, NOW, "en")).toBe("yesterday");
     expect(formatRelativeTime(yesterday, NOW, "de")).toBe("gestern");
+  });
+});
+
+describe("relativeRefreshMs", () => {
+  const now = Date.UTC(2026, 10, 21, 12, 0, 0);
+  it("refreshes faster the finer the unit", () => {
+    expect(relativeRefreshMs(now - 5_000, now)).toBe(3_000);
+    expect(relativeRefreshMs(now - 5 * 60_000, now)).toBe(15_000);
+    expect(relativeRefreshMs(now - 3 * 3_600_000, now)).toBe(30_000);
+    expect(relativeRefreshMs(now - 3 * 86_400_000, now)).toBe(3_600_000);
   });
 });
 

@@ -3,6 +3,7 @@ import type {
   ConnectionStatus,
   ConnectionType,
 } from "@core/stores/deviceStore/types.ts";
+import { formatVoltageValue } from "@core/nodes/format.ts";
 import {
   initialsFor,
   type NodeNames,
@@ -83,6 +84,8 @@ export interface DeviceSummaryInput {
   readonly fallbackName: (idSuffix: string) => string;
   /** Name when neither the node nor a connection is known yet. */
   readonly unknownName: string;
+  /** For number formatting. */
+  readonly locale: string;
 }
 
 const stateForStatus = {
@@ -132,15 +135,16 @@ export const powerState = (
     : { kind: "battery", level: Math.round(level) };
 };
 
-/** Three significant digits; zero means the radio has no voltage sense. */
-export const formatVoltage = (
+/** Two decimals; zero means the radio has no voltage sense. */
+export const deviceVoltage = (
   voltage: number | null | undefined,
+  locale: string,
 ): string | undefined => {
   const value = finite(voltage);
   if (value === undefined || value === 0) {
     return undefined;
   }
-  return Math.abs(value).toPrecision(3);
+  return formatVoltageValue(Math.abs(value), locale);
 };
 
 /** One decimal place, without a trailing `.0`. */
@@ -206,6 +210,7 @@ export const deriveDeviceSummary = ({
   connection,
   fallbackName,
   unknownName,
+  locale,
 }: DeviceSummaryInput): DeviceSummary => {
   const names: NodeNames = myNode?.user ?? {};
   const name = myNode
@@ -224,7 +229,7 @@ export const deriveDeviceSummary = ({
     transport: connection?.type,
     target: connection ? connectionTarget(connection) : undefined,
     power: powerState(metrics?.batteryLevel),
-    voltage: formatVoltage(metrics?.voltage),
+    voltage: deviceVoltage(metrics?.voltage, locale),
     firmware: parseFirmwareVersion(firmwareVersion),
     channelUtilization: formatPercent(metrics?.channelUtilization),
     airUtilTx: formatPercent(metrics?.airUtilTx),
@@ -321,8 +326,8 @@ export const deviceListEntries = (
       return [];
     }
     const names = nodeNum === 0 ? undefined : namesFor(nodeNum);
-    const ownerName =
-      (names?.longName ?? "").trim() || (names?.shortName ?? "").trim();
+    // The owner's long then short name; empty when it has neither.
+    const ownerName = names ? nodeDisplayName(names, nodeNum, () => "") : "";
     const name =
       ownerName || connectionName || fallbackName(nodeIdSuffix(nodeNum));
     return [

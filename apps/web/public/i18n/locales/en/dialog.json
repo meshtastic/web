@@ -284,6 +284,7 @@
   "qr": {
     "addChannels": "Add Channels",
     "replaceChannels": "Replace Channels",
+    "linkMode": "What scanning the code does",
     "description": "The current LoRa configuration will also be shared.",
     "sharableUrl": "Sharable URL",
     "title": "Generate QR Code"

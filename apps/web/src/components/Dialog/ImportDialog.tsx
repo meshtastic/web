@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@components/UI/Select.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
+import { mergeLinkLora } from "@core/channels/loraMerge.ts";
 import { useDevice } from "@core/stores";
 import type { BeaconJoinPlan } from "@core/utils/beaconJoin.ts";
 import { channelSetFromUrl } from "@core/utils/channelUrl.ts";
@@ -112,12 +113,14 @@ export const ImportDialog = ({
       },
     );
 
-    if (channelSet?.loraConfig && updateConfig) {
-      const payload = {
-        ...config.lora,
-        ...channelSet.loraConfig,
-      } as Protobuf.Config.Config_LoRaConfig;
-      editor.setRadioSection("lora", payload);
+    // Only the link's modem settings are taken; without the radio's own
+    // section to merge over, the LoRa config is left as it is.
+    const currentLora = editor.radio.peek().lora ?? config.lora;
+    if (channelSet?.loraConfig && updateConfig && currentLora) {
+      editor.setRadioSection(
+        "lora",
+        mergeLinkLora(currentLora, channelSet.loraConfig),
+      );
     }
     handleOpenChange(false);
     // Apply only stages the change; take a beacon join to where it's saved.

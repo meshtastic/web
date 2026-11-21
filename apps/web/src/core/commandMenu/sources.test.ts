@@ -3,7 +3,6 @@ import { settingsSections } from "./settingsSections.ts";
 import {
   actionCommands,
   buildRegistry,
-  channelLabel,
   compareNodes,
   conversationCommands,
   deviceCommands,
@@ -77,20 +76,6 @@ const input: RegistryInput = {
 
 const byId = (commands: Command[], id: string): Command | undefined =>
   commands.find((command) => command.id === id);
-
-describe("channelLabel", () => {
-  it("prefers the channel name, then Primary / Ch N", () => {
-    expect(
-      channelLabel({ index: 2, name: " Hiking ", disabled: false }, t),
-    ).toBe("Hiking");
-    expect(channelLabel({ index: 0, disabled: false }, t)).toBe(
-      "page.broadcastLabel(ns=channels)",
-    );
-    expect(channelLabel({ index: 4, name: "", disabled: false }, t)).toBe(
-      "page.channelIndex(ns=channels,index=4)",
-    );
-  });
-});
 
 describe("nodeHint", () => {
   it("joins hops and last heard", () => {

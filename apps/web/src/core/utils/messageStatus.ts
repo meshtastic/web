@@ -1,4 +1,4 @@
-import { MessageState } from "@core/stores/messageStore";
+import { MessageState } from "@core/messaging/messageEnums.ts";
 import { Protobuf } from "@core/protobuf.ts";
 
 const RoutingError = Protobuf.Mesh.Routing_Error;

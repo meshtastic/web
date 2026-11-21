@@ -6,7 +6,8 @@ import { type DeviceSummary, deriveDeviceSummary } from "./deviceSummary.ts";
 
 /** The connected radio, as the rail, device card and device menu show it. */
 export function useDeviceSummary(): DeviceSummary {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n.language;
   const myNode = useMyNodeAsProto();
   const { metadata } = useDevice();
   const connection = useDisplayedConnection();
@@ -20,7 +21,8 @@ export function useDeviceSummary(): DeviceSummary {
         connection,
         fallbackName: (last4) => t("fallbackName", { last4 }),
         unknownName: t("unknown.longName"),
+        locale,
       }),
-    [myNode, firmwareVersion, connection, t],
+    [myNode, firmwareVersion, connection, t, locale],
   );
 }

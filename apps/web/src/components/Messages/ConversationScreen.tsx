@@ -4,6 +4,7 @@ import {
   DETAILS_PANEL_STORAGE_KEY,
   ShellPage,
 } from "@components/Shell/ShellPage.tsx";
+import { channelLabel } from "@core/channels/channelLabel.ts";
 import { isChannelMuted } from "@core/channels/mute.ts";
 import {
   useCanFitDetailsColumn,
@@ -93,10 +94,7 @@ export const ConversationScreen = ({
   const title =
     peer !== undefined
       ? directory.nameOf(peer)
-      : channel?.settings?.name ||
-        (channelIndex === 0
-          ? t("page.broadcastLabel", { ns: "channels" })
-          : t("page.channelIndex", { ns: "channels", index: channelIndex }));
+      : channelLabel({ index: channelIndex, name: channel?.settings?.name }, t);
 
   const traces = useMemo(
     () => (peer === undefined ? [] : traceroutesForPeer(traceroutes, peer)),

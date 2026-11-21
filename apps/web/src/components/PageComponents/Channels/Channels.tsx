@@ -1,6 +1,7 @@
 import { BeaconOffers } from "@app/components/PageComponents/Channels/BeaconOffers.tsx";
 import { ConfirmDialog } from "@components/UI/ConfirmDialog.tsx";
 import { StatusDot } from "@components/UI/StatusDot.tsx";
+import { channelLabel } from "@core/channels/channelLabel.ts";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useChannels, useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { constantSignal } from "@core/kmp/signals.ts";
@@ -8,7 +9,6 @@ import type { Protobuf } from "@core/protobuf.ts";
 import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { firmwareAtLeast } from "@core/utils/firmware.ts";
-import i18next from "i18next";
 import { MapPinIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
@@ -22,20 +22,6 @@ import { locationSharingIndex } from "./channelStaging.ts";
 interface ConfigProps {
   onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
 }
-
-export const getChannelName = (channel: {
-  index: number;
-  settings?: { name?: string };
-}) => {
-  return channel.settings?.name?.length
-    ? channel.settings.name
-    : channel.index === 0
-      ? i18next.t("page.broadcastLabel", { ns: "channels" })
-      : i18next.t("page.channelIndex", {
-          ns: "channels",
-          index: channel.index,
-        });
-};
 
 type ChannelLike = Pick<Protobuf.Channel.Channel, "index" | "role"> & {
   settings?: Protobuf.Channel.ChannelSettings;
@@ -108,8 +94,11 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
 
   const selectedChannel = channels.get(selected);
   const radioChannel = onRadio.get(selected);
-  const defaultName = getChannelName({ index: selected });
-  const selectedName = getChannelName(selectedChannel ?? { index: selected });
+  const defaultName = channelLabel({ index: selected }, t);
+  const selectedName = channelLabel(
+    { index: selected, name: selectedChannel?.settings?.name },
+    t,
+  );
 
   return (
     <div className="flex flex-col gap-5">
@@ -125,7 +114,7 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
               const empty = slot.role === "disabled";
               const label = empty
                 ? t("slots.empty")
-                : (slot.name ?? getChannelName({ index: slot.index }));
+                : (slot.name ?? channelLabel({ index: slot.index }, t));
               return (
                 <li key={slot.index}>
                   <button

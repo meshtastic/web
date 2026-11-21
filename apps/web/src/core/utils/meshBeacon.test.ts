@@ -1,4 +1,5 @@
 import { create } from "@bufbuild/protobuf";
+import { mergeLinkLora } from "@core/channels/loraMerge.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
 import {
@@ -102,6 +103,27 @@ describe("beaconJoinChannelSet", () => {
     expect(set?.loraConfig?.region).toBe(Region.US);
     expect(set?.loraConfig?.channelNum).toBe(0);
     expect(set?.loraConfig?.overrideFrequency).toBe(0);
+  });
+
+  it("keeps the radio's own LoRa settings once merged", () => {
+    const current = lora({
+      txEnabled: true,
+      txPower: 27,
+      hopLimit: 6,
+      channelNum: 9,
+    });
+    const set = beaconJoinChannelSet(
+      beacon({ offerPreset: Preset.MEDIUM_FAST }),
+      "switch",
+      current,
+    );
+    if (!set?.loraConfig) throw new Error("expected a LoRa config");
+    const merged = mergeLinkLora(current, set.loraConfig);
+    expect(merged.txPower).toBe(27);
+    expect(merged.txEnabled).toBe(true);
+    expect(merged.hopLimit).toBe(6);
+    expect(merged.modemPreset).toBe(Preset.MEDIUM_FAST);
+    expect(merged.channelNum).toBe(0);
   });
 });
 

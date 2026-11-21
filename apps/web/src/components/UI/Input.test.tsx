@@ -1,5 +1,4 @@
 import { Input } from "@components/UI/Input.tsx";
-import { Textarea } from "@components/UI/Textarea.tsx";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -94,24 +93,5 @@ describe("Input with a limit", () => {
   it("marks dirty fields amber", () => {
     render(<Input aria-label="Dirty" variant="dirty" defaultValue="x" />);
     expect(screen.getByRole("textbox").className).toContain("border-dirty");
-  });
-});
-
-describe("Textarea", () => {
-  it("shows a counter for a string value", () => {
-    render(
-      <Textarea
-        aria-label="Message"
-        value={"€".repeat(70)}
-        onChange={vi.fn()}
-        limit={{ max: 200, mode: "bytes" }}
-      />,
-    );
-    expect(screen.getByText("210/200")).toBeTruthy();
-    expect(
-      screen
-        .getByRole("textbox", { name: "Message" })
-        .getAttribute("aria-invalid"),
-    ).toBe("true");
   });
 });

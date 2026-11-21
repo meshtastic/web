@@ -9,6 +9,7 @@
   },
   "waypointDetail": {
     "edit": "Edit",
+    "details": "Waypoint details",
     "description": "Description:",
     "createdBy": "Edited by:",
     "createdDate": "Created:",

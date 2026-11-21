@@ -99,10 +99,13 @@ export function beaconJoinOption(
 
 /**
  * The ChannelSet to hand the channel import flow. "add" carries only the
- * channel. "switch" also carries a fresh LoRa config (not a copy of the
- * current one, so no stale frequency or slot pin survives) with the offered
- * preset and region. Position sharing is always turned off on the offered
- * channel, so joining a stranger's mesh never shares our location.
+ * channel. "switch" also carries the offered modem settings (preset, region,
+ * frequency slot) in a fresh LoRa config, so no stale frequency pin
+ * survives. Only those modem fields are applied, merged over the radio's own
+ * section with `mergeLinkLora`, so the zeroes in the rest of this message
+ * never reach tx_power, tx_enabled or the hop limit. Position sharing is
+ * always turned off on the offered channel, so joining a stranger's mesh
+ * never shares our location.
  */
 export function beaconJoinChannelSet(
   beacon: MeshBeacon,
@@ -127,10 +130,10 @@ export function beaconJoinChannelSet(
     loraConfig: create(Protobuf.Config.Config_LoRaConfigSchema, {
       usePreset: true,
       modemPreset: beacon.offerPreset ?? lora?.modemPreset,
-      // A full LoRaConfig replacement with region UNSET would stop transmit.
       region:
         beacon.offerRegion !== Region.UNSET ? beacon.offerRegion : lora?.region,
-      hopLimit: 3,
+      // Ignored by the merge; set so a reader that replaces the whole
+      // section never turns transmit off.
       txEnabled: true,
       channelNum: beacon.offerFrequencySlot ?? 0,
     }),

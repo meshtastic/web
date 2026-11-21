@@ -9,7 +9,7 @@ import { ShellPage } from "@components/Shell/ShellPage.tsx";
 import { IconButton } from "@components/UI/IconButton.tsx";
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useChannels, useConversationSummaries } from "@core/kmp/hooks";
-import { commandMenuShortcutLabel } from "@core/commandMenu/shortcut.ts";
+import { useCommandMenuShortcutLabel } from "@components/CommandPalette/useCommandMenuShortcutLabel.ts";
 import { recentlyHeard } from "@core/messaging/channelInfo.ts";
 import {
   mixedRows,
@@ -80,10 +80,7 @@ export const MessagesPage = () => {
       : { myNodeNum: directory.myNodeNum }),
     now: directory.now,
   });
-  const shortcut = commandMenuShortcutLabel(
-    typeof navigator === "undefined" ? "" : navigator.platform,
-    t("keys.ctrl", { ns: "commandPalette" }),
-  );
+  const shortcut = useCommandMenuShortcutLabel();
 
   const openSearch = useCallback(
     () => setCommandPaletteOpen(true),

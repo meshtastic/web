@@ -667,8 +667,6 @@
     "backToSettings": "Back to settings",
     "backTo": "Back to {{section}}",
     "open": "Open",
-    "openSection": "Open {{section}}",
-    "deviceSettings": "Device settings",
     "otherDeviceSettings": "Other device settings",
     "sameLayout": "Same layout inside each",
     "modules": "Modules",

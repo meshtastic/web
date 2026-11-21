@@ -2,9 +2,9 @@ import {
   SettingsGroup,
   SettingsSections,
 } from "@components/PageComponents/SettingsPages/SettingsSection.tsx";
+import { useCommandMenuShortcutLabel } from "@components/CommandPalette/useCommandMenuShortcutLabel.ts";
 import { ExternalLinkRow } from "@components/Settings/ExternalLinkRow.tsx";
 import { SettingRow } from "@components/UI/SettingRow.tsx";
-import { commandMenuShortcutLabel } from "@core/commandMenu/shortcut.ts";
 import { DOCS_BASE } from "@core/settings/registry.ts";
 import { useAppStore } from "@core/stores";
 import { useNavigate } from "@tanstack/react-router";
@@ -25,10 +25,7 @@ export const Help = (_props: ConfigProps) => {
   const setCommandPaletteOpen = useAppStore(
     (state) => state.setCommandPaletteOpen,
   );
-  const keys = commandMenuShortcutLabel(
-    globalThis.navigator?.platform ?? "",
-    t("keys.ctrl", { ns: "commandPalette" }),
-  );
+  const keys = useCommandMenuShortcutLabel();
 
   return (
     <SettingsSections>

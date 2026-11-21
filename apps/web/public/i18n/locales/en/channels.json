@@ -1,21 +1,13 @@
 {
   "page": {
-    "sectionLabel": "Channels",
     "channelName": "Channel: {{channelName}}",
     "broadcastLabel": "Primary",
-    "channelIndex": "Ch {{index}}",
-    "import": "Import",
-    "export": "Export"
+    "channelIndex": "Ch {{index}}"
   },
   "header": {
     "frequency": "Freq: {{frequency}} MHz",
     "slot": "Slot: {{slot}}",
     "slotAuto": "Slot: Auto"
-  },
-  "list": {
-    "add": "Add channel",
-    "edit": "Edit {{name}}",
-    "delete": "Delete {{name}}"
   },
   "legend": {
     "primary": "Primary",
@@ -63,41 +55,11 @@
       "description": "A red open lock with a warning means the channel is not securely encrypted, is used for precise location data which is being uplinked to the internet via MQTT, and uses either no key at all or a 1 byte known key."
     }
   },
-  "editDialog": {
-    "addTitle": "Add channel",
-    "editTitle": "Edit channel {{index}}",
-    "description": "Changes are sent to the radio when you save the settings."
-  },
   "validation": {
     "pskInvalid": "Please enter a valid {{bits}} bit PSK.",
     "pskAnyLength": "Use no key, the 1 byte default key, or a 128 or 256 bit key."
   },
-  "name": {
-    "label": "Channel Name",
-    "description": "Up to 11 bytes. Leave blank to use the default name."
-  },
-  "psk": {
-    "label": "PSK",
-    "description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
-    "generate": "Generate"
-  },
-  "uplinkEnabled": {
-    "label": "MQTT Uplink Enabled",
-    "description": "Send messages from the local mesh to MQTT"
-  },
-  "downlinkEnabled": {
-    "label": "MQTT Downlink Enabled",
-    "description": "Send messages from MQTT to the local mesh"
-  },
-  "positionEnabled": {
-    "label": "Position enabled",
-    "description": "Share this node's position on this channel."
-  },
-  "preciseLocation": {
-    "label": "Precise location"
-  },
   "positionPrecision": {
-    "label": "Location precision",
     "options": {
       "metric_km23": "Within 23 kilometers",
       "metric_km12": "Within 12 kilometers",

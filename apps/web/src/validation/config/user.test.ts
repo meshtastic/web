@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import i18next from "i18next";
+import { describe, expect, it, vi } from "vitest";
 import {
   LONG_NAME_MAX_BYTES,
   NODE_STATUS_MAX_BYTES,
@@ -100,5 +101,15 @@ describe("UserValidationSchema shortName", () => {
     // One emoji is 4 bytes; an emoji plus a letter is 5.
     expect(parseShort("📡").success).toBe(true);
     expect(parseShort("📡A").success).toBe(false);
+  });
+
+  it("translates its messages in the config namespace when they fail", () => {
+    const spy = vi.spyOn(i18next, "t");
+    const issue = parseShort("").error?.issues[0];
+    expect(spy).toHaveBeenCalledWith("user.shortName.validation.min", {
+      ns: "config",
+    });
+    expect(issue?.message).toBe("Short name must be at least 2 characters");
+    spy.mockRestore();
   });
 });

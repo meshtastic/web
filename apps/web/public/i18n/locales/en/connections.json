@@ -44,7 +44,6 @@
     "description": "Modify the settings for this connection."
   },
   "toasts": {
-    "connected": "Connected",
     "failed": "Failed to connect",
     "checkConnection": "Check your device or settings and try again",
     "defaultSet": "Default set",

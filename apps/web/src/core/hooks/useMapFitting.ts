@@ -1,16 +1,14 @@
-import { boundsFromLngLat, type LngLat, toLngLat } from "@core/utils/geo";
+import {
+  clampFitPadding,
+  type FitPadding,
+  NODE_FOCUS_ZOOM,
+} from "@core/nodes/mapView.ts";
 import type { Protobuf } from "@core/protobuf.ts";
+import { boundsFromLngLat, type LngLat, toLngLat } from "@core/utils/geo";
 import { useCallback } from "react";
 import type { MapRef } from "react-map-gl/maplibre";
 
-export interface MapFitPadding {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-}
-
-const DEFAULT_PADDING: MapFitPadding = {
+const DEFAULT_PADDING: FitPadding = {
   top: 10,
   bottom: 10,
   left: 10,
@@ -23,7 +21,7 @@ const DEFAULT_PADDING: MapFitPadding = {
  */
 export function useMapFitting(
   map: MapRef | undefined,
-  padding: MapFitPadding = DEFAULT_PADDING,
+  padding: FitPadding = DEFAULT_PADDING,
 ) {
   const focusLngLat = useCallback(
     (position: LngLat) => {
@@ -45,8 +43,11 @@ export function useMapFitting(
         return;
       }
 
-      if (nodes.length === 1 && nodes[0]) {
-        return focusLngLat(toLngLat(nodes[0].position));
+      const [only] = nodes;
+      if (nodes.length === 1 && only) {
+        const [lng, lat] = toLngLat(only.position);
+        map.easeTo({ center: [lng, lat], zoom: NODE_FOCUS_ZOOM });
+        return;
       }
 
       // Build [lng, lat] coords, then let boundsFromLngLat do the turf dance
@@ -56,15 +57,20 @@ export function useMapFitting(
         return;
       }
 
+      const container = map.getContainer();
       const center = map.cameraForBounds(bounds, {
-        padding,
+        padding: clampFitPadding(padding, {
+          width: container.clientWidth,
+          height: container.clientHeight,
+        }),
+        maxZoom: NODE_FOCUS_ZOOM,
       });
 
       if (center) {
         map.easeTo(center);
       }
     },
-    [map, focusLngLat, padding],
+    [map, padding],
   );
 
   return { focusLngLat, fitToNodes };

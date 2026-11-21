@@ -1,3 +1,4 @@
+import { channelLabel } from "@core/channels/channelLabel.ts";
 import { isChannelMuted } from "@core/channels/mute.ts";
 import type { Channel } from "@core/kmp/channels.ts";
 import type { SidebarConversation } from "@core/messaging/conversations.ts";
@@ -58,11 +59,9 @@ export function useConversationRowViews({
         return nameOf(row.target.peer);
       }
       const index = row.target.channel;
-      return (
-        channelByIndex.get(index)?.settings?.name ||
-        (index === 0
-          ? t("page.broadcastLabel", { ns: "channels" })
-          : t("page.channelIndex", { ns: "channels", index }))
+      return channelLabel(
+        { index, name: channelByIndex.get(index)?.settings?.name },
+        t,
       );
     },
     [channelByIndex, nameOf, t],

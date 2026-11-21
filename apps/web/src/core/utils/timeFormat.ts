@@ -70,6 +70,19 @@ export const formatRelativeTime = (
   return relativeFormatter(locale).format(value, unit);
 };
 
+const REFRESH_MS: Partial<Record<Intl.RelativeTimeFormatUnit, number>> = {
+  second: 3_000,
+  minute: 15_000,
+  hour: 30_000,
+};
+
+/**
+ * How often a live "5 minutes ago" label needs re-rendering: every few
+ * seconds while it counts seconds, hourly once it counts days or more.
+ */
+export const relativeRefreshMs = (date: TimeInput, now: TimeInput): number =>
+  REFRESH_MS[getRelativeTimeParts(date, now).unit] ?? 3_600_000;
+
 /** Wall-clock time in the locale's short style: "9:40 AM" / "09:40". */
 export const formatClockTime = (date: TimeInput, locale: string): string =>
   new Intl.DateTimeFormat(locale, { timeStyle: "short" }).format(toDate(date));

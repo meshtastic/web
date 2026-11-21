@@ -61,14 +61,18 @@ import {
 } from "@core/nodes/mapPins.ts";
 import {
   DESKTOP_FIT_PADDING,
+  type FitPhase,
+  initialFitPhase,
   MAP_LAYERS_PANEL_WIDTH,
   MAP_NODE_PANEL_WIDTH,
   MAP_OVERLAY_INSET,
   MAP_VIEW_STORAGE_KEY,
   MOBILE_FIT_PADDING,
+  nextFitStep,
   parseMapView,
   pickInitialView,
   serializeMapView,
+  shouldPersistMove,
   viewFromRouteParams,
 } from "@core/nodes/mapView.ts";
 import { matchesNodeSearch } from "@core/nodes/nodeFilters.ts";
@@ -152,7 +156,7 @@ const MapPage = () => {
   const [initialView] = useState(() =>
     pickInitialView(routeView, readSavedView()),
   );
-  const pendingFit = useRef(initialView.kind === "fitNodes");
+  const fitPhase = useRef<FitPhase>(initialFitPhase(initialView));
   const [mapLoaded, setMapLoaded] = useState(false);
   // Only the label threshold matters to pins, so they skip zoom changes.
   const [zoomedIn, setZoomedIn] = useState(
@@ -280,26 +284,48 @@ const MapPage = () => {
     });
   }, [mapRef, routeKey, routeView]);
 
-  // With no view to restore, fit once the map and the nodes are both ready.
+  // With no view to restore, fit once the map and the nodes are both ready,
+  // and once more if that first fit only saw a single node.
   useEffect(() => {
-    if (mapLoaded && pendingFit.current && filteredNodes.length > 0) {
-      pendingFit.current = false;
+    if (!mapLoaded) {
+      return;
+    }
+    const step = nextFitStep(fitPhase.current, filteredNodes.length);
+    fitPhase.current = step.phase;
+    if (step.fit) {
       fitToNodes(filteredNodes);
     }
   }, [mapLoaded, filteredNodes, fitToNodes]);
 
-  const handleMoveEnd = useCallback((event: ViewStateChangeEvent) => {
-    const { longitude, latitude, zoom: nextZoom } = event.viewState;
-    setZoomedIn(pinLabelsAtZoom(nextZoom));
-    try {
-      globalThis.localStorage?.setItem(
-        MAP_VIEW_STORAGE_KEY,
-        serializeMapView({ longitude, latitude, zoom: nextZoom }),
-      );
-    } catch (error) {
-      log.warn("failed to persist map view", { error: String(error) });
-    }
-  }, []);
+  const handleMoveEnd = useCallback(
+    (event: ViewStateChangeEvent) => {
+      const { longitude, latitude, zoom: nextZoom } = event.viewState;
+      setZoomedIn(pinLabelsAtZoom(nextZoom));
+      // Fits, link targets and resizes have no originating input event.
+      const userInitiated = event.originalEvent !== undefined;
+      if (userInitiated) {
+        // The user has picked a view; stop fitting to nodes.
+        fitPhase.current = "done";
+      }
+      if (
+        !shouldPersistMove({
+          userInitiated,
+          initialViewApplied: mapLoaded,
+        })
+      ) {
+        return;
+      }
+      try {
+        globalThis.localStorage?.setItem(
+          MAP_VIEW_STORAGE_KEY,
+          serializeMapView({ longitude, latitude, zoom: nextZoom }),
+        );
+      } catch (error) {
+        log.warn("failed to persist map view", { error: String(error) });
+      }
+    },
+    [mapLoaded],
+  );
 
   const selectNode = useCallback(
     (num: number) => {

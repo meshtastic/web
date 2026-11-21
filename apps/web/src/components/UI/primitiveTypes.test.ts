@@ -1,7 +1,6 @@
 import type { IconButtonProps } from "@components/UI/IconButton.tsx";
 import type { SegmentedProps } from "@components/UI/Segmented.tsx";
 import type { SettingRowProps } from "@components/UI/SettingRow.tsx";
-import type { TextareaProps } from "@components/UI/Textarea.tsx";
 import { describe, expectTypeOf, it } from "vitest";
 
 /**
@@ -89,17 +88,5 @@ describe("IconButton typing", () => {
       .toEqualTypeOf<string>();
     type Unnamed = Omit<IconButtonProps, "aria-label">;
     expectTypeOf<Unnamed>().not.toExtend<IconButtonProps>();
-  });
-});
-
-describe("Textarea typing", () => {
-  it("needs a value when a limit is set", () => {
-    expectTypeOf<{
-      limit: { max: number; mode: "bytes" };
-    }>().not.toExtend<TextareaProps>();
-    expectTypeOf<{
-      limit: { max: number; mode: "bytes" };
-      value: string;
-    }>().toExtend<TextareaProps>();
   });
 });

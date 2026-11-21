@@ -1,4 +1,4 @@
-import { urlOrIpv4Schema } from "@components/ConnectionsDrawer/validation.ts";
+import { urlOrIpv4Schema } from "@core/connections/address.ts";
 import {
   LONG_NAME_MAX_BYTES,
   SHORT_NAME_MAX_BYTES,

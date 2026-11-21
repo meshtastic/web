@@ -1,6 +1,6 @@
 import { validateMaxByteLength } from "@core/utils/string.ts";
 import { utf8ByteLength } from "@core/utils/textLimit.ts";
-import { t } from "i18next";
+import i18next from "i18next";
 import { z } from "zod/v4";
 
 /**
@@ -22,13 +22,17 @@ export const SHORT_NAME_MAX_BYTES = 4;
  */
 export const NODE_STATUS_MAX_BYTES = 80;
 
+// Resolved when a value fails, so the message follows the current language
+// and is looked up once translations have loaded.
+const configText = (key: string) => () => i18next.t(key, { ns: "config" });
+
 export const UserValidationSchema = z.object({
   // Read-only display fields (preserved on submit).
   nodeId: z.string().optional(),
   hardwareModel: z.string().optional(),
   longName: z
     .string()
-    .min(1, t("user.longName.validation.min"))
+    .min(1, { error: configText("user.longName.validation.min") })
     .superRefine((value, ctx) => {
       const { isValid, currentLength } = validateMaxByteLength(
         value,
@@ -44,9 +48,9 @@ export const UserValidationSchema = z.object({
     }),
   shortName: z
     .string()
-    .min(1, t("user.shortName.validation.min"))
+    .min(1, { error: configText("user.shortName.validation.min") })
     .refine((value) => utf8ByteLength(value) <= SHORT_NAME_MAX_BYTES, {
-      message: t("user.shortName.validation.max"),
+      error: configText("user.shortName.validation.max"),
     }),
   // Status Message module's node_status; not part of the owner.
   nodeStatus: z

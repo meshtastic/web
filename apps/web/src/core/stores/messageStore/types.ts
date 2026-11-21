@@ -1,4 +1,7 @@
-import type { MessageState, MessageType } from "@core/stores";
+import type {
+  MessageState,
+  MessageType,
+} from "@core/messaging/messageEnums.ts";
 import type { Protobuf, Types } from "@core/protobuf.ts";
 
 type NodeNum = number;
