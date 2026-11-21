@@ -130,6 +130,10 @@ describe("toNodeRow", () => {
       makeRow({ num: 1, heardOnCurrentLora: false, viaMqtt: true })
         .unheardOnCurrentLora,
     ).toBe(false);
+    expect(
+      makeRow({ num: 5, heardOnCurrentLora: false }, { myNodeNum: 5 })
+        .unheardOnCurrentLora,
+    ).toBe(false);
   });
 
   it("formats the MAC address from user info", () => {

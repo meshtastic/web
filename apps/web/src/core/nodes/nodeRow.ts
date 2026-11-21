@@ -210,8 +210,9 @@ export function toNodeRow(node: NodeSource, ctx: NodeRowContext): NodeRow {
     hasXeddsaSigned: node.hasXeddsaSigned,
     isSelf,
     isMessageable: !isSelf && user?.isUnmessagable !== true,
-    // MQTT-only nodes don't depend on LoRa settings.
-    unheardOnCurrentLora: !node.heardOnCurrentLora && !node.viaMqtt,
+    // MQTT-only nodes don't depend on LoRa settings, and this radio is
+    // never "unheard" by itself.
+    unheardOnCurrentLora: !isSelf && !node.heardOnCurrentLora && !node.viaMqtt,
     status: nonEmpty(node.status),
   };
 }
