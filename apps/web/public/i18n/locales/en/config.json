@@ -716,7 +716,11 @@
     "commandMenu": "Command menu",
     "commandMenuHelp": "{{keys}} opens the command menu from anywhere.",
     "show": "Show",
-    "openLink": "Open"
+    "openLink": "Open",
+    "walkthroughCard": "Getting started",
+    "walkthrough": "Replay the welcome walkthrough",
+    "walkthroughHelp": "Walk through connecting a radio, your name and channels again.",
+    "walkthroughAction": "Start"
   },
   "appSection": {
     "browserOnlyTitle": "Saved in this browser only",

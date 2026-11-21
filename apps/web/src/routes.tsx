@@ -5,6 +5,7 @@ import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
 import ConfigPage from "@pages/Settings/index.tsx";
+import WelcomePage from "@pages/Welcome/index.tsx";
 import {
   createRootRouteWithContext,
   createRoute,
@@ -159,6 +160,16 @@ const legacyRadioRoute = createRoute({
   },
 });
 
+// First-run setup, also reachable any time to walk through it again. App
+// renders it full screen, outside the shell, and redirects first-time
+// visitors here once the saved connections have loaded.
+export const welcomeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/welcome",
+  component: WelcomePage,
+  staticData: { hideTabBar: true },
+});
+
 const nodesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/nodes",
@@ -205,6 +216,7 @@ export const routeTree = rootRoute.addChildren([
     legacyRadioRoute,
   ]),
   nodesRoute,
+  welcomeRoute,
   dialogWithParamsRoute,
   connectionsRoute,
 ]);

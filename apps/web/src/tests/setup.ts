@@ -12,6 +12,7 @@ import dialogEN from "@public/i18n/locales/en/dialog.json" with { type: "json" }
 import messagesEN from "@public/i18n/locales/en/messages.json" with { type: "json" };
 import moduleConfigEN from "@public/i18n/locales/en/moduleConfig.json" with { type: "json" };
 import nodesEN from "@public/i18n/locales/en/nodes.json" with { type: "json" };
+import onboardingEN from "@public/i18n/locales/en/onboarding.json" with { type: "json" };
 import uiEN from "@public/i18n/locales/en/ui.json" with { type: "json" };
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
@@ -43,6 +44,7 @@ const appNamespaces = [
   "dialog",
   "messages",
   "nodes",
+  "onboarding",
   "ui",
 ];
 const appFallbackNS = ["common", "ui", "dialog"];
@@ -66,6 +68,7 @@ i18n.use(initReactI18next).init({
       dialog: dialogEN,
       messages: messagesEN,
       nodes: nodesEN,
+      onboarding: onboardingEN,
       ui: uiEN,
     },
   },

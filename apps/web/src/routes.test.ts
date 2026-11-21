@@ -40,6 +40,15 @@ describe("routes", () => {
     });
   });
 
+  it("/welcome is the full-screen setup wizard", async () => {
+    const router = await load("/welcome");
+    expect(router.state.location.pathname).toBe("/welcome");
+    expect(router.state.matches.at(-1)?.routeId).toBe("/welcome");
+    expect(router.state.matches.at(-1)?.staticData).toEqual({
+      hideTabBar: true,
+    });
+  });
+
   it("/ no longer renders the Connections page", async () => {
     const router = await load("/");
     expect(router.state.location.pathname).toBe("/messages");

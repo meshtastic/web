@@ -60,6 +60,7 @@ i18next
       "dialog",
       "messages",
       "nodes",
+      "onboarding",
       "ui",
       "map",
     ],

@@ -14,9 +14,11 @@ import { useTheme } from "@core/hooks/useTheme.ts";
 import { cn } from "@core/utils/cn.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { useTotalUnread } from "@core/kmp/hooks";
-import { Outlet } from "@tanstack/react-router";
+import { useWelcomeRedirect } from "@components/Onboarding/useWelcomeRedirect.ts";
+import { WELCOME_PATH } from "@core/onboarding/welcome.ts";
+import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { MapProvider } from "react-map-gl/maplibre";
 
@@ -41,6 +43,30 @@ export function App() {
   const { selectedDeviceId } = useAppStore();
 
   const device = getDevice(selectedDeviceId);
+
+  // First-time visitors go to the welcome wizard once the saved
+  // connections have loaded; the wizard renders full screen, outside the
+  // shell, whether or not a radio is connected yet.
+  const onWelcome = useRouterState({
+    select: (s) => s.location.pathname === WELCOME_PATH,
+  });
+  const navigate = useNavigate();
+  const goToWelcome = useCallback(() => {
+    void navigate({ to: "/welcome", replace: true });
+  }, [navigate]);
+  useWelcomeRedirect(goToWelcome, onWelcome);
+
+  if (onWelcome) {
+    return (
+      <ErrorBoundary FallbackComponent={ErrorPage}>
+        <Toaster />
+        <DeviceWrapper deviceId={selectedDeviceId}>
+          {device ? <LockdownGate /> : null}
+          <Outlet />
+        </DeviceWrapper>
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
