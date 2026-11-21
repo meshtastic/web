@@ -33,7 +33,7 @@ describe("routes", () => {
 
   it("/connections redirects home and opens the Connections drawer", async () => {
     const router = await load("/connections");
-    expect(router.state.location.pathname).toBe("/messages/broadcast/0");
+    expect(router.state.location.pathname).toBe("/messages");
     expect(useAppStore.getState().connectionsDrawer).toEqual({
       open: true,
       view: "list",
@@ -42,8 +42,21 @@ describe("routes", () => {
 
   it("/ no longer renders the Connections page", async () => {
     const router = await load("/");
-    expect(router.state.location.pathname).toBe("/messages/broadcast/0");
+    expect(router.state.location.pathname).toBe("/messages");
     expect(useAppStore.getState().connectionsDrawer.open).toBe(false);
+  });
+
+  it("/messages stays on the conversation list instead of opening a channel", async () => {
+    const router = await load("/messages");
+    expect(router.state.location.pathname).toBe("/messages");
+    expect(router.state.matches.at(-1)?.staticData.hideTabBar).toBeUndefined();
+  });
+
+  it("a conversation hides the mobile tab bar", async () => {
+    const router = await load("/messages/direct/42");
+    expect(router.state.matches.at(-1)?.staticData).toEqual({
+      hideTabBar: true,
+    });
   });
 
   it("opening and closing the drawer changes no route", async () => {

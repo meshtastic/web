@@ -1,341 +1,238 @@
-import { messagesWithParamsRoute } from "@app/routes.tsx";
-import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
-import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
+import { ChatsEmptyState } from "@components/Messages/ChatsEmptyState.tsx";
+import { ConversationScreen } from "@components/Messages/ConversationScreen.tsx";
+import { ConversationSidebar } from "@components/Messages/ConversationSidebar.tsx";
+import { NewDirectMessageDialog } from "@components/Messages/NewDirectMessageDialog.tsx";
+import { useConversationRowViews } from "@components/Messages/useConversationRowViews.ts";
+import { useMessagingDirectory } from "@components/Messages/useMessagingDirectory.ts";
 import { DeviceCard } from "@components/Shell/DeviceCard.tsx";
 import { ShellPage } from "@components/Shell/ShellPage.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
-import { Input } from "@components/UI/Input.tsx";
-import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { useChatAsLegacyMessages } from "@core/hooks/useChatAsLegacyMessages.ts";
-import { useDocumentVisible } from "@core/hooks/useDocumentVisible.ts";
-import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { useToast } from "@core/hooks/useToast.ts";
-import { MessageType } from "@core/stores";
-import { Protobuf, Types } from "@core/protobuf.ts";
+import { IconButton } from "@components/UI/IconButton.tsx";
+import { useIsMobile } from "@core/hooks/useIsMobile.ts";
+import { useChannels, useConversationSummaries } from "@core/kmp/hooks";
+import { commandMenuShortcutLabel } from "@core/commandMenu/shortcut.ts";
+import { recentlyHeard } from "@core/messaging/channelInfo.ts";
 import {
-  useActiveClient,
-  useChannels,
-  useNodeErrors,
-  useUnreadByKey,
-} from "@core/kmp/hooks";
+  mixedRows,
+  type SidebarFilter,
+  sidebarSections,
+} from "@core/messaging/sidebarView.ts";
+import { formatLastHeard } from "@core/nodes/format.ts";
+import {
+  type ConversationKey,
+  conversationKeyString,
+} from "@core/storage/types.ts";
+import { useAppStore } from "@core/stores";
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { PencilLineIcon } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getChannelName } from "../components/PageComponents/Channels/Channels.tsx";
 
-type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
+/** The conversation the route names, or undefined. */
+const conversationFromParams = (params: {
+  type?: "direct" | "broadcast";
+  chatId?: number;
+}): ConversationKey | undefined => {
+  if (params.type === undefined || params.chatId === undefined) {
+    return undefined;
+  }
+  return params.type === "direct"
+    ? { kind: "direct", peer: params.chatId }
+    : { kind: "channel", channel: params.chatId };
+};
 
-function SelectMessageChat() {
-  const { t } = useTranslation("messages");
-  return (
-    <div className="flex-1 flex items-center justify-center text-slate-500 p-4">
-      {t("selectChatPrompt.text", { ns: "messages" })}
-    </div>
-  );
-}
+const RECENT_NODES = 6;
 
+/**
+ * Messages: the conversation sidebar beside either the open conversation
+ * or the Chats empty state. On narrow screens the list and a conversation
+ * are separate full screens.
+ */
 export const MessagesPage = () => {
-  const channels = useChannels();
-  const unreadByKey = useUnreadByKey();
-  const meshClient = useActiveClient();
-  const directUnread = (peer: number): number =>
-    unreadByKey.get(`direct:${peer}`) ?? 0;
-  const channelUnread = (idx: number): number =>
-    unreadByKey.get(`channel:${idx}`) ?? 0;
-  const allNodes = useNodesAsProto();
-  const getNode = (n: number) => allNodes.find((node) => node.num === n);
-  const errors = useNodeErrors();
-  const errorSet = useMemo(() => new Set(errors.map((e) => e.node)), [errors]);
-  const hasNodeError = useCallback(
-    (num: number) => errorSet.has(num),
-    [errorSet],
-  );
-
-  const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
-
+  const { t, i18n } = useTranslation("messages");
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const { t } = useTranslation(["messages", "channels", "ui"]);
-  const deferredSearch = useDeferredValue(searchTerm);
+  const params = useParams({ strict: false });
+  const conversation = conversationFromParams(params);
+  const selectedId = conversation
+    ? conversationKeyString(conversation)
+    : undefined;
 
-  const navigateToChat = useCallback(
-    (type: MessageType, id: string) => {
-      const typeParam = type === MessageType.Direct ? "direct" : "broadcast";
-      navigate({ to: `/messages/${typeParam}/${id}` });
+  const directory = useMessagingDirectory();
+  const channels = useChannels();
+  const summaries = useConversationSummaries();
+  const setCommandPaletteOpen = useAppStore((s) => s.setCommandPaletteOpen);
+  const [filter, setFilter] = useState<SidebarFilter>("all");
+  const [newDmOpen, setNewDmOpen] = useState(false);
+  const { byNum } = directory;
+  const peer = useCallback(
+    (num: number) => {
+      const row = byNum.get(num);
+      return row ? { initials: row.initials, online: row.isOnline } : undefined;
     },
-    [navigate],
+    [byNum],
+  );
+  const { title, toView } = useConversationRowViews({
+    channels,
+    nameOf: directory.nameOf,
+    peer,
+    ...(directory.myNodeNum === undefined
+      ? {}
+      : { myNodeNum: directory.myNodeNum }),
+    now: directory.now,
+  });
+  const shortcut = commandMenuShortcutLabel(
+    typeof navigator === "undefined" ? "" : navigator.platform,
+    t("keys.ctrl", { ns: "commandPalette" }),
   );
 
-  const chatType =
-    type === "direct" ? MessageType.Direct : MessageType.Broadcast;
-  const numericChatId = Number(chatId);
-  const documentVisible = useDocumentVisible();
+  const openSearch = useCallback(
+    () => setCommandPaletteOpen(true),
+    [setCommandPaletteOpen],
+  );
+  const openNewDm = useCallback(() => setNewDmOpen(true), []);
 
-  // The open conversation is read, however it was opened, and stays read as
-  // text arrives, except while the tab is in the background.
-  useEffect(() => {
-    if (!meshClient || !type || !chatId || Number.isNaN(numericChatId)) return;
-    if (!documentVisible) return;
-    const unread = meshClient.chat.unread;
-    unread.setActive(
-      type === "direct"
-        ? { kind: "direct", peer: numericChatId }
-        : { kind: "channel", channel: numericChatId },
+  const sections = useMemo(() => {
+    const { channels: ch, direct } = sidebarSections(
+      summaries,
+      filter === "channels" ? "all" : filter,
+      title,
+      { keepChannelOrder: true },
     );
-    return () => unread.setActive(undefined);
-  }, [meshClient, type, chatId, numericChatId, documentVisible]);
+    return { channels: ch.map(toView), direct: direct.map(toView) };
+  }, [summaries, filter, title, toView]);
 
-  const filteredChannels = useMemo(
+  const mobileRows = useMemo(
+    () => mixedRows(summaries, filter, title).map(toView),
+    [summaries, filter, title, toView],
+  );
+
+  const locale = i18n.language;
+  const candidates = useMemo(
     () =>
-      channels.filter(
-        (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
-      ),
-    [channels],
+      [...directory.rows]
+        .filter((row) => !row.isSelf && row.isMessageable)
+        .sort((a, b) => (b.lastHeardMs ?? 0) - (a.lastHeardMs ?? 0))
+        .map((row) => {
+          const heard = formatLastHeard(row.lastHeardMs, directory.now, locale);
+          return {
+            num: row.num,
+            name: row.name,
+            id: row.id,
+            initials: row.initials,
+            online: row.isOnline,
+            ...(row.shortName ? { shortName: row.shortName } : {}),
+            ...(heard ? { heard: t("newDm.heard", { time: heard }) } : {}),
+          };
+        }),
+    [directory, locale, t],
   );
 
-  useEffect(() => {
-    if (!type && !chatId && filteredChannels.length > 0) {
-      const defaultChannel = filteredChannels[0];
-      navigateToChat(
-        MessageType.Broadcast,
-        defaultChannel?.index.toString() ?? "0",
-      );
-    }
-  }, [type, chatId, filteredChannels, navigateToChat]);
-
-  const currentChannel = channels.find((ch) => ch.index === numericChatId);
-  const otherNode = getNode(numericChatId);
-
-  const isDirect = chatType === MessageType.Direct;
-  const isBroadcast = chatType === MessageType.Broadcast;
-
-  const filteredNodes = useCallback((): NodeInfoWithUnread[] => {
-    const lowerCaseSearchTerm = deferredSearch.toLowerCase();
-
-    return allNodes
-      .filter((node: Protobuf.Mesh.NodeInfo) => {
-        const longName = node.user?.longName?.toLowerCase() ?? "";
-        const shortName = node.user?.shortName?.toLowerCase() ?? "";
-        return (
-          longName.includes(lowerCaseSearchTerm) ||
-          shortName.includes(lowerCaseSearchTerm)
-        );
-      })
-      .map((node: Protobuf.Mesh.NodeInfo) => ({
-        ...node,
-        unreadCount: directUnread(node.num),
-      }))
-      .sort((a: NodeInfoWithUnread, b: NodeInfoWithUnread) => {
-        const diff = b.unreadCount - a.unreadCount;
-        if (diff !== 0) {
-          return diff;
-        }
-        return Number(b.isFavorite) - Number(a.isFavorite);
-      });
-  }, [deferredSearch, allNodes, directUnread]);
-
-  const sendText = useCallback(
-    async (message: string) => {
-      if (!meshClient) {
-        console.warn("[MessagesPage] no active mesh client; send dropped");
-        return;
-      }
-      const destination: Types.Destination = isDirect
-        ? numericChatId
-        : "broadcast";
-      const channel = isDirect ? Types.ChannelNumber.Primary : numericChatId;
-      const result = await meshClient.chat.send({
-        text: message,
-        destination,
-        channel,
-      });
-      if (result.status === "error") {
-        console.error("Failed to send message:", result.error);
-      }
-      // Outbound state (Ack / Failed) is updated by the SDK chat slice when the
-      // routing packet for this message id arrives.
-    },
-    [meshClient, numericChatId, isDirect],
+  const recent = useMemo(
+    () =>
+      recentlyHeard(
+        directory.rows.map((row) => ({
+          num: row.num,
+          isSelf: row.isSelf,
+          name: row.name,
+          initials: row.initials,
+          ...(row.lastHeardMs === undefined
+            ? {}
+            : { lastHeardMs: row.lastHeardMs }),
+        })),
+        RECENT_NODES,
+      ).map(({ num, name, initials }) => ({ num, name, initials })),
+    [directory.rows],
   );
 
-  const broadcastMessages = useChatAsLegacyMessages({
-    type: MessageType.Broadcast,
-    channelId: numericChatId,
-  });
-  const directMessages = useChatAsLegacyMessages({
-    type: MessageType.Direct,
-    peer: numericChatId,
-  });
-
-  const renderChatContent = () => {
-    switch (chatType) {
-      case MessageType.Broadcast:
-        return <ChannelChat messages={[...broadcastMessages].reverse()} />;
-      case MessageType.Direct:
-        return <ChannelChat messages={[...directMessages].reverse()} />;
-      default:
-        return <SelectMessageChat />;
-    }
-  };
-
-  const channelSection = useMemo(
-    () => (
-      <SidebarSection label={t("navigation.channels")} className="py-2 px-0">
-        {filteredChannels?.map((channel) => (
-          <SidebarButton
-            key={channel.index}
-            count={channelUnread(channel.index)}
-            label={
-              channel.settings?.name ||
-              (channel.index === 0
-                ? t("page.broadcastLabel", { ns: "channels" })
-                : t("page.channelLabel", {
-                    index: channel.index,
-                    ns: "channels",
-                  }))
-            }
-            active={
-              numericChatId === channel.index &&
-              chatType === MessageType.Broadcast
-            }
-            onClick={() =>
-              navigateToChat(MessageType.Broadcast, channel.index.toString())
-            }
-          >
-            <HashIcon size={16} className="mr-2" />
-          </SidebarButton>
-        ))}
-      </SidebarSection>
-    ),
-    [
-      filteredChannels,
-      numericChatId,
-      chatType,
-      channelUnread,
-      navigateToChat,
-      t,
-    ],
+  const newDmDialog = (
+    <NewDirectMessageDialog
+      open={newDmOpen}
+      onOpenChange={setNewDmOpen}
+      candidates={candidates}
+      onSelect={(num) => {
+        setNewDmOpen(false);
+        void navigate({
+          to: "/messages/$type/$chatId",
+          params: { type: "direct", chatId: num },
+        });
+      }}
+    />
   );
 
-  const directMessageSection = (
-    <SidebarSection
-      label={t("shell.directMessages", { ns: "ui" })}
-      className="px-0 py-2 flex flex-col"
-    >
-      <label className="p-2 block" htmlFor="nodeSearch">
-        <Input
-          type="text"
-          name="nodeSearch"
-          placeholder={t("search.nodes")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          showClearButton={!!searchTerm}
+  const sidebar = isMobile ? undefined : (
+    <ConversationSidebar
+      layout="sections"
+      channels={sections.channels}
+      direct={sections.direct}
+      filter={filter === "channels" ? "all" : filter}
+      onFilterChange={setFilter}
+      onOpenSearch={openSearch}
+      shortcut={shortcut}
+      onNewDirectMessage={openNewDm}
+      onAddChannel={() => void navigate({ to: "/settings/channels" })}
+      {...(selectedId ? { selectedId } : {})}
+    />
+  );
+  const sidebarFooter = isMobile ? undefined : <DeviceCard />;
+
+  if (conversation) {
+    return (
+      <>
+        <ConversationScreen
+          conversation={conversation}
+          directory={directory}
+          sidebar={sidebar}
+          sidebarFooter={sidebarFooter}
+          touch={isMobile}
         />
-      </label>
-      <div
-        className="flex flex-col gap-2.5 pt-1"
-        style={{ contentVisibility: "auto", containIntrinsicSize: "100px" }}
+        {newDmDialog}
+      </>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <ShellPage
+        label={t("sidebar.chatsTitle")}
+        noPadding
+        trailing={
+          <IconButton
+            aria-label={t("sidebar.newDm")}
+            size="touch"
+            icon={<PencilLineIcon className="size-5" />}
+            onClick={openNewDm}
+          />
+        }
       >
-        {filteredNodes()?.map((node) => (
-          <SidebarButton
-            key={node.num}
-            label={node.user?.longName ?? t("unknown.shortName")}
-            count={node.unreadCount > 0 ? node.unreadCount : undefined}
-            active={
-              numericChatId === node.num && chatType === MessageType.Direct
-            }
-            onClick={() =>
-              navigateToChat(MessageType.Direct, node.num.toString())
-            }
-          >
-            <Avatar
-              nodeNum={node.num}
-              showError={hasNodeError(node.num)}
-              showFavorite={node.isFavorite}
-              size="sm"
-            />
-          </SidebarButton>
-        ))}
-      </div>
-    </SidebarSection>
-  );
+        <ConversationSidebar
+          layout="mixed"
+          rows={mobileRows}
+          filter={filter}
+          onFilterChange={setFilter}
+          onOpenSearch={openSearch}
+          shortcut={shortcut}
+        />
+        {newDmDialog}
+      </ShellPage>
+    );
+  }
 
   return (
     <ShellPage
-      label={`${t("page.title", {
-        interpolation: { escapeValue: false },
-        chatName:
-          isBroadcast && currentChannel
-            ? getChannelName(currentChannel)
-            : isDirect && otherNode
-              ? (otherNode.user?.longName ?? t("unknown.longName"))
-              : t("emptyState.title"),
-      })} 
-      `}
-      sidebarLabel={t("navigation.messages", { ns: "ui" })}
-      sidebar={
-        <>
-          {channelSection}
-          {directMessageSection}
-        </>
-      }
-      sidebarFooter={<DeviceCard />}
-      actions={
-        isDirect && otherNode
-          ? [
-              {
-                key: "encryption",
-                ariaLabel: otherNode.user?.publicKey?.length
-                  ? t("toast.messages.pkiEncryption.title")
-                  : t("toast.messages.pskEncryption.title"),
-                icon: otherNode.user?.publicKey?.length
-                  ? LockIcon
-                  : LockOpenIcon,
-                iconClasses: otherNode.user?.publicKey?.length
-                  ? "text-green-600"
-                  : "text-yellow-300",
-                onClick() {
-                  toast({
-                    title: otherNode.user?.publicKey?.length
-                      ? t("toast.messages.pkiEncryption.title")
-                      : t("toast.messages.pskEncryption.title"),
-                  });
-                },
-              },
-            ]
-          : []
-      }
+      label={t("sidebar.title")}
+      hideLabel
+      noPadding
+      sidebar={sidebar}
+      sidebarLabel={t("sidebar.title")}
+      sidebarFooter={sidebarFooter}
     >
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {renderChatContent()}
-
-        <div className="flex-none dark:bg-slate-900 p-2">
-          {isBroadcast || isDirect ? (
-            <MessageInput
-              conversation={
-                isDirect
-                  ? { kind: "direct", peer: numericChatId }
-                  : { kind: "channel", channel: numericChatId }
-              }
-              onSend={sendText}
-              maxBytes={200}
-            />
-          ) : (
-            <div className="p-4 text-center text-slate-400 italic">
-              {t("sendMessage.sendButton", { ns: "messages" })}
-            </div>
-          )}
-        </div>
-      </div>
+      <ChatsEmptyState
+        shortcut={shortcut}
+        recent={recent}
+        onNewDirectMessage={openNewDm}
+        onOpenSearch={openSearch}
+      />
+      {newDmDialog}
     </ShellPage>
   );
 };

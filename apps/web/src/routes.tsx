@@ -34,8 +34,8 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   loader: () => {
-    // Redirect to the broadcast messages page on initial load
-    return redirect({ to: "/messages/broadcast/0", replace: true });
+    // Messages is the home screen; with nothing selected it shows the Chats list.
+    return redirect({ to: "/messages", replace: true });
   },
 });
 
@@ -43,22 +43,14 @@ const messagesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages",
   component: MessagesPage,
-  beforeLoad: ({ params }) => {
-    const DEFAULT_CHANNEL = 0;
-
-    if (Object.values(params).length === 0) {
-      throw redirect({
-        to: `/messages/broadcast/${DEFAULT_CHANNEL}`,
-        replace: true,
-      });
-    }
-  },
 });
 
 export const messagesWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages/$type/$chatId",
   component: MessagesPage,
+  // A conversation is a full screen on mobile, so the tab bar steps aside.
+  staticData: { hideTabBar: true },
   parseParams: (params) => ({
     type: z
       .enum(["direct", "broadcast"])

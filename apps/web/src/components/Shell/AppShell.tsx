@@ -1,12 +1,12 @@
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { useTotalUnread } from "@core/kmp/hooks";
 import { useAppStore } from "@core/stores";
 import { useLocation, useMatches } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { AppRail } from "./AppRail.tsx";
 import { BottomTabBar } from "./BottomTabBar.tsx";
 import { remoteNodeCount, shouldHideTabBar } from "./navItems.ts";
+import { useRailUnread } from "./railUnread.ts";
 import { useDeviceSummary } from "./useDeviceSummary.ts";
 
 /**
@@ -17,7 +17,8 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
   const isMobile = useIsMobile();
   const pathname = useLocation({ select: (location) => location.pathname });
   const hideTabBar = useMatches({ select: shouldHideTabBar });
-  const unreadCount = useTotalUnread();
+  // Muted channels don't count toward the badge.
+  const unreadCount = useRailUnread();
   const nodeCount = remoteNodeCount(useNodesAsProto().length);
   const device = useDeviceSummary();
   const setCommandPaletteOpen = useAppStore((s) => s.setCommandPaletteOpen);

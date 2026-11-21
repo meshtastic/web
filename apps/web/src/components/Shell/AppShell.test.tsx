@@ -48,8 +48,8 @@ vi.mock("@core/hooks/useNodesAsProto.ts", () => ({
   useNodesAsProto: () => [{ num: 1 }, { num: 2 }, { num: 3 }],
 }));
 
-vi.mock("@core/kmp/hooks", () => ({
-  useTotalUnread: () => 4,
+vi.mock("./railUnread.ts", () => ({
+  useRailUnread: () => 4,
 }));
 
 vi.mock("@core/stores", () => ({
