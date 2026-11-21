@@ -1,8 +1,11 @@
 import { MessageState } from "@core/storage/types.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { describe, expect, it } from "vitest";
+import { NOW, makeRow } from "@core/nodes/testNodes.ts";
+import { DEFAULT_CHANNEL_HEARD_SORT } from "@core/nodes/nodeSort.ts";
 import {
   channelEncryption,
+  channelHeardRows,
   isPrivatelyEncrypted,
   recentlyHeard,
   recentlyHeardOn,
@@ -217,6 +220,46 @@ describe("channelInfo", () => {
   it("lists the most recently heard nodes overall", () => {
     expect(recentlyHeard(nodes, 3).map((n) => n.num)).toEqual([4, 3, 2]);
     expect(recentlyHeard(nodes, 0)).toEqual([]);
+  });
+
+  describe("channelHeardRows", () => {
+    const rows = [
+      makeRow({ num: 1, longName: "zulu", heardSecondsAgo: 30, hopsAway: 3 }),
+      makeRow({
+        num: 2,
+        longName: "alpha",
+        heardSecondsAgo: 600,
+        hopsAway: 0,
+        isFavorite: true,
+      }),
+      makeRow({ num: 3, longName: "mike", heardSecondsAgo: 60, hopsAway: 1 }),
+      // Outside the two-hour window.
+      makeRow({ num: 4, longName: "bravo", heardSecondsAgo: 3 * 3600 }),
+      // Heard on another channel.
+      makeRow({ num: 5, longName: "charlie", heardSecondsAgo: 10 }),
+    ];
+    const channelOf = (num: number) => (num === 5 ? 1 : undefined);
+    const heard = (sort: Parameters<typeof channelHeardRows>[4]) =>
+      channelHeardRows(rows, channelOf, 0, NOW, sort).map((row) => row.num);
+
+    it("keeps the window and channel, most recent first by default", () => {
+      expect(heard(DEFAULT_CHANNEL_HEARD_SORT)).toEqual([1, 3, 2]);
+    });
+
+    it("puts favorites first, then last heard", () => {
+      expect(
+        heard({ ...DEFAULT_CHANNEL_HEARD_SORT, favoritesFirst: true }),
+      ).toEqual([2, 1, 3]);
+    });
+
+    it("sorts by name or hops", () => {
+      expect(
+        heard({ key: "name", direction: "asc", favoritesFirst: false }),
+      ).toEqual([2, 3, 1]);
+      expect(
+        heard({ key: "hops", direction: "asc", favoritesFirst: false }),
+      ).toEqual([2, 3, 1]);
+    });
   });
 });
 

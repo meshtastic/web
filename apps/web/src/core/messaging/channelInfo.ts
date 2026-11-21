@@ -1,3 +1,10 @@
+import type { NodeRow } from "@core/nodes/nodeRow.ts";
+import {
+  type ChannelHeardSortKey,
+  type NodeListSort,
+  sortNodeRows,
+} from "@core/nodes/nodeSort.ts";
+
 /**
  * What the channel header and details panel say about a channel: its
  * encryption (from the PSK length) and which nodes were heard on it.
@@ -72,3 +79,36 @@ export const recentlyHeard = <T extends HeardNode>(
     .filter((node) => !node.isSelf && node.lastHeardMs !== undefined)
     .sort((a, b) => (b.lastHeardMs ?? 0) - (a.lastHeardMs ?? 0))
     .slice(0, Math.max(0, limit));
+
+/**
+ * The channel panel's "Recently heard" rows: nodes heard on `channel` within
+ * the window, in the list's chosen sort.
+ */
+export const channelHeardRows = (
+  rows: readonly NodeRow[],
+  channelOf: (nodeNum: number) => number | undefined,
+  channel: number,
+  now: number,
+  sort: NodeListSort<ChannelHeardSortKey>,
+  collator?: Intl.Collator,
+  windowMs: number = RECENTLY_HEARD_WINDOW_MS,
+): NodeRow[] => {
+  const heard = recentlyHeardOn(
+    rows.map((row) => {
+      const rowChannel = channelOf(row.num);
+      return {
+        row,
+        num: row.num,
+        isSelf: row.isSelf,
+        ...(row.lastHeardMs === undefined
+          ? {}
+          : { lastHeardMs: row.lastHeardMs }),
+        ...(rowChannel === undefined ? {} : { channel: rowChannel }),
+      };
+    }),
+    channel,
+    now,
+    windowMs,
+  ).map(({ row }) => row);
+  return sortNodeRows(heard, sort, collator);
+};

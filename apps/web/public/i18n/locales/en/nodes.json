@@ -38,6 +38,7 @@
     "filtersLabel": "Filter nodes",
     "sortLabel": "Sort nodes",
     "sortBy": "Sort: {{column}}",
+    "favoritesFirst": "Favorites first",
     "tableLabel": "Known nodes",
     "noMatches": "No nodes match",
     "noMatchesDescription": "Try another search or filter.",
@@ -57,6 +58,7 @@
   },
   "column": {
     "node": "Node",
+    "name": "Name",
     "role": "Role",
     "hardware": "Hardware",
     "hops": "Hops",

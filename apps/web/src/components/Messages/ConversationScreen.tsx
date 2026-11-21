@@ -1,3 +1,4 @@
+import { useCollator } from "@components/Nodes/useCollator.ts";
 import { useNodeActions } from "@components/Nodes/useNodeActions.ts";
 import { useNodeLabels } from "@components/Nodes/useNodeLabels.ts";
 import {
@@ -14,8 +15,8 @@ import useLocalStorage from "@core/hooks/useLocalStorage.ts";
 import { useActiveClient, useChannel } from "@core/kmp/hooks";
 import {
   channelEncryption,
+  channelHeardRows,
   isPrivatelyEncrypted,
-  recentlyHeardOn,
 } from "@core/messaging/channelInfo.ts";
 import { traceroutesForPeer } from "@core/messaging/tracerouteView.ts";
 import { formatLastHeard } from "@core/nodes/format.ts";
@@ -25,7 +26,7 @@ import {
   type ConversationKey,
   conversationKeyString,
 } from "@core/storage/types.ts";
-import { useDevice } from "@core/stores";
+import { useAppStore, useDevice } from "@core/stores";
 import { formatNodeId } from "@core/utils/nodeIdentity.ts";
 import type { LoRaSignalSettings } from "@core/utils/signalQuality.ts";
 import { useNavigate } from "@tanstack/react-router";
@@ -84,6 +85,9 @@ export const ConversationScreen = ({
   const channel = useChannel(channelIndex);
   const peerRow = peer === undefined ? undefined : directory.byNum.get(peer);
   const nodeLabels = useNodeLabels(directory.now);
+  const collator = useCollator();
+  const heardSort = useAppStore((state) => state.nodeListSorts.channelHeard);
+  const setNodeListSort = useAppStore((state) => state.setNodeListSort);
   // Same definition as the Nodes screen's "known" count: this radio excluded.
   const knownNodes = useMemo(
     () => knownNodeCount(directory.rows),
@@ -167,29 +171,24 @@ export const ConversationScreen = ({
     if (isDm) {
       return [];
     }
-    const nodes = directory.rows.map((row) => ({
-      row,
+    return channelHeardRows(
+      directory.rows,
+      directory.channelOf,
+      channelIndex,
+      directory.now,
+      heardSort,
+      collator,
+    ).map((row) => ({
       num: row.num,
-      isSelf: row.isSelf,
-      ...(row.lastHeardMs === undefined
-        ? {}
-        : { lastHeardMs: row.lastHeardMs }),
-      ...(directory.channelOf(row.num) === undefined
-        ? {}
-        : { channel: directory.channelOf(row.num) }),
-    }));
-    return recentlyHeardOn(nodes, channelIndex, directory.now).map(
-      ({ row }) => ({
-        num: row.num,
-        name: row.name,
-        initials: row.initials,
-        meta: t("channelDetails.heardMeta", {
-          hops: nodeLabels.hops(row),
-          time: nodeLabels.lastHeard(row),
-        }),
+      name: row.name,
+      initials: row.initials,
+      isFavorite: row.isFavorite,
+      meta: t("channelDetails.heardMeta", {
+        hops: nodeLabels.hops(row),
+        time: nodeLabels.lastHeard(row),
       }),
-    );
-  }, [isDm, directory, channelIndex, nodeLabels, t]);
+    }));
+  }, [isDm, directory, channelIndex, heardSort, collator, nodeLabels, t]);
 
   const details = isDm ? (
     <DirectDetailsPanel
@@ -206,6 +205,8 @@ export const ConversationScreen = ({
       encryption={encryption}
       muted={muted}
       heard={heard}
+      heardSort={heardSort}
+      onHeardSortChange={(sort) => setNodeListSort("channelHeard", sort)}
       totalNodes={knownNodes}
       onShareQr={() => setDialogOpen("QR", true)}
       onOpenNode={(num) =>

@@ -193,3 +193,119 @@ describe("AppStore – persistence: partialize + rehydrate", () => {
     }
   });
 });
+
+const IDB_KEY = "meshtastic-app-store";
+
+const seed = (state: unknown, version: number) => {
+  idbMem.set(IDB_KEY, JSON.stringify({ state, version }));
+};
+
+async function hydratedStore(persistApp: boolean) {
+  const mod = await freshStore(persistApp);
+  await vi.waitFor(() => {
+    expect(mod.useAppStore.persist.hasHydrated()).toBe(true);
+  });
+  return mod;
+}
+
+describe("AppStore – node list sorts", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("starts every list at its default", async () => {
+    const { useAppStore } = await hydratedStore(false);
+    expect(useAppStore.getState().nodeListSorts).toEqual({
+      nodes: { key: "lastHeard", direction: "desc", favoritesFirst: false },
+      channelHeard: {
+        key: "lastHeard",
+        direction: "desc",
+        favoritesFirst: false,
+      },
+    });
+  });
+
+  it("keeps each list's sort separately across reloads, even with persistApp off", async () => {
+    {
+      const { useAppStore } = await hydratedStore(false);
+      useAppStore.getState().setNodeListSort("nodes", {
+        key: "snr",
+        direction: "asc",
+        favoritesFirst: false,
+      });
+      useAppStore.getState().setNodeListSort("channelHeard", {
+        key: "lastHeard",
+        direction: "desc",
+        favoritesFirst: true,
+      });
+    }
+    {
+      const { useAppStore } = await hydratedStore(false);
+      expect(useAppStore.getState().nodeListSorts).toEqual({
+        nodes: { key: "snr", direction: "asc", favoritesFirst: false },
+        channelHeard: {
+          key: "lastHeard",
+          direction: "desc",
+          favoritesFirst: true,
+        },
+      });
+    }
+  });
+
+  it("migrates a version 0 store: raster sources kept, sorts defaulted", async () => {
+    seed({ rasterSources: [makeRaster({ title: "old" })] }, 0);
+    const { useAppStore, CURRENT_STORE_VERSION } = await hydratedStore(true);
+    expect(CURRENT_STORE_VERSION).toBe(1);
+    const state = useAppStore.getState();
+    expect(state.rasterSources.map((raster) => raster.title)).toEqual(["old"]);
+    expect(state.nodeListSorts.nodes.key).toBe("lastHeard");
+    expect(state.nodeListSorts.channelHeard.favoritesFirst).toBe(false);
+  });
+
+  it("falls back to the default for an invalid stored sort, list by list", async () => {
+    seed(
+      {
+        nodeListSorts: {
+          nodes: { key: "rssi", direction: "asc", favoritesFirst: true },
+          channelHeard: { key: "hops", direction: "asc", favoritesFirst: true },
+        },
+      },
+      1,
+    );
+    const { useAppStore } = await hydratedStore(false);
+    expect(useAppStore.getState().nodeListSorts).toEqual({
+      nodes: { key: "lastHeard", direction: "desc", favoritesFirst: false },
+      channelHeard: { key: "hops", direction: "asc", favoritesFirst: true },
+    });
+  });
+
+  it("ignores stored raster sources while persistApp is off", async () => {
+    seed({ rasterSources: [makeRaster({ title: "stale" })] }, 1);
+    const { useAppStore } = await hydratedStore(false);
+    expect(useAppStore.getState().rasterSources).toEqual([]);
+  });
+});
+
+describe("migrateAppData", () => {
+  it("defaults the sorts from version 0 and drops malformed raster sources", async () => {
+    const { migrateAppData } = await freshStore(false);
+    expect(
+      migrateAppData(
+        { rasterSources: [makeRaster({ title: "ok" }), { title: 3 }] },
+        0,
+      ),
+    ).toEqual({
+      nodeListSorts: {
+        nodes: { key: "lastHeard", direction: "desc", favoritesFirst: false },
+        channelHeard: {
+          key: "lastHeard",
+          direction: "desc",
+          favoritesFirst: false,
+        },
+      },
+      rasterSources: [makeRaster({ title: "ok" })],
+    });
+    expect(migrateAppData(null, 0)).toEqual({});
+  });
+});

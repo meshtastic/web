@@ -2,14 +2,38 @@ import { NodeDetailsPanel } from "@components/Nodes/NodeDetailsPanel.tsx";
 import type { NodeActions } from "@components/Nodes/useNodeActions.ts";
 import type { NodeLabels } from "@components/Nodes/useNodeLabels.ts";
 import { Button } from "@components/UI/Button.tsx";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@components/UI/DropdownMenu.tsx";
 import { IconButton } from "@components/UI/IconButton.tsx";
 import { KeyValue, KeyValueList } from "@components/UI/KeyValue.tsx";
 import { NodeAvatar } from "@components/UI/NodeAvatar.tsx";
 import { SectionHeader } from "@components/UI/SectionHeader.tsx";
 import type { ChannelEncryption } from "@core/messaging/channelInfo.ts";
 import type { NodeRow } from "@core/nodes/nodeRow.ts";
+import {
+  CHANNEL_HEARD_SORT_KEYS,
+  type ChannelHeardSortKey,
+  isChannelHeardSortKey,
+  NODE_SORT_INITIAL_DIRECTION,
+  type NodeListSort,
+} from "@core/nodes/nodeSort.ts";
 import { Link } from "@tanstack/react-router";
-import { QrCodeIcon, SettingsIcon, XIcon } from "lucide-react";
+import {
+  ArrowDownUpIcon,
+  ChevronDownIcon,
+  QrCodeIcon,
+  SettingsIcon,
+  StarIcon,
+  XIcon,
+} from "lucide-react";
 import { type ReactNode, useId } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -51,15 +75,89 @@ export interface HeardNodeView {
   readonly num: number;
   readonly name: string;
   readonly initials: string;
+  readonly isFavorite: boolean;
   /** "2 hops · 3m". */
   readonly meta: string;
 }
+
+type ChannelHeardSort = NodeListSort<ChannelHeardSortKey>;
+
+interface HeardSortMenuProps {
+  sort: ChannelHeardSort;
+  onSortChange: (sort: ChannelHeardSort) => void;
+}
+
+/**
+ * Compact sort control for the narrow "Recently heard" header: the column
+ * as a radio group and "Favorites first" as a modifier in front of it.
+ */
+const HeardSortMenu = ({ sort, onSortChange }: HeardSortMenuProps) => {
+  const { t } = useTranslation("messages");
+  const column = t(`column.${sort.key}`, { ns: "nodes" });
+  const summary = sort.favoritesFirst
+    ? t("channelDetails.sortFavoritesThen", { column })
+    : column;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={t("channelDetails.sortCurrent", { sort: summary })}
+        className="inline-flex h-7 max-w-[60%] min-w-0 shrink cursor-pointer items-center gap-1 rounded-md px-1.5 text-meta font-medium text-muted pointer-coarse:touch-target hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus data-[state=open]:bg-raised data-[state=open]:text-primary"
+      >
+        {sort.favoritesFirst ? (
+          <StarIcon
+            aria-hidden="true"
+            className="size-3.5 shrink-0 fill-current text-accent"
+          />
+        ) : (
+          <ArrowDownUpIcon aria-hidden="true" className="size-3.5 shrink-0" />
+        )}
+        <span className="truncate">{column}</span>
+        <ChevronDownIcon aria-hidden="true" className="size-3.5 shrink-0" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-48">
+        <DropdownMenuLabel>{t("channelDetails.sortBy")}</DropdownMenuLabel>
+        <DropdownMenuRadioGroup
+          value={sort.key}
+          onValueChange={(value) => {
+            if (isChannelHeardSortKey(value)) {
+              onSortChange({
+                key: value,
+                direction: NODE_SORT_INITIAL_DIRECTION[value],
+                favoritesFirst: sort.favoritesFirst,
+              });
+            }
+          }}
+        >
+          {CHANNEL_HEARD_SORT_KEYS.map((key) => (
+            <DropdownMenuRadioItem key={key} value={key}>
+              {t(`column.${key}`, { ns: "nodes" })}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuCheckboxItem
+          checked={sort.favoritesFirst}
+          onCheckedChange={(checked) =>
+            onSortChange({ ...sort, favoritesFirst: checked })
+          }
+          // Stay open so the column can be picked next.
+          onSelect={(event) => event.preventDefault()}
+        >
+          {t("page.favoritesFirst", { ns: "nodes" })}
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 export interface ChannelDetailsPanelProps {
   primary: boolean;
   encryption: ChannelEncryption;
   muted: boolean;
   heard: readonly HeardNodeView[];
+  /** How `heard` is ordered; the list arrives already sorted. */
+  heardSort: ChannelHeardSort;
+  onHeardSortChange: (sort: ChannelHeardSort) => void;
   /** Every node this radio knows, for "View all N nodes". */
   totalNodes: number;
   onShareQr: () => void;
@@ -76,6 +174,8 @@ export const ChannelDetailsPanel = ({
   encryption,
   muted,
   heard,
+  heardSort,
+  onHeardSortChange,
   totalNodes,
   onShareQr,
   onOpenNode,
@@ -130,17 +230,22 @@ export const ChannelDetailsPanel = ({
         aria-labelledby={heardId}
         className="flex min-h-0 flex-1 flex-col"
       >
-        <SectionHeader
-          id={heardId}
-          as="h3"
-          title={t("channelDetails.recentlyHeard")}
-          className="px-4 pt-3.5 pb-1.5"
-          action={
-            <span className="text-meta text-muted">
-              {t("channelDetails.window")}
-            </span>
-          }
-        />
+        <div className="px-4 pt-3.5 pb-1.5">
+          <SectionHeader
+            id={heardId}
+            as="h3"
+            title={t("channelDetails.recentlyHeard")}
+            action={
+              <HeardSortMenu
+                sort={heardSort}
+                onSortChange={onHeardSortChange}
+              />
+            }
+          />
+          <p className="m-0 text-meta text-muted">
+            {t("channelDetails.window")}
+          </p>
+        </div>
         {heard.length === 0 ? (
           <p className="m-0 px-4 py-2 text-help text-muted">
             {t("channelDetails.noneHeard")}
@@ -151,7 +256,15 @@ export const ChannelDetailsPanel = ({
               <li key={node.num}>
                 <button
                   type="button"
-                  aria-label={`${t("channelDetails.messageNode", { name: node.name })}, ${node.meta}`}
+                  aria-label={[
+                    t("channelDetails.messageNode", { name: node.name }),
+                    node.isFavorite
+                      ? t("value.favorite", { ns: "nodes" })
+                      : undefined,
+                    node.meta,
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
                   onClick={() => onOpenNode(node.num)}
                   className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg p-2 text-left hover:bg-raised focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
                 >
@@ -159,10 +272,22 @@ export const ChannelDetailsPanel = ({
                     initials={node.initials}
                     tone={{ kind: "node", nodeNum: node.num }}
                     size="xs"
-                  />
-                  <span className="min-w-0 flex-1 truncate">{node.name}</span>
-                  <span className="text-meta whitespace-nowrap text-muted">
-                    {node.meta}
+                  >
+                    {node.isFavorite ? (
+                      <span className="absolute -top-1 -right-1 flex size-3.5 items-center justify-center rounded-full bg-surface text-warning">
+                        <StarIcon
+                          aria-hidden="true"
+                          className="size-2.5 fill-current"
+                        />
+                      </span>
+                    ) : null}
+                  </NodeAvatar>
+                  {/* Name over meta, so a long meta can't squeeze the name. */}
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate">{node.name}</span>
+                    <span className="truncate text-meta text-muted">
+                      {node.meta}
+                    </span>
                   </span>
                 </button>
               </li>

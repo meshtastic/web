@@ -1,4 +1,5 @@
 import { FilterChip } from "@components/UI/FilterChip.tsx";
+import { IconButton } from "@components/UI/IconButton.tsx";
 import { SearchField } from "@components/UI/SearchField.tsx";
 import {
   Select,
@@ -17,6 +18,7 @@ import {
   type NodeSortKey,
 } from "@core/nodes/nodeSort.ts";
 import { cn } from "@core/utils/cn.ts";
+import { StarIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -29,6 +31,9 @@ export interface NodeFilterBarProps {
   counts?: Readonly<Record<NodeQuickFilter, number>>;
   sortKey: NodeSortKey;
   onSortKeyChange: (key: NodeSortKey) => void;
+  /** Favourites lead the list, each group in the chosen sort. */
+  favoritesFirst: boolean;
+  onFavoritesFirstChange: (favoritesFirst: boolean) => void;
   /** The advanced filter popover trigger. */
   moreFilters?: ReactNode;
   className?: string;
@@ -46,6 +51,8 @@ export const NodeFilterBar = ({
   counts,
   sortKey,
   onSortKeyChange,
+  favoritesFirst,
+  onFavoritesFirstChange,
   moreFilters,
   className,
 }: NodeFilterBarProps) => {
@@ -96,6 +103,22 @@ export const NodeFilterBar = ({
             ))}
           </SelectContent>
         </Select>
+        <IconButton
+          aria-label={t("page.favoritesFirst")}
+          title={t("page.favoritesFirst")}
+          aria-pressed={favoritesFirst}
+          onClick={() => onFavoritesFirstChange(!favoritesFirst)}
+          icon={
+            <StarIcon
+              className={cn("size-4", favoritesFirst && "fill-current")}
+            />
+          }
+          className={cn(
+            "border border-control bg-app text-muted hover:bg-raised hover:text-primary",
+            favoritesFirst &&
+              "border-accent bg-accent-tint text-accent hover:bg-accent-tint hover:text-accent",
+          )}
+        />
         {moreFilters}
       </div>
     </div>

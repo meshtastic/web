@@ -1,4 +1,6 @@
+import { DEFAULT_NODE_LIST_SORT } from "@core/nodes/nodeSort.ts";
 import { makeNode, makeRow, NOW } from "@core/nodes/testNodes.ts";
+import { useAppStore } from "@core/stores";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -95,6 +97,23 @@ describe("Nodes page", () => {
     env.mobile = false;
     env.wide = true;
     localStorage.clear();
+    // The sort is an app preference; start each test from the default.
+    useAppStore.getState().setNodeListSort("nodes", DEFAULT_NODE_LIST_SORT);
+  });
+
+  it("puts favorites first, keeps them there on a header sort, and remembers it", async () => {
+    const user = userEvent.setup();
+    render(<NodesPage />);
+    await user.click(screen.getByRole("button", { name: "Favorites first" }));
+    expect(rowNames()).toEqual(["Alpha Base", "Bravo Hill", "Charlie Relay"]);
+    await user.click(screen.getByRole("button", { name: "Node" }));
+    await user.click(screen.getByRole("button", { name: "Node" }));
+    expect(rowNames()).toEqual(["Alpha Base", "Charlie Relay", "Bravo Hill"]);
+    expect(useAppStore.getState().nodeListSorts.nodes).toEqual({
+      key: "name",
+      direction: "desc",
+      favoritesFirst: true,
+    });
   });
 
   it("summarises the mesh and lists nodes, most recently heard first", () => {
@@ -117,9 +136,13 @@ describe("Nodes page", () => {
   it("filters with chips and search, and offers to clear when nothing matches", async () => {
     const user = userEvent.setup();
     render(<NodesPage />);
-    await user.click(screen.getByRole("button", { name: /Favorites/u }));
+    await user.click(
+      screen.getByRole("button", { name: /^Favorites( \d+)?$/u }),
+    );
     expect(rowNames()).toEqual(["Alpha Base"]);
-    await user.click(screen.getByRole("button", { name: /Favorites/u }));
+    await user.click(
+      screen.getByRole("button", { name: /^Favorites( \d+)?$/u }),
+    );
     await user.type(
       screen.getByRole("searchbox", { name: "Search nodes" }),
       "chrl",

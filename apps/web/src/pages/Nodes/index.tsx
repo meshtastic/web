@@ -30,12 +30,12 @@ import {
 } from "@core/nodes/nodeFilters.ts";
 import { summarizeNodes } from "@core/nodes/nodeRow.ts";
 import {
-  DEFAULT_NODE_SORT,
   NODE_SORT_INITIAL_DIRECTION,
-  type NodeSortKey,
+  type NodeListSort,
   sortNodeRows,
 } from "@core/nodes/nodeSort.ts";
-import { nextSortState, type SortState } from "@core/nodes/sort.ts";
+import { nextSortState } from "@core/nodes/sort.ts";
+import { useAppStore } from "@core/stores";
 import { useNavigate } from "@tanstack/react-router";
 import { FunnelIcon, InfoIcon, UsersIcon } from "lucide-react";
 import {
@@ -63,7 +63,13 @@ const NodesPage = (): JSX.Element => {
   );
   const [search, setSearch] = useState("");
   const [quickFilter, setQuickFilter] = useState<NodeQuickFilter>("all");
-  const [sort, setSort] = useState<SortState<NodeSortKey>>(DEFAULT_NODE_SORT);
+  // Kept as an app preference, so the order survives reloads.
+  const sort = useAppStore((state) => state.nodeListSorts.nodes);
+  const setNodeListSort = useAppStore((state) => state.setNodeListSort);
+  const setSort = useCallback(
+    (next: NodeListSort) => setNodeListSort("nodes", next),
+    [setNodeListSort],
+  );
   const [selectedNum, setSelectedNum] = useState<number | undefined>();
   // Tablets show the details panel as a drawer; picking a row opens it.
   const [detailsRequest, setDetailsRequest] = useState(0);
@@ -225,9 +231,10 @@ const NodesPage = (): JSX.Element => {
         rows={visibleRows}
         sort={sort}
         onSort={(key) =>
-          setSort((current) =>
-            nextSortState(current, key, NODE_SORT_INITIAL_DIRECTION),
-          )
+          setSort({
+            ...nextSortState(sort, key, NODE_SORT_INITIAL_DIRECTION),
+            favoritesFirst: sort.favoritesFirst,
+          })
         }
         selectedNum={selectedNum}
         onSelect={selectNode}
@@ -283,7 +290,15 @@ const NodesPage = (): JSX.Element => {
               counts={counts}
               sortKey={sort.key}
               onSortKeyChange={(key) =>
-                setSort({ key, direction: NODE_SORT_INITIAL_DIRECTION[key] })
+                setSort({
+                  key,
+                  direction: NODE_SORT_INITIAL_DIRECTION[key],
+                  favoritesFirst: sort.favoritesFirst,
+                })
+              }
+              favoritesFirst={sort.favoritesFirst}
+              onFavoritesFirstChange={(favoritesFirst) =>
+                setSort({ ...sort, favoritesFirst })
               }
               moreFilters={moreFilters}
             />
