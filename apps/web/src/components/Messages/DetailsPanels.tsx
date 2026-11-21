@@ -172,6 +172,8 @@ const HeardSearch = ({ query, onQueryChange, onClose }: HeardSearchProps) => {
         ref={field}
         label={t("channelDetails.searchHeard")}
         containerClassName="h-9 flex-1"
+        // The close button beside it clears too; one ✕ is enough.
+        className="[&::-webkit-search-cancel-button]:appearance-none"
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
         onKeyDown={(event) => {
