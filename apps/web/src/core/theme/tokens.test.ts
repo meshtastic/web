@@ -159,9 +159,11 @@ describe("token values", () => {
 
 describe("@theme scales stay in sync with cn()", () => {
   it("type scale", () => {
-    expect(readThemeScale(indexCss, "text")).toEqual(
-      [...typeScaleNames].sort(),
-    );
+    // Tailwind's own steps may be re-sized in @theme; cn() already knows them.
+    const builtIn = new Set(["xs", "sm", "base"]);
+    expect(
+      readThemeScale(indexCss, "text").filter((name) => !builtIn.has(name)),
+    ).toEqual([...typeScaleNames].sort());
   });
 
   it("radius scale", () => {

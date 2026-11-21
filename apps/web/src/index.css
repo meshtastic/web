@@ -33,27 +33,33 @@
 
   /*
    * Type scale. Keys are distinct from Tailwind's xs..9xl steps so both work.
-   * meta 12 · help 13 · body 14 · header 15 · header-lg 16 · title 20 ·
-   * title-lg 26 · display 32 · display-lg 36 (onboarding headings).
+   * meta 13 · help 14 · body 15 · header 16 · header-lg 17 · title 22 ·
+   * title-lg 28 · display 34 · display-lg 38 (onboarding headings).
    */
-  --text-meta: 0.75rem;
-  --text-meta--line-height: 1rem;
-  --text-help: 0.8125rem;
-  --text-help--line-height: 1.125rem;
-  --text-body: 0.875rem;
-  --text-body--line-height: 1.25rem;
-  --text-header: 0.9375rem;
-  --text-header--line-height: 1.375rem;
-  --text-header-lg: 1rem;
-  --text-header-lg--line-height: 1.5rem;
-  --text-title: 1.25rem;
-  --text-title--line-height: 1.75rem;
-  --text-title-lg: 1.625rem;
-  --text-title-lg--line-height: 2rem;
-  --text-display: 2rem;
-  --text-display--line-height: 2.25rem;
-  --text-display-lg: 2.25rem;
-  --text-display-lg--line-height: 2.5rem;
+  /* One step (about 1px) above the mockups' scale, for readability. */
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.125rem;
+  --text-help: 0.875rem;
+  --text-help--line-height: 1.25rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.375rem;
+  --text-header: 1rem;
+  --text-header--line-height: 1.5rem;
+  --text-header-lg: 1.0625rem;
+  --text-header-lg--line-height: 1.625rem;
+  --text-title: 1.375rem;
+  --text-title--line-height: 1.875rem;
+  --text-title-lg: 1.75rem;
+  --text-title-lg--line-height: 2.125rem;
+  --text-display: 2.125rem;
+  --text-display--line-height: 2.375rem;
+  --text-display-lg: 2.375rem;
+  --text-display-lg--line-height: 2.625rem;
+  /* Tailwind's small steps, raised by the same step for older components. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
 
   /*
    * Radius scale. Small controls use Tailwind's stock `rounded-md` (6px) and
