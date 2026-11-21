@@ -63,7 +63,7 @@ export const UnsafeRolesDialog = ({
             onChange={() => setConfirmState(!confirmState)}
             name="confirmUnderstanding"
           >
-            <span className="dark:text-white">
+            <span className="text-primary">
               {t("unsafeRoles.confirmUnderstanding")}
             </span>
           </Checkbox>

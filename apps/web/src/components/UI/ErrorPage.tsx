@@ -29,13 +29,15 @@ export function ErrorPage({ error }: Pick<FallbackProps, "error">) {
   const stack = thrownString(error, "stack");
 
   return (
-    <article className="w-full h-screen overflow-y-auto bg-background-primary text-text-primary">
-      <section className="flex shrink md:flex-row gap-16 mt-20 px-4 md:px-8 text-lg md:text-xl space-y-2 place-items-center dark:bg-background-primary text-slate-900 dark:text-text-primary">
+    <article className="w-full h-screen overflow-y-auto bg-surface text-primary">
+      <section className="flex shrink md:flex-row gap-16 mt-20 px-4 md:px-8 text-lg md:text-xl space-y-2 place-items-center">
         <div>
-          <Heading as="h2" className="text-text-primary">
+          <Heading as="h2" className="text-primary">
             {t("errorPage.title")}
           </Heading>
-          <P>{t("errorPage.description1")}</P>
+          <P>
+            <Trans i18nKey="errorPage.description1" />
+          </P>
           <P>{t("errorPage.description2")}</P>
           <P>{t("errorPage.reportInstructions")}</P>
           <ul className="list-disc list-inside text-sm">
@@ -88,21 +90,17 @@ export function ErrorPage({ error }: Pick<FallbackProps, "error">) {
               <label htmlFor="message">
                 {t("errorPage.errorMessageLabel")}
               </label>
-              <p className="text-slate-400 break-words overflow-wrap">
-                {message}
-              </p>
+              <p className="text-muted break-words overflow-wrap">{message}</p>
             </> // TODO: Use Trans for the label and message together?
           )}
           {stack && (
             <>
               <label htmlFor="stack">{t("errorPage.stackTraceLabel")}</label>
-              <p className="text-slate-400 break-words overflow-wrap">
-                {stack}
-              </p>
+              <p className="text-muted break-words overflow-wrap">{stack}</p>
             </>
           )}
           {!message && !stack && (
-            <p className="text-slate-400">
+            <p className="text-muted">
               {t("errorPage.fallbackError", { error: String(error) })}
             </p>
           )}

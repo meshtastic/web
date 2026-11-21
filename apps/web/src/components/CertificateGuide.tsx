@@ -115,10 +115,7 @@ export function CertificateGuide({
   if (state === "trusted") {
     return (
       <p
-        className={cn(
-          "flex items-center gap-1 text-sm text-green-600 dark:text-green-400",
-          className,
-        )}
+        className={cn("flex items-center gap-1 text-sm text-accent", className)}
       >
         <CheckCircle2 className="size-4" />
         {t("certGuide.trusted")}
@@ -129,18 +126,16 @@ export function CertificateGuide({
   return (
     <div
       className={cn(
-        "space-y-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm dark:border-amber-700 dark:bg-amber-950/40",
+        "space-y-3 rounded-card border border-warning bg-warning p-3 text-sm",
         className,
       )}
     >
-      <p className="flex items-center gap-2 font-medium text-amber-800 dark:text-amber-300">
+      <p className="flex items-center gap-2 font-medium text-warning">
         <ShieldAlert className="size-4 shrink-0" />
         {uncertain ? t("certGuide.titleUncertain") : t("certGuide.title")}
       </p>
-      <p className="text-slate-600 dark:text-slate-300">
-        {t("certGuide.description")}
-      </p>
-      <ol className="list-decimal space-y-1 pl-5 text-slate-700 dark:text-slate-200">
+      <p className="text-secondary">{t("certGuide.description")}</p>
+      <ol className="list-decimal space-y-1 pl-5 text-primary">
         {steps.map((step) => (
           <li key={step}>{step}</li>
         ))}
@@ -153,15 +148,13 @@ export function CertificateGuide({
             : t("certGuide.openAgain")}
         </Button>
         {state === "waiting" && (
-          <span className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1 text-muted">
             <Loader2 className="size-4 animate-spin" />
             {t("certGuide.waiting")}
           </span>
         )}
         {state === "timedOut" && (
-          <span className="text-red-600 dark:text-red-400">
-            {t("certGuide.timedOut")}
-          </span>
+          <span className="text-danger">{t("certGuide.timedOut")}</span>
         )}
       </div>
     </div>

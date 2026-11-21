@@ -137,9 +137,7 @@ export const RebootDialog = ({ open, onOpenChange }: RebootDialogProps) => {
         ) : (
           <div className="px-2">
             <div className="pb-6 pt-2  text-center">
-              <Label className=" text-gray-700 dark:text-gray-300 ">
-                {t("reboot.scheduled")}
-              </Label>
+              <Label className="text-secondary">{t("reboot.scheduled")}</Label>
             </div>
             <Button
               variant="destructive"

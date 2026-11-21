@@ -56,11 +56,11 @@ export const LocationResponseDialog = ({
         <DialogDescription>
           {hasCoordinates ? (
             <div className="ml-5 flex">
-              <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
+              <span className="ml-4 border-l-2 border-l-control pl-2 text-primary">
                 <p>
                   {t("locationResponse.coordinates")}
                   <a
-                    className="text-blue-500 dark:text-blue-400"
+                    className="text-accent underline-offset-4 hover:text-accent-hover hover:underline"
                     href={`https://www.openstreetmap.org/?mlat=${
                       position.latitudeI ?? 0 / 1e7
                     }&mlon=${position.longitudeI ?? 0 / 1e7}&layers=N`}
@@ -82,7 +82,7 @@ export const LocationResponseDialog = ({
             </div>
           ) : (
             // Optional: Show a message if coordinates are not available
-            <p className="text-textPrimary">
+            <p className="text-primary">
               {t("locationResponse.noCoordinates")}
             </p>
           )}

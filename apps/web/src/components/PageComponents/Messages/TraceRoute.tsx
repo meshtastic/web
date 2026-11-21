@@ -30,7 +30,7 @@ const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
   return (
     <span
       id={title}
-      className="ml-4 border-l-2 pl-2 border-l-slate-900 text-slate-900 dark:text-slate-100 dark:border-l-slate-100"
+      className="ml-4 border-l-2 pl-2 border-l-input text-primary"
     >
       <p className="font-semibold">{title}</p>
       <p>{from?.user?.longName}</p>

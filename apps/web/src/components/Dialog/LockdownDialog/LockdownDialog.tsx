@@ -173,12 +173,12 @@ export const LockdownDialog = ({
         </DialogHeader>
 
         {provisioning && (
-          <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+          <p className="text-sm font-medium text-warning">
             {t("lockdown.provision.warning")}
           </p>
         )}
         {reason && (
-          <p className="text-sm text-slate-600 dark:text-slate-300">
+          <p className="text-sm text-secondary">
             {t("lockdown.reason.label", {
               reason: KNOWN_REASONS.has(reason)
                 ? t(`lockdown.reason.${reason}`)
@@ -187,7 +187,7 @@ export const LockdownDialog = ({
           </p>
         )}
         {failed && (
-          <div role="alert" className="text-sm text-red-600 dark:text-red-400">
+          <div role="alert" className="text-sm text-danger">
             <p>{t("lockdown.failed.description")}</p>
             {remaining > 0 && (
               <p>{t("lockdown.failed.backoff", { seconds: remaining })}</p>
@@ -210,7 +210,7 @@ export const LockdownDialog = ({
               showPasswordToggle
             />
             {bytes > MAX_PASSPHRASE_BYTES && (
-              <p className="text-sm text-red-600 dark:text-red-400">
+              <p className="text-sm text-danger">
                 {t("lockdown.passphrase.length")}
               </p>
             )}
@@ -231,7 +231,7 @@ export const LockdownDialog = ({
                 showPasswordToggle
               />
               {mismatch && (
-                <p className="text-sm text-red-600 dark:text-red-400">
+                <p className="text-sm text-danger">
                   {t("lockdown.passphrase.mismatch")}
                 </p>
               )}
@@ -314,7 +314,7 @@ const NumberField = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
     />
-    <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
+    <p className="text-xs text-muted">{description}</p>
   </div>
 );
 

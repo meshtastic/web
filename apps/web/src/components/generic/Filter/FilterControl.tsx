@@ -212,11 +212,11 @@ export function FilterControl({
         <button
           type="button"
           className={cn(
-            "rounded",
-            "text-slate-600 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 active:bg-slate-300",
-            "dark:text-slate-400 hover:dark:text-slate-400 dark:bg-slate-700 hover:dark:bg-slate-800 dark:active:bg-slate-950",
+            "rounded-md transition-colors",
+            "bg-raised text-secondary hover:bg-selected hover:text-primary",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
             isDirty &&
-              "text-slate-100 dark:text-slate-300 bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 hover:text-slate-200 dark:hover:text-slate-300 active:bg-green-800 dark:active:bg-green-900",
+              "bg-accent text-on-accent hover:bg-accent hover:text-on-accent hover:opacity-90",
             parameters?.popoverTriggerClassName,
           )}
           aria-label={t("filter.label")}
@@ -227,7 +227,7 @@ export function FilterControl({
       <PopoverContent
         {...parameters?.popoverContentProps}
         className={cn(
-          "dark:text-slate-300",
+          "text-primary",
           "max-md:max-h-[var(--radix-popover-content-available-height)] max-md:overflow-y-auto",
           parameters?.popoverContentProps?.className,
         )}
@@ -405,7 +405,7 @@ export function FilterControl({
           <button
             type="button"
             onClick={resetFilters}
-            className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 dark:bg-slate-900 text-white rounded text-sm hover:text-slate-100 hover:bg-slate-700 active:bg-slate-950"
+            className="w-full rounded-control bg-raised py-1.5 text-sm font-medium text-primary transition-colors hover:bg-selected focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             {t("button.reset")}
           </button>

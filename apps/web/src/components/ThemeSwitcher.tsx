@@ -27,10 +27,8 @@ export default function ThemeSwitcher({
   const { t } = useTranslation("ui");
 
   const iconBaseClass =
-    "size-4 flex-shrink-0 text-gray-500 dark:text-gray-400 transition-colors duration-150";
-  const iconHoverClass = !disableHover
-    ? "group-hover:text-gray-700 dark:group-hover:text-gray-200"
-    : "";
+    "size-4 flex-shrink-0 text-muted transition-colors duration-150";
+  const iconHoverClass = !disableHover ? "group-hover:text-primary" : "";
   const combinedIconClass = cn(iconBaseClass, iconHoverClass);
 
   const themeIcons = {
@@ -65,7 +63,7 @@ export default function ThemeSwitcher({
         "group relative flex justify-start",
         "gap-2.5 p-1.5 rounded-md transition-colors duration-150",
         "cursor-pointer",
-        !disableHover && "hover:bg-gray-100 dark:hover:bg-gray-700",
+        !disableHover && "hover:bg-raised",
         "focus:*:data-label:opacity-100",
         passedClassName,
       )}
@@ -75,8 +73,8 @@ export default function ThemeSwitcher({
         className={cn(
           "transition-opacity duration-150 hidden",
           "block absolute w-max max-w-xs",
-          "p-1 text-xs text-white dark:text-black bg-black dark:bg-white",
-          "rounded-md shadow-lg",
+          "border border-elevated bg-raised px-2 py-1 text-meta text-primary",
+          "rounded-md shadow-popover",
           "left-1/2 -translate-x-1/2 -top-8",
           showTooltip ? "visible" : "hidden opacity-0",
         )}
@@ -88,10 +86,9 @@ export default function ThemeSwitcher({
       <Subtle
         className={cn(
           "text-sm",
-          "text-gray-600 dark:text-gray-300",
+          "text-secondary",
           "transition-colors duration-150",
-          !disableHover &&
-            "group-hover:text-gray-800 dark:group-hover:text-gray-100",
+          !disableHover && "group-hover:text-primary",
         )}
       >
         {t("theme.changeTheme")}

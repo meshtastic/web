@@ -70,13 +70,13 @@ export function Slider({
     >
       <SliderPrimitive.Track
         className={cn(
-          "relative h-2 flex-1 rounded-full bg-slate-200",
+          "relative h-2 flex-1 overflow-hidden rounded-full bg-toggle-off",
           trackClassName,
         )}
       >
         <SliderPrimitive.Range
           className={cn(
-            "absolute h-full rounded-full bg-blue-500",
+            "absolute h-full rounded-full bg-accent",
             rangeClassName,
           )}
         />
@@ -85,7 +85,7 @@ export function Slider({
         <SliderPrimitive.Thumb
           key={thumbIds[idx]}
           className={cn(
-            "block w-4 h-4 rounded-full bg-white border border-slate-400 shadow-md",
+            "block w-4 h-4 rounded-full border-2 border-accent bg-toggle-knob shadow-raised transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
             thumbClassName,
           )}
           aria-label={`Thumb ${idx + 1}`}

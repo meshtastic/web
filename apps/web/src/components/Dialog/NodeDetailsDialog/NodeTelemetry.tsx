@@ -33,11 +33,11 @@ export const TelemetrySections = ({
       </p>
       {sections.map((section) => (
         <div key={section.kind} className="mt-2 first-of-type:mt-1">
-          <div className="flex items-baseline justify-between gap-2 border-b border-slate-300 dark:border-slate-600 pb-0.5 mb-1">
+          <div className="flex items-baseline justify-between gap-2 border-b border-control pb-0.5 mb-1">
             <h3 className="font-semibold">
               {t(`nodeDetails.telemetry.kind.${section.kind}`)}
             </h3>
-            <span className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-xs text-muted">
               <TimeAgo timestamp={section.time} />
             </span>
           </div>

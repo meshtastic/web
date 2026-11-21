@@ -69,24 +69,20 @@ export function Checkbox({
       />
       <div
         className={cn(
-          "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-gray-500 transition-colors",
-          "peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2",
-          { "border-slate-500 bg-slate-500": value },
+          "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-colors",
+          "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus",
+          value ? "border-accent bg-accent" : "border-input bg-app",
           { "opacity-50": disabled },
         )}
         role="presentation"
       >
         {value && (
           <div className="animate-fade-in">
-            <Check className="h-4 w-4 text-white" />
+            <Check className="h-4 w-4 text-on-accent" />
           </div>
         )}
       </div>
-      {children && (
-        <span className="text-sm text-gray-900 dark:text-gray-100">
-          {children}
-        </span>
-      )}
+      {children && <span className="text-sm text-primary">{children}</span>}
     </label>
   );
 }

@@ -41,17 +41,15 @@ import {
 import { useTranslation } from "react-i18next";
 
 /** Tonal, rounded surface shared by cards and the empty state. */
-const surfaceClasses =
-  "rounded-xl bg-slate-100 ring-1 ring-border ring-inset dark:bg-slate-800";
+const surfaceClasses = "rounded-card border border-subtle bg-inset";
 
-const primaryButtonClasses =
-  "h-auto min-h-11 gap-2 rounded-xl bg-primary px-4 text-primary-foreground hover:bg-primary/90 focus:ring-ring dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90";
+const primaryButtonClasses = "h-auto min-h-11 gap-2 px-4";
 
 const secondaryButtonClasses =
-  "h-auto min-h-11 gap-2 rounded-xl bg-background px-4 text-foreground ring-1 ring-input ring-inset hover:bg-muted focus:ring-ring dark:bg-background dark:text-foreground dark:hover:bg-muted";
+  "h-auto min-h-11 gap-2 rounded-control border border-control bg-transparent px-4 font-medium text-primary hover:bg-raised hover:opacity-100";
 
 const destructiveButtonClasses =
-  "h-auto min-h-11 gap-2 rounded-xl bg-destructive px-4 text-destructive-foreground hover:bg-destructive/90 focus:ring-ring dark:bg-destructive dark:text-destructive-foreground dark:hover:bg-destructive/90";
+  "h-auto min-h-11 gap-2 border border-danger bg-danger px-4 text-on-danger hover:border-danger-strong hover:opacity-100";
 
 export interface ConnectionsListProps {
   /** The "Add connection" button, so the drawer can return focus to it. */
@@ -148,7 +146,7 @@ export const ConnectionsList = ({ addButtonRef }: ConnectionsListProps) => {
     <div className="flex flex-col gap-4 py-1">
       {/* Toolbar: description beside the primary action once there is room. */}
       <div className="flex flex-col gap-3 @sm:flex-row @sm:items-center @sm:justify-between">
-        <p className="min-w-0 text-sm text-muted-foreground @sm:flex-1">
+        <p className="min-w-0 text-sm text-muted @sm:flex-1">
           {t("page.description")}
         </p>
         <Button
@@ -171,9 +169,7 @@ export const ConnectionsList = ({ addButtonRef }: ConnectionsListProps) => {
           <h3 className="text-base font-semibold @md:text-lg">
             {t("noConnections.title")}
           </h3>
-          <p className="text-sm text-muted-foreground">
-            {t("noConnections.description")}
-          </p>
+          <p className="text-sm text-muted">{t("noConnections.description")}</p>
         </div>
       ) : (
         <ul
@@ -242,11 +238,12 @@ function statusTone(status: Connection["status"]): StatusTone {
 }
 
 const statusDot: Record<StatusTone, string> = {
-  connected: "bg-emerald-500",
-  busy: "bg-amber-500",
-  online: "bg-sky-500",
-  error: "bg-red-500",
-  idle: "bg-muted-foreground/40",
+  connected: "bg-online",
+  busy: "bg-dirty",
+  // Reachable but not connected: a hollow ring in the online colour.
+  online: "bg-transparent ring-2 ring-inset ring-online",
+  error: "bg-danger-strong",
+  idle: "bg-offline",
 };
 
 function StatusPill({
@@ -271,7 +268,7 @@ function StatusPill({
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-full bg-background px-2.5 py-0.5 text-sm font-medium capitalize text-muted-foreground ring-1 ring-border ring-inset",
+        "inline-flex shrink-0 items-center gap-1.5 rounded-full border border-control bg-surface px-2.5 py-0.5 text-sm font-medium capitalize text-secondary",
         className,
       )}
     >
@@ -337,14 +334,14 @@ function ConnectionCard({
     <article
       className={cn(
         surfaceClasses,
-        "flex h-full flex-col divide-y divide-border p-3 @md:p-4",
+        "flex h-full flex-col divide-y divide-subtle p-3 @md:p-4",
       )}
       aria-label={connection.name}
     >
       <div className="flex items-start gap-3 pb-3">
         {/* Avatar steps up with the drawer. */}
         <span
-          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-background text-muted-foreground ring-1 ring-border ring-inset @md:size-10 @xl:size-11"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-control bg-surface text-muted @md:size-10 @xl:size-11"
           aria-hidden="true"
         >
           {createElement(connectionTypeIcon(connection.type), {
@@ -357,8 +354,8 @@ function ConnectionCard({
               {connection.name}
             </h3>
             {connection.isDefault ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-background px-2.5 py-0.5 text-sm font-medium text-muted-foreground ring-1 ring-border ring-inset">
-                <Star className="size-3.5 fill-amber-500 text-amber-500" />
+              <span className="inline-flex items-center gap-1 rounded-full border border-control bg-surface px-2.5 py-0.5 text-sm font-medium text-secondary">
+                <Star className="size-3.5 fill-dirty text-dirty" />
                 {t("default")}
               </span>
             ) : null}
@@ -369,7 +366,7 @@ function ConnectionCard({
               className="hidden @xl:flex"
             />
           </div>
-          <p className="mt-0.5 break-all text-sm text-muted-foreground">
+          <p className="mt-0.5 break-all text-sm text-muted">
             {formatConnectionSubtext(connection)}
           </p>
           <StatusPill
@@ -385,7 +382,7 @@ function ConnectionCard({
               data-row-focus=""
               variant="ghost"
               size="icon"
-              className="h-11 w-11 shrink-0 rounded-full text-muted-foreground hover:bg-background hover:text-foreground focus:ring-ring dark:text-muted-foreground dark:hover:bg-background dark:hover:text-foreground"
+              className="h-11 w-11 shrink-0 rounded-full text-muted hover:bg-raised hover:text-primary"
             >
               <MoreHorizontal className="size-5" />
               <span className="sr-only">{t("moreActions")}</span>
@@ -401,11 +398,11 @@ function ConnectionCard({
                 cancelRef.current?.focus();
               }
             }}
-            className="min-w-44 rounded-xl border-border bg-popover p-1 text-popover-foreground shadow-lg dark:border-border dark:bg-popover dark:text-popover-foreground"
+            className="min-w-44"
           >
             {connection.type === "http" ? (
               <DropdownMenuItem
-                className="min-h-11 gap-2 rounded-lg px-3 focus:bg-muted dark:focus:bg-muted"
+                className="min-h-11 gap-2 rounded-lg px-3"
                 onClick={() => onSetDefault()}
               >
                 {connection.isDefault ? (
@@ -419,7 +416,7 @@ function ConnectionCard({
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuItem
-              className="min-h-11 gap-2 rounded-lg px-3 text-destructive focus:bg-destructive/10 focus:text-destructive dark:focus:bg-destructive/10"
+              className="min-h-11 gap-2 rounded-lg px-3 text-danger focus:bg-danger focus:text-danger"
               onSelect={() => {
                 focusCancelOnMenuClose.current = true;
                 onRequestDelete();
@@ -432,12 +429,10 @@ function ConnectionCard({
         </DropdownMenu>
       </div>
 
-      <div className="py-3 text-sm text-muted-foreground">
+      <div className="py-3 text-sm text-muted">
         {connection.error ? (
           <div className="space-y-1">
-            <p className="text-sm text-red-700 dark:text-red-400">
-              {connection.error}
-            </p>
+            <p className="text-sm text-danger">{connection.error}</p>
             {connection.type === "http" &&
               connection.url.startsWith("https:") && (
                 <CertificateGuide
@@ -455,7 +450,7 @@ function ConnectionCard({
             {t("lastConnectedAt", { date: "" })}{" "}
             <TimeAgo
               timestamp={connection.lastConnectedAt}
-              className="text-sm text-muted-foreground"
+              className="text-sm text-muted"
             />
           </p>
         ) : (

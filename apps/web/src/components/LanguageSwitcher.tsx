@@ -39,31 +39,28 @@ export default function LanguageSwitcher({
           className={cn(
             "group flex items-center justify-start",
             "transition-colors duration-150 gap-2.5 p-1.5 rounded-md",
-            !disableHover && "hover:bg-gray-100 dark:hover:bg-gray-700",
+            !disableHover && "hover:bg-raised",
           )}
         >
           <Languages
             size={16}
             className={cn(
-              "text-gray-500 dark:text-gray-400 w-4 flex-shrink-0 transition-colors duration-150",
-              !disableHover &&
-                "group-hover:text-gray-700 dark:group-hover:text-gray-200",
+              "text-muted w-4 flex-shrink-0 transition-colors duration-150",
+              !disableHover && "group-hover:text-primary",
             )}
           />
           <Subtle
             className={cn(
-              "text-sm text-gray-600 dark:text-gray-100 transition-colors duration-150",
-              !disableHover &&
-                "group-hover:text-gray-800 dark:group-hover:text-gray-100",
+              "text-sm text-secondary transition-colors duration-150",
+              !disableHover && "group-hover:text-primary",
             )}
           >
             {`${t("languagePicker.label")}:`}
           </Subtle>
           <Subtle
             className={cn(
-              "text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors duration-150",
-              !disableHover &&
-                "group-hover:text-gray-900 dark:group-hover:text-white",
+              "text-sm font-medium text-primary transition-colors duration-150",
+              !disableHover && "group-hover:text-primary",
             )}
           >
             {current?.name}
@@ -82,7 +79,7 @@ export default function LanguageSwitcher({
               <span>{language.name}</span>
             </div>
             {i18n.language === language.code && (
-              <Check className="h-4 w-4 text-primary" />
+              <Check className="h-4 w-4 text-accent" />
             )}
           </DropdownMenuItem>
         ))}

@@ -28,17 +28,11 @@ const Footer = ({ className, ...props }: FooterProps) => {
       {...props}
     >
       <div className="px-2">
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
-          {version}
-        </span>
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40 mx-2">
-          -
-        </span>
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
-          {`#${commitHash}`}
-        </span>
+        <span className="font-semibold text-muted">{version}</span>
+        <span className="font-semibold text-muted mx-2">-</span>
+        <span className="font-semibold text-muted">{`#${commitHash}`}</span>
       </div>
-      <p className="ml-auto mr-auto text-gray-500 dark:text-gray-400">
+      <p className="ml-auto mr-auto text-muted">
         <Trans
           i18nKey="footer.text"
           components={[
@@ -46,7 +40,7 @@ const Footer = ({ className, ...props }: FooterProps) => {
               key="vercel"
               rel="noopener noreferrer"
               href="https://vercel.com/?utm_source=meshtastic&utm_campaign=oss"
-              className="hover:underline text-link"
+              className="text-accent hover:underline hover:text-accent-hover"
               aria-label="Link to Vercel homepage"
               title="Vercel"
             />,
@@ -54,7 +48,7 @@ const Footer = ({ className, ...props }: FooterProps) => {
               key="legal"
               rel="noopener noreferrer"
               href="https://meshtastic.org/docs/legal"
-              className="hover:underline text-link"
+              className="text-accent hover:underline hover:text-accent-hover"
               aria-label="Link to Legal page"
               title="Legal"
             />,

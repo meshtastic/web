@@ -97,29 +97,29 @@ export const ConnectingOverlay = (): ReactElement | null => {
   return (
     <Dialog open>
       <DialogContent
-        className="max-w-md overflow-hidden bg-background-primary p-0 text-text-primary shadow-2xl"
+        className="max-w-md overflow-hidden bg-surface p-0 text-primary shadow-dialog"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <div className="flex flex-col items-center gap-6 px-8 pt-10 pb-8">
-          {/* Hero icon with radial pings — uses the theme link color so light
+          {/* Hero icon with radial pings — uses the theme accent color so light
               and dark modes both look at-home. */}
           <div className="relative flex h-28 w-28 items-center justify-center">
-            <span className="absolute inset-0 animate-ping rounded-full bg-link/20 [animation-duration:1.8s]" />
-            <span className="absolute inset-3 animate-ping rounded-full bg-link/30 [animation-duration:2.4s] [animation-delay:0.4s]" />
-            <span className="absolute inset-6 rounded-full bg-link shadow-lg shadow-link/40" />
-            <Icon className="relative h-9 w-9 text-background-primary" />
+            <span className="absolute inset-0 animate-ping rounded-full bg-accent/20 [animation-duration:1.8s]" />
+            <span className="absolute inset-3 animate-ping rounded-full bg-accent/30 [animation-duration:2.4s] [animation-delay:0.4s]" />
+            <span className="absolute inset-6 rounded-full bg-accent shadow-lg shadow-accent/40" />
+            <Icon className="relative h-9 w-9 text-on-accent" />
           </div>
 
           {/* What's happening, to which device, and the current phase */}
           <div className="flex flex-col items-center gap-1 text-center">
-            <DialogTitle className="text-2xl font-semibold tracking-tight text-text-primary">
+            <DialogTitle className="text-2xl font-semibold tracking-tight text-primary">
               {title}
             </DialogTitle>
-            <div className="text-lg font-medium text-text-primary">
+            <div className="text-lg font-medium text-primary">
               {active.name}
             </div>
-            <div className="mt-1 inline-flex items-center gap-2 text-base text-text-secondary">
+            <div className="mt-1 inline-flex items-center gap-2 text-base text-secondary">
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               {phaseLabel}
             </div>
@@ -149,7 +149,7 @@ export const ConnectingOverlay = (): ReactElement | null => {
 
           {showCancel && (
             <div className="flex w-full flex-col items-center gap-2">
-              <p className="text-center text-sm text-text-secondary">
+              <p className="text-center text-sm text-secondary">
                 {t("overlay.stuckHint", {
                   defaultValue:
                     "Taking longer than usual. The device may be in CLI / bootloader mode, or the firmware isn't responding to config requests.",
@@ -183,17 +183,17 @@ function Chip({ label, count, done }: ChipProps): ReactElement {
       className={cn(
         "flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-base transition-colors",
         filled
-          ? "border-green-500/40 bg-green-500/10 text-green-700 dark:text-green-300"
-          : "border-text-secondary/30 bg-text-secondary/5 text-text-secondary",
+          ? "border-accent-tint bg-accent-tint text-on-accent-tint"
+          : "border-control bg-inset text-secondary",
       )}
     >
       <span className="font-medium">{label}</span>
       {count !== undefined ? (
         <span className="font-mono text-sm tabular-nums">{count}</span>
       ) : done ? (
-        <CheckCircle2 className="h-5 w-5 text-green-500" />
+        <CheckCircle2 className="h-5 w-5 text-accent" />
       ) : (
-        <span className="h-5 w-5 rounded-full border border-dashed border-text-secondary/50" />
+        <span className="h-5 w-5 rounded-full border border-dashed border-input" />
       )}
     </div>
   );
