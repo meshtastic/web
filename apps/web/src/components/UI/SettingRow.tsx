@@ -71,6 +71,10 @@ export interface ReadonlyKeySettingRow extends SettingRowBase {
   kind: "readonlyKey";
   value: string;
   copyable?: boolean;
+  /** What Copy copies, when `value` is masked. */
+  copyValue?: string;
+  /** The value fills the row, on its own line under the label. */
+  fill?: boolean;
   /** Buttons after Copy, e.g. Regenerate. */
   actions?: ReactNode;
 }
@@ -210,6 +214,9 @@ const SettingControl = <T extends string>({
           value={row.value}
           label={row.label}
           copyable={row.copyable ?? true}
+          {...(row.copyValue === undefined ? {} : { copyValue: row.copyValue })}
+          fill={row.fill === true}
+          className={row.fill === true ? "w-full" : undefined}
           actions={row.actions}
         />
       );
@@ -274,7 +281,9 @@ export const SettingRow = <T extends string = string>(
       : props.kind === "custom"
         ? props.controlId
         : undefined;
-  const stacked = props.kind === "custom" && props.stacked === true;
+  const stacked =
+    (props.kind === "custom" && props.stacked === true) ||
+    (props.kind === "readonlyKey" && props.fill === true);
 
   return (
     <div

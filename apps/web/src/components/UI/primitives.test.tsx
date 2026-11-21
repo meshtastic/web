@@ -474,4 +474,22 @@ describe("CopyField", () => {
     expect(writeText).toHaveBeenCalledWith("base64key=");
     expect(screen.getByRole("button", { name: "Copied!" })).toBeTruthy();
   });
+
+  it("copies the real value while showing a masked one", async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+    render(<CopyField label="Key" value="••••" copyValue="secret=" />);
+    expect(
+      screen.getByRole("group", { name: "Key" }).textContent,
+    ).not.toContain("secret=");
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole("button", { name: "Copy to clipboard" }),
+      );
+    });
+    expect(writeText).toHaveBeenCalledWith("secret=");
+  });
 });

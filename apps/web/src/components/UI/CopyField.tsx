@@ -12,6 +12,10 @@ export interface CopyFieldProps {
   label: string;
   /** Show a copy button. */
   copyable?: boolean;
+  /** What Copy puts on the clipboard, when `value` is masked. */
+  copyValue?: string;
+  /** Let the value fill the row instead of sizing to its text. */
+  fill?: boolean;
   /** Further actions after Copy, e.g. Regenerate. */
   actions?: ReactNode;
   className?: string;
@@ -22,6 +26,8 @@ export const CopyField = ({
   value,
   label,
   copyable = true,
+  copyValue = value,
+  fill = false,
   actions,
   className,
 }: CopyFieldProps) => {
@@ -37,7 +43,10 @@ export const CopyField = ({
     >
       <code
         title={value}
-        className="flex h-10 max-w-[300px] min-w-0 items-center truncate rounded-control border border-input bg-app px-3 font-mono text-help text-secondary"
+        className={cn(
+          "flex h-10 min-w-0 items-center truncate rounded-control border border-input bg-app px-3 font-mono text-help text-secondary",
+          fill ? "flex-[1_1_16rem]" : "max-w-[300px]",
+        )}
       >
         <span className="truncate">{value}</span>
       </code>
@@ -47,7 +56,7 @@ export const CopyField = ({
           size="default"
           className="text-help"
           onClick={() => {
-            void copy(value);
+            void copy(copyValue);
           }}
           icon={
             isCopied ? (

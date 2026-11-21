@@ -164,6 +164,19 @@ describe("Channels", () => {
     expect(psk).not.toEqual(new Uint8Array(16).fill(3));
   });
 
+  it("keeps the same key actions whether the key is shown or hidden", () => {
+    renderPage();
+    openSlot(/Friends/);
+    const copy = () =>
+      within(screen.getByRole("group", { name: "Key" })).queryByRole("button", {
+        name: "Copy to clipboard",
+      });
+    expect(copy()).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Show" }));
+    expect(screen.getByRole("button", { name: "Hide" })).toBeInTheDocument();
+    expect(copy()).toBeInTheDocument();
+  });
+
   it("toggles uplink and mute", () => {
     renderPage();
     openSlot(/Friends/);

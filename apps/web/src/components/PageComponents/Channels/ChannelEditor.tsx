@@ -52,6 +52,19 @@ type ChannelLike = Pick<Protobuf.Channel.Channel, "index" | "role"> & {
 
 const TEXT_BUTTON = "text-help";
 
+/**
+ * A button label that keeps the width of the wider of two labels, so
+ * toggling between them (Show/Hide) doesn't move what follows.
+ */
+const StableLabel = ({ label, other }: { label: string; other: string }) => (
+  <span className="inline-grid">
+    <span className="col-start-1 row-start-1">{label}</span>
+    <span aria-hidden="true" className="invisible col-start-1 row-start-1">
+      {other}
+    </span>
+  </span>
+);
+
 function toForm(index: number, channel: ChannelLike | undefined): ChannelForm {
   const source = channel ?? {
     index,
@@ -267,7 +280,7 @@ export const ChannelEditor = ({
             <Input
               id={keyId}
               className="font-mono"
-              containerClassName="w-full sm:w-[320px]"
+              containerClassName="min-w-0 flex-[1_1_16rem]"
               autoComplete="off"
               spellCheck={false}
               value={psk}
@@ -295,7 +308,8 @@ export const ChannelEditor = ({
             label={t("editor.key.label")}
             help={t("editor.key.help")}
             value={showKey ? psk : MASKED_KEY}
-            copyable={showKey}
+            copyValue={psk}
+            fill
             dirty={keyDirty}
             error={errorText("psk")}
             actions={
@@ -306,7 +320,14 @@ export const ChannelEditor = ({
                   aria-pressed={showKey}
                   onClick={() => setShowKey((shown) => !shown)}
                 >
-                  {showKey ? t("editor.key.hide") : t("editor.key.show")}
+                  <StableLabel
+                    label={
+                      showKey ? t("editor.key.hide") : t("editor.key.show")
+                    }
+                    other={
+                      showKey ? t("editor.key.show") : t("editor.key.hide")
+                    }
+                  />
                 </Button>
                 <Button
                   variant="secondary"
