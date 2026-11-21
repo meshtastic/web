@@ -40,6 +40,7 @@ const heard: HeardNodeView[] = [
 
 const setup = (props: Partial<ChannelDetailsPanelProps> = {}) => {
   const onHeardSortChange = vi.fn();
+  const onHeardQueryChange = vi.fn();
   render(
     <ChannelDetailsPanel
       primary
@@ -48,14 +49,74 @@ const setup = (props: Partial<ChannelDetailsPanelProps> = {}) => {
       heard={heard}
       heardSort={DEFAULT_CHANNEL_HEARD_SORT}
       onHeardSortChange={onHeardSortChange}
+      heardQuery=""
+      onHeardQueryChange={onHeardQueryChange}
+      heardTotal={heard.length}
       totalNodes={12}
       onShareQr={vi.fn()}
       onOpenNode={vi.fn()}
       {...props}
     />,
   );
-  return { onHeardSortChange, user: userEvent.setup() };
+  return { onHeardSortChange, onHeardQueryChange, user: userEvent.setup() };
 };
+
+describe("ChannelDetailsPanel recently heard search", () => {
+  it("keeps search behind an icon until it is opened", async () => {
+    const { user, onHeardQueryChange } = setup();
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    const open = screen.getByRole("button", { name: "Search recently heard" });
+    expect(open).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(open);
+    const field = screen.getByRole("searchbox", {
+      name: "Search recently heard",
+    });
+    expect(field).toHaveFocus();
+    await user.type(field, "d");
+    expect(onHeardQueryChange).toHaveBeenLastCalledWith("d");
+  });
+
+  it("Escape closes the search, clears it and returns focus to the icon", async () => {
+    const { user, onHeardQueryChange } = setup({ heardQuery: "dock" });
+    await user.click(
+      screen.getByRole("button", { name: "Search recently heard" }),
+    );
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    expect(onHeardQueryChange).toHaveBeenLastCalledWith("");
+    expect(
+      screen.getByRole("button", { name: "Search recently heard" }),
+    ).toHaveFocus();
+  });
+
+  it("the close button also clears the search", async () => {
+    const { user, onHeardQueryChange } = setup();
+    await user.click(
+      screen.getByRole("button", { name: "Search recently heard" }),
+    );
+    await user.click(screen.getByRole("button", { name: "Close search" }));
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    expect(onHeardQueryChange).toHaveBeenLastCalledWith("");
+  });
+
+  it("says when nothing matches", () => {
+    setup({ heard: [], heardQuery: "zzz", heardTotal: 2 });
+    expect(
+      screen.getByText("No recently heard nodes match “zzz”."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/No nodes heard on this channel/),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers no search when nothing was heard", () => {
+    setup({ heard: [], heardTotal: 0 });
+    expect(
+      screen.queryByRole("button", { name: "Search recently heard" }),
+    ).not.toBeInTheDocument();
+  });
+});
 
 describe("ChannelDetailsPanel recently heard", () => {
   it("names the sort control after the current sort and keeps the window as a caption", () => {

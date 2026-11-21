@@ -15,6 +15,7 @@ import {
 import { IconButton } from "@components/UI/IconButton.tsx";
 import { KeyValue, KeyValueList } from "@components/UI/KeyValue.tsx";
 import { NodeAvatar } from "@components/UI/NodeAvatar.tsx";
+import { SearchField } from "@components/UI/SearchField.tsx";
 import { SectionHeader } from "@components/UI/SectionHeader.tsx";
 import type { ChannelEncryption } from "@core/messaging/channelInfo.ts";
 import type { NodeRow } from "@core/nodes/nodeRow.ts";
@@ -30,11 +31,12 @@ import {
   ArrowDownUpIcon,
   ChevronDownIcon,
   QrCodeIcon,
+  SearchIcon,
   SettingsIcon,
   StarIcon,
   XIcon,
 } from "lucide-react";
-import { type ReactNode, useId } from "react";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface DetailsFrameProps {
@@ -150,6 +152,46 @@ const HeardSortMenu = ({ sort, onSortChange }: HeardSortMenuProps) => {
   );
 };
 
+interface HeardSearchProps {
+  query: string;
+  onQueryChange: (query: string) => void;
+  onClose: () => void;
+}
+
+/** The search field that stands in for the header row while open. */
+const HeardSearch = ({ query, onQueryChange, onClose }: HeardSearchProps) => {
+  const { t } = useTranslation("messages");
+  const field = useRef<HTMLInputElement>(null);
+  // Opened on purpose from the icon, so the field takes focus at once.
+  useEffect(() => {
+    field.current?.focus();
+  }, []);
+  return (
+    <div className="flex items-center gap-1">
+      <SearchField
+        ref={field}
+        label={t("channelDetails.searchHeard")}
+        containerClassName="h-9 flex-1"
+        value={query}
+        onChange={(event) => onQueryChange(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            onClose();
+          }
+        }}
+      />
+      <IconButton
+        size="sm"
+        aria-label={t("channelDetails.closeSearch")}
+        icon={<XIcon className="size-4" />}
+        onClick={onClose}
+      />
+    </div>
+  );
+};
+
 export interface ChannelDetailsPanelProps {
   primary: boolean;
   encryption: ChannelEncryption;
@@ -158,6 +200,11 @@ export interface ChannelDetailsPanelProps {
   /** How `heard` is ordered; the list arrives already sorted. */
   heardSort: ChannelHeardSort;
   onHeardSortChange: (sort: ChannelHeardSort) => void;
+  /** Search over the recently heard list; `heard` arrives already filtered. */
+  heardQuery: string;
+  onHeardQueryChange: (query: string) => void;
+  /** Nodes heard before the search, to tell "none heard" from "none match". */
+  heardTotal: number;
   /** Every node this radio knows, for "View all N nodes". */
   totalNodes: number;
   onShareQr: () => void;
@@ -176,6 +223,9 @@ export const ChannelDetailsPanel = ({
   heard,
   heardSort,
   onHeardSortChange,
+  heardQuery,
+  onHeardQueryChange,
+  heardTotal,
   totalNodes,
   onShareQr,
   onOpenNode,
@@ -183,6 +233,21 @@ export const ChannelDetailsPanel = ({
 }: ChannelDetailsPanelProps) => {
   const { t } = useTranslation("messages");
   const heardId = useId();
+  const [searching, setSearching] = useState(false);
+  const searchButton = useRef<HTMLButtonElement>(null);
+  const returnFocus = useRef(false);
+  // The icon comes back when the field closes; focus goes back to it.
+  useEffect(() => {
+    if (!searching && returnFocus.current) {
+      returnFocus.current = false;
+      searchButton.current?.focus();
+    }
+  }, [searching]);
+  const closeSearch = () => {
+    returnFocus.current = true;
+    setSearching(false);
+    onHeardQueryChange("");
+  };
   return (
     <DetailsFrame title={t("header.channelDetails")} onClose={onClose}>
       <div className="flex flex-col gap-3 border-b border-subtle p-4">
@@ -231,24 +296,51 @@ export const ChannelDetailsPanel = ({
         className="flex min-h-0 flex-1 flex-col"
       >
         <div className="px-4 pt-3.5 pb-1.5">
-          <SectionHeader
-            id={heardId}
-            as="h3"
-            title={t("channelDetails.recentlyHeard")}
-            action={
-              <HeardSortMenu
-                sort={heardSort}
-                onSortChange={onHeardSortChange}
+          {searching ? (
+            <>
+              <h3 id={heardId} className="sr-only">
+                {t("channelDetails.recentlyHeard")}
+              </h3>
+              <HeardSearch
+                query={heardQuery}
+                onQueryChange={onHeardQueryChange}
+                onClose={closeSearch}
               />
-            }
-          />
+            </>
+          ) : (
+            <SectionHeader
+              id={heardId}
+              as="h3"
+              title={t("channelDetails.recentlyHeard")}
+              action={
+                <div className="flex items-center gap-1">
+                  {heardTotal > 0 ? (
+                    <IconButton
+                      ref={searchButton}
+                      size="sm"
+                      aria-label={t("channelDetails.searchHeard")}
+                      aria-expanded={false}
+                      icon={<SearchIcon className="size-4" />}
+                      onClick={() => setSearching(true)}
+                    />
+                  ) : null}
+                  <HeardSortMenu
+                    sort={heardSort}
+                    onSortChange={onHeardSortChange}
+                  />
+                </div>
+              }
+            />
+          )}
           <p className="m-0 text-meta text-muted">
             {t("channelDetails.window")}
           </p>
         </div>
         {heard.length === 0 ? (
           <p className="m-0 px-4 py-2 text-help text-muted">
-            {t("channelDetails.noneHeard")}
+            {heardTotal > 0 && heardQuery.trim() !== ""
+              ? t("channelDetails.noHeardMatch", { query: heardQuery.trim() })
+              : t("channelDetails.noneHeard")}
           </p>
         ) : (
           <ul className="m-0 flex list-none flex-col p-0 px-2">

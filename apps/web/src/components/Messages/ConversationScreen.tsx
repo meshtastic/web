@@ -20,6 +20,7 @@ import {
 } from "@core/messaging/channelInfo.ts";
 import { traceroutesForPeer } from "@core/messaging/tracerouteView.ts";
 import { formatLastHeard } from "@core/nodes/format.ts";
+import { matchesNodeSearch } from "@core/nodes/nodeFilters.ts";
 import { knownNodeCount } from "@core/nodes/nodeRow.ts";
 import { Types } from "@core/protobuf.ts";
 import {
@@ -161,28 +162,41 @@ export const ConversationScreen = ({
   const closeDetails =
     touch || !fitsDetailsColumn ? undefined : () => setDetailsOpen(false);
 
+  // The search belongs to one channel; another channel starts empty.
+  const [heardSearch, setHeardSearch] = useState({
+    channel: channelIndex,
+    query: "",
+  });
+  const heardQuery =
+    heardSearch.channel === channelIndex ? heardSearch.query : "";
+  const heardRows = useMemo(
+    () =>
+      isDm
+        ? []
+        : channelHeardRows(
+            directory.rows,
+            directory.channelOf,
+            channelIndex,
+            directory.now,
+            heardSort,
+            collator,
+          ),
+    [isDm, directory, channelIndex, heardSort, collator],
+  );
   const heard = useMemo(() => {
-    if (isDm) {
-      return [];
-    }
-    return channelHeardRows(
-      directory.rows,
-      directory.channelOf,
-      channelIndex,
-      directory.now,
-      heardSort,
-      collator,
-    ).map((row) => ({
-      num: row.num,
-      name: row.name,
-      initials: row.initials,
-      isFavorite: row.isFavorite,
-      meta: t("channelDetails.heardMeta", {
-        hops: nodeLabels.hops(row),
-        time: nodeLabels.lastHeard(row),
-      }),
-    }));
-  }, [isDm, directory, channelIndex, heardSort, collator, nodeLabels, t]);
+    return heardRows
+      .filter((row) => matchesNodeSearch(row, heardQuery))
+      .map((row) => ({
+        num: row.num,
+        name: row.name,
+        initials: row.initials,
+        isFavorite: row.isFavorite,
+        meta: t("channelDetails.heardMeta", {
+          hops: nodeLabels.hops(row),
+          time: nodeLabels.lastHeard(row),
+        }),
+      }));
+  }, [heardRows, heardQuery, nodeLabels, t]);
 
   const details = isDm ? (
     <DirectDetailsPanel
@@ -201,6 +215,11 @@ export const ConversationScreen = ({
       heard={heard}
       heardSort={heardSort}
       onHeardSortChange={(sort) => setNodeListSort("channelHeard", sort)}
+      heardQuery={heardQuery}
+      onHeardQueryChange={(query) =>
+        setHeardSearch({ channel: channelIndex, query })
+      }
+      heardTotal={heardRows.length}
       totalNodes={knownNodes}
       onShareQr={() => setDialogOpen("QR", true)}
       onOpenNode={(num) =>
