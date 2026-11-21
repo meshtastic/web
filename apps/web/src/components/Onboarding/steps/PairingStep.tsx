@@ -1,4 +1,5 @@
 import { Button } from "@components/UI/Button.tsx";
+import { cn } from "@core/utils/cn.ts";
 import type { PickerState } from "@core/onboarding/wizard.ts";
 import { Trans, useTranslation } from "react-i18next";
 import {
@@ -53,6 +54,9 @@ export const PairingStep = ({
   const { t } = useTranslation("onboarding");
   const [chosen, other] = EXAMPLE_DEVICES[method];
   const text = PICKER_TEXT[method];
+  // Once the real picker has been closed, clicking its stand-in reopens it,
+  // like "Show radios again". The button below stays the accessible route.
+  const reopen = picker === "closed" ? actions.next?.onClick : undefined;
   return (
     <StepShell actions={actions}>
       <StepHeading>{t("pairing.title")}</StepHeading>
@@ -67,9 +71,15 @@ export const PairingStep = ({
           components={{ strong: <strong className="font-semibold" /> }}
         />
       </StepBody>
+      {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- a pointer shortcut for "Show radios again", which keyboard users reach as a real button */}
       <div
         aria-hidden="true"
-        className="max-w-[420px] overflow-hidden rounded-panel border border-control bg-surface text-primary shadow-floating"
+        data-testid="picker-illustration"
+        onClick={reopen}
+        className={cn(
+          "max-w-[420px] overflow-hidden rounded-panel border border-control bg-surface text-primary shadow-floating select-none",
+          reopen ? "cursor-pointer" : "cursor-default",
+        )}
       >
         <div className="border-b border-subtle px-3.5 py-3 text-help font-semibold">
           {t(text.title)}

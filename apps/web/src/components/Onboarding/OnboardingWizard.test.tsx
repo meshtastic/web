@@ -192,6 +192,11 @@ describe("OnboardingWizard", () => {
     expect(screen.getByText("Meshtastic_1a2b")).toBeInTheDocument();
     expect(addConnectionAndConnect).not.toHaveBeenCalled();
 
+    const illustration = screen.getByTestId("picker-illustration");
+    expect(illustration).toHaveClass("cursor-pointer", "select-none");
+    await user.click(illustration);
+    expect(requestDevice).toHaveBeenCalledTimes(2);
+
     await user.click(
       screen.getByRole("button", { name: "My radio isn't in the list" }),
     );
