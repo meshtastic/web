@@ -42,6 +42,8 @@ vi.mock("@tanstack/react-router", () => ({
 
 vi.mock("@core/hooks/useIsMobile.ts", () => ({
   useIsMobile: () => env.mobile,
+  useCanFitDetailsColumn: () => !env.mobile,
+  useFitsLabelledActions: () => !env.mobile,
 }));
 
 vi.mock("@core/hooks/useNodesAsProto.ts", () => ({

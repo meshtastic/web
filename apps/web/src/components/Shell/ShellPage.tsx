@@ -2,16 +2,20 @@ import { IconButton } from "@components/UI/IconButton.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
-import { useIsMobile } from "@core/hooks/useIsMobile.ts";
+import {
+  useCanFitDetailsColumn,
+  useIsMobile,
+} from "@core/hooks/useIsMobile.ts";
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
 import { cn } from "@core/utils/cn.ts";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { useLocation } from "@tanstack/react-router";
+import { useLocation, useMatches } from "@tanstack/react-router";
 import { type LucideIcon, MenuIcon, PanelRightIcon, XIcon } from "lucide-react";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useTranslation } from "react-i18next";
 import { MobileHeaderControls } from "./MobileHeaderControls.tsx";
+import { shouldHideTabBar } from "./navItems.ts";
 
 interface ActionItemBase {
   key: string;
@@ -53,6 +57,12 @@ export interface ShellPageProps {
   /** Toggleable details panel (320px column, drawer on mobile). */
   details?: ReactNode;
   detailsLabel?: string;
+  /**
+   * Bump to show the details panel where it is a drawer (phones,
+   * tablets), e.g. when a list row is picked. The column is opened through
+   * the remembered toggle instead.
+   */
+  detailsDrawerRequest?: number;
   noPadding?: boolean;
   contentClassName?: string;
 }
@@ -94,8 +104,11 @@ const MobileDrawer = ({
         aria-describedby={undefined}
         className={cn(
           "fixed inset-y-0 z-50 flex w-[300px] max-w-[85vw] flex-col overflow-hidden",
+          "pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]",
           "bg-surface text-primary shadow-dialog",
-          side === "left" ? "left-0" : "right-0",
+          side === "left"
+            ? "left-0 pl-[env(safe-area-inset-left)]"
+            : "right-0 pr-[env(safe-area-inset-right)]",
         )}
       >
         <DialogPrimitive.Title className="sr-only">
@@ -103,7 +116,7 @@ const MobileDrawer = ({
         </DialogPrimitive.Title>
         <DialogPrimitive.Close
           aria-label={closeLabel}
-          className="absolute top-2 right-2 z-10 flex size-11 cursor-pointer items-center justify-center rounded-control text-muted hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="absolute top-[calc(0.5rem+env(safe-area-inset-top))] right-2 z-10 flex size-11 cursor-pointer items-center justify-center rounded-control text-muted hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           <XIcon aria-hidden="true" className="size-5" />
         </DialogPrimitive.Close>
@@ -143,10 +156,18 @@ export const ShellPage = ({
   sidebarFooter,
   details,
   detailsLabel,
+  detailsDrawerRequest,
   noPadding,
   contentClassName,
 }: ShellPageProps) => {
   const isMobile = useIsMobile();
+  const fitsDetailsColumn = useCanFitDetailsColumn();
+  // Phones and tablets: the details panel slides in rather than squeezing
+  // the conversation.
+  const detailsAsDrawer = isMobile || !fitsDetailsColumn;
+  // A full-screen sub-page (conversation, settings section) keeps its header
+  // to back, title and its own actions, as the tab bar is hidden there too.
+  const fullScreen = useMatches({ select: shouldHideTabBar });
   const { t } = useTranslation("ui");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
@@ -165,12 +186,20 @@ export const ShellPage = ({
   const closeLabel = t("button.close", { ns: "common" });
 
   // Navigating or crossing the breakpoint closes any open drawer.
-  const layoutKey = `${pathname}|${isMobile}`;
+  const layoutKey = `${pathname}|${isMobile}|${detailsAsDrawer}`;
   const [drawersKey, setDrawersKey] = useState(layoutKey);
   if (drawersKey !== layoutKey) {
     setDrawersKey(layoutKey);
     setSidebarOpen(false);
     setMobileDetailsOpen(false);
+  }
+  const [seenDrawerRequest, setSeenDrawerRequest] =
+    useState(detailsDrawerRequest);
+  if (seenDrawerRequest !== detailsDrawerRequest) {
+    setSeenDrawerRequest(detailsDrawerRequest);
+    if (detailsDrawerRequest !== undefined && detailsAsDrawer) {
+      setMobileDetailsOpen(true);
+    }
   }
 
   useEffect(() => {
@@ -183,7 +212,7 @@ export const ShellPage = ({
     }
   }, [pathname, isMobile]);
 
-  const showDetailsColumn = Boolean(details) && !isMobile && detailsOpen;
+  const showDetailsColumn = Boolean(details) && !detailsAsDrawer && detailsOpen;
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
@@ -198,7 +227,7 @@ export const ShellPage = ({
         ) : null}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex h-16 shrink-0 items-center gap-1 border-b border-subtle p-2">
+          <header className="flex h-[calc(4rem+env(safe-area-inset-top))] shrink-0 items-center gap-1 border-b border-subtle p-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
             {isMobile && sidebar ? (
               <MobileDrawer
                 side="left"
@@ -215,7 +244,14 @@ export const ShellPage = ({
             ) : null}
 
             {leading}
-            <div className="flex min-w-0 flex-1 items-center justify-between">
+            {/* A hidden label leaves the room to `leading`, e.g. a chat's
+                name and status line. */}
+            <div
+              className={cn(
+                "flex min-w-0 items-center justify-between",
+                hideLabel ? "ml-auto shrink-0" : "flex-1",
+              )}
+            >
               <span
                 className={cn(
                   "truncate px-2 text-header-lg font-semibold",
@@ -260,7 +296,7 @@ export const ShellPage = ({
                   </button>
                 ))}
 
-                {details && !isMobile ? (
+                {details && !detailsAsDrawer ? (
                   <IconButton
                     aria-label={detailsName}
                     aria-pressed={detailsOpen}
@@ -271,7 +307,7 @@ export const ShellPage = ({
                   />
                 ) : null}
 
-                {details && isMobile ? (
+                {details && detailsAsDrawer ? (
                   <MobileDrawer
                     side="right"
                     label={detailsName}
@@ -286,7 +322,7 @@ export const ShellPage = ({
                   </MobileDrawer>
                 ) : null}
 
-                {isMobile ? <MobileHeaderControls /> : null}
+                {isMobile && !fullScreen ? <MobileHeaderControls /> : null}
               </div>
             </div>
           </header>
@@ -302,7 +338,8 @@ export const ShellPage = ({
           >
             {children}
           </main>
-          <Footer />
+          {/* Phones show the footer at the end of the Settings list instead. */}
+          {isMobile ? null : <Footer />}
         </div>
 
         {showDetailsColumn ? (

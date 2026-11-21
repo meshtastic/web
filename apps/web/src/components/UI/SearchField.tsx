@@ -26,7 +26,7 @@ export const SearchField = ({
 }: SearchFieldProps) => (
   <label
     className={cn(
-      "flex h-10 items-center gap-2 rounded-control border border-control bg-app px-3 text-muted focus-within:border-accent",
+      "flex h-10 items-center gap-2 rounded-control border border-control bg-app px-3 text-muted focus-within:border-accent pointer-coarse:h-11",
       containerClassName,
     )}
   >
@@ -36,7 +36,7 @@ export const SearchField = ({
       aria-label={label}
       placeholder={placeholder ?? label}
       className={cn(
-        "min-w-0 flex-1 border-0 bg-transparent text-body text-primary outline-none placeholder:text-muted",
+        "min-w-0 flex-1 border-0 bg-transparent text-body text-primary outline-none placeholder:text-muted pointer-coarse:text-base",
         className,
       )}
       {...props}

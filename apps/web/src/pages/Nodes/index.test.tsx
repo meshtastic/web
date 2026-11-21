@@ -4,14 +4,17 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import NodesPage from "./index.tsx";
 
-const env = vi.hoisted(() => ({ mobile: false }));
+const env = vi.hoisted(() => ({ mobile: false, wide: true }));
 const navigate = vi.hoisted(() => vi.fn());
 
 vi.mock("@core/hooks/useIsMobile.ts", () => ({
   useIsMobile: () => env.mobile,
+  useCanFitDetailsColumn: () => !env.mobile && env.wide,
+  useFitsLabelledActions: () => !env.mobile,
 }));
 
 vi.mock("@tanstack/react-router", () => ({
+  useMatches: () => false,
   useNavigate: () => navigate,
   useLocation: ({
     select,
@@ -90,6 +93,7 @@ const rowNames = () =>
 describe("Nodes page", () => {
   beforeEach(() => {
     env.mobile = false;
+    env.wide = true;
     localStorage.clear();
   });
 
@@ -150,6 +154,22 @@ describe("Nodes page", () => {
     await user.click(screen.getByRole("button", { name: "Alpha Base" }));
     expect(
       screen.getByRole("complementary", { name: "Node details" }),
+    ).toBeInTheDocument();
+  });
+
+  it("opens the details drawer when a node is picked on a tablet", async () => {
+    env.wide = false;
+    const user = userEvent.setup();
+    render(<NodesPage />);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Alpha Base" }));
+
+    expect(
+      within(screen.getByRole("dialog", { name: "Node details" })).getByRole(
+        "heading",
+        { name: "Alpha Base" },
+      ),
     ).toBeInTheDocument();
   });
 

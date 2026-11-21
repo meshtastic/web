@@ -73,7 +73,7 @@ export function ChannelLegend({
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t("legend.dialog.title")}
-        className="flex w-full cursor-pointer items-center justify-evenly gap-4 rounded-md py-1.5 text-sm hover:bg-raised focus:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+        className="flex w-full cursor-pointer items-center justify-evenly gap-4 rounded-md py-1.5 text-sm pointer-coarse:min-h-11 hover:bg-raised focus:outline-none focus-visible:ring-2 focus-visible:ring-focus"
       >
         <span className="flex items-center gap-2 font-medium text-accent">
           <InfoIcon size={16} aria-hidden />

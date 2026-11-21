@@ -49,9 +49,12 @@ vi.mock("react-map-gl/maplibre", () => ({
 
 vi.mock("@core/hooks/useIsMobile.ts", () => ({
   useIsMobile: () => env.mobile,
+  useCanFitDetailsColumn: () => !env.mobile,
+  useFitsLabelledActions: () => !env.mobile,
 }));
 
 vi.mock("@tanstack/react-router", () => ({
+  useMatches: () => false,
   Link: ({ children }: { children?: ReactNode }) => <a href="/">{children}</a>,
   useParams: () => env.params,
   useNavigate: () => vi.fn(),

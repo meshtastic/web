@@ -35,6 +35,11 @@ i18next
     react: {
       useSuspense: true,
     },
+    // React escapes rendered text already; escaping here too would show
+    // node names like "Bob's" as "Bob&#39;s".
+    interpolation: {
+      escapeValue: false,
+    },
     nonExplicitSupportedLngs: true,
     detection: {
       order: ["localStorage", "navigator"],

@@ -58,7 +58,9 @@ const CommandDialog = ({
           "flex flex-col gap-0 overflow-hidden p-0",
           // Narrow: full-screen sheet.
           "max-w-none sm:max-w-none sm:rounded-none",
-          "max-md:inset-0 max-md:h-dvh max-md:max-h-dvh max-md:border-0",
+          "max-md:inset-0 max-md:max-h-dvh max-md:border-0",
+          // Clear of the notch, the home indicator and an overlaying keyboard.
+          "max-md:h-[calc(100dvh-var(--keyboard-inset,0px))] max-md:pt-[env(safe-area-inset-top)] max-md:pb-[env(safe-area-inset-bottom)]",
           // Wide: floating panel 64px from the top.
           "md:top-16 md:max-h-[calc(100dvh-8rem)] md:max-w-[640px] md:rounded-bubble",
           className,

@@ -28,6 +28,7 @@ const env = vi.hoisted((): TestEnv => ({
 }));
 
 vi.mock("@tanstack/react-router", () => ({
+  useMatches: () => false,
   useNavigate: () => env.navigate,
   useLocation: ({
     select,
@@ -45,6 +46,8 @@ vi.mock("@tanstack/react-router", () => ({
 
 vi.mock("@core/hooks/useIsMobile.ts", () => ({
   useIsMobile: () => env.mobile,
+  useCanFitDetailsColumn: () => !env.mobile,
+  useFitsLabelledActions: () => !env.mobile,
 }));
 
 vi.mock("@core/hooks/useToast.ts", () => ({

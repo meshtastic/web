@@ -22,8 +22,9 @@ const avatarVariants = cva(
   {
     variants: {
       size: {
-        xs: "size-8 text-meta",
-        sm: "size-9 text-meta",
+        // Four 12px initials only just fit the small sizes.
+        xs: "size-8 text-meta tracking-tight",
+        sm: "size-9 text-meta tracking-tight",
         md: "size-10 text-meta",
         lg: "size-11 text-meta",
         xl: "size-16 text-header-lg",
@@ -127,7 +128,7 @@ export const NodeAvatar = ({
       style={style}
     >
       <span aria-hidden={exposeDot ? true : undefined} className="contents">
-        <span className="truncate px-0.5">{initials}</span>
+        <span className="truncate px-px">{initials}</span>
         {children}
       </span>
       {dot}

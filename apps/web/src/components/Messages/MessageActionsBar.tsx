@@ -99,7 +99,11 @@ const ToolButton = ({
     onFocus={() => onFocus(index)}
     className={cn(
       "flex shrink-0 cursor-pointer items-center justify-center text-secondary hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus data-[state=open]:bg-raised",
-      touch ? "size-10 rounded-full" : "size-[34px] rounded-lg",
+      // Touch: full-height targets that share the row's width on a narrow
+      // phone rather than run off its edge.
+      touch
+        ? "h-11 w-11 min-w-0 shrink rounded-full"
+        : "size-[34px] rounded-lg",
       className,
     )}
   />
@@ -173,7 +177,7 @@ export const MessageActionsBar = ({
       onKeyDown={onKeyDown}
       className={cn(
         "z-10 flex items-center gap-0.5 border border-elevated bg-surface p-1 shadow-popover",
-        touch ? "rounded-full" : "rounded-card",
+        touch ? "max-w-full gap-0 rounded-full" : "rounded-card",
       )}
     >
       {reactions.map((reaction, i) => (

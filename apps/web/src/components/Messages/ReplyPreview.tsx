@@ -28,7 +28,7 @@ export const ReplyPreview = ({
         type="button"
         aria-label={t("reply.cancel")}
         onClick={onCancel}
-        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted pointer-coarse:touch-target hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         <XIcon aria-hidden="true" className="size-4" />
       </button>

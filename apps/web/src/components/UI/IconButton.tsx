@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 const iconButtonVariants = cva(
-  "relative inline-flex shrink-0 items-center justify-center transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50",
+  "relative inline-flex shrink-0 items-center justify-center transition-colors cursor-pointer pointer-coarse:touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {

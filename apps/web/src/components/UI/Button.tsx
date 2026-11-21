@@ -13,7 +13,7 @@ const danger =
  * `destructive` are kept for existing callers and map onto the new looks.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-control text-body font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50",
+  "relative inline-flex items-center justify-center gap-2 rounded-control text-body font-medium transition-colors cursor-pointer pointer-coarse:touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {

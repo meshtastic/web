@@ -71,7 +71,9 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
         }
         className={cn(
           // Floating inset panel on the right at every size.
-          "inset-y-2 right-2 h-auto rounded-2xl border border-border bg-background text-foreground shadow-2xl",
+          // Inset by at least the safe areas on notched phones. Scoped like
+          // the drawer's own right-side placement, which it overrides.
+          "data-[vaul-drawer-direction=right]:top-[max(0.5rem,env(safe-area-inset-top))] data-[vaul-drawer-direction=right]:right-[max(0.5rem,env(safe-area-inset-right))] data-[vaul-drawer-direction=right]:bottom-[max(0.5rem,env(safe-area-inset-bottom))] h-auto rounded-2xl border border-border bg-background text-foreground shadow-2xl",
           "motion-reduce:transition-none!",
           "data-[vaul-drawer-direction=right]:w-[min(calc(100vw-16px),440px)] data-[vaul-drawer-direction=right]:sm:max-w-none",
         )}

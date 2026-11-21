@@ -5,6 +5,10 @@ import {
   ShellPage,
 } from "@components/Shell/ShellPage.tsx";
 import { isChannelMuted } from "@core/channels/mute.ts";
+import {
+  useCanFitDetailsColumn,
+  useFitsLabelledActions,
+} from "@core/hooks/useIsMobile.ts";
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
 import { useActiveClient, useChannel } from "@core/kmp/hooks";
 import {
@@ -150,7 +154,11 @@ export const ConversationScreen = ({
         .filter(Boolean)
         .join(" · ");
 
-  const closeDetails = touch ? undefined : () => setDetailsOpen(false);
+  // Only the details column has its own close; the drawer brings one.
+  const fitsDetailsColumn = useCanFitDetailsColumn();
+  const fitsLabelledActions = useFitsLabelledActions();
+  const closeDetails =
+    touch || !fitsDetailsColumn ? undefined : () => setDetailsOpen(false);
 
   const heard = useMemo(() => {
     if (isDm) {
@@ -235,7 +243,7 @@ export const ConversationScreen = ({
       trailing={
         <ChatHeaderActions
           kind={isDm ? "dm" : "channel"}
-          compact={touch}
+          compact={touch || !fitsLabelledActions}
           connected={connected}
           {...(isDm
             ? {

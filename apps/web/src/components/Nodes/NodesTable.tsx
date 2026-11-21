@@ -159,7 +159,12 @@ export const NodesTableRow = memo(function NodesTableRow({
     >
       <th
         scope="row"
-        className={cn(cellPad, "rounded-l-control text-left font-normal")}
+        // Below xl the name column takes what the others leave and
+        // truncates, so the table fits a tablet without scrolling sideways.
+        className={cn(
+          cellPad,
+          "rounded-l-control text-left font-normal max-xl:w-full max-xl:max-w-0",
+        )}
       >
         <span className="flex min-w-0 items-center gap-3">
           <NodeRowAvatar row={row} />
@@ -173,7 +178,7 @@ export const NodesTableRow = memo(function NodesTableRow({
                   event.stopPropagation();
                   onSelect(row.num);
                 }}
-                className="cursor-pointer truncate rounded-sm text-left font-semibold text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="min-w-0 cursor-pointer truncate rounded-sm text-left font-semibold text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 {row.name}
               </button>

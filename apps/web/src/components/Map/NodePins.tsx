@@ -82,7 +82,7 @@ const Pin = memo(function Pin({
         aria-label={name}
         aria-pressed={isSelected}
         className={cn(
-          "flex cursor-pointer items-center gap-1.5 rounded-full border-2 bg-surface p-[3px] text-meta font-medium text-primary shadow-floating transition-opacity",
+          "relative flex cursor-pointer items-center gap-1.5 rounded-full border-2 bg-surface p-[3px] pointer-coarse:touch-target text-meta font-medium text-primary shadow-floating transition-opacity",
           withLabel && "pr-2.5",
           dimmed && "opacity-40",
           toneRing[tone],
@@ -141,7 +141,7 @@ const StackBadge = memo(function StackBadge({
         type="button"
         tabIndex={-1}
         aria-label={t("pins.expandStack", { count: hiddenCount })}
-        className="cursor-pointer rounded-full bg-accent px-2 py-0.5 text-meta font-bold text-on-accent shadow-floating"
+        className="relative cursor-pointer rounded-full bg-accent px-2 py-0.5 pointer-coarse:touch-target text-meta font-bold text-on-accent shadow-floating"
       >
         +{hiddenCount}
       </button>

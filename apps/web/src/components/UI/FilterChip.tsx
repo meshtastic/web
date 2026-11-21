@@ -27,7 +27,7 @@ export const FilterChip = ({
     type={type}
     aria-pressed={selected}
     className={cn(
-      "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-help transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50",
+      "relative inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-help pointer-coarse:touch-target transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50",
       selected
         ? "bg-accent font-semibold text-on-accent"
         : "bg-raised font-medium text-secondary hover:bg-selected hover:text-primary",

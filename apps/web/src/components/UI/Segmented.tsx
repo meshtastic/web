@@ -143,7 +143,10 @@ export const Segmented = <T extends string>({
             className={cn(
               segmentedItemClasses,
               "inline-flex items-center justify-center",
+              // Touch screens: full 44px rows rather than a hit area that would
+              // overlap the next segment.
               size === "md" ? "h-8 min-w-9 px-2.5" : "h-7 min-w-8 px-2",
+              "pointer-coarse:h-11",
             )}
           >
             {option.label}

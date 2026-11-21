@@ -59,7 +59,8 @@ export const NodeFilterBar = ({
         onChange={(event) => onSearchChange(event.target.value)}
         containerClassName="min-w-0 flex-[1_1_280px]"
       />
-      <fieldset className="m-0 flex min-w-0 flex-wrap gap-1.5 border-0 p-0">
+      {/* Touch: room between wrapped rows for each chip's 44px hit area. */}
+      <fieldset className="m-0 flex min-w-0 flex-wrap gap-1.5 border-0 p-0 pointer-coarse:gap-y-3">
         <legend className="sr-only">{t("page.filtersLabel")}</legend>
         {NODE_QUICK_FILTERS.map((filter) => (
           <FilterChip

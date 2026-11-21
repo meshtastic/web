@@ -22,7 +22,8 @@ export const MobileSettingsList = <Id extends string>({
   onSelect,
 }: MobileSettingsListProps<Id>) => (
   <div className="flex flex-col gap-4.5 px-2 pt-5 pb-4">
-    <h1 className="m-0 px-1 text-display font-bold">{title}</h1>
+    {/* The header already shows the title, as on the other tabs. */}
+    <h1 className="sr-only">{title}</h1>
     {header}
     {groups.map((group) => (
       <section key={group.id} className="flex flex-col gap-1.5">

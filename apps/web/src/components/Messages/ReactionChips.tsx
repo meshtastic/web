@@ -58,7 +58,7 @@ export const ReactionChips = ({
               disabled={!onToggle}
               onClick={() => onToggle?.(chip.emoji)}
               className={cn(
-                "inline-flex h-[26px] cursor-pointer items-center gap-1 rounded-full border px-2 text-meta font-medium text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-default",
+                "inline-flex h-[26px] cursor-pointer items-center gap-1 rounded-full border px-2 relative pointer-coarse:touch-target text-meta font-medium text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-default",
                 chip.mine
                   ? "border-accent bg-accent-tint"
                   : "border-control bg-inset hover:border-input",
@@ -76,7 +76,7 @@ export const ReactionChips = ({
                 type="button"
                 aria-label={t("reactions.retry", { emoji: chip.emoji })}
                 onClick={() => onRetry(own.packetId)}
-                className="inline-flex size-[26px] cursor-pointer items-center justify-center rounded-full text-danger hover:bg-danger hover:text-on-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="inline-flex size-[26px] cursor-pointer items-center justify-center rounded-full text-danger relative pointer-coarse:touch-target hover:bg-danger hover:text-on-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 <RotateCwIcon aria-hidden="true" className="size-3.5" />
               </button>

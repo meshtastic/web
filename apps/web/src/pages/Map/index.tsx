@@ -409,7 +409,7 @@ const MapPage = () => {
       parameters={{
         popoverContentProps: { side: "bottom", align: "end", sideOffset: 8 },
         popoverTriggerClassName: [
-          "flex size-[38px] shrink-0 items-center justify-center rounded-control border border-control",
+          "relative flex size-[38px] shrink-0 items-center justify-center rounded-control border border-control pointer-coarse:touch-target",
           "bg-app text-muted hover:bg-raised hover:text-primary active:bg-raised",
           "dark:bg-app dark:text-muted hover:dark:bg-raised hover:dark:text-primary dark:active:bg-raised",
           "focus-visible:outline-2 focus-visible:outline-focus",
@@ -468,7 +468,7 @@ const MapPage = () => {
                     {t("page.showNodes")}
                   </Button>
                 </DrawerTrigger>
-                <DrawerContent className="h-[70vh] border-subtle bg-surface text-primary">
+                <DrawerContent className="h-[70dvh] border-subtle bg-surface pb-[env(safe-area-inset-bottom)] text-primary">
                   <DrawerTitle className="sr-only">
                     {t("page.nodeListLabel")}
                   </DrawerTitle>

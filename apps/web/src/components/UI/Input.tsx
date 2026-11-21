@@ -15,7 +15,7 @@ const cnInvalidBase = "border-danger-strong";
 const cnDirtyBase = "border-dirty";
 
 const inputVariants = cva(
-  "flex h-10 w-full rounded-control border border-input bg-app py-2 px-3 text-body text-primary placeholder:text-muted focus:outline-none focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50",
+  "flex h-10 w-full rounded-control border border-input bg-app py-2 px-3 text-body text-primary pointer-coarse:h-11 pointer-coarse:text-base placeholder:text-muted focus:outline-none focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -257,7 +257,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   key={action.id}
                   type="button"
                   className={cn(
-                    "inline-flex h-full items-center justify-center px-2.5 text-muted hover:bg-raised hover:text-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-focus last:hover:rounded-r-control",
+                    "inline-flex h-full items-center justify-center px-2.5 text-muted pointer-coarse:min-w-11 hover:bg-raised hover:text-primary focus:outline-none focus-visible:ring-1 focus-visible:ring-focus last:hover:rounded-r-control",
                     disabled && "text-muted",
                     action.id === "copy-value" && isCopied && "text-accent",
                   )}

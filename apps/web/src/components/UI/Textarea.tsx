@@ -47,7 +47,7 @@ export const Textarea = ({
       <textarea
         value={value}
         className={cn(
-          "min-h-20 w-full resize-y rounded-control border border-input bg-app px-3 py-2.5 text-body text-primary placeholder:text-muted focus:outline-none focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50",
+          "min-h-20 w-full resize-y rounded-control border border-input bg-app px-3 py-2.5 text-body text-primary pointer-coarse:text-base placeholder:text-muted focus:outline-none focus-visible:border-accent focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50",
           dirty && "border-dirty",
           (invalid || over) && "border-danger-strong",
           counted && "pb-7",

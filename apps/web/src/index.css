@@ -486,6 +486,32 @@ body {
   }
 }
 
+/*
+ * The map's scale bar defaults to 10px; keep it at the 12px minimum.
+ * Unlayered, like maplibre's own stylesheet, so it wins over it.
+ */
+.maplibregl-ctrl.maplibregl-ctrl-scale {
+  font-size: var(--text-meta);
+  line-height: var(--text-meta--line-height);
+}
+
+/*
+ * Grows a small control's hit area to at least 44x44px without changing
+ * how it looks, for touch screens (`relative pointer-coarse:touch-target`).
+ * The control must be positioned (pair it with `relative`, which
+ * tailwind-merge drops for a caller's `absolute`), so the pseudo-element's
+ * percentages resolve against the control itself: it only reaches out by
+ * the missing amount, centred on the control.
+ */
+@utility touch-target {
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block: min(0px, calc((100% - 44px) / 2));
+    inset-inline: min(0px, calc((100% - 44px) / 2));
+  }
+}
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;

@@ -404,8 +404,10 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
   const stepName = t(`steps.${info.label}`);
 
   return (
-    <div className="flex min-h-dvh flex-col bg-app text-primary">
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-subtle px-4 md:px-8">
+    // Safe-area padding keeps the frame clear of notches and the home
+    // indicator once the page draws edge to edge (viewport-fit=cover).
+    <div className="flex min-h-dvh flex-col bg-app pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] text-primary">
+      <header className="flex h-[calc(4rem+env(safe-area-inset-top))] shrink-0 items-center justify-between border-b border-subtle px-4 pt-[env(safe-area-inset-top)] md:px-8">
         <span className="flex items-center gap-2.5 text-title font-bold">
           <span
             aria-hidden="true"
@@ -432,7 +434,7 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
             href="https://meshtastic.org/docs"
             target="_blank"
             rel="noreferrer"
-            className="text-accent underline-offset-4 hover:underline"
+            className="relative text-accent underline-offset-4 hover:underline pointer-coarse:touch-target"
           >
             {t("frame.docs")}
           </a>
@@ -443,7 +445,7 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
                 void discard();
                 dispatch({ type: "skip" });
               }}
-              className="h-9 rounded-md px-1 text-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-focus"
+              className="relative h-9 rounded-md px-1 text-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-focus pointer-coarse:touch-target"
             >
               {t("frame.skip")}
             </button>
@@ -452,7 +454,7 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
       </header>
       <main className="flex flex-1 items-start justify-center px-0 py-0 md:items-center md:px-6 md:py-10">
         <div className="flex w-full max-w-[1040px] flex-wrap overflow-hidden bg-surface md:rounded-[20px] md:border md:border-subtle">
-          <section className="flex min-h-[calc(100dvh-4rem)] min-w-0 flex-[1_1_480px] flex-col gap-5 px-4 py-6 md:min-h-[620px] md:px-11 md:py-10">
+          <section className="flex min-h-[calc(100dvh-4rem-env(safe-area-inset-top))] min-w-0 flex-[1_1_480px] flex-col gap-5 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:min-h-[620px] md:px-11 md:py-10">
             {/* Each step's heading takes focus and is described by this
                 counter, so "Step n of m" is read with it. */}
             <div id={counterId}>

@@ -65,6 +65,8 @@ const NodesPage = (): JSX.Element => {
   const [quickFilter, setQuickFilter] = useState<NodeQuickFilter>("all");
   const [sort, setSort] = useState<SortState<NodeSortKey>>(DEFAULT_NODE_SORT);
   const [selectedNum, setSelectedNum] = useState<number | undefined>();
+  // Tablets show the details panel as a drawer; picking a row opens it.
+  const [detailsRequest, setDetailsRequest] = useState(0);
   // Row to focus when the mobile list comes back from a node's details.
   const [returnFocusNum, setReturnFocusNum] = useState<number | undefined>();
   // Shared with ShellPage: selecting a node reopens a hidden details column.
@@ -121,6 +123,7 @@ const NodesPage = (): JSX.Element => {
       setSelectedNum(num);
       if (!isMobile) {
         setDetailsOpen(true);
+        setDetailsRequest((request) => request + 1);
       }
     },
     [isMobile, setDetailsOpen],
@@ -175,7 +178,7 @@ const NodesPage = (): JSX.Element => {
       parameters={{
         popoverContentProps: { side: "bottom", align: "end", sideOffset: 8 },
         popoverTriggerClassName: [
-          "flex size-9 items-center justify-center rounded-control border border-control",
+          "relative flex size-9 items-center justify-center rounded-control border border-control pointer-coarse:touch-target",
           "bg-app text-muted hover:bg-raised hover:text-primary active:bg-raised",
           "dark:bg-app dark:text-muted hover:dark:bg-raised hover:dark:text-primary dark:active:bg-raised",
           "focus-visible:outline-2 focus-visible:outline-focus",
@@ -241,6 +244,7 @@ const NodesPage = (): JSX.Element => {
       label={title}
       details={details}
       detailsLabel={t("details.label")}
+      detailsDrawerRequest={detailsRequest}
       noPadding
     >
       <h1 className="sr-only">{title}</h1>

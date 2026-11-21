@@ -238,7 +238,7 @@ export const MessageBubble = memo(function MessageBubble({
         // detail 0: activated from the keyboard, so focus the bar.
         handlers.setActive(active ? undefined : key, event.detail === 0)
       }
-      className="flex size-[26px] shrink-0 cursor-pointer items-center justify-center rounded-md text-muted hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      className="flex size-[26px] shrink-0 cursor-pointer items-center justify-center rounded-md text-muted relative pointer-coarse:touch-target hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
       <SmileIcon aria-hidden="true" className="size-[15px]" />
     </button>
@@ -247,11 +247,18 @@ export const MessageBubble = memo(function MessageBubble({
   // Sits on the bubble's top corner (right for incoming, left for
   // outgoing). On a bubble narrower than the bar, safe alignment lets it
   // run into the open side of the row instead of off the list's edge.
+  // On touch it spans the whole row instead (the row is the anchor), so a
+  // bar of full-size targets fits a phone's width beside a narrow bubble.
   const bar = canAct ? (
     <div
       className={cn(
-        "pointer-events-none absolute -top-6 z-10 justify-end-safe *:pointer-events-auto",
-        outgoing ? "right-0 -left-3 flex-row-reverse" : "-right-3 left-0",
+        "pointer-events-none absolute z-10 *:pointer-events-auto",
+        touch
+          ? cn("inset-x-0 -top-8", outgoing ? "justify-end" : "justify-start")
+          : cn(
+              "-top-6 justify-end-safe",
+              outgoing ? "right-0 -left-3 flex-row-reverse" : "-right-3 left-0",
+            ),
         barVisible ? "flex" : "hidden group-focus-within:flex group-hover:flex",
       )}
     >
@@ -313,9 +320,19 @@ export const MessageBubble = memo(function MessageBubble({
     return (
       <div
         {...rowProps}
-        className={cn("group flex justify-end outline-none", pressClass)}
+        className={cn(
+          "group flex justify-end outline-none",
+          touch && "relative",
+          pressClass,
+        )}
       >
-        <div className={cn("relative flex flex-col items-end gap-1", maxWidth)}>
+        <div
+          className={cn(
+            "flex flex-col items-end gap-1",
+            !touch && "relative",
+            maxWidth,
+          )}
+        >
           {bar}
           <div
             className={cn(
@@ -357,22 +374,30 @@ export const MessageBubble = memo(function MessageBubble({
   return (
     <div
       {...rowProps}
-      className={cn("group flex items-end gap-2.5 outline-none", pressClass)}
+      className={cn(
+        "group flex items-end gap-2.5 outline-none",
+        touch && "relative",
+        pressClass,
+      )}
     >
       {sender && showSender ? (
         <NodeAvatar
           initials={sender.initials}
           tone={{ kind: "node", nodeNum: sender.nodeNum }}
           size="xs"
-          className={cn(touch ? "size-[30px]" : "size-[34px]")}
+          // Four 12px initials need the full 34px, touch layout included.
+          className="size-[34px]"
         />
       ) : (
-        <span
-          aria-hidden="true"
-          className={cn("shrink-0", touch ? "w-[30px]" : "w-[34px]")}
-        />
+        <span aria-hidden="true" className="w-[34px] shrink-0" />
       )}
-      <div className={cn("relative flex min-w-0 flex-col gap-1", maxWidth)}>
+      <div
+        className={cn(
+          "flex min-w-0 flex-col gap-1",
+          !touch && "relative",
+          maxWidth,
+        )}
+      >
         {bar}
         <div
           className={cn(

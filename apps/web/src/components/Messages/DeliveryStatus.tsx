@@ -70,7 +70,7 @@ export const DeliveryStatus = ({
         onClick={onShowDetails}
         title={t("bubble.deliveryDetails")}
         className={cn(
-          "inline-flex min-w-0 cursor-pointer items-center gap-1.5 rounded-md text-meta hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+          "inline-flex min-w-0 cursor-pointer items-center gap-1.5 rounded-md text-meta hover:underline relative pointer-coarse:touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
           line.kind === "failed"
             ? "text-danger"
             : line.kind === "proofFailed"
@@ -90,7 +90,7 @@ export const DeliveryStatus = ({
         <button
           type="button"
           onClick={onRetry}
-          className="inline-flex h-[26px] shrink-0 cursor-pointer items-center rounded-full border border-danger bg-danger px-2.5 text-meta font-semibold text-on-danger hover:border-danger-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="inline-flex h-[26px] shrink-0 cursor-pointer items-center rounded-full border border-danger relative pointer-coarse:touch-target bg-danger px-2.5 text-meta font-semibold text-on-danger hover:border-danger-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           {t("bubble.retry")}
         </button>

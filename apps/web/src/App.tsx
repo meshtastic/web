@@ -10,6 +10,7 @@ import { AppShell } from "@components/Shell/AppShell.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
+import { useKeyboardInset } from "@core/hooks/useKeyboardInset.ts";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { cn } from "@core/utils/cn.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
@@ -38,6 +39,7 @@ function useUnreadTitleIndicator() {
 export function App() {
   useTheme();
   useUnreadTitleIndicator();
+  useKeyboardInset();
 
   const { getDevice } = useDeviceStore();
   const { selectedDeviceId } = useAppStore();
@@ -70,7 +72,11 @@ export function App() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <Toaster className={cn(device && "max-sm:top-16")} />
+      <Toaster
+        className={cn(
+          device && "max-sm:top-[calc(4rem+env(safe-area-inset-top))]",
+        )}
+      />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>
         {/* Overlay sits outside the device-conditional branch so it shows
@@ -81,13 +87,19 @@ export function App() {
             device it is forced open and replaces the old full-page screen. */}
         <ConnectionsDrawer forced={!device} />
         <div
-          className="flex h-screen flex-col bg-background-primary text-text-primary"
+          className={cn(
+            "flex flex-col bg-background-primary text-text-primary",
+            // The connection screen keeps its h-screen; the shell fits the
+            // dynamic viewport so nothing scrolls under mobile browser chrome.
+            device ? "h-dvh" : "h-screen",
+          )}
           style={{ scrollbarWidth: "thin" }}
         >
           <div className="h-full flex flex-1 flex-col">
             {device ? (
-              // dvh here only: the shell stays h-screen so the connection screen is untouched.
-              <div className="h-dvh flex w-full">
+              // Shrinks above a keyboard that overlays the page (Safari), so
+              // the composer stays in view; see useKeyboardInset.
+              <div className="flex h-[calc(100dvh-var(--keyboard-inset,0px))] w-full">
                 <DialogManager />
                 <LockdownGate />
                 <RegionSetupReminder />

@@ -13,6 +13,7 @@ import { DeviceCard } from "@components/Shell/DeviceCard.tsx";
 import { ShellPage } from "@components/Shell/ShellPage.tsx";
 import { useDeviceSummary } from "@components/Shell/useDeviceSummary.ts";
 import { Button } from "@components/UI/Button.tsx";
+import Footer from "@components/UI/Footer.tsx";
 import { IconButton } from "@components/UI/IconButton.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
@@ -305,6 +306,8 @@ const ConfigPage = () => {
           values={listValues}
           onSelect={openSection}
         />
+        {/* The footer's only place on phones: the end of the Settings list. */}
+        <Footer />
       </ShellPage>
     );
   }
@@ -364,6 +367,7 @@ const ConfigPage = () => {
           <IconButton
             aria-label={goBack.label}
             variant="rail"
+            size="touch"
             icon={<ArrowLeftIcon className="size-5" />}
             onClick={goBack.onClick}
           />
@@ -372,7 +376,7 @@ const ConfigPage = () => {
           <Button
             size="sm"
             variant={hasPending ? "primary" : "secondary"}
-            className="rounded-full"
+            className="relative rounded-full pointer-coarse:touch-target"
             disabled={!hasPending || isSaving || !formState.isValid}
             aria-busy={isSaving || undefined}
             onClick={() => void handleSave()}
@@ -397,7 +401,7 @@ const ConfigPage = () => {
         <div
           className={cn(
             "min-h-0 flex-1 overflow-auto px-4 pt-4 md:px-10 md:pt-8",
-            isMobile ? "pb-6" : "pb-32",
+            isMobile ? "pb-[max(1.5rem,env(safe-area-inset-bottom))]" : "pb-32",
           )}
         >
           <div className="mx-auto flex max-w-[760px] flex-col gap-5">
@@ -422,7 +426,7 @@ const ConfigPage = () => {
           </div>
         </div>
         {hasPending && isMobile ? (
-          <div className="flex flex-col gap-2 rounded-card border border-warning-subtle bg-warning mx-3 mb-4 px-3.5 py-3 text-help text-warning">
+          <div className="flex flex-col gap-2 rounded-card border border-warning-subtle bg-warning mx-3 mb-[max(1rem,env(safe-area-inset-bottom))] px-3.5 py-3 text-help text-warning">
             <output>{error ?? note}</output>
             <Button
               variant="ghost"

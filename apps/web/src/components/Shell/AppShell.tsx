@@ -24,7 +24,8 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
   const setCommandPaletteOpen = useAppStore((s) => s.setCommandPaletteOpen);
 
   return (
-    <div className="flex h-full min-h-0 w-full min-w-0 bg-app">
+    // Landscape phones: keep content clear of the notch and rounded corners.
+    <div className="flex h-full min-h-0 w-full min-w-0 bg-app pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
       {isMobile ? null : (
         <AppRail
           pathname={pathname}

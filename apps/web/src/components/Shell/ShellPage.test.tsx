@@ -5,14 +5,26 @@ import { DETAILS_PANEL_STORAGE_KEY, ShellPage } from "./ShellPage.tsx";
 
 const viewport = vi.hoisted(() => ({
   mobile: false,
+  wide: true,
   listeners: new Set<() => void>(),
 }));
 
-const route = vi.hoisted(() => ({ pathname: "/messages/broadcast/0" }));
+const route = vi.hoisted(() => ({
+  pathname: "/messages/broadcast/0",
+  fullScreen: false,
+}));
 
 vi.mock("@core/hooks/useIsMobile.ts", async () => {
   const { useSyncExternalStore } = await import("react");
+  const subscribe = (onChange: () => void) => {
+    viewport.listeners.add(onChange);
+    return () => {
+      viewport.listeners.delete(onChange);
+    };
+  };
   return {
+    useCanFitDetailsColumn: () =>
+      useSyncExternalStore(subscribe, () => viewport.wide),
     useIsMobile: () =>
       useSyncExternalStore(
         (onChange: () => void) => {
@@ -32,6 +44,11 @@ vi.mock("@tanstack/react-router", () => ({
   }: {
     select: (location: { pathname: string }) => string;
   }) => select({ pathname: route.pathname }),
+  useMatches: ({
+    select,
+  }: {
+    select: (matches: { staticData?: { hideTabBar?: boolean } }[]) => boolean;
+  }) => select([{ staticData: { hideTabBar: route.fullScreen } }]),
 }));
 
 vi.mock("./MobileHeaderControls.tsx", () => ({
@@ -78,7 +95,9 @@ beforeEach(() => {
 afterEach(() => {
   viewport.listeners.clear();
   setViewport(false);
+  viewport.wide = true;
   route.pathname = "/messages/broadcast/0";
+  route.fullScreen = false;
 });
 
 describe("ShellPage", () => {
@@ -142,7 +161,116 @@ describe("ShellPage", () => {
     });
   });
 
+  describe("tablet", () => {
+    it("keeps the sidebar as a column but opens the details panel as a drawer", () => {
+      setViewport(false);
+      viewport.wide = false;
+      renderPage();
+
+      expect(
+        screen.getByRole("complementary", { name: "Navigation" }),
+      ).toBeInTheDocument();
+      expect(screen.queryByText("details content")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("mobile header controls"),
+      ).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: "Node details" }));
+      expect(screen.getByRole("dialog")).toHaveTextContent("details content");
+    });
+
+    it("gives the details column back once the viewport is wide enough", () => {
+      setViewport(false);
+      viewport.wide = false;
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: "Node details" }));
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+      viewport.wide = true;
+      act(() => {
+        for (const listener of [...viewport.listeners]) listener();
+      });
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("complementary", { name: "Node details" }),
+      ).toHaveTextContent("details content");
+    });
+  });
+
+  describe("details drawer request", () => {
+    const withRequest = (request: number) => (
+      <ShellPage
+        label="Nodes"
+        details={<div>details content</div>}
+        detailsLabel="Node details"
+        detailsDrawerRequest={request}
+      >
+        <div>page content</div>
+      </ShellPage>
+    );
+
+    it("opens the drawer on a tablet each time the request changes", () => {
+      setViewport(false);
+      viewport.wide = false;
+      const { rerender } = render(withRequest(0));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+      rerender(withRequest(1));
+      expect(screen.getByRole("dialog")).toHaveTextContent("details content");
+
+      fireEvent.click(screen.getByRole("button", { name: "Close" }));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+      rerender(withRequest(2));
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("leaves the column to the remembered toggle on a wide screen", () => {
+      setViewport(false);
+      const { rerender } = render(withRequest(0));
+      rerender(withRequest(1));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("complementary", { name: "Node details" }),
+      ).toBeInTheDocument();
+    });
+  });
+
   describe("mobile", () => {
+    it("leaves the footer out of the page and pads the header for the notch", () => {
+      setViewport(true);
+      renderPage();
+
+      expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
+      expect(screen.getByRole("banner").className).toContain(
+        "env(safe-area-inset-top)",
+      );
+    });
+
+    it("keeps a full-screen sub-page header to its own controls", () => {
+      setViewport(true);
+      route.fullScreen = true;
+      renderPage();
+
+      expect(
+        screen.queryByText("mobile header controls"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Node details" }),
+      ).toBeInTheDocument();
+    });
+
+    it("pads drawers clear of the safe-area insets", () => {
+      setViewport(true);
+      renderPage();
+
+      fireEvent.click(screen.getByRole("button", { name: "Navigation" }));
+      expect(screen.getByRole("dialog").className).toContain(
+        "env(safe-area-inset-bottom)",
+      );
+    });
+
     it("keeps the side panels out of the page and reaches them from the header", () => {
       setViewport(true);
       renderPage();

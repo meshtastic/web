@@ -115,7 +115,10 @@ export const Composer = ({
       onSubmit={onSubmit}
       className={cn(
         "flex shrink-0 flex-col gap-1.5 border-t border-subtle",
-        touch ? "bg-surface px-2 pt-2 pb-5" : "px-5 pt-3 pb-4",
+        // The composer is the bottom edge on phones: clear the home indicator.
+        touch
+          ? "bg-surface px-2 pt-2 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+          : "px-5 pt-3 pb-4",
       )}
     >
       {replying ? (
