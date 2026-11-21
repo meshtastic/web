@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SCHEMA_SQL > is pinned per SCHEMA_VERSION (bump the version when the DDL changes) > schema v1 1`] = `
+exports[`SCHEMA_SQL > is pinned per SCHEMA_VERSION (bump the version when the DDL changes) > schema v2 1`] = `
 "CREATE TABLE IF NOT EXISTS messages (
     seq INTEGER PRIMARY KEY AUTOINCREMENT,
     device_id INTEGER NOT NULL,
@@ -22,7 +22,8 @@ exports[`SCHEMA_SQL > is pinned per SCHEMA_VERSION (bump the version when the DD
     rssi INTEGER,
     hops_away INTEGER,
     via_mqtt INTEGER,
-    transport INTEGER
+    transport INTEGER,
+    filtered INTEGER NOT NULL DEFAULT 0
   );
 CREATE UNIQUE INDEX IF NOT EXISTS ux_messages_packet ON messages(device_id, from_node, packet_id);
 CREATE INDEX IF NOT EXISTS idx_messages_packet_id ON messages(device_id, packet_id);
@@ -77,5 +78,20 @@ CREATE TABLE IF NOT EXISTS telemetry (
     ts INTEGER NOT NULL,
     payload_json TEXT NOT NULL
   );
-CREATE INDEX IF NOT EXISTS idx_telemetry_node_ts ON telemetry(device_id, node_num, ts)"
+CREATE INDEX IF NOT EXISTS idx_telemetry_node_ts ON telemetry(device_id, node_num, ts);
+CREATE TABLE IF NOT EXISTS filter_words (
+    device_id INTEGER NOT NULL,
+    pattern TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (device_id, pattern)
+  );
+CREATE TABLE IF NOT EXISTS filter_settings (
+    device_id INTEGER PRIMARY KEY,
+    enabled INTEGER NOT NULL DEFAULT 0
+  );
+CREATE TABLE IF NOT EXISTS filter_opt_outs (
+    device_id INTEGER NOT NULL,
+    conversation_key TEXT NOT NULL,
+    PRIMARY KEY (device_id, conversation_key)
+  )"
 `;

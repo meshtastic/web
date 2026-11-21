@@ -12,7 +12,11 @@ import {
   useFitsLabelledActions,
 } from "@core/hooks/useIsMobile.ts";
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
-import { useActiveClient, useChannel } from "@core/kmp/hooks";
+import {
+  useActiveClient,
+  useChannel,
+  useConversationFilter,
+} from "@core/kmp/hooks";
 import {
   channelEncryption,
   channelHeardRows,
@@ -74,6 +78,7 @@ export const ConversationScreen = ({
     { serializer: String, deserializer: readBoolean },
   );
   const key = conversationKeyString(conversation);
+  const filter = useConversationFilter(conversation);
   // Which conversation asked to be cleared; switching drops the request.
   const [confirmClearFor, setConfirmClearFor] = useState<string | undefined>(
     undefined,
@@ -277,6 +282,20 @@ export const ConversationScreen = ({
               })}
           onClearConversation={() => setConfirmClearFor(key)}
           onDeleteAllMessages={() => setDialogOpen("deleteMessages", true)}
+          {...(client
+            ? {
+                filter: {
+                  enabled: filter.enabled,
+                  optedOut: filter.optedOut,
+                  filteredCount: filter.filteredCount,
+                  revealed: filter.revealed,
+                  onOptedOutChange: filter.setOptedOut,
+                  onRevealedChange: filter.setRevealed,
+                  onOpenSettings: () =>
+                    void navigate({ to: "/settings/message-filter" }),
+                },
+              }
+            : {})}
         />
       }
       sidebar={sidebar}

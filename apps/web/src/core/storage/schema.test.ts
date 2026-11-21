@@ -5,6 +5,9 @@ import { applySchema, type RawSql } from "./db.ts";
 import { describe, expect, it } from "vitest";
 import {
   drafts,
+  filterOptOuts,
+  filterSettings,
+  filterWords,
   messages,
   nodes,
   reactions,
@@ -22,6 +25,9 @@ const TABLES: ReadonlyArray<SQLiteTable> = [
   readMarkers,
   nodes,
   telemetry,
+  filterWords,
+  filterSettings,
+  filterOptOuts,
 ];
 
 async function freshSqlite() {
@@ -100,6 +106,9 @@ describe("SCHEMA_SQL", () => {
     ).map((row) => row[0]);
     expect(tables).toEqual([
       "drafts",
+      "filter_opt_outs",
+      "filter_settings",
+      "filter_words",
       "messages",
       "nodes",
       "reactions",
@@ -141,7 +150,7 @@ describe("applySchema", () => {
     const db = await freshSqlite();
     await applySchema(rawSql(db));
     await applySchema(rawSql(db));
-    expect(userTables(db)).toHaveLength(6);
+    expect(userTables(db)).toHaveLength(9);
     expect(db.exec("PRAGMA user_version")[0]?.values).toEqual([
       [SCHEMA_VERSION],
     ]);

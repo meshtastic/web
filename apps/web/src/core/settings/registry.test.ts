@@ -39,7 +39,7 @@ describe("settings registry", () => {
       ],
       backupRestore: ["backup"],
       advanced: ["firmware", "clean-nodes", "debug"],
-      app: ["app"],
+      app: ["app", "message-filter"],
       information: ["about", "help"],
     });
     expect(Object.keys(GROUP_LABEL_KEYS)).toEqual([...SETTINGS_GROUP_IDS]);
@@ -53,10 +53,10 @@ describe("settings registry", () => {
     }
   });
 
-  it("only App settings are stored in the browser", () => {
+  it("only App settings and the message filter are stored in the browser", () => {
     expect(
       SETTINGS_SECTIONS.filter((s) => s.scope === "browser").map((s) => s.id),
-    ).toEqual(["app"]);
+    ).toEqual(["app", "message-filter"]);
   });
 
   it("reads the section from the path, keeping the old segments", () => {

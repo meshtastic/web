@@ -86,6 +86,29 @@ export function adoptionStatements(from: number, to: number): SqlStatement[] {
       to,
       from,
     ),
+    // Filter words and opted-out conversations: the union of both lists.
+    statement(
+      `UPDATE OR IGNORE filter_words SET device_id = ? WHERE device_id = ?`,
+      to,
+      from,
+    ),
+    statement(`DELETE FROM filter_words WHERE device_id = ?`, from),
+    statement(
+      `UPDATE OR IGNORE filter_opt_outs SET device_id = ? WHERE device_id = ?`,
+      to,
+      from,
+    ),
+    statement(`DELETE FROM filter_opt_outs WHERE device_id = ?`, from),
+    // A provisional row exists only if the switch was flipped on this
+    // connection, so it is the newer choice.
+    statement(
+      `INSERT INTO filter_settings (device_id, enabled)
+       SELECT ?, enabled FROM filter_settings WHERE device_id = ?
+       ON CONFLICT (device_id) DO UPDATE SET enabled = excluded.enabled`,
+      to,
+      from,
+    ),
+    statement(`DELETE FROM filter_settings WHERE device_id = ?`, from),
   ];
 }
 
@@ -120,6 +143,9 @@ const PROVISIONAL_TABLES = [
   "drafts",
   "nodes",
   "telemetry",
+  "filter_words",
+  "filter_settings",
+  "filter_opt_outs",
 ] as const;
 
 /**

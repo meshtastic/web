@@ -67,6 +67,11 @@ const EXTRAS: Readonly<Record<SettingsSectionId, CommandMenuExtras>> = {
     keywordsKey: "keywords.app",
     icon: "app",
   },
+  "message-filter": {
+    hintKey: "settingsHint.messageFilter",
+    keywordsKey: "keywords.messageFilter",
+    icon: "filter",
+  },
   about: { hintKey: "settingsHint.about", icon: "about" },
   help: {
     hintKey: "settingsHint.help",

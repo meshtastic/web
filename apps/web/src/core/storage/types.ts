@@ -40,6 +40,11 @@ export interface Message {
   /** Packet id of the message this one replies to (Data.reply_id). */
   readonly replyId?: number;
   /**
+   * The message filter matched it on arrival: it never counts as unread or
+   * becomes the conversation preview.
+   */
+  readonly filtered?: boolean;
+  /**
    * Local arrival order, set on messages loaded from storage. Ties on
    * `rxTime` are paged by it (see `MessageCursor`).
    */

@@ -261,6 +261,18 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
       expect((await repo.loadConversations(ME))[0]?.unread).toBe(0);
     });
 
+    it("leaves filtered messages out of the preview and unread, but keeps them", async () => {
+      await repo.append(dm(1, 2, "hi"), DM);
+      await repo.append({ ...dm(2, 2, "spam"), filtered: true }, DM);
+      const [conv] = await repo.loadConversations(ME);
+      expect(conv).toMatchObject({ lastMessage: { id: 1 }, unread: 1 });
+      const thread = await repo.loadRecent(DM, 10);
+      expect(thread.map((m) => [m.id, m.filtered])).toEqual([
+        [1, undefined],
+        [2, true],
+      ]);
+    });
+
     it("marking an empty conversation read is a no-op", async () => {
       await repo.markRead(DM);
       expect(await repo.loadConversations(ME)).toEqual([]);

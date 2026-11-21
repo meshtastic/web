@@ -158,6 +158,7 @@ export const firmwareRoute = settingsPage("firmware");
 export const cleanNodeDbRoute = settingsPage("clean-nodes");
 export const debugRoute = settingsPage("debug");
 export const appSettingsRoute = settingsPage("app");
+export const messageFilterRoute = settingsPage("message-filter");
 export const aboutRoute = settingsPage("about");
 export const helpRoute = settingsPage("help");
 
@@ -221,6 +222,7 @@ export const routeTree = rootRoute.addChildren([
     cleanNodeDbRoute,
     debugRoute,
     appSettingsRoute,
+    messageFilterRoute,
     aboutRoute,
     helpRoute,
     legacyRadioRoute,

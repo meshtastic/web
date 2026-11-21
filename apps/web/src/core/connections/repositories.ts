@@ -4,6 +4,7 @@ import type { SdkStorage } from "@meshtastic/sdk-kmp";
 import { createLogger } from "@core/log.ts";
 import { coordinator, getStorageDb } from "@core/sdkStorage.ts";
 import { SqlocalDraftRepository } from "@core/storage/drafts.ts";
+import { SqlocalMessageFilterRepository } from "@core/storage/messageFilter.ts";
 import { SqlocalMessageRepository } from "@core/storage/messages.ts";
 import { SqlocalNodesRepository } from "@core/storage/nodes.ts";
 import {
@@ -163,6 +164,7 @@ export async function openRepositories(): Promise<{
       options: {
         messages: new SqlocalMessageRepository(db, { scope, coordinator }),
         drafts: new SqlocalDraftRepository(db, { scope }),
+        messageFilter: new SqlocalMessageFilterRepository(db, { scope }),
         nodes: new SqlocalNodesRepository(db, { scope }),
         telemetry: new SqlocalTelemetryRepository(db, { scope }),
         chatRetention: CHAT_RETENTION,

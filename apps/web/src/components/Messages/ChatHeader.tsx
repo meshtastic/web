@@ -1,6 +1,7 @@
 import { Button } from "@components/UI/Button.tsx";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -14,6 +15,9 @@ import {
   ArrowLeftIcon,
   BellOffIcon,
   EraserIcon,
+  EyeIcon,
+  EyeOffIcon,
+  FilterIcon,
   LockIcon,
   LockOpenIcon,
   MapIcon,
@@ -127,6 +131,21 @@ export interface ChatHeaderActionsProps {
   onClearConversation: () => void;
   onDeleteAllMessages: () => void;
   onChannelSettings?: () => void;
+  /** The message filter's entries for this conversation. */
+  filter?: ChatHeaderFilterProps;
+}
+
+export interface ChatHeaderFilterProps {
+  /** Filtering is on for the radio: offers the per-conversation toggle. */
+  enabled: boolean;
+  /** This conversation turned filtering off. */
+  optedOut: boolean;
+  /** Filtered messages loaded here: offers Show / Hide N filtered. */
+  filteredCount: number;
+  revealed: boolean;
+  onOptedOutChange: (optedOut: boolean) => void;
+  onRevealedChange: (revealed: boolean) => void;
+  onOpenSettings: () => void;
 }
 
 /**
@@ -144,6 +163,7 @@ export const ChatHeaderActions = ({
   onClearConversation,
   onDeleteAllMessages,
   onChannelSettings,
+  filter,
 }: ChatHeaderActionsProps) => {
   const { t } = useTranslation("messages");
   const dm = kind === "dm";
@@ -220,6 +240,45 @@ export const ChatHeaderActions = ({
               <SettingsIcon aria-hidden="true" className={iconClass} />
               {t("channelDetails.settings")}
             </DropdownMenuItem>
+          ) : null}
+          {filter ? (
+            <>
+              <DropdownMenuSeparator />
+              {filter.enabled &&
+              filter.filteredCount > 0 &&
+              !filter.optedOut ? (
+                <DropdownMenuItem
+                  onSelect={() => filter.onRevealedChange(!filter.revealed)}
+                  className="gap-2"
+                >
+                  {filter.revealed ? (
+                    <EyeOffIcon aria-hidden="true" className={iconClass} />
+                  ) : (
+                    <EyeIcon aria-hidden="true" className={iconClass} />
+                  )}
+                  {filter.revealed
+                    ? t("filter.hideFiltered", { count: filter.filteredCount })
+                    : t("filter.showFiltered", { count: filter.filteredCount })}
+                </DropdownMenuItem>
+              ) : null}
+              {filter.enabled ? (
+                <DropdownMenuCheckboxItem
+                  checked={!filter.optedOut}
+                  onCheckedChange={(checked) =>
+                    filter.onOptedOutChange(!checked)
+                  }
+                >
+                  {t("filter.filterConversation")}
+                </DropdownMenuCheckboxItem>
+              ) : null}
+              <DropdownMenuItem
+                onSelect={filter.onOpenSettings}
+                className="gap-2"
+              >
+                <FilterIcon aria-hidden="true" className={iconClass} />
+                {t("filter.settings")}
+              </DropdownMenuItem>
+            </>
           ) : null}
           <DropdownMenuSeparator />
           <DropdownMenuItem

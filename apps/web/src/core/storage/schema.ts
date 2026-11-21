@@ -30,7 +30,7 @@ export const DATABASE_FILE = "meshtastic-app-v1.db";
  * Bump whenever the DDL below changes; older databases are wiped.
  * schema.test.ts pins the DDL per version, so an edit without a bump fails.
  */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 const MESSAGE_STATES = [
   MessageState.Pending,
@@ -73,6 +73,11 @@ export const messages = sqliteTable(
     viaMqtt: integer("via_mqtt", { mode: "boolean" }),
     transport:
       integer("transport").$type<Protobuf.Mesh.MeshPacket_TransportMechanism>(),
+    /**
+     * Hidden by the message filter when it arrived: never unread, never the
+     * preview (see core/messaging/messageFilter.ts).
+     */
+    filtered: integer("filtered", { mode: "boolean" }).notNull().default(false),
   },
   (t) => [
     uniqueIndex("ux_messages_packet").on(t.deviceId, t.fromNode, t.packetId),
@@ -208,6 +213,38 @@ export type TelemetryRow = typeof telemetry.$inferSelect;
 export type TelemetryInsert = typeof telemetry.$inferInsert;
 
 /**
+ * Message filter entries, per radio: a word, or `regex:` and a pattern
+ * (see core/messaging/messageFilter.ts). Stored as typed, trimmed.
+ */
+export const filterWords = sqliteTable(
+  "filter_words",
+  {
+    deviceId: integer("device_id").notNull(),
+    pattern: text("pattern").notNull(),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.deviceId, t.pattern] })],
+);
+
+export type FilterWordRow = typeof filterWords.$inferSelect;
+
+/** Whether the message filter is on, per radio. No row is off. */
+export const filterSettings = sqliteTable("filter_settings", {
+  deviceId: integer("device_id").primaryKey(),
+  enabled: integer("enabled", { mode: "boolean" }).notNull().default(false),
+});
+
+/** Conversations that turned the message filter off for themselves. */
+export const filterOptOuts = sqliteTable(
+  "filter_opt_outs",
+  {
+    deviceId: integer("device_id").notNull(),
+    conversationKey: text("conversation_key").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.deviceId, t.conversationKey] })],
+);
+
+/**
  * The whole schema. Hand-written (rather than drizzle-kit generated) so the
  * database bootstraps itself on first open without a build step; keep it in
  * step with the table definitions above (schema.test.ts checks the columns).
@@ -234,7 +271,8 @@ export const SCHEMA_SQL: ReadonlyArray<string> = [
     rssi INTEGER,
     hops_away INTEGER,
     via_mqtt INTEGER,
-    transport INTEGER
+    transport INTEGER,
+    filtered INTEGER NOT NULL DEFAULT 0
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS ux_messages_packet ON messages(device_id, from_node, packet_id)`,
   `CREATE INDEX IF NOT EXISTS idx_messages_packet_id ON messages(device_id, packet_id)`,
@@ -290,6 +328,21 @@ export const SCHEMA_SQL: ReadonlyArray<string> = [
     payload_json TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS idx_telemetry_node_ts ON telemetry(device_id, node_num, ts)`,
+  `CREATE TABLE IF NOT EXISTS filter_words (
+    device_id INTEGER NOT NULL,
+    pattern TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (device_id, pattern)
+  )`,
+  `CREATE TABLE IF NOT EXISTS filter_settings (
+    device_id INTEGER PRIMARY KEY,
+    enabled INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE TABLE IF NOT EXISTS filter_opt_outs (
+    device_id INTEGER NOT NULL,
+    conversation_key TEXT NOT NULL,
+    PRIMARY KEY (device_id, conversation_key)
+  )`,
 ];
 
 /**

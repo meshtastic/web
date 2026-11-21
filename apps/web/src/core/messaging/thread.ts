@@ -29,6 +29,8 @@ export interface ThreadMessage {
   readonly reactions: readonly ReactionChip[];
   /** Delivery status line, for outgoing messages only. */
   readonly delivery?: DeliveryState;
+  /** Matches the message filter; shown only because the user revealed it. */
+  readonly filtered?: boolean;
 }
 
 export const DEFAULT_EXCERPT_LENGTH = 80;

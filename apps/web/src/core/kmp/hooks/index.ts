@@ -39,3 +39,9 @@ export {
   useThread,
 } from "./useMessaging.ts";
 export { useSignal } from "./useSignal.ts";
+export {
+  type UseConversationFilterResult,
+  type UseMessageFilterResult,
+  useConversationFilter,
+  useMessageFilter,
+} from "./useMessageFilter.ts";

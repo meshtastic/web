@@ -45,6 +45,7 @@ import {
 } from "@pages/Settings/DeviceConfig.tsx";
 import { Firmware } from "@pages/Settings/Firmware.tsx";
 import { Help } from "@pages/Settings/Help.tsx";
+import { MessageFilter } from "@pages/Settings/MessageFilter.tsx";
 import {
   MODULE_TABS,
   ModuleConfig,
@@ -57,6 +58,7 @@ import {
   BookOpenIcon,
   BugIcon,
   EraserIcon,
+  FilterIcon,
   HardDriveUploadIcon,
   InfoIcon,
   LayersIcon,
@@ -103,6 +105,7 @@ const SECTION_VIEWS = {
   "clean-nodes": { icon: EraserIcon, component: CleanNodeDb },
   debug: { icon: BugIcon, component: DebugPanel },
   app: { icon: PaletteIcon, component: AppSettings },
+  "message-filter": { icon: FilterIcon, component: MessageFilter },
   about: { icon: InfoIcon, component: About },
   help: { icon: BookOpenIcon, component: Help },
 } as const satisfies Record<

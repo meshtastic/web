@@ -33,6 +33,7 @@
     "cleanNodeDb": "Clean node database",
     "debugPanel": "Debug panel",
     "appSettings": "App settings",
+    "messageFilter": "Message filter",
     "about": "About",
     "help": "Help & documentation"
   },
@@ -649,6 +650,7 @@
     "cleanNodesDescription": "Remove old nodes so your node list and map stay useful.",
     "debugDescription": "Live logs from the radio, for troubleshooting.",
     "appDescription": "Preferences for this client. They stay in this browser and don’t change the radio.",
+    "messageFilterDescription": "Hide incoming messages that contain words you choose. Each radio keeps its own list, in this browser.",
     "aboutDescription": "Versions and legal information.",
     "helpDescription": "Guides, troubleshooting and community.",
     "positionDescription": "GPS, fixed position and how often to share it.",

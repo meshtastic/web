@@ -91,6 +91,7 @@
     "cleanNodes": "Remove stale nodes",
     "debug": "Device log records",
     "app": "Theme, language and more",
+    "messageFilter": "Hide messages containing words",
     "about": "Version and licences",
     "help": "Guides and community"
   },
@@ -118,6 +119,7 @@
     "notConnected": "Connect a device first"
   },
   "keywords": {
+    "messageFilter": "filter words block hide mute spam regex",
     "user": "owner profile name",
     "lora": "radio region modem preset",
     "security": "keys admin",

@@ -87,6 +87,7 @@ export type CommandIconName =
   | "cleanNodes"
   | "debug"
   | "app"
+  | "filter"
   | "about"
   | "help"
   | "switchDevice"

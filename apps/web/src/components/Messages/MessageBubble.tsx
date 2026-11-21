@@ -406,6 +406,8 @@ export const MessageBubble = memo(function MessageBubble({
         <div
           className={cn(
             "flex flex-col gap-[3px] rounded-bubble rounded-bl-tail bg-raised px-3.5 pt-2 pb-2.5",
+            // Shown only because the user revealed filtered messages.
+            thread.filtered && "border border-dashed border-control",
             highlighted && "ring-2 ring-accent",
           )}
         >
@@ -424,6 +426,11 @@ export const MessageBubble = memo(function MessageBubble({
         </div>
         {chips}
         <div className="flex flex-wrap items-center gap-1.5 text-meta text-muted">
+          {thread.filtered ? (
+            <span className="font-semibold text-secondary">
+              {t("filter.filteredLabel")}
+            </span>
+          ) : null}
           {timeElement}
           {meta ? <IncomingMetaLine meta={meta} locale={locale} /> : null}
           {pick}

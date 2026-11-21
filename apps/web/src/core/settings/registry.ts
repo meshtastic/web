@@ -29,6 +29,7 @@ export const SETTINGS_SECTION_IDS = [
   "clean-nodes",
   "debug",
   "app",
+  "message-filter",
   "about",
   "help",
 ] as const;
@@ -164,6 +165,14 @@ export const SETTINGS_SECTIONS = [
     group: "app",
     labelKey: "navigation.appSettings",
     descriptionKey: "sections.appDescription",
+    scope: "browser",
+    stagesEdits: false,
+  },
+  {
+    id: "message-filter",
+    group: "app",
+    labelKey: "navigation.messageFilter",
+    descriptionKey: "sections.messageFilterDescription",
     scope: "browser",
     stagesEdits: false,
   },

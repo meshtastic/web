@@ -348,11 +348,12 @@ export class SqlocalMessageRepository implements MessageRepository {
     myNodeNum: number,
   ): Promise<StoredConversation[]> {
     // SQLite fills bare columns of a max() aggregate from the row holding
-    // the maximum, so this is each conversation's latest message.
+    // the maximum, so this is each conversation's latest message. Filtered
+    // messages are never the preview nor unread (as on Android).
     const latest = await this.db
       .select({ ...getTableColumns(messages), latestSeq: max(messages.seq) })
       .from(messages)
-      .where(eq(messages.deviceId, deviceId))
+      .where(and(eq(messages.deviceId, deviceId), eq(messages.filtered, false)))
       .groupBy(messages.conversationKey);
     const unread = await this.db
       .select({ key: messages.conversationKey, unread: count() })
@@ -367,6 +368,7 @@ export class SqlocalMessageRepository implements MessageRepository {
       .where(
         and(
           eq(messages.deviceId, deviceId),
+          eq(messages.filtered, false),
           ne(messages.fromNode, myNodeNum),
           // The scope is the radio's own node number: its messages are mine.
           ne(messages.fromNode, deviceId),
@@ -496,6 +498,7 @@ function rowToMessage(row: MessageRow): Message {
     hopsAway: row.hopsAway ?? undefined,
     viaMqtt: row.viaMqtt ?? undefined,
     transport: row.transport ?? undefined,
+    ...(row.filtered ? { filtered: true } : {}),
   };
 }
 
@@ -525,6 +528,7 @@ function messageToRow(
     hopsAway: message.hopsAway ?? null,
     viaMqtt: message.viaMqtt ?? null,
     transport: message.transport ?? null,
+    filtered: message.filtered ?? false,
   };
 }
 

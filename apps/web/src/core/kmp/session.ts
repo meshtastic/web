@@ -9,6 +9,7 @@ import type {
   TelemetryRepository,
   TelemetryRetentionPolicy,
 } from "@core/storage/types.ts";
+import type { MessageFilterRepository } from "@core/storage/messageFilter.ts";
 import type {
   AdminResultJs,
   ConnectionStateJs,
@@ -27,6 +28,7 @@ import {
 } from "./admin.ts";
 import { ChannelsClient } from "./channels.ts";
 import { ChatClient } from "./chat.ts";
+import { MessageFilterClient } from "./messageFilter.ts";
 import { DeviceClient } from "./device.ts";
 import { Emitter } from "./emitter.ts";
 import { NodesClient } from "./nodes.ts";
@@ -69,6 +71,7 @@ const EMPTY_COUNTERS: ConnectionProgressCounters = {
 export interface SessionOptions {
   messages?: MessageRepository;
   drafts?: DraftRepository;
+  messageFilter?: MessageFilterRepository;
   nodes?: NodesRepository;
   telemetry?: TelemetryRepository;
   chatRetention?: RetentionPolicy;
@@ -123,6 +126,8 @@ export class MeshSession {
   readonly nodes: NodesClient;
   readonly channels: ChannelsClient;
   readonly chat: ChatClient;
+  /** Filter words that hide incoming text, per radio. */
+  readonly messageFilter: MessageFilterClient;
   readonly telemetry: TelemetryClient;
   readonly config: {
     readonly isRegionUnset: ReadonlySignal<boolean>;
@@ -155,6 +160,10 @@ export class MeshSession {
     this.device = new DeviceClient(admin);
     this.nodes = new NodesClient(admin, options.nodes);
     this.channels = new ChannelsClient(() => this.device.myNodeNum.peek());
+    this.messageFilter = new MessageFilterClient(
+      options.messageFilter,
+      admin.warn,
+    );
     this.chat = new ChatClient(
       {
         myNodeNum: () => this.myNodeNum,
@@ -167,6 +176,7 @@ export class MeshSession {
         repository: options.messages,
         draftRepository: options.drafts,
         retention: options.chatRetention,
+        filter: this.messageFilter,
       },
     );
     this.telemetry = new TelemetryClient({
@@ -337,8 +347,9 @@ export class MeshSession {
     for (const off of this.unsubscribes.splice(0)) off();
   }
 
-  /** Points message, node and telemetry history at `nodeNum`'s. */
+  /** Points message, filter, node and telemetry history at `nodeNum`'s. */
   rescope(nodeNum: number): void {
+    this.messageFilter.rescope(nodeNum);
     this.chat.rescope(nodeNum);
     this.nodes.rescope(nodeNum);
     this.telemetry.rescope(nodeNum);

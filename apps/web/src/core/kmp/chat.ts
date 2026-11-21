@@ -17,6 +17,12 @@ import {
   routingErrorFromReason,
   toReactionPatch,
 } from "@core/messaging/delivery.ts";
+import {
+  applyThreadFilter,
+  filterAppliesTo,
+  shouldFilterIncoming,
+  type ThreadFilterResult,
+} from "@core/messaging/messageFilter.ts";
 import { reactionKey, toggleReaction } from "@core/messaging/reactions.ts";
 import {
   INITIAL_PRUNE_SCHEDULE,
@@ -52,8 +58,12 @@ import {
 import type { SendHandleJs } from "@meshtastic/sdk-kmp";
 import { batch, computed, type Signal, signal } from "@preact/signals-core";
 import { Result } from "better-result";
+import type { ChatFilter } from "./messageFilter.ts";
 import { BROADCAST_NUM } from "./packets.ts";
 import { deriveSignal, type ReadonlySignal, toReadonly } from "./signals.ts";
+
+const sameItems = <T>(a: readonly T[], b: readonly T[]): boolean =>
+  a.length === b.length && a.every((item, i) => item === b[i]);
 
 /**
  * Message order within a conversation: radio time, then local arrival
@@ -398,6 +408,11 @@ export interface ChatClientOptions {
   draftRepository?: DraftRepository;
   retention?: RetentionPolicy;
   initialLoadLimit?: number;
+  /**
+   * The message filter: incoming text it matches is stored as filtered
+   * (never unread, never the preview) and left out of threads.
+   */
+  filter?: ChatFilter;
   /** Clock for retention throttling; tests pass their own. */
   now?: () => number;
 }
@@ -455,6 +470,11 @@ export class ChatClient {
   );
   private readonly requestedTargets = new Set<number>();
   private readonly threads = new Map<string, ReadonlySignal<ThreadMessage[]>>();
+  private readonly filteredThreads = new Map<
+    string,
+    ReadonlySignal<ThreadFilterResult>
+  >();
+  private readonly filter: ChatFilter | undefined;
   private activeKey: string | undefined;
   /** Routing acks that arrived before the send they answer settled. */
   private readonly earlyAcks = new Map<number, RoutingAck[]>();
@@ -473,6 +493,7 @@ export class ChatClient {
   ) {
     this.repository = options.repository;
     this.draftRepository = options.draftRepository;
+    this.filter = options.filter;
     this.retention = options.retention;
     this.initialLoadLimit = options.initialLoadLimit ?? 50;
     this.now = options.now ?? Date.now;
@@ -542,6 +563,14 @@ export class ChatClient {
       }
       return;
     }
+    const filtered =
+      this.filter !== undefined &&
+      shouldFilterIncoming(
+        this.filter.state.peek(),
+        key,
+        { from: packet.from, text: inbound.text },
+        myNodeNum,
+      );
     const message: Message = {
       id: packet.id,
       from: packet.from,
@@ -550,6 +579,7 @@ export class ChatClient {
       rxTime: packet.rxTime,
       type: packet.type,
       text: inbound.text,
+      ...(filtered ? { filtered: true } : {}),
       state: MessageState.Ack,
       replyId: inbound.replyId,
       signed: packet.xeddsaSigned || undefined,
@@ -562,16 +592,19 @@ export class ChatClient {
     if (this.store.hasMessage(key, message.id)) return;
     this.store.append(key, message);
     const active = key === this.activeKey;
-    const countUnread = packet.from !== myNodeNum && !active;
+    // A filtered message is neither unread nor the preview (as on Android).
+    const countUnread = packet.from !== myNodeNum && !active && !filtered;
     if (countUnread) {
       this.liveUnread.set(key, (this.liveUnread.get(key) ?? 0) + 1);
     }
-    this.summaryStore.value = withMessage(
-      this.summaryStore.peek(),
-      conv,
-      message,
-      countUnread,
-    );
+    if (!filtered) {
+      this.summaryStore.value = withMessage(
+        this.summaryStore.peek(),
+        conv,
+        message,
+        countUnread,
+      );
+    }
     this.persistAppend(message, conv, active);
     this.fetchReplyTargets([message]);
   }
@@ -618,27 +651,82 @@ export class ChatClient {
    * A conversation as the message list renders it: messages oldest first
    * with reply targets resolved, reaction chips (with my reactions'
    * delivery) and delivery state. Unchanged bubbles keep their identity.
+   * Incoming messages the message filter matches are left out, or marked
+   * `filtered` while the conversation's filtered messages are revealed;
+   * the filter's current words apply, so editing them updates open
+   * threads.
    */
   thread(conv: ConversationKey): ReadonlySignal<ThreadMessage[]> {
     this.ensureHydrated(conv);
     const key = conversationKeyString(conv);
     const cached = this.threads.get(key);
     if (cached) return cached;
+    const filtered = this.filteredThread(conv);
+    // Not `deriveSignal`: over a `toReadonly` source it drops the first change.
+    const view = toReadonly(computed(() => filtered.value.messages));
+    this.threads.set(key, view);
+    return view;
+  }
+
+  /**
+   * How many loaded incoming messages of a conversation the message filter
+   * matches (0 while it doesn't apply there), shown or not.
+   */
+  filteredCount(conv: ConversationKey): ReadonlySignal<number> {
+    const filtered = this.filteredThread(conv);
+    return toReadonly(computed(() => filtered.value.filtered));
+  }
+
+  private filteredThread(
+    conv: ConversationKey,
+  ): ReadonlySignal<ThreadFilterResult> {
+    this.ensureHydrated(conv);
+    const key = conversationKeyString(conv);
+    const cached = this.filteredThreads.get(key);
+    if (cached) return cached;
     const messages = this.store.sourceFor(key);
     const reactions = this.reactionStore.sourceFor(key);
     const targets = this.replyTargets;
     const build = createThreadBuilder();
+    const filter = this.filter;
+    const revealed = filter?.revealed(key);
+    // Revealed bubbles keep their identity too.
+    const marked = new WeakMap<ThreadMessage, ThreadMessage>();
+    let last: ThreadFilterResult | undefined;
+    const mark = (item: ThreadMessage): ThreadMessage => {
+      const hit = marked.get(item);
+      if (hit) return hit;
+      const value = { ...item, filtered: true };
+      marked.set(item, value);
+      return value;
+    };
     const view = toReadonly(
-      computed(() => {
+      computed((): ThreadFilterResult => {
         const refs = targets.value;
         const me = this.me.value;
-        return build(messages.value, reactions.value, {
+        const thread = build(messages.value, reactions.value, {
           myNodeNum: me > 0 ? me : undefined,
           lookup: (id) => refs.get(id),
         });
+        if (!filter) return { messages: thread, filtered: 0 };
+        const state = filter.state.value;
+        const next = applyThreadFilter(thread, {
+          active: filterAppliesTo(state, key),
+          matcher: state.matcher,
+          reveal: revealed?.value ?? false,
+          mark,
+        });
+        // A filter change that shows the same bubbles keeps the same list,
+        // so the message list doesn't re-render for nothing.
+        const kept =
+          last !== undefined && sameItems(last.messages, next.messages)
+            ? { messages: last.messages, filtered: next.filtered }
+            : next;
+        last = kept;
+        return kept;
       }),
     );
-    this.threads.set(key, view);
+    this.filteredThreads.set(key, view);
     return view;
   }
 
