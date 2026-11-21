@@ -33,6 +33,8 @@ export function packetMetadata(
     to: packet.to,
     channel: packet.channel,
     requestId: data.requestId || undefined,
+    replyId: data.replyId || undefined,
+    emoji: data.emoji || undefined,
     xeddsaSigned: packet.xeddsaSigned,
     ackProofStatus: packet.ackProofStatus,
     rxSnr: measured ? packet.rxSnr : undefined,

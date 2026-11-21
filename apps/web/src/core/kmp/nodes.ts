@@ -5,7 +5,12 @@ import { firmwareAtLeast } from "@core/utils/firmware.ts";
 import type { NodeChangeJs } from "@meshtastic/sdk-kmp";
 import { signal } from "@preact/signals-core";
 import type { Result } from "better-result";
-import { deriveSignal as derive, type ReadonlySignal } from "./signals.ts";
+import {
+  deriveSignal,
+  deriveStableSignal,
+  type ReadonlySignal,
+  sameSet,
+} from "./signals.ts";
 
 export type NodeErrorType =
   | Protobuf.Mesh.Routing_Error
@@ -104,13 +109,31 @@ export class NodesClient {
 
   readonly list: ReadonlySignal<ReadonlyArray<Node>>;
   readonly errors: ReadonlySignal<ReadonlyArray<NodeError>>;
+  /** Favourite node numbers; the same Set until membership changes. */
+  readonly favoriteNums: ReadonlySignal<ReadonlySet<number>>;
+  /** Ignored node numbers; the same Set until membership changes. */
+  readonly ignoredNums: ReadonlySignal<ReadonlySet<number>>;
 
   constructor(
     private readonly admin: NodesAdmin,
     private readonly repository?: NodesRepository,
   ) {
-    this.list = derive(this.nodes, (m) => [...m.values()]);
-    this.errors = derive(this.errorMap, (m) => [...m.values()]);
+    this.list = deriveSignal(this.nodes, (m) => [...m.values()]);
+    this.errors = deriveSignal(this.errorMap, (m) => [...m.values()]);
+    const numsWhere =
+      (keep: (node: Node) => boolean) =>
+      (m: ReadonlyMap<number, Node>): ReadonlySet<number> =>
+        new Set([...m.values()].filter(keep).map((n) => n.num));
+    this.favoriteNums = deriveStableSignal(
+      this.nodes,
+      numsWhere((n) => n.isFavorite),
+      sameSet,
+    );
+    this.ignoredNums = deriveStableSignal(
+      this.nodes,
+      numsWhere((n) => n.isIgnored),
+      sameSet,
+    );
     void this.hydrate();
   }
 

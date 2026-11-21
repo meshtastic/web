@@ -160,6 +160,7 @@ export class MeshSession {
         myNodeNum: () => this.myNodeNum,
         sendText: (text, to, channel, replyId) =>
           kmp.sendText(text, to, channel, replyId),
+        sendPacket: (meshPacket) => kmp.sendPacket(meshPacket),
         warn: admin.warn,
       },
       {
@@ -184,6 +185,11 @@ export class MeshSession {
     };
     this.progress = toReadonly(this.progressStore);
 
+    this.unsubscribes.push(
+      this.device.myNodeNum.subscribe((num) =>
+        this.chat.setMyNodeNum(num ?? 0),
+      ),
+    );
     this.events.onPendingSettingsChange.subscribe((pending) =>
       this.device.setPendingSettingsChanges(pending),
     );
@@ -419,7 +425,6 @@ export class MeshSession {
       case "myInfo":
         this.bump("myInfo");
         this.device.applyMyNodeInfo(variant.value);
-        this.chat.refileSentDirect(variant.value.myNodeNum);
         this.events.onMyNodeInfo.dispatch(variant.value);
         return;
       case "metadata":
@@ -491,9 +496,13 @@ export class MeshSession {
     try {
       switch (data.portnum) {
         case PortNum.TEXT_MESSAGE_APP: {
+          // Tapback reactions are text packets too (Data.emoji set); the
+          // chat client files them as reactions, and they aren't messages.
           const text = withData(meta, new TextDecoder().decode(data.payload));
           this.chat.receive(text);
-          this.events.onMessagePacket.dispatch(text);
+          if (!(meta.emoji && meta.replyId)) {
+            this.events.onMessagePacket.dispatch(text);
+          }
           return;
         }
         case PortNum.ROUTING_APP: {

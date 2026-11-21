@@ -2,10 +2,10 @@ import { drizzle } from "drizzle-orm/sqlite-proxy";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { SQLocalDrizzle } from "sqlocal/drizzle";
 import * as schema from "./schema.ts";
-import { MIGRATIONS } from "./schema.ts";
+import { DATABASE_FILE, SCHEMA_VERSION, schemaStatements } from "./schema.ts";
 
 export interface CreateSqlocalDbOptions {
-  /** OPFS path. Defaults to "meshtastic.db". */
+  /** OPFS path. Defaults to `DATABASE_FILE`. */
   databasePath?: string;
 }
 
@@ -30,7 +30,7 @@ export interface OpenedSqlocalDb {
 }
 
 /**
- * Opens (or creates) the OPFS-backed SQLite database, applies migrations, and
+ * Opens (or creates) the OPFS-backed SQLite database, applies the schema, and
  * returns a Drizzle client typed against the schema, along with where sqlocal
  * ended up storing it. One instance per origin — sqlocal serializes writes
  * via Web Locks under the hood.
@@ -38,7 +38,7 @@ export interface OpenedSqlocalDb {
 export async function openSqlocalDb(
   options: CreateSqlocalDbOptions = {},
 ): Promise<OpenedSqlocalDb> {
-  const databasePath = options.databasePath ?? "meshtastic.db";
+  const databasePath = options.databasePath ?? DATABASE_FILE;
   const client = new SQLocalDrizzle({ databasePath });
   const { driver, batchDriver, sql } = client;
   const db: SqlocalDb = drizzle(driver, batchDriver, {
@@ -46,7 +46,7 @@ export async function openSqlocalDb(
     casing: "snake_case",
   });
 
-  await applyMigrations(sql);
+  await applySchema(sql);
 
   const { storageType = "memory" } = await client.getDatabaseInfo();
   return {
@@ -57,31 +57,36 @@ export async function openSqlocalDb(
   };
 }
 
-type RawSql = (
+export type RawSql = (
   query: TemplateStringsArray,
   ...values: ReadonlyArray<unknown>
 ) => Promise<unknown>;
 
-export const isDuplicateColumn = (e: unknown): boolean =>
-  /duplicate column name/i.test(e instanceof Error ? e.message : String(e));
-
-async function applyMigrations(sql: RawSql): Promise<void> {
-  await sql`CREATE TABLE IF NOT EXISTS _schema (version INTEGER PRIMARY KEY)`;
-  const current = latestVersion(
-    await sql`SELECT version FROM _schema ORDER BY version DESC LIMIT 1`,
-  );
-  for (const migration of MIGRATIONS) {
-    if (migration.version <= current) continue;
-    for (const statement of migration.sql) {
-      try {
-        await sql(literal(statement));
-      } catch (e) {
-        // Another tab opening the same database can apply an ALTER TABLE
-        // first; the column it adds is the one we wanted.
-        if (!isDuplicateColumn(e)) throw e;
-      }
+/**
+ * Creates the schema, or wipes and recreates it when the file carries
+ * another schema version (see `schemaStatements`). Runs in one
+ * `BEGIN IMMEDIATE` transaction, so another tab opening the same file waits
+ * instead of seeing (or wiping) a half-built schema, and a failure leaves the
+ * file as it was.
+ */
+export async function applySchema(sql: RawSql): Promise<void> {
+  await sql`BEGIN IMMEDIATE`;
+  try {
+    const version = numberField(await sql`PRAGMA user_version`, "user_version");
+    const tables =
+      version === SCHEMA_VERSION
+        ? []
+        : stringFields(
+            await sql`SELECT name FROM sqlite_master WHERE type = 'table'`,
+            "name",
+          );
+    for (const statement of schemaStatements(version, tables)) {
+      await sql(literal(statement));
     }
-    await sql`INSERT OR IGNORE INTO _schema (version) VALUES (${migration.version})`;
+    await sql`COMMIT`;
+  } catch (e) {
+    await sql`ROLLBACK`.catch(() => {});
+    throw e;
   }
 }
 
@@ -89,11 +94,22 @@ function literal(statement: string): TemplateStringsArray {
   return Object.assign([statement], { raw: [statement] });
 }
 
-function latestVersion(rows: unknown): number {
-  if (!Array.isArray(rows)) return 0;
-  const first: unknown = rows[0];
-  if (typeof first !== "object" || first === null || !("version" in first)) {
-    return 0;
-  }
-  return typeof first.version === "number" ? first.version : 0;
+function rowsOf(rows: unknown): ReadonlyArray<object> {
+  if (!Array.isArray(rows)) return [];
+  return rows.filter(
+    (row): row is object => typeof row === "object" && row !== null,
+  );
+}
+
+function numberField(rows: unknown, field: string): number {
+  const first = rowsOf(rows)[0];
+  const value: unknown = first ? Reflect.get(first, field) : undefined;
+  return typeof value === "number" ? value : 0;
+}
+
+function stringFields(rows: unknown, field: string): string[] {
+  return rowsOf(rows).flatMap((row) => {
+    const value: unknown = Reflect.get(row, field);
+    return typeof value === "string" ? [value] : [];
+  });
 }

@@ -63,3 +63,32 @@ describe("sdkStorage singletons", () => {
     expect(sqlocal.open).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("removeLegacyDatabase", () => {
+  it("removes the old files it can and never throws", async () => {
+    const { removeLegacyDatabase } = await import("./sdkStorage.ts");
+    const removeEntry = vi.fn(async (name: string) => {
+      if (name !== "meshtastic.db") throw new Error("NotFoundError");
+    });
+    expect(await removeLegacyDatabase(async () => ({ removeEntry }))).toEqual([
+      "meshtastic.db",
+    ]);
+    expect(removeEntry).toHaveBeenCalledTimes(3);
+  });
+
+  it("leaves a file another tab holds and survives a missing OPFS", async () => {
+    const { removeLegacyDatabase } = await import("./sdkStorage.ts");
+    const locked = vi.fn(async () => {
+      throw new Error("NoModificationAllowedError");
+    });
+    expect(
+      await removeLegacyDatabase(async () => ({ removeEntry: locked })),
+    ).toEqual([]);
+    expect(await removeLegacyDatabase(async () => undefined)).toEqual([]);
+    expect(
+      await removeLegacyDatabase(async () => {
+        throw new Error("SecurityError");
+      }),
+    ).toEqual([]);
+  });
+});

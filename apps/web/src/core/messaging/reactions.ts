@@ -4,9 +4,19 @@
  * emoji with how many distinct nodes sent it.
  */
 
+import type { MessageState } from "@core/storage/types.ts";
+
+/** Delivery of a reaction I sent: the packet that carried it and its state. */
+export interface OwnReactionDelivery {
+  readonly packetId: number;
+  readonly state: MessageState;
+}
+
 export interface ReactionEvent {
   readonly emoji: string;
   readonly fromNode: number;
+  /** Set on my own reactions, so the chip can show pending / failed. */
+  readonly delivery?: OwnReactionDelivery;
 }
 
 /**
@@ -24,6 +34,11 @@ export interface ReactionChip {
   /** Whether my node is one of them (drawn outlined in accent). */
   readonly mine: boolean;
   readonly fromNodes: readonly number[];
+  /**
+   * How my reaction's packet fared, when `mine` and it was sent from here:
+   * pending, failed (offer retry with `packetId`), or delivered.
+   */
+  readonly own?: OwnReactionDelivery;
 }
 
 /**
@@ -36,25 +51,36 @@ export const aggregateReactions = (
   myNodeNum: number | undefined,
 ): ReactionChip[] => {
   // Keyed by reactionKey; shows the first spelling seen.
-  const byEmoji = new Map<string, { emoji: string; fromNodes: number[] }>();
-  for (const { emoji, fromNode } of events) {
+  const byEmoji = new Map<
+    string,
+    { emoji: string; fromNodes: number[]; own?: OwnReactionDelivery }
+  >();
+  for (const { emoji, fromNode, delivery } of events) {
     const key = reactionKey(emoji);
     if (key.length === 0) {
       continue;
     }
-    const group = byEmoji.get(key);
+    let group = byEmoji.get(key);
     if (!group) {
-      byEmoji.set(key, { emoji, fromNodes: [fromNode] });
+      group = { emoji, fromNodes: [fromNode] };
+      byEmoji.set(key, group);
     } else if (!group.fromNodes.includes(fromNode)) {
       group.fromNodes.push(fromNode);
     }
+    if (delivery && myNodeNum !== undefined && fromNode === myNodeNum) {
+      group.own = delivery;
+    }
   }
-  return [...byEmoji.values()].map(({ emoji, fromNodes }) => ({
-    emoji,
-    count: fromNodes.length,
-    mine: myNodeNum !== undefined && fromNodes.includes(myNodeNum),
-    fromNodes,
-  }));
+  return [...byEmoji.values()].map(({ emoji, fromNodes, own }) => {
+    const mine = myNodeNum !== undefined && fromNodes.includes(myNodeNum);
+    return {
+      emoji,
+      count: fromNodes.length,
+      mine,
+      fromNodes,
+      ...(mine && own ? { own } : {}),
+    };
+  });
 };
 
 export type ReactionToggle =

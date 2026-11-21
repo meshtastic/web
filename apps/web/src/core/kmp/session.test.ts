@@ -1,4 +1,4 @@
-import { create, toBinary } from "@bufbuild/protobuf";
+import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
 import { MessageState } from "@core/storage/types.ts";
 import { describe, expect, it } from "vitest";
@@ -28,6 +28,8 @@ function packet(init: {
   requestId?: number;
   rxTime?: number;
   channel?: number;
+  replyId?: number;
+  emoji?: number;
 }): Uint8Array {
   return toBinary(
     Protobuf.Mesh.MeshPacketSchema,
@@ -43,6 +45,8 @@ function packet(init: {
           portnum: init.portnum,
           payload: init.payload,
           requestId: init.requestId ?? 0,
+          replyId: init.replyId ?? 0,
+          emoji: init.emoji ?? 0,
         }),
       },
     }),
@@ -56,6 +60,23 @@ const text = (from: number, to: number, body: string, id = 1): Uint8Array =>
     to,
     portnum: Protobuf.Portnums.PortNum.TEXT_MESSAGE_APP,
     payload: new TextEncoder().encode(body),
+  });
+
+const reactionPacket = (
+  from: number,
+  to: number,
+  targetId: number,
+  emoji: string,
+  id = 50,
+): Uint8Array =>
+  packet({
+    id,
+    from,
+    to,
+    portnum: Protobuf.Portnums.PortNum.TEXT_MESSAGE_APP,
+    payload: new TextEncoder().encode(emoji),
+    replyId: targetId,
+    emoji: 1,
   });
 
 const ack = (
@@ -301,6 +322,280 @@ describe("MeshSession", () => {
     kmp.settleSends();
     await sending;
     expect(channel.value[0]?.state).toBe(MessageState.Delivered);
+  });
+
+  it("marks my messages outgoing once the handshake names my node", () => {
+    const kmp = new FakeKmpClient();
+    const session = new MeshSession(kmp);
+    const thread = session.chat.thread({ kind: "channel", channel: 0 });
+    kmp.setState(state("configuring"));
+    kmp.emitPacket(text(ME, BROADCAST_NUM, "from me", 10));
+    expect(thread.value[0]?.outgoing).toBe(false);
+
+    kmp.emitFrame(
+      frame({
+        case: "myInfo",
+        value: create(Protobuf.Mesh.MyNodeInfoSchema, { myNodeNum: ME }),
+      }),
+    );
+    expect(thread.value[0]?.outgoing).toBe(true);
+    expect(thread.value[0]?.delivery).toBeDefined();
+  });
+
+  it("files an inbound tapback as a reaction, not a message", () => {
+    const { kmp, session } = connected();
+    const seen: string[] = [];
+    session.events.onMessagePacket.subscribe((p) => seen.push(p.data));
+    const thread = session.chat.thread({ kind: "channel", channel: 0 });
+    kmp.emitPacket(text(PEER, BROADCAST_NUM, "lunch?", 10));
+    kmp.emitPacket(reactionPacket(PEER, BROADCAST_NUM, 10, "👍", 11));
+    kmp.emitPacket(reactionPacket(0x55, BROADCAST_NUM, 10, "👍", 12));
+    kmp.emitPacket(reactionPacket(0x55, BROADCAST_NUM, 10, "👍", 12));
+
+    expect(thread.value.map((t) => t.message.text)).toEqual(["lunch?"]);
+    expect(thread.value[0]?.reactions).toEqual([
+      { emoji: "👍", count: 2, mine: false, fromNodes: [PEER, 0x55] },
+    ]);
+    expect(session.chat.unread.total.value).toBe(1);
+    expect(seen).toEqual(["lunch?"]);
+  });
+
+  it("resolves an inbound reply against the message it quotes", () => {
+    const { kmp, session } = connected();
+    const thread = session.chat.thread({ kind: "direct", peer: PEER });
+    kmp.emitPacket(text(PEER, ME, "where?", 10));
+    kmp.emitPacket(
+      packet({
+        id: 11,
+        from: PEER,
+        to: ME,
+        portnum: Protobuf.Portnums.PortNum.TEXT_MESSAGE_APP,
+        payload: new TextEncoder().encode("the park"),
+        replyId: 10,
+      }),
+    );
+    expect(thread.value[1]?.replyTo).toEqual({
+      kind: "resolved",
+      id: 10,
+      from: PEER,
+      excerpt: "where?",
+    });
+  });
+
+  it("sends a reply through sendText with its reply id", async () => {
+    const { kmp, session } = connected();
+    const thread = session.chat.thread({ kind: "direct", peer: PEER });
+    kmp.emitPacket(text(PEER, ME, "where?", 10));
+    const result = await session.chat.sendText({
+      text: "here",
+      destination: PEER,
+      replyId: 10,
+    });
+    expect(result.status).toBe("ok");
+    expect(kmp.texts[0]).toMatchObject({ text: "here", to: PEER, replyId: 10 });
+    expect(thread.value[1]).toMatchObject({
+      outgoing: true,
+      replyTo: { kind: "resolved", id: 10 },
+      delivery: { kind: "pending", relayed: true },
+    });
+  });
+
+  it("sends a reaction packet, shows it as mine and tracks its delivery", async () => {
+    const { kmp, session } = connected();
+    kmp.holdSends = true;
+    const thread = session.chat.thread({ kind: "channel", channel: 1 });
+    kmp.emitPacket(
+      packet({
+        id: 10,
+        from: PEER,
+        to: BROADCAST_NUM,
+        channel: 1,
+        portnum: Protobuf.Portnums.PortNum.TEXT_MESSAGE_APP,
+        payload: new TextEncoder().encode("hi"),
+      }),
+    );
+
+    const sending = session.chat.sendReaction({
+      targetId: 10,
+      emoji: "❤️",
+      destination: "broadcast",
+      channel: 1,
+    });
+    const sent = fromBinary(
+      Protobuf.Mesh.MeshPacketSchema,
+      kmp.packets[0] ?? new Uint8Array(),
+    );
+    expect(sent).toMatchObject({
+      to: BROADCAST_NUM,
+      channel: 1,
+      wantAck: true,
+    });
+    expect(sent.payloadVariant).toMatchObject({
+      case: "decoded",
+      value: { replyId: 10, emoji: 1 },
+    });
+    // The fake SDK numbers sends from 1.
+    const packetId = 1;
+    expect(thread.value[0]?.reactions).toEqual([
+      {
+        emoji: "❤️",
+        count: 1,
+        mine: true,
+        fromNodes: [ME],
+        own: { packetId, state: MessageState.Pending },
+      },
+    ]);
+
+    kmp.settleSends({ ok: false, reason: "MAX_RETRANSMIT" });
+    const result = await sending;
+    expect(result.status).toBe("error");
+    expect(thread.value[0]?.reactions[0]?.own).toEqual({
+      packetId,
+      state: MessageState.Failed,
+    });
+
+    kmp.holdSends = false;
+    const retried = await session.chat.retry(packetId);
+    expect(retried.status).toBe("ok");
+    expect(kmp.packets).toHaveLength(2);
+    expect(thread.value[0]?.reactions).toMatchObject([
+      { count: 1, own: { state: MessageState.Delivered } },
+    ]);
+  });
+
+  it("acks a DM reaction from its recipient and keeps it acked", async () => {
+    const { kmp, session } = connected();
+    kmp.holdSends = true;
+    const thread = session.chat.thread({ kind: "direct", peer: PEER });
+    kmp.emitPacket(text(PEER, ME, "hi", 10));
+    const sending = session.chat.sendReaction({
+      targetId: 10,
+      emoji: "👍",
+      destination: PEER,
+    });
+    const id = 1;
+    kmp.emitPacket(ack(PEER, id));
+    expect(thread.value[0]?.reactions[0]?.own?.state).toBe(MessageState.Ack);
+    kmp.emitPacket(ack(0x55, id, Protobuf.Mesh.Routing_Error.TIMEOUT));
+    expect(thread.value[0]?.reactions[0]?.own?.state).toBe(MessageState.Ack);
+    kmp.settleSends({ ok: true, reason: null });
+    await sending;
+    expect(thread.value[0]?.reactions[0]?.own?.state).toBe(MessageState.Ack);
+  });
+
+  it("replays an ack that beat the reaction's send", async () => {
+    const { kmp, session } = connected();
+    kmp.holdSends = true;
+    const thread = session.chat.thread({ kind: "direct", peer: PEER });
+    kmp.emitPacket(text(PEER, ME, "hi", 10));
+    kmp.emitPacket(ack(PEER, 1));
+    const sending = session.chat.sendReaction({
+      targetId: 10,
+      emoji: "👍",
+      destination: PEER,
+    });
+    expect(thread.value[0]?.reactions[0]?.own).toEqual({
+      packetId: 1,
+      state: MessageState.Ack,
+    });
+    kmp.settleSends();
+    await sending;
+  });
+
+  it("counts a packet delivered twice once, even in an unopened conversation", () => {
+    const { kmp, session } = connected();
+    kmp.emitPacket(text(PEER, ME, "hi", 10));
+    kmp.emitPacket(text(PEER, ME, "hi", 10));
+    kmp.emitPacket(reactionPacket(PEER, ME, 10, "👍", 11));
+    kmp.emitPacket(reactionPacket(PEER, ME, 10, "👍", 11));
+    expect(session.chat.unread.total.value).toBe(1);
+    expect(
+      session.chat.summaries.value.get(`direct:${PEER}`)?.lastMessage?.id,
+    ).toBe(10);
+  });
+
+  it("toggles off my reaction whatever spacing or VS16 variant is clicked", async () => {
+    const { kmp, session } = connected();
+    const thread = session.chat.thread({ kind: "direct", peer: PEER });
+    kmp.emitPacket(text(PEER, ME, "hi", 10));
+    const added = await session.chat.toggleReaction({
+      targetId: 10,
+      emoji: " ❤️ ",
+      destination: PEER,
+    });
+    expect(added.status).toBe("ok");
+    expect(thread.value[0]?.reactions[0]?.emoji).toBe("❤️");
+    const removed = await session.chat.toggleReaction({
+      targetId: 10,
+      emoji: "❤",
+      destination: PEER,
+    });
+    expect(removed.isOk() && removed.value).toEqual({ action: "removed" });
+    expect(thread.value[0]?.reactions).toEqual([]);
+    const blank = await session.chat.toggleReaction({
+      targetId: 10,
+      emoji: " \uFE0F ",
+      destination: PEER,
+    });
+    expect(blank.isErr() && blank.error.reason).toBe("empty-reaction");
+  });
+
+  it("toggles my reaction off locally without sending anything", async () => {
+    const { kmp, session } = connected();
+    const thread = session.chat.thread({ kind: "direct", peer: PEER });
+    kmp.emitPacket(text(PEER, ME, "hi", 10));
+    const input = {
+      targetId: 10,
+      emoji: "👍",
+      destination: PEER,
+    };
+
+    const added = await session.chat.toggleReaction(input);
+    expect(added.status).toBe("ok");
+    expect(thread.value[0]?.reactions[0]?.mine).toBe(true);
+    expect(kmp.packets).toHaveLength(1);
+
+    const removed = await session.chat.toggleReaction(input);
+    expect(removed.isOk() && removed.value).toEqual({ action: "removed" });
+    expect(thread.value[0]?.reactions).toEqual([]);
+    expect(kmp.packets).toHaveLength(1);
+  });
+
+  it("retries a failed message with its reply and refuses others", async () => {
+    const { kmp, session } = connected();
+    const direct = session.chat.direct(PEER);
+    kmp.sendOutcome = { ok: false, reason: "TIMEOUT" };
+    const first = await session.chat.sendText({
+      text: "again",
+      destination: PEER,
+      replyId: 3,
+    });
+    const failedId = first.isErr() ? (kmp.texts[0]?.id ?? 0) : 0;
+    expect(direct.value[0]?.state).toBe(MessageState.Failed);
+
+    kmp.sendOutcome = { ok: true, reason: null };
+    const retried = await session.chat.retry(failedId);
+    expect(retried.status).toBe("ok");
+    expect(kmp.texts[1]).toMatchObject({ text: "again", replyId: 3 });
+    expect(direct.value.map((m) => m.id)).toEqual([kmp.texts[1]?.id]);
+
+    const again = await session.chat.retry(kmp.texts[1]?.id ?? 0);
+    expect(again.isErr() && again.error.reason).toBe("not-failed");
+    const missing = await session.chat.retry(12345);
+    expect(missing.isErr() && missing.error.reason).toBe("not-found");
+  });
+
+  it("keeps conversation summaries for the sidebar", () => {
+    const { kmp, session } = connected();
+    kmp.emitPacket(text(PEER, ME, "first", 10));
+    kmp.emitPacket(text(PEER, ME, "second", 11));
+    const summary = session.chat.summaries.value.get(`direct:${PEER}`);
+    expect(summary).toMatchObject({
+      unread: 2,
+      lastMessage: { text: "second" },
+    });
+    session.chat.markRead({ kind: "direct", peer: PEER });
+    expect(session.chat.summaries.value.get(`direct:${PEER}`)?.unread).toBe(0);
   });
 
   it("mirrors the SDK's node DB and refuses a node presenting another node's key", async () => {

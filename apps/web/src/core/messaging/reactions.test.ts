@@ -1,3 +1,4 @@
+import { MessageState } from "@core/storage/types.ts";
 import { describe, expect, it } from "vitest";
 import {
   aggregateReactions,
@@ -130,5 +131,36 @@ describe("toggleReaction", () => {
     const added = toggleReaction(events, "😮", ME);
     const removed = toggleReaction(added.events, "😮", ME);
     expect(removed.events).toEqual(events);
+  });
+});
+
+describe("own reaction delivery", () => {
+  it("carries my reaction's packet state onto the chip", () => {
+    const delivery = { packetId: 9, state: MessageState.Failed };
+    expect(
+      aggregateReactions(
+        [
+          { emoji: "👍", fromNode: 1 },
+          { emoji: "👍", fromNode: ME, delivery },
+        ],
+        ME,
+      ),
+    ).toEqual([
+      { emoji: "👍", count: 2, mine: true, fromNodes: [1, ME], own: delivery },
+    ]);
+  });
+
+  it("ignores delivery on someone else's event", () => {
+    const [chip] = aggregateReactions(
+      [
+        {
+          emoji: "👍",
+          fromNode: 1,
+          delivery: { packetId: 9, state: MessageState.Ack },
+        },
+      ],
+      ME,
+    );
+    expect(chip?.own).toBeUndefined();
   });
 });
