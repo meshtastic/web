@@ -46,21 +46,25 @@ const messagesRoute = createRoute({
   component: MessagesPage,
 });
 
+const conversationParamsSchema = z.object({
+  type: z.enum(["direct", "broadcast"]),
+  chatId: z.coerce.number().int().min(0).max(4294967294), // max is 0xffffffff - 1
+});
+
 export const messagesWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages/$type/$chatId",
   component: MessagesPage,
   // A conversation is a full screen on mobile, so the tab bar steps aside.
   staticData: { hideTabBar: true },
-  parseParams: (params) => ({
-    type: z
-      .enum(["direct", "broadcast"])
-      .refine((val) => val === "direct" || val === "broadcast", {
-        message: 'Type must be "direct" or "broadcast".',
-      })
-      .parse(params.type),
-    chatId: z.coerce.number().int().min(0).max(4294967294).parse(params.chatId), // max is 0xffffffff - 1
-  }),
+  // A malformed link goes to the Chats list rather than the crash screen.
+  parseParams: (params) => {
+    const parsed = conversationParamsSchema.safeParse(params);
+    if (!parsed.success) {
+      throw redirect({ to: "/messages", replace: true });
+    }
+    return parsed.data;
+  },
 });
 
 const mapRoute = createRoute({
@@ -95,7 +99,13 @@ export const mapWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map/$long/$lat/$zoom",
   component: MapPage,
-  parseParams: (raw) => coordParamsSchema.parse(raw),
+  parseParams: (raw) => {
+    const parsed = coordParamsSchema.safeParse(raw);
+    if (!parsed.success) {
+      throw redirect({ to: "/map", replace: true });
+    }
+    return parsed.data;
+  },
   // // This controls how params are serialized when you navigate/link
   // stringifyParams: (p) => ({
   //   long: String(p.long),

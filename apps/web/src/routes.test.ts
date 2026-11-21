@@ -101,6 +101,15 @@ describe("routes", () => {
     expect(router.state.location.search).toEqual({ tab: "position" });
   });
 
+  it.each([
+    ["/messages/channel/0", "/messages"],
+    ["/messages/direct/not-a-node", "/messages"],
+    ["/map/500/0/3", "/map"],
+  ])("malformed %s redirects to %s instead of crashing", async (path, to) => {
+    const router = await load(path);
+    expect(router.state.location.pathname).toBe(to);
+  });
+
   it("/settings/radio redirects to LoRa", async () => {
     const router = await load("/settings/radio");
     expect(router.state.location.pathname).toBe("/settings/lora");
