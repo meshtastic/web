@@ -346,9 +346,11 @@ export type ToggleReactionOutcome =
   | { readonly action: "removed" };
 
 /**
- * Why a send, reaction or retry failed. `reason` is the SDK's reason
- * (often a Routing_Error name), or one of: `empty-reaction`,
- * `reaction-too-long`, `not-found`, `not-failed`.
+ * Why a send, reaction or retry didn't go out: nothing was queued or
+ * stored. `reason` is the SDK's reason for refusing the packet, or one of:
+ * `not-connected`, `empty-reaction`, `reaction-too-long`, `not-found`,
+ * `not-failed`. A packet the mesh didn't deliver is not an error here; its
+ * message or reaction is marked Failed instead.
  */
 export class SendTextError extends Error {
   constructor(
@@ -719,7 +721,15 @@ export class ChatClient {
     for (const key of drafts) this.draftFor(parseConversationKey(key));
   }
 
-  /** Sends text, optionally as a reply, and tracks its delivery. */
+  /**
+   * Sends text, optionally as a reply, and tracks its delivery. Err only
+   * when the SDK refused the packet, so nothing was stored or sent. Once it
+   * is queued the result is Ok with its packet id, whatever the mesh does
+   * with it: a delivery failure is the message's Failed state (with Retry),
+   * not a failed send. Resolves when the SDK's verdict is recorded. Leaves
+   * drafts alone; the composer owns them, and a retry mustn't wipe what is
+   * being typed.
+   */
   async send(input: SendTextInput): Promise<Result<number, SendTextError>> {
     const target = conversationFor(input.destination, input.channel);
     const channel = input.channel ?? 0;
@@ -758,16 +768,13 @@ export class ChatClient {
       );
     });
     this.persistAppend(message, target.key, false);
-    this.setDraft(target.key, "");
     this.replayEarlyAcks(handle.id);
 
     const outcome = await this.settle(handle);
     const settled = this.store.getMessage(handle.id);
     if (settled)
       this.patchDelivery(settled, reduceSendOutcome(settled, outcome));
-    return outcome.ok
-      ? Result.ok(handle.id)
-      : Result.err(new SendTextError(outcome.reason, outcome.routingError));
+    return Result.ok(handle.id);
   }
 
   /** `send`, under the name the UI's action set uses. */
@@ -777,7 +784,8 @@ export class ChatClient {
 
   /**
    * Sends a tapback (see core/messaging/tapback.ts for the wire format) and
-   * shows it at once as mine, tracking its delivery like text.
+   * shows it at once as mine, tracking its delivery like text: Ok once
+   * queued, with a delivery failure left to the reaction's state.
    */
   async sendReaction(
     input: SendReactionInput,
@@ -832,9 +840,7 @@ export class ChatClient {
         toReactionPatch(reduceSendOutcome(settled.reaction, outcome)),
       );
     }
-    return outcome.ok
-      ? Result.ok(handle.id)
-      : Result.err(new SendTextError(outcome.reason, outcome.routingError));
+    return Result.ok(handle.id);
   }
 
   /**

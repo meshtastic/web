@@ -305,11 +305,26 @@ describe("MeshSession", () => {
       destination: "broadcast",
       channel: 0,
     });
-    expect(result.status).toBe("error");
+    // It went out, so the send succeeded; the delivery failure is its state.
+    expect(result.isOk() && result.value).toBe(kmp.texts[0]?.id);
     expect(channel.value[0]).toMatchObject({
       state: MessageState.Failed,
       routingError: Protobuf.Mesh.Routing_Error.NO_CHANNEL,
     });
+  });
+
+  it("fails a send only when the SDK refuses the packet, storing nothing", async () => {
+    const { kmp, session } = connected();
+    kmp.sendText = () => {
+      throw new Error("queue full");
+    };
+    const channel = session.chat.messages(0);
+    const result = await session.chat.send({
+      text: "x",
+      destination: "broadcast",
+    });
+    expect(result.isErr() && result.error.reason).toBe("queue full");
+    expect(channel.value).toEqual([]);
   });
 
   it("keeps an ack that beat the send's id and marks a relay ack as delivered", async () => {
@@ -448,7 +463,7 @@ describe("MeshSession", () => {
 
     kmp.settleSends({ ok: false, reason: "MAX_RETRANSMIT" });
     const result = await sending;
-    expect(result.status).toBe("error");
+    expect(result.status).toBe("ok");
     expect(thread.value[0]?.reactions[0]?.own).toEqual({
       packetId,
       state: MessageState.Failed,
@@ -570,7 +585,8 @@ describe("MeshSession", () => {
       destination: PEER,
       replyId: 3,
     });
-    const failedId = first.isErr() ? (kmp.texts[0]?.id ?? 0) : 0;
+    expect(first.status).toBe("ok");
+    const failedId = kmp.texts[0]?.id ?? 0;
     expect(direct.value[0]?.state).toBe(MessageState.Failed);
 
     kmp.sendOutcome = { ok: true, reason: null };
