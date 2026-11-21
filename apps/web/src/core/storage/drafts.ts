@@ -1,6 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import type { SqlocalDb } from "./db.ts";
 import { drafts } from "./schema.ts";
+import { type ScopeOptions, type StorageScope, scopeOf } from "./scope.ts";
 import {
   type ConversationKey,
   conversationKeyString,
@@ -8,9 +9,8 @@ import {
   parseConversationKey,
 } from "./types.ts";
 
-export interface SqlocalDraftRepositoryOptions {
-  deviceId: number;
-}
+/** The `device_id` rows are stored and read under (see `StorageScope`). */
+export type SqlocalDraftRepositoryOptions = ScopeOptions;
 
 /**
  * Per-conversation draft persistence. Single row per (device_id,
@@ -18,11 +18,11 @@ export interface SqlocalDraftRepositoryOptions {
  */
 export class SqlocalDraftRepository implements DraftRepository {
   private readonly db: SqlocalDb;
-  private deviceId: number;
+  private readonly scope: StorageScope;
 
   constructor(db: SqlocalDb, options: SqlocalDraftRepositoryOptions) {
     this.db = db;
-    this.deviceId = options.deviceId;
+    this.scope = scopeOf(options);
   }
 
   /**
@@ -30,63 +30,74 @@ export class SqlocalDraftRepository implements DraftRepository {
    * old one are left as they are.
    */
   setScope(deviceId: number): void {
-    this.deviceId = deviceId;
+    this.scope.set(deviceId);
   }
 
-  async load(key: ConversationKey): Promise<string> {
-    const rows = await this.db
-      .select({ text: drafts.text })
-      .from(drafts)
-      .where(
-        and(
-          eq(drafts.deviceId, this.deviceId),
-          eq(drafts.conversationKey, conversationKeyString(key)),
-        ),
-      )
-      .limit(1);
-    return rows[0]?.text ?? "";
+  load(key: ConversationKey): Promise<string> {
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.db
+        .select({ text: drafts.text })
+        .from(drafts)
+        .where(
+          and(
+            eq(drafts.deviceId, deviceId),
+            eq(drafts.conversationKey, conversationKeyString(key)),
+          ),
+        )
+        .limit(1);
+      return rows[0]?.text ?? "";
+    });
   }
 
-  async save(key: ConversationKey, text: string): Promise<void> {
-    if (text.length === 0) {
-      await this.clear(key);
-      return;
-    }
-    await this.db
-      .insert(drafts)
-      .values({
-        deviceId: this.deviceId,
-        conversationKey: conversationKeyString(key),
-        text,
-        updatedAt: Date.now(),
-      })
-      .onConflictDoUpdate({
-        target: [drafts.deviceId, drafts.conversationKey],
-        set: { text: sql`excluded.text`, updatedAt: sql`excluded.updated_at` },
-      });
+  save(key: ConversationKey, text: string): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      if (text.length === 0) {
+        await this.remove(deviceId, key);
+        return;
+      }
+      await this.db
+        .insert(drafts)
+        .values({
+          deviceId,
+          conversationKey: conversationKeyString(key),
+          text,
+          updatedAt: Date.now(),
+        })
+        .onConflictDoUpdate({
+          target: [drafts.deviceId, drafts.conversationKey],
+          set: {
+            text: sql`excluded.text`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
+    });
   }
 
-  async clear(key: ConversationKey): Promise<void> {
+  clear(key: ConversationKey): Promise<void> {
+    return this.scope.run((deviceId) => this.remove(deviceId, key));
+  }
+
+  private async remove(deviceId: number, key: ConversationKey): Promise<void> {
     await this.db
       .delete(drafts)
       .where(
         and(
-          eq(drafts.deviceId, this.deviceId),
+          eq(drafts.deviceId, deviceId),
           eq(drafts.conversationKey, conversationKeyString(key)),
         ),
       );
   }
 
-  async loadAll(): Promise<
-    ReadonlyArray<{ key: ConversationKey; text: string }>
-  > {
-    const rows = await this.db
-      .select({ conversationKey: drafts.conversationKey, text: drafts.text })
-      .from(drafts)
-      .where(eq(drafts.deviceId, this.deviceId));
-    return rows.map((r) => ({
-      key: parseConversationKey(r.conversationKey),
-      text: r.text,
-    }));
+  loadAll(): Promise<ReadonlyArray<{ key: ConversationKey; text: string }>> {
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.db
+        .select({ conversationKey: drafts.conversationKey, text: drafts.text })
+        .from(drafts)
+        .where(eq(drafts.deviceId, deviceId));
+      return rows.map((r) => ({
+        key: parseConversationKey(r.conversationKey),
+        text: r.text,
+      }));
+    });
   }
 }

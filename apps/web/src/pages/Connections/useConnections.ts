@@ -6,10 +6,7 @@ import {
   probeConnection,
   type SerialConnection,
 } from "@app/core/connections/browserDevices.ts";
-import {
-  openRepositories,
-  UNKNOWN_NODE_SCOPE,
-} from "@app/core/connections/repositories.ts";
+import { openRepositories } from "@app/core/connections/repositories.ts";
 import {
   nextConnectionPatch,
   supersededAttempts,
@@ -47,6 +44,7 @@ import { useAppStore, useDeviceStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { MIN_FIRMWARE_VERSION } from "@core/utils/firmware.ts";
 import { randId } from "@core/utils/randId.ts";
+import { Result } from "better-result";
 import { t } from "i18next";
 import { useCallback } from "react";
 
@@ -345,16 +343,16 @@ export function useConnections() {
   /**
    * Connects through the Kotlin SDK, which owns the transport, the
    * handshake and reconnects. A session over the client decodes what the
-   * SDK delivers into the app's stores, with history opened for the node
-   * this connection reached last time.
+   * SDK delivers into the app's stores. History is the radio's, whichever
+   * transport reached it: it opens once the handshake names the radio, and
+   * what arrived before that is filed under it then (see `RadioStorage`).
    */
   const connectThroughKmp = useCallback(
     async (attempt: Attempt, makeClient: ClientFactory) => {
       const { id } = attempt;
       const conn = savedConnection(id);
-      const { options, persistent, sdkStorage } = await openRepositories(
-        conn?.nodeNum,
-      );
+      const { options, persistent, sdkStorage, radio } =
+        await openRepositories();
       if (!isCurrent(attempt)) return abandonAttempt(attempt);
       log.info("connect: storage ready", { id, persistent });
       const client = await makeClient(sdkStorage);
@@ -374,8 +372,28 @@ export function useConnections() {
           }),
         });
       }
-      let scope = conn?.nodeNum ?? UNKNOWN_NODE_SCOPE;
       const session = new MeshSession(client, options);
+      // The radio this session's history is filed under, once named.
+      let identified: number | undefined;
+      const identify = (nodeNum: number | undefined) => {
+        if (nodeNum === undefined || nodeNum <= 0) return;
+        if (savedConnection(id)?.nodeNum !== nodeNum) {
+          updateSavedConnection(id, { nodeNum });
+        }
+        if (identified === nodeNum) return;
+        identified = nodeNum;
+        // Adopting switches every repository at once, and their later
+        // calls wait for it, so the reload below sees the adopted rows.
+        void radio?.identify(nodeNum).then((adopted) => {
+          if (Result.isError(adopted)) {
+            log.warn("connect: history before the handshake was not kept", {
+              id,
+              message: adopted.error.message,
+            });
+          }
+        });
+        session.rescope(nodeNum);
+      };
 
       // Replace any session left from an earlier attempt, so the app reads
       // this session's state rather than the dead one's, and its client
@@ -492,18 +510,12 @@ export function useConnections() {
             firmwareChecked = false;
           }
         }),
-        // History is stored per radio. Saving the node on the connection lets
-        // the next connect open that node's history straight away.
-        session.events.onMyNodeInfo.subscribe(({ myNodeNum }) => {
-          if (myNodeNum <= 0) return;
-          if (savedConnection(id)?.nodeNum !== myNodeNum) {
-            updateSavedConnection(id, { nodeNum: myNodeNum });
-          }
-          if (scope !== myNodeNum) {
-            scope = myNodeNum;
-            session.rescope(myNodeNum);
-          }
-        }),
+        // History is stored per radio. The node number usually comes in
+        // my_info; the SDK's own copy covers a my_info the web can't decode.
+        session.events.onMyNodeInfo.subscribe(({ myNodeNum }) =>
+          identify(myNodeNum),
+        ),
+        session.device.myNodeNum.subscribe(identify),
         // Firmware emits `rebooted` after a soft reset; the SDK reconnects
         // and runs the handshake again, so the overlay should show again.
         session.events.onRebooted.subscribe(() => {
@@ -514,6 +526,7 @@ export function useConnections() {
       sessionTeardowns.set(id, () => {
         for (const off of unsubscribes) off();
         session.close();
+        if (identified === undefined) void radio?.discard();
       });
 
       try {

@@ -3,6 +3,7 @@ import { Protobuf } from "@core/protobuf.ts";
 import { and, count, desc, eq, lt, sql } from "drizzle-orm";
 import type { SqlocalDb } from "./db.ts";
 import { telemetry } from "./schema.ts";
+import { type ScopeOptions, type StorageScope, scopeOf } from "./scope.ts";
 import {
   base64Decode,
   base64Encode,
@@ -11,17 +12,16 @@ import {
   type TelemetryRetentionPolicy,
 } from "./types.ts";
 
-export interface SqlocalTelemetryRepositoryOptions {
-  deviceId: number;
-}
+/** The `device_id` rows are stored and read under (see `StorageScope`). */
+export type SqlocalTelemetryRepositoryOptions = ScopeOptions;
 
 export class SqlocalTelemetryRepository implements TelemetryRepository {
   private readonly db: SqlocalDb;
-  private deviceId: number;
+  private readonly scope: StorageScope;
 
   constructor(db: SqlocalDb, options: SqlocalTelemetryRepositoryOptions) {
     this.db = db;
-    this.deviceId = options.deviceId;
+    this.scope = scopeOf(options);
   }
 
   /**
@@ -29,121 +29,122 @@ export class SqlocalTelemetryRepository implements TelemetryRepository {
    * old one are left as they are.
    */
   setScope(deviceId: number): void {
-    this.deviceId = deviceId;
+    this.scope.set(deviceId);
   }
 
-  async loadRecent(
-    nodeNum: number,
-    limit: number,
-  ): Promise<TelemetryReading[]> {
-    const rows = await this.db
-      .select()
-      .from(telemetry)
-      .where(
-        and(
-          eq(telemetry.deviceId, this.deviceId),
-          eq(telemetry.nodeNum, nodeNum),
-        ),
-      )
-      .orderBy(desc(telemetry.ts))
-      .limit(limit);
-    return rows.flatMap((row) => rowToReading(row) ?? []).reverse();
+  loadRecent(nodeNum: number, limit: number): Promise<TelemetryReading[]> {
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.db
+        .select()
+        .from(telemetry)
+        .where(
+          and(eq(telemetry.deviceId, deviceId), eq(telemetry.nodeNum, nodeNum)),
+        )
+        .orderBy(desc(telemetry.ts))
+        .limit(limit);
+      return rows.flatMap((row) => rowToReading(row) ?? []).reverse();
+    });
   }
 
-  async loadBefore(
+  loadBefore(
     nodeNum: number,
     cursor: Date,
     limit: number,
   ): Promise<TelemetryReading[]> {
-    const rows = await this.db
-      .select()
-      .from(telemetry)
-      .where(
-        and(
-          eq(telemetry.deviceId, this.deviceId),
-          eq(telemetry.nodeNum, nodeNum),
-          lt(telemetry.ts, cursor.getTime()),
-        ),
-      )
-      .orderBy(desc(telemetry.ts))
-      .limit(limit);
-    return rows.flatMap((row) => rowToReading(row) ?? []).reverse();
-  }
-
-  async append(reading: TelemetryReading): Promise<void> {
-    await this.appendBatch([reading]);
-  }
-
-  async appendBatch(readings: ReadonlyArray<TelemetryReading>): Promise<void> {
-    if (readings.length === 0) return;
-    const rows = readings.flatMap((r) => readingToRow(this.deviceId, r) ?? []);
-    if (rows.length === 0) return;
-    await this.db.insert(telemetry).values(rows);
-  }
-
-  async prune(policy: TelemetryRetentionPolicy): Promise<void> {
-    if (policy.olderThanMs !== undefined) {
-      const cutoff = Date.now() - policy.olderThanMs;
-      await this.db
-        .delete(telemetry)
-        .where(
-          and(eq(telemetry.deviceId, this.deviceId), lt(telemetry.ts, cutoff)),
-        );
-    }
-    if (policy.maxPerNode !== undefined) {
-      const max = policy.maxPerNode;
-      // Get distinct nodes that exceed the cap, then trim each.
-      const overCap = await this.db
-        .select({ nodeNum: telemetry.nodeNum, c: count() })
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.db
+        .select()
         .from(telemetry)
-        .where(eq(telemetry.deviceId, this.deviceId))
-        .groupBy(telemetry.nodeNum)
-        .having(sql`count(*) > ${max}`);
-      for (const row of overCap) {
-        // Keep the newest `max` rows; delete everything older than the
-        // ts-of-the-(max+1)th-newest. ts ASC; offset by max-th gives cutoff.
-        const cutoffRows = await this.db
-          .select({ ts: telemetry.ts })
-          .from(telemetry)
-          .where(
-            and(
-              eq(telemetry.deviceId, this.deviceId),
-              eq(telemetry.nodeNum, row.nodeNum),
-            ),
-          )
-          .orderBy(desc(telemetry.ts))
-          .limit(1)
-          .offset(max - 1);
-        const cutoff = cutoffRows[0]?.ts;
-        if (cutoff === undefined) continue;
+        .where(
+          and(
+            eq(telemetry.deviceId, deviceId),
+            eq(telemetry.nodeNum, nodeNum),
+            lt(telemetry.ts, cursor.getTime()),
+          ),
+        )
+        .orderBy(desc(telemetry.ts))
+        .limit(limit);
+      return rows.flatMap((row) => rowToReading(row) ?? []).reverse();
+    });
+  }
+
+  append(reading: TelemetryReading): Promise<void> {
+    return this.appendBatch([reading]);
+  }
+
+  appendBatch(readings: ReadonlyArray<TelemetryReading>): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      if (readings.length === 0) return;
+      const rows = readings.flatMap((r) => readingToRow(deviceId, r) ?? []);
+      if (rows.length === 0) return;
+      await this.db.insert(telemetry).values(rows);
+    });
+  }
+
+  prune(policy: TelemetryRetentionPolicy): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      if (policy.olderThanMs !== undefined) {
+        const cutoff = Date.now() - policy.olderThanMs;
         await this.db
           .delete(telemetry)
           .where(
-            and(
-              eq(telemetry.deviceId, this.deviceId),
-              eq(telemetry.nodeNum, row.nodeNum),
-              lt(telemetry.ts, cutoff),
-            ),
+            and(eq(telemetry.deviceId, deviceId), lt(telemetry.ts, cutoff)),
           );
       }
-    }
+      if (policy.maxPerNode !== undefined) {
+        const max = policy.maxPerNode;
+        // Get distinct nodes that exceed the cap, then trim each.
+        const overCap = await this.db
+          .select({ nodeNum: telemetry.nodeNum, c: count() })
+          .from(telemetry)
+          .where(eq(telemetry.deviceId, deviceId))
+          .groupBy(telemetry.nodeNum)
+          .having(sql`count(*) > ${max}`);
+        for (const row of overCap) {
+          // Keep the newest `max` rows; delete everything older than the
+          // ts-of-the-(max+1)th-newest. ts ASC; offset by max-th gives cutoff.
+          const cutoffRows = await this.db
+            .select({ ts: telemetry.ts })
+            .from(telemetry)
+            .where(
+              and(
+                eq(telemetry.deviceId, deviceId),
+                eq(telemetry.nodeNum, row.nodeNum),
+              ),
+            )
+            .orderBy(desc(telemetry.ts))
+            .limit(1)
+            .offset(max - 1);
+          const cutoff = cutoffRows[0]?.ts;
+          if (cutoff === undefined) continue;
+          await this.db
+            .delete(telemetry)
+            .where(
+              and(
+                eq(telemetry.deviceId, deviceId),
+                eq(telemetry.nodeNum, row.nodeNum),
+                lt(telemetry.ts, cutoff),
+              ),
+            );
+        }
+      }
+    });
   }
 
-  async clearNode(nodeNum: number): Promise<void> {
-    await this.db
-      .delete(telemetry)
-      .where(
-        and(
-          eq(telemetry.deviceId, this.deviceId),
-          eq(telemetry.nodeNum, nodeNum),
-        ),
-      );
+  clearNode(nodeNum: number): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      await this.db
+        .delete(telemetry)
+        .where(
+          and(eq(telemetry.deviceId, deviceId), eq(telemetry.nodeNum, nodeNum)),
+        );
+    });
   }
 
-  async clear(): Promise<void> {
-    await this.db
-      .delete(telemetry)
-      .where(eq(telemetry.deviceId, this.deviceId));
+  clear(): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      await this.db.delete(telemetry).where(eq(telemetry.deviceId, deviceId));
+    });
   }
 }
 

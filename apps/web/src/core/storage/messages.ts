@@ -25,6 +25,7 @@ import {
   reactions,
   readMarkers,
 } from "./schema.ts";
+import { type ScopeOptions, type StorageScope, scopeOf } from "./scope.ts";
 import {
   type ConversationKey,
   conversationKeyString,
@@ -42,15 +43,14 @@ import {
   type StoredConversation,
 } from "./types.ts";
 
-export interface SqlocalMessageRepositoryOptions {
-  /**
-   * The `device_id` rows are stored and read under: the storage scope, e.g.
-   * the radio's node number. Change it later with `setScope`.
-   */
-  deviceId: number;
+/**
+ * `scope` (or a fixed `deviceId`) is the `device_id` rows are stored and read
+ * under: the radio's node number, or a connection's provisional scope.
+ */
+export type SqlocalMessageRepositoryOptions = ScopeOptions & {
   /** Optional cross-tab coordinator. If omitted, mutations are silent. */
   coordinator?: MultiTabCoordinator;
-}
+};
 
 /** SQLite caps bound parameters; chunk `IN (...)` lists well under it. */
 const MAX_IN_LIST = 500;
@@ -61,12 +61,12 @@ const MAX_IN_LIST = 500;
  */
 export class SqlocalMessageRepository implements MessageRepository {
   private readonly db: SqlocalDb;
-  private deviceId: number;
+  private readonly scope: StorageScope;
   private readonly coordinator: MultiTabCoordinator | undefined;
 
   constructor(db: SqlocalDb, options: SqlocalMessageRepositoryOptions) {
     this.db = db;
-    this.deviceId = options.deviceId;
+    this.scope = scopeOf(options);
     this.coordinator = options.coordinator;
   }
 
@@ -75,20 +75,22 @@ export class SqlocalMessageRepository implements MessageRepository {
    * old one are left as they are.
    */
   setScope(deviceId: number): void {
-    this.deviceId = deviceId;
+    this.scope.set(deviceId);
   }
 
-  async loadRecent(key: ConversationKey, limit: number): Promise<Message[]> {
-    const rows = await this.db
-      .select()
-      .from(messages)
-      .where(this.scoped(key))
-      .orderBy(desc(messages.rxTime), desc(messages.seq))
-      .limit(limit);
-    return rows.reverse().map(rowToMessage);
+  loadRecent(key: ConversationKey, limit: number): Promise<Message[]> {
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.db
+        .select()
+        .from(messages)
+        .where(scoped(deviceId, key))
+        .orderBy(desc(messages.rxTime), desc(messages.seq))
+        .limit(limit);
+      return rows.reverse().map(rowToMessage);
+    });
   }
 
-  async loadBefore(
+  loadBefore(
     key: ConversationKey,
     cursor: MessageCursor,
     limit: number,
@@ -101,156 +103,184 @@ export class SqlocalMessageRepository implements MessageRepository {
             lt(messages.rxTime, at),
             and(eq(messages.rxTime, at), lt(messages.seq, cursor.seq)),
           );
-    const rows = await this.db
-      .select()
-      .from(messages)
-      .where(and(this.scoped(key), before))
-      .orderBy(desc(messages.rxTime), desc(messages.seq))
-      .limit(limit);
-    return rows.reverse().map(rowToMessage);
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.db
+        .select()
+        .from(messages)
+        .where(and(scoped(deviceId, key), before))
+        .orderBy(desc(messages.rxTime), desc(messages.seq))
+        .limit(limit);
+      return rows.reverse().map(rowToMessage);
+    });
   }
 
-  async append(message: Message, key?: ConversationKey): Promise<void> {
-    await this.insert([
-      messageToRow(this.deviceId, message, key ?? inferConversation(message)),
-    ]);
-  }
-
-  async appendBatch(input: ReadonlyArray<Message>): Promise<void> {
-    await this.insert(
-      input.map((m) => messageToRow(this.deviceId, m, inferConversation(m))),
+  append(message: Message, key?: ConversationKey): Promise<void> {
+    return this.scope.run((deviceId) =>
+      this.insert(deviceId, [
+        messageToRow(deviceId, message, key ?? inferConversation(message)),
+      ]),
     );
   }
 
-  private async insert(rows: MessageInsert[]): Promise<void> {
-    if (rows.length === 0) return;
-    await this.db.insert(messages).values(rows).onConflictDoNothing();
-    this.notify(rows.map((r) => r.conversationKey));
+  appendBatch(input: ReadonlyArray<Message>): Promise<void> {
+    return this.scope.run((deviceId) =>
+      this.insert(
+        deviceId,
+        input.map((m) => messageToRow(deviceId, m, inferConversation(m))),
+      ),
+    );
   }
 
-  async updateDelivery(
-    ref: MessageRef,
-    patch: MessageDeliveryPatch,
-  ): Promise<void> {
+  private async insert(deviceId: number, rows: MessageInsert[]): Promise<void> {
+    if (rows.length === 0) return;
+    await this.db.insert(messages).values(rows).onConflictDoNothing();
+    this.notify(
+      deviceId,
+      rows.map((r) => r.conversationKey),
+    );
+  }
+
+  updateDelivery(ref: MessageRef, patch: MessageDeliveryPatch): Promise<void> {
     const set: Partial<MessageInsert> = {};
     if ("state" in patch) set.state = patch.state;
     if ("ackProof" in patch) set.ackProof = patch.ackProof ?? null;
     if ("routingError" in patch) set.routingError = patch.routingError ?? null;
     if ("relays" in patch) set.relays = patch.relays ?? null;
-    if (Object.keys(set).length === 0) return;
-    await this.db.update(messages).set(set).where(this.byRef(ref));
+    if (Object.keys(set).length === 0) return Promise.resolve();
+    return this.scope.run(async (deviceId) => {
+      await this.db.update(messages).set(set).where(byRef(deviceId, ref));
+    });
   }
 
-  async updateState(ref: MessageRef, state: MessageState): Promise<void> {
-    await this.db.update(messages).set({ state }).where(this.byRef(ref));
+  updateState(ref: MessageRef, state: MessageState): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      await this.db.update(messages).set({ state }).where(byRef(deviceId, ref));
+    });
   }
 
-  async remove(ref: MessageRef): Promise<void> {
-    await this.db.delete(messages).where(this.byRef(ref));
-    await this.removeOrphanReactions();
+  remove(ref: MessageRef): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      await this.db.delete(messages).where(byRef(deviceId, ref));
+      await this.removeOrphanReactions(deviceId);
+    });
   }
 
-  async prune(policy: RetentionPolicy): Promise<void> {
-    if (policy.olderThanMs !== undefined) {
-      const cutoff = Date.now() - policy.olderThanMs;
+  prune(policy: RetentionPolicy): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      if (policy.olderThanMs !== undefined) {
+        const cutoff = Date.now() - policy.olderThanMs;
+        await this.db
+          .delete(messages)
+          .where(
+            and(eq(messages.deviceId, deviceId), lt(messages.rxTime, cutoff)),
+          );
+      }
+      if (policy.maxPerBucket !== undefined) {
+        // Keep the newest N per (device, conversation_key). SQLite has no
+        // per-group LIMIT, so use a windowed delete.
+        await this.db.run(sql`
+          DELETE FROM messages
+          WHERE device_id = ${deviceId}
+            AND seq IN (
+              SELECT seq FROM (
+                SELECT seq,
+                       row_number() OVER (
+                         PARTITION BY conversation_key
+                         ORDER BY rx_time DESC, seq DESC
+                       ) AS rn
+                FROM messages
+                WHERE device_id = ${deviceId}
+              )
+              WHERE rn > ${policy.maxPerBucket}
+            )
+        `);
+      }
+      await this.removeOrphanReactions(deviceId);
+    });
+  }
+
+  clearConversation(key: ConversationKey): Promise<void> {
+    const k = conversationKeyString(key);
+    return this.scope.run(async (deviceId) => {
+      await this.db.delete(messages).where(scoped(deviceId, key));
       await this.db
-        .delete(messages)
+        .delete(reactions)
         .where(
           and(
-            eq(messages.deviceId, this.deviceId),
-            lt(messages.rxTime, cutoff),
+            eq(reactions.deviceId, deviceId),
+            eq(reactions.conversationKey, k),
           ),
         );
-    }
-    if (policy.maxPerBucket !== undefined) {
-      // Keep the newest N per (device, conversation_key). SQLite has no
-      // per-group LIMIT, so use a windowed delete.
-      await this.db.run(sql`
-        DELETE FROM messages
-        WHERE device_id = ${this.deviceId}
-          AND seq IN (
-            SELECT seq FROM (
-              SELECT seq,
-                     row_number() OVER (
-                       PARTITION BY conversation_key
-                       ORDER BY rx_time DESC, seq DESC
-                     ) AS rn
-              FROM messages
-              WHERE device_id = ${this.deviceId}
-            )
-            WHERE rn > ${policy.maxPerBucket}
+      await this.db
+        .delete(readMarkers)
+        .where(
+          and(
+            eq(readMarkers.deviceId, deviceId),
+            eq(readMarkers.conversationKey, k),
+          ),
+        );
+      this.notify(deviceId, [k]);
+    });
+  }
+
+  clear(): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      await this.db.delete(messages).where(eq(messages.deviceId, deviceId));
+      await this.db.delete(reactions).where(eq(reactions.deviceId, deviceId));
+      await this.db
+        .delete(readMarkers)
+        .where(eq(readMarkers.deviceId, deviceId));
+    });
+  }
+
+  findByIds(ids: ReadonlyArray<number>): Promise<Message[]> {
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.inChunks(ids, (chunk) =>
+        this.db
+          .select()
+          .from(messages)
+          .where(
+            and(
+              eq(messages.deviceId, deviceId),
+              inArray(messages.packetId, chunk),
+            ),
+          ),
+      );
+      return rows.map(rowToMessage);
+    });
+  }
+
+  loadReactions(targetIds: ReadonlyArray<number>): Promise<Reaction[]> {
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.inChunks(targetIds, (chunk) =>
+        this.db
+          .select()
+          .from(reactions)
+          .where(
+            and(
+              eq(reactions.deviceId, deviceId),
+              inArray(reactions.targetId, chunk),
+            ),
           )
-      `);
-    }
-    await this.removeOrphanReactions();
-  }
-
-  async clearConversation(key: ConversationKey): Promise<void> {
-    const k = conversationKeyString(key);
-    await this.db.delete(messages).where(this.scoped(key));
-    await this.db
-      .delete(reactions)
-      .where(
-        and(
-          eq(reactions.deviceId, this.deviceId),
-          eq(reactions.conversationKey, k),
-        ),
+          .orderBy(asc(reactions.rxTime)),
       );
-    await this.db
-      .delete(readMarkers)
-      .where(
-        and(
-          eq(readMarkers.deviceId, this.deviceId),
-          eq(readMarkers.conversationKey, k),
-        ),
-      );
-    this.notify([k]);
+      return rows.map(rowToReaction);
+    });
   }
 
-  async clear(): Promise<void> {
-    await this.db.delete(messages).where(eq(messages.deviceId, this.deviceId));
-    await this.db
-      .delete(reactions)
-      .where(eq(reactions.deviceId, this.deviceId));
-    await this.db
-      .delete(readMarkers)
-      .where(eq(readMarkers.deviceId, this.deviceId));
-  }
-
-  async findByIds(ids: ReadonlyArray<number>): Promise<Message[]> {
-    const rows = await this.inChunks(ids, (chunk) =>
-      this.db
-        .select()
-        .from(messages)
-        .where(
-          and(
-            eq(messages.deviceId, this.deviceId),
-            inArray(messages.packetId, chunk),
-          ),
-        ),
+  addReaction(reaction: Reaction, key: ConversationKey): Promise<void> {
+    return this.scope.run((deviceId) =>
+      this.insertReaction(deviceId, reaction, key),
     );
-    return rows.map(rowToMessage);
   }
 
-  async loadReactions(targetIds: ReadonlyArray<number>): Promise<Reaction[]> {
-    const rows = await this.inChunks(targetIds, (chunk) =>
-      this.db
-        .select()
-        .from(reactions)
-        .where(
-          and(
-            eq(reactions.deviceId, this.deviceId),
-            inArray(reactions.targetId, chunk),
-          ),
-        )
-        .orderBy(asc(reactions.rxTime)),
-    );
-    return rows.map(rowToReaction);
-  }
-
-  async addReaction(reaction: Reaction, key: ConversationKey): Promise<void> {
+  private async insertReaction(
+    deviceId: number,
+    reaction: Reaction,
+    key: ConversationKey,
+  ): Promise<void> {
     const row: ReactionInsert = {
-      deviceId: this.deviceId,
+      deviceId,
       targetId: reaction.targetId,
       fromNode: reaction.fromNode,
       emojiKey: reactionKey(reaction.emoji),
@@ -263,53 +293,66 @@ export class SqlocalMessageRepository implements MessageRepository {
       routingError: reaction.routingError ?? null,
     };
     await this.db.insert(reactions).values(row).onConflictDoNothing();
-    this.notify([row.conversationKey]);
+    this.notify(deviceId, [row.conversationKey]);
   }
 
-  async removeReaction(
+  removeReaction(
     targetId: number,
     fromNode: number,
     emoji: string,
   ): Promise<void> {
-    await this.db
-      .delete(reactions)
-      .where(
-        and(
-          eq(reactions.deviceId, this.deviceId),
-          eq(reactions.targetId, targetId),
-          eq(reactions.fromNode, fromNode),
-          eq(reactions.emojiKey, reactionKey(emoji)),
-        ),
-      );
+    return this.scope.run(async (deviceId) => {
+      await this.db
+        .delete(reactions)
+        .where(
+          and(
+            eq(reactions.deviceId, deviceId),
+            eq(reactions.targetId, targetId),
+            eq(reactions.fromNode, fromNode),
+            eq(reactions.emojiKey, reactionKey(emoji)),
+          ),
+        );
+    });
   }
 
-  async updateReactionDelivery(
+  updateReactionDelivery(
     ref: { readonly packetId: number; readonly fromNode: number },
     patch: ReactionDeliveryPatch,
   ): Promise<void> {
     const set: Partial<ReactionInsert> = {};
     if ("state" in patch) set.state = patch.state;
     if ("routingError" in patch) set.routingError = patch.routingError ?? null;
-    if (Object.keys(set).length === 0) return;
-    await this.db
-      .update(reactions)
-      .set(set)
-      .where(
-        and(
-          eq(reactions.deviceId, this.deviceId),
-          eq(reactions.fromNode, ref.fromNode),
-          eq(reactions.packetId, ref.packetId),
-        ),
-      );
+    if (Object.keys(set).length === 0) return Promise.resolve();
+    return this.scope.run(async (deviceId) => {
+      await this.db
+        .update(reactions)
+        .set(set)
+        .where(
+          and(
+            eq(reactions.deviceId, deviceId),
+            eq(reactions.fromNode, ref.fromNode),
+            eq(reactions.packetId, ref.packetId),
+          ),
+        );
+    });
   }
 
-  async loadConversations(myNodeNum: number): Promise<StoredConversation[]> {
+  loadConversations(myNodeNum: number): Promise<StoredConversation[]> {
+    return this.scope.run((deviceId) =>
+      this.conversations(deviceId, myNodeNum),
+    );
+  }
+
+  private async conversations(
+    deviceId: number,
+    myNodeNum: number,
+  ): Promise<StoredConversation[]> {
     // SQLite fills bare columns of a max() aggregate from the row holding
     // the maximum, so this is each conversation's latest message.
     const latest = await this.db
       .select({ ...getTableColumns(messages), latestSeq: max(messages.seq) })
       .from(messages)
-      .where(eq(messages.deviceId, this.deviceId))
+      .where(eq(messages.deviceId, deviceId))
       .groupBy(messages.conversationKey);
     const unread = await this.db
       .select({ key: messages.conversationKey, unread: count() })
@@ -323,10 +366,10 @@ export class SqlocalMessageRepository implements MessageRepository {
       )
       .where(
         and(
-          eq(messages.deviceId, this.deviceId),
+          eq(messages.deviceId, deviceId),
           ne(messages.fromNode, myNodeNum),
           // The scope is the radio's own node number: its messages are mine.
-          ne(messages.fromNode, this.deviceId),
+          ne(messages.fromNode, deviceId),
           gt(messages.seq, sql`coalesce(${readMarkers.lastReadSeq}, 0)`),
         ),
       )
@@ -346,17 +389,24 @@ export class SqlocalMessageRepository implements MessageRepository {
     });
   }
 
-  async markRead(key: ConversationKey): Promise<void> {
+  markRead(key: ConversationKey): Promise<void> {
+    return this.scope.run((deviceId) => this.markReadIn(deviceId, key));
+  }
+
+  private async markReadIn(
+    deviceId: number,
+    key: ConversationKey,
+  ): Promise<void> {
     const [row] = await this.db
       .select({ seq: max(messages.seq) })
       .from(messages)
-      .where(this.scoped(key));
+      .where(scoped(deviceId, key));
     const seq = row?.seq;
     if (seq === null || seq === undefined) return;
     await this.db
       .insert(readMarkers)
       .values({
-        deviceId: this.deviceId,
+        deviceId,
         conversationKey: conversationKeyString(key),
         lastReadSeq: seq,
       })
@@ -368,12 +418,12 @@ export class SqlocalMessageRepository implements MessageRepository {
       });
   }
 
-  private async removeOrphanReactions(): Promise<void> {
+  private async removeOrphanReactions(deviceId: number): Promise<void> {
     await this.db.run(sql`
       DELETE FROM reactions
-      WHERE device_id = ${this.deviceId}
+      WHERE device_id = ${deviceId}
         AND target_id NOT IN (
-          SELECT packet_id FROM messages WHERE device_id = ${this.deviceId}
+          SELECT packet_id FROM messages WHERE device_id = ${deviceId}
         )
     `);
   }
@@ -390,31 +440,31 @@ export class SqlocalMessageRepository implements MessageRepository {
     return out;
   }
 
-  private scoped(key: ConversationKey) {
-    return and(
-      eq(messages.deviceId, this.deviceId),
-      eq(messages.conversationKey, conversationKeyString(key)),
-    );
-  }
-
-  private byRef(ref: MessageRef) {
-    return and(
-      eq(messages.deviceId, this.deviceId),
-      eq(messages.fromNode, ref.from),
-      eq(messages.packetId, ref.id),
-    );
-  }
-
-  private notify(keys: ReadonlyArray<string>): void {
+  private notify(deviceId: number, keys: ReadonlyArray<string>): void {
     if (!this.coordinator) return;
     for (const key of new Set(keys)) {
       this.coordinator.broadcast({
         kind: "messages-changed",
-        deviceId: this.deviceId,
+        deviceId,
         key,
       });
     }
   }
+}
+
+function scoped(deviceId: number, key: ConversationKey) {
+  return and(
+    eq(messages.deviceId, deviceId),
+    eq(messages.conversationKey, conversationKeyString(key)),
+  );
+}
+
+function byRef(deviceId: number, ref: MessageRef) {
+  return and(
+    eq(messages.deviceId, deviceId),
+    eq(messages.fromNode, ref.from),
+    eq(messages.packetId, ref.id),
+  );
 }
 
 function tryParseKey(s: string): ConversationKey | undefined {

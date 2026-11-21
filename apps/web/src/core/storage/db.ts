@@ -1,6 +1,11 @@
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { SQLocalDrizzle } from "sqlocal/drizzle";
+import {
+  discardStatements,
+  type RunAtomically,
+  type SqlStatement,
+} from "./adopt.ts";
 import * as schema from "./schema.ts";
 import { DATABASE_FILE, SCHEMA_VERSION, schemaStatements } from "./schema.ts";
 
@@ -25,6 +30,8 @@ export interface OpenedSqlocalDb {
   storageType: string;
   /** True when the database is saved to OPFS. */
   persistent: boolean;
+  /** Runs statements as one sqlocal batch, which is a single transaction. */
+  atomic: RunAtomically;
   /** Disconnects from the database and stops its worker, releasing the OPFS handle. */
   close: () => Promise<void>;
 }
@@ -47,14 +54,33 @@ export async function openSqlocalDb(
   });
 
   await applySchema(sql);
+  const atomic: RunAtomically = async (statements) => {
+    await client.batch(() => statements.map(toSqlocalStatement));
+  };
+  // Rows a connection wrote before its radio was named belong to no radio;
+  // any a previous page left behind (it closed mid-handshake) go now. They
+  // are harmless if they stay, so a failure here must not cost persistence.
+  try {
+    await atomic(discardStatements());
+  } catch (err) {
+    console.warn("openSqlocalDb: could not drop provisional rows", err);
+  }
 
   const { storageType = "memory" } = await client.getDatabaseInfo();
   return {
     db,
     storageType,
     persistent: storageType === "opfs",
+    atomic,
     close: () => client.destroy(),
   };
+}
+
+function toSqlocalStatement(statement: SqlStatement): {
+  sql: string;
+  params: unknown[];
+} {
+  return { sql: statement.sql, params: [...statement.params] };
 }
 
 export type RawSql = (

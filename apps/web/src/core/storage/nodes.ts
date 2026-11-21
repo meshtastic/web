@@ -3,6 +3,7 @@ import { Protobuf } from "@core/protobuf.ts";
 import { and, eq, sql } from "drizzle-orm";
 import type { SqlocalDb } from "./db.ts";
 import { nodes } from "./schema.ts";
+import { type ScopeOptions, type StorageScope, scopeOf } from "./scope.ts";
 import {
   base64Decode,
   base64Encode,
@@ -10,9 +11,8 @@ import {
   type NodesRepository,
 } from "./types.ts";
 
-export interface SqlocalNodesRepositoryOptions {
-  deviceId: number;
-}
+/** The `device_id` rows are stored and read under (see `StorageScope`). */
+export type SqlocalNodesRepositoryOptions = ScopeOptions;
 
 /** Rows per INSERT: 9 bound values each, well inside SQLite's variable limit. */
 const UPSERT_CHUNK = 500;
@@ -24,11 +24,11 @@ const UPSERT_CHUNK = 500;
  */
 export class SqlocalNodesRepository implements NodesRepository {
   private readonly db: SqlocalDb;
-  private deviceId: number;
+  private readonly scope: StorageScope;
 
   constructor(db: SqlocalDb, options: SqlocalNodesRepositoryOptions) {
     this.db = db;
-    this.deviceId = options.deviceId;
+    this.scope = scopeOf(options);
   }
 
   /**
@@ -36,62 +36,72 @@ export class SqlocalNodesRepository implements NodesRepository {
    * old one are left as they are.
    */
   setScope(deviceId: number): void {
-    this.deviceId = deviceId;
+    this.scope.set(deviceId);
   }
 
-  async loadAll(): Promise<Node[]> {
-    const rows = await this.db
-      .select()
-      .from(nodes)
-      .where(eq(nodes.deviceId, this.deviceId));
-    return rows.map(rowToNode);
+  loadAll(): Promise<Node[]> {
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.db
+        .select()
+        .from(nodes)
+        .where(eq(nodes.deviceId, deviceId));
+      return rows.map(rowToNode);
+    });
   }
 
-  async get(nodeNum: number): Promise<Node | undefined> {
-    const rows = await this.db
-      .select()
-      .from(nodes)
-      .where(and(eq(nodes.deviceId, this.deviceId), eq(nodes.num, nodeNum)))
-      .limit(1);
-    return rows[0] ? rowToNode(rows[0]) : undefined;
+  get(nodeNum: number): Promise<Node | undefined> {
+    return this.scope.run(async (deviceId) => {
+      const rows = await this.db
+        .select()
+        .from(nodes)
+        .where(and(eq(nodes.deviceId, deviceId), eq(nodes.num, nodeNum)))
+        .limit(1);
+      return rows[0] ? rowToNode(rows[0]) : undefined;
+    });
   }
 
-  async upsert(node: Node): Promise<void> {
-    await this.upsertBatch([node]);
+  upsert(node: Node): Promise<void> {
+    return this.upsertBatch([node]);
   }
 
   /** One multi-row statement per chunk, so a large node DB is a few worker round trips, not one per node. */
-  async upsertBatch(input: ReadonlyArray<Node>): Promise<void> {
-    for (let i = 0; i < input.length; i += UPSERT_CHUNK) {
-      const rows = input
-        .slice(i, i + UPSERT_CHUNK)
-        .map((node) => nodeToRow(this.deviceId, node));
+  upsertBatch(input: ReadonlyArray<Node>): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      for (let i = 0; i < input.length; i += UPSERT_CHUNK) {
+        const rows = input
+          .slice(i, i + UPSERT_CHUNK)
+          .map((node) => nodeToRow(deviceId, node));
+        await this.db
+          .insert(nodes)
+          .values(rows)
+          .onConflictDoUpdate({
+            target: [nodes.deviceId, nodes.num],
+            set: {
+              lastHeard: sql`excluded.last_heard`,
+              snr: sql`excluded.snr`,
+              isFavorite: sql`excluded.is_favorite`,
+              isIgnored: sql`excluded.is_ignored`,
+              userJson: sql`excluded.user_json`,
+              positionJson: sql`excluded.position_json`,
+              metricsJson: sql`excluded.metrics_json`,
+            },
+          });
+      }
+    });
+  }
+
+  remove(nodeNum: number): Promise<void> {
+    return this.scope.run(async (deviceId) => {
       await this.db
-        .insert(nodes)
-        .values(rows)
-        .onConflictDoUpdate({
-          target: [nodes.deviceId, nodes.num],
-          set: {
-            lastHeard: sql`excluded.last_heard`,
-            snr: sql`excluded.snr`,
-            isFavorite: sql`excluded.is_favorite`,
-            isIgnored: sql`excluded.is_ignored`,
-            userJson: sql`excluded.user_json`,
-            positionJson: sql`excluded.position_json`,
-            metricsJson: sql`excluded.metrics_json`,
-          },
-        });
-    }
+        .delete(nodes)
+        .where(and(eq(nodes.deviceId, deviceId), eq(nodes.num, nodeNum)));
+    });
   }
 
-  async remove(nodeNum: number): Promise<void> {
-    await this.db
-      .delete(nodes)
-      .where(and(eq(nodes.deviceId, this.deviceId), eq(nodes.num, nodeNum)));
-  }
-
-  async clear(): Promise<void> {
-    await this.db.delete(nodes).where(eq(nodes.deviceId, this.deviceId));
+  clear(): Promise<void> {
+    return this.scope.run(async (deviceId) => {
+      await this.db.delete(nodes).where(eq(nodes.deviceId, deviceId));
+    });
   }
 }
 
