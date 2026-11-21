@@ -149,17 +149,11 @@ export const ConversationScreen = ({
           count: knownNodes,
         }),
       ];
-  const hopLimit = config.lora?.hopLimit;
   const hint = isDm
     ? peerHasKey
       ? t("composer.hintDmPki", { name: title })
       : t("composer.hintDmPsk", { name: title })
-    : [
-        t("composer.hintKeys"),
-        hopLimit ? t("composer.hintHops", { count: hopLimit }) : undefined,
-      ]
-        .filter(Boolean)
-        .join(" · ");
+    : t("composer.hintKeys");
 
   // Only the details column has its own close; the drawer brings one.
   const fitsDetailsColumn = useCanFitDetailsColumn();

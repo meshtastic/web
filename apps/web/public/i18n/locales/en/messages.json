@@ -224,8 +224,6 @@
     "placeholderMobile": "Message",
     "send": "Send",
     "hintKeys": "Enter to send · Shift+Enter for new line",
-    "hintHops_one": "Messages hop up to {{count}} node",
-    "hintHops_other": "Messages hop up to {{count}} nodes",
     "hintDmPki": "Direct messages are encrypted with {{name}}'s public key and wait for an acknowledgement",
     "hintDmPsk": "Direct messages to {{name}} use the channel key and wait for an acknowledgement",
     "notConnected": "Connect a device to send messages"
