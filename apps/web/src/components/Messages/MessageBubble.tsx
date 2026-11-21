@@ -385,11 +385,10 @@ export const MessageBubble = memo(function MessageBubble({
           initials={sender.initials}
           tone={{ kind: "node", nodeNum: sender.nodeNum }}
           size="xs"
-          // Four 12px initials need the full 34px, touch layout included.
-          className="size-[34px]"
         />
       ) : (
-        <span aria-hidden="true" className="w-[34px] shrink-0" />
+        // The xs avatar's minimum width, so grouped messages line up.
+        <span aria-hidden="true" className="w-14 shrink-0" />
       )}
       <div
         className={cn(

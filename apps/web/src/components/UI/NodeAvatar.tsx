@@ -22,14 +22,15 @@ const avatarVariants = cva(
   {
     variants: {
       size: {
-        // Wider than tall, like the Android app, so a full four-character
-        // short name always shows. Corner radius is a quarter of the height.
-        xs: "h-11 w-14 text-meta [--avatar-r:11px]",
-        sm: "h-12 w-16 text-meta [--avatar-r:12px]",
-        md: "h-[52px] w-[68px] text-help [--avatar-r:13px]",
-        lg: "h-14 w-[72px] text-help [--avatar-r:14px]",
-        xl: "h-20 w-[104px] text-header-lg [--avatar-r:20px]",
-        "2xl": "h-24 w-[124px] text-header-lg font-bold [--avatar-r:24px]",
+        // Height, corner radius (a quarter of the height) and the minimum
+        // width of a node avatar, which grows past it to fit its text.
+        xs: "h-11 text-meta [--avatar-r:11px] [--avatar-min-w:3.5rem]",
+        sm: "h-12 text-meta [--avatar-r:12px] [--avatar-min-w:4rem]",
+        md: "h-[52px] text-help [--avatar-r:13px] [--avatar-min-w:68px]",
+        lg: "h-14 text-help [--avatar-r:14px] [--avatar-min-w:72px]",
+        xl: "h-20 text-header-lg [--avatar-r:20px] [--avatar-min-w:104px]",
+        "2xl":
+          "h-24 text-header-lg font-bold [--avatar-r:24px] [--avatar-min-w:124px]",
       },
       shape: {
         squircle: "rounded-avatar",
@@ -128,6 +129,12 @@ export const NodeAvatar = ({
         tone.kind === "device" && "bg-device-avatar text-on-device-avatar",
         tone.kind === "channel" &&
           "bg-accent-tint text-accent text-header-lg font-bold",
+        // Avatars with initials are wider than tall, like the Android app,
+        // and grow so a full four-character short name always shows; the
+        // channel "#" stays square.
+        tone.kind === "channel"
+          ? "aspect-square"
+          : "min-w-(--avatar-min-w) px-2",
         nodeColors && "bg-(--avatar-bg)",
         nodeColors && "text-avatar-contrast",
         className,
@@ -135,7 +142,7 @@ export const NodeAvatar = ({
       style={style}
     >
       <span aria-hidden={exposeDot ? true : undefined} className="contents">
-        <span className="truncate px-px">{initials}</span>
+        <span className="whitespace-nowrap">{initials}</span>
         {children}
       </span>
       {dot}

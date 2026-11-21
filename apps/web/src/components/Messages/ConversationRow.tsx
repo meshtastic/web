@@ -64,14 +64,13 @@ export const ConversationRow = memo(function ConversationRow({
           tone={{ kind: "channel" }}
           shape="rounded"
           size={touch ? "lg" : "md"}
-          className={touch ? "size-12 text-title" : undefined}
+          className={touch ? "text-title" : undefined}
         />
       ) : (
         <NodeAvatar
           initials={row.initials}
           tone={{ kind: "node", nodeNum: row.nodeNum ?? 0 }}
           size={touch ? "lg" : "md"}
-          className={touch ? "size-12" : undefined}
           presence={row.online ? "online" : undefined}
           cutout={selected ? "selected" : "surface"}
         >
