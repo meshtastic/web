@@ -9,7 +9,6 @@ import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
 import { AppShell } from "@components/Shell/AppShell.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
-import Footer from "@components/UI/Footer.tsx";
 import { useKeyboardInset } from "@core/hooks/useKeyboardInset.ts";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { cn } from "@core/utils/cn.ts";
@@ -111,9 +110,7 @@ export function App() {
                   </MapProvider>
                 </AppShell>
               </div>
-            ) : (
-              <Footer />
-            )}
+            ) : null}
           </div>
         </div>
       </DeviceWrapper>

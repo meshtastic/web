@@ -13,7 +13,6 @@ import { DeviceCard } from "@components/Shell/DeviceCard.tsx";
 import { ShellPage } from "@components/Shell/ShellPage.tsx";
 import { useDeviceSummary } from "@components/Shell/useDeviceSummary.ts";
 import { Button } from "@components/UI/Button.tsx";
-import Footer from "@components/UI/Footer.tsx";
 import { IconButton } from "@components/UI/IconButton.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
@@ -306,8 +305,6 @@ const ConfigPage = () => {
           values={listValues}
           onSelect={openSection}
         />
-        {/* The footer's only place on phones: the end of the Settings list. */}
-        <Footer />
       </ShellPage>
     );
   }

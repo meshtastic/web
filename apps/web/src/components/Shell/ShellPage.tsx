@@ -1,6 +1,5 @@
 import { IconButton } from "@components/UI/IconButton.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
-import Footer from "@components/UI/Footer.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import {
   useCanFitDetailsColumn,
@@ -338,8 +337,6 @@ export const ShellPage = ({
           >
             {children}
           </main>
-          {/* Phones show the footer at the end of the Settings list instead. */}
-          {isMobile ? null : <Footer />}
         </div>
 
         {showDetailsColumn ? (

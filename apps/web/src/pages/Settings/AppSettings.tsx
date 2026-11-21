@@ -6,6 +6,8 @@ import {
 } from "@components/PageComponents/SettingsPages/SettingsSection.tsx";
 import ThemeSwitcher from "@components/ThemeSwitcher.tsx";
 import { Callout } from "@components/UI/Callout.tsx";
+import { SettingRow } from "@components/UI/SettingRow.tsx";
+import { BUILD_INFO, type BuildInfo } from "@core/utils/buildInfo.ts";
 import { useTranslation } from "react-i18next";
 import type { ConfigProps } from "./sectionProps.ts";
 
@@ -14,8 +16,11 @@ import type { ConfigProps } from "./sectionProps.ts";
  * Android's Units setting is left out: the web has no shared
  * distance/altitude formatter to apply it to.
  */
-export const AppSettings = (_props: ConfigProps) => {
+export const AppSettings = ({
+  build = BUILD_INFO,
+}: ConfigProps & { build?: BuildInfo }) => {
   const { t } = useTranslation("ui");
+  const notAvailable = t("settingsPages.app.notAvailable");
 
   return (
     <SettingsSections>
@@ -38,6 +43,23 @@ export const AppSettings = (_props: ConfigProps) => {
         >
           <LanguageSwitcher />
         </SettingsRow>
+      </SettingsGroup>
+      <SettingsGroup
+        title={t("settingsPages.app.build")}
+        description={t("settingsPages.app.buildDescription")}
+      >
+        <SettingRow
+          kind="readonlyKey"
+          label={t("settingsPages.app.version")}
+          value={build.version ?? notAvailable}
+          copyable={build.version !== undefined}
+        />
+        <SettingRow
+          kind="readonlyKey"
+          label={t("settingsPages.app.commit")}
+          value={build.shortCommit ?? notAvailable}
+          copyable={build.shortCommit !== undefined}
+        />
       </SettingsGroup>
     </SettingsSections>
   );

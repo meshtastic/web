@@ -6,8 +6,9 @@ import {
 } from "@components/PageComponents/SettingsPages/SettingsSection.tsx";
 import { SettingRow } from "@components/UI/SettingRow.tsx";
 import { ExternalLinkIcon } from "lucide-react";
+import { BUILD_INFO } from "@core/utils/buildInfo.ts";
 import type { ReactNode } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useRadioInfo } from "./radioInfo.ts";
 import type { ConfigProps } from "./sectionProps.ts";
 
@@ -17,17 +18,15 @@ const DOCS_URL = "https://meshtastic.org/docs/";
 const LEGAL_URL = "https://meshtastic.org/docs/legal";
 const LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html";
 const HARDWARE_URL = "https://meshtastic.org/docs/hardware/devices/";
-
-// Set at build time by vite.config.ts, as in the footer.
-const VERSION = String(import.meta.env.VITE_VERSION ?? "");
-const COMMIT = String(import.meta.env.VITE_COMMIT_HASH ?? "").slice(0, 7);
+const VERCEL_URL = "https://vercel.com/?utm_source=meshtastic&utm_campaign=oss";
 
 const ExternalLink = ({
   href,
   children,
 }: {
   href: string;
-  children: ReactNode;
+  /** Optional so `<Trans>` can supply the link text from the translation. */
+  children?: ReactNode;
 }) => (
   <a
     href={href}
@@ -44,7 +43,12 @@ const ExternalLink = ({
 export const About = (_props: ConfigProps) => {
   const { t } = useTranslation("ui");
   const radio = useRadioInfo();
-  const version = [VERSION, COMMIT && `#${COMMIT}`].filter(Boolean).join(" ");
+  const version = [
+    BUILD_INFO.version,
+    BUILD_INFO.shortCommit && `#${BUILD_INFO.shortCommit}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
   const notReported = t("firmwareSection.notReported", { ns: "config" });
 
   return (
@@ -113,6 +117,13 @@ export const About = (_props: ConfigProps) => {
             <ExternalLink href={LEGAL_URL}>
               meshtastic.org/docs/legal
             </ExternalLink>
+          </p>
+          <p className="m-0 mt-2 text-help text-muted">
+            <Trans
+              t={t}
+              i18nKey="settingsPages.about.poweredBy"
+              components={[<ExternalLink key="vercel" href={VERCEL_URL} />]}
+            />
           </p>
         </SettingsBlock>
       </SettingsGroup>

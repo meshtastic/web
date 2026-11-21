@@ -237,6 +237,12 @@ describe("ShellPage", () => {
     });
   });
 
+  it("has no page footer; the build lives in Settings › App", () => {
+    setViewport(false);
+    renderPage();
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
+  });
+
   describe("mobile", () => {
     it("leaves the footer out of the page and pads the header for the notch", () => {
       setViewport(true);

@@ -194,10 +194,6 @@
     "stackTraceLabel": "Stack trace:",
     "fallbackError": "{{error}}"
   },
-  "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
-    "commitSha": "Commit SHA: {{sha}}"
-  },
   "settingsPages": {
     "notConnected": "Connect a node to use these actions.",
     "administration": {
@@ -327,7 +323,12 @@
       "theme": "Theme",
       "themeDescription": "Light, dark, or follow the system setting.",
       "language": "Language",
-      "languageDescription": "The language of the app."
+      "languageDescription": "The language of the app.",
+      "build": "Build",
+      "buildDescription": "This web client's version and the commit it was built from. Include them when you report a problem.",
+      "version": "Version",
+      "commit": "Commit",
+      "notAvailable": "Not available"
     },
     "about": {
       "whatIs": "What is Meshtastic?",
@@ -342,7 +343,8 @@
       "needHardwareDescription": "Meshtastic needs a compatible device. See the supported devices to find one.",
       "devices": "Supported devices",
       "copyright": "Meshtastic® Copyright Meshtastic LLC",
-      "licenseNotice": "Free software under the GNU General Public License v3, with no warranty. You may redistribute it under the same license."
+      "licenseNotice": "Free software under the GNU General Public License v3, with no warranty. You may redistribute it under the same license.",
+      "poweredBy": "Hosting by <0>▲ Vercel</0>. Meshtastic® is a registered trademark of Meshtastic LLC."
     }
   },
   "tabLock": {
