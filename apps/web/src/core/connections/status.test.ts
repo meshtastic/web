@@ -1,6 +1,8 @@
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { describe, expect, it } from "vitest";
 import {
+  connectionLabel,
+  ownRadioName,
   isUnfinishedAttempt,
   mostRecentConnection,
   nextConnectionPatch,
@@ -17,7 +19,7 @@ const serial = (
 ): SerialConnection => ({
   id,
   type: "serial",
-  name: "Serial radio",
+  name: "USB radio",
   createdAt: id,
   status: "online",
   usbVendorId: 0x303a,
@@ -103,13 +105,13 @@ describe("pruneAtStartup", () => {
     expect(kept.map((c) => c.id)).toEqual([1]);
   });
 
-  it.each(["USB radio", "USB serial radio"])(
+  it.each(["USB serial radio", "Serial radio"])(
     'renames entries still called "%s"',
     (name) => {
       const [conn] = pruneAtStartup([
         serial(1, { name, nodeNum: 1, lastConnectedAt: 1 }),
       ]);
-      expect(conn?.name).toBe("Serial radio");
+      expect(conn?.name).toBe("USB radio");
     },
   );
 
@@ -239,5 +241,49 @@ describe("mostRecentConnection", () => {
 
   it("returns nothing when no saved connection reached a radio", () => {
     expect(mostRecentConnection([serial(1)])).toBeUndefined();
+  });
+});
+
+describe("connectionLabel", () => {
+  it("names the radio once its name is known", () => {
+    expect(connectionLabel({ name: "USB radio", radioName: "EAO1 Base" })).toBe(
+      "EAO1 Base",
+    );
+  });
+
+  it.each([undefined, "", "  "])(
+    "falls back to the connection name when the radio name is %j",
+    (radioName) => {
+      expect(
+        connectionLabel({
+          name: "USB radio",
+          ...(radioName === undefined ? {} : { radioName }),
+        }),
+      ).toBe("USB radio");
+    },
+  );
+});
+
+describe("ownRadioName", () => {
+  it("prefers the long name, then the short name", () => {
+    expect(
+      ownRadioName(
+        [{ num: 7, user: { longName: "EAO1 Base", shortName: "EAO1" } }],
+        7,
+      ),
+    ).toBe("EAO1 Base");
+    expect(ownRadioName([{ num: 7, user: { shortName: "EAO1" } }], 7)).toBe(
+      "EAO1",
+    );
+  });
+
+  it("is undefined until the radio has described itself", () => {
+    expect(ownRadioName([{ num: 8, user: { longName: "Other" } }], 7)).toBe(
+      undefined,
+    );
+    expect(ownRadioName([{ num: 7 }], 7)).toBe(undefined);
+    expect(ownRadioName([{ num: 7, user: { longName: " " } }], 7)).toBe(
+      undefined,
+    );
   });
 });

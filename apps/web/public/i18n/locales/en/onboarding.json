@@ -71,7 +71,7 @@
     "noRadio": "No radio yet?",
     "supportedDevices": "See supported devices",
     "bluetoothName": "Bluetooth radio",
-    "serialName": "Serial radio"
+    "serialName": "USB radio"
   },
   "pairing": {
     "title": "Pick your radio",

@@ -1,6 +1,9 @@
 import { Button } from "@components/UI/Button.tsx";
 import { EmptyState } from "@components/UI/EmptyState.tsx";
-import { mostRecentConnection } from "@core/connections/status.ts";
+import {
+  connectionLabel,
+  mostRecentConnection,
+} from "@core/connections/status.ts";
 import type { Connection } from "@core/stores/deviceStore/types.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
@@ -27,7 +30,7 @@ const MeshtasticMark = () => (
 
 export interface NoRadioEmptyStateProps {
   /** The saved radio to offer a one-click reconnect to, if any. */
-  recent?: Pick<Connection, "id" | "name">;
+  recent?: Pick<Connection, "id" | "name" | "radioName">;
   /** A reconnect to `recent` is in flight. */
   reconnecting: boolean;
   onConnect: () => void;
@@ -60,8 +63,8 @@ export function NoRadioEmptyState({
               onClick={onReconnect}
             >
               {reconnecting
-                ? t("noRadio.connecting", { name: recent.name })
-                : t("noRadio.reconnect", { name: recent.name })}
+                ? t("noRadio.connecting", { name: connectionLabel(recent) })
+                : t("noRadio.reconnect", { name: connectionLabel(recent) })}
             </Button>
           ) : null}
           <Button

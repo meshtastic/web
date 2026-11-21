@@ -36,6 +36,20 @@ describe("NoRadioEmptyState", () => {
     expect(onReconnect).toHaveBeenCalledTimes(1);
   });
 
+  it("names the radio when its name is known", () => {
+    render(
+      <NoRadioEmptyState
+        recent={{ id: 1, name: "USB radio", radioName: "EAO1 Base" }}
+        reconnecting={false}
+        onConnect={vi.fn()}
+        onReconnect={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Reconnect EAO1 Base" }),
+    ).toBeInTheDocument();
+  });
+
   it("disables Reconnect while it is connecting", () => {
     render(
       <NoRadioEmptyState

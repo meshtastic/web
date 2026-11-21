@@ -9,6 +9,7 @@ import {
 import { openRepositories } from "@app/core/connections/repositories.ts";
 import {
   nextConnectionPatch,
+  ownRadioName,
   supersededAttempts,
 } from "@app/core/connections/status.ts";
 import type {
@@ -516,6 +517,14 @@ export function useConnections() {
           identify(myNodeNum),
         ),
         session.device.myNodeNum.subscribe(identify),
+        // Remember the radio's own name, so a reconnect can say which radio.
+        session.nodes.list.subscribe((nodes) => {
+          if (identified === undefined) return;
+          const radioName = ownRadioName(nodes, identified);
+          if (radioName && savedConnection(id)?.radioName !== radioName) {
+            updateSavedConnection(id, { radioName });
+          }
+        }),
         // Firmware emits `rebooted` after a soft reset; the SDK reconnects
         // and runs the handshake again, so the overlay should show again.
         session.events.onRebooted.subscribe(() => {

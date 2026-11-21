@@ -1,3 +1,4 @@
+import { type NodeNames, nodeDisplayName } from "@core/utils/nodeIdentity.ts";
 import type {
   Connection,
   ConnectionId,
@@ -144,10 +145,29 @@ export function mostRecentConnection(
 
 /** Names earlier builds gave serial entries by default. */
 export const LEGACY_SERIAL_NAMES: readonly string[] = [
-  "USB radio",
   "USB serial radio",
+  "Serial radio",
 ];
-export const SERIAL_DEFAULT_NAME = "Serial radio";
+export const SERIAL_DEFAULT_NAME = "USB radio";
+
+/**
+ * The radio's own name (long, else short) from the node list, or undefined
+ * while the radio has not described itself yet.
+ */
+export const ownRadioName = (
+  nodes: readonly { readonly num: number; readonly user?: NodeNames }[],
+  myNodeNum: number,
+): string | undefined => {
+  const user = nodes.find((node) => node.num === myNodeNum)?.user;
+  return user
+    ? nodeDisplayName(user, myNodeNum, () => "") || undefined
+    : undefined;
+};
+
+/** What to call a saved connection: its radio's name once known. */
+export const connectionLabel = (
+  conn: Pick<Connection, "name" | "radioName">,
+): string => conn.radioName?.trim() || conn.name;
 
 /** Gives serial entries still named an old default the current one. */
 export const renameLegacyDefault = (conn: Connection): Connection =>
