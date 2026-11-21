@@ -139,7 +139,7 @@ export function formatConnectionSubtext(conn: Connection): string {
   }
   const v = conn.usbVendorId ? conn.usbVendorId.toString(16) : "?";
   const p = conn.usbProductId ? conn.usbProductId.toString(16) : "?";
-  return `USB ${v}:${p}`;
+  return `USB serial ${v}:${p}`;
 }
 
 /**

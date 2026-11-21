@@ -17,7 +17,7 @@ const serial = (
 ): SerialConnection => ({
   id,
   type: "serial",
-  name: "USB radio",
+  name: "USB serial radio",
   createdAt: id,
   status: "online",
   usbVendorId: 0x303a,
@@ -77,6 +77,39 @@ describe("pruneUnfinishedAttempts", () => {
 });
 
 describe("pruneAtStartup", () => {
+  it("merges entries that reached the same radio, keeping the latest", () => {
+    // What the hardware run left: three entries, one radio (one nodeNum).
+    const kept = pruneAtStartup([
+      serial(1, { nodeNum: 0x71275a97 }),
+      serial(2, { nodeNum: 0x71275a97 }),
+      serial(3, { nodeNum: 0x71275a97, lastConnectedAt: 50 }),
+    ]);
+    expect(kept.map((c) => c.id)).toEqual([3]);
+  });
+
+  it("keeps two identical USB radios apart by node number", () => {
+    const kept = pruneAtStartup([
+      serial(1, { nodeNum: 1, lastConnectedAt: 5 }),
+      serial(2, { nodeNum: 2, lastConnectedAt: 6 }),
+    ]);
+    expect(kept.map((c) => c.id)).toEqual([1, 2]);
+  });
+
+  it("keeps the default entry when it duplicates another", () => {
+    const kept = pruneAtStartup([
+      serial(1, { nodeNum: 7, isDefault: true }),
+      serial(2, { nodeNum: 7, lastConnectedAt: 9 }),
+    ]);
+    expect(kept.map((c) => c.id)).toEqual([1]);
+  });
+
+  it('renames entries still called "USB radio"', () => {
+    const [conn] = pruneAtStartup([
+      serial(1, { name: "USB radio", nodeNum: 1, lastConnectedAt: 1 }),
+    ]);
+    expect(conn?.name).toBe("USB serial radio");
+  });
+
   it("drops pending attempts and never-connected duplicates of a reached radio", () => {
     const kept = pruneAtStartup([
       serial(1),
@@ -97,6 +130,20 @@ describe("pruneAtStartup", () => {
 });
 
 describe("supersededAttempts", () => {
+  it("includes other idle entries for the same radio once it connects", () => {
+    const reached = serial(3, { nodeNum: 9, status: "configured" });
+    expect(
+      supersededAttempts(
+        [
+          serial(1, { nodeNum: 9, lastConnectedAt: 1 }),
+          serial(2, { nodeNum: 8, lastConnectedAt: 1 }),
+          reached,
+        ],
+        reached,
+      ),
+    ).toEqual([1]);
+  });
+
   it("returns never-connected entries for the same USB ids", () => {
     const reached = serial(3, { status: "configured", lastConnectedAt: 9 });
     const ids = supersededAttempts(

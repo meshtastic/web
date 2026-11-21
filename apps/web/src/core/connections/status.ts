@@ -80,6 +80,15 @@ function sameTarget(a: Connection, b: Connection): boolean {
   }
 }
 
+/**
+ * The same radio for certain: same transport target and the same node
+ * number from its handshake. Unlike `sameTarget` alone, this tells two
+ * identical USB radios apart, so duplicates of one radio can be merged.
+ */
+function sameRadio(a: Connection, b: Connection): boolean {
+  return a.nodeNum !== undefined && a.nodeNum === b.nodeNum && sameTarget(a, b);
+}
+
 /** Neither pending nor ever connected: what an older build left behind. */
 const neverReached = (conn: Connection): boolean =>
   conn.nodeNum === undefined && conn.lastConnectedAt === undefined;
@@ -95,7 +104,8 @@ const inFlight = (conn: Connection): boolean =>
  * Covers attempts the wizard or drawer left behind (a reload, a failed try
  * before the one that worked) including ones saved before `pending`
  * existed. An entry that ever connected is kept even when its ids match,
- * since it may be a second, identical radio.
+ * since it may be a second, identical radio, unless its node number shows
+ * it is this same radio (see sameRadio).
  */
 export function supersededAttempts(
   connections: readonly Connection[],
@@ -106,9 +116,8 @@ export function supersededAttempts(
       (c) =>
         c.id !== reached.id &&
         !c.isDefault &&
-        neverReached(c) &&
         !inFlight(c) &&
-        sameTarget(reached, c),
+        ((neverReached(c) && sameTarget(reached, c)) || sameRadio(reached, c)),
     )
     .map((c) => c.id);
 }
@@ -133,18 +142,36 @@ export function mostRecentConnection(
   return best;
 }
 
+/** The name the welcome wizard gave USB entries before it said "serial". */
+export const LEGACY_SERIAL_NAME = "USB radio";
+export const SERIAL_DEFAULT_NAME = "USB serial radio";
+
+/** Gives serial entries still named the old default the current one. */
+export const renameLegacyDefault = (conn: Connection): Connection =>
+  conn.type === "serial" && conn.name === LEGACY_SERIAL_NAME
+    ? { ...conn, name: SERIAL_DEFAULT_NAME }
+    : conn;
+
 /**
  * The saved connections to keep at startup, once no session is live: drops
  * unfinished attempts, and entries that never reached a radio when another
  * entry for the same transport and ids did (left by builds before
- * `pending`, see supersededAttempts).
+ * `pending`, see supersededAttempts), and duplicates of one radio. Also
+ * renames entries that still carry the old default USB name.
  */
 export function pruneAtStartup(
   connections: readonly Connection[],
 ): Connection[] {
-  const kept = pruneUnfinishedAttempts(connections);
+  const kept = pruneUnfinishedAttempts(connections).map(renameLegacyDefault);
   const dropped = new Set<ConnectionId>();
-  for (const conn of kept) {
+  // Duplicates keep the default entry, then the one used most recently.
+  const byPreference = [...kept].sort(
+    (a, b) =>
+      Number(b.isDefault ?? false) - Number(a.isDefault ?? false) ||
+      (b.lastConnectedAt ?? 0) - (a.lastConnectedAt ?? 0) ||
+      b.createdAt - a.createdAt,
+  );
+  for (const conn of byPreference) {
     if (neverReached(conn) || dropped.has(conn.id)) continue;
     for (const id of supersededAttempts(kept, conn)) dropped.add(id);
   }
