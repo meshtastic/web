@@ -14,12 +14,14 @@ import {
   type HttpAddressError,
   httpTarget,
 } from "@core/onboarding/validation.ts";
+import { type RestoreNotice, restoreNotice } from "@core/onboarding/restore.ts";
 import { markWelcomeDismissed } from "@core/onboarding/welcome.ts";
 import {
   type BackAction,
   effectiveUseHttps,
   initWizard,
   type NextAction,
+  type SecondaryAction,
   stepInfo,
   WIZARD_STEP_COUNT,
   type WizardEvent,
@@ -49,6 +51,7 @@ import { DoneStep } from "./steps/DoneStep.tsx";
 import { PairingErrorStep } from "./steps/PairingErrorStep.tsx";
 import { PairingStep } from "./steps/PairingStep.tsx";
 import { ProfileStep } from "./steps/ProfileStep.tsx";
+import { RestoreStep } from "./steps/RestoreStep.tsx";
 import { SyncStep } from "./steps/SyncStep.tsx";
 import { WelcomeStep } from "./steps/WelcomeStep.tsx";
 import { useWizardConnection } from "./useWizardConnection.ts";
@@ -68,10 +71,13 @@ const LIVE: ReadonlyArray<ConnectionStatus> = [
   "configured",
 ];
 
-/** A note carried to the next step after a save that restarts the radio. */
+/** A note carried to the next step after a save or a restore. */
 interface RestartNotice {
   readonly step: WizardStepName;
-  readonly message: "profile.savedRestarting" | "channel.savedRestarting";
+  readonly message:
+    | "profile.savedRestarting"
+    | "channel.savedRestarting"
+    | RestoreNotice;
 }
 
 const NEXT_LABEL: Record<NextAction, string> = {
@@ -80,9 +86,17 @@ const NEXT_LABEL: Record<NextAction, string> = {
   searchAgain: "actions.searchAgain",
   tryAgain: "actions.tryAgain",
   continue: "actions.continue",
+  setUpNew: "actions.continue",
+  chooseFile: "actions.chooseFile",
+  restoreAndContinue: "actions.restoreAndContinue",
   saveAndContinue: "actions.saveAndContinue",
   addChannel: "actions.addChannel",
   openMessages: "actions.openMessages",
+};
+
+const SECONDARY_LABEL: Record<SecondaryAction, string> = {
+  skipForNow: "actions.skipForNow",
+  chooseAnotherFile: "actions.chooseAnotherFile",
 };
 
 const BACK_LABEL: Record<BackAction, string> = {
@@ -118,6 +132,8 @@ function sceneOf(state: WizardState): { scene: MeshScene; caption: string } {
       return { scene: "failed", caption: "caption.pairingError" };
     case "sync":
       return { scene: "connected", caption: "caption.sync" };
+    case "restore":
+      return { scene: "connected", caption: "caption.restore" };
     case "profile":
       return { scene: "connected", caption: "caption.profile" };
     case "channel":
@@ -264,12 +280,19 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
       case "continue":
         dispatch({ type: "continue" });
         return;
+      case "setUpNew":
+        dispatch({ type: "setUpNew" });
+        return;
       case "openMessages":
         onFinish();
         return;
       case "saveAndContinue":
       case "addChannel":
+      case "restoreAndContinue":
         // Submitted through the step's form.
+        return;
+      case "chooseFile":
+        // The restore step opens its file input from the click.
         return;
     }
   };
@@ -289,10 +312,13 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
             onClick: () => dispatch({ type: "back" }),
           }
         : undefined,
-    secondary: info.skipForNow
+    secondary: info.secondary
       ? {
-          label: t("actions.skipForNow"),
-          onClick: () => dispatch({ type: "channelDone" }),
+          label: t(SECONDARY_LABEL[info.secondary]),
+          onClick:
+            info.secondary === "skipForNow"
+              ? () => dispatch({ type: "channelDone" })
+              : undefined,
         }
       : undefined,
     next: info.next
@@ -366,6 +392,27 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
         );
       case "sync":
         return <SyncStep actions={actions} radioName={radioName} view={view} />;
+      case "restore":
+        return (
+          <RestoreStep
+            actions={actions}
+            formId={STEP_FORM_ID}
+            view={step}
+            onSelectChoice={(choice) =>
+              dispatch({ type: "selectRestoreChoice", choice })
+            }
+            onFileLoaded={() => dispatch({ type: "restoreFileLoaded" })}
+            radioReady={radioReady}
+            statusNow={statusNow}
+            onRestored={(outcome, regionUnset) => {
+              setNotice({
+                step: regionUnset ? "profile" : "done",
+                message: restoreNotice(outcome, regionUnset),
+              });
+              dispatch({ type: "restored", regionUnset });
+            }}
+          />
+        );
       case "profile":
         return (
           <ProfileStep

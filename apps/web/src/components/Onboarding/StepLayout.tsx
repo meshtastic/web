@@ -92,7 +92,7 @@ export const StepActions = ({ back, secondary, next }: StepActionsProps) => (
       <Button
         variant="primary"
         size="lg"
-        className="h-12 rounded-card px-6"
+        className="ml-auto h-12 rounded-card px-6"
         type={next.form ? "submit" : "button"}
         form={next.form}
         onClick={next.form ? undefined : next.onClick}

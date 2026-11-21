@@ -53,6 +53,7 @@ describe("wizardReducer", () => {
       state,
       { type: "devicePicked" },
       { type: "continue" },
+      { type: "setUpNew" },
       { type: "profileSaved" },
       { type: "channelDone" },
     );
@@ -149,7 +150,12 @@ describe("wizardReducer", () => {
       [{ name: "pairing", picker: "closed" }, { name: "connect" }],
       [{ name: "pairingError" }, { name: "connect" }],
       [{ name: "sync" }, undefined],
-      [{ name: "profile" }, { name: "sync" }],
+      [{ name: "restore", view: "choose", choice: "new" }, { name: "sync" }],
+      [
+        { name: "restore", view: "review" },
+        { name: "restore", view: "choose", choice: "restore" },
+      ],
+      [{ name: "profile" }, { name: "restore", view: "choose", choice: "new" }],
       [{ name: "channel" }, { name: "profile" }],
     ];
     for (const [from, to] of cases) {
@@ -191,6 +197,92 @@ describe("wizardReducer", () => {
     expect(run(profile, { type: "cancelConnect" })).toBe(profile);
   });
 
+  it("asks new or restore once the radio has synced", () => {
+    expect(run(at({ name: "sync" }), { type: "continue" }).step).toEqual({
+      name: "restore",
+      view: "choose",
+      choice: "new",
+    });
+  });
+
+  it("sets up as new from the choice", () => {
+    const state = run(
+      at({ name: "restore", view: "choose", choice: "new" }),
+      { type: "selectRestoreChoice", choice: "restore" },
+      { type: "selectRestoreChoice", choice: "new" },
+      { type: "setUpNew" },
+    );
+    expect(state.step).toEqual({ name: "profile" });
+  });
+
+  it("reviews a loaded backup file", () => {
+    const state = run(at({ name: "restore", view: "choose", choice: "new" }), {
+      type: "selectRestoreChoice",
+      choice: "restore",
+    });
+    expect(state.step).toEqual({
+      name: "restore",
+      view: "choose",
+      choice: "restore",
+    });
+    expect(run(state, { type: "restoreFileLoaded" }).step).toEqual({
+      name: "restore",
+      view: "review",
+    });
+  });
+
+  it("only changes the choice on the choice view", () => {
+    const review = at({ name: "restore", view: "review" });
+    expect(run(review, { type: "selectRestoreChoice", choice: "new" })).toBe(
+      review,
+    );
+  });
+
+  it("skips profile and channel after a restore", () => {
+    const state = run(at({ name: "restore", view: "review" }), {
+      type: "restored",
+      regionUnset: false,
+    });
+    expect(state.step).toEqual({
+      name: "done",
+      skipped: false,
+      returnTo: { name: "restore", view: "choose", choice: "new" },
+    });
+    expect(run(state, { type: "back" }).step).toEqual({
+      name: "restore",
+      view: "choose",
+      choice: "new",
+    });
+  });
+
+  it("asks for a region when the restore left none", () => {
+    const state = run(at({ name: "restore", view: "review" }), {
+      type: "restored",
+      regionUnset: true,
+    });
+    expect(state.step).toEqual({ name: "profile" });
+  });
+
+  it("ignores restore events outside the restore step", () => {
+    const profile = at({ name: "profile" });
+    expect(run(profile, { type: "restored", regionUnset: false })).toBe(
+      profile,
+    );
+    expect(run(profile, { type: "setUpNew" })).toBe(profile);
+    expect(run(profile, { type: "restoreFileLoaded" })).toBe(profile);
+  });
+
+  it("skips setup from the restore step, coming back to the choice", () => {
+    const skipped = run(at({ name: "restore", view: "review" }), {
+      type: "skip",
+    });
+    expect(skipped.step).toEqual({
+      name: "done",
+      skipped: true,
+      returnTo: { name: "restore", view: "choose", choice: "new" },
+    });
+  });
+
   it("only saves a profile from the profile step", () => {
     const state = at({ name: "sync" });
     expect(run(state, { type: "profileSaved" })).toBe(state);
@@ -198,7 +290,7 @@ describe("wizardReducer", () => {
 });
 
 describe("stepInfo", () => {
-  it("numbers the five dots and names the actions", () => {
+  it("numbers the six dots and names the actions", () => {
     expect(stepInfo({ name: "welcome" })).toMatchObject({
       number: 1,
       next: "getStarted",
@@ -222,18 +314,36 @@ describe("stepInfo", () => {
       number: 2,
       back: undefined,
     });
-    expect(stepInfo({ name: "profile" })).toMatchObject({
+    expect(
+      stepInfo({ name: "restore", view: "choose", choice: "new" }),
+    ).toMatchObject({
       number: 3,
+      label: "restore",
+      next: "setUpNew",
+      back: "back",
+      secondary: undefined,
+    });
+    expect(
+      stepInfo({ name: "restore", view: "choose", choice: "restore" }),
+    ).toMatchObject({ number: 3, next: "chooseFile" });
+    expect(stepInfo({ name: "restore", view: "review" })).toMatchObject({
+      number: 3,
+      next: "restoreAndContinue",
+      back: "back",
+      secondary: "chooseAnotherFile",
+    });
+    expect(stepInfo({ name: "profile" })).toMatchObject({
+      number: 4,
       next: "saveAndContinue",
     });
     expect(stepInfo({ name: "channel" })).toMatchObject({
-      number: 4,
+      number: 5,
       next: "addChannel",
-      skipForNow: true,
+      secondary: "skipForNow",
     });
     expect(
       stepInfo({ name: "done", skipped: true, returnTo: { name: "welcome" } }),
-    ).toMatchObject({ number: 5, next: "openMessages", back: "back" });
+    ).toMatchObject({ number: 6, next: "openMessages", back: "back" });
   });
 });
 

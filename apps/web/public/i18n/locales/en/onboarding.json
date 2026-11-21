@@ -7,6 +7,7 @@
   "steps": {
     "welcome": "Welcome",
     "connect": "Connect",
+    "restore": "Restore",
     "profile": "Your profile",
     "channels": "Channels",
     "done": "Done"
@@ -24,7 +25,10 @@
     "cancel": "Cancel",
     "useAnotherMethod": "Use another method",
     "skipForNow": "Skip for now",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "chooseFile": "Choose backup file",
+    "chooseAnotherFile": "Choose another file",
+    "restoreAndContinue": "Restore and continue"
   },
   "welcome": {
     "title": "Welcome to Meshtastic",
@@ -117,6 +121,49 @@
     "stateActive": "in progress",
     "statePending": "waiting"
   },
+  "restore": {
+    "title": "Set up as new or restore?",
+    "body": "Start fresh, or bring back the settings from a backup of this or another radio.",
+    "choiceGroup": "How to set up this radio",
+    "newTitle": "Set up as new",
+    "newBody": "Choose a name and region, then join a channel.",
+    "restoreTitle": "Restore from a backup",
+    "restoreBody": "A .cfg file exported from Meshtastic web or the apps' backup.",
+    "fileInput": "Backup file",
+    "fileInvalidTitle": "Couldn't read that file",
+    "fileInvalid": "{{name}} isn't a Meshtastic backup. Choose a .cfg file exported from Meshtastic.",
+    "reviewTitle": "Restore from a backup",
+    "reviewBody": "Untick anything you don't want to bring back.",
+    "fieldsLegend": "This file has:",
+    "fieldLongName": "Long name",
+    "fieldShortName": "Short name",
+    "fieldChannels": "Channels and their keys",
+    "fieldConfig": "Radio settings, including region and LoRa",
+    "fieldModuleConfig": "Module settings, like MQTT and telemetry",
+    "fieldFixedPosition": "Fixed position",
+    "fieldUnmessagable": "Unmessageable setting",
+    "fieldLicensed": "Licensed amateur radio",
+    "fieldPrivateKey": "Private key (the radio's identity)",
+    "privateKeyWarning": "Restoring the private key makes this radio take on the identity of the radio the file came from.",
+    "notesTitle": "Left as they are:",
+    "noteOwner": "names (your radio's details haven't loaded)",
+    "noteLicensed": "licensed flag (change ham mode in Settings › User)",
+    "noteSecurity": "security settings (your radio's keys haven't loaded)",
+    "noteTrafficManagement": "traffic management",
+    "noteRingtone": "ringtone",
+    "noteCannedMessages": "canned messages",
+    "noteKeysKept": "your radio's own security keys",
+    "replaceWarning": "The file's settings replace your radio's, including its region and LoRa settings. Your radio restarts to apply them.",
+    "replaceNames": "The file's names and channels replace your radio's.",
+    "invalidChannels": "The file's channel list is damaged, so it can't be restored.",
+    "waiting": "Waiting for the radio to be ready…",
+    "restoring": "Restoring…",
+    "saveFailed": "Couldn't restore to the radio: {{message}}",
+    "unknownError": "Unknown error",
+    "saved": "Settings restored.",
+    "savedRestarting": "Settings restored. Your radio is restarting to apply them; this takes a few seconds.",
+    "savedNoRegion": "Settings restored, but your radio still has no region. Choose one below so it can transmit."
+  },
   "profile": {
     "title": "Make it yours",
     "body": "This is how other people on the mesh will see you.",
@@ -195,7 +242,8 @@
     "profile": "Your short name appears on avatars and the map, so pick something people will recognise.",
     "channel": "Channels share a key. Only radios with the same channel can read its messages.",
     "done": "A message can reach you through several hops across other people's radios.",
-    "pairingSerial": "Waiting for you to choose a port…"
+    "pairingSerial": "Waiting for you to choose a port…",
+    "restore": "A backup brings back your names, channels and settings in one go."
   },
   "browser": {
     "firefox": "Firefox",

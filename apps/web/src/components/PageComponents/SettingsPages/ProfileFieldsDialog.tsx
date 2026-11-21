@@ -2,9 +2,10 @@ import { DialogWrapper } from "@components/Dialog/DialogWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Checkbox } from "@components/UI/Checkbox/index.tsx";
 import {
-  PROFILE_FIELDS,
+  anyFieldSelected,
   type ProfileField,
   type ProfileSelection,
+  profileFieldRows,
 } from "@core/utils/profileExport.ts";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
@@ -20,9 +21,6 @@ export interface ProfileFieldsDialogProps {
   initial: ProfileSelection;
   onConfirm: (selection: ProfileSelection) => void;
 }
-
-/** Fields that exist in the file but are never applied on import. */
-const NOT_IMPORTED: readonly ProfileField[] = ["isLicensed"];
 
 /**
  * Android's EditDeviceProfileDialog: pick which parts of a profile to export
@@ -43,16 +41,8 @@ export const ProfileFieldsDialog = ({
   const toggle = (field: ProfileField, checked: boolean) =>
     setSelection((current) => ({ ...current, [field]: checked }));
 
-  // A row the user can't select (unavailable, not imported, or the private
-  // key without the configuration) doesn't count, even if still ticked.
-  const isEnabled = (field: ProfileField) =>
-    available[field] &&
-    !(mode === "import" && NOT_IMPORTED.includes(field)) &&
-    !(field === "privateKey" && !selection.config);
-
-  const anySelected = PROFILE_FIELDS.some(
-    (field) => selection[field] && isEnabled(field),
-  );
+  const rows = profileFieldRows(mode, available, selection);
+  const anySelected = anyFieldSelected(rows);
 
   return (
     <DialogWrapper
@@ -79,14 +69,11 @@ export const ProfileFieldsDialog = ({
       }
     >
       <div className="flex flex-col gap-3 border-y border-subtle py-4">
-        {PROFILE_FIELDS.map((field) => {
-          const notApplied = mode === "import" && NOT_IMPORTED.includes(field);
-          // The key lives in the configuration's security section.
-          const enabled = isEnabled(field);
+        {rows.map(({ field, enabled, checked, notApplied }) => {
           return (
             <div key={field} className="flex flex-col gap-1">
               <Checkbox
-                checked={enabled && selection[field]}
+                checked={checked}
                 disabled={!enabled}
                 onChange={(checked) => toggle(field, checked)}
               >
@@ -111,7 +98,7 @@ export const ProfileFieldsDialog = ({
               {field === "privateKey" &&
                 mode === "export" &&
                 available.privateKey &&
-                !(enabled && selection.privateKey) && (
+                !checked && (
                   <p className="ml-9 text-meta text-muted">
                     {t("settingsPages.backup.privateKeyExcludedNote")}
                   </p>

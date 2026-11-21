@@ -1,4 +1,3 @@
-import { create } from "@bufbuild/protobuf";
 import { ProfileFieldsDialog } from "@components/PageComponents/SettingsPages/ProfileFieldsDialog.tsx";
 import {
   SettingsBlock,
@@ -9,7 +8,6 @@ import {
 import { useDeviceConnected } from "@components/PageComponents/SettingsPages/useDeviceConnected.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Callout } from "@components/UI/Callout.tsx";
-import { STAGED_FIXED_POSITION } from "@core/utils/stagedAdminKeys.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
   buildDeviceProfile,
@@ -17,17 +15,12 @@ import {
   defaultSelection,
   deviceProfileFileName,
   encodeDeviceProfile,
-  type ImportPlan,
-  PROFILE_MODULE_SECTIONS,
-  PROFILE_RADIO_SECTIONS,
-  type ProfileModuleSection,
-  type ProfileRadioSection,
   planProfileImport,
   type ProfileSelection,
   profileContents,
   selectProfileFields,
 } from "@core/utils/profileExport.ts";
-import type { ConfigEditor } from "@core/kmp/configEditor.ts";
+import { importTarget, stageImportPlan } from "@core/utils/profileImport.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useActiveClient } from "@core/kmp/hooks";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
@@ -58,31 +51,6 @@ const downloadBytes = (bytes: Uint8Array, fileName: string) => {
   anchor.click();
   // Revoke after the click has been handled.
   setTimeout(() => URL.revokeObjectURL(url), 0);
-};
-
-const applyPlan = (editor: ConfigEditor, plan: ImportPlan) => {
-  if (plan.owner) editor.setOwner(plan.owner);
-  const stageRadio = <K extends ProfileRadioSection>(key: K) => {
-    const value = plan.radio[key];
-    if (value) editor.setRadioSection(key, value);
-  };
-  const stageModule = <K extends ProfileModuleSection>(key: K) => {
-    const value = plan.modules[key];
-    if (value) editor.setModuleSection(key, value);
-  };
-  for (const key of PROFILE_RADIO_SECTIONS) stageRadio(key);
-  for (const key of PROFILE_MODULE_SECTIONS) stageModule(key);
-  for (const channel of plan.channels) editor.setChannel(channel);
-  if (plan.fixedPosition) {
-    // Same key as the Position page, so only one fixed position is sent;
-    // Reset drops it and a later edit or import replaces it.
-    editor.stageAdminMessage(
-      STAGED_FIXED_POSITION,
-      create(Protobuf.Admin.AdminMessageSchema, {
-        payloadVariant: { case: "setFixedPosition", value: plan.fixedPosition },
-      }),
-    );
-  }
 };
 
 /**
@@ -165,13 +133,14 @@ export const BackupRestore = (_props: ConfigProps) => {
     const nodeUser = myNode()?.user;
     if (!editor.owner.peek() && nodeUser) editor.setBaselineOwner(nodeUser);
 
-    const plan = planProfileImport(selectProfileFields(profile, selection), {
-      owner: editor.owner.peek(),
-      security: editor.radio.peek().security,
-      activeChannelIndexes: [...editor.channels.peek().values()]
-        .filter((ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED)
-        .map((ch) => ch.index),
-    });
+    const plan = planProfileImport(
+      selectProfileFields(profile, selection),
+      importTarget({
+        owner: editor.owner.peek(),
+        security: editor.radio.peek().security,
+        channels: editor.channels.peek().values(),
+      }),
+    );
     if (Result.isError(plan)) {
       toast({
         title: t("settingsPages.backup.import.failed"),
@@ -180,7 +149,7 @@ export const BackupRestore = (_props: ConfigProps) => {
       return;
     }
 
-    applyPlan(editor, plan.value);
+    stageImportPlan(editor, plan.value);
     const skipped = [...new Set(plan.value.skipped)].map((key) =>
       t(`settingsPages.backup.skipped.${key}`),
     );

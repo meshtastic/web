@@ -90,7 +90,7 @@ describe("OnboardingWizard", () => {
       name: "Welcome to Meshtastic",
     });
     expect(heading).toHaveFocus();
-    expect(heading).toHaveAccessibleDescription("Step 1 of 5 · Welcome");
+    expect(heading).toHaveAccessibleDescription("Step 1 of 6 · Welcome");
   });
 
   it("falls back to HTTP where Bluetooth and USB are unavailable", async () => {
@@ -213,7 +213,7 @@ describe("OnboardingWizard", () => {
 
     const done = screen.getByRole("heading", { name: "You're all set" });
     expect(done).toHaveFocus();
-    expect(done).toHaveAccessibleDescription("Step 5 of 5 · Done");
+    expect(done).toHaveAccessibleDescription("Step 6 of 6 · Done");
     await waitFor(() =>
       expect(localStorage.getItem(WELCOME_DISMISSED_KEY)).toBe("1"),
     );

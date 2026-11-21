@@ -7,12 +7,16 @@ import {
 
 /**
  * The onboarding wizard as a pure state machine: welcome → connect →
- * pairing → sync → profile → channel → done, with the pairing-error side
- * state. Skip jumps to done from anywhere. Components dispatch events and
+ * pairing → sync → restore → profile → channel → done, with the
+ * pairing-error side state. A restore from a backup file skips profile and
+ * channel unless it leaves the radio without a region. Skip jumps to done from anywhere. Components dispatch events and
  * run the side effects (pickers, connects, saves) the transitions call for.
  */
 
 export type PickerState = "open" | "closed";
+
+/** Set up as a new radio, or restore a backup file onto it. */
+export type RestoreChoice = "new" | "restore";
 
 export type WizardStep =
   | { readonly name: "welcome" }
@@ -23,6 +27,13 @@ export type WizardStep =
   | { readonly name: "pairingError"; readonly detail?: string }
   /** Connected or connecting; the radio streams its config and nodes. */
   | { readonly name: "sync" }
+  /** Choosing new or restore, then reviewing the picked file. */
+  | {
+      readonly name: "restore";
+      readonly view: "choose";
+      readonly choice: RestoreChoice;
+    }
+  | { readonly name: "restore"; readonly view: "review" }
   | { readonly name: "profile" }
   | { readonly name: "channel" }
   /** `skipped` when Skip setup got here; Back returns to `returnTo`. */
@@ -35,10 +46,23 @@ export type WizardStep =
 export type WizardStepName = WizardStep["name"];
 
 /** Steps Back can return to from done. Transient states map to connect. */
-export type ReturnStep = Extract<
+export type ReturnStep =
+  | Extract<
+      WizardStep,
+      { name: "welcome" | "connect" | "sync" | "profile" | "channel" }
+    >
+  | RestoreChooseStep;
+
+type RestoreChooseStep = Extract<
   WizardStep,
-  { name: "welcome" | "connect" | "sync" | "profile" | "channel" }
+  { name: "restore"; view: "choose" }
 >;
+
+const RESTORE_CHOICE: RestoreChooseStep = {
+  name: "restore",
+  view: "choose",
+  choice: "new",
+};
 
 export interface WizardState {
   readonly step: WizardStep;
@@ -66,6 +90,16 @@ export type WizardEvent =
   /** Cancel while the radio hasn't answered yet; back to the options. */
   | { readonly type: "cancelConnect" }
   | { readonly type: "continue" }
+  | { readonly type: "selectRestoreChoice"; readonly choice: RestoreChoice }
+  /** Set up as new: on to the profile step. */
+  | { readonly type: "setUpNew" }
+  /** A backup file was read; review what it holds. */
+  | { readonly type: "restoreFileLoaded" }
+  /**
+   * The backup was written. `regionUnset` when the radio still has no
+   * LoRa region afterwards, so the profile step must ask for one.
+   */
+  | { readonly type: "restored"; readonly regionUnset: boolean }
   | { readonly type: "profileSaved" }
   | { readonly type: "channelDone" }
   | { readonly type: "back" }
@@ -125,6 +159,9 @@ const toReturnStep = (step: WizardStep): ReturnStep => {
     case "profile":
     case "channel":
       return step;
+    case "restore":
+      // A reviewed file lives in the step's view; coming back starts over.
+      return RESTORE_CHOICE;
     case "pairing":
     case "pairingError":
       return { name: "connect" };
@@ -143,13 +180,21 @@ const backStep = (step: WizardStep): WizardStep | undefined => {
     case "pairing":
     case "pairingError":
       return { name: "connect" };
+    case "restore":
+      return step.view === "review" ? RESTORE_CHOICE_RESTORE : { name: "sync" };
     case "profile":
-      return { name: "sync" };
+      return RESTORE_CHOICE;
     case "channel":
       return { name: "profile" };
     case "done":
       return step.returnTo;
   }
+};
+
+const RESTORE_CHOICE_RESTORE: RestoreChooseStep = {
+  name: "restore",
+  view: "choose",
+  choice: "restore",
 };
 
 const withStep = (state: WizardState, step: WizardStep): WizardState => ({
@@ -210,9 +255,27 @@ export function wizardReducer(
         ? withStep(state, { name: "connect" })
         : state;
     case "continue":
-      return step.name === "sync"
+      return step.name === "sync" ? withStep(state, RESTORE_CHOICE) : state;
+    case "selectRestoreChoice":
+      return step.name === "restore" && step.view === "choose"
+        ? withStep(state, { ...step, choice: event.choice })
+        : state;
+    case "setUpNew":
+      return step.name === "restore"
         ? withStep(state, { name: "profile" })
         : state;
+    case "restoreFileLoaded":
+      return step.name === "restore"
+        ? withStep(state, { name: "restore", view: "review" })
+        : state;
+    case "restored":
+      if (step.name !== "restore") return state;
+      return withStep(
+        state,
+        event.regionUnset
+          ? { name: "profile" }
+          : { name: "done", skipped: false, returnTo: RESTORE_CHOICE },
+      );
     case "profileSaved":
       return step.name === "profile"
         ? withStep(state, { name: "channel" })
@@ -240,10 +303,16 @@ export function wizardReducer(
   }
 }
 
-/** The five dots of the step indicator. */
-export const WIZARD_STEP_COUNT = 5;
+/** The six dots of the step indicator. */
+export const WIZARD_STEP_COUNT = 6;
 
-export type StepLabel = "welcome" | "connect" | "profile" | "channels" | "done";
+export type StepLabel =
+  | "welcome"
+  | "connect"
+  | "restore"
+  | "profile"
+  | "channels"
+  | "done";
 
 export type NextAction =
   | "getStarted"
@@ -251,20 +320,25 @@ export type NextAction =
   | "searchAgain"
   | "tryAgain"
   | "continue"
+  | "setUpNew"
+  | "chooseFile"
+  | "restoreAndContinue"
   | "saveAndContinue"
   | "addChannel"
   | "openMessages";
 
 export type BackAction = "back" | "cancel" | "useAnotherMethod";
 
+export type SecondaryAction = "skipForNow" | "chooseAnotherFile";
+
 export interface StepInfo {
-  /** 1-based position among the five dots. */
+  /** 1-based position among the six dots. */
   readonly number: number;
   readonly label: StepLabel;
   readonly next: NextAction | undefined;
   readonly back: BackAction | undefined;
-  /** "Skip for now" on the channel step. */
-  readonly skipForNow: boolean;
+  /** The quiet action beside next, like "Skip for now" on the channel step. */
+  readonly secondary: SecondaryAction | undefined;
 }
 
 export function stepInfo(step: WizardStep): StepInfo {
@@ -272,7 +346,7 @@ export function stepInfo(step: WizardStep): StepInfo {
     number: number,
     label: StepLabel,
     next: NextAction | undefined,
-    skipForNow = false,
+    secondary?: SecondaryAction,
   ): StepInfo => {
     const back = backStep(step);
     return {
@@ -280,7 +354,7 @@ export function stepInfo(step: WizardStep): StepInfo {
       label,
       next,
       back: back === undefined ? undefined : backAction(step),
-      skipForNow,
+      secondary,
     };
   };
   switch (step.name) {
@@ -298,12 +372,21 @@ export function stepInfo(step: WizardStep): StepInfo {
       return info(2, "connect", "tryAgain");
     case "sync":
       return info(2, "connect", "continue");
+    case "restore":
+      if (step.view === "review") {
+        return info(3, "restore", "restoreAndContinue", "chooseAnotherFile");
+      }
+      return info(
+        3,
+        "restore",
+        step.choice === "restore" ? "chooseFile" : "setUpNew",
+      );
     case "profile":
-      return info(3, "profile", "saveAndContinue");
+      return info(4, "profile", "saveAndContinue");
     case "channel":
-      return info(4, "channels", "addChannel", true);
+      return info(5, "channels", "addChannel", "skipForNow");
     case "done":
-      return info(5, "done", "openMessages");
+      return info(6, "done", "openMessages");
   }
 }
 
