@@ -404,6 +404,7 @@
     "switchToDevice": "Switch to {{name}}",
     "connectAnother": "Connect another device",
     "connectAnotherHint": "Bluetooth, Serial or HTTP. Each device keeps its own chats and nodes.",
-    "details": "Details"
+    "details": "Details",
+    "resizeDetails": "Resize {{name}}"
   }
 }

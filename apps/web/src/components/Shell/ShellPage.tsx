@@ -6,6 +6,7 @@ import {
   useIsMobile,
 } from "@core/hooks/useIsMobile.ts";
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
+import { useDetailsWidth } from "@core/shell/useDetailsWidth.ts";
 import { cn } from "@core/utils/cn.ts";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useLocation, useMatches } from "@tanstack/react-router";
@@ -13,6 +14,7 @@ import { type LucideIcon, MenuIcon, PanelRightIcon, XIcon } from "lucide-react";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useTranslation } from "react-i18next";
+import { DetailsResizeHandle } from "./DetailsResizeHandle.tsx";
 import { MobileHeaderControls } from "./MobileHeaderControls.tsx";
 import { shouldHideTabBar } from "./navItems.ts";
 
@@ -53,7 +55,10 @@ export interface ShellPageProps {
   sidebarLabel?: string;
   /** Pinned under the sidebar's scrolling content, e.g. the device card. */
   sidebarFooter?: ReactNode;
-  /** Toggleable details panel (320px column, drawer on mobile). */
+  /**
+   * Toggleable details panel: a resizable column (320px by default) from
+   * `lg`, a drawer below.
+   */
   details?: ReactNode;
   detailsLabel?: string;
   /**
@@ -70,6 +75,9 @@ export interface ShellPageProps {
 export const DETAILS_PANEL_STORAGE_KEY = "meshtastic:detailsPanelOpen";
 
 const readBoolean = (value: string): boolean => value === "true";
+
+/** The desktop sidebar's width (`w-[300px]`), for the details column's room. */
+const SIDEBAR_WIDTH = 300;
 
 interface MobileDrawerProps {
   side: "left" | "right";
@@ -140,8 +148,8 @@ const SidebarColumn = ({
 
 /**
  * One route's slice of the app shell, next to the rail:
- * `[sidebar ~300px][main][details 320px, toggleable]`. Below `md` the
- * sidebar and details become drawers opened from the header.
+ * `[sidebar ~300px][main][details 320px, toggleable and resizable]`. Below
+ * `md` the sidebar becomes a drawer, and below `lg` the details do too.
  */
 export const ShellPage = ({
   label,
@@ -177,6 +185,13 @@ export const ShellPage = ({
   );
   const pathname = useLocation({ select: (location) => location.pathname });
   const mainRef = useRef<HTMLElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const detailsWidth = useDetailsWidth(
+    rowRef,
+    sidebar && !isMobile ? SIDEBAR_WIDTH : 0,
+  );
+  // The width being dragged, shown live and stored on release.
+  const [draftWidth, setDraftWidth] = useState<number | undefined>(undefined);
   const wasMobile = useRef(isMobile);
   const detailsId = useId();
 
@@ -215,7 +230,10 @@ export const ShellPage = ({
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden bg-chat text-primary">
+      <div
+        ref={rowRef}
+        className="flex min-h-0 min-w-0 flex-1 overflow-hidden bg-chat text-primary"
+      >
         {sidebar && !isMobile ? (
           <aside
             aria-label={sidebarName}
@@ -343,9 +361,19 @@ export const ShellPage = ({
           <aside
             id={detailsId}
             aria-label={detailsName}
-            className="w-80 shrink-0 overflow-y-auto border-l border-subtle bg-surface px-2"
+            style={{ width: draftWidth ?? detailsWidth.width }}
+            className="relative flex shrink-0 flex-col border-l border-subtle bg-surface"
           >
-            {details}
+            <DetailsResizeHandle
+              label={t("shell.resizeDetails", { name: detailsName })}
+              width={draftWidth ?? detailsWidth.width}
+              min={detailsWidth.min}
+              max={detailsWidth.max}
+              onDraft={setDraftWidth}
+              onResize={detailsWidth.setWidth}
+              onReset={detailsWidth.reset}
+            />
+            <div className="min-h-0 flex-1 overflow-y-auto px-2">{details}</div>
           </aside>
         ) : null}
       </div>

@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { SaveIcon } from "lucide-react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DETAILS_WIDTH_KEY } from "@core/shell/detailsWidth.ts";
 import { DETAILS_PANEL_STORAGE_KEY, ShellPage } from "./ShellPage.tsx";
 
 const viewport = vi.hoisted(() => ({
@@ -427,5 +428,113 @@ describe("ShellPage", () => {
       screen.getByRole("button", { name: "Back to settings" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
+  });
+
+  describe("details width", () => {
+    const setViewportWidth = (width: number) => {
+      Object.defineProperty(window, "innerWidth", {
+        configurable: true,
+        writable: true,
+        value: width,
+      });
+    };
+    const separator = () =>
+      screen.getByRole("separator", { name: "Resize Node details" });
+    const panel = () =>
+      screen.getByRole("complementary", { name: "Node details" });
+
+    beforeEach(() => {
+      // 1600 wide: room up to the 640px cap beside a 300px sidebar.
+      setViewportWidth(1600);
+      HTMLElement.prototype.setPointerCapture = () => {};
+    });
+    afterEach(() => setViewportWidth(1024));
+
+    it("starts at the default width with its limits on the separator", () => {
+      renderPage();
+      expect(panel()).toHaveStyle({ width: "320px" });
+      expect(separator()).toHaveAttribute("aria-orientation", "vertical");
+      expect(separator()).toHaveAttribute("aria-valuenow", "320");
+      expect(separator()).toHaveAttribute("aria-valuemin", "280");
+      expect(separator()).toHaveAttribute("aria-valuemax", "640");
+    });
+
+    it("resizes from the keyboard and remembers the width", () => {
+      const { unmount } = renderPage();
+      fireEvent.keyDown(separator(), { key: "ArrowLeft" });
+      expect(separator()).toHaveAttribute("aria-valuenow", "336");
+      fireEvent.keyDown(separator(), { key: "ArrowLeft", shiftKey: true });
+      expect(panel()).toHaveStyle({ width: "400px" });
+      fireEvent.keyDown(separator(), { key: "ArrowRight" });
+      expect(separator()).toHaveAttribute("aria-valuenow", "384");
+      expect(localStorage.getItem(DETAILS_WIDTH_KEY)).toBe("384");
+
+      fireEvent.keyDown(separator(), { key: "End" });
+      expect(separator()).toHaveAttribute("aria-valuenow", "640");
+      fireEvent.keyDown(separator(), { key: "Home" });
+      expect(separator()).toHaveAttribute("aria-valuenow", "280");
+      fireEvent.keyDown(separator(), { key: "ArrowRight" });
+      expect(separator()).toHaveAttribute("aria-valuenow", "280");
+
+      fireEvent.keyDown(separator(), { key: "End" });
+      unmount();
+      renderPage();
+      expect(panel()).toHaveStyle({ width: "640px" });
+    });
+
+    it("drags with the pointer and stores the width on release", () => {
+      renderPage();
+      fireEvent.pointerDown(separator(), {
+        button: 0,
+        pointerId: 1,
+        clientX: 1000,
+      });
+      fireEvent.pointerMove(separator(), { pointerId: 1, clientX: 900 });
+      expect(panel()).toHaveStyle({ width: "420px" });
+      expect(localStorage.getItem(DETAILS_WIDTH_KEY)).toBeNull();
+      fireEvent.pointerUp(separator(), { pointerId: 1, clientX: 880 });
+      expect(panel()).toHaveStyle({ width: "440px" });
+      expect(localStorage.getItem(DETAILS_WIDTH_KEY)).toBe("440");
+    });
+
+    it("resets to the default on double-click", () => {
+      localStorage.setItem(DETAILS_WIDTH_KEY, "500");
+      renderPage();
+      expect(panel()).toHaveStyle({ width: "500px" });
+      fireEvent.doubleClick(separator());
+      expect(panel()).toHaveStyle({ width: "320px" });
+      expect(localStorage.getItem(DETAILS_WIDTH_KEY)).toBeNull();
+    });
+
+    it("clamps a stored width to the room the window has", () => {
+      localStorage.setItem(DETAILS_WIDTH_KEY, "900");
+      setViewportWidth(1280);
+      renderPage();
+      // min(640, 50% of 1280, 1280 - 300 sidebar - 420 main)
+      expect(separator()).toHaveAttribute("aria-valuemax", "560");
+      expect(panel()).toHaveStyle({ width: "560px" });
+    });
+
+    it("still renders and resizes when storage is blocked", () => {
+      // Blocked site data throws on any access to localStorage.
+      const original = Object.getOwnPropertyDescriptor(window, "localStorage");
+      const blocked = vi.fn(() => {
+        throw new DOMException("blocked", "SecurityError");
+      });
+      Object.defineProperty(window, "localStorage", {
+        configurable: true,
+        get: blocked,
+      });
+      try {
+        renderPage();
+        fireEvent.keyDown(separator(), { key: "ArrowLeft" });
+        expect(separator()).toHaveAttribute("aria-valuenow", "336");
+        expect(blocked).toHaveBeenCalled();
+      } finally {
+        if (original) {
+          Object.defineProperty(window, "localStorage", original);
+        }
+      }
+    });
   });
 });
