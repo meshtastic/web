@@ -16,8 +16,7 @@ import {
   Table,
 } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
+import { ShellPage } from "@components/Shell/ShellPage.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
@@ -282,7 +281,7 @@ const NodesPage = (): JSX.Element => {
   });
 
   return (
-    <PageLayout label="" leftBar={<Sidebar />}>
+    <ShellPage label={t("navigation.nodes", { ns: "ui" })}>
       <div className="pl-2 pt-2 flex flex-row">
         <div className="flex-1 mr-2">
           <Input
@@ -332,7 +331,7 @@ const NodesPage = (): JSX.Element => {
           onOpenChange={() => setSelectedLocation(undefined)}
         />
       </div>
-    </PageLayout>
+    </ShellPage>
   );
 };
 

@@ -52,6 +52,7 @@ import {
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useActiveClient } from "@core/kmp/hooks";
+import { useConnections } from "@pages/Connections/useConnections.ts";
 
 export interface Group {
   id: string;
@@ -80,6 +81,8 @@ export const CommandPalette = () => {
     setSelectedDevice,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
+  const activeConnectionId = useDeviceStore((s) => s.activeConnectionId);
+  const { disconnect } = useConnections();
   const { setDialogOpen } = useDevice();
   const connection = useActiveClient();
   const allNodes = useNodesAsProto();
@@ -269,7 +272,12 @@ export const CommandPalette = () => {
           label: t("contextual.command.disconnect"),
           icon: CloudOff,
           action() {
-            connection?.disconnect().catch((error) => {
+            // Through the connection manager, so the saved connection is
+            // marked disconnected rather than lost.
+            const done = activeConnectionId
+              ? disconnect(activeConnectionId)
+              : connection?.disconnect();
+            void Promise.resolve(done).catch((error: unknown) => {
               console.error("Failed to disconnect:", error);
             });
           },

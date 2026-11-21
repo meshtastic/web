@@ -35,6 +35,7 @@ export const CountBadge = ({
     label === undefined ? t("primitives.unread", { count }) : label;
   return (
     <span
+      aria-hidden={accessible === null ? true : undefined}
       className={cn(
         "inline-flex shrink-0 items-center justify-center rounded-full bg-accent font-bold text-on-accent tabular-nums text-meta leading-none",
         size === "md" ? "h-5 min-w-5 px-1.5" : "h-4 min-w-4 px-1",
@@ -42,7 +43,7 @@ export const CountBadge = ({
       )}
       {...props}
     >
-      <span aria-hidden={accessible === null ? undefined : true}>{shown}</span>
+      <span aria-hidden="true">{shown}</span>
       {accessible === null ? null : (
         <span className="sr-only">{accessible}</span>
       )}

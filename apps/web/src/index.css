@@ -301,6 +301,8 @@
   --background-color-danger: var(--mt-danger-bg);
   --background-color-scrim: var(--mt-scrim);
   --background-color-overlay: var(--mt-overlay);
+  /* Muted-text colour as a fill, for neutral indicator dots. */
+  --background-color-muted-dot: var(--mt-fg-muted);
   /* Inactive step / track marks drawn in the control-border shade. */
   --background-color-control: var(--mt-border-control);
 

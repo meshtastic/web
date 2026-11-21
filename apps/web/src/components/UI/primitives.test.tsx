@@ -201,9 +201,73 @@ describe("badges and dots", () => {
       "true",
     );
   });
+
+  it("StatusDot names connecting and error states", () => {
+    render(
+      <>
+        <StatusDot status="connecting" />
+        <StatusDot status="error" />
+      </>,
+    );
+    expect(screen.getByRole("img", { name: "Connecting" }).className).toContain(
+      "bg-dirty",
+    );
+    expect(screen.getByRole("img", { name: "Error" }).className).toContain(
+      "bg-danger-strong",
+    );
+  });
+
+  it("CountBadge with label={null} is hidden from assistive tech", () => {
+    render(<CountBadge count={3} label={null} data-testid="badge" />);
+    const badge = screen.getByTestId("badge");
+    expect(badge.getAttribute("aria-hidden")).toBe("true");
+    expect(badge.textContent).toBe("3");
+  });
 });
 
 describe("NodeAvatar", () => {
+  it("announces presence even when the avatar is decorative", () => {
+    const { rerender } = render(
+      <NodeAvatar initials="EA" tone={{ kind: "device" }} presence="error" />,
+    );
+    expect(screen.getByRole("img", { name: "Error" })).toBeTruthy();
+    expect(
+      screen.queryByText("EA")?.closest("[aria-hidden=true]"),
+    ).toBeTruthy();
+
+    rerender(
+      <NodeAvatar
+        initials="EA"
+        tone={{ kind: "device" }}
+        presence="online"
+        presenceLabel="Connected"
+      />,
+    );
+    expect(screen.getByRole("img", { name: "Connected" })).toBeTruthy();
+
+    rerender(
+      <NodeAvatar
+        initials="EA"
+        tone={{ kind: "device" }}
+        presence="online"
+        presenceLabel={null}
+      />,
+    );
+    expect(screen.queryByRole("img")).toBeNull();
+  });
+
+  it("folds presence into a labelled avatar's single image", () => {
+    render(
+      <NodeAvatar
+        initials="EA"
+        tone={{ kind: "device" }}
+        label="EAO1"
+        presence="online"
+      />,
+    );
+    expect(screen.getAllByRole("img")).toHaveLength(1);
+  });
+
   it("fills node avatars with the node colour via a custom property", () => {
     render(
       <NodeAvatar

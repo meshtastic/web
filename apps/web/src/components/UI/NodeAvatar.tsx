@@ -1,4 +1,4 @@
-import { StatusDot } from "@components/UI/StatusDot.tsx";
+import { StatusDot, type StatusDotStatus } from "@components/UI/StatusDot.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { nodeAvatarColors } from "@core/utils/nodeIdentity.ts";
 import { cva } from "class-variance-authority";
@@ -58,8 +58,14 @@ export interface NodeAvatarProps {
    * then stays decorative.
    */
   label?: string;
-  /** Presence dot in the bottom-right corner. */
-  presence?: "online" | "offline";
+  /** Presence / connection dot in the bottom-right corner. */
+  presence?: StatusDotStatus;
+  /**
+   * Accessible text for the presence dot. Defaults to the dot's own label
+   * (Online, Connecting, ...), announced even when the avatar itself is
+   * decorative; `null` hides it when nearby text already says it.
+   */
+  presenceLabel?: string | null;
   /** Colour of the surface behind the avatar, for the dot's cut-out ring. */
   cutout?: "surface" | "app" | "rail" | "selected";
   /** Overlays, e.g. a favourite star. */
@@ -78,6 +84,7 @@ export const NodeAvatar = ({
   shape = "circle",
   label,
   presence,
+  presenceLabel,
   cutout = "surface",
   children,
   className,
@@ -88,11 +95,23 @@ export const NodeAvatar = ({
   // class can still override it (an inline background-color could not).
   const style: (CSSProperties & Record<"--avatar-bg", string>) | undefined =
     nodeColors ? { "--avatar-bg": nodeColors.background } : undefined;
+  const dot = presence ? (
+    <StatusDot
+      status={presence}
+      size={dotSize[size]}
+      cutout={cutout}
+      label={label ? null : presenceLabel}
+      className="absolute -right-0.5 -bottom-0.5"
+    />
+  ) : null;
+  // A labelled avatar is one image; its name says who it is. A decorative
+  // one hides its initials but keeps the presence dot announced.
+  const exposeDot = !label && presence !== undefined && presenceLabel !== null;
   return (
     <span
       role={label ? "img" : undefined}
       aria-label={label}
-      aria-hidden={label ? undefined : true}
+      aria-hidden={label || exposeDot ? undefined : true}
       className={cn(
         avatarVariants({ size, shape }),
         tone.kind === "device" && "bg-device-avatar text-on-device-avatar",
@@ -107,17 +126,11 @@ export const NodeAvatar = ({
       )}
       style={style}
     >
-      <span className="truncate px-0.5">{initials}</span>
-      {presence ? (
-        <StatusDot
-          status={presence}
-          size={dotSize[size]}
-          cutout={cutout}
-          label={null}
-          className="absolute -right-0.5 -bottom-0.5"
-        />
-      ) : null}
-      {children}
+      <span aria-hidden={exposeDot ? true : undefined} className="contents">
+        <span className="truncate px-0.5">{initials}</span>
+        {children}
+      </span>
+      {dot}
     </span>
   );
 };

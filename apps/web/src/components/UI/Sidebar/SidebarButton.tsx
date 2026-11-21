@@ -1,5 +1,4 @@
 import { Button } from "@components/UI/Button.tsx";
-import { useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import type { LucideIcon } from "lucide-react";
 import type React from "react";
@@ -12,7 +11,6 @@ export interface SidebarButtonProps {
   children?: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
-  preventCollapse?: boolean;
   isDirty?: boolean;
 }
 
@@ -24,61 +22,37 @@ export const SidebarButton = ({
   children,
   onClick,
   disabled = false,
-  preventCollapse = false,
   isDirty,
-}: SidebarButtonProps) => {
-  const { isCollapsed: isSidebarCollapsed } = useSidebar();
-  const isButtonCollapsed = isSidebarCollapsed && !preventCollapse;
+}: SidebarButtonProps) => (
+  <Button
+    onClick={onClick}
+    variant={active ? "subtle" : "ghost"}
+    size="sm"
+    className={cn(
+      "flex min-h-9 w-full items-center justify-start gap-2 text-wrap",
+      // Buttons sit 4px apart, so an offset ring spills onto the next one.
+      // Ring only for keyboard focus, drawn inside the button.
+      "focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400",
+    )}
+    disabled={disabled}
+  >
+    {Icon && <Icon size={18} className="flex-shrink-0" />}
 
-  return (
-    <Button
-      onClick={onClick}
-      variant={active ? "subtle" : "ghost"}
-      size="sm"
-      className={cn(
-        "flex w-full items-center text-wrap",
-        // Buttons sit 4px apart, so an offset ring spills onto the next one.
-        // Ring only for keyboard focus, drawn inside the button.
-        "focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400",
-        isButtonCollapsed
-          ? "justify-center gap-0 px-2 h-9"
-          : "justify-start gap-2 min-h-9",
-      )}
-      disabled={disabled}
-    >
-      {Icon && (
-        <Icon size={isButtonCollapsed ? 20 : 18} className="flex-shrink-0" />
-      )}
+    {children}
 
-      {children}
+    <span className="flex max-w-full min-w-0 flex-wrap justify-start px-1 text-left text-balance break-all whitespace-normal">
+      {label}
+    </span>
 
-      <span
+    {((!active && count && count > 0) || isDirty) && (
+      <div
         className={cn(
-          "flex flex-wrap justify-start text-left text-balance break-all",
-          "min-w-0",
-          "px-1",
-          "transition-all duration-300 ease-in-out",
-          isButtonCollapsed
-            ? "opacity-0 max-w-0 invisible w-0 overflow-hidden"
-            : "opacity-100 max-w-full visible whitespace-normal",
+          "ml-auto flex-shrink-0 justify-end rounded-full px-1.5 py-0.5 text-xs text-white",
+          isDirty ? "bg-sky-500" : "bg-blue-500",
         )}
       >
-        {label}
-      </span>
-
-      {!isButtonCollapsed && ((!active && count && count > 0) || isDirty) && (
-        <div
-          className={cn(
-            "ml-auto flex-shrink-0 justify-end text-white text-xs rounded-full px-1.5 py-0.5",
-            "flex-shrink-0",
-            "transition-opacity duration-300 ease-in-out",
-            isButtonCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
-            isDirty ? "bg-sky-500" : "bg-blue-500",
-          )}
-        >
-          {count}
-        </div>
-      )}
-    </Button>
-  );
-};
+        {count}
+      </div>
+    )}
+  </Button>
+);

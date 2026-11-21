@@ -2,8 +2,7 @@ import { Channels } from "@components/PageComponents/Channels/Channels.tsx";
 import { LoRa } from "@components/PageComponents/Settings/LoRa.tsx";
 import { Security } from "@components/PageComponents/Settings/Security/Security.tsx";
 import { User } from "@components/PageComponents/Settings/User.tsx";
-import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
+import { ShellPage } from "@components/Shell/ShellPage.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
@@ -367,7 +366,7 @@ const ConfigPage = () => {
 
   const leftSidebar = useMemo(
     () => (
-      <Sidebar>
+      <>
         {groups.map((group) => (
           <SidebarSection
             key={group.key}
@@ -387,7 +386,7 @@ const ConfigPage = () => {
             ))}
           </SidebarSection>
         ))}
-      </Sidebar>
+      </>
     ),
     [groups, activeSection?.key, openSection],
   );
@@ -454,15 +453,16 @@ const ConfigPage = () => {
   const ActiveComponent = activeSection?.component;
 
   return (
-    <PageLayout
+    <ShellPage
       contentClassName="overflow-auto"
-      leftBar={leftSidebar}
+      sidebar={leftSidebar}
+      sidebarLabel={t("navigation.settings", { ns: "ui" })}
       label={activeSection?.label ?? ""}
       // Pending edits stay visible from any page so they aren't forgotten.
       actions={activeSection?.edits || hasPending ? actions : []}
     >
       {ActiveComponent && <ActiveComponent onFormInit={onFormInit} />}
-    </PageLayout>
+    </ShellPage>
   );
 };
 

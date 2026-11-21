@@ -8,6 +8,9 @@ const statusDotVariants = cva("inline-block shrink-0 rounded-full", {
     status: {
       online: "bg-online",
       offline: "bg-offline",
+      /** Amber: connecting, configuring, reconnecting. */
+      connecting: "bg-dirty",
+      error: "bg-danger-strong",
       dirty: "bg-dirty",
     },
     size: {
@@ -37,11 +40,23 @@ export type StatusDotProps = Omit<
 > &
   VariantProps<typeof statusDotVariants> & {
     /**
-     * Accessible text. Defaults to Online / Offline / Unsaved changes;
+     * Accessible text. Defaults to Online / Offline / Connecting / Error / Unsaved changes;
      * `null` hides the dot when nearby text already says it.
      */
     label?: string | null;
   };
+
+export type StatusDotStatus = NonNullable<
+  VariantProps<typeof statusDotVariants>["status"]
+>;
+
+const fallbackLabelKeys = {
+  online: "primitives.online",
+  offline: "primitives.offline",
+  connecting: "primitives.connecting",
+  error: "primitives.error",
+  dirty: "primitives.unsavedChanges",
+} as const satisfies Record<StatusDotStatus, string>;
 
 /** Presence / state indicator dot. */
 export const StatusDot = ({
@@ -53,12 +68,7 @@ export const StatusDot = ({
   ...props
 }: StatusDotProps) => {
   const { t } = useTranslation("ui");
-  const fallback =
-    status === "offline"
-      ? t("primitives.offline")
-      : status === "dirty"
-        ? t("primitives.unsavedChanges")
-        : t("primitives.online");
+  const fallback = t(fallbackLabelKeys[status ?? "online"]);
   const accessible = label === undefined ? fallback : label;
   return (
     <span

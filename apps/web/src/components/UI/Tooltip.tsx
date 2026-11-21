@@ -4,7 +4,9 @@ import * as React from "react";
 
 const TooltipProvider = TooltipPrimitive.Provider;
 
-const Tooltip = ({ ...props }) => <TooltipPrimitive.Root {...props} />;
+const Tooltip = (
+  props: React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root>,
+) => <TooltipPrimitive.Root {...props} />;
 Tooltip.displayName = TooltipPrimitive.Tooltip.displayName;
 
 const TooltipTrigger = TooltipPrimitive.Trigger;

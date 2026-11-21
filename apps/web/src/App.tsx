@@ -6,12 +6,13 @@ import { ConnectionsDrawer } from "@components/ConnectionsDrawer/ConnectionsDraw
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { LockdownGate } from "@components/Dialog/LockdownDialog/LockdownDialog.tsx";
 import { RegionSetupReminder } from "@components/RegionSetupReminder.tsx";
+import { AppShell } from "@components/Shell/AppShell.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { cn } from "@core/utils/cn.ts";
-import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
+import { useAppStore, useDeviceStore } from "@core/stores";
 import { useTotalUnread } from "@core/kmp/hooks";
 import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -57,25 +58,25 @@ export function App() {
           className="flex h-screen flex-col bg-background-primary text-text-primary"
           style={{ scrollbarWidth: "thin" }}
         >
-          <SidebarProvider>
-            <div className="h-full flex flex-1 flex-col">
-              {device ? (
-                // dvh here only: the shell stays h-screen so the connection screen is untouched.
-                <div className="h-dvh flex w-full">
-                  <DialogManager />
-                  <LockdownGate />
-                  <RegionSetupReminder />
-                  <BeaconOfferNotifier />
-                  <CommandPalette />
+          <div className="h-full flex flex-1 flex-col">
+            {device ? (
+              // dvh here only: the shell stays h-screen so the connection screen is untouched.
+              <div className="h-dvh flex w-full">
+                <DialogManager />
+                <LockdownGate />
+                <RegionSetupReminder />
+                <BeaconOfferNotifier />
+                <CommandPalette />
+                <AppShell>
                   <MapProvider>
                     <Outlet />
                   </MapProvider>
-                </div>
-              ) : (
-                <Footer />
-              )}
-            </div>
-          </SidebarProvider>
+                </AppShell>
+              </div>
+            ) : (
+              <Footer />
+            )}
+          </div>
         </div>
       </DeviceWrapper>
     </ErrorBoundary>

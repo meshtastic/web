@@ -22,8 +22,7 @@ import {
 } from "@components/PageComponents/Map/Layers/SNRLayer.tsx";
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
-import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
+import { ShellPage } from "@components/Shell/ShellPage.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import {
   useMyNodeAsProto,
@@ -298,7 +297,7 @@ const MapPage = () => {
   );
 
   return (
-    <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
+    <ShellPage label={t("navigation.map", { ns: "ui" })} noPadding>
       <BaseMap
         initialViewState={savedView.current}
         onLoad={getMapBounds}
@@ -373,7 +372,7 @@ const MapPage = () => {
           setHeatmapMode={setHeatmapMode}
         />
       </div>
-    </PageLayout>
+    </ShellPage>
   );
 };
 

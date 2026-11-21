@@ -1,4 +1,5 @@
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
+import type { TabBarStaticData } from "@components/Shell/navItems.ts";
 import { useAppStore } from "@core/stores";
 import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
@@ -13,6 +14,10 @@ import {
 import type { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
+
+declare module "@tanstack/react-router" {
+  interface StaticDataRouteOption extends TabBarStaticData {}
+}
 
 interface AppContext {
   stores: {

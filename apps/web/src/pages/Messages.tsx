@@ -1,8 +1,8 @@
 import { messagesWithParamsRoute } from "@app/routes.tsx";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
-import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
+import { DeviceCard } from "@components/Shell/DeviceCard.tsx";
+import { ShellPage } from "@components/Shell/ShellPage.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
@@ -11,8 +11,7 @@ import { useChatAsLegacyMessages } from "@core/hooks/useChatAsLegacyMessages.ts"
 import { useDocumentVisible } from "@core/hooks/useDocumentVisible.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useToast } from "@core/hooks/useToast.ts";
-import { MessageType, useSidebar } from "@core/stores";
-import { cn } from "@core/utils/cn.ts";
+import { MessageType } from "@core/stores";
 import { Protobuf, Types } from "@core/protobuf.ts";
 import {
   useActiveClient,
@@ -64,7 +63,6 @@ export const MessagesPage = () => {
 
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isCollapsed } = useSidebar();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const { t } = useTranslation(["messages", "channels", "ui"]);
   const deferredSearch = useDeferredValue(searchTerm);
@@ -189,55 +187,49 @@ export const MessagesPage = () => {
     }
   };
 
-  const leftSidebar = useMemo(
+  const channelSection = useMemo(
     () => (
-      <Sidebar>
-        <SidebarSection label={t("navigation.channels")} className="py-2 px-0">
-          {filteredChannels?.map((channel) => (
-            <SidebarButton
-              key={channel.index}
-              count={channelUnread(channel.index)}
-              label={
-                channel.settings?.name ||
-                (channel.index === 0
-                  ? t("page.broadcastLabel", { ns: "channels" })
-                  : t("page.channelLabel", {
-                      index: channel.index,
-                      ns: "channels",
-                    }))
-              }
-              active={
-                numericChatId === channel.index &&
-                chatType === MessageType.Broadcast
-              }
-              onClick={() =>
-                navigateToChat(MessageType.Broadcast, channel.index.toString())
-              }
-            >
-              <HashIcon
-                size={16}
-                className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")}
-              />
-            </SidebarButton>
-          ))}
-        </SidebarSection>
-      </Sidebar>
+      <SidebarSection label={t("navigation.channels")} className="py-2 px-0">
+        {filteredChannels?.map((channel) => (
+          <SidebarButton
+            key={channel.index}
+            count={channelUnread(channel.index)}
+            label={
+              channel.settings?.name ||
+              (channel.index === 0
+                ? t("page.broadcastLabel", { ns: "channels" })
+                : t("page.channelLabel", {
+                    index: channel.index,
+                    ns: "channels",
+                  }))
+            }
+            active={
+              numericChatId === channel.index &&
+              chatType === MessageType.Broadcast
+            }
+            onClick={() =>
+              navigateToChat(MessageType.Broadcast, channel.index.toString())
+            }
+          >
+            <HashIcon size={16} className="mr-2" />
+          </SidebarButton>
+        ))}
+      </SidebarSection>
     ),
     [
       filteredChannels,
       numericChatId,
       chatType,
-      isCollapsed,
       channelUnread,
       navigateToChat,
       t,
     ],
   );
 
-  const rightSidebar = (
+  const directMessageSection = (
     <SidebarSection
-      label=""
-      className="px-0 flex flex-col h-full overflow-y-auto"
+      label={t("shell.directMessages", { ns: "ui" })}
+      className="px-0 py-2 flex flex-col"
     >
       <label className="p-2 block" htmlFor="nodeSearch">
         <Input
@@ -250,15 +242,12 @@ export const MessagesPage = () => {
         />
       </label>
       <div
-        className={cn(
-          "flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1 ",
-        )}
+        className="flex flex-col gap-2.5 pt-1"
         style={{ contentVisibility: "auto", containIntrinsicSize: "100px" }}
       >
         {filteredNodes()?.map((node) => (
           <SidebarButton
             key={node.num}
-            preventCollapse
             label={node.user?.longName ?? t("unknown.shortName")}
             count={node.unreadCount > 0 ? node.unreadCount : undefined}
             active={
@@ -270,7 +259,6 @@ export const MessagesPage = () => {
           >
             <Avatar
               nodeNum={node.num}
-              className={cn(hasNodeError(node.num) && "text-red-500")}
               showError={hasNodeError(node.num)}
               showFavorite={node.isFavorite}
               size="sm"
@@ -282,7 +270,7 @@ export const MessagesPage = () => {
   );
 
   return (
-    <PageLayout
+    <ShellPage
       label={`${t("page.title", {
         interpolation: { escapeValue: false },
         chatName:
@@ -293,13 +281,22 @@ export const MessagesPage = () => {
               : t("emptyState.title"),
       })} 
       `}
-      rightBar={rightSidebar}
-      leftBar={leftSidebar}
+      sidebarLabel={t("navigation.messages", { ns: "ui" })}
+      sidebar={
+        <>
+          {channelSection}
+          {directMessageSection}
+        </>
+      }
+      sidebarFooter={<DeviceCard />}
       actions={
         isDirect && otherNode
           ? [
               {
                 key: "encryption",
+                ariaLabel: otherNode.user?.publicKey?.length
+                  ? t("toast.messages.pkiEncryption.title")
+                  : t("toast.messages.pskEncryption.title"),
                 icon: otherNode.user?.publicKey?.length
                   ? LockIcon
                   : LockOpenIcon,
@@ -339,7 +336,7 @@ export const MessagesPage = () => {
           )}
         </div>
       </div>
-    </PageLayout>
+    </ShellPage>
   );
 };
 
