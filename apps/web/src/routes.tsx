@@ -121,18 +121,25 @@ const settingsTabSearchSchema = z.object({
   tab: z.string().optional(),
 });
 
-const settingsPage = (path: string) =>
+// A section is a full screen on mobile (back returns to the Settings
+// list), so it hides the tab bar there.
+// Generic over the literal path, so `/settings/<section>` is in the route
+// tree's types and links to it are checked.
+const settingsPage = <const P extends string>(path: P) =>
   createRoute({
     getParentRoute: () => settingsRoute,
     path,
     component: ConfigPage,
+    staticData: { hideTabBar: true },
   });
 
-const settingsTabbedPage = (path: string) =>
+// `?tab=` opens a Device configuration subsection or a module.
+const settingsTabbedPage = <const P extends string>(path: P) =>
   createRoute({
     getParentRoute: () => settingsRoute,
     path,
     component: ConfigPage,
+    staticData: { hideTabBar: true },
     validateSearch: (search) => settingsTabSearchSchema.parse(search),
   });
 
@@ -144,10 +151,12 @@ export const deviceRoute = settingsTabbedPage("device");
 export const moduleRoute = settingsTabbedPage("module");
 export const administrationRoute = settingsPage("administration");
 export const backupRestoreRoute = settingsPage("backup");
+export const firmwareRoute = settingsPage("firmware");
 export const cleanNodeDbRoute = settingsPage("clean-nodes");
 export const debugRoute = settingsPage("debug");
 export const appSettingsRoute = settingsPage("app");
 export const aboutRoute = settingsPage("about");
+export const helpRoute = settingsPage("help");
 
 // Radio Config used to group LoRa, Channels and Security.
 const legacyRadioRoute = createRoute({
@@ -195,10 +204,12 @@ export const routeTree = rootRoute.addChildren([
     moduleRoute,
     administrationRoute,
     backupRestoreRoute,
+    firmwareRoute,
     cleanNodeDbRoute,
     debugRoute,
     appSettingsRoute,
     aboutRoute,
+    helpRoute,
     legacyRadioRoute,
   ]),
   nodesRoute,

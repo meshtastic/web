@@ -31,11 +31,6 @@
     "coordinates": "Coordinates: ",
     "noCoordinates": "No Coordinates"
   },
-  "pkiRegenerateDialog": {
-    "title": "Regenerate Pre-Shared Key?",
-    "description": "Are you sure you want to regenerate the pre-shared key?",
-    "regenerate": "Regenerate"
-  },
   "addConnection": {
     "title": "Add connection",
     "description": "Choose a connection type and fill in the details",

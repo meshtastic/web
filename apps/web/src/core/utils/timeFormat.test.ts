@@ -78,6 +78,13 @@ describe("formatRelativeTime", () => {
       formatRelativeTime(new Date(NOW.getTime() - 86_400_000), NOW, "de"),
     ).toBe("gestern");
   });
+
+  it("keeps one formatter per locale", () => {
+    const yesterday = new Date(NOW.getTime() - 86_400_000);
+    expect(formatRelativeTime(yesterday, NOW, "de")).toBe("gestern");
+    expect(formatRelativeTime(yesterday, NOW, "en")).toBe("yesterday");
+    expect(formatRelativeTime(yesterday, NOW, "de")).toBe("gestern");
+  });
 });
 
 describe("formatClockTime", () => {

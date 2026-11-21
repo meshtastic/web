@@ -275,4 +275,23 @@ describe("ShellPage", () => {
       ).not.toBeInTheDocument();
     });
   });
+
+  it("keeps a hidden label for assistive tech and renders the header slots", () => {
+    setViewport(true);
+    render(
+      <ShellPage
+        label="LoRa"
+        hideLabel
+        leading={<button type="button">Back to settings</button>}
+        trailing={<button type="button">Save</button>}
+      >
+        <div>page content</div>
+      </ShellPage>,
+    );
+    expect(screen.getByText("LoRa")).toHaveClass("sr-only");
+    expect(
+      screen.getByRole("button", { name: "Back to settings" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
+  });
 });

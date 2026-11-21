@@ -33,6 +33,15 @@ export type ActionItem = ActionItemBase &
 export interface ShellPageProps {
   /** Page title shown in the main header. */
   label: string;
+  /**
+   * Keep the title for assistive tech only, when the page draws its own
+   * visible heading.
+   */
+  hideLabel?: boolean;
+  /** Before the title, e.g. a back button on a mobile sub-screen. */
+  leading?: ReactNode;
+  /** After the title, before the actions, e.g. a Save button. */
+  trailing?: ReactNode;
   actions?: ActionItem[];
   children: ReactNode;
   /** Route-specific sidebar content (~300px column, drawer on mobile). */
@@ -124,6 +133,9 @@ const SidebarColumn = ({
  */
 export const ShellPage = ({
   label,
+  hideLabel = false,
+  leading,
+  trailing,
   actions,
   children,
   sidebar,
@@ -202,11 +214,18 @@ export const ShellPage = ({
               </MobileDrawer>
             ) : null}
 
+            {leading}
             <div className="flex min-w-0 flex-1 items-center justify-between">
-              <span className="truncate px-2 text-header-lg font-semibold">
+              <span
+                className={cn(
+                  "truncate px-2 text-header-lg font-semibold",
+                  hideLabel && "sr-only",
+                )}
+              >
                 {label}
               </span>
-              <div className="flex shrink-0 items-center gap-1 md:gap-2">
+              <div className="ml-auto flex shrink-0 items-center gap-1 md:gap-2">
+                {trailing}
                 {actions?.map((action) => (
                   <button
                     key={action.key}

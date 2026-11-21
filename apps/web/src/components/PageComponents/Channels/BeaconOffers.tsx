@@ -67,7 +67,7 @@ function BeaconOfferRow({
   const { t } = useTranslation("channels");
   const sender = beaconSenderName(useNodes(), entry.offer.from);
   return (
-    <li className="flex flex-col gap-2 rounded-md border border-slate-300 p-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-600">
+    <li className="flex flex-col gap-2 rounded-md border border-subtle p-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-1">
         <p className="font-semibold">{t("beaconOffers.from", { sender })}</p>
         <BeaconOfferDetails entry={entry} />

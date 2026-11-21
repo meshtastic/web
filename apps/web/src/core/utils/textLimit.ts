@@ -11,6 +11,8 @@ export type TextLimitMode = "bytes" | "chars";
 export interface TextLimitSpec {
   readonly max: number;
   readonly mode: TextLimitMode;
+  /** Count the text as saved, without surrounding whitespace. */
+  readonly trim?: boolean;
 }
 
 export interface TextLimitState {
@@ -42,7 +44,7 @@ export const evaluateTextLimit = (
   text: string,
   spec: TextLimitSpec,
 ): TextLimitState => {
-  const used = measureText(text, spec.mode);
+  const used = measureText(spec.trim ? text.trim() : text, spec.mode);
   return {
     used,
     limit: spec.max,

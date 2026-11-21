@@ -69,7 +69,8 @@
     "description": "Changes are sent to the radio when you save the settings."
   },
   "validation": {
-    "pskInvalid": "Please enter a valid {{bits}} bit PSK."
+    "pskInvalid": "Please enter a valid {{bits}} bit PSK.",
+    "pskAnyLength": "Use no key, the 1 byte default key, or a 128 or 256 bit key."
   },
   "name": {
     "label": "Channel Name",
@@ -129,5 +130,80 @@
     "join": "Join",
     "switch": "Switch",
     "dismiss": "Dismiss"
+  },
+  "slots": {
+    "listLabel": "Channel slots",
+    "empty": "Empty",
+    "summary": "{{role}} · {{key}}",
+    "role": {
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "disabled": "Disabled"
+    },
+    "keyKind": {
+      "default": "Default key",
+      "aes128": "AES-128",
+      "aes256": "AES-256",
+      "none": "No encryption",
+      "custom": "Custom key"
+    },
+    "sharesPosition": "Shares position",
+    "unsaved": "Unsaved changes"
+  },
+  "editor": {
+    "title": "Slot {{index}} · {{name}}",
+    "disabledHelp": "This slot is off. Make it secondary to add a channel here.",
+    "name": {
+      "label": "Name",
+      "help": "Up to 11 bytes. Leave blank for the default name."
+    },
+    "role": {
+      "label": "Role",
+      "help": "Slot 0 is the primary channel. Others are secondary or off."
+    },
+    "encryption": {
+      "label": "Encryption",
+      "help": "Default key is public: anyone with the app can read it."
+    },
+    "key": {
+      "label": "Key",
+      "help": "Share it only through the channel link or QR code.",
+      "show": "Show",
+      "hide": "Hide",
+      "generate": "Generate new",
+      "edit": "Edit",
+      "done": "Done"
+    },
+    "precision": {
+      "label": "Share position",
+      "help": "How precisely your location is shared on this channel.",
+      "off": "Off",
+      "precise": "Precise"
+    },
+    "mute": {
+      "label": "Mute notifications",
+      "help": "Silences notifications for this channel on this device and in apps that honour it."
+    },
+    "mqttCard": "MQTT for this channel",
+    "uplink": {
+      "label": "Uplink",
+      "help": "Send this channel’s messages to the MQTT server."
+    },
+    "downlink": {
+      "label": "Downlink",
+      "help": "Bring messages from the MQTT server into this channel."
+    },
+    "discardTitle": "Discard invalid changes?",
+    "discardDescription": "Slot {{index}} has changes that can’t be saved yet. Switching slots throws them away.",
+    "discardConfirm": "Discard and switch"
+  },
+  "share": {
+    "title": "Share this channel",
+    "qrLabel": "QR code for {{name}}",
+    "linkLabel": "Channel link",
+    "download": "Download QR",
+    "more": "More sharing options",
+    "import": "Import channels",
+    "notOnRadio": "Save this channel to the radio to share it."
   }
 }

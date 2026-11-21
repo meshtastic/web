@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
+import { StatusDot } from "@components/UI/StatusDot.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
 import { cn } from "@core/utils/cn.ts";
 import type { TextLimitSpec } from "@core/utils/textLimit.ts";
@@ -24,6 +25,8 @@ export interface SettingOption<T extends string> {
 interface SettingRowBase {
   label: string;
   help?: ReactNode;
+  /** Validation message under the help text, in red. */
+  error?: ReactNode;
   /** Edited but not saved: amber control border. */
   dirty?: boolean;
   disabled?: boolean;
@@ -80,6 +83,16 @@ export interface ButtonSettingRow extends SettingRowBase {
   tone?: "default" | "danger";
 }
 
+export interface CustomSettingRow extends SettingRowBase {
+  kind: "custom";
+  /** The control, e.g. a form-bound input. */
+  children: ReactNode;
+  /** Id of a labelable control, so the label points at it. */
+  controlId?: string;
+  /** Put the control under the label, for wide controls (lists, sliders). */
+  stacked?: boolean;
+}
+
 /**
  * One settings row: label and help on the left, a control on the right.
  * `kind` selects the control; select and segmented rows are generic over
@@ -91,7 +104,8 @@ export type SettingRowProps<T extends string = string> =
   | TextSettingRow
   | SegmentedSettingRow<T>
   | ReadonlyKeySettingRow
-  | ButtonSettingRow;
+  | ButtonSettingRow
+  | CustomSettingRow;
 
 const textWidth = {
   sm: "w-[100px]",
@@ -102,6 +116,7 @@ const textWidth = {
 interface ControlIds {
   control: string;
   label: string;
+  /** Help and error ids, for aria-describedby. */
   help: string | undefined;
 }
 
@@ -170,7 +185,7 @@ const SettingControl = <T extends string>({
           disabled={row.disabled}
           inputMode={row.inputMode}
           limit={row.limit}
-          variant={dirty ? "dirty" : "default"}
+          variant={row.error ? "invalid" : dirty ? "dirty" : "default"}
           aria-describedby={ids.help}
           containerClassName={textWidth[row.width ?? "lg"]}
           className={cn(row.mono && "font-mono")}
@@ -200,17 +215,22 @@ const SettingControl = <T extends string>({
       );
     case "button":
       return (
-        <Button
-          id={ids.control}
-          variant={row.tone === "danger" ? "danger" : "secondary"}
-          disabled={row.disabled}
-          onClick={row.onAction}
-          aria-describedby={[ids.label, ids.help].filter(Boolean).join(" ")}
-          className="text-help font-semibold"
-        >
-          {row.actionLabel}
-        </Button>
+        <>
+          {dirty ? <StatusDot status="dirty" size="sm" label={null} /> : null}
+          <Button
+            id={ids.control}
+            variant={row.tone === "danger" ? "danger" : "secondary"}
+            disabled={row.disabled}
+            onClick={row.onAction}
+            aria-describedby={[ids.label, ids.help].filter(Boolean).join(" ")}
+            className="text-help font-semibold"
+          >
+            {row.actionLabel}
+          </Button>
+        </>
       );
+    case "custom":
+      return <>{row.children}</>;
     default: {
       const unhandled: never = row;
       return unhandled;
@@ -218,30 +238,43 @@ const SettingControl = <T extends string>({
   }
 };
 
+/**
+ * `aria-describedby` for a custom row's control: its help and error ids,
+ * which a custom row derives from `controlId`.
+ */
+export const settingRowDescribedBy = (
+  controlId: string,
+  { help, error }: { help?: boolean; error?: boolean },
+): string | undefined =>
+  [help && `${controlId}-help`, error && `${controlId}-error`]
+    .filter(Boolean)
+    .join(" ") || undefined;
+
 export const SettingRow = <T extends string = string>(
   props: SettingRowProps<T>,
 ) => {
   const { t } = useTranslation("ui");
-  const baseId = useId();
+  const generatedId = useId();
+  // A custom row's control sets its own aria-describedby, so the help and
+  // error ids follow its id (see settingRowDescribedBy).
+  const baseId =
+    props.kind === "custom" && props.controlId ? props.controlId : generatedId;
+  const helpId = props.help ? `${baseId}-help` : undefined;
+  const errorId = props.error ? `${baseId}-error` : undefined;
+  const describedBy = [helpId, errorId].filter(Boolean).join(" ") || undefined;
   const ids: ControlIds = {
     control: `${baseId}-control`,
     label: `${baseId}-label`,
-    help: props.help ? `${baseId}-help` : undefined,
+    help: describedBy,
   };
   // Labels point at the control when it is a single labelable element.
   const labelFor =
     props.kind === "switch" || props.kind === "select" || props.kind === "text"
       ? ids.control
-      : undefined;
-
-  const labelText = (
-    <>
-      {props.label}
-      {props.dirty ? (
-        <span className="sr-only"> ({t("primitives.unsavedChanges")})</span>
-      ) : null}
-    </>
-  );
+      : props.kind === "custom"
+        ? props.controlId
+        : undefined;
+  const stacked = props.kind === "custom" && props.stacked === true;
 
   return (
     <div
@@ -251,23 +284,42 @@ export const SettingRow = <T extends string = string>(
         props.className,
       )}
     >
-      <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-0.5">
+      <div
+        className={cn(
+          "flex min-w-0 flex-col gap-0.5",
+          stacked ? "w-full" : "flex-[1_1_260px]",
+        )}
+      >
         {labelFor ? (
           <label id={ids.label} htmlFor={labelFor} className="font-medium">
-            {labelText}
+            {props.label}
           </label>
         ) : (
           <span id={ids.label} className="font-medium">
-            {labelText}
+            {props.label}
           </span>
         )}
+        {/* Outside the label, so the control's accessible name stays the label. */}
+        {props.dirty ? (
+          <span className="sr-only"> ({t("primitives.unsavedChanges")})</span>
+        ) : null}
         {props.help ? (
-          <span id={ids.help} className="text-help leading-snug text-muted">
+          <span id={helpId} className="text-help leading-snug text-muted">
             {props.help}
           </span>
         ) : null}
+        {props.error ? (
+          <span id={errorId} className="text-help leading-snug text-danger">
+            {props.error}
+          </span>
+        ) : null}
       </div>
-      <div className="flex min-w-0 flex-[0_1_auto] flex-wrap items-center gap-2">
+      <div
+        className={cn(
+          "flex min-w-0 flex-wrap items-center gap-2",
+          stacked ? "w-full" : "flex-[0_1_auto]",
+        )}
+      >
         <SettingControl row={props} ids={ids} />
       </div>
     </div>

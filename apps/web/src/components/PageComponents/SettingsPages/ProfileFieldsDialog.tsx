@@ -78,7 +78,7 @@ export const ProfileFieldsDialog = ({
         </>
       }
     >
-      <div className="flex flex-col gap-3 border-y border-slate-200 py-4 dark:border-slate-700">
+      <div className="flex flex-col gap-3 border-y border-subtle py-4">
         {PROFILE_FIELDS.map((field) => {
           const notApplied = mode === "import" && NOT_IMPORTED.includes(field);
           // The key lives in the configuration's security section.
@@ -92,7 +92,7 @@ export const ProfileFieldsDialog = ({
               >
                 {t(`settingsPages.backup.fields.${field}`)}
                 {notApplied && available[field] && (
-                  <span className="ml-2 text-slate-500 dark:text-slate-400">
+                  <span className="ml-2 text-muted">
                     ({t("settingsPages.backup.notApplied")})
                   </span>
                 )}
@@ -100,9 +100,9 @@ export const ProfileFieldsDialog = ({
               {field === "privateKey" && available.privateKey && (
                 <p
                   role="note"
-                  className="ml-9 flex gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 p-2 text-xs"
+                  className="ml-9 flex gap-2 rounded-md border border-warning bg-warning p-2 text-meta text-warning"
                 >
-                  <TriangleAlertIcon className="size-4 shrink-0 text-amber-600" />
+                  <TriangleAlertIcon className="size-4 shrink-0" />
                   {mode === "import"
                     ? t("settingsPages.backup.privateKeyImportWarning")
                     : t("settingsPages.backup.privateKeyWarning")}
@@ -112,7 +112,7 @@ export const ProfileFieldsDialog = ({
                 mode === "export" &&
                 available.privateKey &&
                 !(enabled && selection.privateKey) && (
-                  <p className="ml-9 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="ml-9 text-meta text-muted">
                     {t("settingsPages.backup.privateKeyExcludedNote")}
                   </p>
                 )}

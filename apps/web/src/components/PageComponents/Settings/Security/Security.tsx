@@ -5,20 +5,29 @@ import {
   RawSecuritySchema,
 } from "@app/validation/config/security.ts";
 import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
-import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { SettingsFieldRow } from "@components/Settings/SettingsFieldRow.tsx";
+import { Button } from "@components/UI/Button.tsx";
+import { ConfirmDialog } from "@components/UI/ConfirmDialog.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import {
+  SettingRow,
+  settingRowDescribedBy,
+} from "@components/UI/SettingRow.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
+import { adminKeySlots, MASKED_KEY } from "@core/settings/securityKeys.ts";
 import { useDevice } from "@core/stores";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
+import { constantSignal } from "@core/kmp/signals.ts";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
-import { type DefaultValues, useForm } from "react-hook-form";
+import { get, type Path, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { LockdownSection } from "./LockdownSection.tsx";
 
@@ -26,24 +35,33 @@ interface SecurityConfigProps {
   onFormInit: DynamicFormFormInit<RawSecurity>;
 }
 
-const EMPTY_RADIO_SIGNAL = {
-  value: {} as { security?: Protobuf.Config.Config_SecurityConfig },
-  peek: () => ({}) as { security?: Protobuf.Config.Config_SecurityConfig },
-  subscribe: () => () => {},
-} as const;
+const EMPTY_RADIO_SIGNAL = constantSignal<{
+  security?: Protobuf.Config.Config_SecurityConfig;
+}>({});
 
+const keyText = (key: Uint8Array | undefined) =>
+  fromByteArray(key ?? new Uint8Array(0));
+
+/** The form's view of the security section: keys as base64. */
 const toFormShape = (
   cfg: Protobuf.Config.Config_SecurityConfig | undefined,
-) => ({
-  ...cfg,
-  privateKey: fromByteArray(cfg?.privateKey ?? new Uint8Array(0)),
-  publicKey: fromByteArray(cfg?.publicKey ?? new Uint8Array(0)),
+): RawSecurity => ({
+  isManaged: cfg?.isManaged ?? false,
+  debugLogApiEnabled: cfg?.debugLogApiEnabled ?? false,
+  serialEnabled: cfg?.serialEnabled ?? false,
+  packetSignaturePolicy:
+    cfg?.packetSignaturePolicy ??
+    Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy.COMPATIBLE,
+  privateKey: keyText(cfg?.privateKey),
+  publicKey: keyText(cfg?.publicKey),
   adminKey: [
-    fromByteArray(cfg?.adminKey?.at(0) ?? new Uint8Array(0)),
-    fromByteArray(cfg?.adminKey?.at(1) ?? new Uint8Array(0)),
-    fromByteArray(cfg?.adminKey?.at(2) ?? new Uint8Array(0)),
+    keyText(cfg?.adminKey?.at(0)),
+    keyText(cfg?.adminKey?.at(1)),
+    keyText(cfg?.adminKey?.at(2)),
   ],
 });
+
+const ADMIN_KEY_FIELDS = ["adminKey.0", "adminKey.1", "adminKey.2"] as const;
 
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
@@ -51,24 +69,29 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   const { config, getEffectiveConfig } = useDevice();
   const editor = useConfigEditor();
   const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
-  const effective =
-    radio.security ??
-    (getEffectiveConfig("security") as
-      | Protobuf.Config.Config_SecurityConfig
-      | undefined);
+  const effective = radio.security ?? getEffectiveConfig("security");
 
   const { t } = useTranslation("config");
   const { metadata } = useDeviceCapabilities();
 
   const formMethods = useForm<RawSecurity>({
     mode: "onChange",
-    defaultValues: toFormShape(config.security) as DefaultValues<RawSecurity>,
+    defaultValues: toFormShape(config.security),
     resolver: createZodResolver(RawSecuritySchema),
     shouldFocusError: false,
     resetOptions: { keepDefaultValues: true },
-    values: toFormShape(effective) as RawSecurity,
+    values: toFormShape(effective),
   });
-  const { setValue, trigger, handleSubmit, formState } = formMethods;
+  const { setValue, trigger, handleSubmit, formState, getFieldState, control } =
+    formMethods;
+  const [privateKey, publicKey, adminKeys] = useWatch({
+    control,
+    name: ["privateKey", "publicKey", "adminKey"],
+  });
+  const [showPrivateKey, setShowPrivateKey] = useState(false);
+  const [editingPrivateKey, setEditingPrivateKey] = useState(false);
+  const [addingSlot, setAddingSlot] = useState<number>();
+  const [removingSlot, setRemovingSlot] = useState<number>();
 
   useEffect(() => {
     onFormInit?.(formMethods);
@@ -92,10 +115,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
         toByteArray(data.adminKey.at(2) ?? ""),
       ],
     };
-    editor.setRadioSection(
-      "security",
-      payload as unknown as Protobuf.Config.Config_SecurityConfig,
-    );
+    editor.setRadioSection("security", payload);
   };
 
   const pkiRegenerate = () => {
@@ -133,13 +153,215 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     [t("security.packetSignaturePolicy.strict")]: PacketSignaturePolicy.STRICT,
   };
 
-  const bits = [
-    {
-      text: t("security.256bit"),
-      value: "32",
-      key: "bit256",
-    },
-  ];
+  /** The translated validation message for a field, as DynamicForm shows it. */
+  const errorText = (name: Path<RawSecurity>): string | undefined => {
+    const error = get(formState.errors, name);
+    if (!error) return undefined;
+    return String(
+      t([`formValidation.${error.type}`, String(error.message)], {
+        ns: "common",
+        ...error.params,
+      }),
+    );
+  };
+
+  const setAdminKey = (index: number, value: string) => {
+    const name = ADMIN_KEY_FIELDS[index];
+    if (!name) return;
+    setValue(name, value, { shouldDirty: true, shouldValidate: true });
+    void handleSubmit(onSubmit)();
+  };
+
+  const slots = adminKeySlots(adminKeys ?? []);
+  const addingField =
+    addingSlot === undefined ? undefined : ADMIN_KEY_FIELDS[addingSlot];
+  const addingError = addingField ? errorText(addingField) : undefined;
+  const isManaged = useWatch({ control, name: "isManaged" });
+  // Removing the last key while managed would lock the radio's settings.
+  const removingLastManagedKey =
+    removingSlot !== undefined && isManaged && slots.filled.length === 1;
+  const adminLabel = (index: number) =>
+    t("securitySection.adminKeyLabel", { number: index + 1 });
+
+  const keyRows = (
+    <>
+      <SettingRow
+        kind="readonlyKey"
+        label={t("security.publicKey.label")}
+        help={t("securitySection.publicKeyHelp")}
+        value={publicKey ?? ""}
+        dirty={getFieldState("publicKey").isDirty}
+        error={errorText("publicKey")}
+      />
+      {editingPrivateKey ? (
+        <SettingsFieldRow
+          label={t("security.privateKey.label")}
+          htmlFor="privateKeyInput"
+          help={t("securitySection.privateKeyHelp")}
+          error={errorText("privateKey")}
+          dirty={getFieldState("privateKey").isDirty}
+        >
+          <Input
+            id="privateKeyInput"
+            className="font-mono"
+            containerClassName="w-full sm:w-[320px]"
+            autoComplete="off"
+            spellCheck={false}
+            value={privateKey ?? ""}
+            aria-invalid={errorText("privateKey") ? true : undefined}
+            aria-describedby={settingRowDescribedBy("privateKeyInput", {
+              help: true,
+              error: Boolean(errorText("privateKey")),
+            })}
+            variant={
+              errorText("privateKey")
+                ? "invalid"
+                : getFieldState("privateKey").isDirty
+                  ? "dirty"
+                  : "default"
+            }
+            onChange={(event) => void updatePublicKey(event.target.value)}
+          />
+          <Button
+            variant="secondary"
+            className="text-help"
+            onClick={() => setEditingPrivateKey(false)}
+          >
+            {t("securitySection.done")}
+          </Button>
+        </SettingsFieldRow>
+      ) : (
+        <SettingRow
+          kind="readonlyKey"
+          label={t("security.privateKey.label")}
+          help={t("securitySection.privateKeyHelp")}
+          value={showPrivateKey ? (privateKey ?? "") : MASKED_KEY}
+          copyable={showPrivateKey}
+          dirty={getFieldState("privateKey").isDirty}
+          error={errorText("privateKey")}
+          actions={
+            <>
+              <Button
+                variant="secondary"
+                className="text-help"
+                aria-pressed={showPrivateKey}
+                onClick={() => setShowPrivateKey((shown) => !shown)}
+              >
+                {showPrivateKey
+                  ? t("securitySection.hide")
+                  : t("securitySection.show")}
+              </Button>
+              <Button
+                variant="secondary"
+                className="text-help"
+                onClick={() => {
+                  setShowPrivateKey(true);
+                  setEditingPrivateKey(true);
+                }}
+              >
+                {t("securitySection.edit")}
+              </Button>
+              <Button
+                variant="secondary"
+                className="text-help text-danger"
+                onClick={() => setPrivateKeyDialogOpen(true)}
+              >
+                {t("button.regenerate")}
+              </Button>
+            </>
+          }
+        />
+      )}
+    </>
+  );
+
+  const adminRows = (
+    <>
+      {slots.filled
+        .filter(({ index }) => index !== addingSlot)
+        .map(({ index, value }) => {
+          const name = ADMIN_KEY_FIELDS[index];
+          return (
+            <SettingRow
+              key={index}
+              kind="readonlyKey"
+              label={adminLabel(index)}
+              help={t("securitySection.adminKeyHelp")}
+              value={value}
+              dirty={name ? getFieldState(name).isDirty : false}
+              error={name ? errorText(name) : undefined}
+              actions={
+                <Button
+                  variant="secondary"
+                  className="text-help text-danger"
+                  aria-label={t("securitySection.removeAdminKey", {
+                    number: index + 1,
+                  })}
+                  onClick={() => setRemovingSlot(index)}
+                >
+                  {t("button.remove")}
+                </Button>
+              }
+            />
+          );
+        })}
+      {addingSlot === undefined ? null : (
+        <SettingsFieldRow
+          label={t("securitySection.newAdminKey")}
+          htmlFor="newAdminKeyInput"
+          help={t("securitySection.newAdminKeyHelp")}
+          error={addingError}
+          dirty
+        >
+          <Input
+            id="newAdminKeyInput"
+            className="font-mono"
+            containerClassName="w-full sm:w-[320px]"
+            autoComplete="off"
+            spellCheck={false}
+            variant={addingError ? "invalid" : "dirty"}
+            aria-invalid={addingError ? true : undefined}
+            aria-describedby={settingRowDescribedBy("newAdminKeyInput", {
+              help: true,
+              error: Boolean(addingError),
+            })}
+            value={adminKeys?.[addingSlot] ?? ""}
+            onChange={(event) => setAdminKey(addingSlot, event.target.value)}
+          />
+          <Button
+            variant="secondary"
+            className="text-help"
+            onClick={() => setAddingSlot(undefined)}
+          >
+            {t("securitySection.done")}
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-help"
+            onClick={() => {
+              setAdminKey(addingSlot, "");
+              setAddingSlot(undefined);
+            }}
+          >
+            {t("securitySection.cancel")}
+          </Button>
+        </SettingsFieldRow>
+      )}
+      {slots.nextEmpty !== undefined && addingSlot === undefined ? (
+        <SettingRow
+          kind="button"
+          label={t("securitySection.addAdminKey")}
+          help={
+            slots.filled.length === 0
+              ? t("securitySection.noAdminKeys")
+              : t("securitySection.addAdminKeyHelp")
+          }
+          actionLabel={t("securitySection.addKey")}
+          onAction={() => setAddingSlot(slots.nextEmpty)}
+        />
+      ) : null}
+    </>
+  );
 
   return (
     <>
@@ -168,105 +390,15 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
             ],
           },
           {
-            label: t("security.directMessageKey.label"),
-            description: t("security.directMessageKey.description"),
-            fields: [
-              {
-                type: "text",
-                name: "publicKey",
-                label: t("security.publicKey.label"),
-                disabled: true,
-                description: t("security.publicKey.description"),
-                properties: {
-                  showCopyButton: true,
-                },
-              },
-              {
-                type: "passwordGenerator",
-                id: "pskInput",
-                name: "privateKey",
-                label: t("security.privateKey.label"),
-                description: t("security.privateKey.description"),
-                bits,
-                devicePSKBitCount: 32,
-                hide: true,
-                inputChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                  updatePublicKey(e.target.value);
-                },
-                actionButtons: [
-                  {
-                    text: t("button.generate"),
-                    onClick: () => setPrivateKeyDialogOpen(true),
-                    variant: "success",
-                  },
-                ],
-                properties: {
-                  showCopyButton: true,
-                  showPasswordToggle: true,
-                },
-              },
-            ],
+            label: t("securitySection.keysCard"),
+            description: t("securitySection.keysCardDescription"),
+            content: keyRows,
+            fields: [],
           },
           {
-            label: t("security.adminKeysCard.label"),
-            description: t("security.adminKeysCard.description"),
-            fields: [
-              {
-                type: "passwordGenerator",
-                name: "adminKey.0",
-                id: "adminKey0Input",
-                label: t("security.primaryAdminKey.label"),
-                description: t("security.primaryAdminKey.description"),
-                bits,
-                devicePSKBitCount: 32,
-                actionButtons: [],
-                properties: { showCopyButton: true },
-              },
-              {
-                type: "passwordGenerator",
-                name: "adminKey.1",
-                id: "adminKey1Input",
-                label: t("security.secondaryAdminKey.label"),
-                description: t("security.secondaryAdminKey.description"),
-                bits,
-                devicePSKBitCount: 32,
-                actionButtons: [],
-                properties: { showCopyButton: true },
-              },
-              {
-                type: "passwordGenerator",
-                name: "adminKey.2",
-                id: "adminKey2Input",
-                label: t("security.tertiaryAdminKey.label"),
-                description: t("security.tertiaryAdminKey.description"),
-                bits,
-                devicePSKBitCount: 32,
-                actionButtons: [],
-                properties: { showCopyButton: true },
-              },
-            ],
-          },
-          {
-            label: t("security.logsCard.label"),
-            description: t("security.logsCard.description"),
-            fields: [
-              {
-                type: "toggle",
-                name: "serialEnabled",
-                label: t("security.serialOutputEnabled.label"),
-                description: t("security.serialOutputEnabled.description"),
-              },
-              {
-                type: "toggle",
-                name: "debugLogApiEnabled",
-                label: t("security.enableDebugLogApi.label"),
-                description: t("security.enableDebugLogApi.description"),
-              },
-            ],
-          },
-          {
-            label: t("security.administration.label"),
-            description: t("security.administration.description"),
+            label: t("securitySection.remoteAdminCard"),
+            description: t("securitySection.remoteAdminCardDescription"),
+            content: adminRows,
             fields: [
               {
                 type: "toggle",
@@ -283,17 +415,55 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
             ],
             footer: <LockdownSection />,
           },
+          {
+            label: t("securitySection.accessCard"),
+            description: t("securitySection.accessCardDescription"),
+            fields: [
+              {
+                type: "toggle",
+                name: "serialEnabled",
+                label: t("security.serialOutputEnabled.label"),
+                description: t("security.serialOutputEnabled.description"),
+              },
+              {
+                type: "toggle",
+                name: "debugLogApiEnabled",
+                label: t("security.enableDebugLogApi.label"),
+                description: t("security.enableDebugLogApi.description"),
+              },
+            ],
+          },
         ]}
       />
-      <PkiRegenerateDialog
-        text={{
-          button: t("button.regenerate"),
-          title: t("pkiRegenerate.title"),
-          description: t("pkiRegenerate.description"),
-        }}
+      <ConfirmDialog
         open={privateKeyDialogOpen}
-        onOpenChange={() => setPrivateKeyDialogOpen((prev) => !prev)}
-        onSubmit={pkiRegenerate}
+        onOpenChange={setPrivateKeyDialogOpen}
+        tone="danger"
+        title={t("pkiRegenerate.title", { ns: "dialog" })}
+        description={t("pkiRegenerate.description", { ns: "dialog" })}
+        confirmLabel={t("button.regenerate")}
+        onConfirm={pkiRegenerate}
+      />
+
+      <ConfirmDialog
+        open={removingSlot !== undefined}
+        onOpenChange={(open) => {
+          if (!open) setRemovingSlot(undefined);
+        }}
+        tone="danger"
+        title={t("securitySection.removeAdminKeyTitle", {
+          number: (removingSlot ?? 0) + 1,
+        })}
+        description={
+          removingLastManagedKey
+            ? t("securitySection.removeLastManagedKey")
+            : t("securitySection.removeAdminKeyDescription")
+        }
+        confirmLabel={t("button.remove")}
+        onConfirm={() => {
+          if (removingSlot !== undefined) setAdminKey(removingSlot, "");
+          setRemovingSlot(undefined);
+        }}
       />
 
       <ManagedModeDialog

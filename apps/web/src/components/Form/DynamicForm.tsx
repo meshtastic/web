@@ -4,9 +4,8 @@ import {
   type FieldProps,
 } from "@components/Form/DynamicFormField.tsx";
 import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
+import { SettingsCard } from "@components/Settings/SettingsCard.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import { Heading } from "@components/UI/Typography/Heading.tsx";
-import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { type ReactNode, useEffect } from "react";
 import {
   type Control,
@@ -62,6 +61,8 @@ export interface DynamicFormProps<T extends FieldValues> {
     valid?: boolean;
     validationText?: string;
     fields: FieldProps<T>[];
+    /** Rows rendered before the fields, e.g. read-only key rows. */
+    content?: ReactNode;
     /** Optional JSX rendered after the field list (e.g. action buttons that
      * reach into the form via useFormContext). */
     footer?: ReactNode;
@@ -139,29 +140,40 @@ export function DynamicForm<T extends FieldValues>({
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-8"
+        className="flex flex-col gap-5"
         {...(submitType === "onSubmit"
           ? { onSubmit: handleSubmit(onSubmit) }
           : { onChange: handleSubmit(onSubmit) })}
       >
         {fieldGroups.map((fieldGroup) => (
-          <div key={fieldGroup.label} className="space-y-8 sm:space-y-5">
-            <div>
-              <Heading as="h4" className="font-medium">
-                {fieldGroup.label}
-              </Heading>
-              <Subtle>{fieldGroup.description}</Subtle>
-              <Subtle className="font-semibold">{fieldGroup?.notes}</Subtle>
-            </div>
-
+          <SettingsCard
+            key={fieldGroup.label}
+            title={fieldGroup.label}
+            description={
+              fieldGroup.notes ? (
+                <>
+                  {fieldGroup.description}
+                  <span className="mt-1 block font-semibold text-secondary">
+                    {fieldGroup.notes}
+                  </span>
+                </>
+              ) : (
+                fieldGroup.description
+              )
+            }
+          >
+            {fieldGroup.content}
             {fieldGroup.fields.map((field) => {
-              const error = get(formState.errors, field.name as string);
+              const error = get(formState.errors, field.name);
+              const fieldState = getFieldState(field.name);
               return (
                 <FieldWrapper
                   key={field.label}
                   label={field.label}
                   fieldName={field.name}
                   description={field.description}
+                  dirty={fieldState.isDirty}
+                  stacked={field.type === "multiSelect"}
                   valid={!error}
                   validationText={
                     error
@@ -178,14 +190,18 @@ export function DynamicForm<T extends FieldValues>({
                     field={field}
                     control={control}
                     disabled={isDisabled(field.disabledBy, field.disabled)}
-                    isDirty={getFieldState(field.name).isDirty}
-                    invalid={getFieldState(field.name).invalid}
+                    isDirty={fieldState.isDirty}
+                    invalid={fieldState.invalid}
                   />
                 </FieldWrapper>
               );
             })}
-            {fieldGroup.footer}
-          </div>
+            {fieldGroup.footer ? (
+              <div className="border-t border-subtle px-4 py-3.5">
+                {fieldGroup.footer}
+              </div>
+            ) : null}
+          </SettingsCard>
         ))}
         {hasSubmitButton && (
           <Button type="submit" variant="outline" disabled={!formState.isValid}>

@@ -1,4 +1,7 @@
-import { SettingRow } from "@components/UI/SettingRow.tsx";
+import {
+  SettingRow,
+  settingRowDescribedBy,
+} from "@components/UI/SettingRow.tsx";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -52,7 +55,8 @@ describe("SettingRow", () => {
       />,
     );
     expect(
-      screen.getByRole("textbox", { name: /Frequency slot/ }).className,
+      // The note sits outside the label, so the name stays the label.
+      screen.getByRole("textbox", { name: "Frequency slot" }).className,
     ).toContain("border-dirty");
     expect(screen.getByText("(Unsaved changes)")).toBeTruthy();
   });
@@ -123,5 +127,61 @@ describe("SettingRow", () => {
     expect(described).toEqual(["Reset node database", "Forgets every node."]);
     fireEvent.click(button);
     expect(onAction).toHaveBeenCalledOnce();
+  });
+
+  it("button: a dirty row shows the amber mark", () => {
+    const { container } = render(
+      <SettingRow
+        kind="button"
+        label="Position"
+        dirty
+        actionLabel="Open"
+        onAction={vi.fn()}
+      />,
+    );
+    expect(container.querySelector(".bg-dirty")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Open" })).toBeTruthy();
+  });
+
+  it("custom: labels the supplied control and shows its error", () => {
+    render(
+      <SettingRow
+        kind="custom"
+        label="Latitude"
+        controlId="lat"
+        help="Degrees."
+        error="Too precise"
+        stacked
+      >
+        <input
+          id="lat"
+          aria-describedby={settingRowDescribedBy("lat", {
+            help: true,
+            error: true,
+          })}
+        />
+      </SettingRow>,
+    );
+    const input = screen.getByRole("textbox", { name: "Latitude" });
+    expect(input).toHaveAccessibleDescription("Degrees. Too precise");
+    expect(screen.getByText("Too precise").className).toContain("text-danger");
+  });
+
+  it("text: an error marks the input invalid and describes it", () => {
+    render(
+      <SettingRow
+        kind="text"
+        label="Long name"
+        value="x"
+        error="Too long"
+        onValueChange={vi.fn()}
+      />,
+    );
+    const input = screen.getByRole("textbox", { name: "Long name" });
+    expect(input.className).toContain("border-danger-strong");
+    const described = (input.getAttribute("aria-describedby") ?? "")
+      .split(" ")
+      .map((id) => document.getElementById(id)?.textContent);
+    expect(described).toContain("Too long");
   });
 });

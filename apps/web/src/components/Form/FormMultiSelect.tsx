@@ -20,6 +20,17 @@ export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
   };
 }
 
+/** An option with its own label key, like the position flags. */
+const isFlagConfig = (
+  value: unknown,
+): value is { readonly value: number; readonly i18nKey: string } =>
+  typeof value === "object" &&
+  value !== null &&
+  "i18nKey" in value &&
+  typeof value.i18nKey === "string" &&
+  "value" in value &&
+  typeof value.value === "number";
+
 export function MultiSelectInput<T extends FieldValues>({
   field,
   isDirty,
@@ -28,33 +39,20 @@ export function MultiSelectInput<T extends FieldValues>({
   const { t } = useTranslation("config");
   const { enumValue, className, ...remainingProperties } = field.properties;
 
-  const isNewConfigStructure =
-    typeof Object.values(enumValue)[0] === "object" &&
-    Object.values(enumValue)[0] !== null &&
-    "i18nKey" in Object.values(enumValue)[0];
-
   const optionsToRender = Object.entries(enumValue).map(
-    ([key, configOrValue]) => {
-      if (isNewConfigStructure) {
-        const config =
-          configOrValue as (typeof FLAGS_CONFIG)[keyof typeof FLAGS_CONFIG];
-        return {
-          key,
-          display: t(config.i18nKey),
-          value: config.value,
-        };
-      }
-      return { key, display: key, value: configOrValue as number };
-    },
+    ([key, configOrValue]) =>
+      isFlagConfig(configOrValue)
+        ? { key, display: t(configOrValue.i18nKey), value: configOrValue.value }
+        : { key, display: key, value: configOrValue },
   );
 
   return (
     <MultiSelect
       className={cn([
         className,
-        "rounded-md",
-        isDirty ? "focus:ring-sky-500 ring-sky-500 ring-2 ring-offset-5" : "",
-        invalid ? "focus:ring-red-500 ring-red-500 ring-2 ring-offset-5" : "",
+        "rounded-control",
+        isDirty && "outline-2 outline-offset-4 outline-dirty",
+        invalid && "outline-2 outline-offset-4 outline-danger-strong",
       ])}
       {...remainingProperties}
     >

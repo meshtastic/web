@@ -62,4 +62,25 @@ describe("routes", () => {
     );
     expect(offenders).toEqual([]);
   });
+
+  it.each(["/settings/firmware", "/settings/help"])(
+    "%s opens its settings section without the tab bar",
+    async (path) => {
+      const router = await load(path);
+      expect(router.state.location.pathname).toBe(path);
+      const leaf = router.state.matches.at(-1);
+      expect(leaf?.routeId).toBe(path);
+      expect(leaf?.staticData).toEqual({ hideTabBar: true });
+    },
+  );
+
+  it("keeps ?tab= on device and module settings", async () => {
+    const router = await load("/settings/device?tab=position");
+    expect(router.state.location.search).toEqual({ tab: "position" });
+  });
+
+  it("/settings/radio redirects to LoRa", async () => {
+    const router = await load("/settings/radio");
+    expect(router.state.location.pathname).toBe("/settings/lora");
+  });
 });

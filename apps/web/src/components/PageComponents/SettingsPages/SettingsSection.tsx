@@ -1,35 +1,30 @@
-import { Label } from "@components/UI/Label.tsx";
-import { Heading } from "@components/UI/Typography/Heading.tsx";
-import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { cn } from "@core/utils/cn.ts";
+import { SettingsCard } from "@components/Settings/SettingsCard.tsx";
+import { SettingsFieldRow } from "@components/Settings/SettingsFieldRow.tsx";
 import type { ReactNode } from "react";
 
-/** The stack of groups on a settings page, spaced like DynamicForm. */
+/** The stack of cards on a settings page. */
 export const SettingsSections = ({ children }: { children: ReactNode }) => (
-  <div className="space-y-8">{children}</div>
+  <div className="flex flex-col gap-5">{children}</div>
 );
 
 interface SettingsGroupProps {
   title: string;
   description?: ReactNode;
+  /** `danger` for the red Danger zone card. */
+  tone?: "default" | "danger";
   children?: ReactNode;
 }
 
-/** A titled group of rows, matching a DynamicForm field group. */
+/** A titled card of rows, matching a DynamicForm field group. */
 export const SettingsGroup = ({
   title,
   description,
+  tone,
   children,
 }: SettingsGroupProps) => (
-  <section className="space-y-8 sm:space-y-5">
-    <div>
-      <Heading as="h4" className="font-medium">
-        {title}
-      </Heading>
-      {description && <Subtle>{description}</Subtle>}
-    </div>
+  <SettingsCard title={title} description={description} tone={tone}>
     {children}
-  </section>
+  </SettingsCard>
 );
 
 interface SettingsRowProps {
@@ -37,38 +32,32 @@ interface SettingsRowProps {
   /** Id of the control, so the label focuses it. */
   htmlFor?: string;
   description?: ReactNode;
-  destructive?: boolean;
+  /** Put the control under the label, for wide controls. */
+  stacked?: boolean;
   children?: ReactNode;
 }
 
-/** A label, description and control, laid out like FieldWrapper. */
+/** A label, description and control, laid out like a form field row. */
 export const SettingsRow = ({
   label,
   htmlFor,
   description,
-  destructive,
+  stacked,
   children,
 }: SettingsRowProps) => (
-  <div className="pt-6 sm:pt-5">
-    <div className="grid grid-cols-1 lg:grid-cols-[0.6fr_2fr_.1fr] sm:items-baseline gap-4">
-      <Label
-        htmlFor={htmlFor}
-        className={cn(destructive && "text-red-600 dark:text-red-400")}
-      >
-        {label}
-      </Label>
-      <div className="max-w-3xl">
-        {description && (
-          <div className="text-sm text-slate-500 dark:text-slate-400">
-            {description}
-          </div>
-        )}
-        {children && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {children}
-          </div>
-        )}
-      </div>
-    </div>
+  <SettingsFieldRow
+    label={label}
+    htmlFor={htmlFor}
+    help={description}
+    stacked={stacked}
+  >
+    {children}
+  </SettingsFieldRow>
+);
+
+/** Free content inside a settings card (lists, logs), padded like a row. */
+export const SettingsBlock = ({ children }: { children: ReactNode }) => (
+  <div className="flex flex-col gap-3 border-t border-subtle px-4 py-3.5 first:border-t-0">
+    {children}
   </div>
 );

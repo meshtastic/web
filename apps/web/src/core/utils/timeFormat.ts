@@ -47,6 +47,19 @@ export const getRelativeTimeParts = (
   return { value: Math.round(diffSeconds / 31_536_000) + 0, unit: "year" };
 };
 
+const relativeFormatters = new Map<string, Intl.RelativeTimeFormat>();
+
+/** One formatter per locale: constructing them is costly in long lists. */
+const relativeFormatter = (locale: string): Intl.RelativeTimeFormat => {
+  const cached = relativeFormatters.get(locale);
+  if (cached) {
+    return cached;
+  }
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  relativeFormatters.set(locale, formatter);
+  return formatter;
+};
+
 /** "5 minutes ago", "yesterday", "in 2 hours". */
 export const formatRelativeTime = (
   date: TimeInput,
@@ -54,10 +67,7 @@ export const formatRelativeTime = (
   locale: string,
 ): string => {
   const { value, unit } = getRelativeTimeParts(date, now);
-  return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(
-    value,
-    unit,
-  );
+  return relativeFormatter(locale).format(value, unit);
 };
 
 /** Wall-clock time in the locale's short style: "9:40 AM" / "09:40". */

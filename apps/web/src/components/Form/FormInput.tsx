@@ -1,8 +1,10 @@
+import { settingRowDescribedBy } from "@components/UI/SettingRow.tsx";
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
 import { Input } from "@components/UI/Input.tsx";
+import type { TextLimitSpec } from "@core/utils/textLimit.ts";
 import type { ChangeEventHandler } from "react";
 import { type FieldValues, useController } from "react-hook-form";
 
@@ -23,6 +25,11 @@ export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
     };
     showPasswordToggle?: boolean;
     showCopyButton?: boolean;
+    /**
+     * Live `used/max` counter that turns red when over, without blocking
+     * input (validation reports it). Radio strings count UTF-8 bytes.
+     */
+    limit?: TextLimitSpec;
   };
 }
 
@@ -31,7 +38,15 @@ export function GenericInput<T extends FieldValues>({
   disabled,
   field,
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
-  const { fieldLength, ...restProperties } = field.properties || {};
+  const { fieldLength, limit, ...restProperties } = field.properties || {};
+  // A byte/char `limit` shows a counter and lets validation report the
+  // overflow; the older `fieldLength` caps typing at a character count.
+  const blockingLength = limit ? undefined : fieldLength;
+  const counterLimit: TextLimitSpec | undefined =
+    limit ??
+    (fieldLength?.showCharacterCount && fieldLength.max
+      ? { max: fieldLength.max, mode: "chars" }
+      : undefined);
 
   const {
     field: controllerField,
@@ -40,18 +55,15 @@ export function GenericInput<T extends FieldValues>({
     name: field.name,
     control,
     rules: {
-      minLength: field.properties?.fieldLength?.min,
-      maxLength: field.properties?.fieldLength?.max,
+      minLength: blockingLength?.min,
+      maxLength: blockingLength?.max,
     },
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
 
-    if (
-      field.properties?.fieldLength?.max &&
-      newValue.length > field.properties.fieldLength.max
-    ) {
+    if (blockingLength?.max && newValue.length > blockingLength.max) {
       return;
     }
 
@@ -64,20 +76,18 @@ export function GenericInput<T extends FieldValues>({
     controllerField.onChange(newValue);
   };
 
-  const currentLength = controllerField.value
-    ? String(controllerField.value).length
-    : 0;
+  const value =
+    controllerField.value === undefined || controllerField.value === null
+      ? ""
+      : String(controllerField.value);
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full sm:w-[320px]">
       <Input
         type={field.type}
         step={field.properties?.step}
-        value={
-          controllerField.value === undefined || controllerField.value === null
-            ? ""
-            : String(controllerField.value)
-        }
+        value={value}
+        limit={counterLimit}
         id={field.name}
         onChange={handleInputChange}
         showCopyButton={field.properties?.showCopyButton}
@@ -85,16 +95,15 @@ export function GenericInput<T extends FieldValues>({
           field.properties?.showPasswordToggle || field.type === "password"
         }
         className={field.properties?.className}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={settingRowDescribedBy(field.name, {
+          help: Boolean(field.description),
+          error: Boolean(error),
+        })}
         {...restProperties}
         disabled={disabled}
         variant={error ? "invalid" : isDirty ? "dirty" : "default"}
       />
-
-      {fieldLength?.showCharacterCount && fieldLength.max && (
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-sm text-slate-900 dark:text-slate-200">
-          {currentLength}/{fieldLength.max}
-        </div>
-      )}
     </div>
   );
 }

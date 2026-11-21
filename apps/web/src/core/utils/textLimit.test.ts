@@ -86,4 +86,13 @@ describe("evaluateTextLimit", () => {
       over: false,
     });
   });
+
+  it("counts the trimmed text when the field is saved trimmed", () => {
+    expect(
+      evaluateTextLimit("  abc  ", { max: 3, mode: "bytes", trim: true }),
+    ).toMatchObject({ used: 3, over: false });
+    expect(evaluateTextLimit("  abc  ", { max: 3, mode: "bytes" }).over).toBe(
+      true,
+    );
+  });
 });

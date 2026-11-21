@@ -33,11 +33,13 @@ const presetName = (preset: number) =>
     .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
     .join(" ");
 
-interface Option {
-  value: number;
+interface Option<V extends number = number> {
+  value: V;
   label: string;
   disabled?: boolean;
 }
+
+type PresetValue = MeshBeaconTargetValidation["preset"];
 
 interface MeshBeaconTargetsProps {
   onSubmit: SubmitHandler<MeshBeaconValidation>;
@@ -98,8 +100,8 @@ export const MeshBeaconTargets = ({
             disabled: true,
           });
         }
-        const presetOptions: Option[] = [
-          defaultOption,
+        const presetOptions: Option<PresetValue>[] = [
+          { ...defaultOption, value: TARGET_DEFAULT },
           ...presets.map((p) => ({ value: p, label: presetName(p) })),
         ];
         if (!presetOptions.some((o) => o.value === target.preset)) {
@@ -115,7 +117,7 @@ export const MeshBeaconTargets = ({
         return (
           <div
             key={field.id}
-            className="space-y-3 border-b border-slate-200 pb-6 last:border-b-0 dark:border-slate-700"
+            className="space-y-3 border-b border-subtle pb-6 last:border-b-0"
           >
             <p className="text-sm font-medium">
               {t("meshBeacon.targets.target", { number: index + 1 })}
@@ -151,7 +153,7 @@ export const MeshBeaconTargets = ({
                   onChange={(preset) => {
                     update(index, {
                       ...target,
-                      preset: preset as MeshBeaconTargetValidation["preset"],
+                      preset,
                     });
                     stage();
                   }}
@@ -193,24 +195,28 @@ export const MeshBeaconTargets = ({
   );
 };
 
-interface TargetSelectProps {
+interface TargetSelectProps<V extends number> {
   id: string;
-  value: number;
-  options: Option[];
+  value: V;
+  options: readonly Option<V>[];
   disabled?: boolean;
-  onChange: (value: number) => void;
+  onChange: (value: V) => void;
 }
 
-const TargetSelect = ({
+const TargetSelect = <V extends number>({
   id,
   value,
   options,
   disabled,
   onChange,
-}: TargetSelectProps) => (
+}: TargetSelectProps<V>) => (
   <Select
     value={value.toString()}
-    onValueChange={(next) => onChange(Number.parseInt(next, 10))}
+    onValueChange={(next) => {
+      // Hand back the option's own value, keeping its type.
+      const option = options.find((o) => o.value.toString() === next);
+      if (option) onChange(option.value);
+    }}
     disabled={disabled}
   >
     <SelectTrigger id={id}>
