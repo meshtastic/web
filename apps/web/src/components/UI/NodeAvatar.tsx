@@ -31,11 +31,11 @@ const avatarVariants = cva(
         "2xl": "size-20 text-header-lg font-bold",
       },
       shape: {
-        circle: "rounded-full",
+        squircle: "rounded-squircle",
         rounded: "rounded-card",
       },
     },
-    defaultVariants: { size: "md", shape: "circle" },
+    defaultVariants: { size: "md", shape: "squircle" },
   },
 );
 
@@ -53,7 +53,7 @@ export interface NodeAvatarProps {
   initials: string;
   tone: AvatarTone;
   size?: AvatarSize;
-  shape?: "circle" | "rounded";
+  shape?: "squircle" | "rounded";
   /**
    * Accessible name. Omit when the name is shown next to the avatar, which
    * then stays decorative.
@@ -82,7 +82,7 @@ export const NodeAvatar = ({
   initials,
   tone,
   size = "md",
-  shape = "circle",
+  shape = "squircle",
   label,
   presence,
   presenceLabel,

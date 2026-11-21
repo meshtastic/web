@@ -518,6 +518,22 @@ body {
   }
 }
 
+/*
+ * Squircle avatar shape (CSS corner-shape, Chrome 139+). A squircle corner
+ * needs twice the radius of a circular one to look as round, so the full
+ * superellipse is 50% with `corner-shape: squircle`; browsers without it
+ * get a 25% rounded square, the same overall roundness.
+ * See https://orgpad.info/blog/squircles.
+ */
+@utility rounded-squircle {
+  border-radius: 25%;
+
+  @supports (corner-shape: squircle) {
+    border-radius: 50%;
+    corner-shape: squircle;
+  }
+}
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
