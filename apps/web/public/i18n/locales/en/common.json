@@ -68,6 +68,17 @@
     "record": { "one": "Records", "plural": "Records" },
     "degree": { "one": "Degree", "plural": "Degrees", "suffix": "°" }
   },
+  "interval": {
+    "seconds_one": "{{count}} second",
+    "seconds_other": "{{count}} seconds",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "alwaysOn": "Always on",
+    "off": "Off",
+    "deviceDefault": "Device default"
+  },
   "security": {
     "0bit": "Empty",
     "8bit": "8 bit",
