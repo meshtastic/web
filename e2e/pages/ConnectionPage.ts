@@ -65,21 +65,9 @@ export class ConnectionPage {
     });
     await save.click();
 
-    // The drawer closes itself when the radio finished connecting before the
-    // save returned; otherwise it goes back to the saved list, where the entry
-    // turns "connected", and stays open until closed.
-    const connected = drawer
-      .getByRole("article", { name })
-      .getByText("connected", { exact: true })
-      .filter({ visible: true });
-    const close = drawer.getByRole("button", { name: "Close connections" });
-    await expect(async () => {
-      if (await connected.isVisible()) {
-        await close.click();
-      }
-      await expect(drawer).toHaveCount(0, { timeout: 2_000 });
-    }).toPass({ timeout: 60_000 });
-    await expect(this.deviceStatus().first()).toBeVisible({ timeout: 30_000 });
+    // Saving closes the drawer, even while the radio is still connecting.
+    await expect(drawer).toHaveCount(0);
+    await expect(this.deviceStatus().first()).toBeVisible({ timeout: 60_000 });
     await expect(page).toHaveURL(/\/messages$/);
   }
 

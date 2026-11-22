@@ -101,7 +101,7 @@ export function useWizardConnection(
       const conn = await addConnectionAndConnect(input, handle);
       created.current.add(conn.id);
       setAttemptId(conn.id);
-      // The returned object predates the connect; read the outcome live.
+      // Read the outcome from the store, the source of truth for status.
       const after = liveConnection(conn.id);
       if (after?.status === "error") {
         dispatch({ type: "connectFailed", detail: after.error });

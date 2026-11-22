@@ -728,7 +728,9 @@ export function useConnections() {
       if (opts?.keep && savedConnection(conn.id)?.pending) {
         updateSavedConnection(conn.id, { pending: undefined });
       }
-      return conn;
+      // The saved entry as the attempt left it, so callers see its status;
+      // a failed attempt that was not kept is gone, leaving the original.
+      return savedConnection(conn.id) ?? conn;
     },
     [addSavedConnection, connect, updateSavedConnection],
   );

@@ -463,6 +463,32 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     kmp.holdFactory = undefined;
   });
 
+  it("returns the saved connection with the status the attempt reached", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = await act(() =>
+      result.current.addConnectionAndConnect({
+        type: "http",
+        name: "Radio",
+        url: "http://192.168.1.10",
+      }),
+    );
+    expect(conn.status).toBe("configured");
+  });
+
+  it("returns an error status when a kept attempt fails", async () => {
+    kmp.connectError = named("transport");
+    const { result } = renderHook(() => useConnections());
+    const conn = await act(() =>
+      result.current.addConnectionAndConnect(
+        { type: "http", name: "Radio", url: "http://192.168.1.10" },
+        undefined,
+        { keep: true },
+      ),
+    );
+    kmp.connectError = undefined;
+    expect(conn.status).toBe("error");
+  });
+
   it("drops earlier unfinished attempts at the same radio once one reaches it", async () => {
     kmp.connectError = named("transport");
     const { result } = renderHook(() => useConnections());

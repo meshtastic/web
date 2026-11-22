@@ -18,6 +18,7 @@ import { AddConnectionForm } from "./AddConnectionForm.tsx";
 import { ConnectionsList } from "./ConnectionsList.tsx";
 import { DrawerResizeHandle } from "./DrawerResizeHandle.tsx";
 import { useDrawerWidth } from "./useDrawerWidth.ts";
+import { closesAfterSave } from "./afterSave.ts";
 
 const iconButtonClasses =
   "inline-flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -176,10 +177,7 @@ function DrawerBody() {
                   interpolation: { escapeValue: false },
                 }),
               });
-              if (
-                created.status === "connected" ||
-                created.status === "configured"
-              ) {
+              if (closesAfterSave(created.status)) {
                 closeConnections();
               } else {
                 goBack();
