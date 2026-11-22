@@ -22,16 +22,16 @@ const avatarVariants = cva(
   {
     variants: {
       size: {
-        // Android-style chips: about 2.3 times as wide as tall, corners a
-        // little under a quarter of the height. A node avatar grows past
-        // the minimum width to fit its text.
-        xs: "h-6 text-meta [--avatar-r:6px] [--avatar-min-w:56px]",
-        sm: "h-7 text-meta [--avatar-r:7px] [--avatar-min-w:64px]",
-        md: "h-8 text-help [--avatar-r:8px] [--avatar-min-w:74px]",
-        lg: "h-9 text-help [--avatar-r:9px] [--avatar-min-w:84px]",
-        xl: "h-12 text-header-lg [--avatar-r:12px] [--avatar-min-w:112px]",
+        // Squircles: height, corner radius (a quarter of the height) and
+        // the minimum width of a node avatar, which grows past it to fit
+        // its text.
+        xs: "h-11 text-meta [--avatar-r:11px] [--avatar-min-w:3.5rem]",
+        sm: "h-12 text-meta [--avatar-r:12px] [--avatar-min-w:4rem]",
+        md: "h-[52px] text-help [--avatar-r:13px] [--avatar-min-w:68px]",
+        lg: "h-14 text-help [--avatar-r:14px] [--avatar-min-w:72px]",
+        xl: "h-20 text-header-lg [--avatar-r:20px] [--avatar-min-w:104px]",
         "2xl":
-          "h-14 text-header-lg font-bold [--avatar-r:14px] [--avatar-min-w:128px]",
+          "h-24 text-header-lg font-bold [--avatar-r:24px] [--avatar-min-w:124px]",
       },
       shape: {
         squircle: "rounded-avatar",
@@ -130,12 +130,13 @@ export const NodeAvatar = ({
         tone.kind === "device" && "bg-device-avatar text-on-device-avatar",
         tone.kind === "channel" &&
           "bg-accent-tint text-accent text-header-lg font-bold",
-        // Avatars with initials are wider than tall, like the Android app,
-        // and grow so a full four-character short name always shows; the
-        // channel "#" stays square.
+        // Avatars with initials are a little wider than tall and grow so a
+        // full four-character short name always shows, with side padding
+        // that keeps the text clear of the curved corners; the channel "#"
+        // stays square.
         tone.kind === "channel"
           ? "aspect-square"
-          : "min-w-(--avatar-min-w) px-2",
+          : "min-w-(--avatar-min-w) px-3",
         nodeColors && "bg-(--avatar-bg)",
         nodeColors && "text-avatar-contrast",
         className,
