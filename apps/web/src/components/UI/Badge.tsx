@@ -2,18 +2,22 @@ import { cn } from "@core/utils/cn.ts";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 
+/**
+ * Small status pill (role, "MQTT", "Admin", ...). `secondary` and
+ * `destructive` are kept from the previous API.
+ */
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2",
+  "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-meta font-medium whitespace-nowrap",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-slate-900 text-white hover:bg-slate-900/80 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/80",
-        secondary:
-          "border-transparent bg-slate-100 text-slate-900 hover:bg-slate-100/80 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-800/80",
-        destructive:
-          "border-transparent bg-red-500 text-white hover:bg-red-500/80 dark:bg-red-900 dark:text-red-50 dark:hover:bg-red-900/80",
-        outline: "text-slate-900 dark:text-slate-100",
+        default: "border-transparent bg-raised text-secondary",
+        secondary: "border-transparent bg-raised text-secondary",
+        accent: "border-accent-tint bg-accent-tint text-on-accent-tint",
+        warning: "border-warning bg-warning text-warning",
+        danger: "border-danger bg-danger text-on-danger",
+        destructive: "border-danger bg-danger text-on-danger",
+        outline: "border-control bg-transparent text-secondary",
       },
     },
     defaultVariants: {

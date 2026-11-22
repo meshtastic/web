@@ -1,9 +1,11 @@
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
+import type { TabBarStaticData } from "@components/Shell/navItems.ts";
 import { useAppStore } from "@core/stores";
 import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
 import ConfigPage from "@pages/Settings/index.tsx";
+import WelcomePage from "@pages/Welcome/index.tsx";
 import {
   createRootRouteWithContext,
   createRoute,
@@ -13,6 +15,10 @@ import {
 import type { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
+
+declare module "@tanstack/react-router" {
+  interface StaticDataRouteOption extends TabBarStaticData {}
+}
 
 interface AppContext {
   stores: {
@@ -29,8 +35,8 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   loader: () => {
-    // Redirect to the broadcast messages page on initial load
-    return redirect({ to: "/messages/broadcast/0", replace: true });
+    // Messages is the home screen; with nothing selected it shows the Chats list.
+    return redirect({ to: "/messages", replace: true });
   },
 });
 
@@ -38,31 +44,27 @@ const messagesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages",
   component: MessagesPage,
-  beforeLoad: ({ params }) => {
-    const DEFAULT_CHANNEL = 0;
+});
 
-    if (Object.values(params).length === 0) {
-      throw redirect({
-        to: `/messages/broadcast/${DEFAULT_CHANNEL}`,
-        replace: true,
-      });
-    }
-  },
+const conversationParamsSchema = z.object({
+  type: z.enum(["direct", "broadcast"]),
+  chatId: z.coerce.number().int().min(0).max(4294967294), // max is 0xffffffff - 1
 });
 
 export const messagesWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages/$type/$chatId",
   component: MessagesPage,
-  parseParams: (params) => ({
-    type: z
-      .enum(["direct", "broadcast"])
-      .refine((val) => val === "direct" || val === "broadcast", {
-        message: 'Type must be "direct" or "broadcast".',
-      })
-      .parse(params.type),
-    chatId: z.coerce.number().int().min(0).max(4294967294).parse(params.chatId), // max is 0xffffffff - 1
-  }),
+  // A conversation is a full screen on mobile, so the tab bar steps aside.
+  staticData: { hideTabBar: true },
+  // A malformed link goes to the Chats list rather than the crash screen.
+  parseParams: (params) => {
+    const parsed = conversationParamsSchema.safeParse(params);
+    if (!parsed.success) {
+      throw redirect({ to: "/messages", replace: true });
+    }
+    return parsed.data;
+  },
 });
 
 const mapRoute = createRoute({
@@ -97,7 +99,13 @@ export const mapWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map/$long/$lat/$zoom",
   component: MapPage,
-  parseParams: (raw) => coordParamsSchema.parse(raw),
+  parseParams: (raw) => {
+    const parsed = coordParamsSchema.safeParse(raw);
+    if (!parsed.success) {
+      throw redirect({ to: "/map", replace: true });
+    }
+    return parsed.data;
+  },
   // // This controls how params are serialized when you navigate/link
   // stringifyParams: (p) => ({
   //   long: String(p.long),
@@ -116,18 +124,25 @@ const settingsTabSearchSchema = z.object({
   tab: z.string().optional(),
 });
 
-const settingsPage = (path: string) =>
+// A section is a full screen on mobile (back returns to the Settings
+// list), so it hides the tab bar there.
+// Generic over the literal path, so `/settings/<section>` is in the route
+// tree's types and links to it are checked.
+const settingsPage = <const P extends string>(path: P) =>
   createRoute({
     getParentRoute: () => settingsRoute,
     path,
     component: ConfigPage,
+    staticData: { hideTabBar: true },
   });
 
-const settingsTabbedPage = (path: string) =>
+// `?tab=` opens a Device configuration subsection or a module.
+const settingsTabbedPage = <const P extends string>(path: P) =>
   createRoute({
     getParentRoute: () => settingsRoute,
     path,
     component: ConfigPage,
+    staticData: { hideTabBar: true },
     validateSearch: (search) => settingsTabSearchSchema.parse(search),
   });
 
@@ -139,10 +154,13 @@ export const deviceRoute = settingsTabbedPage("device");
 export const moduleRoute = settingsTabbedPage("module");
 export const administrationRoute = settingsPage("administration");
 export const backupRestoreRoute = settingsPage("backup");
+export const firmwareRoute = settingsPage("firmware");
 export const cleanNodeDbRoute = settingsPage("clean-nodes");
 export const debugRoute = settingsPage("debug");
 export const appSettingsRoute = settingsPage("app");
+export const messageFilterRoute = settingsPage("message-filter");
 export const aboutRoute = settingsPage("about");
+export const helpRoute = settingsPage("help");
 
 // Radio Config used to group LoRa, Channels and Security.
 const legacyRadioRoute = createRoute({
@@ -151,6 +169,16 @@ const legacyRadioRoute = createRoute({
   beforeLoad: () => {
     throw redirect({ to: "/settings/lora", replace: true });
   },
+});
+
+// First-run setup, also reachable any time to walk through it again. App
+// renders it full screen, outside the shell, and redirects first-time
+// visitors here once the saved connections have loaded.
+export const welcomeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/welcome",
+  component: WelcomePage,
+  staticData: { hideTabBar: true },
 });
 
 const nodesRoute = createRoute({
@@ -190,13 +218,17 @@ export const routeTree = rootRoute.addChildren([
     moduleRoute,
     administrationRoute,
     backupRestoreRoute,
+    firmwareRoute,
     cleanNodeDbRoute,
     debugRoute,
     appSettingsRoute,
+    messageFilterRoute,
     aboutRoute,
+    helpRoute,
     legacyRadioRoute,
   ]),
   nodesRoute,
+  welcomeRoute,
   dialogWithParamsRoute,
   connectionsRoute,
 ]);

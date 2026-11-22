@@ -44,7 +44,6 @@
     "description": "Modify the settings for this connection."
   },
   "toasts": {
-    "connected": "Connected",
     "failed": "Failed to connect",
     "checkConnection": "Check your device or settings and try again",
     "defaultSet": "Default set",
@@ -63,6 +62,13 @@
     "firmwareOutdatedDescription": "This radio runs firmware {{version}}. Some features need {{minimum}} or newer.",
     "storageUnavailable": "Messages won't be saved",
     "storageUnavailableDescription": "The browser couldn't open the app's storage, so messages from this session will be gone after a reload. This can happen in a private window, or with the app open in other tabs."
+  },
+  "noRadio": {
+    "title": "No radio connected",
+    "description": "Connect your Meshtastic radio over Bluetooth, USB or the network to see your messages, nodes and map.",
+    "connect": "Connect a radio",
+    "reconnect": "Reconnect {{name}}",
+    "connecting": "Connecting to {{name}}…"
   },
   "overlay": {
     "title": {
@@ -96,7 +102,8 @@
     "localNetworkPrompt": "Chrome needs your permission to reach the local network. Click Connect to allow it.",
     "handshakeTimeout": "The radio stopped responding during the handshake. It may be in CLI or bootloader mode, or its firmware isn't answering config requests.",
     "reconnectFailed": "Could not reconnect after {{attempts}} attempts.",
-    "connectionLost": "The connection to the radio was lost."
+    "connectionLost": "The connection to the radio was lost.",
+    "openTimeout": "The radio didn't open. Close other tabs or apps using it, or unplug it and plug it back in, then try again."
   },
   "httpTest": {
     "certNotTrusted": "Certificate not trusted. <0>Open in new tab</0> and accept the warning, then test again."

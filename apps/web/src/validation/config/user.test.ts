@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import i18next from "i18next";
+import { describe, expect, it, vi } from "vitest";
 import {
   LONG_NAME_MAX_BYTES,
   NODE_STATUS_MAX_BYTES,
+  SHORT_NAME_MAX_BYTES,
   UserValidationSchema,
 } from "./user.ts";
 
@@ -74,5 +76,40 @@ describe("UserValidationSchema nodeStatus", () => {
     const result = parseStatus(undefined);
     expect(result.success).toBe(true);
     expect(result.data?.nodeStatus).toBe("");
+  });
+});
+
+describe("UserValidationSchema shortName", () => {
+  const parseShort = (shortName: string) =>
+    UserValidationSchema.safeParse({
+      longName: "Node",
+      shortName,
+      isUnmessageable: false,
+      isLicensed: false,
+    });
+
+  it("limits the short name to 4 UTF-8 bytes", () => {
+    expect(SHORT_NAME_MAX_BYTES).toBe(4);
+    expect(parseShort("ABCD").success).toBe(true);
+    expect(parseShort("ABCDE").success).toBe(false);
+  });
+
+  it("counts bytes, not characters", () => {
+    // "é" is 2 bytes: two fit, three (3 characters, 6 bytes) do not.
+    expect(parseShort("éé").success).toBe(true);
+    expect(parseShort("ééé").success).toBe(false);
+    // One emoji is 4 bytes; an emoji plus a letter is 5.
+    expect(parseShort("📡").success).toBe(true);
+    expect(parseShort("📡A").success).toBe(false);
+  });
+
+  it("translates its messages in the config namespace when they fail", () => {
+    const spy = vi.spyOn(i18next, "t");
+    const issue = parseShort("").error?.issues[0];
+    expect(spy).toHaveBeenCalledWith("user.shortName.validation.min", {
+      ns: "config",
+    });
+    expect(issue?.message).toBe("Short name must be at least 2 characters");
+    spy.mockRestore();
   });
 });

@@ -70,6 +70,7 @@ export class FakeKmpClient implements MeshtasticClient {
     to: number;
     channel: number;
     id: number;
+    replyId?: number;
   }> = [];
   readonly packets: Uint8Array[] = [];
   readonly requests: Array<{ kind: string; nodeNum: number }> = [];
@@ -151,9 +152,14 @@ export class FakeKmpClient implements MeshtasticClient {
     return created;
   }
 
-  sendText(text: string, to: number, channel: number): SendHandleJs {
+  sendText(
+    text: string,
+    to: number,
+    channel: number,
+    replyId?: number,
+  ): SendHandleJs {
     const handle = this.handle();
-    this.texts.push({ text, to, channel, id: handle.id });
+    this.texts.push({ text, to, channel, id: handle.id, replyId });
     return handle;
   }
 

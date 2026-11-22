@@ -1,429 +1,289 @@
-import { Avatar } from "@components/UI/Avatar.tsx";
+import type { routeTree } from "@app/routes.tsx";
+import { idleChord, nextChord } from "@core/commandMenu/chords.ts";
 import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@components/UI/Command.tsx";
-import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
-import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
-import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
-import { useAppStore, useDevice, useDeviceStore } from "@core/stores";
-import { cn } from "@core/utils/cn.ts";
-import { isModuleExcluded } from "@core/utils/excludedModules.ts";
-import { visibleDeviceTabs } from "@pages/Settings/DeviceConfig.tsx";
-import { MODULE_TABS } from "@pages/Settings/ModuleConfig.tsx";
-import { useNavigate } from "@tanstack/react-router";
-import { useCommandState } from "cmdk";
+  migratePinnedGroups,
+  togglePinnedGroup,
+} from "@core/commandMenu/pins.ts";
+import { buildResults, type GroupLimits } from "@core/commandMenu/results.ts";
+import { indexCommands, parseQuery } from "@core/commandMenu/search.ts";
+import { isCommandMenuShortcut } from "@core/commandMenu/shortcut.ts";
 import {
-  ArchiveRestoreIcon,
-  ArrowLeftRightIcon,
-  BoxSelectIcon,
-  BugIcon,
-  InfoIcon,
-  LayersIcon,
-  ListIcon,
-  PaletteIcon,
-  RadioTowerIcon,
-  RouterIcon,
-  ShieldAlertIcon,
-  ShieldIcon,
-  UserIcon,
-  CloudOff,
-  EraserIcon,
-  FactoryIcon,
-  HardDriveUpload,
-  LinkIcon,
-  type LucideIcon,
-  MapIcon,
-  MessageSquareIcon,
-  Pin,
-  PlusIcon,
-  PowerIcon,
-  QrCodeIcon,
-  RefreshCwIcon,
-  SettingsIcon,
-  SmartphoneIcon,
-  TrashIcon,
-  UsersIcon,
-} from "lucide-react";
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+  buildRegistry,
+  deviceCommands,
+  nodeCommands,
+  pinCommands,
+} from "@core/commandMenu/sources.ts";
+import type {
+  Command,
+  CommandAction,
+  CommandPageId,
+} from "@core/commandMenu/types.ts";
+import useLocalStorage from "@core/hooks/useLocalStorage.ts";
+import { useToast } from "@core/hooks/useToast.ts";
 import { useActiveClient } from "@core/kmp/hooks";
+import { useAppStore, useDevice, useDeviceStore } from "@core/stores";
+import { useConnections } from "@pages/Connections/useConnections.ts";
+import { type RouteIds, useNavigate } from "@tanstack/react-router";
+import { Result } from "better-result";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { CommandMenuView } from "./CommandMenuView.tsx";
+import { isEditableTarget, isInsidePopup, isPopupOpen } from "./keyTargets.ts";
+import { useRegistryInput } from "./useRegistryInput.ts";
 
-export interface Group {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-  commands: Command[];
-}
-export interface Command {
-  label: string;
-  icon: LucideIcon;
-  action?: () => void;
-  subItems?: SubItem[];
-  tags?: string[];
-}
-export interface SubItem {
-  label: string;
-  icon: React.ReactNode;
-  action: () => void;
-}
+/** Paths a command may open: the router's registered routes. */
+type AppRoutePath = RouteIds<typeof routeTree>;
 
-export const CommandPalette = () => {
-  const {
-    commandPaletteOpen,
-    setCommandPaletteOpen,
-    openConnections,
-    setSelectedDevice,
-  } = useAppStore();
-  const { getDevices } = useDeviceStore();
-  const { setDialogOpen } = useDevice();
-  const connection = useActiveClient();
-  const allNodes = useNodesAsProto();
-  const getNode = (n: number) => allNodes.find((node) => node.num === n);
-  const { pinnedItems, togglePinnedItem } = usePinnedItems({
-    storageName: "pinnedCommandMenuGroups",
-  });
-  const { t } = useTranslation("commandPalette");
-  const navigate = useNavigate({ from: "/" });
-  const { metadata, excludedModules } = useDeviceCapabilities();
+/**
+ * Compile-time guard: every path a command can open must be one of the
+ * above, so a typo in the command registry fails the build.
+ */
+const routePath = <P extends AppRoutePath>(path: P): P => path;
 
-  // Every Settings page, and each Device / Module configuration tab as a
-  // sub-item (shown while searching), from the same lists the pages use.
-  const openSettings = (page: string, tab?: string) => {
-    navigate({ to: `/settings/${page}`, search: tab ? { tab } : {} });
-    setCommandPaletteOpen(false);
-  };
-  const settingsPage = (
-    page: string,
-    labelKey: string,
-    icon: LucideIcon,
-  ): Command => ({
-    label: t(labelKey, { ns: "config" }),
-    icon,
-    action: () => openSettings(page),
-    tags: ["settings", "config"],
-  });
-  const settingsGroup: Group = {
-    id: "settingsGroup",
-    label: t("settings.label"),
-    icon: SettingsIcon,
-    commands: [
-      settingsPage("user", "navigation.user", UserIcon),
-      settingsPage("lora", "navigation.lora", RadioTowerIcon),
-      settingsPage("channels", "navigation.channels", ListIcon),
-      settingsPage("security", "navigation.security", ShieldIcon),
-      {
-        ...settingsPage("device", "navigation.deviceConfiguration", RouterIcon),
-        subItems: visibleDeviceTabs(metadata).map((tab) => ({
-          label: t(tab.labelKey, { ns: "config" }),
-          icon: <RouterIcon size={16} className="mr-2" />,
-          action: () => openSettings("device", tab.key),
-        })),
-      },
-      {
-        ...settingsPage("module", "navigation.moduleConfiguration", LayersIcon),
-        subItems: MODULE_TABS.filter(
-          (tab) => !isModuleExcluded(excludedModules, tab.key),
-        ).map((tab) => ({
-          label: t(tab.labelKey, { ns: "moduleConfig" }),
-          icon: <LayersIcon size={16} className="mr-2" />,
-          action: () => openSettings("module", tab.key),
-        })),
-      },
-      settingsPage(
-        "administration",
-        "navigation.administration",
-        ShieldAlertIcon,
-      ),
-      settingsPage("backup", "navigation.deviceProfile", ArchiveRestoreIcon),
-      settingsPage("clean-nodes", "navigation.cleanNodeDb", EraserIcon),
-      settingsPage("debug", "navigation.debugPanel", BugIcon),
-      settingsPage("app", "navigation.appSettings", PaletteIcon),
-      settingsPage("about", "navigation.about", InfoIcon),
-    ],
-  };
+/** Storage key shared with the previous palette (old ids are migrated). */
+const PINNED_STORAGE_KEY = "pinnedCommandMenuGroups";
 
-  const groups: Group[] = [
-    {
-      id: "gotoGroup",
-      label: t("goto.label"),
-      icon: LinkIcon,
-      commands: [
-        {
-          label: t("goto.command.messages"),
-          icon: MessageSquareIcon,
-          action() {
-            navigate({ to: "/messages" });
-          },
-        },
-        {
-          label: t("goto.command.map"),
-          icon: MapIcon,
-          action() {
-            navigate({ to: "/map" });
-          },
-        },
-        {
-          label: t("goto.command.config"),
-          icon: SettingsIcon,
-          action() {
-            navigate({ to: "/settings" });
-          },
-          tags: ["settings"],
-        },
-        {
-          label: t("goto.command.nodes"),
-          icon: UsersIcon,
-          action() {
-            navigate({ to: "/nodes" });
-          },
-        },
-      ],
-    },
-    {
-      id: "manageGroup",
-      label: t("manage.label"),
-      icon: SmartphoneIcon,
-      commands: [
-        {
-          label: t("manage.command.switchNode"),
-          icon: ArrowLeftRightIcon,
-          subItems: getDevices().map((device) => ({
-            label:
-              getNode(device.hardware.myNodeNum)?.user?.longName ??
-              t("unknown.shortName"),
-            icon: <Avatar nodeNum={device.hardware.myNodeNum} />,
-            action() {
-              setSelectedDevice(device.id);
-            },
-          })),
-        },
-        {
-          label: t("manage.command.connectNewNode"),
-          icon: PlusIcon,
-          action() {
-            openConnections("add");
-            setCommandPaletteOpen(false);
-          },
-        },
-      ],
-    },
-    {
-      id: "contextualGroup",
-      label: t("contextual.label"),
-      icon: BoxSelectIcon,
-      commands: [
-        {
-          label: t("contextual.command.qrCode"),
-          icon: QrCodeIcon,
-          subItems: [
-            {
-              label: t("contextual.command.qrGenerator"),
-              icon: <QrCodeIcon size={16} />,
-              action() {
-                setDialogOpen("QR", true);
-              },
-            },
-            {
-              label: t("contextual.command.qrImport"),
-              icon: <QrCodeIcon size={16} />,
-              action() {
-                setDialogOpen("import", true);
-              },
-            },
-          ],
-        },
-        {
-          label: t("contextual.command.scheduleShutdown"),
-          icon: PowerIcon,
-          action() {
-            setDialogOpen("shutdown", true);
-          },
-        },
-        {
-          label: t("contextual.command.scheduleReboot"),
-          icon: RefreshCwIcon,
-          action() {
-            setDialogOpen("reboot", true);
-          },
-        },
-        {
-          label: t("contextual.command.dfuMode"),
-          icon: HardDriveUpload,
-          action() {
-            connection?.enterDfuMode();
-          },
-        },
-        {
-          label: t("contextual.command.resetNodeDb"),
-          icon: TrashIcon,
-          action() {
-            setDialogOpen("resetNodeDb", true);
-          },
-        },
-        {
-          label: t("contextual.command.disconnect"),
-          icon: CloudOff,
-          action() {
-            connection?.disconnect().catch((error) => {
-              console.error("Failed to disconnect:", error);
-            });
-          },
-        },
-        {
-          label: t("contextual.command.factoryResetDevice"),
-          icon: FactoryIcon,
-          action() {
-            setDialogOpen("factoryResetDevice", true);
-          },
-        },
-        {
-          label: t("contextual.command.factoryResetConfig"),
-          icon: FactoryIcon,
-          action() {
-            setDialogOpen("factoryResetConfig", true);
-          },
-        },
-      ],
-    },
-    {
-      id: "debugGroup",
-      label: t("debug.label"),
-      icon: BugIcon,
-      commands: [
-        {
-          label: t("debug.command.reconfigure"),
-          icon: RefreshCwIcon,
-          action() {
-            void connection?.rehandshake();
-          },
-        },
-        {
-          label: t("debug.command.clearAllStoredMessages"),
-          icon: EraserIcon,
-          action() {
-            setDialogOpen("deleteMessages", true);
-          },
-        },
-        {
-          label: t("debug.command.clearAllStores"),
-          icon: EraserIcon,
-          action() {
-            setDialogOpen("clearAllStores", true);
-          },
-        },
-      ],
-    },
-  ];
-  // Right after "Goto".
-  groups.splice(1, 0, settingsGroup);
-
-  const sortedGroups = [...groups].sort((a, b) => {
-    const aPinned = pinnedItems.includes(a.id) ? 1 : 0;
-    const bPinned = pinnedItems.includes(b.id) ? 1 : 0;
-    return bPinned - aPinned;
-  });
-
-  useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setCommandPaletteOpen(true);
-      }
-    };
-
-    globalThis.addEventListener("keydown", handleKeydown);
-    return () => globalThis.removeEventListener("keydown", handleKeydown);
-  }, [setCommandPaletteOpen]);
-
-  return (
-    <CommandDialog
-      open={commandPaletteOpen}
-      onOpenChange={setCommandPaletteOpen}
-    >
-      <CommandInput placeholder={t("search.commandPalette")} />
-      <CommandList>
-        <CommandEmpty>{t("emptyState")}</CommandEmpty>
-        {sortedGroups.map((group) => (
-          <CommandGroup
-            key={group.label}
-            heading={
-              <div className="flex items-center justify-between">
-                <span>{group.label}</span>
-                <button
-                  type="button"
-                  onClick={() => togglePinnedItem(group.id)}
-                  className={cn(
-                    "transition-all duration-300 scale-100 cursor-pointer p-2 focus:*:data-label:opacity-100",
-                  )}
-                >
-                  <span
-                    data-label
-                    className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-5 opacity-0 rounded-lg"
-                  />
-                  <Pin
-                    size={16}
-                    className={cn(
-                      "transition-opacity",
-                      pinnedItems.includes(group.id)
-                        ? "opacity-100 text-red-500"
-                        : "opacity-40 hover:opacity-70",
-                    )}
-                  />
-                </button>
-              </div>
-            }
-          >
-            {group.commands.map((command) => (
-              <div key={command.label}>
-                <CommandItem
-                  onSelect={() => {
-                    command.action?.();
-                    setCommandPaletteOpen(false);
-                  }}
-                >
-                  <command.icon size={16} className="mr-2" />
-                  {command.label}
-                </CommandItem>
-                {command.subItems?.map((subItem) => (
-                  <SubItem
-                    key={subItem.label}
-                    label={subItem.label}
-                    icon={subItem.icon}
-                    action={subItem.action}
-                  />
-                ))}
-              </div>
-            ))}
-          </CommandGroup>
-        ))}
-      </CommandList>
-    </CommandDialog>
-  );
+/** Pickers list more than the short browsing list, but stay bounded. */
+const pickerLimits: GroupLimits = {
+  browsing: { nodes: 50, commands: 50 },
+  searching: { nodes: 50, commands: 50 },
 };
 
-const SubItem = ({
-  label,
-  icon,
-  action,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  action: () => void;
-}) => {
-  const search = useCommandState((state) => state.search);
-  if (!search) {
-    return null;
-  }
+/**
+ * Global command menu (⌘K / Ctrl+K) and the G-then-letter shortcuts. The
+ * menu's data hooks only mount while it is open.
+ */
+export const CommandPalette = () => {
+  const open = useAppStore((s) => s.commandPaletteOpen);
+  const setOpen = useAppStore((s) => s.setCommandPaletteOpen);
+  const navigate = useNavigate({ from: "/" });
+
+  useEffect(() => {
+    let chord = idleChord;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.isComposing || event.repeat) {
+        return;
+      }
+      if (isCommandMenuShortcut(event)) {
+        event.preventDefault();
+        chord = idleChord;
+        setOpen(!useAppStore.getState().commandPaletteOpen);
+        return;
+      }
+      if (event.defaultPrevented) {
+        return;
+      }
+      const step = nextChord(
+        chord,
+        {
+          key: event.key,
+          metaKey: event.metaKey,
+          ctrlKey: event.ctrlKey,
+          altKey: event.altKey,
+          editable:
+            isEditableTarget(event.target) || isInsidePopup(event.target),
+          blocked: isPopupOpen(document),
+        },
+        event.timeStamp,
+      );
+      chord = step.state;
+      if (step.path) {
+        event.preventDefault();
+        void navigate({ to: routePath(step.path) });
+      }
+    };
+    globalThis.addEventListener("keydown", onKeyDown);
+    return () => globalThis.removeEventListener("keydown", onKeyDown);
+  }, [setOpen, navigate]);
+
+  return open ? <OpenCommandMenu onClose={() => setOpen(false)} /> : null;
+};
+
+/** The menu while it is up: fresh query, list and clock on every open. */
+const OpenCommandMenu = ({ onClose }: { onClose: () => void }) => {
+  const openConnections = useAppStore((s) => s.openConnections);
+  const setSelectedDevice = useAppStore((s) => s.setSelectedDevice);
+  const setNodeNumDetails = useAppStore((s) => s.setNodeNumDetails);
+  const activeConnectionId = useDeviceStore((s) => s.activeConnectionId);
+  const { disconnect } = useConnections();
+  const { setDialogOpen } = useDevice();
+  const connection = useActiveClient();
+  const { toast } = useToast();
+  const { t } = useTranslation("commandPalette");
+  const navigate = useNavigate({ from: "/" });
+  const [storedPins, setStoredPins] = useLocalStorage<string[]>(
+    PINNED_STORAGE_KEY,
+    [],
+  );
+  const pinned = useMemo(() => migratePinnedGroups(storedPins), [storedPins]);
+
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState<CommandPageId | null>(null);
+  // Captured on open so "5 min ago" holds still while the menu is up.
+  const [openedAt] = useState(() => Date.now());
+  // The menu has no trigger element, so remember what had focus.
+  const [returnFocusTo] = useState(() => document.activeElement);
+  const input = useRegistryInput(openedAt);
+
+  // Normalised once per data change; a keystroke only re-scores.
+  const rootIndex = useMemo(() => indexCommands(buildRegistry(input)), [input]);
+  const pinIndex = useMemo(
+    () => indexCommands(pinCommands(t, pinned)),
+    [t, pinned],
+  );
+  const pageIndex = useMemo(() => {
+    switch (page) {
+      case null:
+        return null;
+      case "traceroute":
+        return indexCommands(nodeCommands(input));
+      case "switchDevice":
+        return indexCommands(deviceCommands(input));
+    }
+  }, [page, input]);
+
+  const groups = useMemo(() => {
+    const parsed = parseQuery(query);
+    return pageIndex
+      ? buildResults(pageIndex, parsed, { limits: pickerLimits })
+      : buildResults([...rootIndex, ...pinIndex], parsed, { pinned });
+  }, [query, pageIndex, rootIndex, pinIndex, pinned]);
+
+  const showPage = (next: CommandPageId | null) => {
+    setPage(next);
+    setQuery("");
+  };
+
+  const runAction = (action: CommandAction) => {
+    switch (action.type) {
+      case "openPage":
+        showPage(action.page);
+        return;
+      case "togglePin":
+        setStoredPins(togglePinnedGroup(pinned, action.group));
+        setQuery("");
+        return;
+      case "dialog":
+        setDialogOpen(action.dialog, true);
+        break;
+      case "connectDevice":
+        openConnections("add");
+        break;
+      case "disconnect": {
+        // Through the connection manager, so the saved connection is
+        // marked disconnected rather than lost.
+        const done = activeConnectionId
+          ? disconnect(activeConnectionId)
+          : connection?.disconnect();
+        void Promise.resolve(done).catch((error: unknown) => {
+          console.error("Failed to disconnect:", error);
+        });
+        break;
+      }
+      case "enterDfuMode":
+        void connection?.enterDfuMode();
+        break;
+      case "reconfigure":
+        void connection?.rehandshake();
+        break;
+      case "switchDevice":
+        setSelectedDevice(action.deviceId);
+        break;
+      default: {
+        const unhandled: never = action;
+        return unhandled;
+      }
+    }
+    onClose();
+  };
+
+  const traceroute = (nodeNum: number) => {
+    if (!connection) {
+      toast({ title: t("toast.notConnected"), variant: "destructive" });
+      return;
+    }
+    const failed = () =>
+      toast({ title: t("toast.tracerouteFailed"), variant: "destructive" });
+    toast({ title: t("toast.sendingTraceroute.title", { ns: "ui" }) });
+    connection
+      .traceRoute(nodeNum)
+      .then((result) => {
+        if (Result.isError(result)) {
+          failed();
+        } else {
+          toast({ title: t("toast.tracerouteSent.title", { ns: "ui" }) });
+        }
+      })
+      .catch(failed);
+  };
+
+  const run = (command: Command) => {
+    switch (command.kind) {
+      case "action":
+        runAction(command.action);
+        return;
+      case "navigate":
+        void navigate({
+          to: routePath(command.target.to),
+          search: command.target.search ?? {},
+        });
+        break;
+      case "conversation": {
+        const { target } = command;
+        void navigate({
+          to: routePath("/messages/$type/$chatId"),
+          params:
+            target.type === "broadcast"
+              ? { type: "broadcast", chatId: String(target.channel) }
+              : { type: "direct", chatId: String(target.nodeNum) },
+        });
+        break;
+      }
+      case "node":
+        if (page === "traceroute") {
+          traceroute(command.nodeNum);
+        } else {
+          setNodeNumDetails(command.nodeNum);
+          setDialogOpen("nodeDetails", true);
+        }
+        break;
+      default: {
+        const unhandled: never = command;
+        return unhandled;
+      }
+    }
+    onClose();
+  };
 
   return (
-    <CommandItem onSelect={action}>
-      {icon}
-      {label}
-    </CommandItem>
+    <CommandMenuView
+      open
+      onOpenChange={(next) => {
+        if (!next) {
+          onClose();
+        }
+      }}
+      query={query}
+      onQueryChange={setQuery}
+      groups={groups}
+      page={page}
+      onBack={() => showPage(null)}
+      pinned={pinned}
+      onSelect={run}
+      onCloseAutoFocus={(event) => {
+        event.preventDefault();
+        // Leave focus alone if a command moved it (e.g. opened a dialog).
+        const idle =
+          document.activeElement === null ||
+          document.activeElement === document.body;
+        if (
+          idle &&
+          returnFocusTo instanceof HTMLElement &&
+          returnFocusTo.isConnected
+        ) {
+          returnFocusTo.focus();
+        }
+      }}
+    />
   );
 };

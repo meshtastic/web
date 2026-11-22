@@ -1,17 +1,19 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "../fixtures/test.ts";
 
 /**
  * Mobile responsiveness (meshtastic/web#666).
  *
- * Below the `md` breakpoint the side bars stop being columns and are reached
- * from the header instead. These checks assert the two things that actually
- * break on a phone: the document must never scroll sideways, and nothing that
- * lived in a side bar may become unreachable.
+ * Below the `md` breakpoint the app rail becomes a bottom tab bar, a
+ * conversation takes the whole screen, and side panels open as sheets. These
+ * checks assert the two things that actually break on a phone: the document
+ * must never scroll sideways, and nothing that lived in a side column may
+ * become unreachable.
  */
 test.use({ viewport: { width: 390, height: 844 } });
 
 /** Long-lived reminder toasts overlay the page; clear them before interacting. */
-async function dismissToasts(page: import("@playwright/test").Page) {
+async function dismissToasts(page: Page) {
   const closers = page.locator("[toast-close]");
   for (let i = await closers.count(); i > 0; i = await closers.count()) {
     await closers.first().click();
@@ -20,9 +22,7 @@ async function dismissToasts(page: import("@playwright/test").Page) {
 }
 
 /** The app itself must never scroll sideways, whatever a page puts inside it. */
-async function expectNoHorizontalOverflow(
-  page: import("@playwright/test").Page,
-) {
+async function expectNoHorizontalOverflow(page: Page) {
   const { scrollWidth, clientWidth } = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     clientWidth: document.documentElement.clientWidth,
@@ -30,103 +30,83 @@ async function expectNoHorizontalOverflow(
   expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
 }
 
+const tabBar = (page: Page) => page.getByRole("navigation", { name: "App" });
+
 test.describe("mobile layout", () => {
   test.beforeEach(async ({ page, connectionPage, device }) => {
     await connectionPage.connectHttp({ host: device.host, tls: device.tls });
-    await expect(page.locator('input[name="messageInput"]')).toBeVisible({
-      timeout: 60_000,
-    });
     await dismissToasts(page);
   });
 
-  test("reaches navigation and device info through the header drawer", async ({
-    page,
-  }) => {
+  test("reaches every section from the bottom tab bar", async ({ page }) => {
     await expectNoHorizontalOverflow(page);
-    // The sidebar is not taking page width...
-    await expect(page.getByRole("button", { name: "Map" })).toBeHidden();
-
-    await page.getByRole("button", { name: "Navigation" }).click();
-    const drawer = page.getByRole("dialog");
-    await expect(drawer).toBeVisible();
-    // ...but everything it carries is still reachable.
-    await expect(drawer.getByRole("button", { name: "Map" })).toBeVisible();
-    await expect(
-      drawer.getByRole("button", { name: "Settings" }),
-    ).toBeVisible();
-    await expect(drawer.getByText("Connected", { exact: true })).toBeVisible();
-
-    await page.keyboard.press("Escape");
-    await expect(drawer).toBeHidden();
+    for (const [name, path] of [
+      ["Nodes", "/nodes"],
+      ["Map", "/map"],
+      ["Settings", "/settings"],
+      ["Chats", "/messages"],
+    ] as const) {
+      await tabBar(page).getByRole("link", { name, exact: true }).click();
+      await expect(page).toHaveURL(new RegExp(`${path}$`));
+      await expectNoHorizontalOverflow(page);
+    }
   });
 
-  test("navigating from the drawer closes it and shows the page", async ({
-    page,
-  }) => {
-    await page.getByRole("button", { name: "Navigation" }).click();
-    await page
-      .getByRole("button", { name: /^Nodes \(/ })
-      .first()
-      .click();
-
-    await expect(page).toHaveURL(/\/nodes/);
-    await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expectNoHorizontalOverflow(page);
-  });
-
-  test("keeps the wide nodes table inside its own scroll region", async ({
-    page,
-  }) => {
-    await page.getByRole("button", { name: "Navigation" }).click();
-    await page
-      .getByRole("button", { name: /^Nodes \(/ })
-      .first()
-      .click();
-    await expect(page.getByRole("table")).toBeVisible();
-
-    // The table is wider than the phone and scrolls — the document does not.
-    const region = page.getByRole("table").locator("xpath=..");
-    const { scrollWidth, clientWidth } = await region.evaluate((el) => ({
-      scrollWidth: el.scrollWidth,
-      clientWidth: el.clientWidth,
-    }));
-    expect(scrollWidth).toBeGreaterThan(clientWidth);
-    await expectNoHorizontalOverflow(page);
-  });
-
-  test("keeps the composer usable and the node panel reachable", async ({
+  test("a conversation takes the screen and Back returns to the list", async ({
     page,
     messagesPage,
   }) => {
+    await messagesPage.openChannel(0);
+    await expect(tabBar(page)).toBeHidden();
+
     await expect(messagesPage.input()).toBeVisible();
     await expect(messagesPage.sendButton()).toBeVisible();
     await messagesPage.input().fill("typed on a phone");
     await expectNoHorizontalOverflow(page);
 
-    await page.getByRole("button", { name: "Nodes", exact: true }).click();
-    const panel = page.getByRole("dialog");
-    await expect(panel).toBeVisible();
-    await expect(panel.getByPlaceholder("Search nodes...")).toBeVisible();
+    await page.getByRole("link", { name: "Back to chats" }).click();
+    await expect(page).toHaveURL(/\/messages$/);
+    await expect(tabBar(page)).toBeVisible();
   });
 
-  test("keeps the settings tab strip on one scrollable row", async ({
-    page,
-  }) => {
-    await page.getByRole("button", { name: "Navigation" }).click();
-    await page.getByRole("button", { name: "Settings" }).click();
-    await page.getByRole("button", { name: "Navigation" }).click();
-    await page.getByRole("button", { name: "Module Config" }).click();
+  test("opens channel details as a sheet", async ({ page, messagesPage }) => {
+    await messagesPage.openChannel(0);
+    await page.getByRole("button", { name: "Channel details" }).click();
 
-    const list = page.getByRole("tablist").first();
+    const sheet = page.getByRole("dialog", { name: "Channel details" });
+    await expect(sheet).toBeVisible();
+    await expect(
+      sheet.getByRole("region", { name: "Recently heard" }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+  });
+
+  test("keeps the nodes list inside the page width", async ({ page }) => {
+    await tabBar(page)
+      .getByRole("link", { name: "Nodes", exact: true })
+      .click();
+    const list = page.getByRole("list", { name: "Known nodes" });
     await expect(list).toBeVisible();
-    const { scrollWidth, clientWidth, height } = await list.evaluate((el) => ({
-      scrollWidth: el.scrollWidth,
-      clientWidth: el.clientWidth,
-      height: el.getBoundingClientRect().height,
-    }));
-    // One row that scrolls, not a wrapped block filling the screen.
-    expect(scrollWidth).toBeGreaterThan(clientWidth);
-    expect(height).toBeLessThan(80);
+    await expect(list.getByRole("listitem").first()).toBeVisible();
+
+    const { right } = await list.evaluate((el) => el.getBoundingClientRect());
+    expect(right).toBeLessThanOrEqual(390);
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("opens a settings section full screen", async ({ page }) => {
+    await tabBar(page)
+      .getByRole("link", { name: "Settings", exact: true })
+      .click();
+    await page.getByRole("button", { name: /^Device configuration/ }).click();
+
+    await expect(page).toHaveURL(/\/settings\/device/);
+    await expect(
+      page.getByRole("heading", { name: "Device configuration", exact: true }),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 });

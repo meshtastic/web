@@ -6,60 +6,137 @@ import {
   real,
   sqliteTable,
   text,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { MessageState } from "./types.ts";
 
+/**
+ * The web app's own SQLite database (OPFS, via sqlocal): message history,
+ * reactions, drafts, read markers, and caches of the node DB and telemetry.
+ * The Kotlin SDK keeps its device state in a separate database it manages
+ * itself (see core/kmp/browserStorage.ts), so nothing here is shared with it.
+ *
+ * Every table is scoped by `device_id`: the node number of the radio the
+ * history belongs to.
+ *
+ * There are no migrations. The schema is stamped in `PRAGMA user_version`;
+ * a database carrying any other version is wiped and recreated on open (see
+ * `schemaStatements`). The file name is new as well, so a database written by
+ * an older release is never opened at all.
+ */
+export const DATABASE_FILE = "meshtastic-app-v1.db";
+
+/**
+ * Bump whenever the DDL below changes; older databases are wiped.
+ * schema.test.ts pins the DDL per version, so an edit without a bump fails.
+ */
+export const SCHEMA_VERSION = 2;
+
+const MESSAGE_STATES = [
+  MessageState.Pending,
+  MessageState.Delivered,
+  MessageState.Ack,
+  MessageState.Failed,
+] as const;
+
+/**
+ * Text messages, one row per packet. `seq` is the local arrival order, which
+ * read markers compare against: `rx_time` comes from the radio's clock and
+ * can be missing or skewed. A packet is unique per (device, sender, packet
+ * id), so a retransmission the radio hands us twice is stored once.
+ */
 export const messages = sqliteTable(
   "messages",
   {
-    /**
-     * Composite primary key would be ideal, but Meshtastic packet IDs are
-     * already 32-bit random values; collisions across devices are rare. We
-     * scope reads by (device_id, conversation_key) so collisions only
-     * matter within a single device's history.
-     */
-    id: integer("id").notNull(),
+    seq: integer("seq").primaryKey({ autoIncrement: true }),
     deviceId: integer("device_id").notNull(),
+    packetId: integer("packet_id").notNull(),
     conversationKey: text("conversation_key").notNull(),
     fromNode: integer("from_node").notNull(),
     toNode: integer("to_node").notNull(),
     channel: integer("channel").notNull(),
-    rxTime: integer("rx_time").notNull(),
     type: text("type", { enum: ["broadcast", "direct"] }).notNull(),
+    rxTime: integer("rx_time").notNull(),
     text: text("text").notNull(),
-    state: text("state", {
-      enum: [
-        MessageState.Pending,
-        MessageState.Delivered,
-        MessageState.Ack,
-        MessageState.Failed,
-      ],
-    }).notNull(),
-    signed: integer("signed", { mode: "boolean" }),
+    /** Packet id of the message this one replies to. */
+    replyId: integer("reply_id"),
+    state: text("state", { enum: MESSAGE_STATES }).notNull(),
+    routingError: integer("routing_error").$type<Protobuf.Mesh.Routing_Error>(),
     ackProof:
       integer("ack_proof").$type<Protobuf.Mesh.MeshPacket_AckProofStatus>(),
-    routingError: integer("routing_error").$type<Protobuf.Mesh.Routing_Error>(),
+    /** Acks heard for an outgoing message: relays plus the recipient. */
     relays: integer("relays"),
+    signed: integer("signed", { mode: "boolean" }),
     snr: real("snr"),
     rssi: integer("rssi"),
     hopsAway: integer("hops_away"),
     viaMqtt: integer("via_mqtt", { mode: "boolean" }),
     transport:
       integer("transport").$type<Protobuf.Mesh.MeshPacket_TransportMechanism>(),
+    /**
+     * Hidden by the message filter when it arrived: never unread, never the
+     * preview (see core/messaging/messageFilter.ts).
+     */
+    filtered: integer("filtered", { mode: "boolean" }).notNull().default(false),
   },
-  (t) => ({
-    pk: index("messages_pk").on(t.deviceId, t.id),
-    convRxTime: index("idx_messages_conv_rxtime").on(
+  (t) => [
+    uniqueIndex("ux_messages_packet").on(t.deviceId, t.fromNode, t.packetId),
+    index("idx_messages_packet_id").on(t.deviceId, t.packetId),
+    index("idx_messages_conv_rx").on(
       t.deviceId,
       t.conversationKey,
       t.rxTime,
+      t.seq,
     ),
-    pending: index("idx_messages_pending").on(t.deviceId, t.state),
-  }),
+  ],
 );
 
 export type MessageRow = typeof messages.$inferSelect;
 export type MessageInsert = typeof messages.$inferInsert;
+
+/**
+ * Tapback reactions, kept apart from `messages` on purpose:
+ *
+ * - The primary key (device, target, sender, emoji) is exactly what a chip
+ *   counts (distinct senders per emoji), so a repeated packet is a no-op and
+ *   removing my own reaction is a single delete.
+ * - Reactions don't fill the message pagination window or the per-
+ *   conversation retention cap, and can't become a conversation's last-message
+ *   preview or count as unread.
+ * - All reactions for a page of messages load with one indexed lookup on
+ *   `target_id`.
+ *
+ * `emoji_key` is the emoji without variation selectors (see
+ * core/messaging/reactions.ts `reactionKey`); `emoji` is the spelling
+ * received. `packet_id` is the reaction packet itself, which acks refer to;
+ * `to_node` is where it went, so an ack from the peer counts as delivered.
+ */
+export const reactions = sqliteTable(
+  "reactions",
+  {
+    deviceId: integer("device_id").notNull(),
+    targetId: integer("target_id").notNull(),
+    fromNode: integer("from_node").notNull(),
+    emojiKey: text("emoji_key").notNull(),
+    emoji: text("emoji").notNull(),
+    packetId: integer("packet_id").notNull(),
+    toNode: integer("to_node").notNull(),
+    conversationKey: text("conversation_key").notNull(),
+    rxTime: integer("rx_time").notNull(),
+    state: text("state", { enum: MESSAGE_STATES }).notNull(),
+    routingError: integer("routing_error").$type<Protobuf.Mesh.Routing_Error>(),
+  },
+  (t) => [
+    primaryKey({
+      columns: [t.deviceId, t.targetId, t.fromNode, t.emojiKey],
+    }),
+    index("idx_reactions_packet").on(t.deviceId, t.fromNode, t.packetId),
+    index("idx_reactions_conv").on(t.deviceId, t.conversationKey),
+  ],
+);
+
+export type ReactionRow = typeof reactions.$inferSelect;
+export type ReactionInsert = typeof reactions.$inferInsert;
 
 export const drafts = sqliteTable(
   "drafts",
@@ -69,18 +146,29 @@ export const drafts = sqliteTable(
     text: text("text").notNull(),
     updatedAt: integer("updated_at").notNull(),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.deviceId, t.conversationKey] }),
-  }),
+  (t) => [primaryKey({ columns: [t.deviceId, t.conversationKey] })],
 );
 
 export type DraftRow = typeof drafts.$inferSelect;
 export type DraftInsert = typeof drafts.$inferInsert;
 
 /**
- * Snapshot of the device's NodeDB. Position / metrics / user are stored as
- * JSON blobs (proto-shape) — slice infrastructure mappers are responsible
- * for serialization. Last-heard duplicates the column for sortable indexes.
+ * How far each conversation has been read, as a `messages.seq`. Unread is
+ * every message from someone else with a higher `seq`.
+ */
+export const readMarkers = sqliteTable(
+  "read_markers",
+  {
+    deviceId: integer("device_id").notNull(),
+    conversationKey: text("conversation_key").notNull(),
+    lastReadSeq: integer("last_read_seq").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.deviceId, t.conversationKey] })],
+);
+
+/**
+ * Snapshot of the device's NodeDB, as protobuf bytes in base64 (the `_json`
+ * names are historical). Last-heard duplicates the column for sorting.
  */
 export const nodes = sqliteTable(
   "nodes",
@@ -98,13 +186,11 @@ export const nodes = sqliteTable(
     userJson: text("user_json"),
     positionJson: text("position_json"),
     metricsJson: text("metrics_json"),
-    /** The whole NodeInfo as the SDK last saved it, base64; absent on rows older than v5. */
-    nodeInfo: text("node_info"),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.deviceId, t.num] }),
-    lastHeardIdx: index("idx_nodes_last_heard").on(t.deviceId, t.lastHeard),
-  }),
+  (t) => [
+    primaryKey({ columns: [t.deviceId, t.num] }),
+    index("idx_nodes_last_heard").on(t.deviceId, t.lastHeard),
+  ],
 );
 
 export type NodeRow = typeof nodes.$inferSelect;
@@ -120,179 +206,161 @@ export const telemetry = sqliteTable(
     ts: integer("ts").notNull(),
     payloadJson: text("payload_json").notNull(),
   },
-  (t) => ({
-    nodeTs: index("idx_telemetry_node_ts").on(t.deviceId, t.nodeNum, t.ts),
-  }),
+  (t) => [index("idx_telemetry_node_ts").on(t.deviceId, t.nodeNum, t.ts)],
 );
 
 export type TelemetryRow = typeof telemetry.$inferSelect;
 export type TelemetryInsert = typeof telemetry.$inferInsert;
 
-/** The SDK's DeviceStorage: one config bundle per node, protobufs as base64. */
-export const sdkConfig = sqliteTable("sdk_config", {
-  deviceId: integer("device_id").primaryKey(),
-  myInfo: text("my_info").notNull(),
-  metadata: text("metadata").notNull(),
-  configs: text("configs").notNull(),
-  moduleConfigs: text("module_configs").notNull(),
-  deviceUiConfig: text("device_ui_config"),
-});
-
-export const sdkChannels = sqliteTable(
-  "sdk_channels",
+/**
+ * Message filter entries, per radio: a word, or `regex:` and a pattern
+ * (see core/messaging/messageFilter.ts). Stored as typed, trimmed.
+ */
+export const filterWords = sqliteTable(
+  "filter_words",
   {
     deviceId: integer("device_id").notNull(),
-    idx: integer("idx").notNull(),
-    channel: text("channel").notNull(),
+    pattern: text("pattern").notNull(),
+    createdAt: integer("created_at").notNull(),
   },
-  (t) => ({ pk: primaryKey({ columns: [t.deviceId, t.idx] }) }),
+  (t) => [primaryKey({ columns: [t.deviceId, t.pattern] })],
 );
 
-export const sdkHeartbeats = sqliteTable(
-  "sdk_heartbeats",
+export type FilterWordRow = typeof filterWords.$inferSelect;
+
+/** Whether the message filter is on, per radio. No row is off. */
+export const filterSettings = sqliteTable("filter_settings", {
+  deviceId: integer("device_id").primaryKey(),
+  enabled: integer("enabled", { mode: "boolean" }).notNull().default(false),
+});
+
+/** Conversations that turned the message filter off for themselves. */
+export const filterOptOuts = sqliteTable(
+  "filter_opt_outs",
   {
     deviceId: integer("device_id").notNull(),
-    nodeNum: integer("node_num").notNull(),
-    epochMs: integer("epoch_ms").notNull(),
+    conversationKey: text("conversation_key").notNull(),
   },
-  (t) => ({ pk: primaryKey({ columns: [t.deviceId, t.nodeNum] }) }),
+  (t) => [primaryKey({ columns: [t.deviceId, t.conversationKey] })],
 );
-
-export const sdkPasskey = sqliteTable("sdk_passkey", {
-  deviceId: integer("device_id").primaryKey(),
-  passkey: text("passkey").notNull(),
-  expiresAt: integer("expires_at").notNull(),
-});
-
-export const sdkOwnNode = sqliteTable("sdk_own_node", {
-  deviceId: integer("device_id").primaryKey(),
-  nodeNum: integer("node_num").notNull(),
-  firmwareVersion: text("firmware_version").notNull(),
-});
-
-export const schemaVersion = sqliteTable("_schema", {
-  version: integer("version").primaryKey(),
-});
 
 /**
- * Hand-written DDL applied at boot if `_schema` is empty or behind. Drizzle's
- * own migration tooling is great but adds a build-time step; we keep migrations
- * inline so the package self-bootstraps on first DB open.
+ * The whole schema. Hand-written (rather than drizzle-kit generated) so the
+ * database bootstraps itself on first open without a build step; keep it in
+ * step with the table definitions above (schema.test.ts checks the columns).
  */
-export const MIGRATIONS: ReadonlyArray<{ version: number; sql: string[] }> = [
-  {
-    version: 1,
-    sql: [
-      `CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER NOT NULL,
-        device_id INTEGER NOT NULL,
-        conversation_key TEXT NOT NULL,
-        from_node INTEGER NOT NULL,
-        to_node INTEGER NOT NULL,
-        channel INTEGER NOT NULL,
-        rx_time INTEGER NOT NULL,
-        type TEXT NOT NULL,
-        text TEXT NOT NULL,
-        state TEXT NOT NULL
-      )`,
-      `CREATE INDEX IF NOT EXISTS messages_pk ON messages(device_id, id)`,
-      `CREATE INDEX IF NOT EXISTS idx_messages_conv_rxtime ON messages(device_id, conversation_key, rx_time)`,
-      `CREATE INDEX IF NOT EXISTS idx_messages_pending ON messages(device_id, state)`,
-      `CREATE TABLE IF NOT EXISTS nodes (
-        device_id INTEGER NOT NULL,
-        num INTEGER NOT NULL,
-        last_heard INTEGER,
-        snr INTEGER,
-        is_favorite INTEGER NOT NULL DEFAULT 0,
-        is_ignored INTEGER NOT NULL DEFAULT 0,
-        user_json TEXT,
-        position_json TEXT,
-        metrics_json TEXT,
-        PRIMARY KEY (device_id, num)
-      )`,
-      `CREATE INDEX IF NOT EXISTS idx_nodes_last_heard ON nodes(device_id, last_heard)`,
-      `CREATE TABLE IF NOT EXISTS telemetry (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        device_id INTEGER NOT NULL,
-        node_num INTEGER NOT NULL,
-        kind TEXT NOT NULL,
-        ts INTEGER NOT NULL,
-        payload_json TEXT NOT NULL
-      )`,
-      `CREATE INDEX IF NOT EXISTS idx_telemetry_node_ts ON telemetry(device_id, node_num, ts)`,
-      `CREATE TABLE IF NOT EXISTS _schema (version INTEGER PRIMARY KEY)`,
-    ],
-  },
-  {
-    version: 2,
-    sql: [
-      `CREATE TABLE IF NOT EXISTS drafts (
-        device_id INTEGER NOT NULL,
-        conversation_key TEXT NOT NULL,
-        text TEXT NOT NULL,
-        updated_at INTEGER NOT NULL,
-        PRIMARY KEY (device_id, conversation_key)
-      )`,
-    ],
-  },
-  {
-    // Firmware 2.8: XEdDSA-signed messages, ack proof of delivery, and why
-    // a message failed and how many acks it got.
-    version: 3,
-    sql: [
-      `ALTER TABLE messages ADD COLUMN signed INTEGER`,
-      `ALTER TABLE messages ADD COLUMN ack_proof INTEGER`,
-      `ALTER TABLE messages ADD COLUMN routing_error INTEGER`,
-      `ALTER TABLE messages ADD COLUMN relays INTEGER`,
-    ],
-  },
-  {
-    // How a received message reached us: signal, hops and transport.
-    version: 4,
-    sql: [
-      `ALTER TABLE messages ADD COLUMN snr REAL`,
-      `ALTER TABLE messages ADD COLUMN rssi INTEGER`,
-      `ALTER TABLE messages ADD COLUMN hops_away INTEGER`,
-      `ALTER TABLE messages ADD COLUMN via_mqtt INTEGER`,
-      `ALTER TABLE messages ADD COLUMN transport INTEGER`,
-    ],
-  },
-  {
-    // The Kotlin SDK's DeviceStorage (config bundle, channels, heartbeats,
-    // passkey) next to the existing tables, and the whole NodeInfo on nodes.
-    version: 5,
-    sql: [
-      `ALTER TABLE nodes ADD COLUMN node_info TEXT`,
-      `CREATE TABLE IF NOT EXISTS sdk_config (
-        device_id INTEGER PRIMARY KEY,
-        my_info TEXT NOT NULL,
-        metadata TEXT NOT NULL,
-        configs TEXT NOT NULL,
-        module_configs TEXT NOT NULL,
-        device_ui_config TEXT
-      )`,
-      `CREATE TABLE IF NOT EXISTS sdk_channels (
-        device_id INTEGER NOT NULL,
-        idx INTEGER NOT NULL,
-        channel TEXT NOT NULL,
-        PRIMARY KEY (device_id, idx)
-      )`,
-      `CREATE TABLE IF NOT EXISTS sdk_heartbeats (
-        device_id INTEGER NOT NULL,
-        node_num INTEGER NOT NULL,
-        epoch_ms INTEGER NOT NULL,
-        PRIMARY KEY (device_id, node_num)
-      )`,
-      `CREATE TABLE IF NOT EXISTS sdk_passkey (
-        device_id INTEGER PRIMARY KEY,
-        passkey TEXT NOT NULL,
-        expires_at INTEGER NOT NULL
-      )`,
-      `CREATE TABLE IF NOT EXISTS sdk_own_node (
-        device_id INTEGER PRIMARY KEY,
-        node_num INTEGER NOT NULL,
-        firmware_version TEXT NOT NULL
-      )`,
-    ],
-  },
+export const SCHEMA_SQL: ReadonlyArray<string> = [
+  `CREATE TABLE IF NOT EXISTS messages (
+    seq INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id INTEGER NOT NULL,
+    packet_id INTEGER NOT NULL,
+    conversation_key TEXT NOT NULL,
+    from_node INTEGER NOT NULL,
+    to_node INTEGER NOT NULL,
+    channel INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    rx_time INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    reply_id INTEGER,
+    state TEXT NOT NULL,
+    routing_error INTEGER,
+    ack_proof INTEGER,
+    relays INTEGER,
+    signed INTEGER,
+    snr REAL,
+    rssi INTEGER,
+    hops_away INTEGER,
+    via_mqtt INTEGER,
+    transport INTEGER,
+    filtered INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS ux_messages_packet ON messages(device_id, from_node, packet_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_messages_packet_id ON messages(device_id, packet_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_messages_conv_rx ON messages(device_id, conversation_key, rx_time, seq)`,
+  `CREATE TABLE IF NOT EXISTS reactions (
+    device_id INTEGER NOT NULL,
+    target_id INTEGER NOT NULL,
+    from_node INTEGER NOT NULL,
+    emoji_key TEXT NOT NULL,
+    emoji TEXT NOT NULL,
+    packet_id INTEGER NOT NULL,
+    to_node INTEGER NOT NULL,
+    conversation_key TEXT NOT NULL,
+    rx_time INTEGER NOT NULL,
+    state TEXT NOT NULL,
+    routing_error INTEGER,
+    PRIMARY KEY (device_id, target_id, from_node, emoji_key)
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_reactions_packet ON reactions(device_id, from_node, packet_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_reactions_conv ON reactions(device_id, conversation_key)`,
+  `CREATE TABLE IF NOT EXISTS drafts (
+    device_id INTEGER NOT NULL,
+    conversation_key TEXT NOT NULL,
+    text TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (device_id, conversation_key)
+  )`,
+  `CREATE TABLE IF NOT EXISTS read_markers (
+    device_id INTEGER NOT NULL,
+    conversation_key TEXT NOT NULL,
+    last_read_seq INTEGER NOT NULL,
+    PRIMARY KEY (device_id, conversation_key)
+  )`,
+  `CREATE TABLE IF NOT EXISTS nodes (
+    device_id INTEGER NOT NULL,
+    num INTEGER NOT NULL,
+    last_heard INTEGER,
+    snr INTEGER,
+    is_favorite INTEGER NOT NULL DEFAULT 0,
+    is_ignored INTEGER NOT NULL DEFAULT 0,
+    user_json TEXT,
+    position_json TEXT,
+    metrics_json TEXT,
+    PRIMARY KEY (device_id, num)
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_nodes_last_heard ON nodes(device_id, last_heard)`,
+  `CREATE TABLE IF NOT EXISTS telemetry (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id INTEGER NOT NULL,
+    node_num INTEGER NOT NULL,
+    kind TEXT NOT NULL,
+    ts INTEGER NOT NULL,
+    payload_json TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_telemetry_node_ts ON telemetry(device_id, node_num, ts)`,
+  `CREATE TABLE IF NOT EXISTS filter_words (
+    device_id INTEGER NOT NULL,
+    pattern TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (device_id, pattern)
+  )`,
+  `CREATE TABLE IF NOT EXISTS filter_settings (
+    device_id INTEGER PRIMARY KEY,
+    enabled INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE TABLE IF NOT EXISTS filter_opt_outs (
+    device_id INTEGER NOT NULL,
+    conversation_key TEXT NOT NULL,
+    PRIMARY KEY (device_id, conversation_key)
+  )`,
 ];
+
+/**
+ * What to run against a database found at `currentVersion` holding
+ * `existingTables` (user tables; `sqlite_*` internals are skipped). At the
+ * current version the DDL is re-run idempotently; any other version (an empty
+ * file is 0) has its tables dropped first, then the schema is created and
+ * stamped. Pure, so the wipe rule is unit-tested without a database.
+ */
+export const schemaStatements = (
+  currentVersion: number,
+  existingTables: ReadonlyArray<string>,
+): string[] => {
+  if (currentVersion === SCHEMA_VERSION) {
+    return [...SCHEMA_SQL];
+  }
+  const drops = existingTables
+    .filter((name) => !name.startsWith("sqlite_"))
+    .map((name) => `DROP TABLE IF EXISTS "${name.replaceAll('"', '""')}"`);
+  return [...drops, ...SCHEMA_SQL, `PRAGMA user_version = ${SCHEMA_VERSION}`];
+};

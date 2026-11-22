@@ -1,23 +1,29 @@
-import { UNKNOWN_NODE_SCOPE } from "@app/core/connections/repositories.ts";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { create, toBinary } from "@bufbuild/protobuf";
 import { FakeKmpClient } from "@core/kmp/fakeClient.ts";
 import { meshRegistry } from "@core/kmp/registry.ts";
 import { Protobuf } from "@core/protobuf.ts";
+import type { StorageScope } from "@core/storage/scope.ts";
 import { useDeviceStore } from "@core/stores";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useConnections } from "./useConnections.ts";
 
-// Every storage scope a sqlocal repository was opened with or switched to,
-// in order, per repository kind.
-const scopes = vi.hoisted(() => ({
-  opened: [] as Array<[string, number]>,
-  switched: [] as Array<[string, number]>,
-}));
+// The storage scope each sqlocal repository was opened with, and the scopes
+// it was switched to, in order, per repository kind.
+const scopes = vi.hoisted(
+  (): {
+    opened: Array<[string, StorageScope]>;
+    switched: Array<[string, number]>;
+  } => ({ opened: [], switched: [] }),
+);
 
 vi.mock("@core/sdkStorage.ts", () => ({
-  getStorageDb: async () => ({ db: {}, persistent: true }),
+  getStorageDb: async () => ({
+    db: {},
+    persistent: true,
+    atomic: async () => {},
+  }),
   coordinator: undefined,
 }));
 
@@ -36,8 +42,8 @@ vi.mock("@core/kmp/client.ts", async () => {
 // The sqlocal repositories, replaced by empty ones that record the scopes
 // they are given. Called with `new`; the returned object is the instance.
 function recording(kind: string) {
-  return function Recording(_db: unknown, options: { deviceId: number }) {
-    scopes.opened.push([kind, options.deviceId]);
+  return function Recording(_db: unknown, options: { scope: StorageScope }) {
+    scopes.opened.push([kind, options.scope]);
     return {
       setScope(scope: number): void {
         scopes.switched.push([kind, scope]);
@@ -95,7 +101,16 @@ describe("useConnections storage scope", () => {
     scopes.switched.length = 0;
   });
 
-  it("saves the node number on the connection and opens its history on the next connect", async () => {
+  /** The one scope every repository of the latest connect shares. */
+  function sharedScope(): StorageScope {
+    const [first] = scopes.opened;
+    if (!first) throw new Error("no repositories opened");
+    expect(scopes.opened.map(([kind]) => kind)).toEqual(KINDS);
+    for (const [, scope] of scopes.opened) expect(scope).toBe(first[1]);
+    return first[1];
+  }
+
+  it("saves the node number on the connection and files history under it once named", async () => {
     const { result } = renderHook(() => useConnections());
     const conn = result.current.addConnection({
       type: "serial",
@@ -104,26 +119,34 @@ describe("useConnections storage scope", () => {
     expect(conn.nodeNum).toBeUndefined();
 
     await act(() => result.current.connect(conn.id));
-    expect(scopes.opened).toEqual(
-      KINDS.map((kind) => [kind, UNKNOWN_NODE_SCOPE]),
-    );
+    const first = sharedScope();
+    expect(first.provisional).toBe(true);
 
     act(() => kmpFor(conn.id).emitFrame(myInfo(NODE)));
     expect(saved(conn.id)?.nodeNum).toBe(NODE);
     // The session moves to the node's history straight away.
+    expect(first.deviceId).toBe(NODE);
     expect(scopes.switched).toEqual(KINDS.map((kind) => [kind, NODE]));
 
     await act(() => result.current.disconnect(conn.id));
     scopes.opened.length = 0;
     scopes.switched.length = 0;
 
+    // The next connect does not assume the port still leads to that radio:
+    // it starts provisional again, under a scope of its own.
     await act(() => result.current.connect(conn.id));
-    expect(scopes.opened).toEqual(KINDS.map((kind) => [kind, NODE]));
+    const second = sharedScope();
+    expect(second.provisional).toBe(true);
+    expect(second.deviceId).not.toBe(first.deviceId);
 
-    // my_info for the same node changes nothing.
+    act(() => kmpFor(conn.id).emitFrame(myInfo(NODE)));
+    expect(second.deviceId).toBe(NODE);
+    expect(saved(conn.id)?.nodeNum).toBe(NODE);
+
+    // my_info again for the same node changes nothing.
+    scopes.switched.length = 0;
     act(() => kmpFor(conn.id).emitFrame(myInfo(NODE)));
     expect(scopes.switched).toEqual([]);
-    expect(saved(conn.id)?.nodeNum).toBe(NODE);
 
     await act(() => result.current.disconnect(conn.id));
   });

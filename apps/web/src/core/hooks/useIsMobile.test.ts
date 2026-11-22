@@ -1,6 +1,10 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { useIsMobile } from "./useIsMobile.ts";
+import {
+  useCanFitDetailsColumn,
+  useFitsLabelledActions,
+  useIsMobile,
+} from "./useIsMobile.ts";
 
 const realMatchMedia = globalThis.matchMedia;
 let listeners: Array<() => void> = [];
@@ -79,5 +83,19 @@ describe("useIsMobile", () => {
 
     unmount();
     expect(listeners).toHaveLength(0);
+  });
+
+  it("should ask whether the details column fits at the lg breakpoint", () => {
+    setViewport(true);
+    const { result } = renderHook(() => useCanFitDetailsColumn());
+    expect(queries[0]).toBe("(min-width: 64rem)");
+    expect(result.current).toBe(true);
+  });
+
+  it("should ask whether labelled header actions fit at the xl breakpoint", () => {
+    setViewport(false);
+    const { result } = renderHook(() => useFitsLabelledActions());
+    expect(queries[0]).toBe("(min-width: 80rem)");
+    expect(result.current).toBe(false);
   });
 });

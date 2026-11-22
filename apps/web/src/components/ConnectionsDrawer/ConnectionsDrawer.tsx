@@ -18,14 +18,7 @@ import { AddConnectionForm } from "./AddConnectionForm.tsx";
 import { ConnectionsList } from "./ConnectionsList.tsx";
 import { DrawerResizeHandle } from "./DrawerResizeHandle.tsx";
 import { useDrawerWidth } from "./useDrawerWidth.ts";
-
-export interface ConnectionsDrawerProps {
-  /**
-   * No device is connected: the drawer stays open with no way to dismiss it,
-   * replacing the old full-page Connections screen.
-   */
-  forced: boolean;
-}
+import { closesAfterSave } from "./afterSave.ts";
 
 const iconButtonClasses =
   "inline-flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -34,10 +27,9 @@ const iconButtonClasses =
  * The Connections drawer. An overlay over whatever page is showing; its open
  * state and view live in the app store, never in the URL.
  */
-export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
-  const storeOpen = useAppStore((s) => s.connectionsDrawer.open);
+export function ConnectionsDrawer() {
+  const open = useAppStore((s) => s.connectionsDrawer.open);
   const closeConnections = useAppStore((s) => s.closeConnections);
-  const open = forced || storeOpen;
   // Below md the drawer is min(100vw - 16px, 440px) wide and not resizable.
   const isMobile = useIsMobile();
   const drawerWidth = useDrawerWidth();
@@ -47,9 +39,8 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
     <Drawer
       direction="right"
       open={open}
-      dismissible={!forced}
       onOpenChange={(next) => {
-        if (!next && !forced) {
+        if (!next) {
           closeConnections();
         }
       }}
@@ -62,7 +53,7 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
           const inInlineConfirm =
             event.target instanceof Element &&
             event.target.closest("[data-inline-confirm]") !== null;
-          if (forced || inInlineConfirm) {
+          if (inInlineConfirm) {
             event.preventDefault();
           }
         }}
@@ -71,7 +62,9 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
         }
         className={cn(
           // Floating inset panel on the right at every size.
-          "inset-y-2 right-2 h-auto rounded-2xl border border-border bg-background text-foreground shadow-2xl",
+          // Inset by at least the safe areas on notched phones. Scoped like
+          // the drawer's own right-side placement, which it overrides.
+          "data-[vaul-drawer-direction=right]:top-[max(0.5rem,env(safe-area-inset-top))] data-[vaul-drawer-direction=right]:right-[max(0.5rem,env(safe-area-inset-right))] data-[vaul-drawer-direction=right]:bottom-[max(0.5rem,env(safe-area-inset-bottom))] h-auto rounded-2xl border border-border bg-background text-foreground shadow-2xl",
           "motion-reduce:transition-none!",
           "data-[vaul-drawer-direction=right]:w-[min(calc(100vw-16px),440px)] data-[vaul-drawer-direction=right]:sm:max-w-none",
         )}
@@ -82,14 +75,14 @@ export function ConnectionsDrawer({ forced }: ConnectionsDrawerProps) {
             onDraft={setDraftWidth}
           />
         )}
-        <DrawerBody forced={forced} />
+        <DrawerBody />
       </DrawerContent>
     </Drawer>
   );
 }
 
 /** Mounted only while the drawer is open, so each opening starts fresh. */
-function DrawerBody({ forced }: { forced: boolean }) {
+function DrawerBody() {
   const { t } = useTranslation("connections");
   const { toast } = useToast();
   const view = useAppStore((s) => s.connectionsDrawer.view);
@@ -151,14 +144,12 @@ function DrawerBody({ forced }: { forced: boolean }) {
             {t("page.description")}
           </DrawerDescription>
         </div>
-        {forced ? null : (
-          <DrawerClose
-            aria-label={t("drawer.close")}
-            className={cn(iconButtonClasses, "-mr-1")}
-          >
-            <XIcon className="size-5" />
-          </DrawerClose>
-        )}
+        <DrawerClose
+          aria-label={t("drawer.close")}
+          className={cn(iconButtonClasses, "-mr-1")}
+        >
+          <XIcon className="size-5" />
+        </DrawerClose>
       </DrawerHeader>
       <div className="@container min-h-0 flex-1 overflow-y-auto px-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
         {isList ? (
@@ -167,7 +158,11 @@ function DrawerBody({ forced }: { forced: boolean }) {
           <AddConnectionForm
             isHTTPS={isURLHTTPS}
             onSave={async (partial, handle) => {
-              const created = await addConnectionAndConnect(partial, handle);
+              // An explicit save keeps its entry even when the radio
+              // doesn't answer; only a reload mid-connect drops it.
+              const created = await addConnectionAndConnect(partial, handle, {
+                keep: true,
+              });
               if (!created) {
                 toast({
                   title: t("toasts.failed"),
@@ -182,10 +177,7 @@ function DrawerBody({ forced }: { forced: boolean }) {
                   interpolation: { escapeValue: false },
                 }),
               });
-              if (
-                created.status === "connected" ||
-                created.status === "configured"
-              ) {
+              if (closesAfterSave(created.status)) {
                 closeConnections();
               } else {
                 goBack();

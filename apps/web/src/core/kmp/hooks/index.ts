@@ -31,4 +31,17 @@ export {
   useUnreadByKey,
   useUnreadCount,
 } from "./useSession.ts";
+export {
+  type MessagingActions,
+  type UseThreadResult,
+  useConversationSummaries,
+  useMessagingActions,
+  useThread,
+} from "./useMessaging.ts";
 export { useSignal } from "./useSignal.ts";
+export {
+  type UseConversationFilterResult,
+  type UseMessageFilterResult,
+  useConversationFilter,
+  useMessageFilter,
+} from "./useMessageFilter.ts";

@@ -35,34 +35,15 @@ describe("ConnectionsDrawer", () => {
     act(() => useAppStore.getState().closeConnections());
   });
 
-  describe("forced open (no device)", () => {
-    it("renders without a close button and ignores Escape", () => {
-      render(<ConnectionsDrawer forced />);
-
-      expect(screen.getByRole("dialog")).not.toBeNull();
-      expect(screen.getByTestId("connections-list")).not.toBeNull();
-      expect(
-        screen.queryByRole("button", { name: "Close connections" }),
-      ).toBeNull();
-
-      fireEvent.keyDown(document.activeElement ?? document.body, {
-        key: "Escape",
-      });
-
-      expect(screen.getByRole("dialog")).not.toBeNull();
-      expect(useAppStore.getState().connectionsDrawer.open).toBe(false);
-    });
-  });
-
-  describe("dismissable (device connected)", () => {
+  describe("dismissable", () => {
     it("renders nothing until opened from the store", () => {
-      render(<ConnectionsDrawer forced={false} />);
+      render(<ConnectionsDrawer />);
       expect(screen.queryByRole("dialog")).toBeNull();
       expect(screen.queryByTestId("connections-list")).toBeNull();
     });
 
     it("closes from the close button", () => {
-      render(<ConnectionsDrawer forced={false} />);
+      render(<ConnectionsDrawer />);
       act(() => useAppStore.getState().openConnections());
 
       fireEvent.click(
@@ -73,7 +54,7 @@ describe("ConnectionsDrawer", () => {
     });
 
     it("closes on Escape", () => {
-      render(<ConnectionsDrawer forced={false} />);
+      render(<ConnectionsDrawer />);
       act(() => useAppStore.getState().openConnections());
       const dialog = screen.getByRole("dialog");
 
@@ -90,7 +71,7 @@ describe("ConnectionsDrawer views", () => {
   });
 
   it("opens on the list by default and on the add view when asked", () => {
-    render(<ConnectionsDrawer forced={false} />);
+    render(<ConnectionsDrawer />);
 
     act(() => useAppStore.getState().openConnections());
     expect(screen.getByRole("heading", { name: /Connections/ })).not.toBeNull();
@@ -105,7 +86,7 @@ describe("ConnectionsDrawer views", () => {
   });
 
   it("focuses the title on push and the Add connection button on pop", () => {
-    render(<ConnectionsDrawer forced={false} />);
+    render(<ConnectionsDrawer />);
     act(() => useAppStore.getState().openConnections());
 
     const addButton = screen.getByRole("button", { name: "Add connection" });

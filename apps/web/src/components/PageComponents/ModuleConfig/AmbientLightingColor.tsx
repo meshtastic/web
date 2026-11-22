@@ -70,9 +70,9 @@ export const AmbientLightingColor = ({
               setValue("green", rgb.green, options);
               setValue("blue", rgb.blue, options);
             }}
-            className="h-10 w-16 cursor-pointer rounded-md border border-slate-300 bg-transparent p-1 dark:border-slate-500"
+            className="h-10 w-16 cursor-pointer rounded-md border border-input bg-transparent p-1"
           />
-          <span className="font-mono text-sm text-slate-600 dark:text-slate-300">
+          <span className="font-mono text-sm text-secondary">
             {hex.toUpperCase()}
           </span>
         </div>

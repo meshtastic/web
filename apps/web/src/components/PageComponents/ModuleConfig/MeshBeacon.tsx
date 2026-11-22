@@ -8,7 +8,7 @@ import {
   OFFER_CHANNEL_KEEP,
   toMeshBeaconForm,
 } from "@app/validation/moduleConfig/meshBeacon.ts";
-import { getChannelName } from "@components/PageComponents/Channels/Channels.tsx";
+import { channelLabel } from "@core/channels/channelLabel.ts";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -89,10 +89,15 @@ export const MeshBeacon = ({ onFormInit }: MeshBeaconModuleConfigProps) => {
     () =>
       channelsByIndex.flatMap((settings, index) =>
         settings
-          ? [{ value: index, label: getChannelName({ index, settings }) }]
+          ? [
+              {
+                value: index,
+                label: channelLabel({ index, name: settings.name }, t),
+              },
+            ]
           : [],
       ),
-    [channelsByIndex],
+    [channelsByIndex, t],
   );
 
   const offerChannelOptions = useMemo(() => {

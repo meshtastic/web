@@ -2,6 +2,7 @@ import { cn } from "@core/utils/cn.ts";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 
 const Dialog = DialogPrimitive.Root;
 
@@ -25,7 +26,7 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-black/50 backdrop-blur-xs transition-opacity animate-in fade-in",
+      "fixed inset-0 z-50 bg-scrim backdrop-blur-xs transition-opacity animate-in fade-in",
       className,
     )}
     {...props}
@@ -43,7 +44,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed z-50 grid w-full bg-white dark:bg-slate-800 dark:text-slate-200 text-slate-900 max-w-[512px] max-h-[100dvh] overflow-y-auto scale-100 gap-4 p-6 opacity-100 animate-in fade-in-90 slide-in-from-bottom-10 sm:max-w-lg sm:rounded-lg sm:zoom-in-90 sm:slide-in-from-bottom-0",
+        "fixed z-50 grid w-full border border-elevated bg-surface text-primary shadow-dialog max-w-[512px] max-h-[100dvh] overflow-y-auto scale-100 gap-4 p-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] opacity-100 animate-in fade-in-90 slide-in-from-bottom-10 sm:max-w-lg sm:rounded-panel sm:zoom-in-90 sm:slide-in-from-bottom-0",
         className,
       )}
       {...props}
@@ -57,20 +58,22 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 const DialogClose = ({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>) => (
-  <DialogPrimitive.Close
-    aria-label="Close"
-    data-testid="dialog-close-button"
-    className={cn(
-      "absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-slate-100 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900",
-      className,
-    )}
-    {...props}
-  >
-    <X className="h-4 w-4" />
-    <span className="sr-only">Close</span>
-  </DialogPrimitive.Close>
-);
+}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>) => {
+  const { t } = useTranslation();
+  return (
+    <DialogPrimitive.Close
+      aria-label={t("button.close")}
+      data-testid="dialog-close-button"
+      className={cn(
+        "absolute top-4 right-4 inline-flex size-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:pointer-events-none",
+        className,
+      )}
+      {...props}
+    >
+      <X aria-hidden="true" className="size-4" />
+    </DialogPrimitive.Close>
+  );
+};
 
 const DialogHeader = ({
   className,
@@ -106,10 +109,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn(
-      "text-lg font-semibold text-slate-900 dark:text-slate-100",
-      className,
-    )}
+    className={cn("text-header-lg font-semibold text-primary", className)}
     {...props}
   />
 ));
@@ -121,7 +121,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-slate-800 dark:text-slate-200", className)}
+    className={cn("text-help text-secondary", className)}
     {...props}
   />
 ));

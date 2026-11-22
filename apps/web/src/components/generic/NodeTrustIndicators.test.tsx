@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   isNodeUnheardOnCurrentLora,
   NodeTrustIndicators,
+  TrustTooltipProvider,
 } from "./NodeTrustIndicators.tsx";
 
 const node = {
@@ -66,5 +67,20 @@ describe("NodeTrustIndicators", () => {
       />,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe("TrustTooltipProvider", () => {
+  it("lets indicators share one provider and still show their tooltip", async () => {
+    render(
+      <TrustTooltipProvider>
+        <NodeTrustIndicators node={{ ...node, isMuted: true }} />
+      </TrustTooltipProvider>,
+    );
+    const button = screen.getByRole("button", { name: "Muted" });
+    await userEvent.setup().hover(button);
+    expect(
+      await screen.findAllByText("Notifications from this node are muted."),
+    ).not.toHaveLength(0);
   });
 });

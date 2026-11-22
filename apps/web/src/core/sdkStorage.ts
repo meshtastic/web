@@ -1,6 +1,7 @@
 import { createLogger } from "@core/log.ts";
 import { MultiTabCoordinator } from "@core/storage/coordinator.ts";
 import { type OpenedSqlocalDb, openSqlocalDb } from "@core/storage/db.ts";
+import { DATABASE_FILE } from "@core/storage/schema.ts";
 
 const log = createLogger("sdkStorage");
 
@@ -26,22 +27,22 @@ export function getStorageDb(): Promise<OpenedSqlocalDb> {
     );
   }
   if (!dbPromise) {
-    log.debug("getStorageDb: creating sqlocal DB", { path: "meshtastic.db" });
+    log.debug("getStorageDb: creating sqlocal DB", { path: DATABASE_FILE });
     const t0 = Date.now();
-    dbPromise = openSqlocalDb({ databasePath: "meshtastic.db" })
+    dbPromise = openSqlocalDb({ databasePath: DATABASE_FILE })
       .then((opened) => {
         const ready = { ms: Date.now() - t0, storageType: opened.storageType };
-        if (opened.persistent)
+        if (opened.persistent) {
           log.info("getStorageDb: sqlocal DB ready", ready);
-        else log.warn("getStorageDb: sqlocal DB is not persisted", ready);
+          if (!relinquished) void removeLegacyDatabase();
+        } else log.warn("getStorageDb: sqlocal DB is not persisted", ready);
         return opened;
       })
-      .catch((err) => {
-        const e = err as Error;
+      .catch((err: unknown) => {
         log.error("getStorageDb: sqlocal DB open failed", {
           ms: Date.now() - t0,
-          name: e?.name,
-          message: e?.message,
+          name: err instanceof Error ? err.name : undefined,
+          message: err instanceof Error ? err.message : String(err),
         });
         throw err;
       });
@@ -77,3 +78,52 @@ export function resumeStorageDb(): void {
 }
 
 export const coordinator = new MultiTabCoordinator();
+
+/** What older releases stored the app database as, before `DATABASE_FILE`. */
+export const LEGACY_DATABASE_FILES = [
+  "meshtastic.db",
+  "meshtastic.db-journal",
+  "meshtastic.db-wal",
+] as const;
+
+export interface RemovableDirectory {
+  removeEntry(name: string): Promise<void>;
+}
+
+const opfsRoot = async (): Promise<RemovableDirectory | undefined> =>
+  typeof navigator !== "undefined" &&
+  typeof navigator.storage?.getDirectory === "function"
+    ? navigator.storage.getDirectory()
+    : undefined;
+
+/**
+ * Best-effort removal of the database older releases wrote, which nothing
+ * reads any more. Only the tab that owns the app (and so opened storage)
+ * gets here, and OPFS refuses to remove a file another tab still has open,
+ * so an older tab in another window keeps its file. Never throws.
+ */
+export async function removeLegacyDatabase(
+  root: () => Promise<RemovableDirectory | undefined> = opfsRoot,
+): Promise<string[]> {
+  const removed: string[] = [];
+  try {
+    const dir = await root();
+    if (!dir) return removed;
+    for (const name of LEGACY_DATABASE_FILES) {
+      try {
+        await dir.removeEntry(name);
+        removed.push(name);
+      } catch {
+        // Missing, or still open in another tab: leave it.
+      }
+    }
+    if (removed.length > 0) {
+      log.info("removeLegacyDatabase: removed old database", { removed });
+    }
+  } catch (err) {
+    log.debug("removeLegacyDatabase: skipped", {
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+  return removed;
+}

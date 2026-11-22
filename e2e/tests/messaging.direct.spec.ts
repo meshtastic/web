@@ -25,6 +25,7 @@ import { expect, test } from "../fixtures/test.ts";
 test.describe("direct messaging over a real two-node mesh", () => {
   test.beforeEach(async ({ connectionPage, messagesPage, device }) => {
     await connectionPage.connectHttp({ host: device.host, tls: device.tls });
+    await messagesPage.openChannel(0);
     await messagesPage.waitReady();
   });
 

@@ -11,6 +11,21 @@ test("connects to a real device over HTTPS and reaches the message view", async 
   device,
 }) => {
   await connectionPage.connectHttp({ host: device.host, tls: device.tls });
+  await messagesPage.openChannel(0);
   await messagesPage.waitReady();
   await expect(page).toHaveURL(/\/messages\/broadcast\/0/);
+});
+
+test("connects from the first-run welcome wizard", async ({
+  connectionPage,
+  messagesPage,
+  device,
+}) => {
+  await connectionPage.connectHttpThroughWelcome({
+    host: device.host,
+    tls: device.tls,
+  });
+  await expect(connectionPage.deviceStatus().first()).toBeVisible();
+  await messagesPage.openChannel(0);
+  await messagesPage.waitReady();
 });

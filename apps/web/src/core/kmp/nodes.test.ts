@@ -215,3 +215,34 @@ describe("NodesClient persistence", () => {
     expect(second.byNum(11)?.user?.longName).toBe("Node 11");
   });
 });
+
+describe("NodesClient favourite and ignored sets", () => {
+  // Node changes are published together on a microtask.
+  const tick = () => new Promise<void>((resolve) => queueMicrotask(resolve));
+
+  it("keep their identity until membership changes", async () => {
+    const nodes = new NodesClient(admin);
+    const seen: Array<ReadonlySet<number>> = [];
+    const off = nodes.favoriteNums.subscribe((s) => seen.push(s));
+    nodes.patch(5, { isFavorite: true });
+    await tick();
+    const favorites = nodes.favoriteNums.value;
+    expect([...favorites]).toEqual([5]);
+
+    nodes.patch(5, { snr: 3 });
+    nodes.heard(heardFrom(6, 100));
+    await tick();
+    expect(nodes.favoriteNums.value).toBe(favorites);
+
+    nodes.patch(6, { isIgnored: true });
+    await tick();
+    expect(nodes.favoriteNums.value).toBe(favorites);
+    expect([...nodes.ignoredNums.value]).toEqual([6]);
+
+    nodes.patch(5, { isFavorite: false });
+    await tick();
+    expect(nodes.favoriteNums.value.size).toBe(0);
+    expect(new Set(seen).size).toBe(2);
+    off();
+  });
+});

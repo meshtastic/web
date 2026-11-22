@@ -11,17 +11,7 @@
     "manageConnections": "Manage Connections",
     "nodes": "Nodes"
   },
-  "app": {
-    "title": "Meshtastic",
-    "logo": "Meshtastic Logo"
-  },
   "sidebar": {
-    "collapseToggle": {
-      "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
-      }
-    },
     "deviceInfo": {
       "volts": "{{voltage}} volts",
       "firmware": {
@@ -33,13 +23,10 @@
   },
   "batteryStatus": {
     "charging": "{{level}}% charging",
-    "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "pluggedIn": "Plugged in"
   },
   "search": {
-    "nodes": "Search nodes...",
-    "channels": "Search channels...",
-    "commandPalette": "Search commands..."
+    "channels": "Search channels..."
   },
   "toast": {
     "positionRequestSent": { "title": "Position request sent." },
@@ -47,10 +34,6 @@
     "sendingTraceroute": { "title": "Sending Traceroute, please wait..." },
     "tracerouteSent": { "title": "Traceroute sent." },
     "savedChannel": { "title": "Saved Channel: {{channelName}}" },
-    "messages": {
-      "pkiEncryption": { "title": "Chat is using PKI encryption." },
-      "pskEncryption": { "title": "Chat is using PSK encryption." }
-    },
     "configSaveError": {
       "title": "Error Saving Config",
       "description": "An error occurred while saving the configuration."
@@ -62,10 +45,6 @@
     "saveSuccess": {
       "title": "Saving Config",
       "description": "The configuration change {{case}} has been saved."
-    },
-    "saveAllSuccess": {
-      "title": "Saved",
-      "description": "All configuration changes have been saved."
     },
     "savePending": {
       "title": "Saved",
@@ -123,7 +102,9 @@
     "label": "Role"
   },
   "filter": {
-    "label": "Filter"
+    "label": "Filter",
+    "checkAll": "Check all",
+    "uncheckAll": "Uncheck all"
   },
   "advanced": {
     "label": "Advanced"
@@ -213,15 +194,9 @@
     "stackTraceLabel": "Stack trace:",
     "fallbackError": "{{error}}"
   },
-  "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
-    "commitSha": "Commit SHA: {{sha}}"
-  },
   "settingsPages": {
     "notConnected": "Connect a node to use these actions.",
     "administration": {
-      "title": "Administration",
-      "description": "Power and reset actions run on the connected node straight away. The destructive ones ask for confirmation first.",
       "reboot": {
         "label": "Reboot",
         "description": "Restart the node now or after a delay, optionally into OTA mode.",
@@ -348,16 +323,18 @@
       "theme": "Theme",
       "themeDescription": "Light, dark, or follow the system setting.",
       "language": "Language",
-      "languageDescription": "The language of the app."
+      "languageDescription": "The language of the app.",
+      "build": "Build",
+      "buildDescription": "This web client's version and the commit it was built from. Include them when you report a problem.",
+      "version": "Version",
+      "commit": "Commit",
+      "notAvailable": "Not available"
     },
     "about": {
       "whatIs": "What is Meshtastic?",
       "whatIsDescription": "An open source, off-grid, decentralized mesh network that runs on affordable, low-power radios.",
-      "app": "Meshtastic Web",
-      "version": "App version",
       "github": "GitHub repository",
       "githubDescription": "Source code, issues and releases of this app.",
-      "project": "Project information",
       "website": "Website",
       "documentation": "Documentation",
       "license": "License",
@@ -366,7 +343,8 @@
       "needHardwareDescription": "Meshtastic needs a compatible device. See the supported devices to find one.",
       "devices": "Supported devices",
       "copyright": "Meshtastic® Copyright Meshtastic LLC",
-      "licenseNotice": "Free software under the GNU General Public License v3, with no warranty. You may redistribute it under the same license."
+      "licenseNotice": "Free software under the GNU General Public License v3, with no warranty. You may redistribute it under the same license.",
+      "poweredBy": "Hosting by <0>▲ Vercel</0>. Meshtastic® is a registered trademark of Meshtastic LLC."
     }
   },
   "tabLock": {
@@ -374,5 +352,59 @@
     "description": "Only one tab can use your radio and saved data at a time. Use it here to move Meshtastic to this tab and disconnect the other one.",
     "useHere": "Use here",
     "claiming": "Switching to this tab…"
+  },
+  "primitives": {
+    "bytesUsed": "{{used}} of {{limit}} bytes used",
+    "charsUsed": "{{used}} of {{limit}} characters used",
+    "overLimit": "Over the limit",
+    "online": "Online",
+    "offline": "Offline",
+    "connecting": "Connecting",
+    "error": "Error",
+    "unread_one": "{{count}} unread message",
+    "unread_other": "{{count}} unread messages",
+    "breadcrumb": "Breadcrumb",
+    "stepOf": "Step {{current}} of {{total}}",
+    "stepOfNamed": "Step {{current}} of {{total}} · {{name}}",
+    "progress": "Progress",
+    "unsavedChanges": "Unsaved changes",
+    "typeToConfirm": "Type {{text}} to confirm",
+    "shortcut": "Keyboard shortcut: {{keys}}"
+  },
+  "shell": {
+    "appNavigation": "App",
+    "messagesUnread_one": "Messages, {{count}} unread",
+    "messagesUnread_other": "Messages, {{count}} unread",
+    "nodesCount_one": "Nodes ({{count}})",
+    "nodesCount_other": "Nodes ({{count}})",
+    "chats": "Chats",
+    "commandMenu": "Command menu",
+    "deviceWithStatus": "Device {{name}}, {{status}}",
+    "statusConnected": "Connected",
+    "statusConnecting": "Connecting…",
+    "statusConfiguring": "Syncing with device…",
+    "statusError": "Connection error",
+    "deviceDetails": "Device details",
+    "transportSerial": "Serial",
+    "transportBluetooth": "Bluetooth",
+    "transportHttp": "HTTP",
+    "connectedVia": "Connected via {{transport}}",
+    "notConnected": "Not connected",
+    "power": "Power",
+    "batteryLevel": "{{level}}% battery",
+    "volts": "{{value}} V",
+    "firmwareShort": "fw {{version}}",
+    "channelUtilization": "Channel util.",
+    "airUtilTx": "Air time TX",
+    "percent": "{{value}}%",
+    "deviceSettings": "Device settings",
+    "reboot": "Reboot device",
+    "devices": "Devices",
+    "activeDevice": "Active",
+    "switchToDevice": "Switch to {{name}}",
+    "connectAnother": "Connect another device",
+    "connectAnotherHint": "Bluetooth, Serial or HTTP. Each device keeps its own chats and nodes.",
+    "details": "Details",
+    "resizeDetails": "Resize {{name}}"
   }
 }

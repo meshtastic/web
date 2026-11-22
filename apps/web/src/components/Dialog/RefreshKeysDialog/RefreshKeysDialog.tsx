@@ -56,16 +56,16 @@ export const RefreshKeysDialog = ({
         {text.description}
         <ul className="mt-2">
           <li className="flex place-items-center gap-2 items-start">
-            <div className="p-2 bg-slate-500 rounded-lg mt-1">
+            <div className="p-2 bg-accent-tint border border-accent-tint rounded-lg mt-1">
               <LockKeyholeOpenIcon
                 size={30}
-                className="text-white justify-center"
+                className="text-accent justify-center"
               />
             </div>
             <div className="flex flex-col gap-2">
               <div>
                 <p className="font-bold mb-0.5">
-                  {t("refreshKeys.label.acceptNewKeys")}
+                  {t("refreshKeys.acceptNewKeys")}
                 </p>
                 <p>{t("refreshKeys.description.acceptNewKeys")}</p>
               </div>

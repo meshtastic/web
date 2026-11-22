@@ -1,5 +1,6 @@
 import { validateMaxByteLength } from "@core/utils/string.ts";
-import { t } from "i18next";
+import { utf8ByteLength } from "@core/utils/textLimit.ts";
+import i18next from "i18next";
 import { z } from "zod/v4";
 
 /**
@@ -10,10 +11,20 @@ import { z } from "zod/v4";
 export const LONG_NAME_MAX_BYTES = 24;
 
 /**
+ * User.short_name is a 5-byte field (mesh.options max_size:5): 4 bytes of
+ * UTF-8 plus the terminator. One emoji fills it.
+ */
+export const SHORT_NAME_MAX_BYTES = 4;
+
+/**
  * ModuleConfig.statusmessage.node_status, shown on the User page from
  * firmware 2.7.20. Android limits it to 80 bytes of UTF-8.
  */
 export const NODE_STATUS_MAX_BYTES = 80;
+
+// Resolved when a value fails, so the message follows the current language
+// and is looked up once translations have loaded.
+const configText = (key: string) => () => i18next.t(key, { ns: "config" });
 
 export const UserValidationSchema = z.object({
   // Read-only display fields (preserved on submit).
@@ -21,7 +32,7 @@ export const UserValidationSchema = z.object({
   hardwareModel: z.string().optional(),
   longName: z
     .string()
-    .min(1, t("user.longName.validation.min"))
+    .min(1, { error: configText("user.longName.validation.min") })
     .superRefine((value, ctx) => {
       const { isValid, currentLength } = validateMaxByteLength(
         value,
@@ -37,8 +48,10 @@ export const UserValidationSchema = z.object({
     }),
   shortName: z
     .string()
-    .min(1, t("user.shortName.validation.min"))
-    .max(4, t("user.shortName.validation.max")),
+    .min(1, { error: configText("user.shortName.validation.min") })
+    .refine((value) => utf8ByteLength(value) <= SHORT_NAME_MAX_BYTES, {
+      error: configText("user.shortName.validation.max"),
+    }),
   // Status Message module's node_status; not part of the owner.
   nodeStatus: z
     .string()

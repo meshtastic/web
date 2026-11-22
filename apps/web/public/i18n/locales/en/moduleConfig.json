@@ -639,5 +639,22 @@
       "add": "Add target",
       "remove": "Remove target"
     }
+  },
+  "summary": {
+    "mqtt": "Bridge the mesh to an MQTT server over the internet.",
+    "serial": "Send and receive messages over a serial port.",
+    "externalNotification": "Buzzers, LEDs or vibration for new messages.",
+    "storeForward": "Keep messages for radios that were out of range.",
+    "rangeTest": "Send test messages to measure range.",
+    "telemetry": "Share battery, environment and air quality readings.",
+    "cannedMessage": "Preset messages for radios without a keyboard.",
+    "audio": "Push-to-talk audio on supported hardware.",
+    "remoteHardware": "Control the radio’s pins from another node.",
+    "neighborInfo": "Share which radios you hear directly.",
+    "ambientLighting": "Control an RGB LED on supported hardware.",
+    "detectionSensor": "Send an alert when a sensor pin changes.",
+    "paxcounter": "Count nearby Wi-Fi and Bluetooth devices.",
+    "tak": "Settings for ATAK and other TAK clients.",
+    "meshBeacon": "Hear and send invitations that let nearby radios join a channel."
   }
 }

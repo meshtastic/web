@@ -6,8 +6,12 @@ import { useDeviceStore } from "@core/stores";
 import { Protobuf } from "@core/protobuf.ts";
 import type { SdkStorage } from "@meshtastic/sdk-kmp";
 import { act, renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { disconnectAllConnections, useConnections } from "./useConnections.ts";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  disconnectAllConnections,
+  OPEN_TIMEOUT_MS,
+  useConnections,
+} from "./useConnections.ts";
 
 const calls = vi.hoisted((): string[] => []);
 
@@ -25,6 +29,7 @@ const kmp = vi.hoisted(
     clients: FakeKmpClient[];
     storages: Array<SdkStorage | undefined>;
     connectError?: Error;
+    connectHangs?: boolean;
     holdFactory?: Promise<void>;
   } => ({ clients: [], storages: [] }),
 );
@@ -66,6 +71,17 @@ vi.mock("@core/kmp/client.ts", async () => {
       kmp.clients.push(client);
       return client;
     },
+    createSerialClient: async (_target: unknown, storage?: SdkStorage) => {
+      kmp.storages.push(storage);
+      await kmp.holdFactory;
+      const client = new FakeKmpClient();
+      if (kmp.connectHangs) {
+        client.connect = () => new Promise<void>(() => {});
+      }
+      kmp.client = client;
+      kmp.clients.push(client);
+      return client;
+    },
   };
 });
 
@@ -95,6 +111,8 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     kmp.clients = [];
     kmp.storages = [];
     kmp.connectError = undefined;
+    kmp.connectHangs = false;
+    kmp.holdFactory = undefined;
     sdkOpened.storage = undefined;
     useDeviceStore.setState({ savedConnections: [] });
   });
@@ -393,6 +411,109 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     expect(kmp.storages[0]).toBe(opened);
   });
 
+  it("records when the radio was last reached, not only when it disconnects", async () => {
+    const now = vi.spyOn(Date, "now");
+    try {
+      const { result } = renderHook(() => useConnections());
+      const conn = addRadio(result);
+      expect(saved(conn.id)?.lastConnectedAt).toBeUndefined();
+
+      now.mockReturnValue(1_000);
+      await act(() => result.current.connect(conn.id));
+      expect(saved(conn.id)).toMatchObject({
+        status: "configured",
+        lastConnectedAt: 1_000,
+      });
+
+      now.mockReturnValue(2_000);
+      await act(() => result.current.disconnect(conn.id));
+      expect(saved(conn.id)?.lastConnectedAt).toBe(2_000);
+    } finally {
+      now.mockRestore();
+    }
+  });
+
+  it("does not record a failed connect as having reached the radio", async () => {
+    kmp.connectError = named("transport");
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    await act(() => result.current.disconnect(conn.id));
+    expect(saved(conn.id)?.lastConnectedAt).toBeUndefined();
+  });
+
+  it("marks an unfinished attempt pending until it reaches the radio", async () => {
+    let releaseFactory: () => void = () => {};
+    kmp.holdFactory = new Promise<void>(
+      (resolve) => (releaseFactory = resolve),
+    );
+    const { result } = renderHook(() => useConnections());
+    const connecting = result.current.addConnectionAndConnect({
+      type: "http",
+      name: "Radio",
+      url: "http://192.168.1.10",
+    });
+    await act(async () => {});
+    const [pending] = useDeviceStore.getState().savedConnections;
+    expect(pending?.pending).toBe(true);
+
+    releaseFactory();
+    const conn = await act(() => connecting);
+    expect(saved(conn.id)?.pending).toBeUndefined();
+    kmp.holdFactory = undefined;
+  });
+
+  it("returns the saved connection with the status the attempt reached", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = await act(() =>
+      result.current.addConnectionAndConnect({
+        type: "http",
+        name: "Radio",
+        url: "http://192.168.1.10",
+      }),
+    );
+    expect(conn.status).toBe("configured");
+  });
+
+  it("returns an error status when a kept attempt fails", async () => {
+    kmp.connectError = named("transport");
+    const { result } = renderHook(() => useConnections());
+    const conn = await act(() =>
+      result.current.addConnectionAndConnect(
+        { type: "http", name: "Radio", url: "http://192.168.1.10" },
+        undefined,
+        { keep: true },
+      ),
+    );
+    kmp.connectError = undefined;
+    expect(conn.status).toBe("error");
+  });
+
+  it("drops earlier unfinished attempts at the same radio once one reaches it", async () => {
+    kmp.connectError = named("transport");
+    const { result } = renderHook(() => useConnections());
+    const input = {
+      type: "http",
+      name: "Radio",
+      url: "http://192.168.1.10",
+    } as const;
+    const failed = await act(() =>
+      result.current.addConnectionAndConnect(input),
+    );
+    const other = await act(() =>
+      result.current.addConnectionAndConnect({
+        ...input,
+        url: "http://192.168.1.11",
+      }),
+    );
+    kmp.connectError = undefined;
+    const ok = await act(() => result.current.addConnectionAndConnect(input));
+
+    expect(saved(ok.id)?.status).toBe("configured");
+    expect(saved(failed.id)).toBeUndefined();
+    expect(saved(other.id)).toBeDefined();
+  });
+
   it("marks a denied Local Network Access permission as a terminal error", async () => {
     kmp.connectError = named("lna-denied");
     const { result } = renderHook(() => useConnections());
@@ -406,6 +527,84 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     expect(saved(conn.id)).toMatchObject({
       status: "error",
       errorKind: "lna-denied",
+    });
+  });
+
+  describe("a serial connect stuck opening the port", () => {
+    const addUsb = (result: { current: ReturnType<typeof useConnections> }) =>
+      result.current.addConnection({
+        type: "serial",
+        name: "USB radio",
+        usbVendorId: 0x303a,
+        usbProductId: 0x1001,
+      });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("times out with a visible error when the port never opens", async () => {
+      vi.useFakeTimers();
+      kmp.connectHangs = true;
+      const { result } = renderHook(() => useConnections());
+      const conn = addUsb(result);
+
+      const connecting = result.current.connect(conn.id);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(OPEN_TIMEOUT_MS - 1);
+      });
+      expect(saved(conn.id)?.status).toBe("connecting");
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1);
+      });
+      expect(await connecting).toBe(false);
+      expect(saved(conn.id)).toMatchObject({
+        status: "error",
+        error: expect.stringContaining("didn't open"),
+      });
+      expect(meshRegistry.get(conn.id)).toBeUndefined();
+      expect(kmp.client?.disconnects).toHaveLength(1);
+
+      // Retry starts a fresh attempt that can succeed.
+      kmp.connectHangs = false;
+      vi.useRealTimers();
+      expect(await act(() => result.current.connect(conn.id))).toBe(true);
+      expect(saved(conn.id)?.status).toBe("configured");
+    });
+
+    it("times out when the client is never created", async () => {
+      vi.useFakeTimers();
+      kmp.holdFactory = new Promise<void>(() => {});
+      const { result } = renderHook(() => useConnections());
+      const conn = addUsb(result);
+
+      const connecting = result.current.connect(conn.id);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(OPEN_TIMEOUT_MS);
+      });
+      expect(await connecting).toBe(false);
+      expect(saved(conn.id)?.status).toBe("error");
+    });
+
+    it("does not come back after the user cancels a stuck connect", async () => {
+      vi.useFakeTimers();
+      kmp.connectHangs = true;
+      const { result } = renderHook(() => useConnections());
+      const conn = addUsb(result);
+
+      const connecting = result.current.connect(conn.id);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1_000);
+      });
+      await act(() => result.current.disconnect(conn.id));
+      expect(await connecting).toBe(false);
+      expect(saved(conn.id)?.status).toBe("disconnected");
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(OPEN_TIMEOUT_MS);
+      });
+      expect(saved(conn.id)?.status).toBe("disconnected");
     });
   });
 });

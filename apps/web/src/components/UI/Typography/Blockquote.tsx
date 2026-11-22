@@ -3,7 +3,7 @@ export interface BlockquoteProps {
 }
 
 export const BlockQuote = ({ children }: BlockquoteProps) => (
-  <blockquote className="mt-6 border-l-2 border-slate-300 pl-6 italic text-slate-800 dark:border-slate-600 dark:text-slate-200">
+  <blockquote className="mt-6 border-l-2 border-control pl-6 italic text-secondary">
     {children}
   </blockquote>
 );

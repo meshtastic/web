@@ -4,7 +4,8 @@ import * as React from "react";
 import { segmentedItemClasses, segmentedTrackClasses } from "./segmented.ts";
 
 const toggleGroupItemClasses = [
-  "flex flex-1 h-10 items-center justify-center",
+  // 32px items + 3px track padding + border keep the group 40px tall.
+  "flex flex-1 h-8 items-center justify-center",
   segmentedItemClasses,
 ];
 

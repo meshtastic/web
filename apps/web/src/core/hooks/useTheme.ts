@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import type { ThemeName } from "@core/theme/tokens.ts";
 
-type Theme = "light" | "dark" | "system";
+type Theme = ThemeName | "system";
 
 const THEME_CHANGE_EVENT = "meshtastic:theme-change";
 
-const getSystemTheme = (): Theme =>
+const getSystemTheme = (): ThemeName =>
   globalThis.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";

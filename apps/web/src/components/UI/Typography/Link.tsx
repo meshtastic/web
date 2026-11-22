@@ -15,7 +15,7 @@ export const Link = ({ href, children, className }: LinkProps) => (
     target="_blank"
     rel="noopener noreferrer"
     className={cn(
-      "font-medium text-slate-900 underline underline-offset-4 dark:text-slate-200",
+      "font-medium text-accent underline underline-offset-4 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
       className,
     )}
   >

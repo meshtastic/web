@@ -3,12 +3,17 @@ import { Protobuf } from "@core/protobuf.ts";
 import { Result } from "better-result";
 import { describe, expect, it } from "vitest";
 import {
+  anyFieldSelected,
   buildDeviceProfile,
   decodeDeviceProfile,
   defaultSelection,
   deviceProfileFileName,
   encodeDeviceProfile,
   planProfileImport,
+  type ProfileField,
+  type ProfileFieldRow,
+  profileFieldRows,
+  type ProfileSelection,
   type ProfileSource,
   profileContents,
   sanitizeExportNameSegment,
@@ -268,6 +273,69 @@ describe("profile import", () => {
       Result.isError(
         planProfileImport(profile, { owner, activeChannelIndexes: [] }),
       ),
+    ).toBe(true);
+  });
+});
+
+describe("profile field rows", () => {
+  const all = (value: boolean): ProfileSelection => ({
+    longName: value,
+    shortName: value,
+    channelUrl: value,
+    config: value,
+    moduleConfig: value,
+    fixedPosition: value,
+    isUnmessagable: value,
+    isLicensed: value,
+    privateKey: value,
+  });
+  const row = (rows: ProfileFieldRow[], field: ProfileField) =>
+    rows.find((r) => r.field === field);
+
+  it("disables parts the profile doesn't hold", () => {
+    const rows = profileFieldRows(
+      "export",
+      { ...all(true), fixedPosition: false },
+      all(true),
+    );
+    expect(row(rows, "fixedPosition")).toMatchObject({
+      available: false,
+      enabled: false,
+      checked: false,
+    });
+    expect(row(rows, "longName")).toMatchObject({ checked: true });
+  });
+
+  it("never applies the licensed flag on import", () => {
+    const rows = profileFieldRows("import", all(true), all(true));
+    expect(row(rows, "isLicensed")).toMatchObject({
+      enabled: false,
+      checked: false,
+      notApplied: true,
+    });
+    expect(
+      row(profileFieldRows("export", all(true), all(true)), "isLicensed"),
+    ).toMatchObject({ enabled: true, notApplied: false });
+  });
+
+  it("ties the private key to the configuration", () => {
+    const rows = profileFieldRows("import", all(true), {
+      ...all(true),
+      config: false,
+    });
+    expect(row(rows, "privateKey")).toMatchObject({
+      enabled: false,
+      checked: false,
+    });
+  });
+
+  it("counts only checked rows as a selection", () => {
+    const onlyLicensed = { ...all(false), isLicensed: true };
+    expect(
+      anyFieldSelected(profileFieldRows("import", all(true), onlyLicensed)),
+    ).toBe(false);
+    expect(
+      anyFieldSelected(profileFieldRows("export", all(true), onlyLicensed)),
     ).toBe(true);
   });
 });

@@ -1,20 +1,28 @@
-import {
-  defaultVisibilityState,
-  MapLayerTool,
-  type VisibilityState,
-} from "@app/components/PageComponents/Map/Tools/MapLayerTool.tsx";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
-import { BaseMap } from "@components/Map.tsx";
+import { LayersControl } from "@components/Map/LayersControl.tsx";
+import { MapControls } from "@components/Map/MapControls.tsx";
+import { MapNodeList } from "@components/Map/MapNodeList.tsx";
+import { MeshMap } from "@components/Map/MeshMap.tsx";
+import { NodePins } from "@components/Map/NodePins.tsx";
+import { SelectedNodeCard } from "@components/Map/SelectedNodeCard.tsx";
+import { NodeResponseDialogs } from "@components/Nodes/NodeResponseDialogs.tsx";
+import { useCollator } from "@components/Nodes/useCollator.ts";
+import { useNodeActions } from "@components/Nodes/useNodeActions.ts";
+import { useNodeLabels } from "@components/Nodes/useNodeLabels.ts";
+import { useNodeRows } from "@components/Nodes/useNodeRows.ts";
 import {
   HeatmapLayer,
   type HeatmapMode,
 } from "@components/PageComponents/Map/Layers/HeatmapLayer.tsx";
-import { NodesLayer } from "@components/PageComponents/Map/Layers/NodesLayer.tsx";
-import { PrecisionLayer } from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
+import {
+  generatePrecisionCircles,
+  PrecisionLayer,
+  SourcePrecisionCircles,
+} from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
 import {
   SNRLayer,
   SNRTooltip,
@@ -22,20 +30,60 @@ import {
 } from "@components/PageComponents/Map/Layers/SNRLayer.tsx";
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
-import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
+import { ShellPage } from "@components/Shell/ShellPage.tsx";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@components/shadcn/drawer.tsx";
+import { Button } from "@components/UI/Button.tsx";
+import { IconButton } from "@components/UI/IconButton.tsx";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@components/UI/Popover.tsx";
+import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
-import {
-  useMyNodeAsProto,
-  useNodesAsProto,
-} from "@core/hooks/useNodesAsProto.ts";
-import { cn } from "@core/utils/cn.ts";
-import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import { createLogger } from "@core/log.ts";
-import type { Protobuf } from "@core/protobuf.ts";
-import { numberToHexUnpadded } from "@noble/curves/utils.js";
-import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
+  defaultVisibilityState,
+  type MapLayerKey,
+  toggleLayer,
+  type VisibilityState,
+} from "@core/nodes/mapLayers.ts";
+import {
+  derivePins,
+  nodeAtLngLat,
+  pinLabelsAtZoom,
+} from "@core/nodes/mapPins.ts";
+import {
+  desktopFitPadding,
+  type FitPhase,
+  initialFitPhase,
+  MAP_LAYERS_PANEL_WIDTH,
+  MAP_NODE_PANEL_WIDTH,
+  MAP_OVERLAY_INSET,
+  MAP_VIEW_STORAGE_KEY,
+  MOBILE_FIT_PADDING,
+  nextFitStep,
+  type OverlayReach,
+  parseMapView,
+  pickInitialView,
+  serializeMapView,
+  shouldPersistMove,
+  viewFromRouteParams,
+} from "@core/nodes/mapView.ts";
+import { matchesNodeSearch } from "@core/nodes/nodeFilters.ts";
+import type { NodeRow } from "@core/nodes/nodeRow.ts";
+import { sortNodeRows } from "@core/nodes/nodeSort.ts";
+import { hasPos } from "@core/utils/geo.ts";
+import { useParams } from "@tanstack/react-router";
+import { FunnelIcon, LayersIcon, ListIcon } from "lucide-react";
+import {
+  type RefObject,
   useCallback,
   useDeferredValue,
   useEffect,
@@ -45,335 +93,602 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { type MapLayerMouseEvent, useMap } from "react-map-gl/maplibre";
+import {
+  type MapLayerMouseEvent,
+  Marker,
+  useMap,
+  type ViewStateChangeEvent,
+} from "react-map-gl/maplibre";
 
 const log = createLogger("MapPage");
-const MAP_VIEW_STORAGE_KEY = "meshtastic:mapView";
 
-type SavedMapView = { longitude: number; latitude: number; zoom: number };
-
-function loadSavedMapView(): SavedMapView | undefined {
-  if (typeof localStorage === "undefined") return undefined;
+const readSavedView = () => {
   try {
-    const raw = localStorage.getItem(MAP_VIEW_STORAGE_KEY);
-    if (!raw) return undefined;
-    const parsed = JSON.parse(raw) as Partial<SavedMapView>;
-    if (
-      typeof parsed.longitude === "number" &&
-      typeof parsed.latitude === "number" &&
-      typeof parsed.zoom === "number"
-    ) {
-      return parsed as SavedMapView;
-    }
-    log.warn("saved map view has unexpected shape; ignoring", parsed);
-  } catch (e) {
-    const err = e as Error;
-    log.warn("failed to read saved map view", {
-      name: err?.name,
-      message: err?.message,
-    });
+    return parseMapView(globalThis.localStorage?.getItem(MAP_VIEW_STORAGE_KEY));
+  } catch (error) {
+    log.warn("failed to read saved map view", { error: String(error) });
+    return undefined;
   }
-  return undefined;
-}
+};
+
+const textProp = (value: unknown): string | undefined =>
+  typeof value === "string" && value.length > 0 ? value : undefined;
+
+const numberProp = (value: unknown): number | undefined => {
+  const n = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(n) ? n : undefined;
+};
+
+/**
+ * How far the desktop node list and layers card reach into the map, kept
+ * up to date as they resize, so fitted nodes land clear of both.
+ */
+const useOverlayReach = (
+  leftRef: RefObject<HTMLElement | null>,
+  rightRef: RefObject<HTMLElement | null>,
+  enabled: boolean,
+): OverlayReach | undefined => {
+  const [reach, setReach] = useState<OverlayReach>();
+  useEffect(() => {
+    const left = leftRef.current;
+    const right = rightRef.current;
+    const container = left?.parentElement;
+    if (!enabled || !left || !right || !container) {
+      return;
+    }
+    const measure = () => {
+      const box = container.getBoundingClientRect();
+      const next = {
+        left: Math.round(left.getBoundingClientRect().right - box.left),
+        right: Math.round(box.right - right.getBoundingClientRect().left),
+      };
+      setReach((current) =>
+        current?.left === next.left && current.right === next.right
+          ? current
+          : next,
+      );
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const observer = new ResizeObserver(measure);
+    for (const element of [left, right, container]) {
+      observer.observe(element);
+    }
+    return () => observer.disconnect();
+  }, [leftRef, rightRef, enabled]);
+  return enabled ? reach : undefined;
+};
+
+/** This radio first, then the most recently heard. */
+const orderForList = (
+  rows: readonly NodeRow[],
+  collator: Intl.Collator,
+): NodeRow[] => {
+  const sorted = sortNodeRows(
+    rows,
+    { key: "lastHeard", direction: "desc" },
+    collator,
+  );
+  return [
+    ...sorted.filter((row) => row.isSelf),
+    ...sorted.filter((row) => !row.isSelf),
+  ];
+};
 
 const MapPage = () => {
   const { t } = useTranslation("map");
-  const allNodes = useNodesAsProto();
-  const getNode = useCallback(
-    (n: number) => allNodes.find((node) => node.num === n),
-    [allNodes],
-  );
-  const validNodes = useMemo(
-    () =>
-      allNodes.filter((n): n is Protobuf.Mesh.NodeInfo =>
-        Boolean(n.position?.latitudeI),
-      ),
-    [allNodes],
-  );
-  const myNode = useMyNodeAsProto();
-  const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
+  const isMobile = useIsMobile();
+  const { rows, sources, myNodeNum, now } = useNodeRows();
+  const labels = useNodeLabels(now);
+  const collator = useCollator();
   const { default: mapRef } = useMap();
-  const { focusLngLat, fitToNodes } = useMapFitting(mapRef);
-
-  // Read once so the ref is stable across renders.
-  const savedView = useRef<SavedMapView | undefined>(loadSavedMapView());
-  // Skip auto-fit-to-nodes if a saved view already positioned the map.
-  const hasFitBoundsOnce = useRef<boolean>(!!savedView.current);
-
-  useEffect(() => {
-    const map = mapRef?.getMap();
-    if (!map) return;
-    const handler = () => {
-      const center = map.getCenter();
-      const view: SavedMapView = {
-        longitude: center.lng,
-        latitude: center.lat,
-        zoom: map.getZoom(),
-      };
-      try {
-        localStorage.setItem(MAP_VIEW_STORAGE_KEY, JSON.stringify(view));
-      } catch (e) {
-        const err = e as Error;
-        log.warn("failed to persist map view", {
-          name: err?.name,
-          message: err?.message,
-        });
-      }
-    };
-    map.on("moveend", handler);
-    return () => {
-      map.off("moveend", handler);
-    };
-  }, [mapRef]);
-  const [snrHover, setSnrHover] = useState<SNRTooltipProps>();
-  const [expandedCluster, setExpandedCluster] = useState<string | undefined>();
-  const [popupState, setPopupState] = useState<PopupState | undefined>();
-
-  const [visibilityState, setVisibilityState] = useState<VisibilityState>(
-    () => defaultVisibilityState,
+  const listRef = useRef<HTMLElement>(null);
+  const layersRef = useRef<HTMLDivElement>(null);
+  const overlayReach = useOverlayReach(listRef, layersRef, !isMobile);
+  const fitPadding = useMemo(
+    () => (isMobile ? MOBILE_FIT_PADDING : desktopFitPadding(overlayReach)),
+    [isMobile, overlayReach],
   );
-  const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>("density");
+  const { focusLngLat, fitToNodes } = useMapFitting(mapRef, fitPadding);
+  const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
-  // Filters
+  // Where to open: a /map/$long/$lat/$zoom link, else the last view, else fit.
+  const routeParams = useParams({ strict: false });
+  const routeView = viewFromRouteParams(routeParams);
+  // A string, so effects follow the link itself, not the params object.
+  const routeKey = routeView
+    ? `${routeView.longitude},${routeView.latitude},${routeView.zoom}`
+    : "";
+  const [initialView] = useState(() =>
+    pickInitialView(routeView, readSavedView()),
+  );
+  const fitPhase = useRef<FitPhase>(initialFitPhase(initialView));
+  const [mapLoaded, setMapLoaded] = useState(false);
+  // Only the label threshold matters to pins, so they skip zoom changes.
+  const [zoomedIn, setZoomedIn] = useState(
+    initialView.kind !== "fitNodes" && pinLabelsAtZoom(initialView.view.zoom),
+  );
+
   const [filterState, setFilterState] = useState<FilterState>(
     () => defaultFilterValues,
   );
   const deferredFilterState = useDeferredValue(filterState);
+  const filtersDirty = isFilterDirty(filterState);
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+  // undefined: nothing picked yet (a link's target applies); null: cleared.
+  const [picked, setPicked] = useState<number | null | undefined>();
+  // The link the current selection follows; a new link resets the pick so
+  // its target node is selected (state adjusted during render, not in an
+  // effect).
+  const [pickedForRoute, setPickedForRoute] = useState(routeKey);
+  if (pickedForRoute !== routeKey) {
+    setPickedForRoute(routeKey);
+    setPicked(undefined);
+  }
+  const [expandedCluster, setExpandedCluster] = useState<string | undefined>();
+  const [popupState, setPopupState] = useState<PopupState | undefined>();
+  const [visibility, setVisibility] = useState<VisibilityState>(
+    () => defaultVisibilityState,
+  );
+  const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>("density");
+  const [snrHover, setSnrHover] = useState<SNRTooltipProps>();
+  const [listOpen, setListOpen] = useState(false);
 
+  // Nodes with a position that pass the advanced filters.
   const filteredNodes = useMemo(
-    () => validNodes.filter((node) => nodeFilter(node, deferredFilterState)),
-    [validNodes, deferredFilterState, nodeFilter],
+    () =>
+      sources.filter(
+        (node) =>
+          hasPos(node.position) && nodeFilter(node, deferredFilterState),
+      ),
+    [sources, nodeFilter, deferredFilterState],
   );
-
-  // Map fitting
-  const getMapBounds = useCallback(() => {
-    if (!hasFitBoundsOnce.current) {
-      fitToNodes(validNodes);
-      hasFitBoundsOnce.current = true;
-    }
-  }, [fitToNodes, validNodes]);
-
-  // SNR lines
-  const snrLayerElementId = useId();
-  const snrLayerElement = useMemo(
-    () => (
-      <SNRLayer
-        id={snrLayerElementId}
-        filteredNodes={filteredNodes}
-        myNode={myNode}
-        visibilityState={visibilityState}
-      />
-    ),
-    [filteredNodes, myNode, visibilityState, snrLayerElementId],
+  const myNode = useMemo(
+    () => sources.find((node) => node.num === myNodeNum),
+    [sources, myNodeNum],
   );
-
-  // Heatmap
-  const heatmapLayerElementId = useId();
-  const heatmapLayerElement = useMemo(
-    () => (
-      <HeatmapLayer
-        id={heatmapLayerElementId}
-        filteredNodes={filteredNodes}
-        isVisible={visibilityState.heatmap}
-        mode={heatmapMode}
-      />
-    ),
+  const rowsByNum = useMemo(
+    () => new Map(rows.map((row) => [row.num, row])),
+    [rows],
+  );
+  const placedRows = useMemo(() => {
+    const nums = new Set(filteredNodes.map((node) => node.num));
+    return rows.filter((row) => nums.has(row.num) && row.lngLat);
+  }, [rows, filteredNodes]);
+  // A "Show on map" link selects the node at its point until the user picks.
+  const routeLng = routeView?.longitude;
+  const routeLat = routeView?.latitude;
+  const routeTargetNum = useMemo(
+    () =>
+      routeLng === undefined || routeLat === undefined
+        ? undefined
+        : nodeAtLngLat(placedRows, [routeLng, routeLat])?.num,
+    [routeLng, routeLat, placedRows],
+  );
+  const selectedNum =
+    picked === undefined ? routeTargetNum : (picked ?? undefined);
+  const listRows = useMemo(
+    () =>
+      orderForList(
+        placedRows.filter((row) => matchesNodeSearch(row, deferredSearch)),
+        collator,
+      ),
+    [placedRows, deferredSearch, collator],
+  );
+  // Pins not matching the list search are faded rather than hidden.
+  const matchingNums = useMemo(
+    () =>
+      deferredSearch.trim() === ""
+        ? undefined
+        : new Set(listRows.map((row) => row.num)),
+    [listRows, deferredSearch],
+  );
+  const pinModel = useMemo(
+    () =>
+      derivePins(visibility.nodeMarkers ? placedRows : [], {
+        myNodeNum,
+        selectedNum,
+        expandedCluster,
+      }),
     [
-      filteredNodes,
-      visibilityState.heatmap,
-      heatmapMode,
-      heatmapLayerElementId,
+      placedRows,
+      visibility.nodeMarkers,
+      myNodeNum,
+      selectedNum,
+      expandedCluster,
     ],
   );
+
+  const selectedRow =
+    selectedNum === undefined ? undefined : rowsByNum.get(selectedNum);
+
+  const actions = useNodeActions(selectedRow);
+  const selectedNode = useMemo(
+    () => filteredNodes.find((node) => node.num === selectedNum),
+    [filteredNodes, selectedNum],
+  );
+  // The selected node's precision circle shows even with the layer off.
+  const selectedPrecision = useMemo(
+    () => (selectedNode ? generatePrecisionCircles([selectedNode]) : undefined),
+    [selectedNode],
+  );
+  const myRow = myNodeNum === undefined ? undefined : rowsByNum.get(myNodeNum);
+  const myLngLat = myRow?.lngLat;
+
+  // A link followed while the map is open (e.g. "Show on map" from the
+  // node card) moves the camera; the first one is the initial view.
+  const lastRouteKey = useRef(routeKey);
+  useEffect(() => {
+    if (!mapRef || !routeView || lastRouteKey.current === routeKey) {
+      return;
+    }
+    lastRouteKey.current = routeKey;
+    mapRef.easeTo({
+      center: [routeView.longitude, routeView.latitude],
+      zoom: routeView.zoom,
+    });
+  }, [mapRef, routeKey, routeView]);
+
+  // With no view to restore, fit once the map and the nodes are both ready,
+  // and once more if that first fit only saw a single node.
+  useEffect(() => {
+    if (!mapLoaded) {
+      return;
+    }
+    const step = nextFitStep(fitPhase.current, filteredNodes.length);
+    fitPhase.current = step.phase;
+    if (step.fit) {
+      fitToNodes(filteredNodes, myNode?.position);
+    }
+  }, [mapLoaded, filteredNodes, fitToNodes, myNode?.position]);
+
+  const handleMoveEnd = useCallback(
+    (event: ViewStateChangeEvent) => {
+      const { longitude, latitude, zoom: nextZoom } = event.viewState;
+      setZoomedIn(pinLabelsAtZoom(nextZoom));
+      // Fits, link targets and resizes have no originating input event.
+      const userInitiated = event.originalEvent !== undefined;
+      if (userInitiated) {
+        // The user has picked a view; stop fitting to nodes.
+        fitPhase.current = "done";
+      }
+      if (
+        !shouldPersistMove({
+          userInitiated,
+          initialViewApplied: mapLoaded,
+        })
+      ) {
+        return;
+      }
+      try {
+        globalThis.localStorage?.setItem(
+          MAP_VIEW_STORAGE_KEY,
+          serializeMapView({ longitude, latitude, zoom: nextZoom }),
+        );
+      } catch (error) {
+        log.warn("failed to persist map view", { error: String(error) });
+      }
+    },
+    [mapLoaded],
+  );
+
+  const selectNode = useCallback(
+    (num: number) => {
+      setPicked(num);
+      setListOpen(false);
+      const lngLat = rowsByNum.get(num)?.lngLat;
+      if (lngLat) {
+        focusLngLat(lngLat);
+      }
+    },
+    [rowsByNum, focusLngLat],
+  );
+
+  // Closing the card returns focus to the node's list item, else the map.
+  const closeCard = useCallback(() => {
+    const num = selectedNum;
+    setPicked(null);
+    requestAnimationFrame(() => {
+      const item =
+        num === undefined
+          ? null
+          : listRef.current?.querySelector<HTMLElement>(
+              `[data-node-num="${num}"]`,
+            );
+      if (item) {
+        item.focus();
+      } else {
+        mapRef?.getCanvas().focus();
+      }
+    });
+  }, [selectedNum, mapRef]);
+
+  const onMapClick = useCallback(() => {
+    setExpandedCluster(undefined);
+    setPicked(null);
+  }, []);
+
+  const snrLayerId = useId();
+  const heatmapLayerId = useId();
+  const precisionLayerId = useId();
 
   const onMouseMove = useCallback(
     (event: MapLayerMouseEvent) => {
-      const {
-        features,
-        point: { x, y },
-      } = event;
-      const hoveredFeature = features?.[0];
-
-      if (hoveredFeature) {
-        const { from, to, snr, name, shortName, num } =
-          hoveredFeature.properties;
-
-        // Handle Heatmap Hover
-        if (
-          hoveredFeature.layer.id === `${heatmapLayerElementId}-interaction` &&
-          name !== undefined
-        ) {
-          setSnrHover({
-            pos: { x, y },
-            snr: snr, // Single node SNR
-            from:
-              name ||
-              shortName ||
-              t("fallbackName", {
-                last4: numberToHexUnpadded(num).slice(-4).toUpperCase(),
-              }),
-            to: undefined, // Single node
-          });
-          return;
-        }
-
-        // Handle SNR Line Hover
-        const fromLong =
-          getNode(from)?.user?.longName ??
-          t("fallbackName", {
-            last4: numberToHexUnpadded(from).slice(-4).toUpperCase(),
-          });
-
-        const toLong =
-          getNode(to)?.user?.longName ??
-          t("fallbackName", {
-            last4: numberToHexUnpadded(to).slice(-4).toUpperCase(),
-          });
-
-        setSnrHover({ pos: { x, y }, snr, from: fromLong, to: toLong });
-      } else {
+      const feature = event.features?.[0];
+      if (!feature) {
         setSnrHover(undefined);
+        return;
       }
+      const pos = { x: event.point.x, y: event.point.y };
+      const props = feature.properties;
+      const snr = numberProp(props.snr) ?? 0;
+      const nameOf = (num: number | undefined) =>
+        num === undefined ? undefined : rowsByNum.get(num)?.name;
+      if (feature.layer.id === `${heatmapLayerId}-interaction`) {
+        const num = numberProp(props.num);
+        setSnrHover({
+          pos,
+          snr,
+          from:
+            textProp(props.name) ??
+            textProp(props.shortName) ??
+            nameOf(num) ??
+            labels.notAvailable,
+          to: undefined,
+        });
+        return;
+      }
+      setSnrHover({
+        pos,
+        snr,
+        from: nameOf(numberProp(props.from)) ?? labels.notAvailable,
+        to: nameOf(numberProp(props.to)) ?? labels.notAvailable,
+      });
     },
-    [getNode, t, heatmapLayerElementId],
+    [heatmapLayerId, rowsByNum, labels.notAvailable],
   );
 
-  // Node markers & clusters
-  const onMapBackgroundClick = useCallback(() => {
-    setExpandedCluster(undefined);
-  }, []);
+  const toggle = (key: MapLayerKey) =>
+    setVisibility((current) => toggleLayer(current, key));
 
-  const markerElements = useMemo(
-    () => (
-      <NodesLayer
-        mapRef={mapRef}
-        filteredNodes={filteredNodes}
-        myNode={myNode}
-        expandedCluster={expandedCluster}
-        setExpandedCluster={setExpandedCluster}
-        popupState={popupState}
-        setPopupState={setPopupState}
-        isVisible={visibilityState.nodeMarkers}
-      />
-    ),
-    [
-      filteredNodes,
-      expandedCluster,
-      mapRef,
-      myNode,
-      popupState,
-      visibilityState.nodeMarkers,
-    ],
+  const map = mapRef?.getMap();
+  const controls = (
+    <MapControls
+      onCenter={myLngLat ? () => focusLngLat(myLngLat) : undefined}
+      onZoomIn={() => map?.zoomIn()}
+      onZoomOut={() => map?.zoomOut()}
+    />
   );
 
-  // Precision circles
-  const precisionCirclesElementId = useId();
-  const precisionCirclesElement = useMemo(
-    () => (
-      <PrecisionLayer
-        id={precisionCirclesElementId}
-        filteredNodes={filteredNodes}
-        isVisible={visibilityState.positionPrecision}
-      />
-    ),
-    [
-      filteredNodes,
-      visibilityState.positionPrecision,
-      precisionCirclesElementId,
-    ],
+  const layers = (
+    <LayersControl
+      visibility={visibility}
+      onToggle={toggle}
+      heatmapMode={heatmapMode}
+      onHeatmapModeChange={setHeatmapMode}
+    />
   );
 
-  // Waypoints
-  const waypointLayerElement = useMemo(
-    () => (
-      <WaypointLayer
-        mapRef={mapRef}
-        myNode={myNode}
-        isVisible={visibilityState.waypoints}
-        popupState={popupState}
-        setPopupState={setPopupState}
-      />
-    ),
-    [mapRef, myNode, visibilityState.waypoints, popupState],
+  const filters = (
+    <FilterControl
+      filterState={filterState}
+      defaultFilterValues={defaultFilterValues}
+      setFilterState={setFilterState}
+      isDirty={filtersDirty}
+      parameters={{
+        popoverContentProps: { side: "bottom", align: "end", sideOffset: 8 },
+        popoverTriggerClassName: [
+          "relative flex size-[38px] shrink-0 items-center justify-center rounded-control border border-control pointer-coarse:touch-target",
+          "bg-app text-muted hover:bg-raised hover:text-primary active:bg-raised",
+          "dark:bg-app dark:text-muted hover:dark:bg-raised hover:dark:text-primary dark:active:bg-raised",
+          "focus-visible:outline-2 focus-visible:outline-focus",
+          filtersDirty
+            ? "border-accent bg-accent-tint text-accent dark:bg-accent-tint dark:text-accent hover:bg-accent-tint hover:dark:bg-accent-tint"
+            : "",
+        ].join(" "),
+        triggerIcon: <FunnelIcon aria-hidden="true" className="size-4" />,
+      }}
+    />
   );
+
+  const nodeList = (
+    <MapNodeList
+      rows={listRows}
+      total={placedRows.length}
+      search={search}
+      onSearchChange={setSearch}
+      selectedNum={selectedNum}
+      onSelect={selectNode}
+      labels={labels}
+      tools={filters}
+      showHeading={false}
+      className="h-full"
+    />
+  );
+
+  const selectedCard = selectedRow ? (
+    <SelectedNodeCard
+      row={selectedRow}
+      labels={labels}
+      actions={actions}
+      onClose={closeCard}
+      className={isMobile ? "w-auto" : undefined}
+    />
+  ) : null;
+
+  const selectedPin = pinModel.pins.find((pin) => pin.isSelected);
+  const title = t("navigation.map", { ns: "ui" });
 
   return (
-    <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
-      <BaseMap
-        initialViewState={savedView.current}
-        onLoad={getMapBounds}
-        onMouseMove={onMouseMove}
-        onClick={onMapBackgroundClick}
-        interactiveLayerIds={[
-          snrLayerElementId,
-          `${heatmapLayerElementId}-interaction`,
-        ]}
-      >
-        {heatmapLayerElement}
-        {markerElements}
-        {snrLayerElement}
-        {precisionCirclesElement}
-        {waypointLayerElement}
-
-        {snrHover && (
-          <SNRTooltip
-            pos={snrHover.pos}
-            snr={snrHover.snr}
-            from={snrHover.from}
-            to={snrHover.to}
+    <ShellPage label={title} noPadding>
+      <h1 className="sr-only">{title}</h1>
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        {isMobile ? (
+          <>
+            <div className="absolute top-3 left-3 z-10 flex gap-2">
+              <Drawer open={listOpen} onOpenChange={setListOpen}>
+                <DrawerTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="touch"
+                    className="border border-control bg-surface shadow-floating"
+                    icon={<ListIcon aria-hidden="true" className="size-4" />}
+                  >
+                    {t("page.showNodes")}
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent className="h-[70dvh] border-subtle bg-surface pb-[env(safe-area-inset-bottom)] text-primary">
+                  <DrawerTitle className="sr-only">
+                    {t("page.nodeListLabel")}
+                  </DrawerTitle>
+                  <DrawerDescription className="sr-only">
+                    {t("page.nodesWithPosition", { count: placedRows.length })}
+                  </DrawerDescription>
+                  {nodeList}
+                </DrawerContent>
+              </Drawer>
+            </div>
+            <div className="absolute top-3 right-3 z-10">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <IconButton
+                    aria-label={t("layers.open")}
+                    size="touch"
+                    className="border border-control bg-surface text-primary shadow-floating"
+                    icon={<LayersIcon className="size-5" />}
+                  />
+                </PopoverTrigger>
+                <PopoverContent
+                  align="end"
+                  className="border-0 bg-transparent p-0 shadow-none"
+                  style={{ width: MAP_LAYERS_PANEL_WIDTH }}
+                >
+                  {layers}
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="absolute right-3 bottom-20 z-10">{controls}</div>
+            {selectedCard ? (
+              <div className="absolute inset-x-3 bottom-3 z-10 mr-14">
+                {selectedCard}
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <>
+            {/* Panel sizes come from the constants the fit padding uses. */}
+            <section
+              ref={listRef}
+              aria-label={t("page.nodeListLabel")}
+              className="absolute z-10 flex flex-col overflow-hidden rounded-panel border border-control bg-surface shadow-dialog"
+              style={{
+                top: MAP_OVERLAY_INSET,
+                bottom: MAP_OVERLAY_INSET,
+                left: MAP_OVERLAY_INSET,
+                width: MAP_NODE_PANEL_WIDTH,
+              }}
+            >
+              {nodeList}
+            </section>
+            <div
+              ref={layersRef}
+              className="absolute z-10"
+              style={{
+                top: MAP_OVERLAY_INSET,
+                right: MAP_OVERLAY_INSET,
+                width: MAP_LAYERS_PANEL_WIDTH,
+              }}
+            >
+              {layers}
+            </div>
+            <div
+              className="absolute bottom-20 z-10"
+              style={{ right: MAP_OVERLAY_INSET }}
+            >
+              {controls}
+            </div>
+          </>
+        )}
+        <MeshMap
+          initialView={
+            initialView.kind === "fitNodes" ? undefined : initialView.view
+          }
+          onLoad={() => setMapLoaded(true)}
+          onMoveEnd={handleMoveEnd}
+          onMouseMove={onMouseMove}
+          onClick={onMapClick}
+          interactiveLayerIds={[snrLayerId, `${heatmapLayerId}-interaction`]}
+        >
+          <HeatmapLayer
+            id={heatmapLayerId}
+            filteredNodes={filteredNodes}
+            isVisible={visibility.heatmap}
+            mode={heatmapMode}
           />
-        )}
-      </BaseMap>
-      <div className="flex flex-col space-y-1 fixed top-35 right-2.5">
-        {myNode && hasPos(myNode?.position) && (
-          <button
-            type="button"
-            className={cn(
-              "rounded align-center",
-              "w-[29px] px-1 py-1 shadow-l outline-[2px] outline-stone-600/20",
-              "bg-stone-50 hover:bg-stone-200 dark:bg-stone-200 dark:hover:bg-stone-300 ",
-              "text-slate-600 hover:text-slate-700",
-              "dark:text-slate-600 hover:dark:text-slate-700",
-            )}
-            aria-label={t("mapMenu.locateAria")}
-            onClick={() => focusLngLat(toLngLat(myNode.position))}
-          >
-            {" "}
-            <LocateFixedIcon className="w-[21px]" />
-          </button>
-        )}
-
-        <FilterControl
-          filterState={filterState}
-          defaultFilterValues={defaultFilterValues}
-          setFilterState={setFilterState}
-          isDirty={isFilterDirty(filterState)}
-          parameters={{
-            popoverContentProps: {
-              side: "bottom",
-              align: "end",
-              sideOffset: 7,
-            },
-            popoverTriggerClassName: cn(
-              "w-[29px] px-1 py-1 rounded shadow-l outline-[2px] outline-stone-600/20 ",
-              "dark:text-slate-600 dark:hover:text-slate-700 bg-stone-50 hover:bg-stone-200 dark:bg-stone-200 dark:hover:bg-stone-300 dark:active:bg-stone-300",
-              isFilterDirty(filterState)
-                ? "text-slate-100 dark:text-slate-100 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 hover:text-slate-200 dark:hover:text-slate-200 active:bg-green-800 dark:active:bg-green-800 outline-green-600 dark:outline-green-700"
-                : "",
-            ),
-            triggerIcon: <FunnelIcon className="w-[21px]" />,
-            showTextSearch: true,
-          }}
-        />
-
-        <MapLayerTool
-          visibilityState={visibilityState}
-          setVisibilityState={setVisibilityState}
-          heatmapMode={heatmapMode}
-          setHeatmapMode={setHeatmapMode}
-        />
+          <SNRLayer
+            id={snrLayerId}
+            filteredNodes={filteredNodes}
+            myNode={myNode}
+            visibilityState={visibility}
+          />
+          <PrecisionLayer
+            id={precisionLayerId}
+            filteredNodes={filteredNodes}
+            isVisible={visibility.positionPrecision}
+          />
+          {selectedPrecision && !visibility.positionPrecision ? (
+            <SourcePrecisionCircles
+              id={`${precisionLayerId}-selected`}
+              data={selectedPrecision}
+              isVisible
+            />
+          ) : null}
+          <WaypointLayer
+            mapRef={mapRef}
+            myNode={myNode}
+            isVisible={visibility.waypoints}
+            popupState={popupState}
+            setPopupState={setPopupState}
+          />
+          <NodePins
+            pins={pinModel.pins}
+            stacks={pinModel.stacks}
+            rowsByNum={rowsByNum}
+            zoomedIn={zoomedIn}
+            matchingNums={matchingNums}
+            onSelect={selectNode}
+            onExpandStack={setExpandedCluster}
+          />
+          {!isMobile && selectedCard && selectedRow?.lngLat ? (
+            <Marker
+              longitude={selectedRow.lngLat[0]}
+              latitude={selectedRow.lngLat[1]}
+              anchor="top-left"
+              offset={[
+                (selectedPin?.offsetPx[0] ?? 0) + 24,
+                (selectedPin?.offsetPx[1] ?? 0) + 24,
+              ]}
+              style={{ zIndex: 4 }}
+              onClick={(event) => event.originalEvent.stopPropagation()}
+            >
+              {selectedCard}
+            </Marker>
+          ) : null}
+          {snrHover ? (
+            <SNRTooltip
+              pos={snrHover.pos}
+              snr={snrHover.snr}
+              from={snrHover.from}
+              to={snrHover.to}
+            />
+          ) : null}
+        </MeshMap>
       </div>
-    </PageLayout>
+      <NodeResponseDialogs />
+    </ShellPage>
   );
 };
 

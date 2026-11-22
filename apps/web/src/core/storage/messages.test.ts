@@ -4,7 +4,18 @@ import { MultiTabCoordinator } from "./coordinator.ts";
 import type { SqlocalDb } from "./db.ts";
 import { createMemoryDb } from "./memoryDb.ts";
 import { SqlocalMessageRepository } from "./messages.ts";
-import { type ConversationKey, type Message, MessageState } from "./types.ts";
+import {
+  type ConversationKey,
+  conversationKeyString,
+  type Message,
+  MessageState,
+  type Reaction,
+} from "./types.ts";
+
+const PRIMARY: ConversationKey = {
+  kind: "channel",
+  channel: Types.ChannelNumber.Primary,
+};
 
 function msg(id: number, ms: number, text = "t"): Message {
   return {
@@ -46,10 +57,38 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     ]);
     const out = await repo.loadBefore(
       { kind: "channel", channel: Types.ChannelNumber.Primary },
-      new Date(3000),
+      { rxTime: new Date(3000) },
       10,
     );
     expect(out.map((m) => m.id)).toEqual([1, 2]);
+  });
+
+  it("pages through messages sharing one rxTime by arrival order", async () => {
+    await repo.appendBatch([
+      msg(1, 1000),
+      msg(2, 2000),
+      msg(3, 2000),
+      msg(4, 2000),
+      msg(5, 3000),
+    ]);
+    const recent = await repo.loadRecent(PRIMARY, 2);
+    expect(recent.map((m) => m.id)).toEqual([4, 5]);
+    const oldest = recent[0];
+    if (!oldest) throw new Error("expected a message");
+    const page = await repo.loadBefore(
+      PRIMARY,
+      { rxTime: oldest.rxTime, seq: oldest.seq },
+      2,
+    );
+    expect(page.map((m) => m.id)).toEqual([2, 3]);
+    const last = page[0];
+    if (!last) throw new Error("expected a message");
+    const rest = await repo.loadBefore(
+      PRIMARY,
+      { rxTime: last.rxTime, seq: last.seq },
+      10,
+    );
+    expect(rest.map((m) => m.id)).toEqual([1]);
   });
 
   it("round-trips how a message was received, keeping 0 readings", async () => {
@@ -94,33 +133,159 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     expect(await repo.loadRecent({ kind: "direct", peer: 1 }, 10)).toEqual([]);
   });
 
-  it("refiles sent direct messages filed under our own node", async () => {
-    const direct = (id: number, from: number, to: number): Message => ({
-      ...msg(id, id * 1000),
+  it("stores a packet once per sender and keeps its reply id", async () => {
+    await repo.append({ ...msg(9, 1000, "reply"), replyId: 4 });
+    await repo.append({ ...msg(9, 1000, "dup") });
+    await repo.append({ ...msg(9, 1500, "other sender"), from: 2 });
+    const out = await repo.loadRecent(PRIMARY, 10);
+    expect(out.map((m) => [m.from, m.text, m.replyId])).toEqual([
+      [1, "reply", 4],
+      [2, "other sender", undefined],
+    ]);
+  });
+
+  it("finds messages by packet id", async () => {
+    await repo.appendBatch([msg(1, 1000, "a"), msg(2, 2000, "b")]);
+    const found = await repo.findByIds([2, 3]);
+    expect(found.map((m) => m.text)).toEqual(["b"]);
+    expect(await repo.findByIds([])).toEqual([]);
+  });
+
+  describe("reactions", () => {
+    const reaction = (
+      targetId: number,
+      fromNode: number,
+      emoji: string,
+      packetId = 500 + fromNode,
+    ): Reaction => ({
+      targetId,
+      fromNode,
+      emoji,
+      packetId,
+      to: 0xffffffff,
+      rxTime: new Date(1000 + fromNode),
+      state: MessageState.Ack,
+    });
+
+    it("keeps one per target, sender and emoji (ignoring U+FE0F)", async () => {
+      await repo.addReaction(reaction(1, 2, "❤️"), PRIMARY);
+      await repo.addReaction(reaction(1, 2, "❤"), PRIMARY);
+      await repo.addReaction(reaction(1, 3, "❤"), PRIMARY);
+      await repo.addReaction(reaction(7, 3, "👍"), PRIMARY);
+      const out = await repo.loadReactions([1]);
+      expect(out.map((r) => [r.fromNode, r.emoji])).toEqual([
+        [2, "❤️"],
+        [3, "❤"],
+      ]);
+    });
+
+    it("removes one locally and tracks delivery by packet id", async () => {
+      await repo.addReaction(
+        { ...reaction(1, 1, "👍", 77), state: MessageState.Pending },
+        PRIMARY,
+      );
+      await repo.updateReactionDelivery(
+        { packetId: 77, fromNode: 2 },
+        {
+          state: MessageState.Ack,
+        },
+      );
+      expect((await repo.loadReactions([1]))[0]?.state).toBe(
+        MessageState.Pending,
+      );
+      await repo.updateReactionDelivery(
+        { packetId: 77, fromNode: 1 },
+        {
+          state: MessageState.Failed,
+          routingError: 5,
+        },
+      );
+      expect(await repo.loadReactions([1])).toMatchObject([
+        { state: MessageState.Failed, routingError: 5 },
+      ]);
+      await repo.removeReaction(1, 1, "👍");
+      expect(await repo.loadReactions([1])).toEqual([]);
+    });
+
+    it("drops reactions with the messages they belong to", async () => {
+      await repo.appendBatch([msg(1, 1000), msg(2, 2000)]);
+      await repo.addReaction(reaction(1, 2, "👍"), PRIMARY);
+      await repo.addReaction(reaction(2, 2, "👍"), PRIMARY);
+      await repo.prune({ maxPerBucket: 1 });
+      expect((await repo.loadReactions([1, 2])).map((r) => r.targetId)).toEqual(
+        [2],
+      );
+      await repo.clearConversation(PRIMARY);
+      expect(await repo.loadReactions([2])).toEqual([]);
+    });
+  });
+
+  describe("conversations and read markers", () => {
+    const ME = 1;
+    const dm = (id: number, from: number, text: string): Message => ({
+      ...msg(id, id * 1000, text),
       from,
-      to,
+      to: from === ME ? 2 : ME,
       type: "direct",
     });
-    // What older versions wrote: everything under direct:<from>.
-    await repo.appendBatch([
-      direct(1, 1, 2), // sent by us (node 1) to 2: misfiled
-      direct(2, 2, 1), // received from 2: already right
-      direct(3, 1, 1), // a note to ourselves: stays put
-    ]);
+    const DM: ConversationKey = { kind: "direct", peer: 2 };
 
-    expect(await repo.refileSentDirect(1)).toBe(1);
-    expect(
-      (await repo.loadRecent({ kind: "direct", peer: 2 }, 10)).map((m) => m.id),
-    ).toEqual([1, 2]);
-    expect(
-      (await repo.loadRecent({ kind: "direct", peer: 1 }, 10)).map((m) => m.id),
-    ).toEqual([3]);
-    expect(await repo.refileSentDirect(1)).toBe(0);
+    it("summarises each conversation's latest message and unread count", async () => {
+      await repo.append(dm(1, 2, "hi"), DM);
+      await repo.append(dm(2, 2, "there"), DM);
+      await repo.append(dm(3, ME, "hey"), DM);
+      await repo.append({ ...msg(4, 500, "all"), from: 3 }, PRIMARY);
+
+      const out = await repo.loadConversations(ME);
+      const byKey = new Map(out.map((c) => [conversationKeyString(c.key), c]));
+      expect(byKey.get("direct:2")).toMatchObject({
+        lastMessage: { id: 3, text: "hey" },
+        unread: 2,
+      });
+      expect(byKey.get("channel:0")).toMatchObject({
+        lastMessage: { id: 4 },
+        unread: 1,
+      });
+    });
+
+    it("counts only what arrived after the read marker", async () => {
+      await repo.append(dm(1, 2, "hi"), DM);
+      await repo.markRead(DM);
+      // Arrival order counts, not the radio's clock: this one is stamped
+      // earlier but arrived later.
+      await repo.append({ ...dm(2, 2, "late"), rxTime: new Date(1) }, DM);
+      const [conv] = await repo.loadConversations(ME);
+      expect(conv?.unread).toBe(1);
+
+      await repo.markRead(DM);
+      expect((await repo.loadConversations(ME))[0]?.unread).toBe(0);
+    });
+
+    it("leaves filtered messages out of the preview and unread, but keeps them", async () => {
+      await repo.append(dm(1, 2, "hi"), DM);
+      await repo.append({ ...dm(2, 2, "spam"), filtered: true }, DM);
+      const [conv] = await repo.loadConversations(ME);
+      expect(conv).toMatchObject({ lastMessage: { id: 1 }, unread: 1 });
+      const thread = await repo.loadRecent(DM, 10);
+      expect(thread.map((m) => [m.id, m.filtered])).toEqual([
+        [1, undefined],
+        [2, true],
+      ]);
+    });
+
+    it("marking an empty conversation read is a no-op", async () => {
+      await repo.markRead(DM);
+      expect(await repo.loadConversations(ME)).toEqual([]);
+    });
   });
 
   it("updateState mutates the matching row", async () => {
     await repo.append(msg(42, 1000));
-    await repo.updateState(42, MessageState.Failed);
+    await repo.updateState({ id: 42, from: 2 }, MessageState.Failed);
+    expect((await repo.loadRecent(PRIMARY, 1))[0]?.state).toBe(
+      MessageState.Ack,
+    );
+    await repo.updateState({ id: 42, from: 1 }, MessageState.Failed);
     const [found] = await repo.loadRecent(
       { kind: "channel", channel: Types.ChannelNumber.Primary },
       1,
@@ -185,7 +350,7 @@ describe("SqlocalMessageRepository (sql.js test driver)", () => {
     await repo.append(msg(3, 3000, "new"), channel);
     await repo.append(msg(4, 4000, "new"), channel);
     await repo.prune({ maxPerBucket: 1 });
-    await repo.updateState(1, MessageState.Failed);
+    await repo.updateState({ id: 1, from: 1 }, MessageState.Failed);
     expect(
       (await repo.loadRecent(channel, 10)).map((m) => [m.id, m.text]),
     ).toEqual([[4, "new"]]);

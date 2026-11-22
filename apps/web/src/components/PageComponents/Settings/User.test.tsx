@@ -119,4 +119,25 @@ describe("User", () => {
       }),
     );
   });
+
+  it("counts the long name in UTF-8 bytes and flags it once over", () => {
+    render(<User onFormInit={vi.fn()} />);
+    const longName = screen.getByLabelText("Long Name");
+    // 12 two-byte letters: 12 characters but 24 bytes, exactly the limit.
+    fireEvent.change(longName, { target: { value: "é".repeat(12) } });
+    expect(screen.getByText("24/24")).toBeInTheDocument();
+    expect(longName).not.toHaveAttribute("aria-invalid", "true");
+
+    fireEvent.change(longName, { target: { value: "é".repeat(13) } });
+    expect(screen.getByText("26/24")).toBeInTheDocument();
+    expect(longName).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("counts the short name in bytes, so one emoji fills it", () => {
+    render(<User onFormInit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText("Short Name"), {
+      target: { value: "📡" },
+    });
+    expect(screen.getByText("4/4")).toBeInTheDocument();
+  });
 });

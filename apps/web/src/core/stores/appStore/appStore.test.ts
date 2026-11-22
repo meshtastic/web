@@ -193,3 +193,203 @@ describe("AppStore – persistence: partialize + rehydrate", () => {
     }
   });
 });
+
+const IDB_KEY = "meshtastic-app-store";
+
+const seed = (state: unknown, version: number) => {
+  idbMem.set(IDB_KEY, JSON.stringify({ state, version }));
+};
+
+async function hydratedStore(persistApp: boolean) {
+  const mod = await freshStore(persistApp);
+  await vi.waitFor(() => {
+    expect(mod.useAppStore.persist.hasHydrated()).toBe(true);
+  });
+  return mod;
+}
+
+describe("AppStore – node list sorts", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("starts every list at its default", async () => {
+    const { useAppStore } = await hydratedStore(false);
+    expect(useAppStore.getState().nodeListSorts).toEqual({
+      nodes: { key: "lastHeard", direction: "desc", favoritesFirst: false },
+      channelHeard: {
+        key: "lastHeard",
+        direction: "desc",
+        favoritesFirst: false,
+      },
+    });
+  });
+
+  it("keeps each list's sort separately across reloads, even with persistApp off", async () => {
+    {
+      const { useAppStore } = await hydratedStore(false);
+      useAppStore.getState().setNodeListSort("nodes", {
+        key: "snr",
+        direction: "asc",
+        favoritesFirst: false,
+      });
+      useAppStore.getState().setNodeListSort("channelHeard", {
+        key: "lastHeard",
+        direction: "desc",
+        favoritesFirst: true,
+      });
+    }
+    {
+      const { useAppStore } = await hydratedStore(false);
+      expect(useAppStore.getState().nodeListSorts).toEqual({
+        nodes: { key: "snr", direction: "asc", favoritesFirst: false },
+        channelHeard: {
+          key: "lastHeard",
+          direction: "desc",
+          favoritesFirst: true,
+        },
+      });
+    }
+  });
+
+  it("migrates a version 0 store: raster sources kept, sorts defaulted", async () => {
+    seed({ rasterSources: [makeRaster({ title: "old" })] }, 0);
+    const { useAppStore, CURRENT_STORE_VERSION } = await hydratedStore(true);
+    expect(CURRENT_STORE_VERSION).toBe(2);
+    const state = useAppStore.getState();
+    expect(state.rasterSources.map((raster) => raster.title)).toEqual(["old"]);
+    expect(state.nodeListSorts.nodes.key).toBe("lastHeard");
+    expect(state.nodeListSorts.channelHeard.favoritesFirst).toBe(false);
+  });
+
+  it("falls back to the default for an invalid stored sort, list by list", async () => {
+    seed(
+      {
+        nodeListSorts: {
+          nodes: { key: "rssi", direction: "asc", favoritesFirst: true },
+          channelHeard: { key: "hops", direction: "asc", favoritesFirst: true },
+        },
+      },
+      1,
+    );
+    const { useAppStore } = await hydratedStore(false);
+    expect(useAppStore.getState().nodeListSorts).toEqual({
+      nodes: { key: "lastHeard", direction: "desc", favoritesFirst: false },
+      channelHeard: { key: "hops", direction: "asc", favoritesFirst: true },
+    });
+  });
+
+  it("ignores stored raster sources while persistApp is off", async () => {
+    seed({ rasterSources: [makeRaster({ title: "stale" })] }, 1);
+    const { useAppStore } = await hydratedStore(false);
+    expect(useAppStore.getState().rasterSources).toEqual([]);
+  });
+});
+
+describe("migrateAppData", () => {
+  it("defaults the sorts from version 0 and drops malformed raster sources", async () => {
+    const { migrateAppData } = await freshStore(false);
+    expect(
+      migrateAppData(
+        { rasterSources: [makeRaster({ title: "ok" }), { title: 3 }] },
+        0,
+      ),
+    ).toEqual({
+      nodeListSorts: {
+        nodes: { key: "lastHeard", direction: "desc", favoritesFirst: false },
+        channelHeard: {
+          key: "lastHeard",
+          direction: "desc",
+          favoritesFirst: false,
+        },
+      },
+      emojiFrequency: [],
+      skinToneIndex: 0,
+      rasterSources: [makeRaster({ title: "ok" })],
+    });
+    expect(migrateAppData(null, 0)).toEqual({});
+  });
+
+  it("starts the emoji memory empty when coming from version 1", async () => {
+    const { migrateAppData } = await freshStore(false);
+    const migrated = migrateAppData(
+      {
+        nodeListSorts: {},
+        emojiFrequency: [{ emoji: "🔥", count: 2 }],
+        skinToneIndex: 3,
+      },
+      1,
+    );
+    expect(migrated.emojiFrequency).toEqual([]);
+    expect(migrated.skinToneIndex).toBe(0);
+  });
+});
+
+describe("AppStore – emoji memory", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("upgrades a version 1 store with no emoji memory", async () => {
+    seed(
+      {
+        nodeListSorts: {
+          nodes: { key: "snr", direction: "asc", favoritesFirst: false },
+        },
+      },
+      1,
+    );
+    const { useAppStore } = await hydratedStore(false);
+    const state = useAppStore.getState();
+    expect(state.emojiFrequency).toEqual([]);
+    expect(state.skinToneIndex).toBe(0);
+    expect(state.nodeListSorts.nodes.key).toBe("snr");
+  });
+
+  it("keeps counts and the skin tone across reloads, even with persistApp off", async () => {
+    {
+      const { useAppStore } = await hydratedStore(false);
+      const state = useAppStore.getState();
+      state.recordEmojiUse("🔥");
+      state.recordEmojiUse("👋🏽");
+      state.recordEmojiUse("🔥");
+      state.setSkinToneIndex(3);
+    }
+    {
+      const { useAppStore } = await hydratedStore(false);
+      const state = useAppStore.getState();
+      expect(state.emojiFrequency).toEqual([
+        { emoji: "🔥", count: 2 },
+        { emoji: "👋🏽", count: 1 },
+      ]);
+      expect(state.skinToneIndex).toBe(3);
+    }
+  });
+
+  it("drops malformed stored emoji uses and an out-of-range tone", async () => {
+    seed(
+      {
+        emojiFrequency: [
+          { emoji: "🔥", count: 2 },
+          { emoji: "", count: 1 },
+          { emoji: "😂", count: -1 },
+          "👍=3",
+        ],
+        skinToneIndex: 9,
+      },
+      2,
+    );
+    const { useAppStore } = await hydratedStore(false);
+    const state = useAppStore.getState();
+    expect(state.emojiFrequency).toEqual([{ emoji: "🔥", count: 2 }]);
+    expect(state.skinToneIndex).toBe(0);
+  });
+
+  it("ignores an invalid skin tone", async () => {
+    const { useAppStore } = await hydratedStore(false);
+    useAppStore.getState().setSkinToneIndex(7);
+    expect(useAppStore.getState().skinToneIndex).toBe(0);
+  });
+});

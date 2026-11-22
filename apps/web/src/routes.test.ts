@@ -33,17 +33,39 @@ describe("routes", () => {
 
   it("/connections redirects home and opens the Connections drawer", async () => {
     const router = await load("/connections");
-    expect(router.state.location.pathname).toBe("/messages/broadcast/0");
+    expect(router.state.location.pathname).toBe("/messages");
     expect(useAppStore.getState().connectionsDrawer).toEqual({
       open: true,
       view: "list",
     });
   });
 
+  it("/welcome is the full-screen setup wizard", async () => {
+    const router = await load("/welcome");
+    expect(router.state.location.pathname).toBe("/welcome");
+    expect(router.state.matches.at(-1)?.routeId).toBe("/welcome");
+    expect(router.state.matches.at(-1)?.staticData).toEqual({
+      hideTabBar: true,
+    });
+  });
+
   it("/ no longer renders the Connections page", async () => {
     const router = await load("/");
-    expect(router.state.location.pathname).toBe("/messages/broadcast/0");
+    expect(router.state.location.pathname).toBe("/messages");
     expect(useAppStore.getState().connectionsDrawer.open).toBe(false);
+  });
+
+  it("/messages stays on the conversation list instead of opening a channel", async () => {
+    const router = await load("/messages");
+    expect(router.state.location.pathname).toBe("/messages");
+    expect(router.state.matches.at(-1)?.staticData.hideTabBar).toBeUndefined();
+  });
+
+  it("a conversation hides the mobile tab bar", async () => {
+    const router = await load("/messages/direct/42");
+    expect(router.state.matches.at(-1)?.staticData).toEqual({
+      hideTabBar: true,
+    });
   });
 
   it("opening and closing the drawer changes no route", async () => {
@@ -61,5 +83,35 @@ describe("routes", () => {
         /to:\s*["'`]\/connections["'`]/.test(readFileSync(file, "utf8")),
     );
     expect(offenders).toEqual([]);
+  });
+
+  it.each(["/settings/firmware", "/settings/help"])(
+    "%s opens its settings section without the tab bar",
+    async (path) => {
+      const router = await load(path);
+      expect(router.state.location.pathname).toBe(path);
+      const leaf = router.state.matches.at(-1);
+      expect(leaf?.routeId).toBe(path);
+      expect(leaf?.staticData).toEqual({ hideTabBar: true });
+    },
+  );
+
+  it("keeps ?tab= on device and module settings", async () => {
+    const router = await load("/settings/device?tab=position");
+    expect(router.state.location.search).toEqual({ tab: "position" });
+  });
+
+  it.each([
+    ["/messages/channel/0", "/messages"],
+    ["/messages/direct/not-a-node", "/messages"],
+    ["/map/500/0/3", "/map"],
+  ])("malformed %s redirects to %s instead of crashing", async (path, to) => {
+    const router = await load(path);
+    expect(router.state.location.pathname).toBe(to);
+  });
+
+  it("/settings/radio redirects to LoRa", async () => {
+    const router = await load("/settings/radio");
+    expect(router.state.location.pathname).toBe("/settings/lora");
   });
 });

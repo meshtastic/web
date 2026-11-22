@@ -1,3 +1,4 @@
+import { settingRowDescribedBy } from "@components/UI/SettingRow.tsx";
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
@@ -100,12 +101,15 @@ export function SelectInput<T extends FieldValues>({
     >
       <SelectTrigger
         id={field.name}
+        aria-describedby={settingRowDescribedBy(field.name, {
+          help: Boolean(field.description),
+          error: invalid,
+        })}
         className={cn([
+          "w-full sm:w-auto sm:min-w-60",
           className,
-          isDirty ? "focus:ring-sky-500 ring-sky-500 ring-2 ring-offset-2" : "",
-          invalid
-            ? "focus:ring-red-500 ring-red-500 ring-2 outline-offset-2"
-            : "",
+          isDirty && "border-dirty",
+          invalid && "border-danger-strong",
         ])}
         ref={ref}
         onBlur={onBlur}

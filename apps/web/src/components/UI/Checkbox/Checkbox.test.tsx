@@ -11,7 +11,7 @@ describe("Checkbox", () => {
     const presentation = screen.getByRole("presentation");
     expect(checkbox).not.toBeChecked();
     // unchecked -> no filled bg class
-    expect(presentation).not.toHaveClass("bg-slate-500");
+    expect(presentation).not.toHaveClass("bg-accent");
   });
 
   it("respects defaultChecked in uncontrolled mode", () => {
@@ -24,7 +24,7 @@ describe("Checkbox", () => {
     const checkbox = screen.getByRole("checkbox");
     const presentation = screen.getByRole("presentation");
     expect(checkbox).toBeChecked();
-    expect(presentation).toHaveClass("bg-slate-500");
+    expect(presentation).toHaveClass("bg-accent");
   });
 
   it("calls onChange when clicked (uncontrolled) and toggles DOM state", () => {
@@ -71,7 +71,7 @@ describe("Checkbox", () => {
     // parent updates `checked` based on onChange
     rerender(<Checkbox checked={true} onChange={onChange} />);
     expect(checkbox).toBeChecked();
-    expect(presentation).toHaveClass("bg-slate-500");
+    expect(presentation).toHaveClass("bg-accent");
   });
 
   it("uses provided id", () => {

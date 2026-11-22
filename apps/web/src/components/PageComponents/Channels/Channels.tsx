@@ -1,84 +1,48 @@
 import { BeaconOffers } from "@app/components/PageComponents/Channels/BeaconOffers.tsx";
-import { Button } from "@components/UI/Button.tsx";
+import { ConfirmDialog } from "@components/UI/ConfirmDialog.tsx";
+import { StatusDot } from "@components/UI/StatusDot.tsx";
+import { channelLabel } from "@core/channels/channelLabel.ts";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
-import { useDevice } from "@core/stores";
-import { firmwareAtLeast } from "@core/utils/firmware.ts";
+import { useChannels, useConfigEditor, useSignal } from "@core/kmp/hooks";
+import { constantSignal } from "@core/kmp/signals.ts";
 import type { Protobuf } from "@core/protobuf.ts";
-import { useChannels } from "@core/kmp/hooks";
-import { useConfigEditor, useSignal } from "@core/kmp/hooks";
-import i18next from "i18next";
-import { PlusIcon, QrCodeIcon, UploadIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { type UseFormReturn, useForm } from "react-hook-form";
+import { useDevice } from "@core/stores";
+import { cn } from "@core/utils/cn.ts";
+import { firmwareAtLeast } from "@core/utils/firmware.ts";
+import { MapPinIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { ChannelCard } from "./ChannelCard.tsx";
+import { ChannelEditor } from "./ChannelEditor.tsx";
 import { ChannelLegend } from "./ChannelLegend.tsx";
-import {
-  buildDisabledChannel,
-  buildNewChannel,
-  EXISTING_CHANNEL_PSK_STATE,
-  enabledChannels,
-  firstFreeIndex,
-  generatePsk,
-  locationSharingIndex,
-  MAX_CHANNELS,
-  NEW_CHANNEL_PSK_STATE,
-  type PskEditState,
-} from "./channelStaging.ts";
-import { EditChannelDialog } from "./EditChannelDialog.tsx";
+import { ChannelShareCard } from "./ChannelShareCard.tsx";
+import { slotRole, slotSummaries } from "./channelSlots.ts";
+import { locationSharingIndex } from "./channelStaging.ts";
 
 interface ConfigProps {
   onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
 }
 
-export const getChannelName = (channel: {
-  index: number;
-  settings?: { name?: string };
-}) => {
-  return channel.settings?.name?.length
-    ? channel.settings.name
-    : channel.index === 0
-      ? i18next.t("page.broadcastLabel", { ns: "channels" })
-      : i18next.t("page.channelIndex", {
-          ns: "channels",
-          index: channel.index,
-        });
+type ChannelLike = Pick<Protobuf.Channel.Channel, "index" | "role"> & {
+  settings?: Protobuf.Channel.ChannelSettings;
 };
+type ChannelMap = ReadonlyMap<number, ChannelLike>;
 
-type ChannelMap = ReadonlyMap<number, Protobuf.Channel.Channel>;
-
-const EMPTY_CHANNELS_SIGNAL = {
-  value: new Map() as ChannelMap,
-  peek: () => new Map() as ChannelMap,
-  subscribe: () => () => {},
-} as const;
-
-const EMPTY_DIRTY_CHANNELS_SIGNAL = {
-  value: [] as readonly number[],
-  peek: () => [] as readonly number[],
-  subscribe: () => () => {},
-} as const;
-
-const EMPTY_RADIO_SIGNAL = {
-  value: {} as { lora?: Protobuf.Config.Config_LoRaConfig },
-  peek: () => ({}) as { lora?: Protobuf.Config.Config_LoRaConfig },
-  subscribe: () => () => {},
-} as const;
+const EMPTY_CHANNELS = constantSignal<
+  ReadonlyMap<number, Protobuf.Channel.Channel>
+>(new Map());
+const EMPTY_DIRTY = constantSignal<readonly number[]>([]);
+const EMPTY_RADIO = constantSignal<{
+  lora?: Protobuf.Config.Config_LoRaConfig;
+}>({});
 
 /** Firmware that can broadcast position on a secondary channel. */
 const SECONDARY_CHANNEL_LOCATION_FIRMWARE = "2.6.10";
 
-interface Editing {
-  channel: Protobuf.Channel.Channel;
-  isNew: boolean;
-  pskState: PskEditState;
-}
-
 /**
- * The Channels settings page, laid out like Android's ChannelConfigScreen:
- * a header, a Primary/Secondary legend, one card per enabled channel and an
- * "Add channel" button. Edits are staged in the config editor by channel
- * index and sent with the page's Save.
+ * The Channels settings page: the eight slots on the left, the selected
+ * channel's QR share card beside them and its editor below. Edits are staged
+ * in the config editor by slot and sent with the page's Save.
  *
  * Channels can't be reordered: chat history is keyed by channel index, so
  * moving a channel would attach its messages to another one.
@@ -89,150 +53,168 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
   const { metadata } = useDeviceCapabilities();
   const editor = useConfigEditor();
   const deviceChannels = useChannels();
-  const workingChannels = useSignal(editor?.channels ?? EMPTY_CHANNELS_SIGNAL);
-  const dirtyChannels = useSignal(
-    editor?.dirtyChannels ?? EMPTY_DIRTY_CHANNELS_SIGNAL,
-  );
-  const radio = useSignal(editor?.radio ?? EMPTY_RADIO_SIGNAL);
+  const workingChannels = useSignal(editor?.channels ?? EMPTY_CHANNELS);
+  const dirtyChannels = useSignal(editor?.dirtyChannels ?? EMPTY_DIRTY);
+  const radio = useSignal(editor?.radio ?? EMPTY_RADIO);
   const lora = radio.lora ?? config.lora;
-  const [editing, setEditing] = useState<Editing | undefined>();
+  const [selected, setSelected] = useState(0);
+  // An invalid edit isn't staged, so switching slots would drop it: ask.
+  const [editorInvalid, setEditorInvalid] = useState(false);
+  const [pendingSlot, setPendingSlot] = useState<number>();
+  const selectSlot = (index: number) => {
+    if (index === selected) return;
+    if (editorInvalid) {
+      setPendingSlot(index);
+      return;
+    }
+    setSelected(index);
+  };
 
-  // The page has no form of its own: edits are staged from the dialog. Give
-  // Settings a stable empty form so Save only depends on the editor's state.
-  const pageForm = useForm();
-  useEffect(() => {
-    onFormInit(pageForm);
-  }, [onFormInit, pageForm]);
-
-  // The editor's working copy, falling back to the device's channels before
+  const onRadio: ChannelMap = useMemo(
+    () => new Map(deviceChannels.map((c) => [c.index, c])),
+    [deviceChannels],
+  );
+  // The editor's working copy, falling back to the radio's channels before
   // the editor has seen them.
-  const channels: ChannelMap = useMemo(() => {
-    if (workingChannels.size > 0) return workingChannels;
-    return new Map(
-      deviceChannels.map((c) => [
-        c.index,
-        { ...c, $typeName: "meshtastic.Channel" } as Protobuf.Channel.Channel,
-      ]),
-    );
-  }, [workingChannels, deviceChannels]);
+  const channels: ChannelMap =
+    workingChannels.size > 0 ? workingChannels : onRadio;
 
-  const listed = useMemo(() => enabledChannels(channels.values()), [channels]);
+  const slots = slotSummaries(channels);
   const supportsSecondaryChannelLocation = firmwareAtLeast(
     metadata?.firmwareVersion ?? "",
     SECONDARY_CHANNEL_LOCATION_FIRMWARE,
   );
   const sharingIndex = locationSharingIndex(
-    listed,
+    channels.values(),
     supportsSecondaryChannelLocation,
   );
-  const freeIndex = firstFreeIndex(channels);
-  const canAdd =
-    editor !== undefined &&
-    listed.length < MAX_CHANNELS &&
-    freeIndex !== undefined;
   const metric = config.display?.units === 0;
-
-  const slot = lora?.channelNum ?? 0;
+  const loraSlot = lora?.channelNum ?? 0;
   const overrideFrequency = lora?.overrideFrequency ?? 0;
 
-  const addChannel = () => {
-    if (freeIndex === undefined) return;
-    setEditing({
-      channel: buildNewChannel(freeIndex, generatePsk()),
-      isNew: true,
-      pskState: NEW_CHANNEL_PSK_STATE,
-    });
-  };
+  const selectedChannel = channels.get(selected);
+  const radioChannel = onRadio.get(selected);
+  const defaultName = channelLabel({ index: selected }, t);
+  const selectedName = channelLabel(
+    { index: selected, name: selectedChannel?.settings?.name },
+    t,
+  );
 
   return (
-    <div className="flex flex-col gap-4 max-md:px-2">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex flex-col gap-0.5">
-          <h3 className="text-lg font-semibold">{t("page.sectionLabel")}</h3>
-          <div className="text-xs text-slate-500 dark:text-slate-400">
-            {overrideFrequency > 0 && (
-              <p>{t("header.frequency", { frequency: overrideFrequency })}</p>
-            )}
-            <p>
-              {slot > 0 ? t("header.slot", { slot }) : t("header.slotAuto")}
-            </p>
-          </div>
+    <div className="flex flex-col gap-5">
+      <BeaconOffers />
+      <div className="flex flex-wrap items-start gap-4">
+        <div className="flex min-w-0 flex-[1_1_220px] flex-col gap-2 md:flex-[0_0_220px]">
+          <ul
+            aria-label={t("slots.listLabel")}
+            className="m-0 flex list-none flex-col rounded-card border border-subtle bg-surface p-1.5"
+          >
+            {slots.map((slot) => {
+              const active = slot.index === selected;
+              const empty = slot.role === "disabled";
+              const label = empty
+                ? t("slots.empty")
+                : (slot.name ?? channelLabel({ index: slot.index }, t));
+              return (
+                <li key={slot.index}>
+                  <button
+                    type="button"
+                    aria-current={active ? "true" : undefined}
+                    onClick={() => selectSlot(slot.index)}
+                    className={cn(
+                      "flex w-full cursor-pointer items-center gap-2.5 rounded-control px-2 py-2 text-left hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+                      active && "bg-selected",
+                    )}
+                  >
+                    <span className="w-5 flex-none text-meta text-muted">
+                      {slot.index}
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span
+                        className={cn(
+                          "truncate font-medium",
+                          empty && "text-muted",
+                        )}
+                      >
+                        {label}
+                      </span>
+                      <span className="truncate text-meta text-muted">
+                        {t("slots.summary", {
+                          role: t(`slots.role.${slot.role}`),
+                          key: t(
+                            `slots.keyKind.${empty ? "none" : (slot.keyKind ?? "custom")}`,
+                          ),
+                        })}
+                      </span>
+                    </span>
+                    {sharingIndex === slot.index ? (
+                      <MapPinIcon
+                        aria-label={t("slots.sharesPosition")}
+                        className="size-4 flex-none text-muted"
+                      />
+                    ) : null}
+                    {dirtyChannels.includes(slot.index) ? (
+                      <StatusDot status="dirty" label={t("slots.unsaved")} />
+                    ) : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="m-0 px-1 text-meta text-muted">
+            {overrideFrequency > 0
+              ? `${t("header.frequency", { frequency: overrideFrequency })} · `
+              : ""}
+            {loraSlot > 0
+              ? t("header.slot", { slot: loraSlot })
+              : t("header.slotAuto")}
+          </p>
+          <ChannelLegend
+            supportsSecondaryChannelLocation={supportsSecondaryChannelLocation}
+          />
         </div>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setDialogOpen("import", true)}
-          >
-            <UploadIcon className="mr-2" size={14} />
-            {t("page.import")}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setDialogOpen("QR", true)}
-          >
-            <QrCodeIcon className="mr-2" size={14} />
-            {t("page.export")}
-          </Button>
+        <div className="flex min-w-0 flex-[1_1_360px] flex-col gap-4">
+          <ChannelShareCard
+            index={selected}
+            name={selectedName}
+            settings={
+              slotRole(radioChannel) === "disabled"
+                ? undefined
+                : radioChannel?.settings
+            }
+            loraConfig={config.lora}
+            onMoreOptions={() => setDialogOpen("QR", true)}
+            onImport={() => setDialogOpen("import", true)}
+          />
         </div>
       </div>
-
-      <BeaconOffers />
-
-      <ChannelLegend
-        supportsSecondaryChannelLocation={supportsSecondaryChannelLocation}
-      />
-
-      <ul className="flex flex-col gap-2" aria-label={t("page.sectionLabel")}>
-        {listed.map((channel) => {
-          const title = getChannelName(channel);
-          return (
-            <ChannelCard
-              key={channel.index}
-              channel={channel}
-              title={title}
-              sharesLocation={sharingIndex === channel.index}
-              dirty={dirtyChannels.includes(channel.index)}
-              onEdit={() =>
-                setEditing({
-                  channel,
-                  isNew: false,
-                  pskState: EXISTING_CHANNEL_PSK_STATE,
-                })
-              }
-              onDelete={
-                channel.index === 0 || !editor
-                  ? undefined
-                  : () => editor.setChannel(buildDisabledChannel(channel.index))
-              }
-            />
-          );
-        })}
-      </ul>
-
-      {canAdd && (
-        <Button variant="outline" className="self-start" onClick={addChannel}>
-          <PlusIcon className="mr-2" size={16} />
-          {t("list.add")}
-        </Button>
-      )}
-
-      {editing && editor && (
-        <EditChannelDialog
-          key={`${editing.channel.index}-${editing.isNew}`}
-          channel={editing.channel}
-          isNew={editing.isNew}
-          initialPskState={editing.pskState}
-          defaultName={getChannelName({ index: editing.channel.index })}
+      {editor ? (
+        <ChannelEditor
+          key={selected}
+          index={selected}
+          working={selectedChannel}
+          device={radioChannel}
+          editor={editor}
+          defaultName={defaultName}
           metric={metric}
-          onClose={() => setEditing(undefined)}
-          onSave={(channel) => {
-            editor.setChannel(channel);
-            setEditing(undefined);
-          }}
+          onFormInit={onFormInit}
+          onInvalidChange={setEditorInvalid}
         />
-      )}
+      ) : null}
+      <ConfirmDialog
+        open={pendingSlot !== undefined}
+        onOpenChange={(open) => {
+          if (!open) setPendingSlot(undefined);
+        }}
+        title={t("editor.discardTitle")}
+        description={t("editor.discardDescription", { index: selected })}
+        confirmLabel={t("editor.discardConfirm")}
+        onConfirm={() => {
+          if (pendingSlot !== undefined) setSelected(pendingSlot);
+          setEditorInvalid(false);
+          setPendingSlot(undefined);
+        }}
+      />
     </div>
   );
 };

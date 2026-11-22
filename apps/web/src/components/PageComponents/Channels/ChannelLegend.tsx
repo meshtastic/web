@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SecurityIcon } from "./ChannelCard.tsx";
+import { SecurityIcon } from "./SecurityIcon.tsx";
 import type { SecurityState } from "./channelStaging.ts";
 
 const FEATURE_ICONS: { key: string; icon: LucideIcon }[] = [
@@ -49,9 +49,7 @@ function Meaning({
       </span>
       <span className="flex flex-col gap-0.5">
         <span className="font-medium">{title}</span>
-        <span className="text-sm text-slate-600 dark:text-slate-400">
-          {text}
-        </span>
+        <span className="text-sm text-secondary">{text}</span>
       </span>
     </li>
   );
@@ -75,9 +73,9 @@ export function ChannelLegend({
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t("legend.dialog.title")}
-        className="flex w-full cursor-pointer items-center justify-evenly gap-4 rounded-md py-1.5 text-sm hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 dark:hover:bg-slate-700/50"
+        className="flex w-full cursor-pointer items-center justify-evenly gap-4 rounded-md py-1.5 text-sm pointer-coarse:min-h-11 hover:bg-raised focus:outline-none focus-visible:ring-2 focus-visible:ring-focus"
       >
-        <span className="flex items-center gap-2 font-medium text-green-700 dark:text-green-400">
+        <span className="flex items-center gap-2 font-medium text-accent">
           <InfoIcon size={16} aria-hidden />
           {t("legend.primary")}
         </span>
@@ -95,10 +93,8 @@ export function ChannelLegend({
           </DialogHeader>
 
           <section className="flex flex-col gap-1">
-            <h3 className="font-semibold text-green-700 dark:text-green-400">
-              {t("legend.primary")}
-            </h3>
-            <p className="text-sm text-green-700 dark:text-green-400">
+            <h3 className="font-semibold text-accent">{t("legend.primary")}</h3>
+            <p className="text-sm text-accent">
               - {t("legend.dialog.primaryFeature")}
             </p>
           </section>

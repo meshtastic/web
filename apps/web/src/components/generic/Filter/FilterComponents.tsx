@@ -12,6 +12,7 @@ import { ToggleGroup, ToggleGroupItem } from "@components/UI/ToggleGroup.tsx";
 import { cn } from "@core/utils/cn.ts";
 import type { ReactNode } from "react";
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 
 interface FilterAccordionItemProps {
   label: string;
@@ -59,15 +60,13 @@ export const FilterAccordionItem = ({
       <AccordionHeader>
         <AccordionTrigger
           className={cn(
-            "w-full text-left font-bold text-sm px-1 py-2 dark:border-slate-700 text-slate-800 dark:text-slate-200",
+            "w-full text-left font-bold text-sm px-1 py-2 text-primary",
           )}
         >
           {label}
         </AccordionTrigger>
       </AccordionHeader>
-      <AccordionContent
-        className={cn("px-1 pb-4 pt-2 space-y-3 dark:border-slate-700")}
-      >
+      <AccordionContent className={cn("px-1 pb-4 pt-2 space-y-3")}>
         {children}
       </AccordionContent>
     </AccordionItem>
@@ -107,9 +106,8 @@ export const FilterSlider = <K extends RangeKeys<FilterState>>({
         step={step ?? 1}
         onValueChange={onChange(filterKey)}
         className="w-full pb-3"
-        trackClassName="h-1 bg-slate-200 dark:bg-slate-700"
-        rangeClassName="bg-blue-500 dark:bg-blue-600"
-        thumbClassName="w-3 h-3 bg-white dark:bg-slate-300 border border-slate-400 dark:border-slate-100"
+        trackClassName="h-1"
+        thumbClassName="w-3 h-3"
         aria-label={label ?? String(filterKey)}
         id={sliderId}
       />
@@ -130,6 +128,7 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
   setFilterState,
   getLabel = (v) => String(v),
 }: FilterMultiProps<K>) => {
+  const { t } = useTranslation("ui");
   const selected = getNumberArray(filterState, filterKey);
 
   const allSelected =
@@ -156,14 +155,14 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
 
   return (
     <div className="space-y-2">
-      <ScrollArea className="h-64 border rounded-md dark:border-slate-700">
+      <ScrollArea className="h-64 border border-control rounded-md">
         <div className="space-y-2 px-2 py-3">
           <button
             type="button"
-            className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 dark:bg-slate-900 text-white rounded text-sm  hover:text-slate-100 hover:bg-slate-700 active:bg-slate-950"
+            className="w-full rounded-control bg-raised py-1.5 text-sm font-medium text-primary transition-colors hover:bg-selected focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             onClick={toggleAll}
           >
-            {allSelected ? "Uncheck All" : "Check All"}
+            {allSelected ? t("filter.uncheckAll") : t("filter.checkAll")}
           </button>
           {options.map((val) => (
             <Checkbox
@@ -172,7 +171,7 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
               onChange={(checked) => toggleValue(val, checked)}
               className="flex items-center gap-2"
             >
-              <span className="dark:text-slate-200">{getLabel(val)}</span>
+              <span className="text-primary">{getLabel(val)}</span>
             </Checkbox>
           ))}
         </div>
@@ -206,14 +205,14 @@ export const FilterToggle = <K extends keyof FilterState>({
       <ToggleGroupItem
         value="false"
         aria-label={alternativeLabels[0]}
-        className="text-sm h-7 dark:bg-slate-900"
+        className="text-sm h-7"
       >
         {alternativeLabels[0]}
       </ToggleGroupItem>
       <ToggleGroupItem
         value="true"
         aria-label={alternativeLabels[1]}
-        className="text-sm h-7 dark:bg-slate-900"
+        className="text-sm h-7"
       >
         {alternativeLabels[1]}
       </ToggleGroupItem>

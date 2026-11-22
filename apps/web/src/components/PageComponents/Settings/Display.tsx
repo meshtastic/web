@@ -10,6 +10,12 @@ import {
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
+import {
+  CAROUSEL_PRESETS,
+  describeInterval,
+  intervalChoices,
+  SCREEN_ON_PRESETS,
+} from "@core/settings/intervals.ts";
 import { useTranslation } from "react-i18next";
 
 interface DisplayConfigProps {
@@ -34,6 +40,27 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
       | undefined);
 
   const { t } = useTranslation("config");
+
+  // Label -> value map for the select, in the order the choices are offered.
+  const intervalOptions = (
+    presets: readonly number[],
+    current: number | undefined,
+    zeroKey: "interval.off" | "interval.deviceDefault",
+  ): Record<string, number> =>
+    Object.fromEntries(
+      intervalChoices(presets, current).map((seconds) => {
+        const label = describeInterval(seconds);
+        if (label.kind === "zero")
+          return [t(zeroKey, { ns: "common" }), seconds];
+        if (label.kind === "alwaysOn") {
+          return [t("interval.alwaysOn", { ns: "common" }), seconds];
+        }
+        return [
+          t(`interval.${label.unit}`, { ns: "common", count: label.count }),
+          seconds,
+        ];
+      }),
+    );
 
   const onSubmit = (data: DisplayValidation) => {
     if (!editor) return;
@@ -90,18 +117,30 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
           description: t("display.advanced.description"),
           fields: [
             {
-              type: "number",
+              type: "select",
               name: "screenOnSecs",
               label: t("display.screenTimeout.label"),
               description: t("display.screenTimeout.description"),
-              properties: { suffix: t("unit.second.plural") },
+              properties: {
+                enumValue: intervalOptions(
+                  SCREEN_ON_PRESETS,
+                  effective?.screenOnSecs,
+                  "interval.deviceDefault",
+                ),
+              },
             },
             {
-              type: "number",
+              type: "select",
               name: "autoScreenCarouselSecs",
               label: t("display.carouselDelay.label"),
               description: t("display.carouselDelay.description"),
-              properties: { suffix: t("unit.second.plural") },
+              properties: {
+                enumValue: intervalOptions(
+                  CAROUSEL_PRESETS,
+                  effective?.autoScreenCarouselSecs,
+                  "interval.off",
+                ),
+              },
             },
             {
               type: "toggle",

@@ -1,4 +1,5 @@
 import { create } from "@bufbuild/protobuf";
+import { pruneAtStartup } from "@core/connections/status.ts";
 import { meshRegistry } from "@core/kmp/registry.ts";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
@@ -806,21 +807,28 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
         }
         draft.devices = rebuilt as unknown as Map<number, Draft<Device>>;
 
-        // Stale in-flight states can't survive a reload — no JS code is
-        // running that could complete them. Reset any persisted
-        // "connecting" / "configuring" / "disconnecting" entries to
-        // "disconnected" so the connecting overlay (which keys off
-        // these statuses) doesn't get stuck visible on cold boot.
+        // No session survives a reload, so no persisted status past
+        // "disconnected" is true any more. Stale in-flight states would
+        // keep the connecting overlay up on cold boot, and a stale
+        // "configured" would make connect() think it is already connected.
         for (const conn of draft.savedConnections) {
           if (
             conn.status === "connecting" ||
             conn.status === "configuring" ||
-            conn.status === "disconnecting"
+            conn.status === "disconnecting" ||
+            conn.status === "configured" ||
+            conn.status === "connected"
           ) {
             conn.status = "disconnected";
             conn.error = undefined;
           }
         }
+
+        // A connect attempt saves its entry before the radio answers; one
+        // still pending now was cut off by a reload and can't finish, and
+        // a never-connected duplicate of a radio another entry reached is
+        // left over from one.
+        draft.savedConnections = pruneAtStartup(draft.savedConnections);
       }),
     );
   },

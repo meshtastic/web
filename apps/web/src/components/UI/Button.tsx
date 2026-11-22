@@ -2,32 +2,47 @@ import { cn } from "@core/utils/cn.ts";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 
+const accent = "bg-accent text-on-accent font-semibold hover:opacity-90";
+const secondary = "bg-raised text-primary hover:bg-selected";
+const danger =
+  "border border-danger bg-danger text-on-danger font-semibold hover:border-danger-strong";
+
+/**
+ * Buttons per the redesign: 10px radius, 40px tall by default, 44px for
+ * touch. `primary` is the accent action; `default`, `success`, `subtle` and
+ * `destructive` are kept for existing callers and map onto the new looks.
+ */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-slate-400 disabled:cursor-not-allowed dark:focus:ring-offset-slate-900 cursor-pointer",
+  "relative inline-flex items-center justify-center gap-2 rounded-control text-body font-medium transition-colors cursor-pointer pointer-coarse:touch-target focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
-        default:
-          "bg-slate-900 text-white dark:bg-slate-50 hover:dark:bg-slate-200 dark:text-slate-900 hover:bg-slate-500",
-        destructive:
-          "bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-600",
-        success:
-          "bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600",
+        primary: accent,
+        default: accent,
+        success: accent,
+        secondary,
+        subtle: secondary,
         outline:
-          "bg-transparent border border-slate-400 hover:text-slate-400 dark:hover:text-slate-300 dark:border-slate-400 dark:text-slate-100 ",
-        subtle:
-          "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-500 dark:text-white dark:hover:bg-slate-400",
+          "border border-control bg-transparent text-primary hover:bg-raised",
         ghost:
-          "bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-100 dark:hover:text-slate-100 data-[state=open]:bg-transparent dark:data-[state=open]:bg-transparent",
-        link: "bg-transparent underline-offset-4 hover:underline text-slate-900 dark:text-slate-100 hover:bg-transparent dark:hover:bg-transparent",
+          "bg-transparent text-primary hover:bg-raised data-[state=open]:bg-raised",
+        danger,
+        destructive: danger,
+        dangerGhost: "bg-transparent text-danger hover:bg-danger",
+        link: "bg-transparent text-accent underline-offset-4 hover:underline hover:text-accent-hover",
       },
       size: {
-        default: "h-10 py-2 px-4",
-        sm: "h-9 px-2 rounded-md",
-        lg: "h-11 px-8 rounded-md",
-        icon: "h-10 w-10",
+        default: "h-10 px-4",
+        sm: "h-9 px-3 text-help",
+        lg: "h-11 px-6",
+        touch: "h-11 px-4",
+        icon: "size-10",
+        /** No box: for inline text links. */
+        inline: "h-auto p-0",
       },
     },
+    // A link reads like text whatever size it is given.
+    compoundVariants: [{ variant: "link", class: "h-auto px-0" }],
     defaultVariants: {
       variant: "default",
       size: "default",
@@ -60,20 +75,16 @@ const Button = ({
   return (
     <button
       type="button"
-      className={cn(
-        buttonVariants({ variant, size, className }),
-        { "cursor-not-allowed": disabled },
-        "inline-flex items-center",
-      )}
+      className={cn(buttonVariants({ variant, size, className }))}
       disabled={disabled}
       {...props}
     >
       {icon && iconAlignment === "left" && (
-        <span className={cn({ "mr-2": !!children })}>{icon}</span>
+        <span className="inline-flex shrink-0">{icon}</span>
       )}
       {children}
       {icon && iconAlignment === "right" && (
-        <span className={cn({ "ml-2": !!children })}>{icon}</span>
+        <span className="inline-flex shrink-0">{icon}</span>
       )}
     </button>
   );

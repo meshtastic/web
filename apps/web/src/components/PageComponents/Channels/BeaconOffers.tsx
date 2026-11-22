@@ -6,6 +6,7 @@ import {
 import type { Node } from "@core/storage/types.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useNodes } from "@core/kmp/hooks";
+import { formatNodeId, nodeDisplayName } from "@core/utils/nodeIdentity.ts";
 import { RadioTowerIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -16,13 +17,13 @@ const formatEnum = (name: string) =>
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
     .join(" ");
 
-/** The sender's long name, or its node ID. */
+/** The sender's long or short name, or its node ID. */
 export function beaconSenderName(
   nodes: ReadonlyArray<Node>,
   from: number,
 ): string {
   const node = nodes.find((n) => n.num === from);
-  return node?.user?.longName || `!${from.toString(16).padStart(8, "0")}`;
+  return nodeDisplayName(node?.user ?? {}, from, () => formatNodeId(from));
 }
 
 /** Channel, preset and region an offer advertises, and what joining does. */
@@ -67,7 +68,7 @@ function BeaconOfferRow({
   const { t } = useTranslation("channels");
   const sender = beaconSenderName(useNodes(), entry.offer.from);
   return (
-    <li className="flex flex-col gap-2 rounded-md border border-slate-300 p-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-600">
+    <li className="flex flex-col gap-2 rounded-md border border-subtle p-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-1">
         <p className="font-semibold">{t("beaconOffers.from", { sender })}</p>
         <BeaconOfferDetails entry={entry} />

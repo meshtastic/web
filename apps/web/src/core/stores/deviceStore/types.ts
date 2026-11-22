@@ -63,6 +63,17 @@ export type Connection = {
    * node, so every connection to the same radio shares it.
    */
   nodeNum?: number;
+  /**
+   * The radio's own name (long name, else short name) as last seen on this
+   * connection, so a reconnect can name the radio rather than the transport.
+   */
+  radioName?: string;
+  /**
+   * Set while the connect attempt that created this entry is unfinished;
+   * cleared once it reaches a radio. Entries still pending at startup are
+   * dropped (see core/connections/status.ts).
+   */
+  pending?: boolean;
 } & NewConnection;
 
 export type NewConnection =

@@ -204,7 +204,7 @@ export const NodeDetailsDialog = ({
   ];
 
   const sectionClassName =
-    "text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-4 rounded-lg mt-3";
+    "text-primary bg-inset border border-subtle p-4 rounded-card mt-3";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -244,10 +244,18 @@ export const NodeDetailsDialog = ({
                 <WaypointsIcon className="mr-2" />
                 {t("nodeDetails.traceRoute")}
               </Button>
-              <Button className="mr-1" onClick={handleToggleFavorite}>
+              <Button
+                className="mr-1"
+                onClick={handleToggleFavorite}
+                aria-label={
+                  isFavoriteState
+                    ? t("details.removeFavorite", { ns: "nodes" })
+                    : t("details.addFavorite", { ns: "nodes" })
+                }
+              >
                 <StarIcon
                   className={cn(
-                    isFavoriteState ? " fill-yellow-400 stroke-yellow-400" : "",
+                    isFavoriteState ? "fill-dirty stroke-dirty" : "",
                   )}
                 />
               </Button>
@@ -268,21 +276,26 @@ export const NodeDetailsDialog = ({
                   <TooltipTrigger asChild>
                     <Button
                       className={cn(
-                        "flex justify-end mr-1 text-white",
+                        "flex justify-end mr-1",
                         isIgnoredState
-                          ? "bg-red-500 dark:bg-red-500 hover:bg-red-600 hover:dark:bg-red-600 text-white dark:text-white"
+                          ? "border border-danger bg-danger text-on-danger hover:border-danger-strong hover:opacity-100"
                           : "",
                       )}
+                      aria-label={
+                        isIgnoredState
+                          ? t("nodeDetails.unignoreNode")
+                          : t("nodeDetails.ignoreNode")
+                      }
                       onClick={handleToggleIgnored}
                     >
                       {isIgnoredState ? <BellIcon /> : <BellOffIcon />}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
+                  <TooltipContent>
                     {isIgnoredState
                       ? t("nodeDetails.unignoreNode")
                       : t("nodeDetails.ignoreNode")}
-                    <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
+                    <TooltipArrow className="fill-[var(--mt-bg-raised)]" />
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -293,14 +306,15 @@ export const NodeDetailsDialog = ({
                     <Button
                       variant="destructive"
                       className="flex justify-end"
+                      aria-label={t("nodeDetails.removeNode")}
                       onClick={handleNodeRemove}
                     >
                       <TrashIcon />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
+                  <TooltipContent>
                     {t("nodeDetails.removeNode")}
-                    <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
+                    <TooltipArrow className="fill-[var(--mt-bg-raised)]" />
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -310,7 +324,7 @@ export const NodeDetailsDialog = ({
 
             <div className="flex flex-col flex-wrap space-x-1 space-y-1">
               <div className="flex flex-row space-x-2">
-                <div className="w-full bg-slate-100 text-slate-900 dark:text-slate-100 dark:bg-slate-800 p-3  rounded-lg">
+                <div className="w-full bg-inset text-primary border border-subtle p-3 rounded-card">
                   <p className="text-lg font-semibold">
                     {t("nodeDetails.details")}
                   </p>
@@ -370,7 +384,7 @@ export const NodeDetailsDialog = ({
                   </table>
                 </div>
                 <DeviceImage
-                  className="w-40 p-2 rounded-lg border-4 border-slate-200 dark:border-slate-800"
+                  className="w-40 p-2 rounded-card border border-subtle bg-inset"
                   deviceType={
                     Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
                     "UNKNOWN"
@@ -428,7 +442,7 @@ export const NodeDetailsDialog = ({
                           <td>{t("locationResponse.coordinates")}</td>
                           <td>
                             <a
-                              className="text-blue-500 dark:text-blue-400"
+                              className="text-accent underline-offset-4 hover:text-accent-hover hover:underline"
                               href={`https://www.openstreetmap.org/?mlat=${
                                 node.position.latitudeI / 1e7
                               }&mlon=${node.position.longitudeI / 1e7}&layers=N`}
@@ -467,7 +481,7 @@ export const NodeDetailsDialog = ({
 
               {node.deviceMetrics && (
                 <div className={sectionClassName}>
-                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                  <p className="text-lg font-semibold text-primary">
                     {t("nodeDetails.deviceMetrics")}
                   </p>
                   <table className="table-fixed w-full">
@@ -498,11 +512,11 @@ export const NodeDetailsDialog = ({
               <NodeTelemetry nodeNum={node.num} className={sectionClassName} />
             </div>
 
-            <div className="text-slate-900 dark:text-slate-100 w-full max-w-[464px] bg-slate-100 dark:bg-slate-800 rounded-lg mt-3">
+            <div className="text-primary w-full max-w-[464px] bg-inset border border-subtle rounded-card mt-3">
               <Accordion className="AccordionRoot" type="single" collapsible>
                 <AccordionItem className="AccordionItem" value="item-1">
                   <AccordionTrigger>
-                    <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                    <p className="text-lg font-semibold text-primary">
                       {t("nodeDetails.allRawMetrics")}
                     </p>
                   </AccordionTrigger>

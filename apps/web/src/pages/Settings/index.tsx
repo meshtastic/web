@@ -2,27 +2,70 @@ import { Channels } from "@components/PageComponents/Channels/Channels.tsx";
 import { LoRa } from "@components/PageComponents/Settings/LoRa.tsx";
 import { Security } from "@components/PageComponents/Settings/Security/Security.tsx";
 import { User } from "@components/PageComponents/Settings/User.tsx";
-import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
-import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
+import { MobileSettingsList } from "@components/Settings/MobileSettingsList.tsx";
+import {
+  type SettingsNavGroup,
+  SettingsNav,
+} from "@components/Settings/SettingsNav.tsx";
+import { SettingsPageHeader } from "@components/Settings/SettingsPageHeader.tsx";
+import { UnsavedChangesBar } from "@components/Settings/UnsavedChangesBar.tsx";
+import { DeviceCard } from "@components/Shell/DeviceCard.tsx";
+import { ShellPage } from "@components/Shell/ShellPage.tsx";
+import { useDeviceSummary } from "@components/Shell/useDeviceSummary.ts";
+import { Button } from "@components/UI/Button.tsx";
+import { IconButton } from "@components/UI/IconButton.tsx";
+import { Spinner } from "@components/UI/Spinner.tsx";
+import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { cn } from "@core/utils/cn.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
+import { constantSignal } from "@core/kmp/signals.ts";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
+import {
+  dirtyDeviceTabs,
+  dirtyModuleTabs,
+  sectionChangeCounts,
+} from "@core/settings/dirty.ts";
+import {
+  GROUP_LABEL_KEYS,
+  moduleDocsUrl,
+  SETTINGS_GROUP_IDS,
+  SETTINGS_SECTIONS,
+  type SettingsSectionDef,
+  type SettingsSectionId,
+  DEVICE_SUBSECTION_DOCS,
+  sectionFromPath,
+} from "@core/settings/registry.ts";
+import { filterGroups, groupBy } from "@core/settings/search.ts";
 import { About } from "@pages/Settings/About.tsx";
 import { Administration } from "@pages/Settings/Administration.tsx";
 import { AppSettings } from "@pages/Settings/AppSettings.tsx";
 import { BackupRestore } from "@pages/Settings/BackupRestore.tsx";
 import { CleanNodeDb } from "@pages/Settings/CleanNodeDb.tsx";
 import { DebugPanel } from "@pages/Settings/DebugPanel.tsx";
-import { DeviceConfig } from "@pages/Settings/DeviceConfig.tsx";
-import { ModuleConfig } from "@pages/Settings/ModuleConfig.tsx";
+import {
+  DEVICE_TABS,
+  DeviceConfig,
+  useDeviceSubsection,
+  visibleDeviceTabs,
+} from "@pages/Settings/DeviceConfig.tsx";
+import { Firmware } from "@pages/Settings/Firmware.tsx";
+import { Help } from "@pages/Settings/Help.tsx";
+import { MessageFilter } from "@pages/Settings/MessageFilter.tsx";
+import {
+  MODULE_TABS,
+  ModuleConfig,
+  useModuleSubsection,
+  useVisibleModules,
+} from "@pages/Settings/ModuleConfig.tsx";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   ArchiveRestoreIcon,
+  ArrowLeftIcon,
   BookOpenIcon,
   BugIcon,
   EraserIcon,
+  FilterIcon,
   HardDriveUploadIcon,
   InfoIcon,
   LayersIcon,
@@ -30,267 +73,182 @@ import {
   type LucideIcon,
   PaletteIcon,
   RadioTowerIcon,
-  RefreshCwIcon,
   RouterIcon,
-  SaveIcon,
-  SaveOff,
   ShieldAlertIcon,
   ShieldIcon,
   UserIcon,
 } from "lucide-react";
 import {
   type ComponentType,
+  type ReactNode,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { dirtyDeviceTabs, dirtyModuleTabs } from "./dirtySections.ts";
-import { type ConfigProps, SettingsCard } from "./SettingsTabs.tsx";
+import type { ConfigProps } from "./sectionProps.ts";
+import { useSettingsListValues } from "./useSettingsListValues.ts";
 
-const EMPTY_DIRTY_STRING_SIGNAL = {
-  value: [] as readonly string[],
-  peek: () => [] as readonly string[],
-  subscribe: () => () => {},
-} as const;
-const EMPTY_DIRTY_NUMBER_SIGNAL = {
-  value: [] as readonly number[],
-  peek: () => [] as readonly number[],
-  subscribe: () => () => {},
-} as const;
-const EMPTY_STAGED_SIGNAL = {
-  value: new Map() as ReadonlyMap<string, unknown>,
-  peek: () => new Map() as ReadonlyMap<string, unknown>,
-  subscribe: () => () => {},
-} as const;
-const EMPTY_BOOLEAN_SIGNAL = {
-  value: false,
-  peek: () => false,
-  subscribe: () => () => {},
-} as const;
+const NO_STRINGS = constantSignal<readonly string[]>([]);
+const NO_NUMBERS = constantSignal<readonly number[]>([]);
+const NO_STAGED = constantSignal<ReadonlyMap<string, unknown>>(new Map());
+const NO_FLAG = constantSignal(false);
 
-const FIRMWARE_FLASHER_URL = "https://flasher.meshtastic.org";
-const DOCS_URL = "https://meshtastic.org/docs/";
+/** Sidebar icon and page body of each section. */
+const SECTION_VIEWS = {
+  user: { icon: UserIcon, component: User },
+  lora: { icon: RadioTowerIcon, component: LoRa },
+  channels: { icon: ListIcon, component: Channels },
+  security: { icon: ShieldIcon, component: Security },
+  device: { icon: RouterIcon, component: DeviceConfig },
+  module: { icon: LayersIcon, component: ModuleConfig },
+  administration: { icon: ShieldAlertIcon, component: Administration },
+  backup: { icon: ArchiveRestoreIcon, component: BackupRestore },
+  firmware: { icon: HardDriveUploadIcon, component: Firmware },
+  "clean-nodes": { icon: EraserIcon, component: CleanNodeDb },
+  debug: { icon: BugIcon, component: DebugPanel },
+  app: { icon: PaletteIcon, component: AppSettings },
+  "message-filter": { icon: FilterIcon, component: MessageFilter },
+  about: { icon: InfoIcon, component: About },
+  help: { icon: BookOpenIcon, component: Help },
+} as const satisfies Record<
+  SettingsSectionId,
+  { icon: LucideIcon; component: ComponentType<ConfigProps> }
+>;
 
-const carded =
-  (Form: ComponentType<ConfigProps>): ComponentType<ConfigProps> =>
-  ({ onFormInit }) => (
-    <SettingsCard>
-      <Form onFormInit={onFormInit} />
-    </SettingsCard>
-  );
+/** What the page's Save and Reset act on: the open section's form. */
+interface FormHandle {
+  reset: () => void;
+  /** Takes the saved values as the new baseline, clearing dirty marks. */
+  markSaved: () => void;
+}
 
-const UserPage = carded(User);
-const LoRaPage = carded(LoRa);
-const ChannelsPage = carded(Channels);
-const SecurityPage = carded(Security);
-
-type SettingsSection = {
-  /** Path segment under /settings. */
-  key: string;
-  label: string;
-  icon: LucideIcon;
-  /** Opens in a new tab instead of rendering a page. */
-  href?: string;
-  component?: ComponentType<ConfigProps>;
-  /** Shows Save / Reset; true for pages that edit device config. */
-  edits?: boolean;
-  changeCount?: number;
-};
-
-type SettingsGroup = {
-  key: string;
-  label: string;
-  sections: SettingsSection[];
-};
+const FIRST_SECTION = SETTINGS_SECTIONS[0];
 
 const ConfigPage = () => {
-  const editor = useConfigEditor();
-  const editorIsDirty = useSignal(editor?.isDirty ?? EMPTY_BOOLEAN_SIGNAL);
-  const dirtyRadio = useSignal(
-    editor?.dirtyRadioSections ?? EMPTY_DIRTY_STRING_SIGNAL,
-  );
-  const dirtyModule = useSignal(
-    editor?.dirtyModuleSections ?? EMPTY_DIRTY_STRING_SIGNAL,
-  );
-  const dirtyChannels = useSignal(
-    editor?.dirtyChannels ?? EMPTY_DIRTY_NUMBER_SIGNAL,
-  );
-  const isOwnerDirty = useSignal(editor?.isOwnerDirty ?? EMPTY_BOOLEAN_SIGNAL);
-  const staged = useSignal(editor?.stagedAdminMessages ?? EMPTY_STAGED_SIGNAL);
-
-  const [isSaving, setIsSaving] = useState(false);
-  const [rhfState, setRhfState] = useState({ isDirty: false, isValid: true });
-  const unsubRef = useRef<(() => void) | null>(null);
-  const [formMethods, setFormMethods] = useState<UseFormReturn | null>(null);
+  const { t } = useTranslation("config");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { t } = useTranslation("config");
+  const device = useDeviceSummary();
+  const listValues = useSettingsListValues();
 
-  // Grouped like Android's Settings screen.
-  const groups: SettingsGroup[] = useMemo(() => {
-    const radioCount = (key: string) => (dirtyRadio.includes(key) ? 1 : 0);
-    // The status message is a module field that lives on the User page.
-    const statusDirty = dirtyModule.includes("statusmessage") ? 1 : 0;
-    return [
-      {
-        key: "configuration",
-        label: t("sidebar.configuration"),
-        sections: [
-          {
-            key: "user",
-            label: t("navigation.user"),
-            icon: UserIcon,
-            component: UserPage,
-            edits: true,
-            changeCount: (isOwnerDirty ? 1 : 0) + statusDirty,
-          },
-          {
-            key: "lora",
-            label: t("navigation.lora"),
-            icon: RadioTowerIcon,
-            component: LoRaPage,
-            edits: true,
-            changeCount: radioCount("lora"),
-          },
-          {
-            key: "channels",
-            label: t("navigation.channels"),
-            icon: ListIcon,
-            component: ChannelsPage,
-            edits: true,
-            changeCount: dirtyChannels.length,
-          },
-          {
-            key: "security",
-            label: t("navigation.security"),
-            icon: ShieldIcon,
-            component: SecurityPage,
-            edits: true,
-            changeCount: radioCount("security"),
-          },
-          {
-            key: "device",
-            label: t("navigation.deviceConfiguration"),
-            icon: RouterIcon,
-            component: DeviceConfig,
-            edits: true,
-            changeCount: dirtyDeviceTabs(dirtyRadio, staged.keys()).size,
-          },
-          {
-            key: "module",
-            label: t("navigation.moduleConfiguration"),
-            icon: LayersIcon,
-            component: ModuleConfig,
-            edits: true,
-            changeCount: dirtyModuleTabs(dirtyModule, staged.keys()).size,
-          },
-          {
-            key: "administration",
-            label: t("navigation.administration"),
-            icon: ShieldAlertIcon,
-            component: Administration,
-          },
-        ],
-      },
-      {
-        key: "backupRestore",
-        label: t("sidebar.backupRestore"),
-        sections: [
-          {
-            key: "backup",
-            label: t("navigation.deviceProfile"),
-            icon: ArchiveRestoreIcon,
-            component: BackupRestore,
-          },
-        ],
-      },
-      {
-        key: "advanced",
-        label: t("sidebar.advanced"),
-        sections: [
-          {
-            key: "firmware",
-            label: t("navigation.firmwareUpdate"),
-            icon: HardDriveUploadIcon,
-            href: FIRMWARE_FLASHER_URL,
-          },
-          {
-            key: "clean-nodes",
-            label: t("navigation.cleanNodeDb"),
-            icon: EraserIcon,
-            component: CleanNodeDb,
-          },
-          {
-            key: "debug",
-            label: t("navigation.debugPanel"),
-            icon: BugIcon,
-            component: DebugPanel,
-          },
-        ],
-      },
-      {
-        key: "app",
-        label: t("sidebar.app"),
-        sections: [
-          {
-            key: "app",
-            label: t("navigation.appSettings"),
-            icon: PaletteIcon,
-            component: AppSettings,
-          },
-        ],
-      },
-      {
-        key: "information",
-        label: t("sidebar.information"),
-        sections: [
-          {
-            key: "about",
-            label: t("navigation.about"),
-            icon: InfoIcon,
-            component: About,
-          },
-          {
-            key: "help",
-            label: t("navigation.help"),
-            icon: BookOpenIcon,
-            href: DOCS_URL,
-          },
-        ],
-      },
-    ];
-  }, [t, dirtyRadio, dirtyModule, dirtyChannels, isOwnerDirty, staged]);
+  const editor = useConfigEditor();
+  const editorDirty = useSignal(editor?.isDirty ?? NO_FLAG);
+  const dirtyRadio = useSignal(editor?.dirtyRadioSections ?? NO_STRINGS);
+  const dirtyModule = useSignal(editor?.dirtyModuleSections ?? NO_STRINGS);
+  const dirtyChannels = useSignal(editor?.dirtyChannels ?? NO_NUMBERS);
+  const ownerDirty = useSignal(editor?.isOwnerDirty ?? NO_FLAG);
+  const staged = useSignal(editor?.stagedAdminMessages ?? NO_STAGED);
 
-  const sections = useMemo(
-    () => groups.flatMap((group) => group.sections),
-    [groups],
+  const [query, setQuery] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [formState, setFormState] = useState({ isDirty: false, isValid: true });
+  const [form, setForm] = useState<FormHandle | null>(null);
+  const unsubRef = useRef<(() => void) | null>(null);
+
+  const routeSection = sectionFromPath(pathname);
+  // Desktop opens the first section for a bare /settings; mobile shows the list.
+  const activeSection: SettingsSectionDef | undefined =
+    SETTINGS_SECTIONS.find((section) => section.id === routeSection) ??
+    (isMobile ? undefined : FIRST_SECTION);
+  const deviceSubsection = useDeviceSubsection();
+  const moduleSubsection = useModuleSubsection();
+  const { metadata } = useDeviceCapabilities();
+  const visibleModules = useVisibleModules();
+
+  const changeCounts = useMemo(
+    () =>
+      sectionChangeCounts({
+        dirtyRadio,
+        dirtyModule,
+        dirtyChannels,
+        ownerDirty,
+        stagedKeys: [...staged.keys()],
+      }),
+    [dirtyRadio, dirtyModule, dirtyChannels, ownerDirty, staged],
   );
-  const segment = pathname.split("/")[2] ?? "";
-  const activeSection =
-    sections.find((section) => section.component && section.key === segment) ??
-    sections[0];
+
+  const navGroups: SettingsNavGroup<SettingsSectionId>[] = useMemo(() => {
+    const dirtyDevice = dirtyDeviceTabs(dirtyRadio, staged.keys());
+    // Device configuration lists its pages under it, as Android does.
+    const deviceSubitems = visibleDeviceTabs(metadata).map((tab) => ({
+      id: tab.key,
+      label: t(tab.labelKey),
+      dirty: dirtyDevice.has(tab.key),
+    }));
+    // And Module configuration lists the modules this node offers.
+    const dirtyModules = dirtyModuleTabs(dirtyModule, staged.keys());
+    const moduleSubitems = visibleModules.map((tab) => ({
+      id: tab.key,
+      label: t(tab.labelKey, { ns: "moduleConfig" }),
+      dirty: dirtyModules.has(tab.key),
+    }));
+    const items = SETTINGS_SECTIONS.map((section) => ({
+      id: section.id,
+      group: section.group,
+      label: t(section.labelKey),
+      icon: SECTION_VIEWS[section.id].icon,
+      dirty: (changeCounts[section.id] ?? 0) > 0,
+      subitems:
+        section.id === "device"
+          ? deviceSubitems
+          : section.id === "module"
+            ? moduleSubitems
+            : undefined,
+      // Subsections are found by name too ("Position" finds Device configuration).
+      terms:
+        section.id === "device"
+          ? DEVICE_TABS.map((tab) => t(tab.labelKey))
+          : section.id === "module"
+            ? MODULE_TABS.map((tab) => t(tab.labelKey, { ns: "moduleConfig" }))
+            : [],
+    }));
+    return filterGroups(groupBy(items, SETTINGS_GROUP_IDS), query).map(
+      (group) => ({
+        id: group.group,
+        label: t(GROUP_LABEL_KEYS[group.group]),
+        items: group.items,
+      }),
+    );
+  }, [
+    t,
+    changeCounts,
+    query,
+    metadata,
+    dirtyRadio,
+    dirtyModule,
+    staged,
+    visibleModules,
+  ]);
 
   const onFormInit = useCallback(
-    <T extends FieldValues>(methods: UseFormReturn<T>) => {
-      setFormMethods(methods as UseFormReturn);
-
-      setRhfState({
-        // Assume default on init, changes will be caught by subscription
-        isDirty: false,
-        isValid: true,
+    <T extends object>(methods: UseFormReturn<T>) => {
+      setForm({
+        reset: () => methods.reset(),
+        markSaved: () => {
+          methods.reset(methods.getValues(), {
+            keepDirty: false,
+            keepErrors: false,
+            keepTouched: false,
+            keepValues: true,
+          });
+          void methods.trigger();
+        },
       });
-
-      // Unsubscribe from previous subscriptions & subscribe to form changes
+      // Assume a clean, valid form until the subscription reports otherwise.
+      setFormState({ isDirty: false, isValid: true });
       unsubRef.current?.();
       unsubRef.current = methods.subscribe({
         formState: { isDirty: true, isValid: true },
         callback: ({ isValid, isDirty }) => {
-          setRhfState({
+          setFormState({
             isDirty: isDirty ?? false,
             isValid: isValid ?? true,
           });
@@ -300,169 +258,260 @@ const ConfigPage = () => {
     [],
   );
 
-  useEffect(() => {
-    return () => unsubRef.current?.();
-  }, []);
+  useEffect(() => () => unsubRef.current?.(), []);
+
+  // A section without a form must not keep the last form's state.
+  const sectionKey = `${activeSection?.id}|${deviceSubsection?.key}|${moduleSubsection?.key}`;
+  const [formSectionKey, setFormSectionKey] = useState(sectionKey);
+  if (formSectionKey !== sectionKey) {
+    setFormSectionKey(sectionKey);
+    setFormState({ isDirty: false, isValid: true });
+    setForm(null);
+  }
+
+  const deviceName = device.connected
+    ? device.name
+    : t("settingsLayout.thisRadio");
 
   const handleSave = useCallback(async () => {
     if (!editor) return;
     setIsSaving(true);
-
     try {
       const result = await editor.commit();
       if (result.status === "error") {
         throw result.error;
       }
-
       // Edits made while the save was in flight are still pending.
       if (editor.isDirty.value) {
         toast({
-          title: t("toast.savePending.title"),
-          description: t("toast.savePending.description"),
+          title: t("toast.savePending.title", { ns: "ui" }),
+          description: t("toast.savePending.description", { ns: "ui" }),
         });
         return;
       }
-
       toast({
-        title: t("toast.saveAllSuccess.title"),
-        description: t("toast.saveAllSuccess.description"),
+        variant: "success",
+        title: t("settingsLayout.savedTitle"),
+        description: t("settingsLayout.savedRestarting", {
+          device: deviceName,
+        }),
       });
-
-      if (formMethods) {
-        formMethods.reset(formMethods.getValues(), {
-          keepDirty: false,
-          keepErrors: false,
-          keepTouched: false,
-          keepValues: true,
-        });
-        formMethods.trigger();
-      }
+      form?.markSaved();
+      // The bar or Save button that had focus is going away.
+      titleRef.current?.focus();
     } catch {
       toast({
-        title: t("toast.configSaveError.title"),
-        description: t("toast.configSaveError.description"),
+        variant: "destructive",
+        title: t("toast.configSaveError.title", { ns: "ui" }),
+        description: t("toast.configSaveError.description", { ns: "ui" }),
       });
     } finally {
       setIsSaving(false);
     }
-  }, [toast, t, formMethods, editor]);
+  }, [editor, toast, t, deviceName, form]);
 
   const handleReset = useCallback(() => {
-    if (formMethods) {
-      formMethods.reset();
-    }
+    form?.reset();
     editor?.reset();
-  }, [formMethods, editor]);
+    titleRef.current?.focus();
+  }, [editor, form]);
 
   const openSection = useCallback(
-    (section: SettingsSection) => {
-      if (section.href) {
-        window.open(section.href, "_blank", "noopener,noreferrer");
-        return;
-      }
-      navigate({ to: `/settings/${section.key}` });
+    (id: SettingsSectionId) => {
+      void navigate({ to: `/settings/${id}` });
     },
     [navigate],
   );
 
-  const leftSidebar = useMemo(
-    () => (
-      <Sidebar>
-        {groups.map((group) => (
-          <SidebarSection
-            key={group.key}
-            label={group.label}
-            className="py-2 px-0"
+  const openSubsection = useCallback(
+    (id: SettingsSectionId, subId: string) => {
+      // The Device form is the section's own page, without `?tab=`.
+      void navigate(
+        id === "device" && subId === "device"
+          ? { to: "/settings/device" }
+          : { to: `/settings/${id}`, search: { tab: subId } },
+      );
+    },
+    [navigate],
+  );
+
+  const hasPending = editorDirty || formState.isDirty;
+
+  const sidebar = (
+    <SettingsNav
+      title={t("page.title")}
+      groups={navGroups}
+      activeId={activeSection?.id}
+      activeSubId={
+        activeSection?.id === "device"
+          ? (deviceSubsection?.key ?? "device")
+          : activeSection?.id === "module"
+            ? moduleSubsection?.key
+            : undefined
+      }
+      onSelect={openSection}
+      onSelectSub={openSubsection}
+      query={query}
+      onQueryChange={setQuery}
+    />
+  );
+
+  if (!activeSection) {
+    return (
+      <ShellPage label={t("page.title")} contentClassName="overflow-auto">
+        <MobileSettingsList
+          title={t("page.title")}
+          header={<DeviceCard />}
+          groups={navGroups}
+          values={listValues}
+          onSelect={openSection}
+        />
+      </ShellPage>
+    );
+  }
+
+  const sectionLabel = t(activeSection.labelKey);
+  const groupLabel = t(GROUP_LABEL_KEYS[activeSection.group]);
+  const crumbs: ReactNode[] =
+    activeSection.scope === "radio" ? [groupLabel, deviceName] : [groupLabel];
+
+  // Device subsections and modules have their own title, text and docs,
+  // with a way back to the list they were opened from.
+  const subsection = deviceSubsection
+    ? {
+        title: t(deviceSubsection.labelKey),
+        description: t(deviceSubsection.descriptionKey),
+        docsUrl: DEVICE_SUBSECTION_DOCS[deviceSubsection.key],
+      }
+    : moduleSubsection
+      ? {
+          title: t(moduleSubsection.labelKey, { ns: "moduleConfig" }),
+          description: t(`summary.${moduleSubsection.key}`, {
+            ns: "moduleConfig",
+          }),
+          docsUrl: moduleDocsUrl(moduleSubsection.key),
+        }
+      : undefined;
+
+  const backLink = (label: string, onClick: () => void) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-fit cursor-pointer items-center gap-1.5 rounded-control py-1 text-help text-link focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    >
+      <ArrowLeftIcon aria-hidden="true" className="size-4" />
+      {label}
+    </button>
+  );
+  const goBack = subsection
+    ? {
+        label: t("settingsLayout.backTo", { section: sectionLabel }),
+        onClick: () => openSection(activeSection.id),
+      }
+    : {
+        label: t("settingsLayout.backToSettings"),
+        onClick: () => void navigate({ to: "/settings" }),
+      };
+
+  const title = subsection?.title ?? sectionLabel;
+  const note = t("settingsLayout.restartNote", { device: deviceName });
+  const error = formState.isValid ? undefined : t("settingsLayout.fixErrors");
+  const Body = SECTION_VIEWS[activeSection.id].component;
+
+  // Mobile, as drawn: back and Save in the header, the note at the bottom.
+  const mobileHeader = isMobile
+    ? {
+        leading: (
+          <IconButton
+            aria-label={goBack.label}
+            variant="rail"
+            size="touch"
+            icon={<ArrowLeftIcon className="size-5" />}
+            onClick={goBack.onClick}
+          />
+        ),
+        trailing: (
+          <Button
+            size="sm"
+            variant={hasPending ? "primary" : "secondary"}
+            className="relative rounded-full pointer-coarse:touch-target"
+            disabled={!hasPending || isSaving || !formState.isValid}
+            aria-busy={isSaving || undefined}
+            onClick={() => void handleSave()}
           >
-            {group.sections.map((section) => (
-              <SidebarButton
-                key={section.key}
-                label={section.label}
-                active={activeSection?.key === section.key}
-                onClick={() => openSection(section)}
-                Icon={section.icon}
-                isDirty={(section.changeCount ?? 0) > 0}
-                count={section.changeCount}
-              />
-            ))}
-          </SidebarSection>
-        ))}
-      </Sidebar>
-    ),
-    [groups, activeSection?.key, openSection],
-  );
-
-  const hasDrafts = editorIsDirty;
-  const hasPending = hasDrafts || rhfState.isDirty;
-  const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
-  const saveDisabled = isSaving || !rhfState.isValid || !hasPending;
-
-  const actions = useMemo(
-    () => [
-      {
-        key: "unsavedChanges",
-        label: t("common:formValidation.unsavedChanges"),
-        onClick: () => {},
-        className: cn([
-          "bg-blue-500 text-slate-900 hover:bg-initial",
-          "transition-colors duration-200",
-          buttonOpacity,
-          "transition-opacity",
-        ]),
-      },
-      {
-        key: "reset",
-        icon: RefreshCwIcon,
-        label: t("common:button.reset"),
-        onClick: handleReset,
-        className: cn([
-          buttonOpacity,
-          "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
-          "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer",
-        ]),
-      },
-      {
-        key: "save",
-        icon: !hasPending ? SaveOff : SaveIcon,
-        isLoading: isSaving,
-        disabled: saveDisabled,
-        iconClasses:
-          !rhfState.isValid && hasPending
-            ? "text-red-400 cursor-not-allowed"
-            : "cursor-pointer",
-        className: cn([
-          "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
-          "hover:dark:bg-slate-300 hover:dark:text-black",
-          "disabled:hover:cursor-not-allowed cursor-pointer",
-        ]),
-        onClick: handleSave,
-        label: t("common:button.save"),
-      },
-    ],
-    [
-      isSaving,
-      hasPending,
-      rhfState.isValid,
-      saveDisabled,
-      buttonOpacity,
-      handleReset,
-      handleSave,
-      t,
-    ],
-  );
-
-  const ActiveComponent = activeSection?.component;
+            {t("button.save", { ns: "common" })}
+          </Button>
+        ),
+      }
+    : undefined;
 
   return (
-    <PageLayout
-      contentClassName="overflow-auto"
-      leftBar={leftSidebar}
-      label={activeSection?.label ?? ""}
-      // Pending edits stay visible from any page so they aren't forgotten.
-      actions={activeSection?.edits || hasPending ? actions : []}
+    <ShellPage
+      label={title}
+      hideLabel={!isMobile}
+      leading={mobileHeader?.leading}
+      trailing={mobileHeader?.trailing}
+      sidebar={isMobile ? undefined : sidebar}
+      sidebarLabel={t("page.title")}
+      noPadding
     >
-      {ActiveComponent && <ActiveComponent onFormInit={onFormInit} />}
-    </PageLayout>
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <div
+          className={cn(
+            "min-h-0 flex-1 overflow-auto px-4 pt-4 md:px-10 md:pt-8",
+            isMobile ? "pb-[max(1.5rem,env(safe-area-inset-bottom))]" : "pb-32",
+          )}
+        >
+          <div className="mx-auto flex max-w-[760px] flex-col gap-5">
+            <SettingsPageHeader
+              leading={
+                subsection && !isMobile
+                  ? backLink(goBack.label, goBack.onClick)
+                  : undefined
+              }
+              crumbs={crumbs}
+              title={title}
+              hideTitle={isMobile}
+              titleRef={titleRef}
+              description={
+                subsection?.description ?? t(activeSection.descriptionKey)
+              }
+              docsUrl={subsection?.docsUrl ?? activeSection.docsUrl}
+            />
+            <Suspense fallback={<Spinner size="lg" className="my-5" />}>
+              <Body onFormInit={onFormInit} />
+            </Suspense>
+          </div>
+        </div>
+        {hasPending && isMobile ? (
+          <div className="flex flex-col gap-2 rounded-card border border-warning-subtle bg-warning mx-3 mb-[max(1rem,env(safe-area-inset-bottom))] px-3.5 py-3 text-help text-warning">
+            <output>{error ?? note}</output>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="self-start"
+              disabled={isSaving}
+              onClick={handleReset}
+            >
+              {t("button.reset", { ns: "common" })}
+            </Button>
+          </div>
+        ) : null}
+        {hasPending && !isMobile ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center px-3">
+            <UnsavedChangesBar
+              className="pointer-events-auto"
+              note={note}
+              error={error}
+              saving={isSaving}
+              saveDisabled={!formState.isValid}
+              onReset={handleReset}
+              onSave={() => void handleSave()}
+            />
+          </div>
+        ) : null}
+      </div>
+    </ShellPage>
   );
 };
 

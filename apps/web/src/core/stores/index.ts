@@ -31,11 +31,6 @@ export type {
   ValidModuleConfigType,
   WaypointWithMetadata,
 } from "@core/stores/deviceStore/types.ts";
-export { MessageState, MessageType } from "@core/stores/messageStore";
-export {
-  SidebarProvider,
-  useSidebar, // TODO: Bring hook into this file
-} from "@core/stores/sidebarStore/index.tsx";
 
 // Re-export idb-keyval functions for clearing all stores, expand this if we add more local storage types
 export { clear as clearAllStores } from "idb-keyval";

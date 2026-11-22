@@ -9,6 +9,7 @@
     "protobufs",
     "**/locales/*-*/*.json",
     "**/packages/ui/",
-    "*.md"
+    "*.md",
+    "public/emoji/emoji-data.json"
   ]
 }

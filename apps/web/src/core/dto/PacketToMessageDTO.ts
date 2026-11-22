@@ -1,4 +1,4 @@
-import { MessageState, MessageType } from "@core/stores";
+import { MessageState, MessageType } from "@core/messaging/messageEnums.ts";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import type { Types } from "@core/protobuf.ts";
 

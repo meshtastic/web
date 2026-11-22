@@ -14,12 +14,10 @@
     "download": "Download",
     "disconnect": "Disconnect",
     "export": "Export",
-    "generate": "Generate",
     "regenerate": "Regenerate",
     "import": "Import",
     "message": "Message",
     "now": "Now",
-    "ok": "OK",
     "print": "Print",
     "remove": "Remove",
     "requestNewKeys": "Request New Keys",
@@ -40,13 +38,8 @@
   "loading": "Loading...",
   "unit": {
     "cps": "CPS",
-    "db": "dB",
     "dbm": "dBm",
     "hertz": "Hz",
-    "hop": {
-      "one": "Hop",
-      "plural": "Hops"
-    },
     "hopsAway": {
       "one": "{{count}} hop away",
       "plural": "{{count}} hops away",
@@ -67,16 +60,24 @@
     "second": { "one": "Second", "plural": "Seconds" },
     "day": {
       "one": "Day",
-      "plural": "Days",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "plural": "Days"
     },
     "month": { "one": "Month", "plural": "Months" },
     "year": { "one": "Year", "plural": "Years" },
-    "snr": "SNR",
     "volt": { "one": "Volt", "plural": "Volts", "suffix": "V" },
     "record": { "one": "Records", "plural": "Records" },
     "degree": { "one": "Degree", "plural": "Degrees", "suffix": "°" }
+  },
+  "interval": {
+    "seconds_one": "{{count}} second",
+    "seconds_other": "{{count}} seconds",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "alwaysOn": "Always on",
+    "off": "Off",
+    "deviceDefault": "Device default"
   },
   "security": {
     "0bit": "Empty",
@@ -91,7 +92,6 @@
     "num": "??"
   },
   "nodeUnknownPrefix": "!",
-  "unset": "UNSET",
   "fallbackName": "Meshtastic {{last4}}",
   "node": "Node",
   "formValidation": {

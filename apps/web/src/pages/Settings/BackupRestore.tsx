@@ -1,14 +1,13 @@
-import { create } from "@bufbuild/protobuf";
 import { ProfileFieldsDialog } from "@components/PageComponents/SettingsPages/ProfileFieldsDialog.tsx";
 import {
+  SettingsBlock,
   SettingsGroup,
   SettingsRow,
   SettingsSections,
 } from "@components/PageComponents/SettingsPages/SettingsSection.tsx";
 import { useDeviceConnected } from "@components/PageComponents/SettingsPages/useDeviceConnected.ts";
 import { Button } from "@components/UI/Button.tsx";
-import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { STAGED_FIXED_POSITION } from "@core/utils/stagedAdminKeys.ts";
+import { Callout } from "@components/UI/Callout.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
   buildDeviceProfile,
@@ -16,36 +15,33 @@ import {
   defaultSelection,
   deviceProfileFileName,
   encodeDeviceProfile,
-  type ImportPlan,
   planProfileImport,
   type ProfileSelection,
   profileContents,
   selectProfileFields,
 } from "@core/utils/profileExport.ts";
-import type { ConfigEditor } from "@core/kmp/configEditor.ts";
+import { importTarget, stageImportPlan } from "@core/utils/profileImport.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useActiveClient } from "@core/kmp/hooks";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
+import { constantSignal } from "@core/kmp/signals.ts";
 import { Result } from "better-result";
 import { DownloadIcon, UploadIcon } from "lucide-react";
 import { type ChangeEvent, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { type ConfigProps, SettingsCard } from "./SettingsTabs.tsx";
+import type { ConfigProps } from "./sectionProps.ts";
 
 type DeviceProfile = Protobuf.ClientOnly.DeviceProfile;
 
-const EMPTY_BOOLEAN_SIGNAL = {
-  value: false,
-  peek: () => false,
-  subscribe: () => () => {},
-} as const;
+const EMPTY_BOOLEAN_SIGNAL = constantSignal(false);
 
 type PendingDialog =
   | { mode: "export"; profile: DeviceProfile }
   | { mode: "import"; profile: DeviceProfile };
 
 const downloadBytes = (bytes: Uint8Array, fileName: string) => {
-  const blob = new Blob([bytes as Uint8Array<ArrayBuffer>], {
+  // A copy is backed by a plain ArrayBuffer, which Blob requires.
+  const blob = new Blob([new Uint8Array(bytes)], {
     type: "application/octet-stream",
   });
   const url = URL.createObjectURL(blob);
@@ -55,33 +51,6 @@ const downloadBytes = (bytes: Uint8Array, fileName: string) => {
   anchor.click();
   // Revoke after the click has been handled.
   setTimeout(() => URL.revokeObjectURL(url), 0);
-};
-
-const applyPlan = (editor: ConfigEditor, plan: ImportPlan) => {
-  if (plan.owner) editor.setOwner(plan.owner);
-  for (const [key, value] of Object.entries(plan.radio)) {
-    editor.setRadioSection(
-      key as keyof ImportPlan["radio"],
-      value as NonNullable<ImportPlan["radio"][keyof ImportPlan["radio"]]>,
-    );
-  }
-  for (const [key, value] of Object.entries(plan.modules)) {
-    editor.setModuleSection(
-      key as keyof ImportPlan["modules"],
-      value as NonNullable<ImportPlan["modules"][keyof ImportPlan["modules"]]>,
-    );
-  }
-  for (const channel of plan.channels) editor.setChannel(channel);
-  if (plan.fixedPosition) {
-    // Same key as the Position page, so only one fixed position is sent;
-    // Reset drops it and a later edit or import replaces it.
-    editor.stageAdminMessage(
-      STAGED_FIXED_POSITION,
-      create(Protobuf.Admin.AdminMessageSchema, {
-        payloadVariant: { case: "setFixedPosition", value: plan.fixedPosition },
-      }),
-    );
-  }
 };
 
 /**
@@ -164,13 +133,14 @@ export const BackupRestore = (_props: ConfigProps) => {
     const nodeUser = myNode()?.user;
     if (!editor.owner.peek() && nodeUser) editor.setBaselineOwner(nodeUser);
 
-    const plan = planProfileImport(selectProfileFields(profile, selection), {
-      owner: editor.owner.peek(),
-      security: editor.radio.peek().security,
-      activeChannelIndexes: [...editor.channels.peek().values()]
-        .filter((ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED)
-        .map((ch) => ch.index),
-    });
+    const plan = planProfileImport(
+      selectProfileFields(profile, selection),
+      importTarget({
+        owner: editor.owner.peek(),
+        security: editor.radio.peek().security,
+        channels: editor.channels.peek().values(),
+      }),
+    );
     if (Result.isError(plan)) {
       toast({
         title: t("settingsPages.backup.import.failed"),
@@ -179,7 +149,7 @@ export const BackupRestore = (_props: ConfigProps) => {
       return;
     }
 
-    applyPlan(editor, plan.value);
+    stageImportPlan(editor, plan.value);
     const skipped = [...new Set(plan.value.skipped)].map((key) =>
       t(`settingsPages.backup.skipped.${key}`),
     );
@@ -206,27 +176,29 @@ export const BackupRestore = (_props: ConfigProps) => {
   );
 
   return (
-    <SettingsCard>
+    <>
       <SettingsSections>
         <SettingsGroup
           title={t("settingsPages.backup.title")}
           description={t("settingsPages.backup.description")}
         >
           {!connected && (
-            <Subtle className="font-semibold">
-              {t("settingsPages.notConnected")}
-            </Subtle>
+            <SettingsBlock>
+              <Callout tone="warning">
+                {t("settingsPages.notConnected")}
+              </Callout>
+            </SettingsBlock>
           )}
           <SettingsRow
             label={t("settingsPages.backup.import.label")}
             description={t("settingsPages.backup.import.description")}
           >
             <Button
-              variant="outline"
+              variant="secondary"
               disabled={!connected}
               onClick={() => fileInputRef.current?.click()}
             >
-              <UploadIcon className="mr-2 size-4" />
+              <UploadIcon aria-hidden="true" className="mr-2 size-4" />
               {t("settingsPages.backup.import.action")}
             </Button>
             <input
@@ -243,7 +215,7 @@ export const BackupRestore = (_props: ConfigProps) => {
               <>
                 {t("settingsPages.backup.export.description")}
                 {isDirty && (
-                  <span className="mt-1 block font-semibold text-amber-600 dark:text-amber-400">
+                  <span className="mt-1 block font-semibold text-warning">
                     {t("settingsPages.backup.export.pendingChanges")}
                   </span>
                 )}
@@ -251,11 +223,11 @@ export const BackupRestore = (_props: ConfigProps) => {
             }
           >
             <Button
-              variant="outline"
+              variant="secondary"
               disabled={!connected || isDirty}
               onClick={startExport}
             >
-              <DownloadIcon className="mr-2 size-4" />
+              <DownloadIcon aria-hidden="true" className="mr-2 size-4" />
               {t("settingsPages.backup.export.action")}
             </Button>
           </SettingsRow>
@@ -278,6 +250,6 @@ export const BackupRestore = (_props: ConfigProps) => {
           }
         />
       )}
-    </SettingsCard>
+    </>
   );
 };

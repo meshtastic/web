@@ -37,6 +37,65 @@ export interface Message {
   readonly hopsAway?: number;
   readonly viaMqtt?: boolean;
   readonly transport?: Protobuf.Mesh.MeshPacket_TransportMechanism;
+  /** Packet id of the message this one replies to (Data.reply_id). */
+  readonly replyId?: number;
+  /**
+   * The message filter matched it on arrival: it never counts as unread or
+   * becomes the conversation preview.
+   */
+  readonly filtered?: boolean;
+  /**
+   * Local arrival order, set on messages loaded from storage. Ties on
+   * `rxTime` are paged by it (see `MessageCursor`).
+   */
+  readonly seq?: number;
+}
+
+/**
+ * Where a page of older history ends: messages strictly before
+ * (`rxTime`, `seq`). Without a `seq` every message at `rxTime` counts as
+ * older.
+ */
+export interface MessageCursor {
+  readonly rxTime: Date;
+  readonly seq?: number;
+}
+
+/** Identifies a stored message: packet ids are only unique per sender. */
+export interface MessageRef {
+  readonly id: number;
+  readonly from: number;
+}
+
+/**
+ * A tapback: `fromNode` reacted to message `targetId` with `emoji`. Mine
+ * carry the delivery state of the packet that sent them (`packetId`);
+ * received ones are Ack.
+ */
+export interface Reaction {
+  readonly targetId: number;
+  readonly fromNode: number;
+  readonly emoji: string;
+  readonly packetId: number;
+  /** Where the reaction packet went: the peer, or broadcast. */
+  readonly to: number;
+  readonly rxTime: Date;
+  readonly state: MessageState;
+  readonly routingError?: Protobuf.Mesh.Routing_Error;
+}
+
+/** Fields an ack or NAK can change on a stored reaction. */
+export type ReactionDeliveryPatch = {
+  -readonly [K in "state" | "routingError"]?: Reaction[K];
+};
+
+/** A conversation as the sidebar first loads it from storage. */
+export interface StoredConversation {
+  readonly key: ConversationKey;
+  /** Latest text message (reactions never count). */
+  readonly lastMessage: Message;
+  /** Messages from others after the conversation's read marker. */
+  readonly unread: number;
 }
 
 /** Fields an ack or NAK can change on a stored message. */
@@ -60,7 +119,7 @@ export interface MessageRepository {
   loadRecent(key: ConversationKey, limit: number): Promise<Message[]>;
   loadBefore(
     key: ConversationKey,
-    cursor: Date,
+    cursor: MessageCursor,
     limit: number,
   ): Promise<Message[]>;
   /**
@@ -70,17 +129,35 @@ export interface MessageRepository {
    */
   append(message: Message, key?: ConversationKey): Promise<void>;
   appendBatch(messages: ReadonlyArray<Message>): Promise<void>;
-  updateState(id: number, state: MessageState): Promise<void>;
-  updateDelivery(id: number, patch: MessageDeliveryPatch): Promise<void>;
-  remove(id: number): Promise<void>;
+  updateState(ref: MessageRef, state: MessageState): Promise<void>;
+  updateDelivery(ref: MessageRef, patch: MessageDeliveryPatch): Promise<void>;
+  remove(ref: MessageRef): Promise<void>;
   prune(policy: RetentionPolicy): Promise<void>;
   clearConversation(key: ConversationKey): Promise<void>;
   clear(): Promise<void>;
+  /** Stored messages with these packet ids, e.g. reply targets out of view. */
+  findByIds(ids: ReadonlyArray<number>): Promise<Message[]>;
+  /** Every reaction to any of these messages. */
+  loadReactions(targetIds: ReadonlyArray<number>): Promise<Reaction[]>;
+  /** Stores a reaction; one per (target, sender, emoji), first one wins. */
+  addReaction(reaction: Reaction, key: ConversationKey): Promise<void>;
+  removeReaction(
+    targetId: number,
+    fromNode: number,
+    emoji: string,
+  ): Promise<void>;
+  /** Patches the reaction `fromNode` sent as packet `packetId`. */
+  updateReactionDelivery(
+    ref: { readonly packetId: number; readonly fromNode: number },
+    patch: ReactionDeliveryPatch,
+  ): Promise<void>;
   /**
-   * Moves direct messages we sent that were filed under our own node, as
-   * older versions did, to the conversation with their recipient.
+   * Every conversation with a message, with its latest message and how many
+   * messages not from `myNodeNum` arrived after its read marker.
    */
-  refileSentDirect?(localNodeNum: number): Promise<number>;
+  loadConversations(myNodeNum: number): Promise<StoredConversation[]>;
+  /** Moves the conversation's read marker past every stored message. */
+  markRead(key: ConversationKey): Promise<void>;
   /** Points every later read and write at another node's history. */
   setScope?(scope: number): void;
 }

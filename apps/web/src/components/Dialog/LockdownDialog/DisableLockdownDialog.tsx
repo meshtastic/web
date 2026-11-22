@@ -84,7 +84,7 @@ export const DisableLockdownDialog = ({
             onChange={setConfirmed}
             name="confirmDisableLockdown"
           >
-            <span className="dark:text-white">
+            <span className="text-primary">
               {t("lockdown.disable.confirmUnderstanding")}
             </span>
           </Checkbox>

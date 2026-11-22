@@ -1,5 +1,7 @@
 import {
+  LONG_NAME_MAX_BYTES,
   NODE_STATUS_MAX_BYTES,
+  SHORT_NAME_MAX_BYTES,
   type UserValidation,
   UserValidationSchema,
 } from "@app/validation/config/user.ts";
@@ -13,31 +15,37 @@ import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useDevice } from "@core/stores";
 import { isModuleExcluded } from "@core/utils/excludedModules.ts";
 import { firmwareAtLeast } from "@core/utils/firmware.ts";
+import type { TextLimitSpec } from "@core/utils/textLimit.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
+import { constantSignal } from "@core/kmp/signals.ts";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+
+// Radio strings are fixed-size protobuf fields, so they count UTF-8 bytes.
+const LONG_NAME_LIMIT: TextLimitSpec = {
+  max: LONG_NAME_MAX_BYTES,
+  mode: "bytes",
+};
+const SHORT_NAME_LIMIT: TextLimitSpec = {
+  max: SHORT_NAME_MAX_BYTES,
+  mode: "bytes",
+};
+const NODE_STATUS_LIMIT: TextLimitSpec = {
+  max: NODE_STATUS_MAX_BYTES,
+  mode: "bytes",
+};
 
 interface UserConfigProps {
   onFormInit: DynamicFormFormInit<UserValidation>;
 }
 
-const EMPTY_OWNER_SIGNAL = {
-  value: undefined as Protobuf.Mesh.User | undefined,
-  peek: () => undefined as Protobuf.Mesh.User | undefined,
-  subscribe: () => () => {},
-} as const;
-
-const EMPTY_MODULES_SIGNAL = {
-  value: {} as {
-    statusmessage?: Protobuf.ModuleConfig.ModuleConfig_StatusMessageConfig;
-  },
-  peek: () =>
-    ({}) as {
-      statusmessage?: Protobuf.ModuleConfig.ModuleConfig_StatusMessageConfig;
-    },
-  subscribe: () => () => {},
-} as const;
+const EMPTY_OWNER_SIGNAL = constantSignal<Protobuf.Mesh.User | undefined>(
+  undefined,
+);
+const EMPTY_MODULES_SIGNAL = constantSignal<{
+  statusmessage?: Protobuf.ModuleConfig.ModuleConfig_StatusMessageConfig;
+}>({});
 
 export const User = ({ onFormInit }: UserConfigProps) => {
   const { t } = useTranslation("config");
@@ -154,7 +162,7 @@ export const User = ({ onFormInit }: UserConfigProps) => {
               label: t("user.longName.label"),
               description: t("user.longName.description"),
               properties: {
-                fieldLength: { min: 1, max: 39, showCharacterCount: true },
+                limit: LONG_NAME_LIMIT,
               },
             },
             {
@@ -163,7 +171,7 @@ export const User = ({ onFormInit }: UserConfigProps) => {
               label: t("user.shortName.label"),
               description: t("user.shortName.description"),
               properties: {
-                fieldLength: { min: 1, max: 4, showCharacterCount: true },
+                limit: SHORT_NAME_LIMIT,
               },
             },
             ...(showStatusMessage
@@ -174,10 +182,7 @@ export const User = ({ onFormInit }: UserConfigProps) => {
                     label: t("user.statusMessage.label"),
                     description: t("user.statusMessage.description"),
                     properties: {
-                      fieldLength: {
-                        max: NODE_STATUS_MAX_BYTES,
-                        showCharacterCount: true,
-                      },
+                      limit: NODE_STATUS_LIMIT,
                     },
                   },
                 ]

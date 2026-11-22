@@ -4,17 +4,17 @@
     "title": "Command Menu"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "named": "Pin {{group}} to the top"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "named": "Unpin {{group}}"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Go to",
     "command": {
       "messages": "Messages",
       "map": "Map",
-      "config": "Config",
+      "config": "Settings",
       "nodes": "Nodes"
     }
   },
@@ -22,18 +22,13 @@
     "label": "Settings"
   },
   "manage": {
-    "label": "Manage",
     "command": {
       "switchNode": "Switch Node",
       "connectNewNode": "Connect New Node"
     }
   },
   "contextual": {
-    "label": "Contextual",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
-      "qrImport": "Import",
       "scheduleShutdown": "Schedule Shutdown",
       "scheduleReboot": "Reboot Device",
       "resetNodeDb": "Reset Node DB",
@@ -50,5 +45,89 @@
       "clearAllStoredMessages": "Clear All Stored Messages",
       "clearAllStores": "Clear All Local Storage"
     }
+  },
+  "search": {
+    "label": "Search commands",
+    "placeholder": "Search chats, nodes, settings, or type a command",
+    "pickNode": "Search nodes",
+    "pickDevice": "Search devices"
+  },
+  "groups": {
+    "conversations": "Conversations",
+    "nodes": "Nodes",
+    "commands": "Commands",
+    "navigation": "Go to",
+    "settings": "Settings"
+  },
+  "action": {
+    "traceroute": "Traceroute to…",
+    "qrGenerator": "Share channels as QR code",
+    "qrImport": "Import channels from QR code"
+  },
+  "hint": {
+    "unread_one": "{{count}} unread",
+    "unread_other": "{{count}} unread",
+    "channel": "Channel",
+    "directMessage": "Direct message",
+    "direct": "Direct",
+    "hops_one": "{{count}} hop",
+    "hops_other": "{{count}} hops",
+    "pickNode": "Pick a node",
+    "pickDevice": "Pick a device",
+    "connectMethods": "Bluetooth, Serial, HTTP",
+    "firmware": "Firmware update",
+    "switchToDevice": "Switch to this device"
+  },
+  "settingsHint": {
+    "user": "Name, short name, licensed mode",
+    "lora": "Region, preset, hop limit",
+    "channels": "Names, keys, sharing",
+    "security": "Keys and admin access",
+    "device": "Role, position, power, display, Bluetooth",
+    "module": "MQTT, serial, telemetry and more",
+    "administration": "Reboot, shutdown, factory reset",
+    "backup": "Import or export a profile",
+    "firmware": "Install new firmware",
+    "cleanNodes": "Remove stale nodes",
+    "debug": "Device log records",
+    "app": "Theme, language and more",
+    "messageFilter": "Hide messages containing words",
+    "about": "Version and licences",
+    "help": "Guides and community"
+  },
+  "pages": {
+    "traceroute": "Traceroute",
+    "switchDevice": "Switch device",
+    "back": "Back"
+  },
+  "footer": {
+    "move": "↑↓ to move",
+    "open": "↵ to open",
+    "commandsOnly": "Type > for commands only",
+    "back": "⌫ to go back"
+  },
+  "results_one": "{{count}} result",
+  "results_other": "{{count}} results",
+  "keys": {
+    "esc": "esc",
+    "then": "then",
+    "sequence": "{{first}} then {{second}}",
+    "ctrl": "Ctrl"
+  },
+  "toast": {
+    "tracerouteFailed": "Traceroute failed",
+    "notConnected": "Connect a device first"
+  },
+  "keywords": {
+    "messageFilter": "filter words block hide mute spam regex",
+    "user": "owner profile name",
+    "lora": "radio region modem preset",
+    "security": "keys admin",
+    "backup": "backup restore profile",
+    "firmware": "update flash",
+    "app": "theme language units",
+    "help": "docs documentation support",
+    "qr": "qr code",
+    "pin": "pin unpin favourite"
   }
 }

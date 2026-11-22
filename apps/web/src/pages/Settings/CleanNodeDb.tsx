@@ -1,14 +1,15 @@
-import { DialogWrapper } from "@components/Dialog/DialogWrapper.tsx";
 import {
+  SettingsBlock,
   SettingsGroup,
   SettingsRow,
   SettingsSections,
 } from "@components/PageComponents/SettingsPages/SettingsSection.tsx";
 import { useDeviceConnected } from "@components/PageComponents/SettingsPages/useDeviceConnected.ts";
-import { Button } from "@components/UI/Button.tsx";
+import { Callout } from "@components/UI/Callout.tsx";
+import { ConfirmDialog } from "@components/UI/ConfirmDialog.tsx";
+import { SettingRow } from "@components/UI/SettingRow.tsx";
 import { Slider } from "@components/UI/Slider.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
-import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
   MAX_DAYS,
@@ -17,23 +18,14 @@ import {
   nodesToClean,
 } from "@core/utils/cleanNodes.ts";
 import type { Node } from "@core/storage/types.ts";
-import { EraserIcon } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { type ConfigProps, SettingsCard } from "./SettingsTabs.tsx";
+import type { ConfigProps } from "./sectionProps.ts";
 import { useActiveClient, useSignal } from "@core/kmp/hooks";
+import { constantSignal } from "@core/kmp/signals.ts";
 
-const EMPTY_NODES: ReadonlyArray<Node> = [];
-const EMPTY_NODES_SIGNAL = {
-  value: EMPTY_NODES,
-  peek: () => EMPTY_NODES,
-  subscribe: () => () => {},
-} as const;
-const EMPTY_NUM_SIGNAL = {
-  value: undefined as number | undefined,
-  peek: () => undefined as number | undefined,
-  subscribe: () => () => {},
-} as const;
+const EMPTY_NODES_SIGNAL = constantSignal<ReadonlyArray<Node>>([]);
+const EMPTY_NUM_SIGNAL = constantSignal<number | undefined>(undefined);
 
 const nodeLabel = (node: Node) =>
   node.user?.longName ||
@@ -86,6 +78,7 @@ export const CleanNodeDb = (_props: ConfigProps) => {
       else failed++;
     }
     setCleaning(false);
+    setConfirmOpen(false);
     toast({
       title: t("settingsPages.cleanNodes.done", { count: removed }),
       description:
@@ -96,7 +89,7 @@ export const CleanNodeDb = (_props: ConfigProps) => {
   };
 
   return (
-    <SettingsCard>
+    <>
       <SettingsSections>
         <SettingsGroup
           title={t("settingsPages.cleanNodes.title")}
@@ -111,7 +104,7 @@ export const CleanNodeDb = (_props: ConfigProps) => {
           >
             <Slider
               id={sliderId}
-              className="w-full max-w-md"
+              className="w-full sm:w-60"
               value={[olderThanDays]}
               min={minDays(onlyUnknown)}
               max={MAX_DAYS}
@@ -119,7 +112,7 @@ export const CleanNodeDb = (_props: ConfigProps) => {
                 if (days !== undefined) setOlderThanDays(days);
               }}
             />
-            <span className="w-12 text-right text-sm tabular-nums">
+            <span className="w-12 text-right text-help tabular-nums">
               {olderThanDays}
             </span>
           </SettingsRow>
@@ -137,50 +130,65 @@ export const CleanNodeDb = (_props: ConfigProps) => {
         </SettingsGroup>
 
         <SettingsGroup
+          tone="danger"
           title={t("settingsPages.cleanNodes.queued", { count: queued.length })}
         >
-          {queued.length === 0 ? (
-            <Subtle>{t("settingsPages.cleanNodes.none")}</Subtle>
-          ) : (
-            <ul className="flex max-h-64 flex-wrap gap-2 overflow-y-auto">
-              {queued.map((node) => (
-                <li
-                  key={node.num}
-                  className="rounded-full bg-slate-100 px-3 py-1 text-sm dark:bg-slate-700"
-                >
-                  {nodeLabel(node)}
-                </li>
-              ))}
-            </ul>
-          )}
-          {!connected && (
-            <Subtle className="font-semibold">
-              {t("settingsPages.notConnected")}
-            </Subtle>
-          )}
-          <Button
-            variant="destructive"
+          <SettingsBlock>
+            {queued.length === 0 ? (
+              <p className="m-0 text-help text-muted">
+                {t("settingsPages.cleanNodes.none")}
+              </p>
+            ) : (
+              <ul className="m-0 flex max-h-64 list-none flex-wrap gap-2 overflow-y-auto p-0">
+                {queued.map((node) => (
+                  <li
+                    key={node.num}
+                    className="rounded-full bg-raised px-3 py-1 text-help text-secondary"
+                  >
+                    {nodeLabel(node)}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {!connected && (
+              <Callout tone="warning">
+                {t("settingsPages.notConnected")}
+              </Callout>
+            )}
+          </SettingsBlock>
+          <SettingRow
+            kind="button"
+            tone="danger"
+            label={t("settingsPages.cleanNodes.confirmTitle")}
+            help={t("settingsPages.cleanNodes.confirmDescription", {
+              count: queued.length,
+            })}
+            actionLabel={t("settingsPages.cleanNodes.cleanNow")}
             disabled={!connected || cleaning || queued.length === 0}
-            onClick={() => setConfirmOpen(true)}
-          >
-            <EraserIcon className="mr-2 size-4" />
-            {t("settingsPages.cleanNodes.cleanNow")}
-          </Button>
+            onAction={() => setConfirmOpen(true)}
+          />
         </SettingsGroup>
       </SettingsSections>
 
-      <DialogWrapper
+      <ConfirmDialog
         open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        type="confirm"
-        variant="destructive"
+        onOpenChange={(open) => {
+          // Stays open until every removal has been answered.
+          if (!cleaning) setConfirmOpen(open);
+        }}
+        tone="danger"
         title={t("settingsPages.cleanNodes.confirmTitle")}
         description={t("settingsPages.cleanNodes.confirmDescription", {
           count: queued.length,
         })}
-        confirmText={t("settingsPages.cleanNodes.cleanNow")}
+        confirmLabel={
+          cleaning
+            ? t("settingsLayout.working", { ns: "config" })
+            : t("settingsPages.cleanNodes.cleanNow")
+        }
+        pending={cleaning}
         onConfirm={() => void cleanNow()}
       />
-    </SettingsCard>
+    </>
   );
 };

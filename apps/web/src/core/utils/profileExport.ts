@@ -30,6 +30,57 @@ export const PROFILE_FIELDS = [
 export type ProfileField = (typeof PROFILE_FIELDS)[number];
 export type ProfileSelection = Record<ProfileField, boolean>;
 
+export type ProfileFieldsMode = "export" | "import";
+
+/** Fields that exist in a file but are never applied on import. */
+export const PROFILE_FIELDS_NOT_IMPORTED: readonly ProfileField[] = [
+  "isLicensed",
+];
+
+/** One row of the include/leave-out list. */
+export interface ProfileFieldRow {
+  readonly field: ProfileField;
+  /** The profile holds this part. */
+  readonly available: boolean;
+  /** The user can toggle it. */
+  readonly enabled: boolean;
+  /** Ticked and enabled: it counts as selected. */
+  readonly checked: boolean;
+  /** In the file but never applied on import. */
+  readonly notApplied: boolean;
+}
+
+/**
+ * The include/leave-out rows for a selection. A row the user can't select
+ * (unavailable, not imported, or the private key without the
+ * configuration it lives in) is never checked, even if still ticked.
+ */
+export function profileFieldRows(
+  mode: ProfileFieldsMode,
+  available: ProfileSelection,
+  selection: ProfileSelection,
+): ProfileFieldRow[] {
+  return PROFILE_FIELDS.map((field) => {
+    const notApplied =
+      mode === "import" && PROFILE_FIELDS_NOT_IMPORTED.includes(field);
+    const enabled =
+      available[field] &&
+      !notApplied &&
+      !(field === "privateKey" && !selection.config);
+    return {
+      field,
+      available: available[field],
+      enabled,
+      checked: enabled && selection[field],
+      notApplied,
+    };
+  });
+}
+
+/** Whether any row counts as selected, so there's something to do. */
+export const anyFieldSelected = (rows: readonly ProfileFieldRow[]): boolean =>
+  rows.some((row) => row.checked);
+
 /** LocalConfig sections, as named in both LocalConfig and the editor. */
 export const PROFILE_RADIO_SECTIONS = [
   "device",

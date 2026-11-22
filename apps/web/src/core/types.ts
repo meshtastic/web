@@ -36,6 +36,10 @@ export interface PacketMetadata<T> {
   data: T;
   /** Data.request_id: the packet this one answers or acks. */
   requestId?: number;
+  /** Data.reply_id: the packet this one replies or reacts to. */
+  replyId?: number;
+  /** Data.emoji: non-zero marks a text packet as a tapback reaction. */
+  emoji?: number;
   /** The sender signed the packet with XEdDSA and the device verified it. */
   xeddsaSigned?: boolean;
   /** Firmware's verdict on an ack's proof of delivery (2.8.1+). */
