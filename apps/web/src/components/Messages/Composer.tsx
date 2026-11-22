@@ -193,7 +193,9 @@ export const Composer = ({
         // The composer is the bottom edge on phones: clear the home indicator.
         touch
           ? "bg-surface px-2 pt-2 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
-          : "px-5 pt-3 pb-4",
+          : // Bottom gap matches the device card's, so the input box
+            // lines up with it across the sidebar.
+            "px-5 pt-3 pb-2",
       )}
     >
       {replying ? (
@@ -317,6 +319,7 @@ export const Composer = ({
         <button
           type="submit"
           aria-label={t("composer.send")}
+          title={hint && !touch ? hint : undefined}
           disabled={!canSend}
           className={cn(
             "flex size-11 shrink-0 cursor-pointer items-center justify-center bg-accent text-on-accent transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50",
@@ -326,11 +329,7 @@ export const Composer = ({
           <SendIcon aria-hidden="true" className="size-5" />
         </button>
       </div>
-      {hint && !touch ? (
-        <p id={hintId} className="m-0 pl-1 text-meta text-muted">
-          {hint}
-        </p>
-      ) : hint ? (
+      {hint ? (
         <span id={hintId} className="sr-only">
           {hint}
         </span>
