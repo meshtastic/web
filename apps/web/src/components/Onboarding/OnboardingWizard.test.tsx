@@ -93,6 +93,11 @@ describe("OnboardingWizard", () => {
     expect(heading).toHaveAccessibleDescription("Step 1 of 6 · Welcome");
   });
 
+  it("remembers it was seen as soon as it opens", () => {
+    renderWizard();
+    expect(localStorage.getItem(WELCOME_DISMISSED_KEY)).toBe("1");
+  });
+
   it("falls back to HTTP where Bluetooth and USB are unavailable", async () => {
     const user = userEvent.setup();
     renderWizard();

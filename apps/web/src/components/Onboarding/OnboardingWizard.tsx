@@ -239,10 +239,11 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
     return () => clearTimeout(timer);
   }, [waitingForRadio, cancel, t]);
 
-  // Finishing or skipping means the wizard no longer opens on its own.
+  // The wizard opens on its own once: seeing it counts, whether it is
+  // finished, skipped or left part way.
   useEffect(() => {
-    if (step.name === "done") markWelcomeDismissed();
-  }, [step.name]);
+    markWelcomeDismissed();
+  }, []);
 
   /** Connect, Search again and Try again: run the transport from the click. */
   const beginAttempt = (event: WizardEvent) => {
