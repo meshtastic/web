@@ -41,36 +41,34 @@ If you have questions or feedback, join the [discussion forum](https://github.co
 
 ## How it works
 
-The web client never speaks the Meshtastic protocol itself. Everything between the UI and the radio runs inside the Kotlin SDK:
+The web client doesn't implement the Meshtastic protocol itself. It uses [meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk), the same Kotlin Multiplatform library behind the Android, iOS and Desktop apps, compiled to JavaScript:
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│ apps/web                React UI                              │
-│   src/core/kmp          sessions, chat, nodes, config editor  │
-└───────────────┬──────────────────────────────────────────────┘
-                │  plain JS objects, Promises, Uint8Array protobufs
-┌───────────────▼──────────────────────────────────────────────┐
-│ packages/sdk-kmp        @meshtastic/sdk-kmp  (Kotlin/JS)      │
-│   @JsExport facade      createHttpClient / createSerialClient │
-│                         / createBluetoothClient, admin, sends │
-│   browser transports    HTTP API, Web Serial, Web Bluetooth   │
-│   browser storage       SQLDelight on SQLite in a worker      │
-├──────────────────────────────────────────────────────────────┤
-│ vendor/meshtastic-sdk   meshtastic-sdk `core` (Kotlin)        │
-│                         handshake, node DB, ACKs, retries,    │
-│                         channel decryption, reconnect         │
-└───────────────┬──────────────────────────────────────────────┘
-                ▼
-            Meshtastic radio
+```mermaid
+flowchart TB
+    sdk["meshtastic-sdk<br/>Kotlin Multiplatform"]
+    sdk -.-> android["Android app"]
+    sdk -.-> ios["iOS app"]
+    sdk -.-> desktop["Desktop app"]
+    sdk -.->|compiled to JavaScript| js
+    sdk -.->|compiled for Node.js| nodejs
+
+    subgraph web["meshtastic/web repository"]
+        ui["React UI<br/>apps/web"]
+        js["meshtastic-sdk for the browser<br/>packages/sdk-kmp"]
+        nodejs["meshtastic-sdk for Node.js<br/>packages/sdk-nodejs (planned)"]
+        ui <--> js
+    end
+
+    js <-->|HTTP API, Web Serial or Web Bluetooth| radio(["Meshtastic radio"])
 ```
 
-- **One SDK, every platform.** [meshtastic-sdk](https://github.com/meshtastic/meshtastic-sdk) is a Kotlin Multiplatform library. Android, iOS and Desktop compile it for their own platforms; its `core` module also has a Kotlin/JS target, which is what the web client uses. A protocol fix in the SDK reaches every app.
-- **Compiled to JavaScript at build time.** `packages/sdk-kmp` is a small Gradle project. The Kotlin/JS compiler builds the SDK together with a thin facade and writes an ES module with TypeScript declarations (`dist/sdk-kmp.mjs` and `dist/sdk-kmp.d.mts`). Vite imports it like any other package. The SDK isn't on Maven Central with JS artifacts yet, so it compiles from source out of the `packages/sdk-kmp/vendor/meshtastic-sdk` git submodule.
-- **A narrow boundary.** Only plain objects, Promises, `Uint8Array`s and unsubscribe functions cross into TypeScript. Protobuf messages cross as bytes and are decoded on the TypeScript side with `@meshtastic/protobufs`, so both sides agree on the wire types.
-- **The browser supplies transports and storage.** The SDK leaves I/O to its host. `sdk-kmp` provides `RadioTransport` implementations for the device HTTP API, Web Serial and Web Bluetooth, and SQLDelight storage that runs SQLite in a web worker. If storage can't be opened, it falls back to memory rather than stalling the client.
-- **The UI stays in TypeScript.** `apps/web/src/core/kmp` wraps each connected radio in a session object with signals for nodes, chat, channels and config, and exposes them to React through hooks.
+- **One SDK, every app.** Connecting to a radio, the node database and the protocol itself live in the SDK, so they behave the same in every Meshtastic app, and a fix there reaches all of them.
+- **Built with the web client.** `packages/sdk-kmp` compiles the SDK to a JavaScript module that the web client imports like any other package. This is why building needs JDK 21.
+- **Node.js next.** A planned `packages/sdk-nodejs` will build the same SDK for Node.js, so code outside the browser can talk to radios the same way.
+- **The browser supplies the connection and storage.** The web build adds the browser's ways of reaching a radio (the device HTTP API, Web Serial and Web Bluetooth) and keeps nodes, config and channels in browser storage.
+- **The UI stays in React.** `apps/web` turns what the SDK reports into the screens for messages, the map, nodes and radio configuration.
 
-See [`packages/sdk-kmp/README.md`](./packages/sdk-kmp/README.md) for the facade surface, how the SDK version is pinned, and the switch to released artifacts.
+For how the SDK is wrapped, built and pinned, see [`packages/sdk-kmp/README.md`](./packages/sdk-kmp/README.md).
 
 ## Repository layout
 
@@ -78,6 +76,7 @@ See [`packages/sdk-kmp/README.md`](./packages/sdk-kmp/README.md) for the facade 
 | --- | --- |
 | `apps/web` | The React web client. |
 | `packages/sdk-kmp` | The Kotlin meshtastic-sdk compiled to JavaScript, behind a small `@JsExport` facade plus browser transports and storage. Built with Gradle (JDK 21). |
+| `packages/sdk-nodejs` | Planned: the meshtastic-sdk built for Node.js. |
 | `packages/ui` | Shared Radix + Tailwind component library. |
 | `packages/protobufs` | TypeScript stubs generated from [`meshtastic/protobufs`](https://github.com/meshtastic/protobufs) with `buf generate`. The source of truth for every wire-level type. |
 
