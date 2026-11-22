@@ -110,10 +110,10 @@ const HeardSortMenu = ({ sort, onSortChange }: HeardSortMenuProps) => {
         {sort.favoritesFirst ? (
           <StarIcon
             aria-hidden="true"
-            className="size-4 fill-current text-accent"
+            className="size-5 fill-current text-accent"
           />
         ) : (
-          <ArrowDownUpIcon aria-hidden="true" className="size-4" />
+          <ArrowDownUpIcon aria-hidden="true" className="size-5" />
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-48">
@@ -323,7 +323,7 @@ export const ChannelDetailsPanel = ({
                       size="sm"
                       aria-label={t("channelDetails.searchHeard")}
                       aria-expanded={false}
-                      icon={<SearchIcon className="size-4" />}
+                      icon={<SearchIcon className="size-5" />}
                       onClick={() => setSearching(true)}
                     />
                   ) : null}
