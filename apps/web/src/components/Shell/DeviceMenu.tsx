@@ -86,7 +86,6 @@ export const DeviceMenuPanel = ({
           initials={summary.initials}
           tone={{ kind: "device" }}
           size="lg"
-          shape="rounded"
           presence={presenceForState[summary.state]}
           presenceLabel={null}
         />
@@ -208,7 +207,6 @@ export const DeviceMenuPanel = ({
                     initials={device.initials}
                     tone={{ kind: "device" }}
                     size="xs"
-                    shape="rounded"
                   />
                   <span className="min-w-0 flex-1 truncate font-medium">
                     {device.name}

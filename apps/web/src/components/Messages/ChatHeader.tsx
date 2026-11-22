@@ -77,12 +77,7 @@ export const ChatHeaderIdentity = ({
         </Link>
       ) : null}
       {kind === "channel" ? (
-        <NodeAvatar
-          initials="#"
-          tone={{ kind: "channel" }}
-          shape="rounded"
-          size="sm"
-        />
+        <NodeAvatar initials="#" tone={{ kind: "channel" }} size="sm" />
       ) : (
         <NodeAvatar
           initials={initials ?? ""}

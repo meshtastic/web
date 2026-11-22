@@ -13,14 +13,7 @@ const CommandTile = ({ command }: { command: Command }) => {
   switch (command.kind) {
     case "conversation":
       if (command.target.type === "broadcast") {
-        return (
-          <span
-            aria-hidden="true"
-            className={cn(tile, "bg-accent-tint text-body text-accent")}
-          >
-            #
-          </span>
-        );
+        return <NodeAvatar initials="#" tone={{ kind: "channel" }} size="xs" />;
       }
       return (
         <NodeAvatar

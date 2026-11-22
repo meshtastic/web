@@ -82,7 +82,9 @@ const Pin = memo(function Pin({
         aria-label={name}
         aria-pressed={isSelected}
         className={cn(
-          "relative flex cursor-pointer items-center gap-1.5 rounded-full border-2 bg-surface p-[3px] pointer-coarse:touch-target text-meta font-medium text-primary shadow-floating transition-opacity",
+          // Squircle ring concentric with the avatar: its 11px corner plus the
+          // 3px padding and 2px border.
+          "relative flex cursor-pointer items-center gap-1.5 rounded-avatar border-2 bg-surface p-[3px] [--avatar-r:16px] pointer-coarse:touch-target text-meta font-medium text-primary shadow-floating transition-opacity",
           withLabel && "pr-2.5",
           dimmed && "opacity-40",
           toneRing[tone],

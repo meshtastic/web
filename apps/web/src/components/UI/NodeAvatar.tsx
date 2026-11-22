@@ -18,7 +18,7 @@ export type AvatarTone =
 export type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 
 const avatarVariants = cva(
-  "relative inline-flex shrink-0 select-none items-center justify-center font-semibold leading-none",
+  "relative inline-flex shrink-0 select-none items-center justify-center rounded-avatar font-semibold leading-none",
   {
     variants: {
       size: {
@@ -33,12 +33,8 @@ const avatarVariants = cva(
         "2xl":
           "h-24 text-header-lg font-bold [--avatar-r:24px] [--avatar-min-w:124px]",
       },
-      shape: {
-        squircle: "rounded-avatar",
-        rounded: "rounded-card",
-      },
     },
-    defaultVariants: { size: "md", shape: "squircle" },
+    defaultVariants: { size: "md" },
   },
 );
 
@@ -56,7 +52,6 @@ export interface NodeAvatarProps {
   initials: string;
   tone: AvatarTone;
   size?: AvatarSize;
-  shape?: "squircle" | "rounded";
   /**
    * Accessible name. Omit when the name is shown next to the avatar, which
    * then stays decorative.
@@ -78,14 +73,13 @@ export interface NodeAvatarProps {
 }
 
 /**
- * Round (or rounded-square) initials avatar. Purely presentational: the
- * caller supplies initials and what kind of thing it represents.
+ * Squircle initials avatar. Purely presentational: the caller supplies
+ * initials and what kind of thing it represents.
  */
 export const NodeAvatar = ({
   initials,
   tone,
   size = "md",
-  shape = "squircle",
   label,
   presence,
   presenceLabel,
@@ -126,7 +120,7 @@ export const NodeAvatar = ({
       aria-label={label}
       aria-hidden={label || exposeDot ? undefined : true}
       className={cn(
-        avatarVariants({ size, shape }),
+        avatarVariants({ size }),
         tone.kind === "device" && "bg-device-avatar text-on-device-avatar",
         tone.kind === "channel" &&
           "bg-accent-tint text-accent text-header-lg font-bold",

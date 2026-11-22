@@ -118,7 +118,6 @@ export const AppRail = ({
                     initials={device.initials}
                     tone={{ kind: "device" }}
                     size="lg"
-                    shape="rounded"
                     presence={presenceForState[device.state]}
                     cutout="rail"
                   />

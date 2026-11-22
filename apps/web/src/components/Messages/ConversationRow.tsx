@@ -62,7 +62,6 @@ export const ConversationRow = memo(function ConversationRow({
         <NodeAvatar
           initials="#"
           tone={{ kind: "channel" }}
-          shape="rounded"
           size={touch ? "lg" : "md"}
           className={touch ? "text-title" : undefined}
         />

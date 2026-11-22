@@ -341,7 +341,7 @@ function ConnectionCard({
       <div className="flex items-start gap-3 pb-3">
         {/* Avatar steps up with the drawer. */}
         <span
-          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-control bg-surface text-muted @md:size-10 @xl:size-11"
+          className="flex size-9 shrink-0 items-center justify-center rounded-avatar border border-control bg-surface text-muted [--avatar-r:9px] @md:size-10 @md:[--avatar-r:10px] @xl:size-11 @xl:[--avatar-r:11px]"
           aria-hidden="true"
         >
           {createElement(connectionTypeIcon(connection.type), {

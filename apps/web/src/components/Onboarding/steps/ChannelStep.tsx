@@ -2,6 +2,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { Callout } from "@components/UI/Callout.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
+import { NodeAvatar } from "@components/UI/NodeAvatar.tsx";
 import type { RadioConfig } from "@core/kmp/configEditor.ts";
 import { useChannels, useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { constantSignal } from "@core/kmp/signals.ts";
@@ -174,12 +175,7 @@ export const ChannelStep = ({
         {isDefault ? t("channel.body") : t("channel.bodyCustom")}
       </StepBody>
       <div className="flex items-center gap-3 rounded-card border border-subtle bg-chat px-3.5 py-3">
-        <span
-          aria-hidden="true"
-          className="flex size-9 shrink-0 items-center justify-center rounded-control bg-accent-tint font-bold text-accent"
-        >
-          #
-        </span>
+        <NodeAvatar initials="#" tone={{ kind: "channel" }} size="xs" />
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="truncate text-header font-semibold text-primary">
             {primary?.name || t("channel.primary")}

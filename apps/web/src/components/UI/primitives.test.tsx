@@ -306,7 +306,7 @@ describe("NodeAvatar", () => {
 
   it("is hidden from assistive tech without a label", () => {
     const { container } = render(
-      <NodeAvatar initials="EAO1" tone={{ kind: "device" }} shape="rounded" />,
+      <NodeAvatar initials="EAO1" tone={{ kind: "device" }} />,
     );
     expect(container.firstElementChild?.getAttribute("aria-hidden")).toBe(
       "true",
