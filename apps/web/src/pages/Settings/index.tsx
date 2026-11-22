@@ -20,7 +20,8 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { cn } from "@core/utils/cn.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { constantSignal } from "@core/kmp/signals.ts";
-import { sectionChangeCounts } from "@core/settings/dirty.ts";
+import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
+import { dirtyDeviceTabs, sectionChangeCounts } from "@core/settings/dirty.ts";
 import {
   GROUP_LABEL_KEYS,
   moduleDocsUrl,
@@ -42,6 +43,7 @@ import {
   DEVICE_TABS,
   DeviceConfig,
   useDeviceSubsection,
+  visibleDeviceTabs,
 } from "@pages/Settings/DeviceConfig.tsx";
 import { Firmware } from "@pages/Settings/Firmware.tsx";
 import { Help } from "@pages/Settings/Help.tsx";
@@ -153,6 +155,7 @@ const ConfigPage = () => {
     (isMobile ? undefined : FIRST_SECTION);
   const deviceSubsection = useDeviceSubsection();
   const moduleSubsection = useModuleSubsection();
+  const { metadata } = useDeviceCapabilities();
 
   const changeCounts = useMemo(
     () =>
@@ -167,12 +170,20 @@ const ConfigPage = () => {
   );
 
   const navGroups: SettingsNavGroup<SettingsSectionId>[] = useMemo(() => {
+    const dirtyDevice = dirtyDeviceTabs(dirtyRadio, staged.keys());
+    // Device configuration lists its pages under it, as Android does.
+    const deviceSubitems = visibleDeviceTabs(metadata).map((tab) => ({
+      id: tab.key,
+      label: t(tab.labelKey),
+      dirty: dirtyDevice.has(tab.key),
+    }));
     const items = SETTINGS_SECTIONS.map((section) => ({
       id: section.id,
       group: section.group,
       label: t(section.labelKey),
       icon: SECTION_VIEWS[section.id].icon,
       dirty: (changeCounts[section.id] ?? 0) > 0,
+      subitems: section.id === "device" ? deviceSubitems : undefined,
       // Subsections are found by name too ("Position" finds Device configuration).
       terms:
         section.id === "device"
@@ -188,7 +199,7 @@ const ConfigPage = () => {
         items: group.items,
       }),
     );
-  }, [t, changeCounts, query]);
+  }, [t, changeCounts, query, metadata, dirtyRadio, staged]);
 
   const onFormInit = useCallback(
     <T extends object>(methods: UseFormReturn<T>) => {
@@ -285,6 +296,18 @@ const ConfigPage = () => {
     [navigate],
   );
 
+  const openSubsection = useCallback(
+    (id: SettingsSectionId, subId: string) => {
+      // The Device form is the section's own page, without `?tab=`.
+      void navigate(
+        id === "device" && subId === "device"
+          ? { to: "/settings/device" }
+          : { to: `/settings/${id}`, search: { tab: subId } },
+      );
+    },
+    [navigate],
+  );
+
   const hasPending = editorDirty || formState.isDirty;
 
   const sidebar = (
@@ -292,7 +315,13 @@ const ConfigPage = () => {
       title={t("page.title")}
       groups={navGroups}
       activeId={activeSection?.id}
+      activeSubId={
+        activeSection?.id === "device"
+          ? (deviceSubsection?.key ?? "device")
+          : undefined
+      }
       onSelect={openSection}
+      onSelectSub={openSubsection}
       query={query}
       onQueryChange={setQuery}
     />

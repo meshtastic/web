@@ -74,4 +74,66 @@ describe("SettingsNav", () => {
       "No settings match “zzz”.",
     );
   });
+
+  describe("subitems", () => {
+    const withSubitems: SettingsNavGroup<"user" | "device">[] = [
+      {
+        id: "configuration",
+        label: "Configuration",
+        items: [
+          { id: "user", label: "User", icon: UserIcon, dirty: false },
+          {
+            id: "device",
+            label: "Device configuration",
+            icon: RadioTowerIcon,
+            dirty: true,
+            subitems: [
+              { id: "device", label: "Device", dirty: false },
+              { id: "power", label: "Power", dirty: true },
+            ],
+          },
+        ],
+      },
+    ];
+
+    it("lists them under their section and marks the open one", () => {
+      render(
+        <SettingsNav
+          title="Settings"
+          groups={withSubitems}
+          activeId="device"
+          activeSubId="power"
+          onSelect={vi.fn()}
+          query=""
+          onQueryChange={vi.fn()}
+        />,
+      );
+      const list = screen.getByRole("list", { name: "Device configuration" });
+      const power = within(list).getByRole("button", { name: /Power/ });
+      expect(power).toHaveAttribute("aria-current", "page");
+      expect(
+        within(power).getByRole("img", { name: "Unsaved changes" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /^Device configuration/ }),
+      ).not.toHaveAttribute("aria-current");
+    });
+
+    it("opens a subitem with its section", () => {
+      const onSelectSub = vi.fn();
+      render(
+        <SettingsNav
+          title="Settings"
+          groups={withSubitems}
+          activeId="user"
+          onSelect={vi.fn()}
+          onSelectSub={onSelectSub}
+          query=""
+          onQueryChange={vi.fn()}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button", { name: /Power/ }));
+      expect(onSelectSub).toHaveBeenCalledWith("device", "power");
+    });
+  });
 });
