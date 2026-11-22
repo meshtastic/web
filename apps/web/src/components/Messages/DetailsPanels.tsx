@@ -274,11 +274,12 @@ export const ChannelDetailsPanel = ({
             {t("channelDetails.muted")}
           </p>
         ) : null}
-        <div className="flex gap-2">
+        {/* Side by side when both labels fit, stacked when they don't. */}
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-[1_1_auto] whitespace-nowrap"
             icon={<QrCodeIcon aria-hidden="true" className="size-4" />}
             onClick={onShareQr}
           >
@@ -286,7 +287,7 @@ export const ChannelDetailsPanel = ({
           </Button>
           <Link
             to="/settings/channels"
-            className="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-control border border-control px-3 text-help font-medium text-primary hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="inline-flex h-9 flex-[1_1_auto] items-center justify-center gap-2 whitespace-nowrap rounded-control border border-control px-3 text-help font-medium text-primary hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             <SettingsIcon aria-hidden="true" className="size-4" />
             {t("channelDetails.settings")}
