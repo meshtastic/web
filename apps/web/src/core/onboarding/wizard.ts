@@ -376,10 +376,12 @@ export function stepInfo(step: WizardStep): StepInfo {
       if (step.view === "review") {
         return info(3, "restore", "restoreAndContinue", "chooseAnotherFile");
       }
+      // A radio that is already set up can skip straight to the end.
       return info(
         3,
         "restore",
         step.choice === "restore" ? "chooseFile" : "setUpNew",
+        "skipForNow",
       );
     case "profile":
       return info(4, "profile", "saveAndContinue");

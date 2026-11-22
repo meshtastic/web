@@ -317,9 +317,11 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
       ? {
           label: t(SECONDARY_LABEL[info.secondary]),
           onClick:
-            info.secondary === "skipForNow"
-              ? () => dispatch({ type: "channelDone" })
-              : undefined,
+            info.secondary !== "skipForNow"
+              ? undefined
+              : step.name === "channel"
+                ? () => dispatch({ type: "channelDone" })
+                : () => dispatch({ type: "skip" }),
         }
       : undefined,
     next: info.next

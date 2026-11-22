@@ -321,11 +321,11 @@ describe("stepInfo", () => {
       label: "restore",
       next: "setUpNew",
       back: "back",
-      secondary: undefined,
+      secondary: "skipForNow",
     });
     expect(
       stepInfo({ name: "restore", view: "choose", choice: "restore" }),
-    ).toMatchObject({ number: 3, next: "chooseFile" });
+    ).toMatchObject({ number: 3, next: "chooseFile", secondary: "skipForNow" });
     expect(stepInfo({ name: "restore", view: "review" })).toMatchObject({
       number: 3,
       next: "restoreAndContinue",
