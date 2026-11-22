@@ -343,7 +343,7 @@ describe("stepInfo", () => {
     });
     expect(
       stepInfo({ name: "done", skipped: true, returnTo: { name: "welcome" } }),
-    ).toMatchObject({ number: 6, next: "openMessages", back: "back" });
+    ).toMatchObject({ number: 6, next: "openWebClient", back: "back" });
   });
 });
 

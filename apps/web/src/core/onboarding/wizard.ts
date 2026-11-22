@@ -325,7 +325,7 @@ export type NextAction =
   | "restoreAndContinue"
   | "saveAndContinue"
   | "addChannel"
-  | "openMessages";
+  | "openWebClient";
 
 export type BackAction = "back" | "cancel" | "useAnotherMethod";
 
@@ -386,7 +386,7 @@ export function stepInfo(step: WizardStep): StepInfo {
     case "channel":
       return info(5, "channels", "addChannel", "skipForNow");
     case "done":
-      return info(6, "done", "openMessages");
+      return info(6, "done", "openWebClient");
   }
 }
 

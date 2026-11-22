@@ -91,7 +91,7 @@ const NEXT_LABEL: Record<NextAction, string> = {
   restoreAndContinue: "actions.restoreAndContinue",
   saveAndContinue: "actions.saveAndContinue",
   addChannel: "actions.addChannel",
-  openMessages: "actions.openMessages",
+  openWebClient: "actions.openWebClient",
 };
 
 const SECONDARY_LABEL: Record<SecondaryAction, string> = {
@@ -284,7 +284,7 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
       case "setUpNew":
         dispatch({ type: "setUpNew" });
         return;
-      case "openMessages":
+      case "openWebClient":
         onFinish();
         return;
       case "saveAndContinue":

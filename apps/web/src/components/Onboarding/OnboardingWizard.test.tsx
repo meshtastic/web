@@ -223,7 +223,7 @@ describe("OnboardingWizard", () => {
       expect(localStorage.getItem(WELCOME_DISMISSED_KEY)).toBe("1"),
     );
 
-    await user.click(screen.getByRole("button", { name: "Open messages" }));
+    await user.click(screen.getByRole("button", { name: "Open web client" }));
     expect(onFinish).toHaveBeenCalledOnce();
 
     await user.click(screen.getByRole("button", { name: "Back" }));
