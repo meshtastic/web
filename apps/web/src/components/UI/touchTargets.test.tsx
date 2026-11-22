@@ -18,8 +18,11 @@ const TOUCH_TARGET = "pointer-coarse:touch-target";
 
 describe("touch targets", () => {
   it("defines the touch-target utility in the live theme", () => {
-    // Vitest runs from apps/web.
-    const css = readFileSync(resolve(process.cwd(), "src/index.css"), "utf8");
+    // Relative to this file, so it passes from the repo root or apps/web.
+    const css = readFileSync(
+      resolve(import.meta.dirname, "../../index.css"),
+      "utf8",
+    );
     expect(css).toMatch(/@utility touch-target\s*\{/);
     expect(css).toContain("min(0px, calc((100% - 44px) / 2))");
   });
