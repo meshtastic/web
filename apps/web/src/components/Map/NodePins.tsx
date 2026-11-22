@@ -18,8 +18,8 @@ const toneRing: Record<PinTone, string> = {
   default: "border-control",
 };
 
-/** Border (2px) + padding (3px) + half the 32px avatar. */
-const AVATAR_CENTER_PX = 21;
+/** Border (2px) + padding (3px) + half the xs avatar's 44px minimum width. */
+const AVATAR_CENTER_PX = 27;
 
 /** Stops a marker click reaching the map, whose click clears the selection. */
 const swallow = (event: MarkerEvent<MouseEvent>) => {
@@ -82,9 +82,9 @@ const Pin = memo(function Pin({
         aria-label={name}
         aria-pressed={isSelected}
         className={cn(
-          // Squircle ring concentric with the avatar: its 11px corner plus the
+          // Squircle ring concentric with the avatar: its 8px corner plus the
           // 3px padding and 2px border.
-          "relative flex cursor-pointer items-center gap-1.5 rounded-avatar border-2 bg-surface p-[3px] [--avatar-r:16px] pointer-coarse:touch-target text-meta font-medium text-primary shadow-floating transition-opacity",
+          "relative flex cursor-pointer items-center gap-1.5 rounded-avatar border-2 bg-surface p-[3px] [--avatar-r:13px] pointer-coarse:touch-target text-meta font-medium text-primary shadow-floating transition-opacity",
           withLabel && "pr-2.5",
           dimmed && "opacity-40",
           toneRing[tone],

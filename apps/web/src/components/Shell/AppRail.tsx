@@ -113,11 +113,13 @@ export const AppRail = ({
               <IconButton
                 aria-label={deviceLabel}
                 size="rail"
+                // Grows with a wide short name instead of clipping it.
+                className="w-auto min-w-12 px-1"
                 icon={
                   <NodeAvatar
                     initials={device.initials}
                     tone={{ kind: "device" }}
-                    size="lg"
+                    size="md"
                     presence={presenceForState[device.state]}
                     cutout="rail"
                   />

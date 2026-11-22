@@ -24,14 +24,14 @@ const avatarVariants = cva(
       size: {
         // Squircles: height, corner radius (a quarter of the height) and
         // the minimum width of a node avatar, which grows past it to fit
-        // its text.
-        xs: "h-11 text-meta [--avatar-r:11px] [--avatar-min-w:3.5rem]",
-        sm: "h-12 text-meta [--avatar-r:12px] [--avatar-min-w:4rem]",
-        md: "h-[52px] text-help [--avatar-r:13px] [--avatar-min-w:68px]",
-        lg: "h-14 text-help [--avatar-r:14px] [--avatar-min-w:72px]",
-        xl: "h-20 text-header-lg [--avatar-r:20px] [--avatar-min-w:104px]",
+        // its text. Small enough to sit inside 40px rows and chips.
+        xs: "h-8 text-meta [--avatar-r:8px] [--avatar-min-w:44px]",
+        sm: "h-9 text-meta [--avatar-r:9px] [--avatar-min-w:48px]",
+        md: "h-10 text-meta [--avatar-r:10px] [--avatar-min-w:52px]",
+        lg: "h-11 text-help [--avatar-r:11px] [--avatar-min-w:56px]",
+        xl: "h-16 text-header-lg [--avatar-r:16px] [--avatar-min-w:84px]",
         "2xl":
-          "h-24 text-header-lg font-bold [--avatar-r:24px] [--avatar-min-w:124px]",
+          "h-20 text-header-lg font-bold [--avatar-r:20px] [--avatar-min-w:104px]",
       },
     },
     defaultVariants: { size: "md" },
@@ -130,7 +130,7 @@ export const NodeAvatar = ({
         // stays square.
         tone.kind === "channel"
           ? "aspect-square"
-          : "min-w-(--avatar-min-w) px-3",
+          : "min-w-(--avatar-min-w) px-2.5",
         nodeColors && "bg-(--avatar-bg)",
         nodeColors && "text-avatar-contrast",
         className,
