@@ -88,7 +88,7 @@ export const colorTokens = {
   dark: {
     "bg-rail": "#080d18",
     "bg-app": "#0b1220",
-    "bg-surface": "#0f172a",
+    "bg-surface": "#0a1120",
     "bg-chat": "#111a2e",
     "bg-raised": "#1e293b",
     "bg-selected": "#1a2740",
