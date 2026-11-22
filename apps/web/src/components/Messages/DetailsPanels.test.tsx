@@ -125,7 +125,7 @@ describe("ChannelDetailsPanel recently heard", () => {
       screen.getByRole("button", {
         name: "Sort recently heard: Last heard",
       }),
-    ).toHaveTextContent("Last heard");
+    ).toHaveAttribute("title", "Last heard");
     expect(screen.getByText("Last 2 h")).toBeInTheDocument();
   });
 

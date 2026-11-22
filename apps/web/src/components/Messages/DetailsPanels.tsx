@@ -29,7 +29,6 @@ import {
 import { Link } from "@tanstack/react-router";
 import {
   ArrowDownUpIcon,
-  ChevronDownIcon,
   QrCodeIcon,
   SearchIcon,
   SettingsIcon,
@@ -103,18 +102,19 @@ const HeardSortMenu = ({ sort, onSortChange }: HeardSortMenuProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t("channelDetails.sortCurrent", { sort: summary })}
-        className="inline-flex h-7 max-w-[60%] min-w-0 shrink cursor-pointer items-center gap-1 rounded-md px-1.5 text-meta font-medium text-muted pointer-coarse:touch-target hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus data-[state=open]:bg-raised data-[state=open]:text-primary"
+        title={summary}
+        className="inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted pointer-coarse:touch-target hover:bg-raised hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus data-[state=open]:bg-raised data-[state=open]:text-primary"
       >
+        {/* An icon like the search button beside it; the sort is in the
+            accessible name and the tooltip. */}
         {sort.favoritesFirst ? (
           <StarIcon
             aria-hidden="true"
-            className="size-3.5 shrink-0 fill-current text-accent"
+            className="size-4 fill-current text-accent"
           />
         ) : (
-          <ArrowDownUpIcon aria-hidden="true" className="size-3.5 shrink-0" />
+          <ArrowDownUpIcon aria-hidden="true" className="size-4" />
         )}
-        <span className="truncate">{column}</span>
-        <ChevronDownIcon aria-hidden="true" className="size-3.5 shrink-0" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-48">
         <DropdownMenuLabel>{t("channelDetails.sortBy")}</DropdownMenuLabel>
