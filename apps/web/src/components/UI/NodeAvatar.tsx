@@ -1,5 +1,6 @@
 import { StatusDot, type StatusDotStatus } from "@components/UI/StatusDot.tsx";
 import { cn } from "@core/utils/cn.ts";
+import { initialsScale } from "@core/utils/avatarFit.ts";
 import { nodeAvatarColors } from "@core/utils/nodeIdentity.ts";
 import { cva } from "class-variance-authority";
 import type { CSSProperties, ReactNode } from "react";
@@ -23,20 +24,32 @@ const avatarVariants = cva(
     variants: {
       size: {
         // Squircles: height, corner radius (a quarter of the height) and
-        // the minimum width of a node avatar, which grows past it to fit
-        // its text. Small enough to sit inside 40px rows and chips.
-        xs: "h-8 text-meta [--avatar-r:8px] [--avatar-min-w:44px]",
-        sm: "h-9 text-meta [--avatar-r:9px] [--avatar-min-w:48px]",
-        md: "h-10 text-meta [--avatar-r:10px] [--avatar-min-w:52px]",
-        lg: "h-11 text-help [--avatar-r:11px] [--avatar-min-w:56px]",
-        xl: "h-16 text-header-lg [--avatar-r:16px] [--avatar-min-w:84px]",
+        // width, the same for every avatar of a size whatever its text.
+        xs: "h-8 text-meta [--avatar-r:8px] [--avatar-w:52px]",
+        sm: "h-9 text-meta [--avatar-r:9px] [--avatar-w:58px]",
+        md: "h-10 text-meta [--avatar-r:10px] [--avatar-w:64px]",
+        lg: "h-11 text-help [--avatar-r:11px] [--avatar-w:70px]",
+        xl: "h-16 text-header-lg [--avatar-r:16px] [--avatar-w:100px]",
         "2xl":
-          "h-20 text-header-lg font-bold [--avatar-r:20px] [--avatar-min-w:104px]",
+          "h-20 text-header-lg font-bold [--avatar-r:20px] [--avatar-w:124px]",
       },
     },
     defaultVariants: { size: "md" },
   },
 );
+
+/**
+ * Room for the initials inside each size's width and 6px side padding, in
+ * em of its font size (13, 13, 13, 14, 17 and 17px).
+ */
+const initialsRoomEm = {
+  xs: 40 / 13,
+  sm: 46 / 13,
+  md: 52 / 13,
+  lg: 58 / 14,
+  xl: 88 / 17,
+  "2xl": 112 / 17,
+} as const satisfies Record<AvatarSize, number>;
 
 const dotSize = {
   xs: "sm",
@@ -102,6 +115,8 @@ export const NodeAvatar = ({
             : "var(--color-avatar-ink-light)",
       }
     : undefined;
+  const scale =
+    tone.kind === "channel" ? 1 : initialsScale(initials, initialsRoomEm[size]);
   const dot = presence ? (
     <StatusDot
       status={presence}
@@ -124,13 +139,9 @@ export const NodeAvatar = ({
         tone.kind === "device" && "bg-device-avatar text-on-device-avatar",
         tone.kind === "channel" &&
           "bg-accent-tint text-accent text-header-lg font-bold",
-        // Avatars with initials are a little wider than tall and grow so a
-        // full four-character short name always shows, with side padding
-        // that keeps the text clear of the curved corners; the channel "#"
-        // stays square.
-        tone.kind === "channel"
-          ? "aspect-square"
-          : "min-w-(--avatar-min-w) px-2.5",
+        // Avatars with initials all share one width per size; the channel
+        // "#" stays square.
+        tone.kind === "channel" ? "aspect-square" : "w-(--avatar-w) px-1.5",
         nodeColors && "bg-(--avatar-bg)",
         nodeColors && "text-avatar-contrast",
         className,
@@ -138,7 +149,13 @@ export const NodeAvatar = ({
       style={style}
     >
       <span aria-hidden={exposeDot ? true : undefined} className="contents">
-        <span className="whitespace-nowrap">{initials}</span>
+        <span
+          className="whitespace-nowrap"
+          // A name too wide for the avatar is drawn smaller, not cut.
+          style={scale < 1 ? { fontSize: `${scale}em` } : undefined}
+        >
+          {initials}
+        </span>
         {children}
       </span>
       {dot}

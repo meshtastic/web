@@ -113,8 +113,8 @@ export const AppRail = ({
               <IconButton
                 aria-label={deviceLabel}
                 size="rail"
-                // Grows with a wide short name instead of clipping it.
-                className="w-auto min-w-12 px-1"
+                // As wide as the avatar, which is wider than the 48px button.
+                className="w-auto"
                 icon={
                   <NodeAvatar
                     initials={device.initials}

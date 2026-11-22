@@ -18,8 +18,8 @@ const toneRing: Record<PinTone, string> = {
   default: "border-control",
 };
 
-/** Border (2px) + padding (3px) + half the xs avatar's 44px minimum width. */
-const AVATAR_CENTER_PX = 27;
+/** Border (2px) + padding (3px) + half the xs avatar's 52px width. */
+const AVATAR_CENTER_PX = 31;
 
 /** Stops a marker click reaching the map, whose click clears the selection. */
 const swallow = (event: MarkerEvent<MouseEvent>) => {
