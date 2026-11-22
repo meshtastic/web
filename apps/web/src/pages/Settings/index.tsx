@@ -21,7 +21,11 @@ import { cn } from "@core/utils/cn.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { constantSignal } from "@core/kmp/signals.ts";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
-import { dirtyDeviceTabs, sectionChangeCounts } from "@core/settings/dirty.ts";
+import {
+  dirtyDeviceTabs,
+  dirtyModuleTabs,
+  sectionChangeCounts,
+} from "@core/settings/dirty.ts";
 import {
   GROUP_LABEL_KEYS,
   moduleDocsUrl,
@@ -52,6 +56,7 @@ import {
   MODULE_TABS,
   ModuleConfig,
   useModuleSubsection,
+  useVisibleModules,
 } from "@pages/Settings/ModuleConfig.tsx";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -156,6 +161,7 @@ const ConfigPage = () => {
   const deviceSubsection = useDeviceSubsection();
   const moduleSubsection = useModuleSubsection();
   const { metadata } = useDeviceCapabilities();
+  const visibleModules = useVisibleModules();
 
   const changeCounts = useMemo(
     () =>
@@ -177,13 +183,25 @@ const ConfigPage = () => {
       label: t(tab.labelKey),
       dirty: dirtyDevice.has(tab.key),
     }));
+    // And Module configuration lists the modules this node offers.
+    const dirtyModules = dirtyModuleTabs(dirtyModule, staged.keys());
+    const moduleSubitems = visibleModules.map((tab) => ({
+      id: tab.key,
+      label: t(tab.labelKey, { ns: "moduleConfig" }),
+      dirty: dirtyModules.has(tab.key),
+    }));
     const items = SETTINGS_SECTIONS.map((section) => ({
       id: section.id,
       group: section.group,
       label: t(section.labelKey),
       icon: SECTION_VIEWS[section.id].icon,
       dirty: (changeCounts[section.id] ?? 0) > 0,
-      subitems: section.id === "device" ? deviceSubitems : undefined,
+      subitems:
+        section.id === "device"
+          ? deviceSubitems
+          : section.id === "module"
+            ? moduleSubitems
+            : undefined,
       // Subsections are found by name too ("Position" finds Device configuration).
       terms:
         section.id === "device"
@@ -199,7 +217,16 @@ const ConfigPage = () => {
         items: group.items,
       }),
     );
-  }, [t, changeCounts, query, metadata, dirtyRadio, staged]);
+  }, [
+    t,
+    changeCounts,
+    query,
+    metadata,
+    dirtyRadio,
+    dirtyModule,
+    staged,
+    visibleModules,
+  ]);
 
   const onFormInit = useCallback(
     <T extends object>(methods: UseFormReturn<T>) => {
@@ -318,7 +345,9 @@ const ConfigPage = () => {
       activeSubId={
         activeSection?.id === "device"
           ? (deviceSubsection?.key ?? "device")
-          : undefined
+          : activeSection?.id === "module"
+            ? moduleSubsection?.key
+            : undefined
       }
       onSelect={openSection}
       onSelectSub={openSubsection}

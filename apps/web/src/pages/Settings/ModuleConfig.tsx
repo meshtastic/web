@@ -102,7 +102,7 @@ const TAK_ROLES: Protobuf.Config.Config_DeviceConfig_Role[] = [
 ];
 
 /** Modules this node offers, in list order. */
-function useVisibleModules(): ModuleTab[] {
+export function useVisibleModules(): ModuleTab[] {
   const editor = useConfigEditor();
   const radio = useSignal(editor?.radio ?? NO_RADIO);
   const { getEffectiveConfig } = useDevice();
