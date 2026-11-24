@@ -4,8 +4,7 @@ import process from "node:process";
 import tailwindcss from "@tailwindcss/vite";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
-import { defineConfig, loadEnv } from "vite";
-import { createHtmlPlugin } from "vite-plugin-html";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 let hash = "";
@@ -28,6 +27,35 @@ try {
 const CONTENT_SECURITY_POLICY =
   "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data: https://rsms.me https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data: https://rsms.me https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self';";
 
+/** Sets the page title and, when given a client ID, adds the CookieYes banner. */
+function indexHtml(options: {
+  title: string;
+  cookieYesClientId?: string;
+}): Plugin {
+  return {
+    name: "meshtastic:index-html",
+    transformIndexHtml: (html) => ({
+      html: html.replace(
+        /<title>.*<\/title>/,
+        `<title>${options.title}</title>`,
+      ),
+      tags: options.cookieYesClientId
+        ? [
+            // This is for GDPR/CCPA compliance
+            {
+              tag: "script",
+              attrs: {
+                async: true,
+                src: `https://cdn-cookieyes.com/client_data/${options.cookieYesClientId}/script.js`,
+              },
+              injectTo: "head-prepend",
+            },
+          ]
+        : [],
+    }),
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
 
@@ -40,17 +68,11 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       ...(useHTTPS ? [basicSsl()] : []),
-      createHtmlPlugin({
-        inject: {
-          data: {
-            title: isTest ? "Meshtastic Web Client (TEST)" : "Meshtastic Web Client",
-            cookieYesScript:
-              isProd && env.VITE_COOKIEYES_CLIENT_ID
-                ? // This is for GDPR/CCPA compliance
-                  `<script async src="https://cdn-cookieyes.com/client_data/${env.VITE_COOKIEYES_CLIENT_ID}/script.js"></script>`
-                : "",
-          },
-        },
+      indexHtml({
+        title: isTest
+          ? "Meshtastic Web Client (TEST)"
+          : "Meshtastic Web Client",
+        cookieYesClientId: isProd ? env.VITE_COOKIEYES_CLIENT_ID : undefined,
       }),
       VitePWA({
         selfDestroying: true,
