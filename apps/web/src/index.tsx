@@ -18,6 +18,11 @@ import { MeshRegistryProvider } from "@core/kmp/hooks";
 import { type createRouter, RouterProvider } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { applyStoredTheme } from "@core/hooks/useTheme.ts";
+import { startDiagnosticsCapture } from "@core/diagnostics/capture.ts";
+import { diagnosticsLog } from "@core/log.ts";
+
+// Bring back the log saved before a reload, and catch uncaught errors.
+startDiagnosticsCapture(diagnosticsLog, window);
 
 // Resolve "system" before first paint so the --mt-* tokens exist immediately.
 applyStoredTheme();
