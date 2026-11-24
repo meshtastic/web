@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
+import { useDownloadDiagnostics } from "@core/diagnostics/useDownloadDiagnostics.ts";
 import { useAppStore } from "@core/stores";
 import { useToast } from "@core/hooks/useToast.ts";
 import { cn } from "@core/utils/cn.ts";
@@ -303,6 +304,7 @@ function ConnectionCard({
   onRetry: () => Promise<void>;
 }) {
   const { t } = useTranslation("connections");
+  const downloadDiagnostics = useDownloadDiagnostics();
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
   // The menu returns focus to its trigger as it closes; when the strip is
@@ -444,6 +446,14 @@ function ConnectionCard({
                   onTrusted={() => void onConnect()}
                 />
               )}
+            <Button
+              type="button"
+              variant="link"
+              className="h-auto px-0 py-1 text-sm"
+              onClick={downloadDiagnostics}
+            >
+              {t("diagnostics.download", { ns: "common" })}
+            </Button>
           </div>
         ) : connection.lastConnectedAt ? (
           <p>

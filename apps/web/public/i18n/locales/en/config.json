@@ -720,7 +720,10 @@
     "walkthroughCard": "Getting started",
     "walkthrough": "Replay the welcome walkthrough",
     "walkthroughHelp": "Walk through connecting a radio, your name and channels again.",
-    "walkthroughAction": "Start"
+    "walkthroughAction": "Start",
+    "troubleshootingCard": "Troubleshooting",
+    "diagnostics": "Diagnostics",
+    "diagnosticsAction": "Download"
   },
   "appSection": {
     "browserOnlyTitle": "Saved in this browser only",

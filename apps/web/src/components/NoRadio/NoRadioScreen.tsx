@@ -5,6 +5,7 @@ import {
   mostRecentConnection,
 } from "@core/connections/status.ts";
 import type { Connection } from "@core/stores/deviceStore/types.ts";
+import { useDownloadDiagnostics } from "@core/diagnostics/useDownloadDiagnostics.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { useConnections } from "@app/pages/Connections/useConnections";
@@ -35,6 +36,8 @@ export interface NoRadioEmptyStateProps {
   reconnecting: boolean;
   onConnect: () => void;
   onReconnect: () => void;
+  /** Saves a diagnostics file for a bug report. */
+  onDownloadDiagnostics: () => void;
 }
 
 /** What the app shows behind the Connections drawer with no radio. */
@@ -43,6 +46,7 @@ export function NoRadioEmptyState({
   reconnecting,
   onConnect,
   onReconnect,
+  onDownloadDiagnostics,
 }: NoRadioEmptyStateProps) {
   const { t } = useTranslation("connections");
   return (
@@ -76,6 +80,16 @@ export function NoRadioEmptyState({
             {t("noRadio.connect")}
           </Button>
         </div>
+        {/* After a failed connect this screen is all the app shows, so the
+            diagnostics file has to be reachable from here. */}
+        <Button
+          type="button"
+          variant="link"
+          className="mt-2"
+          onClick={onDownloadDiagnostics}
+        >
+          {t("diagnostics.download", { ns: "common" })}
+        </Button>
       </EmptyState>
     </main>
   );
@@ -95,6 +109,7 @@ export function NoRadioScreen() {
     mostRecentConnection(s.savedConnections),
   );
   const [reconnecting, setReconnecting] = useState(false);
+  const downloadDiagnostics = useDownloadDiagnostics();
 
   // Finds the ports and devices the browser already granted, so Reconnect
   // reuses them instead of showing a picker.
@@ -129,6 +144,7 @@ export function NoRadioScreen() {
       reconnecting={reconnecting}
       onConnect={() => openConnections()}
       onReconnect={() => void onReconnect()}
+      onDownloadDiagnostics={downloadDiagnostics}
     />
   );
 }

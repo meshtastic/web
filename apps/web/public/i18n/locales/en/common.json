@@ -132,5 +132,9 @@
     "regionNeedsFirmware28": "This region needs firmware 2.8 or newer. Update the node's firmware to use it."
   },
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "diagnostics": {
+    "download": "Download diagnostics",
+    "help": "Saves recent app logs to attach to a bug report. Radio addresses, locations and keys are removed."
+  }
 }
