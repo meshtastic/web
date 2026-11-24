@@ -38,9 +38,9 @@ describe("encodeLog and decodeLog", () => {
   });
 
   it("redacts messages before they are stored", () => {
-    expect(encodeLog([entry(1, "GET https://192.168.1.40/json")])).not.toContain(
-      "192.168",
-    );
+    expect(
+      encodeLog([entry(1, "GET https://192.168.1.40/json")]),
+    ).not.toContain("192.168");
   });
 
   it("skips malformed entries and bad JSON", () => {
