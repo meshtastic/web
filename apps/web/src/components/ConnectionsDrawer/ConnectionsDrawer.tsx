@@ -170,13 +170,6 @@ function DrawerBody() {
                 });
                 return;
               }
-              toast({
-                title: t("toasts.added"),
-                description: t("toasts.savedByName", {
-                  name: created.name,
-                  interpolation: { escapeValue: false },
-                }),
-              });
               if (closesAfterSave(created.status)) {
                 closeConnections();
               } else {

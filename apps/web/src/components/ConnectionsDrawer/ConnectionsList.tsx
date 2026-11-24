@@ -187,28 +187,12 @@ export const ConnectionsList = ({ addButtonRef }: ConnectionsListProps) => {
                 onConnect={() => connectAndClose(c, "toasts.checkConnection")}
                 onRetry={() => connectAndClose(c, "toasts.pickConnectionAgain")}
                 onDisconnect={() => disconnect(c.id)}
-                onSetDefault={() => {
-                  setDefaultConnection(c.id);
-                  toast({
-                    title: t("toasts.defaultSet"),
-                    description: t("toasts.defaultConnection", {
-                      name: c.name,
-                      interpolation: { escapeValue: false },
-                    }),
-                  });
-                }}
+                onSetDefault={() => setDefaultConnection(c.id)}
                 onDelete={async () => {
                   pendingFocus.current = focusTargetAfter(index);
                   setConfirmingId(undefined);
                   await disconnect(c.id);
                   removeConnection(c.id);
-                  toast({
-                    title: t("toasts.deleted"),
-                    description: t("toasts.deletedByName", {
-                      name: c.name,
-                      interpolation: { escapeValue: false },
-                    }),
-                  });
                 }}
               />
             </li>
