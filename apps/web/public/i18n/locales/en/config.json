@@ -723,7 +723,9 @@
     "walkthroughAction": "Start",
     "troubleshootingCard": "Troubleshooting",
     "diagnostics": "Diagnostics",
-    "diagnosticsAction": "Download"
+    "diagnosticsAction": "Download",
+    "traces": "Traces",
+    "tracesHelp": "Saves request timings to the radio as an OpenTelemetry (OTLP JSON) file, for tools like Jaeger or Grafana Tempo. Addresses are removed."
   },
   "appSection": {
     "browserOnlyTitle": "Saved in this browser only",

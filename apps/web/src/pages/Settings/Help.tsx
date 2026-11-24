@@ -5,7 +5,10 @@ import {
 import { useCommandMenuShortcutLabel } from "@components/CommandPalette/useCommandMenuShortcutLabel.ts";
 import { ExternalLinkRow } from "@components/Settings/ExternalLinkRow.tsx";
 import { SettingRow } from "@components/UI/SettingRow.tsx";
-import { useDownloadDiagnostics } from "@core/diagnostics/useDownloadDiagnostics.ts";
+import {
+  useDownloadDiagnostics,
+  useDownloadTraces,
+} from "@core/diagnostics/useDownloadDiagnostics.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { DOCS_BASE } from "@core/settings/registry.ts";
 import { useAppStore } from "@core/stores";
@@ -24,7 +27,7 @@ const LINKS = [
 
 /**
  * Help & documentation: links out, the setup walkthrough, the command menu
- * shortcut, and a diagnostics file for bug reports.
+ * shortcut, and diagnostics and trace files for bug reports.
  */
 export const Help = (_props: ConfigProps) => {
   const { t } = useTranslation("config");
@@ -40,6 +43,7 @@ export const Help = (_props: ConfigProps) => {
     [firmware, hardware, nodeCount],
   );
   const downloadDiagnostics = useDownloadDiagnostics(radio);
+  const downloadTraces = useDownloadTraces();
 
   return (
     <SettingsSections>
@@ -79,6 +83,13 @@ export const Help = (_props: ConfigProps) => {
           help={t("diagnostics.help", { ns: "common" })}
           actionLabel={t("helpSection.diagnosticsAction")}
           onAction={downloadDiagnostics}
+        />
+        <SettingRow
+          kind="button"
+          label={t("helpSection.traces")}
+          help={t("helpSection.tracesHelp")}
+          actionLabel={t("helpSection.diagnosticsAction")}
+          onAction={downloadTraces}
         />
       </SettingsGroup>
     </SettingsSections>

@@ -150,7 +150,7 @@ body:
       description: The file from Download diagnostics, or the saved console log (see above).
     validations:
       required: true
-      accept: ".txt,.log"
+      accept: ".txt,.log,.json"
   - type: textarea
     id: logs
     attributes:

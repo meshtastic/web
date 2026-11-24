@@ -5,10 +5,12 @@ import { downloadTextFile } from "@core/utils/downloadText.ts";
 import { useCallback } from "react";
 import {
   diagnosticsFileName,
+  tracesFileName,
   formatDiagnostics,
   type RadioSummary,
   summarizeConnection,
 } from "./report.ts";
+import { recentSpans, spansToOtlpJson, toSpanSummary } from "./tracing.ts";
 
 /**
  * Returns a handler that saves a diagnostics file: the app and browser,
@@ -27,9 +29,21 @@ export function useDownloadDiagnostics(radio?: RadioSummary): () => void {
           .getState()
           .savedConnections.map(summarizeConnection),
         radio,
+        spans: recentSpans().map(toSpanSummary),
       },
       diagnosticsLog.entries(),
     );
     downloadTextFile(diagnosticsFileName(generatedAt), text);
   }, [radio]);
+}
+
+/** Returns a handler that saves recent spans as an OTLP/JSON file. */
+export function useDownloadTraces(): () => void {
+  return useCallback(() => {
+    downloadTextFile(
+      tracesFileName(Date.now()),
+      spansToOtlpJson(recentSpans()),
+      "application/json",
+    );
+  }, []);
 }

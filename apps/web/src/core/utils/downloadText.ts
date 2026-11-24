@@ -1,6 +1,10 @@
-/** Saves `text` as a plain-text file through the browser's download flow. */
-export function downloadTextFile(fileName: string, text: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+/** Saves `text` as a file through the browser's download flow. */
+export function downloadTextFile(
+  fileName: string,
+  text: string,
+  type = "text/plain",
+): void {
+  const url = URL.createObjectURL(new Blob([text], { type }));
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = fileName;

@@ -2,6 +2,7 @@ import type { Connection } from "@core/stores/deviceStore/types.ts";
 import type { BuildInfo } from "@core/utils/buildInfo.ts";
 import type { LogEntry } from "./logBuffer.ts";
 import { redactText } from "./redact.ts";
+import { formatSpanReport, type SpanSummary } from "./spanReport.ts";
 
 /** What a diagnostics file says about one saved connection; no names or hosts. */
 export interface ConnectionSummary {
@@ -31,6 +32,8 @@ export interface DiagnosticsContext {
   readonly connections: readonly ConnectionSummary[];
   /** The connected radio, when there is one. */
   readonly radio?: RadioSummary;
+  /** Recent connect attempts and radio requests, when tracing is on. */
+  readonly spans?: readonly SpanSummary[];
 }
 
 const URL_PARTS = /^([a-z][\w+.-]*):\/\/(?:\[[^\]]*\]|[^/:?#]*)(?::(\d+))?/i;
@@ -96,7 +99,7 @@ export function formatLogLine(entry: LogEntry): string {
 
 /**
  * The text of a diagnostics file: what the app, browser and radio were,
- * then the captured log lines, oldest first, with addresses, positions and
+ * request timings when there are spans, then the captured log lines, oldest first, with addresses, positions and
  * key-like values masked.
  */
 export function formatDiagnostics(
@@ -117,6 +120,7 @@ export function formatDiagnostics(
     "Connections:",
     ...connections,
     "",
+    ...(context.spans ? [...formatSpanReport(context.spans), ""] : []),
     `Log (${entries.length} lines, oldest first):`,
     ...entries.map(formatLogLine),
     "",
@@ -126,4 +130,8 @@ export function formatDiagnostics(
 /** e.g. `meshtastic-diagnostics-2026-11-23T20-05-01-123Z.txt`. */
 export function diagnosticsFileName(generatedAt: number): string {
   return `meshtastic-diagnostics-${iso(generatedAt).replace(/[:.]/g, "-")}.txt`;
+}
+
+export function tracesFileName(generatedAt: number): string {
+  return `meshtastic-traces-${iso(generatedAt).replace(/[:.]/g, "-")}.json`;
 }

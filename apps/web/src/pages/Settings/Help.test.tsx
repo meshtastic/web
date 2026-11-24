@@ -35,12 +35,30 @@ describe("Help", () => {
   it("downloads diagnostics that name the connected radio", async () => {
     const user = userEvent.setup();
     render(<Help onFormInit={vi.fn()} />);
-    await user.click(screen.getByRole("button", { name: /Download/ }));
+    await user.click(
+      screen.getByRole("button", {
+        name: /Download/,
+        description: /^Diagnostics/,
+      }),
+    );
     expect(download).toHaveBeenCalledWith(
       expect.stringMatching(/^meshtastic-diagnostics-/),
       expect.stringContaining(
         "Radio: firmware 2.8.2.1a2b3c4, hardware HELTEC_V3, 3 nodes",
       ),
+    );
+  });
+
+  it("downloads traces as OTLP JSON", async () => {
+    const user = userEvent.setup();
+    render(<Help onFormInit={vi.fn()} />);
+    await user.click(
+      screen.getByRole("button", { name: /Download/, description: /^Traces/ }),
+    );
+    expect(download).toHaveBeenCalledWith(
+      expect.stringMatching(/^meshtastic-traces-.*\.json$/),
+      expect.stringContaining("resourceSpans"),
+      "application/json",
     );
   });
 });

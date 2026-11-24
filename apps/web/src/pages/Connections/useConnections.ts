@@ -43,6 +43,7 @@ import { createLogger } from "@core/log.ts";
 import { closeStorageDb } from "@core/sdkStorage.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
+import { diagnosticsTracer, endSpan } from "@core/diagnostics/tracing.ts";
 import { MIN_FIRMWARE_VERSION } from "@core/utils/firmware.ts";
 import { randId } from "@core/utils/randId.ts";
 import { Result } from "better-result";
@@ -678,12 +679,21 @@ export function useConnections() {
           });
         }, OPEN_TIMEOUT_MS);
       };
+      const span = diagnosticsTracer.startSpan("connect", {
+        attributes: { "connection.type": conn.type },
+      });
+      let ok = false;
       const work = connectAttempt(attempt, conn, allowPrompt, watch);
       try {
-        return await Promise.race([work, ended]);
+        ok = await Promise.race([work, ended]);
+        return ok;
       } finally {
         clearTimeout(timer);
         if (attemptSettlers.get(id) === settle) attemptSettlers.delete(id);
+        endSpan(
+          span,
+          ok ? undefined : (savedConnection(id)?.error ?? "not connected"),
+        );
       }
     },
     [updateStatus, teardown, connectAttempt],
