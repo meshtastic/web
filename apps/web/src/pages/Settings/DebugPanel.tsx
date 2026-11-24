@@ -6,6 +6,7 @@ import {
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { cn } from "@core/utils/cn.ts";
+import { downloadTextFile } from "@core/utils/downloadText.ts";
 import {
   type DeviceLogEntry,
   filterLogEntries,
@@ -60,15 +61,11 @@ export const DebugPanel = (_props: ConfigProps) => {
     [entries, query],
   );
 
-  const exportLogs = () => {
-    const text = `${shown.map(formatLogEntry).join("\n")}\n`;
-    const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `Meshtastic_device_log_${new Date().toISOString().replace(/[:.]/g, "-")}.txt`;
-    anchor.click();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-  };
+  const exportLogs = () =>
+    downloadTextFile(
+      `Meshtastic_device_log_${new Date().toISOString().replace(/[:.]/g, "-")}.txt`,
+      `${shown.map(formatLogEntry).join("\n")}\n`,
+    );
 
   return (
     <>
