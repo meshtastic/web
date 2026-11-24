@@ -43,8 +43,9 @@ jobs:
 
           if [[ "$ENVIRONMENT" == "Production – web" ]]; then
             # The production deploy is built from the release tag's commit; fall back to the SHA.
+            # Only stable vX.Y.Z tags count, so prerelease and moving tags (latest, pre-release) never win the sort.
             VERSION="$(git ls-remote --tags "https://github.com/$REPO" \
-              | awk -v sha="$SHA" '$1 == sha { sub("refs/tags/", "", $2); sub(/\^\{\}$/, "", $2); print $2 }' \
+              | awk -v sha="$SHA" '$1 == sha && $2 ~ /^refs\/tags\/v[0-9]+\.[0-9]+\.[0-9]+(\^\{\})?$/ { sub("refs/tags/", "", $2); sub(/\^\{\}$/, "", $2); print $2 }' \
               | sort -V | tail -n1)"
             VERSION="${VERSION:-$SHORT_SHA}"
             TITLE="🚀 New Web Release: $VERSION"
