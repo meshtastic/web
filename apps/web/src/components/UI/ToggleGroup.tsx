@@ -1,5 +1,5 @@
 import { cn } from "@core/utils/cn.ts";
-import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group";
+import { ToggleGroup as ToggleGroupPrimitive } from "radix-ui";
 import * as React from "react";
 import { segmentedItemClasses, segmentedTrackClasses } from "./segmented.ts";
 

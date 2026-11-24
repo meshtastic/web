@@ -1,4 +1,4 @@
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Checkbox as CheckboxPrimitive } from "radix-ui";
 import { Check } from "lucide-react";
 import { cn } from "../../core/utils/cn.ts";
 

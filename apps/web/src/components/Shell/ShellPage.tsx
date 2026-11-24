@@ -8,7 +8,7 @@ import {
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
 import { useDetailsWidth } from "@core/shell/useDetailsWidth.ts";
 import { cn } from "@core/utils/cn.ts";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Dialog as DialogPrimitive } from "radix-ui";
 import { useLocation, useMatches } from "@tanstack/react-router";
 import { type LucideIcon, MenuIcon, PanelRightIcon, XIcon } from "lucide-react";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";

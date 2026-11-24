@@ -1,5 +1,5 @@
 import { cn } from "@core/utils/cn.ts";
-import * as LabelPrimitive from "@radix-ui/react-label";
+import { Label as LabelPrimitive } from "radix-ui";
 import * as React from "react";
 
 const Label = React.forwardRef<

@@ -1,5 +1,5 @@
 import { cn } from "@core/utils/cn.ts";
-import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { Tabs as TabsPrimitive } from "radix-ui";
 import * as React from "react";
 import { segmentedItemClasses, segmentedTrackClasses } from "./segmented.ts";
 

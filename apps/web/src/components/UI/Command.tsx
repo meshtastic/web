@@ -1,7 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from "@components/UI/Dialog.tsx";
 import { cn } from "@core/utils/cn.ts";
-import type { DialogProps } from "@radix-ui/react-dialog";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { type Dialog as DialogPrimitive, VisuallyHidden } from "radix-ui";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
 import * as React from "react";
@@ -22,7 +21,7 @@ const Command = React.forwardRef<
 ));
 Command.displayName = CommandPrimitive.displayName;
 
-export interface CommandDialogProps extends DialogProps {
+export interface CommandDialogProps extends DialogPrimitive.DialogProps {
   /** Accessible dialog title (visually hidden). Defaults to "Command menu". */
   title?: string;
   /** Props for the inner cmdk root (`shouldFilter`, `label`, `loop`, ...). */
@@ -66,9 +65,9 @@ const CommandDialog = ({
           className,
         )}
       >
-        <VisuallyHidden asChild>
+        <VisuallyHidden.Root asChild>
           <DialogTitle>{title ?? t("shell.commandMenu")}</DialogTitle>
-        </VisuallyHidden>
+        </VisuallyHidden.Root>
         <Command
           {...commandProps}
           className={cn("min-h-0 flex-1", commandProps?.className)}
