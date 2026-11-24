@@ -36,7 +36,7 @@ import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { numberToHexUnpadded } from "@noble/curves/utils.js";
 import { useNavigate } from "@tanstack/react-router";
-import { fromByteArray } from "base64-js";
+import { base64Encode } from "@bufbuild/protobuf/wire";
 import {
   BellIcon,
   BellOffIcon,
@@ -406,7 +406,7 @@ export const NodeDetailsDialog = ({
                         <pre className="text-xs pt-0.5">
                           {node.user?.publicKey &&
                           node.user?.publicKey.length > 0
-                            ? fromByteArray(node.user.publicKey)
+                            ? base64Encode(node.user.publicKey)
                             : t("unknown.longName")}
                         </pre>
                       </td>

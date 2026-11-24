@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
-import { fromByteArray, toByteArray } from "base64-js";
+import { base64Decode, base64Encode } from "@bufbuild/protobuf/wire";
 import { describe, expect, it } from "vitest";
 import {
   applyChannelNameEdit,
@@ -100,7 +100,7 @@ describe("buildEditedChannel", () => {
     const newKey = new Uint8Array(32).fill(9);
     const edited = buildEditedChannel(existing, {
       name: "  Family ",
-      psk: fromByteArray(newKey),
+      psk: base64Encode(newKey),
       uplinkEnabled: true,
       downlinkEnabled: false,
       positionPrecision: 32,
@@ -144,7 +144,7 @@ describe("add and delete", () => {
     const channel = buildNewChannel(3, psk);
     expect(channel.index).toBe(3);
     expect(channel.role).toBe(Role.SECONDARY);
-    expect(fromByteArray(channel.settings?.psk ?? new Uint8Array())).toBe(psk);
+    expect(base64Encode(channel.settings?.psk ?? new Uint8Array())).toBe(psk);
     expect(channel.settings?.moduleSettings?.positionPrecision).toBe(0);
     expect(channel.settings?.name).toBe("");
   });
@@ -152,7 +152,7 @@ describe("add and delete", () => {
   it("stages the dialog's edits on top of a new channel", () => {
     const added = buildEditedChannel(buildNewChannel(1, generatePsk()), {
       name: "New",
-      psk: fromByteArray(key16),
+      psk: base64Encode(key16),
       uplinkEnabled: true,
       downlinkEnabled: true,
       positionPrecision: 15,
@@ -173,9 +173,9 @@ describe("add and delete", () => {
 
   it("generates 32 random bytes by default", () => {
     const a = generatePsk();
-    expect(toByteArray(a).length).toBe(32);
+    expect(base64Decode(a).length).toBe(32);
     expect(generatePsk()).not.toBe(a);
-    expect(toByteArray(generatePsk(16)).length).toBe(16);
+    expect(base64Decode(generatePsk(16)).length).toBe(16);
   });
 });
 
@@ -356,7 +356,7 @@ describe("applyChannelNameEdit", () => {
   });
 
   it("does not generate when the key is already strong", () => {
-    const strong = fromByteArray(key16);
+    const strong = base64Encode(key16);
     const result = applyChannelNameEdit(
       { ...draft, psk: strong },
       "Hiking",

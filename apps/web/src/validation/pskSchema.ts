@@ -1,5 +1,13 @@
-import { toByteArray } from "base64-js";
+import { base64Decode } from "@bufbuild/protobuf/wire";
 import { type ZodType, z } from "zod/v4";
+
+/**
+ * Padded base64 in whole groups of four, standard or URL-safe alphabet.
+ * base64Decode also takes unpadded, extra-padded and spaced input, which a
+ * key field should reject.
+ */
+const PADDED_BASE64 =
+  /^(?:[A-Za-z0-9+/_-]{4})*(?:[A-Za-z0-9+/_-]{2}==|[A-Za-z0-9+/_-]{3}=)?$/;
 
 export function makePskHelpers(allowedByteLengths: readonly number[]) {
   const bitsLabel = allowedByteLengths.map((b) => b * 8).join(" | ");
@@ -10,8 +18,9 @@ export function makePskHelpers(allowedByteLengths: readonly number[]) {
   } as const;
 
   function tryParse(str: string): Uint8Array | null {
+    if (!PADDED_BASE64.test(str)) return null;
     try {
-      return toByteArray(str);
+      return base64Decode(str);
     } catch {
       return null;
     }

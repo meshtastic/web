@@ -1,9 +1,9 @@
-import { fromByteArray } from "base64-js";
+import { base64Encode } from "@bufbuild/protobuf/wire";
 import { describe, expect, it } from "vitest";
 import { makePskHelpers } from "./pskSchema.ts";
 
 function makeBase64OfLength(len: number): string {
-  return fromByteArray(new Uint8Array(len));
+  return base64Encode(new Uint8Array(len));
 }
 
 describe("stringSchema", () => {

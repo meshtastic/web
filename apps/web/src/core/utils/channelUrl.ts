@@ -1,6 +1,6 @@
 import { fromBinary, toBinary } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
-import { fromByteArray, toByteArray } from "base64-js";
+import { base64Decode, base64Encode } from "@bufbuild/protobuf/wire";
 
 /**
  * A channel share URL: the ChannelSet binary, base64url without padding, in
@@ -11,7 +11,7 @@ export function channelSetToUrl(
   channelSet: Protobuf.AppOnly.ChannelSet,
   { add = false }: { add?: boolean } = {},
 ): string {
-  const base64 = fromByteArray(
+  const base64 = base64Encode(
     toBinary(Protobuf.AppOnly.ChannelSetSchema, channelSet),
   )
     .replace(/=/g, "")
@@ -38,5 +38,5 @@ export function channelSetFromUrl(url: string): Protobuf.AppOnly.ChannelSet {
     .replace(/-/g, "+")
     .replace(/_/g, "/");
 
-  return fromBinary(Protobuf.AppOnly.ChannelSetSchema, toByteArray(padded));
+  return fromBinary(Protobuf.AppOnly.ChannelSetSchema, base64Decode(padded));
 }

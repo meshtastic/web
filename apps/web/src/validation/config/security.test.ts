@@ -1,5 +1,5 @@
 import { Protobuf } from "@core/protobuf.ts";
-import { fromByteArray } from "base64-js";
+import { base64Encode } from "@bufbuild/protobuf/wire";
 import { describe, expect, it } from "vitest";
 import { ParsedSecuritySchema, RawSecuritySchema } from "./security.ts";
 
@@ -7,7 +7,7 @@ const Policy = Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy;
 const COMPATIBLE = Policy.COMPATIBLE;
 
 function makeBase64OfLength(len: number): string {
-  return fromByteArray(new Uint8Array(len));
+  return base64Encode(new Uint8Array(len));
 }
 
 describe("RawSecuritySchema", () => {
