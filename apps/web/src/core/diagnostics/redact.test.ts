@@ -10,6 +10,14 @@ describe("redactText", () => {
     ["http://meshtastic.local:8080/x", "http://<host>:8080/x"],
     ["https://[fe80::1]:443/", "https://<host>:443/"],
     ["wss://example.org/socket", "wss://<host>/socket"],
+    [
+      "https://127.0.0.1:9443/api/v1/fromradio?all=false",
+      "https://<host>:9443/api/v1/fromradio?all=false",
+    ],
+    [
+      "http://localhost:5201/i18n/locales/en-GB/channels.json",
+      "http://<host>:5201/i18n/locales/en-GB/channels.json",
+    ],
   ])(
     "masks the host in %s but keeps scheme, port and path",
     (input, output) => {

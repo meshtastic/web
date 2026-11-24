@@ -25,9 +25,11 @@ const RULES: ReadonlyArray<readonly [RegExp, string]> = [
   // Bare decimal-degree pairs: 45.4215, -75.6972.
   [/-?\d{1,3}\.\d{4,}\s*,\s*-?\d{1,3}\.\d{4,}/g, "<coords>"],
   // Base64 or hex runs that look like keys or encoded payloads: padded, or
-  // long and containing a digit. Long plain identifiers have neither.
+  // long and containing a digit. Long plain identifiers have neither. The
+  // unpadded rule leaves out "/", so a URL path such as
+  // `9443/api/v1/fromradio` is not taken for a key; keys are padded anyway.
   [/[A-Za-z0-9+/]{12,}={1,2}/g, "<redacted>"],
-  [/(?=[A-Za-z+/]*\d)[A-Za-z0-9+/]{20,}/g, "<redacted>"],
+  [/(?=[A-Za-z+]*\d)[A-Za-z0-9+]{20,}/g, "<redacted>"],
 ];
 
 export function redactText(text: string): string {
