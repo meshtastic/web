@@ -12,26 +12,29 @@ export interface LogEntry {
   readonly message: string;
 }
 
-export interface LogBuffer {
-  push(entry: LogEntry): void;
+/** A fixed-size buffer that keeps the newest items. */
+export interface RingBuffer<T> {
+  push(item: T): void;
   /** Oldest first. */
-  entries(): LogEntry[];
+  entries(): T[];
   clear(): void;
 }
 
-/** Keeps the newest `capacity` entries; older ones are dropped. */
-export function createLogBuffer(capacity: number): LogBuffer {
+export type LogBuffer = RingBuffer<LogEntry>;
+
+/** Keeps the newest `capacity` items; older ones are dropped. */
+export function createRingBuffer<T>(capacity: number): RingBuffer<T> {
   const size = Math.max(1, Math.floor(capacity));
-  let ring: LogEntry[] = [];
+  let ring: T[] = [];
   let next = 0;
 
   return {
-    push(entry) {
+    push(item) {
       if (ring.length < size) {
-        ring.push(entry);
+        ring.push(item);
         return;
       }
-      ring[next] = entry;
+      ring[next] = item;
       next = (next + 1) % size;
     },
     entries() {
@@ -45,3 +48,7 @@ export function createLogBuffer(capacity: number): LogBuffer {
     },
   };
 }
+
+/** Keeps the newest `capacity` log entries. */
+export const createLogBuffer = (capacity: number): LogBuffer =>
+  createRingBuffer<LogEntry>(capacity);
