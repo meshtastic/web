@@ -63,7 +63,7 @@ docker build -t meshtastic-web -f apps/web/infra/Containerfile .
 ## Deployment flow
 
 - **Preview deployments:** every pull request gets a preview deployment on Vercel, so you and reviewers can try the change before it merges.
-- **Staging (`client-test`):** once merged, changes are available at [client-test.meshtastic.org](https://client-test.meshtastic.org/) for testing without affecting the production site.
+- **Staging (`web-staging`):** once merged, changes are available at [client.staging.meshtastic.org](https://client.staging.meshtastic.org/) for testing without affecting the production site.
 - **Production:** stable releases are promoted to [client.meshtastic.org](https://client.meshtastic.org/), the site most people use to connect to their nodes.
 
 Please read the [contribution guidelines](../../CONTRIBUTING.md) before opening a pull request.
