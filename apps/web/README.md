@@ -52,7 +52,7 @@ The client records radio HTTP requests and connect attempts with [OpenTelemetry]
 
 **Settings › Help & documentation › Troubleshooting › Traces** saves the spans as `meshtastic-traces-<time>.json`, an OTLP/JSON export request with the same redaction as the diagnostics file. This works the same whether the client is hosted, self-hosted or served from a node: the file is downloaded in the browser, and the client never sends traces anywhere.
 
-To view a file, for example one attached to a bug report, post it to any OTLP/HTTP receiver on your own machine, such as [Jaeger](https://www.jaegertracing.io/). Port 4318 below belongs to that local Jaeger container, not to the web client's container:
+To view a file, for example one attached to a bug report, post it to any OTLP/HTTP receiver on your own machine, such as [Jaeger](https://www.jaegertracing.io/). This step only reads the saved file; it doesn't connect to the radio. Port 4318 below belongs to that local Jaeger container, not to the web client's container:
 
 ```bash
 # Start Jaeger in the background, reachable only from this machine
