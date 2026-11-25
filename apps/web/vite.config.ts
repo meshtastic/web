@@ -8,7 +8,9 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 let hash = "";
-let version = "v0.0.0";
+// Builds without tags (staging, previews, shallow clones) leave this empty,
+// so the app shows only the commit rather than a made-up version.
+let version = "";
 try {
   hash = execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
 } catch (error) {
