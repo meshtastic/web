@@ -1,0 +1,93 @@
+name: Notify Discord on Deploy
+
+# Vercel reports each deploy back to GitHub as a Deployment. Its status events
+# come from the Vercel GitHub App rather than GITHUB_TOKEN, so they start
+# workflow runs. Two Vercel production environments matter here:
+#   "Production – web-staging" -> staging, client.staging.meshtastic.org (every merge to main)
+#   "Production – web"         -> production, client.meshtastic.org (stable releases)
+# deployment_status runs the workflow file at the deployed commit, so the
+# production path only fires once this file has shipped in a release.
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      (github.event.deployment.environment == 'Production – web' ||
+       github.event.deployment.environment == 'Production – web-staging')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_WEB }}
+      ENVIRONMENT: ${{ github.event.deployment.environment }}
+      SHA: ${{ github.event.deployment.sha }}
+      REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Notify Discord
+        run: |
+          set -euo pipefail
+          if [[ -z "$DISCORD_WEBHOOK" ]]; then
+            echo "No Discord webhook provided. Skipping notification."
+            exit 0
+          fi
+
+          SHORT_SHA="${SHA:0:7}"
+          COMMIT_URL="https://github.com/$REPO/commit/$SHA"
+          # Commit subjects are user-controlled; jq --arg below keeps them out of the JSON syntax.
+          SUBJECT="$(gh api "repos/$REPO/commits/$SHA" --jq '.commit.message | split("\n")[0]' || echo "")"
+
+          if [[ "$ENVIRONMENT" == "Production – web" ]]; then
+            # The production deploy is built from the release tag's commit; fall back to the SHA.
+            # Only stable vX.Y.Z tags count, so prerelease and moving tags (latest, pre-release) never win the sort.
+            VERSION="$(git ls-remote --tags "https://github.com/$REPO" \
+              | awk -v sha="$SHA" '$1 == sha && $2 ~ /^refs\/tags\/v[0-9]+\.[0-9]+\.[0-9]+(\^\{\})?$/ { sub("refs/tags/", "", $2); sub(/\^\{\}$/, "", $2); print $2 }' \
+              | sort -V | tail -n1)"
+            VERSION="${VERSION:-$SHORT_SHA}"
+            TITLE="🚀 New Web Release: $VERSION"
+            TRACK="Production"
+            SITE="https://client.meshtastic.org"
+            COLOR=5763719
+            if [[ "$VERSION" == "$SHORT_SHA" ]]; then
+              URL="$COMMIT_URL"
+            else
+              URL="https://github.com/$REPO/releases/tag/$VERSION"
+            fi
+          else
+            VERSION="$SHORT_SHA"
+            TITLE="🧪 New Web Staging Build: $VERSION"
+            TRACK="Staging"
+            SITE="https://client.staging.meshtastic.org"
+            COLOR=16705372
+            URL="$COMMIT_URL"
+          fi
+
+          PAYLOAD="$(jq -n \
+            --arg title "$TITLE" \
+            --arg url "$URL" \
+            --arg track "$TRACK" \
+            --arg version "$VERSION" \
+            --arg site "$SITE" \
+            --arg subject "$SUBJECT" \
+            --arg commit "[\`$SHORT_SHA\`]($COMMIT_URL)" \
+            --argjson color "$COLOR" \
+            '{
+              content: null,
+              embeds: [{
+                title: $title,
+                url: $url,
+                description: "A new build has been deployed to **\($track)** at \($site).",
+                color: $color,
+                fields: ([
+                  { name: "Track", value: $track, inline: true },
+                  { name: "Version", value: $version, inline: true },
+                  { name: "Commit", value: $commit, inline: true }
+                ] + (if $subject == "" then [] else [{ name: "Change", value: $subject[0:1024], inline: false }] end))
+              }]
+            }')"
+
+          curl -fsS -H "Content-Type: application/json" -d "$PAYLOAD" "$DISCORD_WEBHOOK"
