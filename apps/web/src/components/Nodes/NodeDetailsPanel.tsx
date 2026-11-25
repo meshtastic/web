@@ -10,7 +10,7 @@ import {
 } from "@core/nodes/format.ts";
 import type { NodeRow } from "@core/nodes/nodeRow.ts";
 import { cn } from "@core/utils/cn.ts";
-import { fromByteArray } from "base64-js";
+import { base64Encode } from "@bufbuild/protobuf/wire";
 import {
   ArrowLeftIcon,
   BellIcon,
@@ -383,9 +383,7 @@ export const NodeDetailsPanel = ({
             label={t("details.publicKey")}
             value={
               row.publicKey ? (
-                <span className="break-all">
-                  {fromByteArray(row.publicKey)}
-                </span>
+                <span className="break-all">{base64Encode(row.publicKey)}</span>
               ) : (
                 t("details.noPublicKey")
               )

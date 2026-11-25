@@ -6,7 +6,7 @@ import {
 } from "@app/validation/channel.ts";
 import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
-import { fromByteArray, toByteArray } from "base64-js";
+import { base64Decode, base64Encode } from "@bufbuild/protobuf/wire";
 
 /** The firmware supports 8 channels: index 0 (primary) and 1-7. */
 export const MAX_CHANNELS = 8;
@@ -59,7 +59,7 @@ export const NEW_CHANNEL_PSK_STATE: PskEditState = {
 
 /** A random 256 bit key, as base64. */
 export function generatePsk(bytes = 32): string {
-  return fromByteArray(crypto.getRandomValues(new Uint8Array(bytes)));
+  return base64Encode(crypto.getRandomValues(new Uint8Array(bytes)));
 }
 
 /**
@@ -79,7 +79,7 @@ export function draftFromChannel(channel: ChannelLike): ChannelDraft {
   const settings = channel.settings;
   return {
     name: settings?.name ?? "",
-    psk: fromByteArray(settings?.psk ?? new Uint8Array(0)),
+    psk: base64Encode(settings?.psk ?? new Uint8Array(0)),
     uplinkEnabled: settings?.uplinkEnabled ?? false,
     downlinkEnabled: settings?.downlinkEnabled ?? false,
     positionPrecision: normalizePositionPrecision(
@@ -117,7 +117,7 @@ export function buildEditedChannel(
   const nextSettings: Protobuf.Channel.ChannelSettings = {
     ...base,
     name: draft.name.trim(),
-    psk: toByteArray(draft.psk),
+    psk: base64Decode(draft.psk),
     uplinkEnabled: draft.uplinkEnabled,
     downlinkEnabled: draft.downlinkEnabled,
     // Only add the key when needed: the editor counts keys when it checks
@@ -155,7 +155,7 @@ export function buildNewChannel(
     index,
     role: Role.SECONDARY,
     settings: create(Protobuf.Channel.ChannelSettingsSchema, {
-      psk: toByteArray(psk),
+      psk: base64Decode(psk),
       moduleSettings: create(Protobuf.Channel.ModuleSettingsSchema, {
         positionPrecision: POSITION_PRECISION_OFF,
       }),
@@ -284,7 +284,7 @@ export function markPskEdited(state: PskEditState): PskEditState {
 /** Byte length of a base64 PSK, or undefined if it isn't valid base64. */
 export function pskByteLength(psk: string): number | undefined {
   try {
-    return toByteArray(psk).byteLength;
+    return base64Decode(psk).byteLength;
   } catch {
     return undefined;
   }

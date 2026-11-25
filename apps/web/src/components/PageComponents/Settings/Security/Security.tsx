@@ -25,7 +25,7 @@ import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { constantSignal } from "@core/kmp/signals.ts";
-import { fromByteArray, toByteArray } from "base64-js";
+import { base64Decode, base64Encode } from "@bufbuild/protobuf/wire";
 import { useEffect, useState } from "react";
 import { get, type Path, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -40,7 +40,7 @@ const EMPTY_RADIO_SIGNAL = constantSignal<{
 }>({});
 
 const keyText = (key: Uint8Array | undefined) =>
-  fromByteArray(key ?? new Uint8Array(0));
+  base64Encode(key ?? new Uint8Array(0));
 
 /** The form's view of the security section: keys as base64. */
 const toFormShape = (
@@ -107,12 +107,12 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
 
     const payload: ParsedSecurity = {
       ...data,
-      privateKey: toByteArray(data.privateKey),
-      publicKey: toByteArray(data.publicKey),
+      privateKey: base64Decode(data.privateKey),
+      publicKey: base64Decode(data.publicKey),
       adminKey: [
-        toByteArray(data.adminKey.at(0) ?? ""),
-        toByteArray(data.adminKey.at(1) ?? ""),
-        toByteArray(data.adminKey.at(2) ?? ""),
+        base64Decode(data.adminKey.at(0) ?? ""),
+        base64Decode(data.adminKey.at(1) ?? ""),
+        base64Decode(data.adminKey.at(2) ?? ""),
       ],
     };
     editor.setRadioSection("security", payload);
@@ -120,13 +120,13 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
 
   const pkiRegenerate = () => {
     const privateKey = getX25519PrivateKey();
-    updatePublicKey(fromByteArray(privateKey));
+    updatePublicKey(base64Encode(privateKey));
   };
 
   const updatePublicKey = async (privateKey: string) => {
     try {
-      const publicKey = fromByteArray(
-        getX25519PublicKey(toByteArray(privateKey)),
+      const publicKey = base64Encode(
+        getX25519PublicKey(base64Decode(privateKey)),
       );
       setValue("privateKey", privateKey, { shouldDirty: true });
       setValue("publicKey", publicKey, { shouldDirty: true });
