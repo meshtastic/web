@@ -690,3 +690,12 @@ img {
 .animate-spin-slow {
   animation: spin-slower 2s linear infinite;
 }
+
+/*
+ * CookieYes's floating "revisit consent" button sits over the app rail.
+ * The rail and Settings › About offer the same action instead.
+ */
+[data-cky-tag="revisit-consent"],
+:has(> [data-cky-tag="revisit-consent"]) {
+  display: none !important;
+}

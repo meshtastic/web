@@ -107,6 +107,29 @@ describe("AppRail", () => {
     expect(messages).toHaveTextContent("3");
   });
 
+  it("shows cookie settings only when consent is part of the build", async () => {
+    renderRail("/map");
+    expect(
+      screen.queryByRole("button", { name: "Cookie settings" }),
+    ).not.toBeInTheDocument();
+
+    const onOpenCookieConsent = vi.fn();
+    render(
+      <AppRail
+        pathname="/map"
+        unreadCount={0}
+        nodeCount={243}
+        device={summary}
+        onOpenCommandMenu={vi.fn()}
+        onOpenCookieConsent={onOpenCookieConsent}
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Cookie settings" }),
+    );
+    expect(onOpenCookieConsent).toHaveBeenCalledOnce();
+  });
+
   it("opens the command menu", async () => {
     const { onOpenCommandMenu } = renderRail("/map");
     await userEvent.click(screen.getByRole("button", { name: "Command menu" }));
