@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.16.0",
-    "@hookform/resolvers": "^5.9.1",
+    "@hookform/resolvers": "^7.0.7",
     "@meshtastic/protobufs": "workspace:*",
     "@meshtastic/sdk-kmp": "workspace:*",
     "@noble/curves": "^2.4.0",
