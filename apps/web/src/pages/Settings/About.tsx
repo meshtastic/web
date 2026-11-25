@@ -7,6 +7,10 @@ import {
 import { SettingRow } from "@components/UI/SettingRow.tsx";
 import { ExternalLinkIcon } from "lucide-react";
 import { BUILD_INFO } from "@core/utils/buildInfo.ts";
+import {
+  cookieConsentEnabled,
+  openCookieConsent,
+} from "@core/utils/cookieConsent.ts";
 import type { ReactNode } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useRadioInfo } from "./radioInfo.ts";
@@ -111,6 +115,15 @@ export const About = (_props: ConfigProps) => {
             {t("settingsPages.about.licenseDescription")}
           </ExternalLink>
         </SettingsRow>
+        {cookieConsentEnabled ? (
+          <SettingRow
+            kind="button"
+            label={t("settingsPages.about.cookies")}
+            help={t("settingsPages.about.cookiesDescription")}
+            actionLabel={t("settingsPages.about.cookiesAction")}
+            onAction={openCookieConsent}
+          />
+        ) : null}
         <SettingsBlock>
           <p className="m-0 text-help text-muted">
             {t("settingsPages.about.copyright")}{" "}

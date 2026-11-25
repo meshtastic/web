@@ -344,7 +344,10 @@
       "devices": "Supported devices",
       "copyright": "Meshtastic® Copyright Meshtastic LLC",
       "licenseNotice": "Free software under the GNU General Public License v3, with no warranty. You may redistribute it under the same license.",
-      "poweredBy": "Hosting by <0>▲ Vercel</0>. Meshtastic® is a registered trademark of Meshtastic LLC."
+      "poweredBy": "Hosting by <0>▲ Vercel</0>. Meshtastic® is a registered trademark of Meshtastic LLC.",
+      "cookies": "Cookies",
+      "cookiesDescription": "Review or change which cookies this site may use.",
+      "cookiesAction": "Cookie settings"
     }
   },
   "tabLock": {
@@ -379,6 +382,7 @@
     "nodesCount_other": "Nodes ({{count}})",
     "chats": "Chats",
     "commandMenu": "Command menu",
+    "cookieSettings": "Cookie settings",
     "deviceWithStatus": "Device {{name}}, {{status}}",
     "statusConnected": "Connected",
     "statusConnecting": "Connecting…",

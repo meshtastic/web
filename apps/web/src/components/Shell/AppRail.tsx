@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
 import { Link } from "@tanstack/react-router";
-import { CommandIcon } from "lucide-react";
+import { CommandIcon, CookieIcon } from "lucide-react";
 import type { ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { DeviceMenu } from "./DeviceMenu.tsx";
@@ -42,6 +42,8 @@ export interface AppRailProps {
   nodeCount: number;
   device: DeviceSummary;
   onOpenCommandMenu: () => void;
+  /** Shown only when the cookie consent banner is part of the build. */
+  onOpenCookieConsent?: () => void;
 }
 
 /** Desktop icon rail: device, top-level destinations, command menu. */
@@ -51,6 +53,7 @@ export const AppRail = ({
   nodeCount,
   device,
   onOpenCommandMenu,
+  onOpenCookieConsent,
 }: AppRailProps) => {
   const { t } = useTranslation("ui");
   const active = activeDestination(pathname);
@@ -132,6 +135,17 @@ export const AppRail = ({
         <div aria-hidden="true" className="my-1.5 h-px w-8 bg-raised" />
         {railPrimaryDestinations.map(navLink)}
         <div className="flex-1" />
+        {onOpenCookieConsent ? (
+          <RailTooltip label={t("shell.cookieSettings")}>
+            <IconButton
+              aria-label={t("shell.cookieSettings")}
+              variant="rail"
+              size="rail"
+              icon={<CookieIcon className="size-[22px]" />}
+              onClick={onOpenCookieConsent}
+            />
+          </RailTooltip>
+        ) : null}
         <RailTooltip label={t("shell.commandMenu")}>
           <IconButton
             aria-label={t("shell.commandMenu")}

@@ -1,6 +1,10 @@
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { useAppStore } from "@core/stores";
+import {
+  cookieConsentEnabled,
+  openCookieConsent,
+} from "@core/utils/cookieConsent.ts";
 import { useLocation, useMatches } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { AppRail } from "./AppRail.tsx";
@@ -33,6 +37,9 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
           nodeCount={nodeCount}
           device={device}
           onOpenCommandMenu={() => setCommandPaletteOpen(true)}
+          onOpenCookieConsent={
+            cookieConsentEnabled ? openCookieConsent : undefined
+          }
         />
       )}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
