@@ -35,6 +35,31 @@ docker run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 
 If you run into a problem, please report it in the [issue tracker](https://github.com/meshtastic/web/issues).
 
+## Diagnostics
+
+When reporting a bug, attach a diagnostics file. **Download diagnostics** is on the "No radio connected" screen, under a connection's error in the Connections drawer, and in **Settings › Help & documentation › Troubleshooting**. It saves `meshtastic-diagnostics-<time>.txt` with:
+
+- the app version and commit, browser, page protocol, and the connected radio's firmware, board and node count
+- one line per saved connection: type, scheme, port, status and last error, without names or addresses
+- the recent app and SDK log (the last 2000 lines at debug level and above, whatever the console level). The log survives a page reload and includes uncaught errors
+- a summary of recent radio requests: connect attempts, count, median and longest time per request type, and any request that failed or took over 2 seconds
+
+Before the file is written, hosts and IP addresses, `.local` names, coordinates and anything that looks like a key are masked. URLs keep their scheme and port (`https://<host>:9443`), since connection bugs often depend on them. Read the file before posting it publicly.
+
+### Traces
+
+The client records radio HTTP requests and connect attempts with [OpenTelemetry](https://opentelemetry.io/), keeping the last 1000 spans in memory. A reload clears them. Map tiles and app assets aren't recorded. Serial and Bluetooth connections get a `connect` span per attempt but no per-request spans. No trace headers are sent to the radio.
+
+**Settings › Help & documentation › Troubleshooting › Traces** saves the spans as `meshtastic-traces-<time>.json`, an OTLP/JSON export request with the same redaction as the diagnostics file. To view it, post it to any OTLP/HTTP receiver, such as [Jaeger](https://www.jaegertracing.io/):
+
+```bash
+docker run --rm -p 16686:16686 -p 4318:4318 jaegertracing/jaeger:latest
+curl -X POST -H 'Content-Type: application/json' \
+  --data-binary @meshtastic-traces-<time>.json http://localhost:4318/v1/traces
+```
+
+Then open http://localhost:16686 and search for the `meshtastic-web` service. Grafana Tempo and the OpenTelemetry Collector accept the same request on their OTLP/HTTP port.
+
 ## Development
 
 From the repository root (see the [repository README](../../README.md#getting-started) for prerequisites, including JDK 21 for the SDK build):
