@@ -50,7 +50,9 @@ Before the file is written, URL hosts, IP addresses, `.local` names, precise coo
 
 The client records radio HTTP requests and connect attempts with [OpenTelemetry](https://opentelemetry.io/), keeping the last 1000 spans in memory. A reload clears them. Map tiles and app assets aren't recorded. Serial and Bluetooth connections get a `connect` span per attempt but no per-request spans. No trace headers are sent to the radio.
 
-**Settings › Help & documentation › Troubleshooting › Traces** saves the spans as `meshtastic-traces-<time>.json`, an OTLP/JSON export request with the same redaction as the diagnostics file. To view it, post it to any OTLP/HTTP receiver, such as [Jaeger](https://www.jaegertracing.io/):
+**Settings › Help & documentation › Troubleshooting › Traces** saves the spans as `meshtastic-traces-<time>.json`, an OTLP/JSON export request with the same redaction as the diagnostics file. This works the same whether the client is hosted, self-hosted or served from a node: the file is downloaded in the browser, and the client never sends traces anywhere.
+
+To view a file, for example one attached to a bug report, post it to any OTLP/HTTP receiver on your own machine, such as [Jaeger](https://www.jaegertracing.io/). Port 4318 below belongs to that local Jaeger container, not to the web client's container:
 
 ```bash
 # Start Jaeger in the background, reachable only from this machine
