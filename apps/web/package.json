@@ -47,7 +47,7 @@
     "@sqlite.org/sqlite-wasm": "3.51.2-build9",
     "@tailwindcss/vite": "^4.3.5",
     "@tanstack/react-router": "^1.170.46",
-    "@tanstack/react-router-devtools": "^1.167.3",
+    "@tanstack/react-router-devtools": "^1.167.4",
     "@turf/turf": "^7.4.0",
     "@types/node": "^26.6.6",
     "@types/web-bluetooth": "^0.0.22",
