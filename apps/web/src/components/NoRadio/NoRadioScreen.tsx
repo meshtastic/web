@@ -7,6 +7,10 @@ import {
 import type { Connection } from "@core/stores/deviceStore/types.ts";
 import { useDownloadDiagnostics } from "@core/diagnostics/useDownloadDiagnostics.ts";
 import { useToast } from "@core/hooks/useToast.ts";
+import {
+  cookieConsentEnabled,
+  openCookieConsent,
+} from "@core/utils/cookieConsent.ts";
 import { useAppStore, useDeviceStore } from "@core/stores";
 import { useConnections } from "@app/pages/Connections/useConnections";
 import { useEffect, useState } from "react";
@@ -38,6 +42,8 @@ export interface NoRadioEmptyStateProps {
   onReconnect: () => void;
   /** Saves a diagnostics file for a bug report. */
   onDownloadDiagnostics: () => void;
+  /** Shown only when the cookie consent banner is part of the build. */
+  onOpenCookieConsent?: () => void;
 }
 
 /** What the app shows behind the Connections drawer with no radio. */
@@ -47,6 +53,7 @@ export function NoRadioEmptyState({
   onConnect,
   onReconnect,
   onDownloadDiagnostics,
+  onOpenCookieConsent,
 }: NoRadioEmptyStateProps) {
   const { t } = useTranslation("connections");
   return (
@@ -82,14 +89,18 @@ export function NoRadioEmptyState({
         </div>
         {/* After a failed connect this screen is all the app shows, so the
             diagnostics file has to be reachable from here. */}
-        <Button
-          type="button"
-          variant="link"
-          className="mt-2"
-          onClick={onDownloadDiagnostics}
-        >
-          {t("diagnostics.download", { ns: "common" })}
-        </Button>
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4">
+          <Button type="button" variant="link" onClick={onDownloadDiagnostics}>
+            {t("diagnostics.download", { ns: "common" })}
+          </Button>
+          {/* There is no app rail here, and CookieYes's own button is
+              hidden, so consent has to be reachable from this screen too. */}
+          {onOpenCookieConsent ? (
+            <Button type="button" variant="link" onClick={onOpenCookieConsent}>
+              {t("shell.cookieSettings", { ns: "ui" })}
+            </Button>
+          ) : null}
+        </div>
       </EmptyState>
     </main>
   );
@@ -145,6 +156,7 @@ export function NoRadioScreen() {
       onConnect={() => openConnections()}
       onReconnect={() => void onReconnect()}
       onDownloadDiagnostics={downloadDiagnostics}
+      onOpenCookieConsent={cookieConsentEnabled ? openCookieConsent : undefined}
     />
   );
 }
