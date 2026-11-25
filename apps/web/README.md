@@ -53,12 +53,17 @@ The client records radio HTTP requests and connect attempts with [OpenTelemetry]
 **Settings › Help & documentation › Troubleshooting › Traces** saves the spans as `meshtastic-traces-<time>.json`, an OTLP/JSON export request with the same redaction as the diagnostics file. To view it, post it to any OTLP/HTTP receiver, such as [Jaeger](https://www.jaegertracing.io/):
 
 ```bash
-docker run --rm -p 16686:16686 -p 4318:4318 jaegertracing/jaeger:latest
+# Start Jaeger in the background, reachable only from this machine
+docker run -d --rm --name jaeger \
+  -p 127.0.0.1:16686:16686 -p 127.0.0.1:4318:4318 jaegertracing/jaeger:latest
+
+# Set TRACES to the file you downloaded, then post it
+TRACES="$HOME/Downloads/meshtastic-traces-2026-01-01T12-00-00-000Z.json"
 curl -X POST -H 'Content-Type: application/json' \
-  --data-binary @meshtastic-traces-<time>.json http://localhost:4318/v1/traces
+  --data-binary "@$TRACES" http://localhost:4318/v1/traces
 ```
 
-Then open http://localhost:16686 and search for the `meshtastic-web` service. Grafana Tempo and the OpenTelemetry Collector accept the same request on their OTLP/HTTP port.
+Then open http://localhost:16686 and search for the `meshtastic-web` service. Run `docker stop jaeger` when you're done. Grafana Tempo and the OpenTelemetry Collector accept the same request on their OTLP/HTTP port.
 
 ## Development
 
