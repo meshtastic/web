@@ -83,4 +83,31 @@ describe("NoRadioEmptyState", () => {
     );
     expect(onDownloadDiagnostics).toHaveBeenCalledTimes(1);
   });
+
+  it("offers cookie settings only when consent is part of the build", () => {
+    const { rerender } = render(
+      <NoRadioEmptyState
+        reconnecting={false}
+        onConnect={vi.fn()}
+        onReconnect={vi.fn()}
+        onDownloadDiagnostics={vi.fn()}
+      />,
+    );
+    expect(
+      screen.queryByRole("button", { name: "Cookie settings" }),
+    ).not.toBeInTheDocument();
+
+    const onOpenCookieConsent = vi.fn();
+    rerender(
+      <NoRadioEmptyState
+        reconnecting={false}
+        onConnect={vi.fn()}
+        onReconnect={vi.fn()}
+        onDownloadDiagnostics={vi.fn()}
+        onOpenCookieConsent={onOpenCookieConsent}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Cookie settings" }));
+    expect(onOpenCookieConsent).toHaveBeenCalledTimes(1);
+  });
 });
