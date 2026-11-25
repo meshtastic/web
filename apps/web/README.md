@@ -42,7 +42,7 @@ When reporting a bug, attach a diagnostics file. **Download diagnostics** is on 
 - the app version and commit, browser, page protocol, and the connected radio's firmware, board and node count
 - one line per saved connection: type, scheme, port, status and last error, without names or addresses
 - the recent app and SDK log (the last 2000 lines at debug level and above, whatever the console level). The log survives a page reload and includes uncaught errors
-- a summary of recent radio requests: connect attempts, count, median and longest time per request type, and any request that failed or took over 2 seconds
+- a summary of recent radio requests: connect attempts, count, median and longest time per request type, and the 20 most recent requests that failed or took 2 seconds or longer (older ones are left out)
 
 Before the file is written, hosts and IP addresses, `.local` names, coordinates and anything that looks like a key are masked. URLs keep their scheme and port (`https://<host>:9443`), since connection bugs often depend on them. Read the file before posting it publicly.
 
