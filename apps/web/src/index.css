@@ -693,9 +693,9 @@ img {
 
 /*
  * CookieYes's floating "revisit consent" button sits over the app rail.
- * The rail and Settings › About offer the same action instead.
+ * The rail and Settings › About offer the same action instead. The tag is on
+ * the button's wrapper, a direct child of <body>, so only it is hidden.
  */
-[data-cky-tag="revisit-consent"],
-:has(> [data-cky-tag="revisit-consent"]) {
+[data-cky-tag="revisit-consent"] {
   display: none !important;
 }
