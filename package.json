@@ -29,22 +29,22 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.16.0",
+    "@bufbuild/protobuf": "^2.17.0",
     "@meshtastic/protobufs": "workspace:*",
     "ste-simple-events": "^4.0.0",
-    "tslog": "^5.2.0"
+    "tslog": "^5.5.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.1",
-    "@types/node": "^26.6.5",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
     "@typescript/typescript6": "^6.0.2",
     "husky": "^9.1.7",
-    "lint-staged": "^17.6.0",
-    "oxfmt": "^0.73.0",
-    "oxlint": "^1.88.0",
-    "tsdown": "^0.23.1",
+    "lint-staged": "^17.6.1",
+    "oxfmt": "^0.79.0",
+    "oxlint": "^1.94.0",
+    "tsdown": "^0.23.7",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.4"
+    "vitest": "^5.1.1"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
