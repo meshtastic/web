@@ -46,13 +46,7 @@
   "toasts": {
     "failed": "Failed to connect",
     "checkConnection": "Check your device or settings and try again",
-    "defaultSet": "Default set",
-    "defaultConnection": "Default connection is now {{nameisconnected}}",
-    "deleted": "Deleted",
-    "deletedByName": "{{name}} was removed",
     "pickConnectionAgain": "Could not connect. You may need to reselect the device/port.",
-    "added": "Connection added",
-    "savedByName": "{{name}} saved.",
     "savedCantConnect": "The connection was saved but could not connect.",
     "renamed": "Renamed",
     "renamedByName": "Connection renamed to {{name}}.",

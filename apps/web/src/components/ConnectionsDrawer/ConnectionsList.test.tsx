@@ -29,6 +29,12 @@ vi.mock("@app/pages/Connections/useConnections", () => ({
   }),
 }));
 
+const downloadMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@core/utils/downloadText.ts", () => ({
+  downloadTextFile: downloadMock,
+}));
+
 vi.mock("@core/hooks/useToast.ts", () => ({
   useToast: () => ({ toast: vi.fn() }),
 }));
@@ -171,5 +177,37 @@ describe("ConnectionsList inline delete", () => {
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Add connection" }),
     );
+  });
+});
+
+describe("ConnectionsList diagnostics", () => {
+  it("offers a diagnostics file under a connection's error", () => {
+    connectionsMock.connections = [
+      {
+        ...http(1, "Alpha"),
+        status: "error",
+        error: "Handshake timed out during stage: Seeding Session",
+      },
+    ];
+    render(<ConnectionsList />);
+    fireEvent.click(
+      within(row("Alpha")).getByRole("button", {
+        name: "Download diagnostics",
+      }),
+    );
+    expect(downloadMock).toHaveBeenCalledWith(
+      expect.stringMatching(/^meshtastic-diagnostics-.*\.txt$/),
+      expect.stringContaining("Meshtastic web client diagnostics"),
+    );
+  });
+
+  it("does not show it when the connection has no error", () => {
+    connectionsMock.connections = [http(1, "Alpha")];
+    render(<ConnectionsList />);
+    expect(
+      within(row("Alpha")).queryByRole("button", {
+        name: "Download diagnostics",
+      }),
+    ).not.toBeInTheDocument();
   });
 });

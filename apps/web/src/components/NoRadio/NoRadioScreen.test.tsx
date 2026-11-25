@@ -10,6 +10,7 @@ describe("NoRadioEmptyState", () => {
         reconnecting={false}
         onConnect={onConnect}
         onReconnect={vi.fn()}
+        onDownloadDiagnostics={vi.fn()}
       />,
     );
     expect(
@@ -28,6 +29,7 @@ describe("NoRadioEmptyState", () => {
         reconnecting={false}
         onConnect={vi.fn()}
         onReconnect={onReconnect}
+        onDownloadDiagnostics={vi.fn()}
       />,
     );
     fireEvent.click(
@@ -43,6 +45,7 @@ describe("NoRadioEmptyState", () => {
         reconnecting={false}
         onConnect={vi.fn()}
         onReconnect={vi.fn()}
+        onDownloadDiagnostics={vi.fn()}
       />,
     );
     expect(
@@ -57,10 +60,27 @@ describe("NoRadioEmptyState", () => {
         reconnecting
         onConnect={vi.fn()}
         onReconnect={vi.fn()}
+        onDownloadDiagnostics={vi.fn()}
       />,
     );
     expect(
       screen.getByRole("button", { name: "Connecting to USB radio…" }),
     ).toBeDisabled();
+  });
+
+  it("offers a diagnostics download even with no saved radio", () => {
+    const onDownloadDiagnostics = vi.fn();
+    render(
+      <NoRadioEmptyState
+        reconnecting={false}
+        onConnect={vi.fn()}
+        onReconnect={vi.fn()}
+        onDownloadDiagnostics={onDownloadDiagnostics}
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Download diagnostics" }),
+    );
+    expect(onDownloadDiagnostics).toHaveBeenCalledTimes(1);
   });
 });

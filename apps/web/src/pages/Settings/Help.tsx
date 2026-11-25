@@ -5,10 +5,17 @@ import {
 import { useCommandMenuShortcutLabel } from "@components/CommandPalette/useCommandMenuShortcutLabel.ts";
 import { ExternalLinkRow } from "@components/Settings/ExternalLinkRow.tsx";
 import { SettingRow } from "@components/UI/SettingRow.tsx";
+import {
+  useDownloadDiagnostics,
+  useDownloadTraces,
+} from "@core/diagnostics/useDownloadDiagnostics.ts";
+import { useNodesAsProto } from "@core/hooks/useNodesAsProto.ts";
 import { DOCS_BASE } from "@core/settings/registry.ts";
 import { useAppStore } from "@core/stores";
 import { useNavigate } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useRadioInfo } from "./radioInfo.ts";
 import type { ConfigProps } from "./sectionProps.ts";
 
 const LINKS = [
@@ -18,7 +25,10 @@ const LINKS = [
   { key: "issues", url: "https://github.com/meshtastic/web/issues" },
 ] as const;
 
-/** Help & documentation: links out, the setup walkthrough, and the command menu shortcut. */
+/**
+ * Help & documentation: links out, the setup walkthrough, the command menu
+ * shortcut, and diagnostics and trace files for bug reports.
+ */
 export const Help = (_props: ConfigProps) => {
   const { t } = useTranslation("config");
   const navigate = useNavigate();
@@ -26,6 +36,14 @@ export const Help = (_props: ConfigProps) => {
     (state) => state.setCommandPaletteOpen,
   );
   const keys = useCommandMenuShortcutLabel();
+  const { firmware, hardware } = useRadioInfo();
+  const nodeCount = useNodesAsProto().length;
+  const radio = useMemo(
+    () => ({ firmware, hardware, nodeCount }),
+    [firmware, hardware, nodeCount],
+  );
+  const downloadDiagnostics = useDownloadDiagnostics(radio);
+  const downloadTraces = useDownloadTraces();
 
   return (
     <SettingsSections>
@@ -56,6 +74,22 @@ export const Help = (_props: ConfigProps) => {
           help={t("helpSection.commandMenuHelp", { keys })}
           actionLabel={t("helpSection.show")}
           onAction={() => setCommandPaletteOpen(true)}
+        />
+      </SettingsGroup>
+      <SettingsGroup title={t("helpSection.troubleshootingCard")}>
+        <SettingRow
+          kind="button"
+          label={t("helpSection.diagnostics")}
+          help={t("diagnostics.help", { ns: "common" })}
+          actionLabel={t("helpSection.diagnosticsAction")}
+          onAction={downloadDiagnostics}
+        />
+        <SettingRow
+          kind="button"
+          label={t("helpSection.traces")}
+          help={t("helpSection.tracesHelp")}
+          actionLabel={t("helpSection.diagnosticsAction")}
+          onAction={downloadTraces}
         />
       </SettingsGroup>
     </SettingsSections>

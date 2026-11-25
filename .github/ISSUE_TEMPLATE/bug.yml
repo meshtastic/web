@@ -128,6 +128,29 @@ body:
         4. See error
     validations:
       required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## How to get diagnostics
+        Reproduce the problem first, then save the file straight away so it covers what went wrong.
+
+        **In the web client:** click **Download diagnostics**. It is on the "No radio connected" screen, under a connection's error in the Connections panel, and in **Settings › Help › Troubleshooting**. Radio addresses, locations and keys are removed from the file.
+
+        **If your version has no Download diagnostics button:**
+        1. Open the browser's developer tools (F12, or Cmd+Option+I on a Mac) and select the **Console** tab.
+        2. Run `localStorage.setItem("mesh-debug", "1")`, then reload the page.
+        3. Reproduce the problem.
+        4. Save the console: in Chrome or Edge, right-click the console and choose **Save as…**; in Firefox, right-click and choose **Export Visible Messages To › File**.
+
+        Please check the file before attaching it. A saved console is not redacted and may contain IP addresses.
+  - type: upload
+    id: diagnostics
+    attributes:
+      label: Diagnostics file
+      description: The file from Download diagnostics, or the saved console log (see above).
+    validations:
+      required: true
+      accept: ".txt,.log,.json"
   - type: textarea
     id: logs
     attributes:

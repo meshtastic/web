@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
+import { useDownloadDiagnostics } from "@core/diagnostics/useDownloadDiagnostics.ts";
 import { useAppStore } from "@core/stores";
 import { useToast } from "@core/hooks/useToast.ts";
 import { cn } from "@core/utils/cn.ts";
@@ -186,28 +187,12 @@ export const ConnectionsList = ({ addButtonRef }: ConnectionsListProps) => {
                 onConnect={() => connectAndClose(c, "toasts.checkConnection")}
                 onRetry={() => connectAndClose(c, "toasts.pickConnectionAgain")}
                 onDisconnect={() => disconnect(c.id)}
-                onSetDefault={() => {
-                  setDefaultConnection(c.id);
-                  toast({
-                    title: t("toasts.defaultSet"),
-                    description: t("toasts.defaultConnection", {
-                      name: c.name,
-                      interpolation: { escapeValue: false },
-                    }),
-                  });
-                }}
+                onSetDefault={() => setDefaultConnection(c.id)}
                 onDelete={async () => {
                   pendingFocus.current = focusTargetAfter(index);
                   setConfirmingId(undefined);
                   await disconnect(c.id);
                   removeConnection(c.id);
-                  toast({
-                    title: t("toasts.deleted"),
-                    description: t("toasts.deletedByName", {
-                      name: c.name,
-                      interpolation: { escapeValue: false },
-                    }),
-                  });
                 }}
               />
             </li>
@@ -303,6 +288,7 @@ function ConnectionCard({
   onRetry: () => Promise<void>;
 }) {
   const { t } = useTranslation("connections");
+  const downloadDiagnostics = useDownloadDiagnostics();
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
   // The menu returns focus to its trigger as it closes; when the strip is
@@ -444,6 +430,14 @@ function ConnectionCard({
                   onTrusted={() => void onConnect()}
                 />
               )}
+            <Button
+              type="button"
+              variant="link"
+              className="h-auto px-0 py-1 text-sm"
+              onClick={downloadDiagnostics}
+            >
+              {t("diagnostics.download", { ns: "common" })}
+            </Button>
           </div>
         ) : connection.lastConnectedAt ? (
           <p>
