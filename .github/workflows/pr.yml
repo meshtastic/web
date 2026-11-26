@@ -3,12 +3,15 @@ name: Pull Request CI
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  # build-and-package is a required check, so it has to report on the merge
+  # queue's temporary branch too, or every queued PR waits for it and times out.
+  merge_group:
 
 permissions:
   contents: read
 
 concurrency:
-  group: pr-${{ github.event.pull_request.number }}-ci
+  group: pr-${{ github.event.pull_request.number || github.ref }}-ci
   cancel-in-progress: true
 
 env:
@@ -17,7 +20,7 @@ env:
 jobs:
   build-and-package:
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.draft == false }}
+    if: ${{ github.event_name == 'merge_group' || github.event.pull_request.draft == false }}
 
     steps:
       - name: Checkout code
