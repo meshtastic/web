@@ -79,9 +79,11 @@ substituting `org.meshtastic:sdk-core` and `sdk-testing` with the included
 the SDK. `ensure-dist` and `build` run `git submodule update --init` when the
 submodule is missing; a fresh clone can also use
 `git clone --recurse-submodules`. CI checks it out with
-`actions/checkout`'s `submodules: true`. Dependabot proposes submodule bumps as
-the SDK's `main` moves; the version above is ignored while the submodule
-substitutes the SDK.
+`actions/checkout`'s `submodules: true`. Dependabot proposes a submodule bump
+each week as the SDK's `main` moves, and CI builds this package against it. A
+bump that changes an API the facade uses fails that build; fix the facade on
+the Dependabot branch rather than merging it red. The version above is ignored
+while the submodule substitutes the SDK.
 
 Once a release carries the `js` artifacts, the switch to Maven Central is: set
 `meshtasticSdkVersion` to the release, delete the `includeBuild` block from
