@@ -31,7 +31,6 @@ import org.meshtastic.sdk.LogLevel
 import org.meshtastic.sdk.MessageHandle
 import org.meshtastic.sdk.NodeId
 import org.meshtastic.sdk.RadioClient
-import org.meshtastic.sdk.RadioTransport
 import org.meshtastic.sdk.RoutingApi
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
@@ -39,14 +38,18 @@ import kotlin.js.Promise
 
 @JsExport
 class MeshtasticClient internal constructor(
-    transport: RadioTransport,
+    transport: BrowserTransport,
     private val maxAttempts: Int,
     storage: SdkStorage? = null,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val frameListeners = mutableSetOf<(Uint8Array) -> Unit>()
     private val client: RadioClient = RadioClient {
-        transport(TappingTransport(transport) { bytes -> forwardFrame(bytes) })
+        val tapping = TappingTransport(transport) { bytes -> forwardFrame(bytes) }
+        transport(transport.identity) { attempt, _ ->
+            transport.failFast = attempt == 0
+            tapping
+        }
         storage(storage?.provider ?: InMemoryStorageProvider())
         autoReconnect(AutoReconnectConfig(maxAttempts = maxAttempts))
         logger(JsLogSink)

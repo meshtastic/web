@@ -8,6 +8,23 @@ internal external fun fetch(url: String, init: dynamic = definedExternally): Pro
 
 internal class ClientException(val kind: String, message: String) : Exception(message)
 
+/**
+ * A browser transport whose failed [org.meshtastic.sdk.RadioTransport.connect] ends the session when
+ * [failFast] is set. The SDK retries even the first connect unless the transport reports a
+ * non-recoverable error; the app wants a connect the user started to fail at once and only drops
+ * of a live session to be retried, so the client sets [failFast] for attempt 0 only.
+ */
+internal abstract class BrowserTransport : org.meshtastic.sdk.RadioTransport {
+    var failFast: Boolean = false
+
+    protected fun connectFailed(cause: Throwable): org.meshtastic.sdk.TransportState =
+        if (failFast) {
+            org.meshtastic.sdk.TransportState.Error(cause, recoverable = false)
+        } else {
+            org.meshtastic.sdk.TransportState.Disconnected
+        }
+}
+
 internal fun Throwable.kind(): String {
     var cause: Throwable? = this
     while (cause != null) {

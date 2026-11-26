@@ -27,6 +27,7 @@ internal fun ConnectionState.toJs(maxAttempts: Int): ConnectionStateJs {
     state.errorKind = null
     when (this) {
         ConnectionState.Disconnected -> state.kind = "disconnected"
+        ConnectionState.Disconnecting -> state.kind = "disconnecting"
         is ConnectionState.Connecting -> {
             state.kind = "connecting"
             state.attempt = attempt
@@ -43,6 +44,12 @@ internal fun ConnectionState.toJs(maxAttempts: Int): ConnectionStateJs {
             state.error = cause.message
             state.errorKind = cause.kind()
         }
+        is ConnectionState.Failed -> {
+            state.kind = "failed"
+            state.error = cause.message
+            state.errorKind = cause.kind()
+        }
+        is ConnectionState.DeviceSleeping -> state.kind = "sleeping"
     }
     return state.unsafeCast<ConnectionStateJs>()
 }

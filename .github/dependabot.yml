@@ -33,6 +33,13 @@ updates:
         update-types:
           - "minor"
           - "patch"
-  # No gitsubmodule entry: the meshtastic-sdk submodule is pinned by hand.
-  # packages/sdk-kmp wraps the SDK's API, so moving the pin usually needs
-  # matching changes there, and an automatic bump breaks the build.
+  # Moves the meshtastic-sdk submodule to the head of the branch .gitmodules
+  # names (meshtastic/meshtastic-sdk main). packages/sdk-kmp wraps the SDK's
+  # API, so a bump that changes it fails the sdk-kmp build in CI; push the
+  # facade changes onto the Dependabot branch instead of merging it red.
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(deps)"

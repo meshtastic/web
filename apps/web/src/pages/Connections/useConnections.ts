@@ -417,6 +417,7 @@ export function useConnections() {
       updateSavedConnection(id, { meshDeviceId: deviceId });
 
       let reconnecting: ConnectionStateJs | undefined;
+      let planned = false;
       let firmwareChecked = false;
       const unsubscribes = [
         unsubscribeStore,
@@ -449,42 +450,58 @@ export function useConnections() {
             });
             return;
           }
-          if (state.kind === "disconnected") {
-            if (!reconnecting) {
-              if (session.isRehandshaking) return;
-              log.error("kmp: dropped without retrying", { id });
+          // The SDK stopped trying: the cause was not retryable, or the
+          // reconnect attempts ran out.
+          if (state.kind === "failed") {
+            const last = reconnecting;
+            reconnecting = undefined;
+            if (last && last.attempt >= state.maxAttempts) {
+              log.error("kmp: reconnect attempts exhausted", { id });
               patchConnection(id, {
                 status: "error",
                 reconnect: undefined,
-                error: t("connections:errors.connectionLost"),
+                error: t("connections:errors.reconnectFailed", {
+                  attempts: state.maxAttempts,
+                }),
                 errorKind: "network",
               });
               return;
             }
-            const last = reconnecting;
+            log.error("kmp: dropped without retrying", {
+              id,
+              errorKind: state.errorKind,
+            });
+            const cause = new Error(state.error ?? "");
+            cause.name = state.errorKind ?? "transport";
+            patchConnection(id, {
+              ...connectFailure(cause),
+              reconnect: undefined,
+            });
+            return;
+          }
+          // Only a planned disconnect (ours, or a rehandshake's) passes
+          // through `disconnecting`; any other `disconnected` is a drop.
+          if (state.kind === "disconnecting") {
+            planned = true;
+            return;
+          }
+          if (state.kind === "disconnected") {
+            const wasPlanned = planned;
+            planned = false;
             reconnecting = undefined;
-            // The SDK gives up before its first attempt on a drop it
-            // cannot retry; that cause is the error, not the attempt cap.
-            if (last.attempt === 1 && last.error) {
-              log.error("kmp: dropped without retrying", {
-                id,
-                errorKind: last.errorKind,
-              });
-              const cause = new Error(last.error);
-              cause.name = last.errorKind ?? "transport";
+            if (session.isRehandshaking) return;
+            if (wasPlanned) {
               patchConnection(id, {
-                ...connectFailure(cause),
+                status: "disconnected",
                 reconnect: undefined,
               });
               return;
             }
-            log.error("kmp: reconnect attempts exhausted", { id });
+            log.error("kmp: dropped without retrying", { id });
             patchConnection(id, {
               status: "error",
               reconnect: undefined,
-              error: t("connections:errors.reconnectFailed", {
-                attempts: state.maxAttempts,
-              }),
+              error: t("connections:errors.connectionLost"),
               errorKind: "network",
             });
             return;

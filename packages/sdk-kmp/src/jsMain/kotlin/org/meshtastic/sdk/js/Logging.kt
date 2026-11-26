@@ -27,8 +27,11 @@ internal object JsLogSink : LogSink {
 
 internal fun ConnectionState.describe(): String = when (this) {
     ConnectionState.Disconnected -> "disconnected"
+    ConnectionState.Disconnecting -> "disconnecting"
     is ConnectionState.Connecting -> "connecting (attempt $attempt)"
     is ConnectionState.Configuring -> "configuring ${phase.name}"
     ConnectionState.Connected -> "connected"
     is ConnectionState.Reconnecting -> "reconnecting (attempt $attempt): ${cause.message}"
+    is ConnectionState.Failed -> "failed: ${cause.message}"
+    is ConnectionState.DeviceSleeping -> "device sleeping (wakes within ${expectedWakeSeconds}s)"
 }

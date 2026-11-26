@@ -18,7 +18,6 @@ import kotlinx.coroutines.sync.withLock
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
 import org.meshtastic.sdk.Frame
-import org.meshtastic.sdk.RadioTransport
 import org.meshtastic.sdk.TransportIdentity
 import org.meshtastic.sdk.TransportState
 import kotlin.js.Promise
@@ -34,7 +33,7 @@ import kotlin.js.Promise
 internal class WebBluetoothTransport(
     private var device: dynamic,
     deviceId: String?,
-) : RadioTransport {
+) : BrowserTransport() {
     override val identity: TransportIdentity =
         TransportIdentity("ble:${deviceId ?: (device?.id as? String) ?: "?"}")
     private val wantedId: String? = deviceId ?: device?.id as? String
@@ -89,9 +88,10 @@ internal class WebBluetoothTransport(
             release()
             throw e
         } catch (e: Throwable) {
-            _state.value = TransportState.Disconnected
+            val cause = if (e is ClientException) e else ClientException(UNAVAILABLE, bluetoothFailure(e))
+            _state.value = connectFailed(cause)
             release()
-            throw if (e is ClientException) e else ClientException(UNAVAILABLE, bluetoothFailure(e))
+            throw cause
         }
         _state.value = TransportState.Connected
         scope = CoroutineScope(SupervisorJob())

@@ -104,6 +104,8 @@ export class FakeKmpClient implements MeshtasticClient {
 
   async disconnect(): Promise<void> {
     this.disconnects.push(Date.now());
+    // The SDK passes through `disconnecting` on a disconnect it was asked for.
+    this.setState(state("disconnecting"));
     if (this.holdDisconnects) {
       await new Promise<void>((resolve) =>
         this.pendingDisconnects.push(resolve),
