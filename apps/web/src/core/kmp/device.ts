@@ -40,6 +40,7 @@ export function toDeviceStatus(
     case "connected":
       return Types.DeviceStatusEnum.DeviceConfigured;
     case "reconnecting":
+    case "sleeping":
       return Types.DeviceStatusEnum.DeviceReconnecting;
     default:
       return Types.DeviceStatusEnum.DeviceDisconnected;

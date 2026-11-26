@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.khronos.webgl.Uint8Array
 import org.meshtastic.sdk.Frame
-import org.meshtastic.sdk.RadioTransport
 import org.meshtastic.sdk.TransportIdentity
 import org.meshtastic.sdk.TransportState
 import kotlin.js.Promise
@@ -36,7 +35,7 @@ internal class WebSerialTransport(
     private val usbVendorId: Int?,
     private val usbProductId: Int?,
     private val baudRate: Int = 115_200,
-) : RadioTransport {
+) : BrowserTransport() {
     override val identity: TransportIdentity =
         TransportIdentity("serial:${usbVendorId?.toString(16) ?: "?"}:${usbProductId?.toString(16) ?: "?"}")
     private val _state = MutableStateFlow<TransportState>(TransportState.Disconnected)
@@ -81,7 +80,7 @@ internal class WebSerialTransport(
             }
         } catch (e: Throwable) {
             stopListening()
-            _state.value = TransportState.Disconnected
+            _state.value = connectFailed(e)
             throw e
         }
         _state.value = TransportState.Connected

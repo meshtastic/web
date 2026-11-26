@@ -81,12 +81,14 @@ export function connectFailure(error: unknown): ConnectFailure {
 /**
  * Maps the SDK's connection state onto the saved-connection status the
  * drawer and overlay render. `configuring` is the SDK handshake and
- * `connected` means it finished, which the app calls `configured`.
+ * `connected` means it finished, which the app calls `configured`. A
+ * `sleeping` radio is one the SDK keeps reconnecting to while it sleeps.
  */
 export function toConnectionStatus(state: ConnectionStateJs): ConnectionStatus {
   switch (state.kind) {
     case "connecting":
     case "reconnecting":
+    case "sleeping":
       return "connecting";
     case "configuring":
       return "configuring";

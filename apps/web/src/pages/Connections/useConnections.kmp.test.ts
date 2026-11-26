@@ -232,10 +232,15 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
       reconnect: undefined,
     });
 
-    act(() => client.setState(state("reconnecting", { attempt: 3 })));
-    act(() => client.setState(state("disconnected")));
+    act(() => client.setState(state("reconnecting", { attempt: 10 })));
+    act(() =>
+      client.setState(
+        state("failed", { error: "toradio 503", errorKind: "transport" }),
+      ),
+    );
     expect(saved(conn.id)).toMatchObject({
       status: "error",
+      error: "Could not reconnect after 10 attempts.",
       errorKind: "network",
       reconnect: undefined,
     });
@@ -250,14 +255,12 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
 
     act(() =>
       client.setState(
-        state("reconnecting", {
-          attempt: 1,
+        state("failed", {
           error: "Firmware 2.3.0 is older than the minimum 2.6.0",
           errorKind: "firmware-too-old",
         }),
       ),
     );
-    act(() => client.setState(state("disconnected")));
 
     expect(saved(conn.id)).toMatchObject({
       status: "error",
@@ -280,6 +283,63 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
       status: "error",
       error: "The connection to the radio was lost.",
       errorKind: "network",
+      reconnect: undefined,
+    });
+  });
+
+  it("reports the cause when the SDK gives up between reconnect attempts", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+
+    act(() => client.setState(state("reconnecting", { attempt: 2 })));
+    act(() =>
+      client.setState(
+        state("failed", {
+          error: "Local network access denied",
+          errorKind: "lna-denied",
+        }),
+      ),
+    );
+
+    expect(saved(conn.id)).toMatchObject({
+      status: "error",
+      errorKind: "lna-denied",
+      reconnect: undefined,
+    });
+  });
+
+  it("settles on disconnected, not an error, after a disconnect it asked for", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+
+    act(() => client.setState(state("reconnecting", { attempt: 2 })));
+    act(() => client.setState(state("disconnecting")));
+    act(() => client.setState(state("disconnected")));
+
+    expect(saved(conn.id)).toMatchObject({
+      status: "disconnected",
+      reconnect: undefined,
+    });
+    expect(saved(conn.id)?.error).toBeUndefined();
+  });
+
+  it("shows a sleeping radio as connecting while the SDK waits for it", async () => {
+    const { result } = renderHook(() => useConnections());
+    const conn = addRadio(result);
+    await act(() => result.current.connect(conn.id));
+    const client = kmp.client;
+    if (!client) throw new Error("no client created");
+
+    act(() => client.setState(state("sleeping")));
+
+    expect(saved(conn.id)).toMatchObject({
+      status: "connecting",
       reconnect: undefined,
     });
   });

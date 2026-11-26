@@ -87,7 +87,7 @@ describe("createSerialClient (Kotlin facade over a fake navigator.serial)", () =
       message: "Serial port not available. Re-select the port.",
     });
     expect(serial.requestPort).not.toHaveBeenCalled();
-    expect(client.connectionState.kind).toBe("disconnected");
+    expect(client.connectionState.kind).toBe("failed");
   });
 
   it("fails with a clear kind when Web Serial is missing", async () => {

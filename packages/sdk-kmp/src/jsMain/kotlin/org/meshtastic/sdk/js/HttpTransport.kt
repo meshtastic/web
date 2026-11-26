@@ -17,7 +17,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
 import org.meshtastic.sdk.Frame
-import org.meshtastic.sdk.RadioTransport
 import org.meshtastic.sdk.TransportIdentity
 import org.meshtastic.sdk.TransportState
 import kotlin.js.Promise
@@ -26,7 +25,7 @@ internal class HttpTransport(
     private val baseUrl: String,
     private var allowPrompt: Boolean,
     private val pollMillis: Long = 3_000,
-) : RadioTransport {
+) : BrowserTransport() {
     override val identity: TransportIdentity = TransportIdentity("http:${baseUrl.lowercase()}")
     private val _state = MutableStateFlow<TransportState>(TransportState.Disconnected)
     override val state: StateFlow<TransportState> = _state.asStateFlow()
@@ -42,8 +41,9 @@ internal class HttpTransport(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
-            _state.value = TransportState.Disconnected
-            throw Lna.classify(baseUrl, e)
+            val cause = Lna.classify(baseUrl, e)
+            _state.value = connectFailed(cause)
+            throw cause
         } finally {
             allowPrompt = false
         }
