@@ -99,6 +99,7 @@ internal fun SendFailure.kind(): String = when (this) {
     SendFailure.Cancelled -> "cancelled"
     SendFailure.IdCollision -> "id-collision"
     SendFailure.AckTimeout -> "ack-timeout"
+    SendFailure.QueueFull -> "queue-full"
     is SendFailure.QueueRejected -> "queue-rejected"
     is SendFailure.Other -> routingError.name
     is SendFailure.Unknown -> message
