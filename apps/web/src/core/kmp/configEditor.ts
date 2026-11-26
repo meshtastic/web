@@ -331,6 +331,15 @@ export class ConfigEditor {
     this.recomputeDirty();
   }
 
+  /** Whether the next commit turns managed mode on. */
+  enablesManagedMode(): boolean {
+    return (
+      this._dirtyRadioSections.peek().includes("security") &&
+      this.workingRadio.peek().security?.isManaged === true &&
+      this.baselineRadio.peek().security?.isManaged !== true
+    );
+  }
+
   /**
    * Sends every dirty section in one settings transaction. Commits run one
    * at a time; edits made during a commit stay dirty for the next one.
@@ -348,9 +357,7 @@ export class ConfigEditor {
     if (payload.messages.length === 0) return Result.ok(undefined);
     const generation = this.connectionGeneration;
 
-    const enablesManaged =
-      payload.radio.security?.isManaged === true &&
-      this.baselineRadio.peek().security?.isManaged !== true;
+    const enablesManaged = this.enablesManagedMode();
     if (enablesManaged && payload.messages.length > 1) {
       return Result.err(new ManagedModeNotAloneError());
     }

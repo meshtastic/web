@@ -277,6 +277,7 @@ const ConfigPage = () => {
   const handleSave = useCallback(async () => {
     if (!editor) return;
     setIsSaving(true);
+    const enablesManaged = editor.enablesManagedMode();
     try {
       const result = await editor.commit();
       if (result.status === "error") {
@@ -293,9 +294,13 @@ const ConfigPage = () => {
       toast({
         variant: "success",
         title: t("settingsLayout.savedTitle"),
-        description: t("settingsLayout.savedRestarting", {
-          device: deviceName,
-        }),
+        // Older firmware saves managed mode without restarting.
+        description: t(
+          enablesManaged
+            ? "settingsLayout.savedManaged"
+            : "settingsLayout.savedRestarting",
+          { device: deviceName },
+        ),
       });
       form?.markSaved();
       // The bar or Save button that had focus is going away.

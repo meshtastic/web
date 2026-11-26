@@ -518,7 +518,9 @@ describe("ConfigEditor.commit", () => {
 
     it("sends the security config on its own, outside a transaction", async () => {
       const { io, editor } = setupSecurity(false);
+      expect(editor.enablesManagedMode()).toBe(false);
       editor.setRadioSection("security", { isManaged: true });
+      expect(editor.enablesManagedMode()).toBe(true);
 
       expect((await editor.commit()).status).toBe("ok");
 
@@ -548,6 +550,7 @@ describe("ConfigEditor.commit", () => {
       editor.setRadioSection("security", { serialEnabled: true });
       editor.setRadioSection("lora", lora(7));
 
+      expect(editor.enablesManagedMode()).toBe(false);
       expect((await editor.commit()).status).toBe("ok");
 
       expect(io.sent).toEqual([]);

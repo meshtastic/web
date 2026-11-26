@@ -679,6 +679,7 @@
     "restartNote": "Saving restarts {{device}}. It reconnects on its own in a few seconds.",
     "savedTitle": "Saved",
     "savedRestarting": "{{device}} is restarting and will reconnect in a few seconds.",
+    "savedManaged": "Managed mode is on. {{device}} now only accepts changes from its admin radios.",
     "managedNotAloneTitle": "Save managed mode on its own",
     "managedNotAloneDescription": "Once managed mode is on, {{device}} ignores changes from this app. Save or reset your other changes first, then turn on managed mode.",
     "fixErrors": "Fix the highlighted fields before saving.",
