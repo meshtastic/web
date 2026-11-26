@@ -49,6 +49,21 @@ export interface ConfigEditorIo {
   onDisconnect(cb: () => void): () => void;
   /** Sends `messages` between `begin_edit_settings` and `commit_edit_settings`. */
   commit(messages: AdminMessages): Promise<Result<void, Error>>;
+  /** Sends one message on its own, outside a settings transaction. */
+  send(message: Protobuf.Admin.AdminMessage): Promise<Result<void, Error>>;
+}
+
+/**
+ * A commit that turns on managed mode alongside other changes. Firmware
+ * ignores local admin as soon as managed mode is on, including the
+ * `commit_edit_settings` that would save and restart, so that change has
+ * to be sent by itself.
+ */
+export class ManagedModeNotAloneError extends Error {
+  constructor() {
+    super("Turning on managed mode must be saved on its own");
+    this.name = "ManagedModeNotAloneError";
+  }
 }
 
 export interface ConfigEditorOptions {
@@ -316,6 +331,15 @@ export class ConfigEditor {
     this.recomputeDirty();
   }
 
+  /** Whether the next commit turns managed mode on. */
+  enablesManagedMode(): boolean {
+    return (
+      this._dirtyRadioSections.peek().includes("security") &&
+      this.workingRadio.peek().security?.isManaged === true &&
+      this.baselineRadio.peek().security?.isManaged !== true
+    );
+  }
+
   /**
    * Sends every dirty section in one settings transaction. Commits run one
    * at a time; edits made during a commit stay dirty for the next one.
@@ -333,7 +357,18 @@ export class ConfigEditor {
     if (payload.messages.length === 0) return Result.ok(undefined);
     const generation = this.connectionGeneration;
 
-    const result = await this.io.commit(payload.messages);
+    const enablesManaged = this.enablesManagedMode();
+    if (enablesManaged && payload.messages.length > 1) {
+      return Result.err(new ManagedModeNotAloneError());
+    }
+
+    // Sent alone the write saves and restarts at once; inside a
+    // transaction the device would drop the commit.
+    const [only] = payload.messages;
+    const result =
+      enablesManaged && only
+        ? await this.io.send(only)
+        : await this.io.commit(payload.messages);
     if (Result.isError(result)) return Result.err(result.error);
     if (generation !== this.connectionGeneration) {
       return Result.err(
