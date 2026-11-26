@@ -2,7 +2,11 @@ import { Protobuf } from "@core/protobuf.ts";
 import { create } from "@bufbuild/protobuf";
 import { Result } from "better-result";
 import { describe, expect, it } from "vitest";
-import { ConfigEditor, type ConfigEditorIo } from "./configEditor.ts";
+import {
+  ConfigEditor,
+  type ConfigEditorIo,
+  ManagedModeNotAloneError,
+} from "./configEditor.ts";
 
 type AdminCase = Protobuf.Admin.AdminMessage["payloadVariant"]["case"];
 
@@ -13,6 +17,7 @@ type AdminCase = Protobuf.Admin.AdminMessage["payloadVariant"]["case"];
  */
 class FakeIo implements ConfigEditorIo {
   readonly commits: Protobuf.Admin.AdminMessage[][] = [];
+  readonly sent: Protobuf.Admin.AdminMessage[] = [];
   private configs = new Set<(c: Protobuf.Config.Config) => void>();
   private modules = new Set<(c: Protobuf.ModuleConfig.ModuleConfig) => void>();
   private channels = new Set<(c: Protobuf.Channel.Channel) => void>();
@@ -50,6 +55,13 @@ class FakeIo implements ConfigEditorIo {
       this.failures--;
       return Result.err(new Error("send failed"));
     }
+    return Result.ok(undefined);
+  }
+
+  async send(
+    message: Protobuf.Admin.AdminMessage,
+  ): Promise<Result<void, Error>> {
+    this.sent.push(message);
     return Result.ok(undefined);
   }
 
@@ -484,5 +496,62 @@ describe("ConfigEditor.commit", () => {
     expect(io.cases()).toEqual(["setConfig", "setModuleConfig"]);
     expect(editor.dirtyRadioSections.value).toEqual(["lora"]);
     expect(editor.dirtyModuleSections.value).toEqual(["mqtt"]);
+  });
+
+  describe("turning on managed mode", () => {
+    const securityPacket = (isManaged: boolean) =>
+      create(Protobuf.Config.ConfigSchema, {
+        payloadVariant: {
+          case: "security",
+          value: create(Protobuf.Config.Config_SecurityConfigSchema, {
+            isManaged,
+          }),
+        },
+      });
+
+    function setupSecurity(isManaged: boolean) {
+      const { io, editor } = setup();
+      io.config(securityPacket(isManaged));
+      io.config(loraPacket(4));
+      return { io, editor };
+    }
+
+    it("sends the security config on its own, outside a transaction", async () => {
+      const { io, editor } = setupSecurity(false);
+      editor.setRadioSection("security", { isManaged: true });
+
+      expect((await editor.commit()).status).toBe("ok");
+
+      expect(io.commits).toEqual([]);
+      expect(io.sent.map((m) => m.payloadVariant.case)).toEqual(["setConfig"]);
+      expect(editor.isDirty.value).toBe(false);
+    });
+
+    it("refuses to save it with other changes and sends nothing", async () => {
+      const { io, editor } = setupSecurity(false);
+      editor.setRadioSection("security", { isManaged: true });
+      editor.setRadioSection("lora", lora(7));
+
+      const result = await editor.commit();
+
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.error).toBeInstanceOf(ManagedModeNotAloneError);
+      }
+      expect(io.commits).toEqual([]);
+      expect(io.sent).toEqual([]);
+      expect(editor.dirtyRadioSections.value).toEqual(["security", "lora"]);
+    });
+
+    it("commits security edits normally when already managed", async () => {
+      const { io, editor } = setupSecurity(true);
+      editor.setRadioSection("security", { serialEnabled: true });
+      editor.setRadioSection("lora", lora(7));
+
+      expect((await editor.commit()).status).toBe("ok");
+
+      expect(io.sent).toEqual([]);
+      expect(io.cases()).toEqual(["setConfig", "setConfig"]);
+    });
   });
 });

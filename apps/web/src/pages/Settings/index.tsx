@@ -18,6 +18,7 @@ import { Spinner } from "@components/UI/Spinner.tsx";
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { cn } from "@core/utils/cn.ts";
+import { ManagedModeNotAloneError } from "@core/kmp/configEditor.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { constantSignal } from "@core/kmp/signals.ts";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
@@ -299,7 +300,17 @@ const ConfigPage = () => {
       form?.markSaved();
       // The bar or Save button that had focus is going away.
       titleRef.current?.focus();
-    } catch {
+    } catch (error) {
+      if (error instanceof ManagedModeNotAloneError) {
+        toast({
+          variant: "destructive",
+          title: t("settingsLayout.managedNotAloneTitle"),
+          description: t("settingsLayout.managedNotAloneDescription", {
+            device: deviceName,
+          }),
+        });
+        return;
+      }
       toast({
         variant: "destructive",
         title: t("toast.configSaveError.title", { ns: "ui" }),

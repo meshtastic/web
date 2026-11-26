@@ -50,6 +50,14 @@ describe("sessionIo", () => {
     expect(pending).toEqual([true, false]);
   });
 
+  it("sends one message outside a settings transaction", async () => {
+    const { io, radio, pending } = setup();
+    const result = await io.send(setLora());
+    expect(result.status).toBe("ok");
+    expect(radio.cases()).toEqual(["setConfig"]);
+    expect(pending).toEqual([true, false]);
+  });
+
   it("reports a failed transaction", async () => {
     const { io, radio, pending } = setup();
     radio.failNext("setOwner");

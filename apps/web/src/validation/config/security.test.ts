@@ -10,6 +10,9 @@ function makeBase64OfLength(len: number): string {
   return base64Encode(new Uint8Array(len));
 }
 
+/** A public key from another radio, unlike this radio's own keys. */
+const otherRadioKey = base64Encode(new Uint8Array(32).fill(9));
+
 describe("RawSecuritySchema", () => {
   const validKey = makeBase64OfLength(32);
 
@@ -21,7 +24,7 @@ describe("RawSecuritySchema", () => {
       packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
-      adminKey: [validKey, "", ""],
+      adminKey: [otherRadioKey, "", ""],
     });
     expect(result.success).toBe(true);
   });
@@ -34,7 +37,7 @@ describe("RawSecuritySchema", () => {
       packetSignaturePolicy: COMPATIBLE,
       privateKey: "badkey",
       publicKey: validKey,
-      adminKey: [validKey, "", ""],
+      adminKey: [otherRadioKey, "", ""],
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -72,7 +75,7 @@ describe("RawSecuritySchema", () => {
       packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
-      adminKey: [validKey, "", ""],
+      adminKey: [otherRadioKey, "", ""],
     });
     expect(result.success).toBe(true);
   });
@@ -89,7 +92,7 @@ describe("adminChannelEnabled", () => {
       packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
-      adminKey: [validKey, "", ""],
+      adminKey: [otherRadioKey, "", ""],
     });
     expect(result.success).toBe(true);
     expect(result.data).not.toHaveProperty("adminChannelEnabled");
@@ -137,7 +140,11 @@ describe("ParsedSecuritySchema", () => {
       packetSignaturePolicy: COMPATIBLE,
       privateKey: validKey,
       publicKey: validKey,
-      adminKey: [validKey, new Uint8Array(), new Uint8Array()],
+      adminKey: [
+        new Uint8Array(32).fill(9),
+        new Uint8Array(),
+        new Uint8Array(),
+      ],
     });
     expect(result.success).toBe(true);
   });
@@ -160,5 +167,41 @@ describe("ParsedSecuritySchema", () => {
         ),
       ).toBe(true);
     }
+  });
+
+  describe("admin keys", () => {
+    const privateKey = base64Encode(new Uint8Array(32).fill(1));
+    const publicKey = base64Encode(new Uint8Array(32).fill(2));
+    const otherKey = base64Encode(new Uint8Array(32).fill(3));
+    const parse = (adminKey: [string, string, string]) =>
+      RawSecuritySchema.safeParse({
+        isManaged: true,
+        debugLogApiEnabled: false,
+        serialEnabled: false,
+        packetSignaturePolicy: COMPATIBLE,
+        privateKey,
+        publicKey,
+        adminKey,
+      });
+    const issues = (result: ReturnType<typeof parse>) =>
+      result.success
+        ? []
+        : result.error.issues.map((i) => [i.path.join("."), i.message]);
+
+    it("rejects this radio's private key", () => {
+      expect(issues(parse([otherKey, privateKey, ""]))).toEqual([
+        ["adminKey.1", "formValidation.adminKey.isPrivateKey"],
+      ]);
+    });
+
+    it("rejects this radio's own public key", () => {
+      expect(issues(parse([publicKey, "", ""]))).toEqual([
+        ["adminKey.0", "formValidation.adminKey.isOwnPublicKey"],
+      ]);
+    });
+
+    it("accepts another radio's public key", () => {
+      expect(parse([otherKey, "", ""]).success).toBe(true);
+    });
   });
 });
