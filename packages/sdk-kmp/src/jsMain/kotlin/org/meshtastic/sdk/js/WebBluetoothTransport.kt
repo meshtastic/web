@@ -113,8 +113,15 @@ internal class WebBluetoothTransport(
         val buffer: ArrayBuffer = payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.length)
         try {
             gatt.withLock {
-                val write = if (characteristic.writeValueWithResponse != null) {
+                val props = characteristic.properties
+                val write = if (props?.writeWithoutResponse == true && props?.write != true && characteristic.writeValueWithoutResponse != null) {
+                    characteristic.writeValueWithoutResponse(buffer)
+                } else if (props?.write == true && characteristic.writeValueWithResponse != null) {
                     characteristic.writeValueWithResponse(buffer)
+                } else if (characteristic.writeValueWithResponse != null) {
+                    characteristic.writeValueWithResponse(buffer)
+                } else if (characteristic.writeValueWithoutResponse != null) {
+                    characteristic.writeValueWithoutResponse(buffer)
                 } else {
                     characteristic.writeValue(buffer)
                 }
