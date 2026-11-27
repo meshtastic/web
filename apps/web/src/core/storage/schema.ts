@@ -25,7 +25,7 @@ import { MessageState } from "./types.ts";
 export const DATABASE_FILE = "meshtastic-app-v1.db";
 
 /** Bump with every DDL change, adding its `MIGRATIONS` step (tests enforce both). */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 /** Oldest version `MIGRATIONS` can upgrade; older files are wiped. */
 export const FIRST_MIGRATABLE_VERSION = 2;
@@ -34,7 +34,10 @@ export const FIRST_MIGRATABLE_VERSION = 2;
  * `MIGRATIONS[n]` upgrades version `n` to `n + 1`. Steps run before
  * `SCHEMA_SQL`, so a step that adds a table must create it itself.
  */
-export const MIGRATIONS: Readonly<Record<number, ReadonlyArray<string>>> = {};
+export const MIGRATIONS: Readonly<Record<number, ReadonlyArray<string>>> = {
+  // 2 → 3: the relaying node of each message.
+  2: ["ALTER TABLE messages ADD COLUMN relay_node INTEGER"],
+};
 
 /**
  * Oldest schema that can safely use a file at this version: unchanged by
@@ -84,6 +87,11 @@ export const messages = sqliteTable(
     viaMqtt: integer("via_mqtt", { mode: "boolean" }),
     transport:
       integer("transport").$type<Protobuf.Mesh.MeshPacket_TransportMechanism>(),
+    /**
+     * Last byte of the relaying node's number (MeshPacket.relay_node): of a
+     * received message, or of the latest ack of an outgoing one.
+     */
+    relayNode: integer("relay_node"),
     /**
      * Hidden by the message filter when it arrived: never unread, never the
      * preview (see core/messaging/messageFilter.ts).
@@ -283,7 +291,8 @@ export const SCHEMA_SQL: ReadonlyArray<string> = [
     hops_away INTEGER,
     via_mqtt INTEGER,
     transport INTEGER,
-    filtered INTEGER NOT NULL DEFAULT 0
+    filtered INTEGER NOT NULL DEFAULT 0,
+    relay_node INTEGER
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS ux_messages_packet ON messages(device_id, from_node, packet_id)`,
   `CREATE INDEX IF NOT EXISTS idx_messages_packet_id ON messages(device_id, packet_id)`,

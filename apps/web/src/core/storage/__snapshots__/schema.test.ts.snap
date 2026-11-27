@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SCHEMA_SQL > is pinned per SCHEMA_VERSION (bump the version when the DDL changes) > schema v2 1`] = `
+exports[`SCHEMA_SQL > is pinned per SCHEMA_VERSION (bump the version when the DDL changes) > schema v3 1`] = `
 "CREATE TABLE IF NOT EXISTS messages (
     seq INTEGER PRIMARY KEY AUTOINCREMENT,
     device_id INTEGER NOT NULL,
@@ -23,7 +23,8 @@ exports[`SCHEMA_SQL > is pinned per SCHEMA_VERSION (bump the version when the DD
     hops_away INTEGER,
     via_mqtt INTEGER,
     transport INTEGER,
-    filtered INTEGER NOT NULL DEFAULT 0
+    filtered INTEGER NOT NULL DEFAULT 0,
+    relay_node INTEGER
   );
 CREATE UNIQUE INDEX IF NOT EXISTS ux_messages_packet ON messages(device_id, from_node, packet_id);
 CREATE INDEX IF NOT EXISTS idx_messages_packet_id ON messages(device_id, packet_id);

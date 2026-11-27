@@ -3,7 +3,7 @@
 The web client's own SQLite database. It holds message history, reactions,
 drafts, read markers, the message filter, and caches of the node DB and
 telemetry. Source of truth: [`schema.ts`](./schema.ts). This file describes
-**schema version 2** (`SCHEMA_VERSION`); if the two disagree, `schema.ts` wins.
+**schema version 3** (`SCHEMA_VERSION`); if the two disagree, `schema.ts` wins.
 
 - **File:** `meshtastic-app-v1.db` in the browser's Origin Private File System
   (OPFS), opened through sqlocal and queried with Drizzle.
@@ -43,6 +43,7 @@ Text messages, one row per packet.
 | `via_mqtt` | INTEGER (bool) | yes | Arrived through MQTT. |
 | `transport` | INTEGER | yes | `MeshPacket_TransportMechanism` enum. |
 | `filtered` | INTEGER (bool) | no | Hidden by the message filter on arrival. Default 0. |
+| `relay_node` | INTEGER | yes | Last byte of the relaying node's number (`MeshPacket.relay_node`): of a received message, or of the latest ack of an outgoing one. Since version 3. |
 
 Indexes:
 
@@ -242,6 +243,12 @@ has shipped is a one-time risk to local history.
 | --- | --- | --- | --- |
 | 1 | First schema: messages, reactions, drafts, read markers, nodes, telemetry. | Wipe (no step). | — |
 | 2 | Message filter tables (`filter_words`, `filter_settings`, `filter_opt_outs`). Later releases at version 2 add `schema_meta`. | Wipe (no step). | 2 |
+| 3 | `messages.relay_node`. First version with migrations. | `ALTER TABLE messages ADD COLUMN relay_node INTEGER`. | 2 |
+
+Version 3 is the first with a newer schema in the field, so this release
+carries the one-time risk above: the released version 2 code (from before
+`schema_meta`) wipes a version 3 file if a deploy is rolled back to it or a
+tab still runs it.
 
 ## Design notes
 
@@ -362,6 +369,13 @@ The filter is per radio, as on Android, so all three tables are keyed by
 - **`filter_opt_outs`** turns the filter off for single conversations.
 
 Adding these tables is what moved the schema to version 2.
+
+### `relay_node` (schema version 3)
+
+A packet's header names only the last byte of the node that relayed it, so
+that byte is what is stored; the node it most likely belongs to is worked
+out when it is shown, against the current NodeDB. It was the first column
+added by a migration, so it sits last in `messages`.
 
 ### `nodes` and `telemetry`
 

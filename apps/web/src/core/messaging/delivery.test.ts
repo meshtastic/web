@@ -15,6 +15,32 @@ const Proof = Protobuf.Mesh.MeshPacket_AckProofStatus;
 const pending: Deliverable = { state: MessageState.Pending, to: PEER };
 
 describe("reduceAck", () => {
+  it("records the relay an ack came back through, and replaces it on the next", () => {
+    expect(
+      reduceAck(pending, { from: 9, error: NONE, relayNode: 0x5a }),
+    ).toEqual({ state: MessageState.Delivered, relays: 1, relayNode: 0x5a });
+    expect(
+      reduceAck(
+        {
+          ...pending,
+          state: MessageState.Delivered,
+          relays: 1,
+          relayNode: 0x5a,
+        },
+        { from: PEER, error: NONE },
+      ),
+    ).toEqual({ state: MessageState.Ack, relays: 2, relayNode: undefined });
+  });
+
+  it("keeps the relay once the recipient has acked", () => {
+    expect(
+      reduceAck(
+        { ...pending, state: MessageState.Ack, relayNode: 0x5a },
+        { from: 9, error: NONE, relayNode: 0x77 },
+      ),
+    ).toEqual({});
+  });
+
   it("an ack from the recipient acks the message", () => {
     expect(reduceAck(pending, { from: PEER, error: NONE })).toEqual({
       state: MessageState.Ack,

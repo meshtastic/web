@@ -247,4 +247,15 @@ describe("actionsFor", () => {
       retry: false,
     });
   });
+
+  it("offers delivery details on a received message only when it names a relay", () => {
+    const relayed = thread(message(3, 7, 0, { relayNode: 0x5a, hopsAway: 1 }));
+    expect(actionsFor(relayed, true, undefined).deliveryDetails).toBe(true);
+    const direct = thread(message(4, 7, 0, { relayNode: 0x5a, hopsAway: 0 }));
+    expect(actionsFor(direct, true, undefined).deliveryDetails).toBe(false);
+    const mqtt = thread(
+      message(5, 7, 0, { relayNode: 0x5a, hopsAway: 1, viaMqtt: true }),
+    );
+    expect(actionsFor(mqtt, true, undefined).deliveryDetails).toBe(false);
+  });
 });

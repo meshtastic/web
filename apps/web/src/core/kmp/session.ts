@@ -1,5 +1,6 @@
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { createLogger } from "@core/log.ts";
+import { packetRelayNode } from "@core/messaging/relayNode.ts";
 import { Protobuf, Types } from "@core/protobuf.ts";
 import type {
   DraftRepository,
@@ -554,6 +555,12 @@ export class MeshSession {
               meta.from,
               routing.variant.value,
               meta.ackProofStatus,
+              packetRelayNode({
+                relayNode: meta.relayNode,
+                hopsAway: meta.hopsAway,
+                viaMqtt: meta.viaMqtt,
+                transport: meta.transportMechanism,
+              }),
             );
             if (routing.variant.value !== Protobuf.Mesh.Routing_Error.NONE) {
               this.nodes.routingError(meta.from, routing.variant.value);

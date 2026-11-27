@@ -30,6 +30,11 @@ function packet(init: {
   channel?: number;
   replyId?: number;
   emoji?: number;
+  /** Route header fields (hops, relay byte, MQTT). */
+  header?: Pick<
+    Protobuf.Mesh.MeshPacket,
+    "hopStart" | "hopLimit" | "relayNode" | "viaMqtt"
+  >;
 }): Uint8Array {
   return toBinary(
     Protobuf.Mesh.MeshPacketSchema,
@@ -39,6 +44,7 @@ function packet(init: {
       to: init.to,
       channel: init.channel ?? 0,
       rxTime: init.rxTime ?? 1_700_000_000,
+      ...init.header,
       payloadVariant: {
         case: "decoded",
         value: create(Protobuf.Mesh.DataSchema, {
@@ -83,12 +89,14 @@ const ack = (
   from: number,
   requestId: number,
   error = Protobuf.Mesh.Routing_Error.NONE,
+  header?: Parameters<typeof packet>[0]["header"],
 ): Uint8Array =>
   packet({
     id: 900 + requestId,
     from,
     to: ME,
     requestId,
+    ...(header ? { header } : {}),
     portnum: Protobuf.Portnums.PortNum.ROUTING_APP,
     payload: toBinary(
       Protobuf.Mesh.RoutingSchema,
@@ -339,6 +347,74 @@ describe("MeshSession", () => {
     kmp.settleSends();
     await sending;
     expect(channel.value[0]?.state).toBe(MessageState.Delivered);
+  });
+
+  it("keeps a received message's relay byte from its header", () => {
+    const { kmp, session } = connected();
+    const direct = session.chat.direct(PEER);
+    kmp.emitPacket(
+      packet({
+        id: 10,
+        from: PEER,
+        to: ME,
+        portnum: Protobuf.Portnums.PortNum.TEXT_MESSAGE_APP,
+        payload: new TextEncoder().encode("relayed"),
+        header: { hopStart: 3, hopLimit: 1, relayNode: 0x5a, viaMqtt: false },
+      }),
+    );
+    expect(direct.value[0]).toMatchObject({ relayNode: 0x5a, hopsAway: 2 });
+  });
+
+  it("records an ack's relay unless the ack came straight back or over MQTT", async () => {
+    const { kmp, session } = connected();
+    kmp.holdSends = true;
+    const channel = session.chat.messages(0);
+    const sending = session.chat.send({ text: "x", destination: "broadcast" });
+    const id = kmp.texts[0]?.id ?? 0;
+    const relayNow = () => channel.value[0]?.relayNode;
+
+    // Relayed on its way back.
+    kmp.emitPacket(
+      ack(0x55, id, undefined, {
+        hopStart: 3,
+        hopLimit: 2,
+        relayNode: 0x5a,
+        viaMqtt: false,
+      }),
+    );
+    expect(relayNow()).toBe(0x5a);
+    // Heard straight from the acking node: its byte is its own.
+    kmp.emitPacket(
+      ack(0x56, id, undefined, {
+        hopStart: 3,
+        hopLimit: 3,
+        relayNode: 0x56,
+        viaMqtt: false,
+      }),
+    );
+    expect(relayNow()).toBeUndefined();
+    // From MQTT: names a node on the far side of the bridge.
+    kmp.emitPacket(
+      ack(0x57, id, undefined, {
+        hopStart: 3,
+        hopLimit: 2,
+        relayNode: 0x77,
+        viaMqtt: true,
+      }),
+    );
+    expect(relayNow()).toBeUndefined();
+    // An implicit ack (hop_start 0) keeps the relayer it overheard.
+    kmp.emitPacket(
+      ack(0x58, id, undefined, {
+        hopStart: 0,
+        hopLimit: 0,
+        relayNode: 0x5b,
+        viaMqtt: false,
+      }),
+    );
+    expect(relayNow()).toBe(0x5b);
+    kmp.settleSends();
+    await sending;
   });
 
   it("marks my messages outgoing once the handshake names my node", () => {

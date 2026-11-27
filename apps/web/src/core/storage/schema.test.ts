@@ -480,6 +480,15 @@ describe("migrations", () => {
     expect(db.exec("SELECT text FROM drafts")[0]?.values).toEqual([["draft"]]);
   });
 
+  it("adds relay_node to the messages of a version 2 database (v3)", async () => {
+    const db = await v2Database();
+    await applySchema(rawSql(db));
+    expect(version(db)).toBeGreaterThanOrEqual(3);
+    expect(
+      db.exec("SELECT packet_id, text, relay_node FROM messages")[0]?.values,
+    ).toEqual([[42, "kept", null]]);
+  });
+
   it("runs a step and keeps the rows", async () => {
     const db = await v2Database();
     await applySchema(rawSql(db), NEXT);

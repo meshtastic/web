@@ -54,4 +54,6 @@ export interface PacketMetadata<T> {
   viaMqtt?: boolean;
   /** How the packet reached our radio (LoRa, MQTT, UDP, API...). */
   transportMechanism?: Protobuf.Mesh.MeshPacket_TransportMechanism;
+  /** MeshPacket.relay_node: last byte of the relaying node's number; 0 when unset. */
+  relayNode?: number;
 }

@@ -8,6 +8,7 @@ import {
 } from "@core/utils/signalQuality.ts";
 import { type DayGroup, groupByDay } from "@core/utils/timeFormat.ts";
 import type { DeliveryLine } from "./deliveryView.ts";
+import { shownRelayNode } from "./relayNode.ts";
 import type { ThreadMessage } from "./thread.ts";
 import type { TracerouteView } from "./tracerouteView.ts";
 
@@ -213,7 +214,10 @@ export interface MessageActionsAvailability {
   readonly react: boolean;
   readonly reply: boolean;
   readonly copy: boolean;
-  /** Outgoing only: the delivery details dialog. */
+  /**
+   * The delivery details dialog: always for an outgoing message, and for a
+   * received one when it names a relay.
+   */
   readonly deliveryDetails: boolean;
   readonly retry: boolean;
 }
@@ -227,6 +231,7 @@ export const actionsFor = (
   react: connected,
   reply: connected,
   copy: thread.message.text.length > 0,
-  deliveryDetails: thread.outgoing,
+  deliveryDetails:
+    thread.outgoing || shownRelayNode(thread.message, false) !== undefined,
   retry: connected && delivery?.kind === "failed" && delivery.retryable,
 });
