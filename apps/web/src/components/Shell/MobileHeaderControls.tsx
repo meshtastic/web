@@ -38,7 +38,7 @@ export const MobileHeaderControls = () => {
           aria-label={label}
           className="group flex h-11 cursor-pointer items-center rounded-full focus-visible:outline-none"
         >
-          <span className="flex h-9 items-center gap-2 rounded-full border border-control bg-app pr-3 pl-0.5 text-help font-medium text-primary group-hover:bg-raised group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-focus">
+          <span className="flex h-9 items-center gap-2 rounded-full border border-input bg-app pr-3 pl-0.5 text-help font-medium text-primary group-hover:bg-raised group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-focus">
             <NodeAvatar
               initials={summary.initials}
               tone={{ kind: "device" }}

@@ -23,7 +23,7 @@ const buttonVariants = cva(
         secondary,
         subtle: secondary,
         outline:
-          "border border-control bg-transparent text-primary hover:bg-raised",
+          "border border-input bg-transparent text-primary hover:bg-raised",
         ghost:
           "bg-transparent text-primary hover:bg-raised data-[state=open]:bg-raised",
         danger,

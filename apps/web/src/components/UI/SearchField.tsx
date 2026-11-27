@@ -26,7 +26,7 @@ export const SearchField = ({
 }: SearchFieldProps) => (
   <label
     className={cn(
-      "flex h-10 items-center gap-2 rounded-control border border-control bg-app px-3 text-muted focus-within:border-accent pointer-coarse:h-11",
+      "flex h-10 items-center gap-2 rounded-control border border-input bg-app px-3 text-muted focus-within:border-accent pointer-coarse:h-11",
       containerClassName,
     )}
   >

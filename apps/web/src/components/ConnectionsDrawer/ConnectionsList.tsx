@@ -47,7 +47,7 @@ const surfaceClasses = "rounded-card border border-subtle bg-inset";
 const primaryButtonClasses = "h-auto min-h-11 gap-2 px-4";
 
 const secondaryButtonClasses =
-  "h-auto min-h-11 gap-2 rounded-control border border-control bg-transparent px-4 font-medium text-primary hover:bg-raised hover:opacity-100";
+  "h-auto min-h-11 gap-2 rounded-control border border-input bg-transparent px-4 font-medium text-primary hover:bg-raised hover:opacity-100";
 
 const destructiveButtonClasses =
   "h-auto min-h-11 gap-2 border border-danger bg-danger px-4 text-on-danger hover:border-danger-strong hover:opacity-100";

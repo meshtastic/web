@@ -188,7 +188,7 @@ export const ConnectStep = ({
                 aria-hidden="true"
                 className={cn(
                   "size-[18px] shrink-0 rounded-full border-2",
-                  checked ? "border-accent bg-accent" : "border-control",
+                  checked ? "border-accent bg-accent" : "border-input",
                   disabled && "opacity-45",
                 )}
               />

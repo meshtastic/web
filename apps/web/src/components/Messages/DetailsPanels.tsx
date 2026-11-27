@@ -287,7 +287,7 @@ export const ChannelDetailsPanel = ({
           </Button>
           <Link
             to="/settings/channels"
-            className="inline-flex h-9 flex-[1_1_auto] items-center justify-center gap-2 whitespace-nowrap rounded-control border border-control px-3 text-help font-medium text-primary hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="inline-flex h-9 flex-[1_1_auto] items-center justify-center gap-2 whitespace-nowrap rounded-control border border-input px-3 text-help font-medium text-primary hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             <SettingsIcon aria-hidden="true" className="size-4" />
             {t("channelDetails.settings")}

@@ -12,7 +12,7 @@ export interface MapControlsProps {
 }
 
 const controlClass =
-  "border border-control bg-surface text-primary shadow-floating hover:bg-raised";
+  "border border-input bg-surface text-primary shadow-floating hover:bg-raised";
 
 /** Center-on-device and zoom buttons, 44px for touch. */
 export const MapControls = ({

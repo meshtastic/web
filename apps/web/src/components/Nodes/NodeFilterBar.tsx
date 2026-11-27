@@ -114,7 +114,7 @@ export const NodeFilterBar = ({
             />
           }
           className={cn(
-            "border border-control bg-app text-muted hover:bg-raised hover:text-primary",
+            "border border-input bg-app text-muted hover:bg-raised hover:text-primary",
             favoritesFirst &&
               "border-accent bg-accent-tint text-accent hover:bg-accent-tint hover:text-accent",
           )}

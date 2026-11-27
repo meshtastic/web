@@ -47,7 +47,7 @@ import { urlOrIpv4Schema } from "@core/connections/address.ts";
 type TabKey = ConnectionType;
 
 const secondaryButtonClasses =
-  "h-auto min-h-11 gap-2 rounded-control border border-control bg-transparent px-4 font-medium text-primary hover:bg-raised hover:opacity-100";
+  "h-auto min-h-11 gap-2 rounded-control border border-input bg-transparent px-4 font-medium text-primary hover:bg-raised hover:opacity-100";
 
 const TAB_KEYS: readonly TabKey[] = ["http", "bluetooth", "serial"];
 const isTabKey = (value: string): value is TabKey =>

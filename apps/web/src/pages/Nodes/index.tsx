@@ -184,7 +184,7 @@ const NodesPage = (): JSX.Element => {
       parameters={{
         popoverContentProps: { side: "bottom", align: "end", sideOffset: 8 },
         popoverTriggerClassName: [
-          "relative flex size-9 items-center justify-center rounded-control border border-control pointer-coarse:touch-target",
+          "relative flex size-9 items-center justify-center rounded-control border border-input pointer-coarse:touch-target",
           "bg-app text-muted hover:bg-raised hover:text-primary active:bg-raised",
           "dark:bg-app dark:text-muted hover:dark:bg-raised hover:dark:text-primary dark:active:bg-raised",
           "focus-visible:outline-2 focus-visible:outline-focus",
