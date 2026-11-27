@@ -77,8 +77,8 @@ describe("useUnsafeRolesDialog", () => {
       const { result } = renderUnsafeRolesHook();
       const safeRole = "SAFE_ROLE";
 
-      const validationResult =
-        await result.current.validateRoleSelection(safeRole);
+      // Synchronous, so the select saves the role within its change event.
+      const validationResult = result.current.validateRoleSelection(safeRole);
 
       expect(validationResult).toBe(true);
       expect(mockDevice.setDialogOpen).not.toHaveBeenCalled();

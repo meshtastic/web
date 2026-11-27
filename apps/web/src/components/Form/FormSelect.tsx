@@ -45,6 +45,7 @@ export function SelectInput<T extends FieldValues>({
   field,
   isDirty,
   invalid,
+  submit,
 }: GenericFormElementProps<T, SelectFieldProps<T>>) {
   const {
     field: { value, onChange, ref, onBlur, ...rest },
@@ -83,8 +84,16 @@ export function SelectInput<T extends FieldValues>({
       // A synchronous answer applies the value within this event, so the
       // form's change handler submits the new value rather than the old one.
       const result = field.validate(selectedKey);
-      const isValid = typeof result === "boolean" ? result : await result;
+      const answeredLater = typeof result !== "boolean";
+      const isValid = answeredLater ? await result : result;
       if (!isValid) {
+        return;
+      }
+      if (answeredLater) {
+        // The change event has already saved the old value; save the new one.
+        field.selectChange?.(newValue, selectedKey);
+        onChange(Number.parseInt(newValue, 10));
+        submit?.();
         return;
       }
     }

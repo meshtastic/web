@@ -13,10 +13,9 @@ export const useUnsafeRolesDialog = () => {
   }, [setDialogOpen]);
 
   const validateRoleSelection = useCallback(
-    (newRoleKey: string): Promise<boolean> => {
-      if (!UNSAFE_ROLES.includes(newRoleKey as UnsafeRole)) {
-        return Promise.resolve(true);
-      }
+    (newRoleKey: string): boolean | Promise<boolean> => {
+      // Answered synchronously so the select saves a safe role at once.
+      if (!UNSAFE_ROLES.includes(newRoleKey as UnsafeRole)) return true;
 
       setDialogOpen("unsafeRoles", true);
 

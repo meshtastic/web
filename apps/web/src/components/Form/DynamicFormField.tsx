@@ -33,6 +33,7 @@ export interface DynamicFormFieldProps<T extends FieldValues> {
   disabled?: boolean;
   isDirty?: boolean;
   invalid?: boolean;
+  submit?: () => void;
 }
 
 export function DynamicFormField<T extends FieldValues>({
@@ -41,6 +42,7 @@ export function DynamicFormField<T extends FieldValues>({
   disabled,
   isDirty,
   invalid,
+  submit,
 }: DynamicFormFieldProps<T>) {
   switch (field.type) {
     case "text":
@@ -73,6 +75,7 @@ export function DynamicFormField<T extends FieldValues>({
           disabled={disabled}
           isDirty={isDirty}
           invalid={invalid}
+          submit={submit}
         />
       );
     case "passwordGenerator":

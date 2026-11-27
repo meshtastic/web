@@ -50,6 +50,12 @@ export interface GenericFormElementProps<T extends FieldValues, Y> {
   field: Y;
   isDirty?: boolean;
   invalid?: boolean;
+  /**
+   * Saves the form as a change would, for a field whose value lands after
+   * the change event (e.g. once a confirmation dialog resolves). Unset when
+   * the form saves on submit.
+   */
+  submit?: () => void;
 }
 
 export interface DynamicFormProps<T extends FieldValues> {
@@ -191,6 +197,11 @@ export function DynamicForm<T extends FieldValues>({
                   disabled={isDisabled(field.disabledBy, field.disabled)}
                   isDirty={fieldState.isDirty}
                   invalid={fieldState.invalid}
+                  submit={
+                    submitType === "onChange"
+                      ? () => void handleSubmit(onSubmit)()
+                      : undefined
+                  }
                 />
               );
               return (

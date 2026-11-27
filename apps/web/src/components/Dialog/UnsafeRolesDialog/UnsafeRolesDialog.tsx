@@ -40,7 +40,15 @@ export const UnsafeRolesDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        // Esc and outside clicks dismiss too, so the pending role choice
+        // is answered rather than left waiting.
+        if (next) onOpenChange(next);
+        else handleCloseDialog("dismiss");
+      }}
+    >
       <DialogContent className="max-w-8 flex flex-col">
         <DialogClose onClick={() => handleCloseDialog("dismiss")} />
         <DialogHeader>
