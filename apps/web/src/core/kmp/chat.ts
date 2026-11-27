@@ -415,6 +415,11 @@ export interface ChatClientOptions {
   filter?: ChatFilter;
   /** Clock for retention throttling; tests pass their own. */
   now?: () => number;
+  /**
+   * Called before each direct message (and retry) goes out, with the peer.
+   * Best-effort side effects only: the send doesn't wait for it.
+   */
+  onDirectSend?: (peer: number) => void;
 }
 
 /** The conversation a send to `destination` on `channel` belongs to. */
@@ -481,6 +486,7 @@ export class ChatClient {
   /** Tail of the storage write queue (see `persist`). */
   private writes: Promise<void> = Promise.resolve();
   private epoch = 0;
+  private readonly onDirectSend: ((peer: number) => void) | undefined;
 
   readonly drafts: ChatDrafts;
   readonly unread: ChatUnread;
@@ -497,6 +503,7 @@ export class ChatClient {
     this.retention = options.retention;
     this.initialLoadLimit = options.initialLoadLimit ?? 50;
     this.now = options.now ?? Date.now;
+    this.onDirectSend = options.onDirectSend;
     this.summaries = toReadonly(this.summaryStore);
     this.me = signal(transport.myNodeNum());
     this.drafts = {
@@ -821,6 +828,7 @@ export class ChatClient {
   async send(input: SendTextInput): Promise<Result<number, SendTextError>> {
     const target = conversationFor(input.destination, input.channel);
     const channel = input.channel ?? 0;
+    if (target.type === "direct") this.onDirectSend?.(target.to);
     let handle: SendHandleJs;
     try {
       handle = this.transport.sendText(

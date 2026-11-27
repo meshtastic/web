@@ -28,6 +28,7 @@ import {
 } from "./admin.ts";
 import { ChannelsClient } from "./channels.ts";
 import { ChatClient } from "./chat.ts";
+import { directContactAction } from "@core/messaging/directContact.ts";
 import { MessageFilterClient } from "./messageFilter.ts";
 import { DeviceClient } from "./device.ts";
 import { Emitter } from "./emitter.ts";
@@ -177,6 +178,7 @@ export class MeshSession {
         draftRepository: options.drafts,
         retention: options.chatRetention,
         filter: this.messageFilter,
+        onDirectSend: (peer) => void this.shareDirectContact(peer),
       },
     );
     this.telemetry = new TelemetryClient({
@@ -222,6 +224,32 @@ export class MeshSession {
     timeoutMs?: number,
   ): Promise<Result<AdminResultJs, Error>> {
     return sendAdmin(this.kmp, variant, dest, timeoutMs);
+  }
+
+  /** See {@link directContactAction}; failures are logged, never thrown. */
+  private async shareDirectContact(peer: number): Promise<void> {
+    const action = directContactAction({
+      peerNum: peer,
+      peer: this.nodes.byNum(peer),
+      me: this.nodes.byNum(this.myNodeNum),
+      firmwareVersion: this.device.metadata.peek()?.firmwareVersion,
+    });
+    try {
+      const result =
+        action.kind === "shareContact"
+          ? await this.sendAdmin({
+              case: "addContact",
+              value: create(Protobuf.Admin.SharedContactSchema, action.contact),
+            })
+          : action.kind === "favorite"
+            ? await this.nodes.favorite(peer)
+            : undefined;
+      if (result && Result.isError(result)) {
+        log.warn(`DM ${action.kind} for ${peer} failed`, result.error);
+      }
+    } catch (e) {
+      log.warn(`DM ${action.kind} for ${peer} failed`, e);
+    }
   }
 
   sendPacket(packet: OutboundPacket): Promise<SendOutcomeJs> {

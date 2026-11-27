@@ -1,7 +1,7 @@
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
 import { MessageState } from "@core/storage/types.ts";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { FakeKmpClient, state } from "./fakeClient.ts";
 import { validateIncomingNode } from "./nodes.ts";
 import { BROADCAST_NUM } from "./packets.ts";
@@ -612,6 +612,37 @@ describe("MeshSession", () => {
     });
     session.chat.markRead({ kind: "direct", peer: PEER });
     expect(session.chat.summaries.value.get(`direct:${PEER}`)?.unread).toBe(0);
+  });
+
+  it("shares the peer's contact with the radio before a direct message", async () => {
+    const { kmp, session } = connected();
+    kmp.emitFrame(
+      frame({
+        case: "metadata",
+        value: create(Protobuf.Mesh.DeviceMetadataSchema, {
+          firmwareVersion: "2.8.2.abcdef",
+        }),
+      }),
+    );
+    const key = new Uint8Array(32).fill(5);
+    kmp.emitNodeChange({
+      kind: "snapshot",
+      nodes: [nodeInfo(PEER, key)],
+      node: null,
+      nodeNum: 0,
+    });
+    await Promise.resolve();
+
+    await session.chat.send({ text: "hi", destination: PEER });
+    await vi.waitFor(() => expect(kmp.admin().sent.length).toBe(1));
+    const sent = fromBinary(
+      Protobuf.Admin.AdminMessageSchema,
+      kmp.admin().sent[0]!,
+    );
+    expect(sent.payloadVariant.case).toBe("addContact");
+    const contact = sent.payloadVariant.value as Protobuf.Admin.SharedContact;
+    expect(contact.nodeNum).toBe(PEER);
+    expect(contact.user?.publicKey).toEqual(key);
   });
 
   it("mirrors the SDK's node DB and refuses a node presenting another node's key", async () => {

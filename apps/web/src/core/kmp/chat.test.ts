@@ -262,3 +262,22 @@ describe("ChatClient with storage", () => {
     expect(prune).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("ChatClient direct-send hook", () => {
+  it("runs before direct messages and their resends, not channel messages", async () => {
+    const onDirectSend = vi.fn();
+    const chat = new ChatClient(transport(), { onDirectSend });
+    await chat.send({ text: "hi", destination: "broadcast" });
+    expect(onDirectSend).not.toHaveBeenCalled();
+    const sent = await chat.send({ text: "hi", destination: PEER });
+    expect(onDirectSend).toHaveBeenCalledWith(PEER);
+    await chat.resend({
+      id: sent.unwrap(),
+      text: "hi",
+      to: PEER,
+      channel: 0,
+      type: "direct",
+    });
+    expect(onDirectSend).toHaveBeenCalledTimes(2);
+  });
+});
