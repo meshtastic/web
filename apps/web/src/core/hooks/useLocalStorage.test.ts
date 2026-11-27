@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import useLocalStorage from "./useLocalStorage.ts";
 
 describe("useLocalStorage", () => {
@@ -48,5 +48,27 @@ describe("useLocalStorage", () => {
 
     expect(localStorage.getItem(key)).toBeNull();
     expect(result.current[0]).toBe("initial");
+  });
+
+  it("keeps the new value in memory when storage refuses the write", () => {
+    const { result } = renderHook(() => useLocalStorage(key, "initial"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const setItem = vi
+      .spyOn(window.localStorage, "setItem")
+      .mockImplementation(() => {
+        throw new DOMException("full", "QuotaExceededError");
+      });
+
+    expect(() =>
+      act(() => {
+        result.current[1]("updated");
+      }),
+    ).not.toThrow();
+
+    expect(result.current[0]).toBe("updated");
+    expect(localStorage.getItem(key)).toBeNull();
+    expect(warn).toHaveBeenCalled();
+    setItem.mockRestore();
+    warn.mockRestore();
   });
 });

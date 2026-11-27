@@ -1,5 +1,6 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { BeaconOfferNotifier } from "@components/BeaconOfferNotifier.tsx";
+import { FirmwareUpdateNotifier } from "@components/FirmwareUpdate/FirmwareUpdateNotifier.tsx";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { ConnectingOverlay } from "@components/ConnectingOverlay.tsx";
 import { ConnectionsDrawer } from "@components/ConnectionsDrawer/ConnectionsDrawer.tsx";
@@ -104,6 +105,7 @@ export function App() {
                 <LockdownGate />
                 <RegionSetupReminder />
                 <BeaconOfferNotifier />
+                <FirmwareUpdateNotifier />
                 <CommandPalette />
                 <AppShell>
                   <MapProvider>

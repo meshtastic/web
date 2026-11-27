@@ -56,21 +56,23 @@ export default function useLocalStorage<T>(
         return;
       }
 
-      try {
-        setStoredValue((prev) => {
-          const newValue =
-            typeof value === "function"
-              ? (value as (prev: T) => T)(prev)
-              : value;
+      setStoredValue((prev) => {
+        const newValue =
+          typeof value === "function" ? (value as (prev: T) => T)(prev) : value;
+        // Inside the updater, so a throw here (storage full, disabled)
+        // would surface during React's render: keep it to a warning and
+        // still update the in-memory value.
+        try {
           window.localStorage.setItem(key, serializerRef.current(newValue));
-          window.dispatchEvent(
-            new CustomEvent("local-storage", { detail: { key } }),
-          );
+        } catch (err) {
+          console.warn(`Error setting localStorage key “${key}”:`, err);
           return newValue;
-        });
-      } catch (err) {
-        console.warn(`Error setting localStorage key “${key}”:`, err);
-      }
+        }
+        window.dispatchEvent(
+          new CustomEvent("local-storage", { detail: { key } }),
+        );
+        return newValue;
+      });
     },
     [key],
   );

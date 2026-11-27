@@ -150,5 +150,11 @@
     "waiting": "Waiting for you to accept the certificate…",
     "timedOut": "Still not trusted. Open the radio again and accept the warning.",
     "trusted": "Certificate accepted. The radio is reachable."
+  },
+  "firmwareUpdate": {
+    "title": "Firmware update available",
+    "message": "{{current}} is installed. Stable {{stable}} is available. Open Meshtastic Flasher to update this hardware.",
+    "action": "Open Meshtastic Flasher",
+    "actionHint": "Opens Meshtastic Flasher in a new tab to update this radio to stable {{stable}}."
   }
 }
