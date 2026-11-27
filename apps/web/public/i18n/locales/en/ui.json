@@ -372,7 +372,9 @@
     "progress": "Progress",
     "unsavedChanges": "Unsaved changes",
     "typeToConfirm": "Type {{text}} to confirm",
-    "shortcut": "Keyboard shortcut: {{keys}}"
+    "shortcut": "Keyboard shortcut: {{keys}}",
+    "share": "Share",
+    "shareFailed": "Couldn't open the share sheet: {{message}}"
   },
   "shell": {
     "appNavigation": "App",

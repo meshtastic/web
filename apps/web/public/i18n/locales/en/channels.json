@@ -163,9 +163,12 @@
     "title": "Share this channel",
     "qrLabel": "QR code for {{name}}",
     "linkLabel": "Channel link",
+    "replaceHint": "A Replace link: it replaces the channels on the receiver's radio and applies your LoRa settings.",
+    "addHint": "An Add link: it adds this channel and keeps the receiver's channels and LoRa settings.",
     "download": "Download QR",
     "more": "More sharing options",
     "import": "Import channels",
-    "notOnRadio": "Save this channel to the radio to share it."
+    "notOnRadio": "Save this channel to the radio to share it.",
+    "waitingForLora": "Waiting for the radio's LoRa settings, which this link shares."
   }
 }

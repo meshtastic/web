@@ -3,6 +3,7 @@ import { useSettingsReadOnly } from "@components/Settings/SettingsReadOnly.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Card } from "@components/UI/Card.tsx";
 import { CopyField } from "@components/UI/CopyField.tsx";
+import { ShareButton } from "@components/UI/ShareButton.tsx";
 import { Protobuf } from "@core/protobuf.ts";
 import { channelSetToUrl } from "@core/utils/channelUrl.ts";
 import { DownloadIcon, QrCodeIcon, UploadIcon } from "lucide-react";
@@ -23,8 +24,8 @@ export interface ChannelShareCardProps {
 
 /**
  * QR code and link for the selected channel, as it is on the radio.
- * Secondary channels are shared as "add" links so they don't replace the
- * receiver's primary.
+ * Secondary channels are shared as "add" links, which carry no LoRa
+ * settings, so they don't replace the receiver's primary or retune it.
  */
 export const ChannelShareCard = ({
   settings,
@@ -39,18 +40,20 @@ export const ChannelShareCard = ({
   // Sharing reads the radio; importing changes it.
   const readOnly = useSettingsReadOnly();
 
+  const add = index !== 0;
   const url = useMemo(
     () =>
-      settings
+      // A Replace link waits for the LoRa settings it must carry.
+      settings && (add || loraConfig)
         ? channelSetToUrl(
             create(Protobuf.AppOnly.ChannelSetSchema, {
               loraConfig,
               settings: [settings],
             }),
-            { add: index !== 0 },
+            { add },
           )
         : undefined,
-    [settings, loraConfig, index],
+    [settings, loraConfig, add],
   );
 
   const downloadQr = () => {
@@ -86,19 +89,29 @@ export const ChannelShareCard = ({
             value={url}
             label={t("share.linkLabel")}
             actions={
-              <Button
-                variant="secondary"
-                className="text-help"
-                icon={<DownloadIcon aria-hidden="true" className="size-4" />}
-                onClick={downloadQr}
-              >
-                {t("share.download")}
-              </Button>
+              <>
+                <Button
+                  variant="secondary"
+                  className="text-help"
+                  icon={<DownloadIcon aria-hidden="true" className="size-4" />}
+                  onClick={downloadQr}
+                >
+                  {t("share.download")}
+                </Button>
+                <ShareButton url={url} title={name} />
+              </>
             }
           />
         ) : (
-          <p className="m-0 text-help text-muted">{t("share.notOnRadio")}</p>
+          <p className="m-0 text-help text-muted">
+            {settings ? t("share.waitingForLora") : t("share.notOnRadio")}
+          </p>
         )}
+        {url ? (
+          <p className="m-0 text-help text-muted">
+            {add ? t("share.addHint") : t("share.replaceHint")}
+          </p>
+        ) : null}
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           <Button
             variant="link"

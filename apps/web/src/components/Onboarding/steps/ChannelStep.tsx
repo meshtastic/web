@@ -8,6 +8,7 @@ import { useChannels, useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { constantSignal } from "@core/kmp/signals.ts";
 import {
   type ChannelImportMode,
+  canReplace,
   isDefaultPublicChannel,
   parseChannelLink,
   planChannelImport,
@@ -70,10 +71,19 @@ export const ChannelStep = ({
 
   const parsed = parseChannelLink(link);
   const channelSet = Result.isOk(parsed) ? parsed.value : undefined;
-  // Adding is the default: replacing drops the channels the radio has.
-  const effectiveMode: ChannelImportMode = mode ?? "add";
+  // Adding is the default: replacing drops the channels the radio has. A
+  // link without LoRa settings (an add link) can only be added.
+  const replaceAvailable = channelSet === undefined || canReplace(channelSet);
+  const effectiveMode: ChannelImportMode =
+    replaceAvailable && mode === "replace" ? "replace" : "add";
   const plan = channelSet
-    ? planChannelImport(channelSet, current, effectiveMode)
+    ? planChannelImport(
+        channelSet,
+        current,
+        effectiveMode,
+        undefined,
+        radio.lora,
+      )
     : undefined;
   const nothingToAdd = plan !== undefined && plan.assignments.length === 0;
   const regionChange =
@@ -243,6 +253,7 @@ export const ChannelStep = ({
               type="radio"
               name={modeName}
               checked={effectiveMode === "replace"}
+              disabled={!replaceAvailable}
               onChange={() => {
                 setMode("replace");
                 setConfirming(false);
@@ -251,7 +262,9 @@ export const ChannelStep = ({
             />
             {t("channel.modeReplace")}
             <span className="text-help text-muted">
-              {t("channel.modeReplaceNote")}
+              {replaceAvailable
+                ? t("channel.modeReplaceNote")
+                : t("channel.modeReplaceUnavailable")}
             </span>
           </label>
         </fieldset>
@@ -280,7 +293,9 @@ export const ChannelStep = ({
         ) : null}
         {nothingToAdd ? (
           <output className="block text-help text-secondary">
-            {t("channel.nothingToAdd")}
+            {(plan?.noSlot.length ?? 0) > 0
+              ? t("channel.noFreeSlot")
+              : t("channel.nothingToAdd")}
           </output>
         ) : plan && plan.skipped > 0 ? (
           <output className="block text-help text-secondary">
