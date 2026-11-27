@@ -118,6 +118,10 @@
       "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
       "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
     },
+    "adminKey": {
+      "isPrivateKey": "This is this radio’s private key. Paste the public key of the radio that will manage it, and keep the private key secret.",
+      "isOwnPublicKey": "This is this radio’s own public key. Paste the public key of the radio that will manage it."
+    },
     "required": {
       "generic": "This field is required.",
       "managed": "At least one admin key is requred if the node is managed.",

@@ -1,3 +1,4 @@
+import { ManagedModeNotAloneError } from "@core/kmp/configEditor.ts";
 import { constantSignal } from "@core/kmp/signals.ts";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -11,6 +12,7 @@ interface TestEnv {
   toast: ReturnType<typeof vi.fn>;
   dirtyRadio: readonly string[];
   editorDirty: boolean;
+  enablesManaged: boolean;
   commit: ReturnType<typeof vi.fn>;
   reset: ReturnType<typeof vi.fn>;
 }
@@ -23,6 +25,7 @@ const env = vi.hoisted((): TestEnv => ({
   toast: vi.fn(),
   dirtyRadio: [],
   editorDirty: false,
+  enablesManaged: false,
   commit: vi.fn(),
   reset: vi.fn(),
 }));
@@ -87,6 +90,7 @@ vi.mock("@core/kmp/hooks", () => ({
     radio: constantSignal({}),
     modules: constantSignal({}),
     commit: env.commit,
+    enablesManagedMode: () => env.enablesManaged,
     reset: env.reset,
   }),
   useSignal: <T,>(signal: { value: T }) => signal.value,
@@ -165,6 +169,7 @@ describe("Settings page", () => {
     vi.clearAllMocks();
     env.pathname = "/settings/lora";
     env.search = {};
+    env.enablesManaged = false;
     env.mobile = false;
     env.dirtyRadio = [];
     env.editorDirty = false;
@@ -237,6 +242,44 @@ describe("Settings page", () => {
     expect(
       screen.getByRole("heading", { level: 2, name: "LoRa" }),
     ).toHaveFocus();
+  });
+
+  it("says managed mode is on instead of promising a restart", async () => {
+    env.dirtyRadio = ["security"];
+    env.editorDirty = true;
+    env.enablesManaged = true;
+    env.commit.mockImplementation(async () => {
+      env.editorDirty = false;
+      return { status: "ok" };
+    });
+    render(<ConfigPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() =>
+      expect(env.toast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          description:
+            "Managed mode is on. EAO1 now only accepts changes from its admin radios.",
+        }),
+      ),
+    );
+  });
+
+  it("asks for managed mode to be saved on its own", async () => {
+    env.dirtyRadio = ["security", "lora"];
+    env.editorDirty = true;
+    env.commit.mockResolvedValue({
+      status: "error",
+      error: new ManagedModeNotAloneError(),
+    });
+    render(<ConfigPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() =>
+      expect(env.toast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: "Save managed mode on its own" }),
+      ),
+    );
   });
 
   it("Reset discards the staged edits and keeps focus on the page", () => {
