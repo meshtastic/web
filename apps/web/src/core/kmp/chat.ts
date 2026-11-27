@@ -416,11 +416,16 @@ export interface ChatClientOptions {
   /** Clock for retention throttling; tests pass their own. */
   now?: () => number;
   /**
-   * Called before each direct message (and retry) goes out, with the peer.
-   * Best-effort side effects only: the send doesn't wait for it.
+   * Runs before each direct message (and retry) goes out, with the peer,
+   * as Android does: the send waits for it, up to
+   * {@link DIRECT_SEND_HOOK_TIMEOUT_MS}, so what it tells the radio (the
+   * peer's key) arrives first. Best-effort: a rejection is ignored.
    */
-  onDirectSend?: (peer: number) => void;
+  onDirectSend?: (peer: number) => Promise<void>;
 }
+
+/** How long a direct message waits for `onDirectSend` before going out. */
+export const DIRECT_SEND_HOOK_TIMEOUT_MS = 3000;
 
 /** The conversation a send to `destination` on `channel` belongs to. */
 export const conversationFor = (
@@ -486,7 +491,7 @@ export class ChatClient {
   /** Tail of the storage write queue (see `persist`). */
   private writes: Promise<void> = Promise.resolve();
   private epoch = 0;
-  private readonly onDirectSend: ((peer: number) => void) | undefined;
+  private readonly onDirectSend: ((peer: number) => Promise<void>) | undefined;
 
   readonly drafts: ChatDrafts;
   readonly unread: ChatUnread;
@@ -828,7 +833,7 @@ export class ChatClient {
   async send(input: SendTextInput): Promise<Result<number, SendTextError>> {
     const target = conversationFor(input.destination, input.channel);
     const channel = input.channel ?? 0;
-    if (target.type === "direct") this.onDirectSend?.(target.to);
+    if (target.type === "direct") await this.beforeDirectSend(target.to);
     let handle: SendHandleJs;
     try {
       handle = this.transport.sendText(
@@ -871,6 +876,18 @@ export class ChatClient {
     if (settled)
       this.patchDelivery(settled, reduceSendOutcome(settled, outcome));
     return Result.ok(handle.id);
+  }
+
+  private async beforeDirectSend(peer: number): Promise<void> {
+    if (!this.onDirectSend) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    await Promise.race([
+      this.onDirectSend(peer).catch(() => {}),
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, DIRECT_SEND_HOOK_TIMEOUT_MS);
+      }),
+    ]);
+    clearTimeout(timer);
   }
 
   /** `send`, under the name the UI's action set uses. */

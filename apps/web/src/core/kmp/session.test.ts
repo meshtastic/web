@@ -280,6 +280,8 @@ describe("MeshSession", () => {
     const direct = session.chat.direct(PEER);
 
     const sending = session.chat.send({ text: "yo", destination: PEER });
+    // A DM goes out once the contact share before it settles.
+    await vi.waitFor(() => expect(kmp.texts).toHaveLength(1));
     const id = kmp.texts[0]?.id;
     expect(id).toBeDefined();
     expect(direct.value.map((m) => [m.id, m.state])).toEqual([
@@ -612,6 +614,13 @@ describe("MeshSession", () => {
     });
     session.chat.markRead({ kind: "direct", peer: PEER });
     expect(session.chat.summaries.value.get(`direct:${PEER}`)?.unread).toBe(0);
+  });
+
+  it("doesn't share our own node as a contact", async () => {
+    const { kmp, session } = connected();
+    await session.chat.send({ text: "note to self", destination: ME });
+    await Promise.resolve();
+    expect(kmp.admin().sent).toEqual([]);
   });
 
   it("shares the peer's contact with the radio before a direct message", async () => {

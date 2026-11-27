@@ -178,7 +178,7 @@ export class MeshSession {
         draftRepository: options.drafts,
         retention: options.chatRetention,
         filter: this.messageFilter,
-        onDirectSend: (peer) => void this.shareDirectContact(peer),
+        onDirectSend: (peer) => this.shareDirectContact(peer),
       },
     );
     this.telemetry = new TelemetryClient({
@@ -228,6 +228,7 @@ export class MeshSession {
 
   /** See {@link directContactAction}; failures are logged, never thrown. */
   private async shareDirectContact(peer: number): Promise<void> {
+    if (peer === this.myNodeNum) return;
     const action = directContactAction({
       peerNum: peer,
       peer: this.nodes.byNum(peer),
