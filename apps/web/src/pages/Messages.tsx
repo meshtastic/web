@@ -80,6 +80,7 @@ export const MessagesPage = () => {
   const { title, toView } = useConversationRowViews({
     channels,
     nameOf: directory.nameOf,
+    mentionName: directory.mentionName,
     peer,
     ...(directory.myNodeNum === undefined
       ? {}

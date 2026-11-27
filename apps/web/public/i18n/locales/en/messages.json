@@ -320,5 +320,10 @@
     "categoryObjects": "Objects",
     "categorySymbols": "Symbols",
     "categoryFlags": "Flags"
+  },
+  "mentions": {
+    "suggestions": "Mention a node",
+    "mentionsYou": "Mentions you",
+    "sidebarMention": "Mentions you"
   }
 }

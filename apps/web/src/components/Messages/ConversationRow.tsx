@@ -22,6 +22,11 @@ export interface ConversationRowView {
   readonly adminAccess?: boolean;
   /** A muted channel: bell-off icon, unread count de-emphasised. */
   readonly muted: boolean;
+  /**
+   * An unread message @mentions me (from a node that isn't muted): an `@`
+   * badge, and full emphasis even in a muted channel.
+   */
+  readonly mentioned?: boolean;
   /** Last message, prefixed with "You:" or the channel sender. */
   readonly preview?: string;
   readonly time?: string;
@@ -50,6 +55,9 @@ export const ConversationRow = memo(function ConversationRow({
 }: ConversationRowProps) {
   const { t } = useTranslation("messages");
   const isChannel = row.kind === "channel";
+  // A mention of me breaks through the channel's mute.
+  const quiet = row.muted && !row.mentioned;
+  const emphasised = row.unread > 0 && !quiet;
   return (
     <Link
       to="/messages/$type/$chatId"
@@ -106,7 +114,7 @@ export const ConversationRow = memo(function ConversationRow({
             <span
               className={cn(
                 "shrink-0 text-meta whitespace-nowrap",
-                row.unread > 0 && !row.muted ? "text-accent" : "text-muted",
+                emphasised ? "text-accent" : "text-muted",
               )}
             >
               {row.time}
@@ -118,16 +126,28 @@ export const ConversationRow = memo(function ConversationRow({
             className={cn(
               "truncate",
               touch ? "text-body" : "text-help",
-              row.unread > 0 && !row.muted ? "text-secondary" : "text-muted",
+              emphasised ? "text-secondary" : "text-muted",
             )}
           >
             {row.preview ?? t("sidebar.noMessages")}
           </span>
+          {row.mentioned ? (
+            <span
+              data-mention-badge=""
+              className={cn(
+                "flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-accent px-1 text-meta font-bold text-on-accent",
+                touch && "h-[22px] min-w-[22px]",
+              )}
+            >
+              <span aria-hidden="true">@</span>
+              <span className="sr-only">{t("mentions.sidebarMention")}</span>
+            </span>
+          ) : null}
           <CountBadge
             count={row.unread}
             className={cn(
               touch && "h-[22px] min-w-[22px]",
-              row.muted && "bg-raised font-semibold text-muted",
+              quiet && "bg-raised font-semibold text-muted",
             )}
           />
         </span>

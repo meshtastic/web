@@ -1,4 +1,6 @@
+import { textMentionsNode } from "@core/messaging/mentions.ts";
 import { reactionKey } from "@core/messaging/reactions.ts";
+import { formatNodeId } from "@core/utils/nodeIdentity.ts";
 import {
   and,
   asc,
@@ -8,6 +10,7 @@ import {
   getTableColumns,
   gt,
   inArray,
+  like,
   lt,
   max,
   ne,
@@ -355,36 +358,57 @@ export class SqlocalMessageRepository implements MessageRepository {
       .from(messages)
       .where(and(eq(messages.deviceId, deviceId), eq(messages.filtered, false)))
       .groupBy(messages.conversationKey);
+    const unreadOnly = and(
+      eq(messages.deviceId, deviceId),
+      eq(messages.filtered, false),
+      ne(messages.fromNode, myNodeNum),
+      // The scope is the radio's own node number: its messages are mine.
+      ne(messages.fromNode, deviceId),
+      gt(messages.seq, sql`coalesce(${readMarkers.lastReadSeq}, 0)`),
+    );
+    const readMarkerJoin = and(
+      eq(readMarkers.deviceId, messages.deviceId),
+      eq(readMarkers.conversationKey, messages.conversationKey),
+    );
     const unread = await this.db
       .select({ key: messages.conversationKey, unread: count() })
       .from(messages)
-      .leftJoin(
-        readMarkers,
-        and(
-          eq(readMarkers.deviceId, messages.deviceId),
-          eq(readMarkers.conversationKey, messages.conversationKey),
-        ),
-      )
-      .where(
-        and(
-          eq(messages.deviceId, deviceId),
-          eq(messages.filtered, false),
-          ne(messages.fromNode, myNodeNum),
-          // The scope is the radio's own node number: its messages are mine.
-          ne(messages.fromNode, deviceId),
-          gt(messages.seq, sql`coalesce(${readMarkers.lastReadSeq}, 0)`),
-        ),
-      )
+      .leftJoin(readMarkers, readMarkerJoin)
+      .where(unreadOnly)
       .groupBy(messages.conversationKey);
+    // Unread messages that @mention me. LIKE (case-insensitive for ASCII)
+    // narrows them down; the token's boundary is checked here.
+    const myId = formatNodeId(myNodeNum);
+    const mentionRows = await this.db
+      .select({
+        key: messages.conversationKey,
+        from: messages.fromNode,
+        text: messages.text,
+      })
+      .from(messages)
+      .leftJoin(readMarkers, readMarkerJoin)
+      .where(and(unreadOnly, like(messages.text, `%@${myId}%`)))
+      .orderBy(asc(messages.seq));
+    const mentionsByKey = new Map<string, number[]>();
+    for (const row of mentionRows) {
+      if (textMentionsNode(row.text, myId)) {
+        mentionsByKey.set(row.key, [
+          ...(mentionsByKey.get(row.key) ?? []),
+          row.from,
+        ]);
+      }
+    }
     const unreadByKey = new Map(unread.map((r) => [r.key, r.unread]));
     return latest.flatMap((row) => {
       const key = tryParseKey(row.conversationKey);
+      const mentionedBy = mentionsByKey.get(row.conversationKey);
       return key
         ? [
             {
               key,
               lastMessage: rowToMessage(row),
               unread: unreadByKey.get(row.conversationKey) ?? 0,
+              ...(mentionedBy ? { mentionedBy } : {}),
             },
           ]
         : [];

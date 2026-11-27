@@ -154,4 +154,32 @@ describe("useConversationRowViews", () => {
     rerender({ at: now + 70_000 });
     expect(result.current.toView(summary)).not.toBe(first);
   });
+
+  it("previews mentions by their current names and flags mentions of me", () => {
+    const summary: SidebarConversation = {
+      ...row(1),
+      mentioned: true,
+      lastMessage: {
+        from: 7,
+        excerpt: "ping @!00000001 and @!12345678",
+        rxTime: new Date(2026, 10, 21, 9, 0),
+      },
+    };
+    const { result, rerender } = renderHook(
+      ({ name }) =>
+        useConversationRowViews({
+          ...input(Date.now()),
+          mentionName: (n: number) => (n === 1 ? name : undefined),
+        }),
+      { initialProps: { name: "Base" } },
+    );
+    expect(result.current.toView(summary)).toMatchObject({
+      preview: "Node 7: ping @Base and @!12345678",
+      mentioned: true,
+    });
+    rerender({ name: "Base Camp" });
+    expect(result.current.toView(summary).preview).toBe(
+      "Node 7: ping @Base Camp and @!12345678",
+    );
+  });
 });

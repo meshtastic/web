@@ -74,6 +74,7 @@ export function useConversationSummaries(): readonly SidebarConversation[] {
   // them, so they don't rebuild the sidebar.
   const favorites = useSignal(client?.nodes.favoriteNums ?? NO_NODES);
   const ignored = useSignal(client?.nodes.ignoredNums ?? NO_NODES);
+  const muted = useSignal(client?.nodes.mutedNums ?? NO_NODES);
   const [stabilize] = useState(createRowStabilizer);
   const channelSlots = useMemo(
     () =>
@@ -91,9 +92,10 @@ export function useConversationSummaries(): readonly SidebarConversation[] {
           channels: channelSlots,
           isFavoriteNode: (num) => favorites.has(num),
           isHiddenNode: (num) => ignored.has(num),
+          isMutedNode: (num) => muted.has(num),
         }),
       ),
-    [stabilize, summaries, channelSlots, favorites, ignored],
+    [stabilize, summaries, channelSlots, favorites, ignored, muted],
   );
 }
 
@@ -136,4 +138,10 @@ export function useMessagingActions(): MessagingActions {
       markRead: (key) => chat.markRead(key),
     };
   }, [client]);
+}
+
+/** Muted node numbers on the active connection. */
+export function useMutedNodeNums(): ReadonlySet<number> {
+  const client = useActiveClient();
+  return useSignal(client?.nodes.mutedNums ?? NO_NODES);
 }

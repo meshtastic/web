@@ -2,6 +2,7 @@ import { channelLabel } from "@core/channels/channelLabel.ts";
 import { isChannelMuted } from "@core/channels/mute.ts";
 import type { Channel } from "@core/kmp/channels.ts";
 import type { SidebarConversation } from "@core/messaging/conversations.ts";
+import { type MentionName, mentionsToText } from "@core/messaging/mentions.ts";
 import { previewAuthor } from "@core/messaging/sidebarView.ts";
 import { formatListTimestamp } from "@core/utils/timeFormat.ts";
 import { useCallback, useMemo, useState } from "react";
@@ -21,11 +22,15 @@ export interface ConversationRowViewsInput {
   readonly nameOf: (nodeNum: number) => string;
   readonly peer: (nodeNum: number) => PeerPresence | undefined;
   readonly myNodeNum?: number;
+  /** Names for @mentions in previews; stable while names don't change. */
+  readonly mentionName?: MentionName;
   /** Epoch ms; rows only re-render when the minute changes. */
   readonly now: number;
 }
 
 const MINUTE_MS = 60_000;
+
+const NO_NAMES: MentionName = () => undefined;
 
 interface CachedRow {
   readonly signature: string;
@@ -43,6 +48,7 @@ export function useConversationRowViews({
   nameOf,
   peer,
   myNodeNum,
+  mentionName = NO_NAMES,
   now,
 }: ConversationRowViewsInput) {
   const { t, i18n } = useTranslation("messages");
@@ -79,6 +85,9 @@ export function useConversationRowViews({
       const last = row.lastMessage;
       const author = previewAuthor(row, myNodeNum);
       const senderName = author.kind === "sender" ? nameOf(author.nodeNum) : "";
+      // Mentions by their current names, never the raw tokens.
+      const text = last ? mentionsToText(last.excerpt, mentionName) : "";
+      const mentioned = row.mentioned === true;
       const signature = [
         name,
         presence?.initials ?? "",
@@ -87,6 +96,8 @@ export function useConversationRowViews({
         muted,
         author.kind,
         senderName,
+        text,
+        mentioned,
         minute,
         locale,
       ].join("\u0000");
@@ -96,13 +107,13 @@ export function useConversationRowViews({
       }
       const preview = last
         ? author.kind === "me"
-          ? t("sidebar.previewYou", { text: last.excerpt })
+          ? t("sidebar.previewYou", { text })
           : author.kind === "sender"
             ? t("sidebar.previewSender", {
                 name: senderName,
-                text: last.excerpt,
+                text,
               })
-            : last.excerpt
+            : text
         : undefined;
       const common = {
         id: row.id,
@@ -110,6 +121,7 @@ export function useConversationRowViews({
         unread: row.unread,
         favorite: row.favorite,
         muted,
+        ...(mentioned ? { mentioned } : {}),
         ...(preview === undefined ? {} : { preview }),
         ...(last
           ? { time: formatListTimestamp(last.rxTime, minute, locale) }
@@ -136,7 +148,18 @@ export function useConversationRowViews({
       cache.set(row, { signature, view });
       return view;
     },
-    [cache, channelByIndex, locale, minute, myNodeNum, nameOf, peer, t, title],
+    [
+      cache,
+      channelByIndex,
+      locale,
+      mentionName,
+      minute,
+      myNodeNum,
+      nameOf,
+      peer,
+      t,
+      title,
+    ],
   );
 
   return { title, toView };

@@ -9,11 +9,13 @@ import {
   buildSidebarConversations,
   createRowStabilizer,
   EMPTY_SUMMARIES,
+  mentionAttention,
   mergeStored,
   sidebarAccessors,
   stabilizeRows,
   totalUnread,
   unreadCounts,
+  unreadMentions,
   withMessage,
   withMessagePatched,
   withoutConversation,
@@ -206,5 +208,62 @@ describe("buildSidebarConversations", () => {
       filterConversations(rows, { filter: "all", search: "there" }, accessors)
         .length,
     ).toBe(1);
+  });
+});
+
+describe("unread mentions of me", () => {
+  const from = (id: number, sender: number) => ({
+    ...msg(id, id * 1000),
+    from: sender,
+  });
+
+  it("records who mentioned me among the unread, until read", () => {
+    let map = withMessage(EMPTY_SUMMARIES, PRIMARY, from(1, 7), true, true);
+    map = withMessage(map, PRIMARY, from(2, 8), true, false);
+    map = withMessage(map, PRIMARY, from(3, 9), true, true);
+    expect(map.get("channel:0")?.mentionedBy).toEqual([7, 9]);
+    expect(unreadMentions(map).get("channel:0")).toEqual([7, 9]);
+    map = withRead(map, PRIMARY);
+    expect(map.get("channel:0")?.mentionedBy).toBeUndefined();
+    expect(map.get("channel:0")?.unread).toBe(0);
+    expect(unreadMentions(map).size).toBe(0);
+  });
+
+  it("doesn't record a mention that isn't counted unread", () => {
+    const map = withMessage(EMPTY_SUMMARIES, PRIMARY, from(1, 7), false, true);
+    expect(map.get("channel:0")?.mentionedBy).toBeUndefined();
+  });
+
+  it("merges stored mentions with ones that arrived since", () => {
+    const live = withMessage(EMPTY_SUMMARIES, PRIMARY, from(5, 9), true, true);
+    const merged = mergeStored(
+      live,
+      [{ key: PRIMARY, lastMessage: from(4, 7), unread: 2, mentionedBy: [7] }],
+      new Map([["channel:0", 1]]),
+      new Map([["channel:0", [9]]]),
+    );
+    expect(merged.get("channel:0")).toMatchObject({
+      unread: 3,
+      mentionedBy: [7, 9],
+    });
+  });
+
+  it("counts only mentions from nodes that aren't muted", () => {
+    expect(mentionAttention([7, 8, 7], (n) => n === 8)).toBe(2);
+    expect(mentionAttention([8], (n) => n === 8)).toBe(0);
+    expect(mentionAttention(undefined, () => false)).toBe(0);
+  });
+
+  it("flags the sidebar row unless every mention is from a muted node", () => {
+    const map = withMessage(EMPTY_SUMMARIES, PRIMARY, from(1, 8), true, true);
+    const build = (muted: ReadonlySet<number>) =>
+      buildSidebarConversations({
+        summaries: map,
+        channels: [{ index: 0, enabled: true }],
+        isFavoriteNode: () => false,
+        isMutedNode: (n) => muted.has(n),
+      })[0];
+    expect(build(new Set())?.mentioned).toBe(true);
+    expect(build(new Set([8]))?.mentioned).toBeUndefined();
   });
 });

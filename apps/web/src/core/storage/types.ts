@@ -96,6 +96,8 @@ export interface StoredConversation {
   readonly lastMessage: Message;
   /** Messages from others after the conversation's read marker. */
   readonly unread: number;
+  /** Senders of the unread messages that @mention me, oldest first. */
+  readonly mentionedBy?: readonly number[];
 }
 
 /** Fields an ack or NAK can change on a stored message. */

@@ -36,11 +36,12 @@ import { useAppStore, useDevice } from "@core/stores";
 import { formatNodeId } from "@core/utils/nodeIdentity.ts";
 import type { LoRaSignalSettings } from "@core/utils/signalQuality.ts";
 import { useNavigate } from "@tanstack/react-router";
-import { type ReactNode, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChatHeaderActions, ChatHeaderIdentity } from "./ChatHeader.tsx";
 import { ConversationThread } from "./ConversationThread.tsx";
 import { ChannelDetailsPanel, DirectDetailsPanel } from "./DetailsPanels.tsx";
+import type { MentionSuggestion } from "./MentionSuggestions.tsx";
 import { useMarkReadWhileVisible } from "./useMarkReadWhileVisible.ts";
 import type { MessagingDirectory } from "./useMessagingDirectory.ts";
 
@@ -73,6 +74,7 @@ export const ConversationScreen = ({
   const client = useActiveClient();
   const connected = client !== undefined;
   const { traceroutes, config, setDialogOpen } = useDevice();
+  const setNodeNumDetails = useAppStore((state) => state.setNodeNumDetails);
   const [, setDetailsOpen] = useLocalStorage<boolean>(
     DETAILS_PANEL_STORAGE_KEY,
     true,
@@ -102,6 +104,36 @@ export const ConversationScreen = ({
   );
   const nodeActions = useNodeActions(peerRow);
   const adminAccess = useAdminAccess(peerRow);
+  // `@` offers every node but this radio and ignored ones, most recently
+  // heard first.
+  const mentionCandidates = useMemo<readonly MentionSuggestion[]>(
+    () =>
+      directory.rows
+        .filter((row) => !row.isSelf && !row.isIgnored)
+        .toSorted((a, b) => (b.lastHeardMs ?? 0) - (a.lastHeardMs ?? 0))
+        .map((row) => {
+          const longName = directory.mentionName(row.num);
+          return {
+            num: row.num,
+            id: row.id,
+            name: row.name,
+            initials: row.initials,
+            online: row.isOnline,
+            ...(row.shortName ? { shortName: row.shortName } : {}),
+            // The short name alone isn't a long name to match on.
+            ...(longName && longName !== row.shortName ? { longName } : {}),
+          };
+        }),
+    [directory],
+  );
+  // A mention opens the node's details, like the command palette does.
+  const openNode = useCallback(
+    (num: number) => {
+      setNodeNumDetails(num);
+      setDialogOpen("nodeDetails", true);
+    },
+    [setNodeNumDetails, setDialogOpen],
+  );
 
   useMarkReadWhileVisible(client?.chat.unread, conversation);
 
@@ -321,6 +353,9 @@ export const ConversationScreen = ({
         traceroutes={traces}
         sender={directory.sender}
         nameOf={directory.nameOf}
+        mentionName={directory.mentionName}
+        mentionCandidates={mentionCandidates}
+        onOpenNode={openNode}
         {...(directory.myNodeNum === undefined
           ? {}
           : { myNodeNum: directory.myNodeNum })}

@@ -4,6 +4,7 @@ import {
   type SummaryMap,
   totalUnread,
   unreadCounts,
+  unreadMentions,
   withMessage,
   withMessagePatched,
   withoutConversation,
@@ -23,6 +24,7 @@ import {
   shouldFilterIncoming,
   type ThreadFilterResult,
 } from "@core/messaging/messageFilter.ts";
+import { textMentionsNode } from "@core/messaging/mentions.ts";
 import { reactionKey, toggleReaction } from "@core/messaging/reactions.ts";
 import {
   INITIAL_PRUNE_SCHEDULE,
@@ -55,6 +57,7 @@ import {
   type ReactionDeliveryPatch,
   type RetentionPolicy,
 } from "@core/storage/types.ts";
+import { formatNodeId } from "@core/utils/nodeIdentity.ts";
 import type { SendHandleJs } from "@meshtastic/sdk-kmp";
 import { batch, computed, type Signal, signal } from "@preact/signals-core";
 import { Result } from "better-result";
@@ -380,6 +383,10 @@ export interface ChatDrafts {
 
 export interface ChatUnread {
   readonly byKey: ReadonlySignal<ReadonlyMap<string, number>>;
+  /** Senders of unread messages that @mention me, per conversation. */
+  readonly mentionsByKey: ReadonlySignal<
+    ReadonlyMap<string, readonly number[]>
+  >;
   readonly total: ReadonlySignal<number>;
   count(key: ConversationKey): ReadonlySignal<number>;
   markRead(key: ConversationKey): void;
@@ -464,6 +471,8 @@ export class ChatClient {
   private readonly readDuringHydration = new Set<string>();
   /** Unread counted per conversation since the summary load started. */
   private readonly liveUnread = new Map<string, number>();
+  /** Unread mentions of me (their senders) since the summary load started. */
+  private readonly liveMentions = new Map<string, number[]>();
   /** Reply targets fetched from storage because they are out of view. */
   private readonly replyTargets = signal<ReadonlyMap<number, Message>>(
     new Map(),
@@ -507,6 +516,7 @@ export class ChatClient {
     const byKey = deriveSignal(this.summaries, unreadCounts);
     this.unread = {
       byKey,
+      mentionsByKey: deriveSignal(this.summaries, unreadMentions),
       total: deriveSignal(this.summaries, totalUnread),
       count: (key) => {
         const k = conversationKeyString(key);
@@ -594,8 +604,16 @@ export class ChatClient {
     const active = key === this.activeKey;
     // A filtered message is neither unread nor the preview (as on Android).
     const countUnread = packet.from !== myNodeNum && !active && !filtered;
+    const mentionsMe =
+      countUnread && textMentionsNode(inbound.text, formatNodeId(myNodeNum));
     if (countUnread) {
       this.liveUnread.set(key, (this.liveUnread.get(key) ?? 0) + 1);
+    }
+    if (mentionsMe) {
+      this.liveMentions.set(key, [
+        ...(this.liveMentions.get(key) ?? []),
+        packet.from,
+      ]);
     }
     if (!filtered) {
       this.summaryStore.value = withMessage(
@@ -603,6 +621,7 @@ export class ChatClient {
         conv,
         message,
         countUnread,
+        mentionsMe,
       );
     }
     this.persistAppend(message, conv, active);
@@ -1022,6 +1041,7 @@ export class ChatClient {
     const k = conversationKeyString(key);
     this.readDuringHydration.add(k);
     this.liveUnread.delete(k);
+    this.liveMentions.delete(k);
     this.summaryStore.value = withRead(this.summaryStore.peek(), key);
     this.persist((repo) => repo.markRead(key));
   }
@@ -1122,6 +1142,7 @@ export class ChatClient {
     const epoch = this.epoch;
     this.readDuringHydration.clear();
     this.liveUnread.clear();
+    this.liveMentions.clear();
     void this.writes
       .then(() => repo.loadConversations(me))
       .then((stored) => {
@@ -1130,6 +1151,7 @@ export class ChatClient {
           this.summaryStore.peek(),
           stored,
           this.liveUnread,
+          this.liveMentions,
         );
         const read = [...this.readDuringHydration];
         if (this.activeKey) read.push(this.activeKey);

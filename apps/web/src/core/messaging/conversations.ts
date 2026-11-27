@@ -15,7 +15,37 @@ export interface ConversationSummary {
   readonly key: ConversationKey;
   readonly lastMessage?: Message;
   readonly unread: number;
+  /**
+   * Who sent the unread messages that @mention me, one entry per message
+   * (see `mentionAttention`).
+   */
+  readonly mentionedBy?: readonly number[];
 }
+
+/**
+ * How many of `mentionedBy` deserve attention: a mention of me breaks
+ * through a muted channel (it is a ping aimed at me), but a muted node
+ * can't force it, as on Android.
+ */
+export const mentionAttention = (
+  mentionedBy: readonly number[] | undefined,
+  isMutedNode: (nodeNum: number) => boolean,
+): number => {
+  let count = 0;
+  for (const from of mentionedBy ?? []) {
+    if (!isMutedNode(from)) count++;
+  }
+  return count;
+};
+
+const withMention = (
+  mentionedBy: readonly number[] | undefined,
+  from: number | undefined,
+): { readonly mentionedBy?: readonly number[] } => {
+  const all =
+    from === undefined ? (mentionedBy ?? []) : [...(mentionedBy ?? []), from];
+  return all.length > 0 ? { mentionedBy: all } : {};
+};
 
 export type SummaryMap = ReadonlyMap<string, ConversationSummary>;
 
@@ -24,13 +54,15 @@ export const EMPTY_SUMMARIES: SummaryMap = new Map();
 /**
  * Records a message as it arrives (or is sent): it becomes the preview,
  * since previews follow arrival order like storage's `seq` (the radio's
- * `rxTime` can be skewed), and counts unread when `countUnread`.
+ * `rxTime` can be skewed), and counts unread when `countUnread` (as an
+ * unread mention of me too when `mentionsMe`).
  */
 export const withMessage = (
   map: SummaryMap,
   key: ConversationKey,
   message: Message,
   countUnread: boolean,
+  mentionsMe: boolean = false,
 ): SummaryMap => {
   const k = conversationKeyString(key);
   const current = map.get(k);
@@ -39,6 +71,10 @@ export const withMessage = (
     key,
     lastMessage: message,
     unread: (current?.unread ?? 0) + (countUnread ? 1 : 0),
+    ...withMention(
+      current?.mentionedBy,
+      countUnread && mentionsMe ? message.from : undefined,
+    ),
   });
   return next;
 };
@@ -64,9 +100,13 @@ export const withMessagePatched = (
 export const withRead = (map: SummaryMap, key: ConversationKey): SummaryMap => {
   const k = conversationKeyString(key);
   const current = map.get(k);
-  if (!current || current.unread === 0) return map;
+  if (!current || (current.unread === 0 && !current.mentionedBy)) return map;
   const next = new Map(map);
-  next.set(k, { ...current, unread: 0 });
+  next.set(k, {
+    key: current.key,
+    ...(current.lastMessage ? { lastMessage: current.lastMessage } : {}),
+    unread: 0,
+  });
   return next;
 };
 
@@ -85,12 +125,14 @@ export const withoutConversation = (
  * Folds what storage held when hydration started into what arrived since.
  * A preview that arrived live is newer than anything stored; unread is the
  * stored count plus `liveUnread`, the messages counted since hydration
- * started (storage hadn't seen those yet).
+ * started (storage hadn't seen those yet); unread mentions of me likewise
+ * with `liveMentions`.
  */
 export const mergeStored = (
   map: SummaryMap,
   stored: readonly StoredConversation[],
   liveUnread: ReadonlyMap<string, number>,
+  liveMentions: ReadonlyMap<string, readonly number[]> = new Map(),
 ): SummaryMap => {
   if (stored.length === 0) return map;
   const next = new Map(map);
@@ -101,9 +143,22 @@ export const mergeStored = (
       key: s.key,
       lastMessage: current?.lastMessage ?? s.lastMessage,
       unread: s.unread + (liveUnread.get(k) ?? 0),
+      ...withMention(
+        [...(s.mentionedBy ?? []), ...(liveMentions.get(k) ?? [])],
+        undefined,
+      ),
     });
   }
   return next;
+};
+
+/** Unread mentions of me per conversation, keyed by `conversationKeyString`. */
+export const unreadMentions = (
+  map: SummaryMap,
+): ReadonlyMap<string, readonly number[]> => {
+  const out = new Map<string, readonly number[]>();
+  for (const [k, s] of map) if (s.mentionedBy) out.set(k, s.mentionedBy);
+  return out;
 };
 
 /** Conversations with unread messages, keyed by `conversationKeyString`. */
@@ -137,6 +192,11 @@ export interface SidebarConversation {
   };
   readonly unread: number;
   readonly favorite: boolean;
+  /**
+   * An unread message @mentions me, from a node that isn't muted: worth
+   * attention even in a muted channel.
+   */
+  readonly mentioned?: boolean;
 }
 
 export interface SidebarChannel {
@@ -153,6 +213,8 @@ export interface BuildSidebarInput {
   readonly isFavoriteNode: (nodeNum: number) => boolean;
   /** Nodes not to list (e.g. ignored ones). */
   readonly isHiddenNode?: (nodeNum: number) => boolean;
+  /** Muted nodes: their mentions of me don't ask for attention. */
+  readonly isMutedNode?: (nodeNum: number) => boolean;
 }
 
 /**
@@ -168,6 +230,11 @@ export const buildSidebarConversations = (
     summary: ConversationSummary | undefined,
   ): SidebarConversation => {
     const last = summary?.lastMessage;
+    const mentioned =
+      mentionAttention(
+        summary?.mentionedBy,
+        input.isMutedNode ?? (() => false),
+      ) > 0;
     return {
       id: conversationKeyString(key),
       key,
@@ -186,6 +253,7 @@ export const buildSidebarConversations = (
         : {}),
       unread: summary?.unread ?? 0,
       favorite: key.kind === "direct" && input.isFavoriteNode(key.peer),
+      ...(mentioned ? { mentioned } : {}),
     };
   };
   const channels = input.channels
@@ -221,6 +289,7 @@ const sameRow = (a: SidebarConversation, b: SidebarConversation): boolean =>
   a.id === b.id &&
   a.unread === b.unread &&
   a.favorite === b.favorite &&
+  a.mentioned === b.mentioned &&
   a.lastMessage?.from === b.lastMessage?.from &&
   a.lastMessage?.excerpt === b.lastMessage?.excerpt &&
   a.lastMessage?.rxTime.getTime() === b.lastMessage?.rxTime.getTime();

@@ -1,6 +1,7 @@
 import { ConfirmDialog } from "@components/UI/ConfirmDialog.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDraft, useMessagingActions, useThread } from "@core/kmp/hooks";
+import { type MentionName, mentionsToText } from "@core/messaging/mentions.ts";
 import { buildTimeline, messageKey } from "@core/messaging/messageListView.ts";
 import { excerpt, type ThreadMessage } from "@core/messaging/thread.ts";
 import type { TracerouteView } from "@core/messaging/tracerouteView.ts";
@@ -11,8 +12,9 @@ import { formatClockTime, formatDayLabel } from "@core/utils/timeFormat.ts";
 import { Result } from "better-result";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Composer } from "./Composer.tsx";
+import { Composer, type ComposerMentions } from "./Composer.tsx";
 import { DeliveryDetailsDialog } from "./DeliveryDetailsDialog.tsx";
+import type { MentionSuggestion } from "./MentionSuggestions.tsx";
 import type { BubbleSender } from "./MessageBubble.tsx";
 import { MessageList, type MessageListHandlers } from "./MessageList.tsx";
 import { useEmojiPrefs } from "./useEmoji.ts";
@@ -28,6 +30,12 @@ export interface ConversationThreadProps {
   traceroutes: readonly TracerouteView[];
   sender: (nodeNum: number) => BubbleSender;
   nameOf: (nodeNum: number) => string;
+  /** Current names for @mentions (undefined: show the raw token). */
+  mentionName?: MentionName;
+  /** Nodes the composer's `@` offers. */
+  mentionCandidates?: readonly MentionSuggestion[];
+  /** Opens a node's details, from an @mention. */
+  onOpenNode?: (nodeNum: number) => void;
   myNodeNum?: number;
   lora?: LoRaSignalSettings;
   /** Muted channel: no screen reader announcements for arriving text. */
@@ -38,6 +46,9 @@ export interface ConversationThreadProps {
   onConfirmClearChange: (open: boolean) => void;
   onClear: () => void;
 }
+
+const NO_NAMES: MentionName = () => undefined;
+const NO_CANDIDATES: readonly MentionSuggestion[] = [];
 
 interface ReplyTarget {
   readonly id: number;
@@ -61,6 +72,9 @@ export const ConversationThread = ({
   traceroutes,
   sender,
   nameOf,
+  mentionName = NO_NAMES,
+  mentionCandidates = NO_CANDIDATES,
+  onOpenNode,
   myNodeNum,
   lora,
   muted,
@@ -135,7 +149,7 @@ export const ConversationThread = ({
           name: thread.outgoing
             ? t("reply.yourself")
             : nameOf(thread.message.from),
-          excerpt: excerpt(thread.message.text),
+          excerpt: excerpt(mentionsToText(thread.message.text, mentionName)),
         });
         composerRef.current?.focus();
       },
@@ -146,8 +160,9 @@ export const ConversationThread = ({
           failToast(t("thread.copyFailed"));
           return;
         }
+        // As shown: names, not the mention tokens.
         clipboard
-          .writeText(thread.message.text)
+          .writeText(mentionsToText(thread.message.text, mentionName))
           .then(() => toast({ title: t("thread.copied") }))
           .catch(() => failToast(t("thread.copyFailed")));
       },
@@ -155,8 +170,22 @@ export const ConversationThread = ({
         setDetailsKey(messageKey(thread.message)),
       retry: (thread: ThreadMessage) => retry(thread.message.id),
       retryReaction: retry,
+      ...(onOpenNode ? { openNode: onOpenNode } : {}),
     }),
-    [toggleReaction, nameOf, failToast, toast, retry, t],
+    [
+      toggleReaction,
+      nameOf,
+      mentionName,
+      onOpenNode,
+      failToast,
+      toast,
+      retry,
+      t,
+    ],
+  );
+  const mentions = useMemo<ComposerMentions>(
+    () => ({ candidates: mentionCandidates, name: mentionName }),
+    [mentionCandidates, mentionName],
   );
 
   const send = (text: string) => {
@@ -223,6 +252,8 @@ export const ConversationThread = ({
         locale={locale}
         {...(lora ? { lora } : {})}
         announce={!muted}
+        mentionName={mentionName}
+        {...(myNodeNum === undefined ? {} : { myNodeNum })}
       />
       <Composer
         ref={composerRef}
@@ -240,6 +271,7 @@ export const ConversationThread = ({
         value={draft.text}
         onChange={draft.setText}
         onSend={send}
+        mentions={mentions}
         disabled={!connected}
         {...(reply ? { replying: reply } : {})}
         onCancelReply={() => {

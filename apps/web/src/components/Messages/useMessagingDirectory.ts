@@ -1,4 +1,5 @@
 import { useNodeRows } from "@components/Nodes/useNodeRows.ts";
+import { mentionLabel, type MentionName } from "@core/messaging/mentions.ts";
 import type { NodeRow } from "@core/nodes/nodeRow.ts";
 import { nodeIdSuffix } from "@core/utils/nodeIdentity.ts";
 import { useCallback, useMemo } from "react";
@@ -17,6 +18,12 @@ export interface MessagingDirectory {
   /** Long name, short name, or "Meshtastic 5A97". Stable while names don't change. */
   readonly nameOf: (nodeNum: number) => string;
   readonly sender: (nodeNum: number) => BubbleSender;
+  /**
+   * What an @mention of the node shows: long name, else short name;
+   * undefined when we know no name (the mention shows the raw token).
+   * Stable while names don't change.
+   */
+  readonly mentionName: MentionName;
 }
 
 /**
@@ -41,8 +48,24 @@ export function useMessagingDirectory(): MessagingDirectory {
     [channels],
   );
 
+  const labels = useMemo(
+    () =>
+      new Map(
+        sources.map((node) => [
+          node.num,
+          mentionLabel({
+            longName: node.user?.longName,
+            shortName: node.user?.shortName,
+          }) ?? "",
+        ]),
+      ),
+    [sources],
+  );
   const identitySignature = rows
-    .map((row) => `${row.num}\u0000${row.name}\u0000${row.initials}`)
+    .map(
+      (row) =>
+        `${row.num}\u0000${row.name}\u0000${row.initials}\u0000${labels.get(row.num) ?? ""}`,
+    )
     .join("\u0001");
   // Rebuilt from the signature, so it changes only when names do.
   const identities = useMemo(
@@ -52,8 +75,9 @@ export function useMessagingDirectory(): MessagingDirectory {
           .split("\u0001")
           .filter(Boolean)
           .map((entry) => {
-            const [num = "0", name = "", initials = ""] = entry.split("\u0000");
-            return [Number(num), { name, initials }] as const;
+            const [num = "0", name = "", initials = "", label = ""] =
+              entry.split("\u0000");
+            return [Number(num), { name, initials, label }] as const;
           }),
       ),
     [identitySignature],
@@ -78,6 +102,11 @@ export function useMessagingDirectory(): MessagingDirectory {
     [identities, t],
   );
 
+  const mentionName = useCallback<MentionName>(
+    (nodeNum) => identities.get(nodeNum)?.label || undefined,
+    [identities],
+  );
+
   // Changes with the rows (telemetry); depend on `nameOf` / `sender` where
   // stability matters.
   return useMemo(
@@ -89,7 +118,8 @@ export function useMessagingDirectory(): MessagingDirectory {
       now,
       nameOf,
       sender,
+      mentionName,
     }),
-    [rows, byNum, channelOf, myNodeNum, now, nameOf, sender],
+    [rows, byNum, channelOf, myNodeNum, now, nameOf, sender, mentionName],
   );
 }

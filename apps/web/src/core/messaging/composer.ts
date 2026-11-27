@@ -32,17 +32,42 @@ export interface ComposerKey {
   /** An IME composition is in progress: Enter confirms it, not the message. */
   readonly isComposing: boolean;
   readonly replying: boolean;
+  /** The @mention suggestions are showing. */
+  readonly mentionOpen?: boolean;
 }
 
-export type ComposerKeyAction = "send" | "cancelReply" | "default";
+export type ComposerKeyAction =
+  | "send"
+  | "cancelReply"
+  | "mentionNext"
+  | "mentionPrevious"
+  | "mentionPick"
+  | "mentionClose"
+  | "default";
+
+const mentionKeys: Readonly<Record<string, ComposerKeyAction>> = {
+  ArrowDown: "mentionNext",
+  ArrowUp: "mentionPrevious",
+  Enter: "mentionPick",
+  Tab: "mentionPick",
+  Escape: "mentionClose",
+};
 
 /**
  * Enter sends, Shift+Enter inserts a newline (the textarea's default),
- * Escape cancels a reply.
+ * Escape cancels a reply. While @mention suggestions show, the arrows
+ * move through them, Enter or Tab picks one and Escape closes them
+ * (leaving the reply alone).
  */
 export const composerKeyAction = (input: ComposerKey): ComposerKeyAction => {
   if (input.isComposing) {
     return "default";
+  }
+  if (input.mentionOpen && !input.shiftKey) {
+    const action = mentionKeys[input.key];
+    if (action) {
+      return action;
+    }
   }
   if (input.key === "Enter" && !input.shiftKey) {
     return "send";
