@@ -21,7 +21,8 @@ export async function createMemoryStorage(): Promise<{
 }> {
   const SQL = await initSqlJs({});
   const sqlite = new SQL.Database();
-  for (const statement of schemaStatements(0, [])) sqlite.run(statement);
+  for (const statement of schemaStatements({ version: 0 }))
+    sqlite.run(statement);
   const atomic: RunAtomically = async (statements) => {
     sqlite.run("BEGIN");
     try {

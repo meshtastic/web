@@ -36,6 +36,15 @@ describe("sdkStorage singletons", () => {
     expect(second).not.toBe(first);
   });
 
+  it("tries again after a failed open instead of keeping the failure", async () => {
+    sqlocal.open.mockRejectedValueOnce(new Error("SQLITE_BUSY"));
+    const { getStorageDb } = await import("./sdkStorage.ts");
+    await expect(getStorageDb()).rejects.toThrow(/SQLITE_BUSY/);
+    const opened = await getStorageDb();
+    expect(opened.persistent).toBe(true);
+    expect(sqlocal.open).toHaveBeenCalledTimes(2);
+  });
+
   it("closing while nothing is open is a no-op", async () => {
     const { closeStorageDb } = await import("./sdkStorage.ts");
     await closeStorageDb();

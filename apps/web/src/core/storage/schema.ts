@@ -19,18 +19,45 @@ import { MessageState } from "./types.ts";
  * Every table is scoped by `device_id`: the node number of the radio the
  * history belongs to.
  *
- * There are no migrations. The schema is stamped in `PRAGMA user_version`;
- * a database carrying any other version is wiped and recreated on open (see
- * `schemaStatements`). The file name is new as well, so a database written by
- * an older release is never opened at all.
+ * The schema is stamped in `PRAGMA user_version`. On open, a database at an
+ * older version is upgraded step by step through `MIGRATIONS`; one that
+ * can't be (no step for it, or newer than this release) is wiped and
+ * recreated (see `schemaStatements`). The file name is new as well, so a
+ * database written by a release before versioning is never opened at all.
  */
 export const DATABASE_FILE = "meshtastic-app-v1.db";
 
 /**
- * Bump whenever the DDL below changes; older databases are wiped.
- * schema.test.ts pins the DDL per version, so an edit without a bump fails.
+ * Bump whenever the DDL below changes, and add the `MIGRATIONS` step that
+ * brings the previous version up to it. schema.test.ts pins the DDL per
+ * version and checks the steps, so an edit without both fails.
  */
 export const SCHEMA_VERSION = 2;
+
+/**
+ * The oldest version that can still be upgraded. Databases from before it
+ * are wiped: there is no step for them.
+ */
+export const FIRST_MIGRATABLE_VERSION = 2;
+
+/**
+ * Upgrade steps: `MIGRATIONS[n]` takes a database from version `n` to
+ * `n + 1`. Steps run in order inside the open transaction, followed by the
+ * idempotent `SCHEMA_SQL` (which creates any new table or index) and the
+ * new version stamp. Prefer additive changes (`ALTER TABLE ... ADD COLUMN`,
+ * new tables, new indexes); see SCHEMA.md for what SQLite can't alter.
+ */
+export const MIGRATIONS: Readonly<Record<number, ReadonlyArray<string>>> = {};
+
+/**
+ * The minimum reader version `SCHEMA_VERSION` declares: the oldest app
+ * schema that can still safely read and write a file at this version. An
+ * additive change (a nullable column, a new table or index) keeps it where
+ * it was, since older code ignores what it doesn't know; a change older code
+ * would misread raises it to the new version. Stored in the file (see
+ * `SCHEMA_META_SQL`), so an older release that opens it knows whether it may.
+ */
+export const MIN_READER_VERSION = 2;
 
 const MESSAGE_STATES = [
   MessageState.Pending,
@@ -346,21 +373,119 @@ export const SCHEMA_SQL: ReadonlyArray<string> = [
 ];
 
 /**
- * What to run against a database found at `currentVersion` holding
- * `existingTables` (user tables; `sqlite_*` internals are skipped). At the
- * current version the DDL is re-run idempotently; any other version (an empty
- * file is 0) has its tables dropped first, then the schema is created and
- * stamped. Pure, so the wipe rule is unit-tested without a database.
+ * Bookkeeping kept in the file next to `PRAGMA user_version`: the minimum
+ * reader version (`min_reader_version`). A table rather than a header field
+ * so it is self-describing and can take more keys; it is not part of
+ * `SCHEMA_SQL`, because it describes the file rather than the data and is
+ * managed by `schemaStatements` alone.
+ */
+export const SCHEMA_META_TABLE = "schema_meta";
+export const MIN_READER_KEY = "min_reader_version";
+
+const SCHEMA_META_SQL = `CREATE TABLE IF NOT EXISTS ${SCHEMA_META_TABLE} (
+    key TEXT PRIMARY KEY,
+    value INTEGER NOT NULL
+  )`;
+
+/** Reads the floor back; `applySchema` runs it on a file newer than the app. */
+export const READ_MIN_READER_SQL = `SELECT value FROM ${SCHEMA_META_TABLE} WHERE key = '${MIN_READER_KEY}'`;
+
+const writeMinReader = (version: number, keepExisting: boolean): string =>
+  keepExisting
+    ? `INSERT OR IGNORE INTO ${SCHEMA_META_TABLE} (key, value) VALUES ('${MIN_READER_KEY}', ${version})`
+    : `INSERT INTO ${SCHEMA_META_TABLE} (key, value) VALUES ('${MIN_READER_KEY}', ${version}) ON CONFLICT(key) DO UPDATE SET value = excluded.value`;
+
+/** What `schemaStatements` builds towards; tests pass their own. */
+export interface SchemaPlan {
+  readonly version: number;
+  /** The minimum reader version this version declares. */
+  readonly minReader: number;
+  /** The oldest version `migrations` can upgrade. */
+  readonly firstMigratable: number;
+  readonly sql: ReadonlyArray<string>;
+  readonly migrations: Readonly<Record<number, ReadonlyArray<string>>>;
+}
+
+export const CURRENT_SCHEMA: SchemaPlan = {
+  version: SCHEMA_VERSION,
+  minReader: MIN_READER_VERSION,
+  firstMigratable: FIRST_MIGRATABLE_VERSION,
+  sql: SCHEMA_SQL,
+  migrations: MIGRATIONS,
+};
+
+/**
+ * The upgrade steps from `from` to `plan.version`, in order, or undefined
+ * when there is no path: `from` is 0, older than `plan.firstMigratable`,
+ * not older than the plan, or a step is missing.
+ */
+export const migrationSteps = (
+  from: number,
+  plan: SchemaPlan = CURRENT_SCHEMA,
+): string[] | undefined => {
+  if (from < plan.firstMigratable || from <= 0 || from >= plan.version) {
+    return undefined;
+  }
+  const steps: string[] = [];
+  for (let version = from; version < plan.version; version++) {
+    const step = plan.migrations[version];
+    if (!step) return undefined;
+    steps.push(...step);
+  }
+  return steps;
+};
+
+/** What `schemaStatements` knows about the file it opens. */
+export interface FileSchema {
+  /** `PRAGMA user_version`; 0 for an empty file. */
+  readonly version: number;
+  /** User tables in it; needed unless the version matches. */
+  readonly tables?: ReadonlyArray<string>;
+  /** Its minimum reader version; needed when it is newer than the app. */
+  readonly minReader?: number;
+}
+
+/**
+ * What to run against a file, all in one transaction (see `applySchema`):
+ *
+ * - at the app's version: the idempotent DDL again, and the minimum reader
+ *   version recorded if the file has none yet;
+ * - at an older version with a step for every version up to the app's:
+ *   those steps in order, the DDL, then both stamps;
+ * - at a newer version whose minimum reader version the app meets (a
+ *   reverted deploy, an old tab, a stale cached bundle): only the
+ *   idempotent DDL, leaving the file's data and stamps alone;
+ * - anything else (an empty file, an older version with no path, a newer
+ *   one the app can't read): every table dropped, the schema created and
+ *   both stamps written.
+ *
+ * Pure, so the rules are unit-tested without a database.
  */
 export const schemaStatements = (
-  currentVersion: number,
-  existingTables: ReadonlyArray<string>,
+  file: FileSchema,
+  plan: SchemaPlan = CURRENT_SCHEMA,
 ): string[] => {
-  if (currentVersion === SCHEMA_VERSION) {
-    return [...SCHEMA_SQL];
+  const stamps = [
+    SCHEMA_META_SQL,
+    writeMinReader(plan.minReader, false),
+    `PRAGMA user_version = ${plan.version}`,
+  ];
+  if (file.version === plan.version) {
+    return [...plan.sql, SCHEMA_META_SQL, writeMinReader(plan.minReader, true)];
   }
-  const drops = existingTables
+  if (
+    file.version > plan.version &&
+    file.minReader !== undefined &&
+    file.minReader <= plan.version
+  ) {
+    return [...plan.sql];
+  }
+  const steps = migrationSteps(file.version, plan);
+  if (steps) {
+    return [...steps, ...plan.sql, ...stamps];
+  }
+  const drops = (file.tables ?? [])
     .filter((name) => !name.startsWith("sqlite_"))
     .map((name) => `DROP TABLE IF EXISTS "${name.replaceAll('"', '""')}"`);
-  return [...drops, ...SCHEMA_SQL, `PRAGMA user_version = ${SCHEMA_VERSION}`];
+  return [...drops, ...plan.sql, ...stamps];
 };

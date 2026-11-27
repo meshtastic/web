@@ -29,7 +29,9 @@ export function getStorageDb(): Promise<OpenedSqlocalDb> {
   if (!dbPromise) {
     log.debug("getStorageDb: creating sqlocal DB", { path: DATABASE_FILE });
     const t0 = Date.now();
-    dbPromise = openSqlocalDb({ databasePath: DATABASE_FILE })
+    const opening: Promise<OpenedSqlocalDb> = openSqlocalDb({
+      databasePath: DATABASE_FILE,
+    })
       .then((opened) => {
         const ready = { ms: Date.now() - t0, storageType: opened.storageType };
         if (opened.persistent) {
@@ -44,8 +46,12 @@ export function getStorageDb(): Promise<OpenedSqlocalDb> {
           name: err instanceof Error ? err.name : undefined,
           message: err instanceof Error ? err.message : String(err),
         });
+        // Forget the failure (e.g. another tab holding the file), so the
+        // next call tries again rather than failing until a reload.
+        if (dbPromise === opening) dbPromise = undefined;
         throw err;
       });
+    dbPromise = opening;
   }
   return dbPromise;
 }
