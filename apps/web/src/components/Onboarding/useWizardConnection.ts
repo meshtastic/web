@@ -8,6 +8,7 @@ import type { ConnectMethod } from "@core/onboarding/capabilities.ts";
 import { classifyPickerError } from "@core/onboarding/picker.ts";
 import { httpConnectionName } from "@core/onboarding/validation.ts";
 import type { WizardEvent } from "@core/onboarding/wizard.ts";
+import { radioInUse } from "@core/connections/radioInUse.ts";
 import { useDeviceStore } from "@core/stores";
 import type {
   Connection,
@@ -104,7 +105,11 @@ export function useWizardConnection(
       // Read the outcome from the store, the source of truth for status.
       const after = liveConnection(conn.id);
       if (after?.status === "error") {
-        dispatch({ type: "connectFailed", detail: after.error });
+        dispatch({
+          type: "connectFailed",
+          detail: after.error,
+          inUse: radioInUse(after.errorKind),
+        });
       }
     },
     [addConnectionAndConnect, discard, dispatch],

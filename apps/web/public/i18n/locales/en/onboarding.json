@@ -92,7 +92,6 @@
     "powerOn": "Make sure the radio is on and close to this computer.",
     "phoneApp": "Disconnect it from the phone app. A radio accepts one Bluetooth connection at a time.",
     "dataCable": "For USB, use a data cable. Some cables only charge.",
-    "otherTab": "Close other tabs or apps that use the radio's USB port.",
     "sameNetwork": "Make sure this computer is on the same network as the radio.",
     "address": "Check the address. The radio shows it on its screen or in the phone app.",
     "https": "If HTTPS is on, the radio needs it turned on too.",

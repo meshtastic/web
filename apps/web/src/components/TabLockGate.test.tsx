@@ -69,6 +69,10 @@ describe("TabLockGate", () => {
       name: "Meshtastic is open in another tab",
     });
     expect(dialog.getAttribute("aria-modal")).toBe("true");
+    // Taking over can't reach tabs on another site, so it says so.
+    expect(dialog).toHaveAccessibleDescription(
+      /tabs on another site or port, and other apps, can't be switched from here/,
+    );
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "Use here" }),
     );

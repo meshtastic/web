@@ -279,7 +279,7 @@ describe("useConnections over the Kotlin SDK (HTTP)", () => {
     expect(saved(conn.id)).toMatchObject({
       status: "error",
       error: "The connection to the radio was lost.",
-      errorKind: "network",
+      errorKind: "interrupted",
       reconnect: undefined,
     });
   });
