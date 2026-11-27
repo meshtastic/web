@@ -758,7 +758,7 @@
     "adminKeyLabel": "Admin key {{number}}",
     "adminKeyHelp": "Radios with this key can change this radio’s settings remotely.",
     "newAdminKey": "New admin key",
-    "newAdminKeyHelp": "Paste the other radio’s public key (base64).",
+    "newAdminKeyHelp": "Paste the other radio’s public key (base64), choose one of your radios, or generate a new key pair.",
     "addAdminKey": "Add admin key",
     "addAdminKeyHelp": "Up to 3.",
     "addKey": "+ Add key",
@@ -766,6 +766,13 @@
     "noAdminKeys": "No admin keys. Add one before turning on managed mode.",
     "removeAdminKeyTitle": "Remove admin key {{number}}?",
     "removeAdminKeyDescription": "The radio holding this key will no longer be able to change this radio’s settings.",
-    "removeLastManagedKey": "Managed mode is on and this is the last admin key. You can’t save until you add another key or turn managed mode off."
+    "removeLastManagedKey": "Managed mode is on and this is the last admin key. You can’t save until you add another key or turn managed mode off.",
+    "pickRadio": "Choose radio",
+    "pickRadioTitle": "Choose a radio to manage this one",
+    "pickRadioDescription": "Uses the selected radio’s public key. Once saved, that radio can change this node’s settings remotely, even when managed mode blocks changes from this app.",
+    "pickRadioSearch": "Search radios by name or ID",
+    "pickRadioEmpty": "No other radios with a public key yet.",
+    "keyVerified": "Verified",
+    "generateKey": "Generate"
   }
 }

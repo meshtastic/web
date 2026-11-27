@@ -442,5 +442,14 @@
       "confirmUnderstanding": "I understand that this can't be undone",
       "submit": "Disable lockdown"
     }
+  },
+  "generateAdminKey": {
+    "title": "Generate admin key pair",
+    "description": "This radio gets the public key. The private key goes on the radio that will manage this one.",
+    "privateKey": "Private key for the managing radio",
+    "warningTitle": "Save this key now",
+    "warning": "It won’t be shown again. Set it as the managing radio’s private key in Settings → Security. That replaces the managing radio’s identity, so others must hear its new key before they can send it direct messages.",
+    "saved": "I’ve saved the private key",
+    "use": "Use this key"
   }
 }

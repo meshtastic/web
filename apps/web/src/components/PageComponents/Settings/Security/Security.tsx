@@ -19,16 +19,26 @@ import {
   settingRowDescribedBy,
 } from "@components/UI/SettingRow.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
-import { adminKeySlots, MASKED_KEY } from "@core/settings/securityKeys.ts";
+import {
+  adminKeyCandidates,
+  adminKeySlots,
+  MASKED_KEY,
+} from "@core/settings/securityKeys.ts";
+import {
+  useMyNodeAsProto,
+  useNodesAsProto,
+} from "@core/hooks/useNodesAsProto.ts";
 import { useDevice } from "@core/stores";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useConfigEditor, useSignal } from "@core/kmp/hooks";
 import { constantSignal } from "@core/kmp/signals.ts";
 import { base64Decode, base64Encode } from "@bufbuild/protobuf/wire";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { get, type Path, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { AdminKeyPicker } from "./AdminKeyPicker.tsx";
+import { GenerateAdminKeyDialog } from "./GenerateAdminKeyDialog.tsx";
 import { LockdownSection } from "./LockdownSection.tsx";
 
 interface SecurityConfigProps {
@@ -92,6 +102,8 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   const [editingPrivateKey, setEditingPrivateKey] = useState(false);
   const [addingSlot, setAddingSlot] = useState<number>();
   const [removingSlot, setRemovingSlot] = useState<number>();
+  const [pickingRadio, setPickingRadio] = useState(false);
+  const [generatingKey, setGeneratingKey] = useState(false);
 
   useEffect(() => {
     onFormInit?.(formMethods);
@@ -173,6 +185,31 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   };
 
   const slots = adminKeySlots(adminKeys ?? []);
+  const nodes = useNodesAsProto();
+  const myNode = useMyNodeAsProto();
+  const fallbackName = useCallback(
+    (last4: string) => t("fallbackName", { ns: "common", last4 }),
+    [t],
+  );
+  const candidates = useMemo(
+    () =>
+      adminKeyCandidates(nodes, {
+        myNodeNum: myNode?.num,
+        // This radio's own key too, in case its node info hasn't arrived.
+        takenKeys: [
+          publicKey ?? "",
+          ...(adminKeys ?? []).filter((_, index) => index !== addingSlot),
+        ],
+        fallbackName,
+      }),
+    [nodes, myNode?.num, publicKey, adminKeys, addingSlot, fallbackName],
+  );
+  /** Fill the slot being added and close its row. */
+  const fillAddingSlot = (key: string) => {
+    if (addingSlot === undefined) return;
+    setAdminKey(addingSlot, key);
+    setAddingSlot(undefined);
+  };
   const addingField =
     addingSlot === undefined ? undefined : ADMIN_KEY_FIELDS[addingSlot];
   const addingError = addingField ? errorText(addingField) : undefined;
@@ -331,6 +368,20 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
           <Button
             variant="secondary"
             className="text-help"
+            onClick={() => setPickingRadio(true)}
+          >
+            {t("securitySection.pickRadio")}
+          </Button>
+          <Button
+            variant="secondary"
+            className="text-help"
+            onClick={() => setGeneratingKey(true)}
+          >
+            {t("securitySection.generateKey")}
+          </Button>
+          <Button
+            variant="secondary"
+            className="text-help"
             onClick={() => setAddingSlot(undefined)}
           >
             {t("securitySection.done")}
@@ -465,6 +516,26 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
           setRemovingSlot(undefined);
         }}
       />
+
+      <AdminKeyPicker
+        open={pickingRadio}
+        onOpenChange={setPickingRadio}
+        candidates={candidates}
+        onPick={(key) => {
+          setPickingRadio(false);
+          fillAddingSlot(key);
+        }}
+      />
+
+      {generatingKey ? (
+        <GenerateAdminKeyDialog
+          onOpenChange={setGeneratingKey}
+          onUse={(key) => {
+            setGeneratingKey(false);
+            fillAddingSlot(key);
+          }}
+        />
+      ) : null}
 
       <ManagedModeDialog
         open={managedModeDialogOpen}
