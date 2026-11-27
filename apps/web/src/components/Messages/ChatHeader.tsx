@@ -36,6 +36,8 @@ export interface ChatHeaderIdentityProps {
   initials?: string;
   nodeNum?: number;
   online?: boolean;
+  /** A DM peer this radio can manage remotely: badge on the avatar. */
+  adminAccess?: boolean;
   /** "Encrypted · Channel 0 · 243 nodes known", "End-to-end encrypted · 1 hop · heard 1 min ago". */
   subtitle: string;
   /** Private key (channel PSK or the peer's public key); open lock otherwise. */
@@ -58,6 +60,7 @@ export const ChatHeaderIdentity = ({
   initials,
   nodeNum,
   online = false,
+  adminAccess = false,
   subtitle,
   secure,
   lockTitle,
@@ -85,6 +88,7 @@ export const ChatHeaderIdentity = ({
           size="sm"
           presence={online ? "online" : undefined}
           cutout="app"
+          adminAccess={adminAccess}
         />
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">

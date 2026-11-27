@@ -3,6 +3,7 @@ import {
   useMyNodeAsProto,
   useNodesAsProto,
 } from "@core/hooks/useNodesAsProto.ts";
+import { rememberedAdminAccess } from "@core/nodes/adminAccess.ts";
 import { type NodeRow, toNodeRow } from "@core/nodes/nodeRow.ts";
 import { useDevice } from "@core/stores";
 import { reuseUnchangedRows } from "@core/nodes/rowCache.ts";
@@ -24,8 +25,12 @@ export function useNodeRows(): NodeRowsResult {
   const { t } = useTranslation("nodes");
   const sources = useNodesAsProto();
   const myNode = useMyNodeAsProto();
-  const { config } = useDevice();
+  const device = useDevice();
+  const { config } = device;
   const lora = config.lora;
+  // Only what this radio learned under its current key.
+  const remembered = rememberedAdminAccess(device, config.security?.publicKey);
+  const adminAccess = useMemo(() => new Set(remembered), [remembered]);
   const now = useNow();
   const fallbackName = useCallback(
     (last4: string) => t("fallbackName", { last4 }),
@@ -41,9 +46,18 @@ export function useNodeRows(): NodeRowsResult {
           myPosition: myNode?.position,
           lora,
           fallbackName,
+          adminAccessNodes: adminAccess,
         }),
       ),
-    [sources, now, myNode?.num, myNode?.position, lora, fallbackName],
+    [
+      sources,
+      now,
+      myNode?.num,
+      myNode?.position,
+      lora,
+      fallbackName,
+      adminAccess,
+    ],
   );
 
   // Every node update rebuilds every row; keep the objects of rows that

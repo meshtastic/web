@@ -30,6 +30,14 @@ export function toResult(result: AdminResultJs): Result<AdminResultJs, Error> {
     : Result.err(new AdminError(result.reason ?? "unknown"));
 }
 
+/**
+ * The facade takes a Kotlin `Int`, and the SDK matches a remote reply's
+ * sender (a signed 32-bit int off the wire) against it, so a node number
+ * above 0x7fffffff has to go in signed or no reply would ever match.
+ */
+const toDest = (dest: number | undefined): number | undefined =>
+  dest === undefined ? undefined : dest | 0;
+
 /** Sends one admin message to `dest` (the local node when omitted). */
 export async function sendAdmin(
   client: MeshtasticClient,
@@ -38,7 +46,7 @@ export async function sendAdmin(
 ): Promise<Result<AdminResultJs, Error>> {
   return toResult(
     await client
-      .admin(dest)
+      .admin(toDest(dest))
       .send(encodeAdminMessage(adminMessage(payloadVariant))),
   );
 }
@@ -50,7 +58,7 @@ export async function editSettings(
   dest?: number,
 ): Promise<Result<void, Error>> {
   const result = await client
-    .admin(dest)
+    .admin(toDest(dest))
     .editSettings(messages.map(encodeAdminMessage));
   return result.ok
     ? Result.ok(undefined)

@@ -15,6 +15,7 @@ export const NODE_SORT_KEYS = [
   "snr",
   "battery",
   "distance",
+  "remoteAdmin",
 ] as const;
 
 export type NodeSortKey = (typeof NODE_SORT_KEYS)[number];
@@ -32,6 +33,7 @@ export const NODE_SORT_INITIAL_DIRECTION = {
   snr: "desc",
   battery: "desc",
   distance: "asc",
+  remoteAdmin: "desc",
 } as const satisfies Record<NodeSortKey, SortDirection>;
 
 export const DEFAULT_NODE_SORT: SortState<NodeSortKey> = {
@@ -56,7 +58,13 @@ export const NODE_SORT_ACCESSORS: SortAccessors<NodeRow, NodeSortKey> = {
   snr: (row) => row.snr,
   battery: batterySortValue,
   distance: (row) => row.distanceMeters,
+  // Nodes this radio can manage first; the rest keep last-heard order.
+  remoteAdmin: (row) => (row.hasAdminAccess ? 1 : 0),
 };
+
+/** Most recently heard first, then node number, so groups stay stable. */
+const byLastHeard = (a: NodeRow, b: NodeRow): number =>
+  (b.lastHeardMs ?? -1) - (a.lastHeardMs ?? -1) || a.num - b.num;
 
 /**
  * A node list's sort: a column plus the "favourites first" modifier.
@@ -93,7 +101,8 @@ export const sortNodeRows = (
 ): NodeRow[] => {
   const byColumn = comparatorFor(NODE_SORT_ACCESSORS, sort, {
     ...(collator ? { collator } : {}),
-    tiebreak: (a, b) => a.num - b.num,
+    tiebreak:
+      sort.key === "remoteAdmin" ? byLastHeard : (a, b) => a.num - b.num,
   });
   const compare = sort.favoritesFirst
     ? (a: NodeRow, b: NodeRow) =>

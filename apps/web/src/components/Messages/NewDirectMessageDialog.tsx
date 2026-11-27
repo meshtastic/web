@@ -20,6 +20,8 @@ export interface DirectMessageCandidate {
   /** "heard 5 minutes ago", or nothing when never heard. */
   readonly heard?: string;
   readonly online: boolean;
+  /** This radio can manage the node remotely. */
+  readonly adminAccess?: boolean;
 }
 
 export interface NewDirectMessageDialogProps {
@@ -88,6 +90,7 @@ export const NewDirectMessageDialog = ({
                     initials={c.initials}
                     tone={{ kind: "node", nodeNum: c.num }}
                     presence={c.online ? "online" : undefined}
+                    adminAccess={c.adminAccess}
                   />
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate font-semibold">{c.name}</span>

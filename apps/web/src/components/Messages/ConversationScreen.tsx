@@ -1,4 +1,5 @@
 import { useCollator } from "@components/Nodes/useCollator.ts";
+import { useAdminAccess } from "@components/Nodes/useAdminAccess.ts";
 import { useNodeActions } from "@components/Nodes/useNodeActions.ts";
 import { useNodeLabels } from "@components/Nodes/useNodeLabels.ts";
 import {
@@ -100,6 +101,7 @@ export const ConversationScreen = ({
     [directory.rows],
   );
   const nodeActions = useNodeActions(peerRow);
+  const adminAccess = useAdminAccess(peerRow);
 
   useMarkReadWhileVisible(client?.chat.unread, conversation);
 
@@ -196,6 +198,7 @@ export const ConversationScreen = ({
         name: row.name,
         initials: row.initials,
         isFavorite: row.isFavorite,
+        hasAdminAccess: row.hasAdminAccess,
         meta: t("channelDetails.heardMeta", {
           hops: nodeLabels.hops(row),
           time: nodeLabels.lastHeard(row),
@@ -208,6 +211,7 @@ export const ConversationScreen = ({
       row={peerRow}
       labels={nodeLabels}
       actions={nodeActions}
+      adminAccess={adminAccess}
       fallbackName={title}
       fallbackId={formatNodeId(peer ?? 0)}
       onClose={closeDetails}
@@ -249,6 +253,7 @@ export const ConversationScreen = ({
           {...(peerRow ? { initials: peerRow.initials } : {})}
           {...(peer === undefined ? {} : { nodeNum: peer })}
           online={peerRow?.isOnline ?? false}
+          adminAccess={peerRow?.hasAdminAccess ?? false}
           subtitle={subtitle.filter(Boolean).join(" · ")}
           secure={secure}
           {...(isDm

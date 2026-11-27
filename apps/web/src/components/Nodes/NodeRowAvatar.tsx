@@ -11,8 +11,9 @@ export interface NodeRowAvatarProps {
 }
 
 /**
- * A node's avatar: its colour and initials, this device in brand blue, and
- * a star for favourites (announced by the row's favourite text, not here).
+ * A node's avatar: its colour and initials, this device in brand blue, a
+ * star for favourites (announced by the row's favourite text, not here) and
+ * a shield for nodes this radio can manage remotely.
  */
 export const NodeRowAvatar = ({
   row,
@@ -25,6 +26,7 @@ export const NodeRowAvatar = ({
     tone={row.isSelf ? { kind: "device" } : { kind: "node", nodeNum: row.num }}
     size={size}
     label={label}
+    adminAccess={row.hasAdminAccess}
     className={className}
   >
     {row.isFavorite ? (

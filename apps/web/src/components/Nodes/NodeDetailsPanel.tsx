@@ -1,6 +1,15 @@
 import { Uptime } from "@components/generic/Uptime.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Callout } from "@components/UI/Callout.tsx";
+import { CopyField } from "@components/UI/CopyField.tsx";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@components/UI/Dialog.tsx";
 import { KeyValue, KeyValueList } from "@components/UI/KeyValue.tsx";
 import { SectionHeader } from "@components/UI/SectionHeader.tsx";
 import {
@@ -16,18 +25,21 @@ import {
   BellIcon,
   BellOffIcon,
   ChartLineIcon,
+  Loader2,
   MapIcon,
   MapPinnedIcon,
   MessageSquareIcon,
   ShieldCheckIcon,
+  ShieldKeyholeIcon,
   StarIcon,
   StarOffIcon,
   TrashIcon,
   WaypointsIcon,
 } from "lucide-react";
-import { type ReactNode, useEffect, useId, useRef } from "react";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NodeRowAvatar } from "./NodeRowAvatar.tsx";
+import type { AdminAccessControl } from "./useAdminAccess.ts";
 import type { NodeActions } from "./useNodeActions.ts";
 import type { NodeLabels } from "./useNodeLabels.ts";
 
@@ -42,6 +54,8 @@ export interface NodeDetailsPanelProps {
   onBack?: () => void;
   /** The node reported an error (a public key mismatch, say). */
   hasError?: boolean;
+  /** Remote admin: checking access, and what a check found. */
+  adminAccess?: AdminAccessControl;
   className?: string;
 }
 
@@ -72,11 +86,13 @@ const Section = ({
 const ActionButton = ({
   icon,
   danger = false,
+  disabled = false,
   onClick,
   children,
 }: {
   icon: ReactNode;
   danger?: boolean;
+  disabled?: boolean;
   onClick: () => void;
   children: ReactNode;
 }) => (
@@ -84,6 +100,7 @@ const ActionButton = ({
     variant={danger ? "dangerGhost" : "outline"}
     className={cn("w-full justify-start text-help", danger && "border-0")}
     icon={icon}
+    disabled={disabled}
     onClick={onClick}
   >
     {children}
@@ -91,6 +108,91 @@ const ActionButton = ({
 );
 
 const iconClass = "size-4";
+
+const noop = () => {};
+
+/**
+ * "Check admin access" until a check succeeds; then "Remote admin" (not
+ * wired up yet) with the check still on offer as "Check again".
+ */
+const AdminAccessActions = ({ control }: { control: AdminAccessControl }) => {
+  const { t } = useTranslation("nodes");
+  const checkIcon = control.checking ? (
+    <Loader2 aria-hidden="true" className={cn(iconClass, "animate-spin")} />
+  ) : (
+    <ShieldKeyholeIcon aria-hidden="true" className={iconClass} />
+  );
+  return (
+    <>
+      {control.authorized ? (
+        <ActionButton
+          disabled
+          icon={<ShieldKeyholeIcon aria-hidden="true" className={iconClass} />}
+          onClick={noop}
+        >
+          {t("details.remoteAdmin")}
+          <span className="ml-auto text-meta text-muted">
+            {t("details.comingSoon")}
+          </span>
+        </ActionButton>
+      ) : null}
+      <ActionButton
+        icon={checkIcon}
+        disabled={control.checking}
+        onClick={control.check}
+      >
+        {control.checking
+          ? t("details.checkingAdminAccess")
+          : control.authorized
+            ? t("details.checkAdminAccessAgain")
+            : t("details.checkAdminAccess")}
+      </ActionButton>
+    </>
+  );
+};
+
+/** Why a node refused this radio, and the key to add on it. */
+const AdminAccessRefusedDialog = ({
+  control,
+}: {
+  control: AdminAccessControl;
+}) => {
+  const { t } = useTranslation("nodes");
+  // Keep showing the last refusal while the dialog animates closed.
+  const [refusal, setRefusal] = useState(control.refusal);
+  if (control.refusal && control.refusal !== refusal) {
+    setRefusal(control.refusal);
+  }
+  return (
+    <Dialog
+      open={control.refusal !== undefined}
+      onOpenChange={(open) => {
+        if (!open) {
+          control.dismissRefusal();
+        }
+      }}
+    >
+      <DialogContent>
+        <DialogClose />
+        <DialogHeader>
+          <DialogTitle>
+            {t("adminAccess.refusedTitle", { name: refusal?.name })}
+          </DialogTitle>
+          <DialogDescription>
+            {t("adminAccess.refusedDescription", { name: refusal?.name })}
+          </DialogDescription>
+        </DialogHeader>
+        {refusal ? (
+          <CopyField
+            label={t("adminAccess.localPublicKey")}
+            value={refusal.localPublicKey}
+            fill
+          />
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 /**
  * One node's details and every action on it: the Nodes screen's details
@@ -102,6 +204,7 @@ export const NodeDetailsPanel = ({
   actions,
   onBack,
   hasError = false,
+  adminAccess,
   className,
 }: NodeDetailsPanelProps) => {
   const { t } = useTranslation("nodes");
@@ -273,6 +376,9 @@ export const NodeDetailsPanel = ({
                 {t("details.verifyKey")}
               </ActionButton>
             ) : null}
+            {adminAccess?.available && row.publicKey ? (
+              <AdminAccessActions control={adminAccess} />
+            ) : null}
           </>
         )}
         <ActionButton
@@ -408,6 +514,7 @@ export const NodeDetailsPanel = ({
           <p className="m-0 text-help text-warning">{t("details.unheard")}</p>
         ) : null}
       </Section>
+      {adminAccess ? <AdminAccessRefusedDialog control={adminAccess} /> : null}
     </div>
   );
 };

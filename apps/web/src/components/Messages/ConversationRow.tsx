@@ -18,6 +18,8 @@ export interface ConversationRowView {
   readonly nodeNum?: number;
   readonly online: boolean;
   readonly favorite: boolean;
+  /** A DM peer this radio can manage remotely. */
+  readonly adminAccess?: boolean;
   /** A muted channel: bell-off icon, unread count de-emphasised. */
   readonly muted: boolean;
   /** Last message, prefixed with "You:" or the channel sender. */
@@ -72,6 +74,7 @@ export const ConversationRow = memo(function ConversationRow({
           size={touch ? "lg" : "md"}
           presence={row.online ? "online" : undefined}
           cutout={selected ? "selected" : "surface"}
+          adminAccess={row.adminAccess}
         >
           {row.favorite ? (
             <span className="absolute -top-1 -left-1 flex size-4 items-center justify-center rounded-full bg-surface text-warning">

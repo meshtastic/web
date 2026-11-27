@@ -67,7 +67,13 @@ export const MessagesPage = () => {
   const peer = useCallback(
     (num: number) => {
       const row = byNum.get(num);
-      return row ? { initials: row.initials, online: row.isOnline } : undefined;
+      return row
+        ? {
+            initials: row.initials,
+            online: row.isOnline,
+            adminAccess: row.hasAdminAccess,
+          }
+        : undefined;
     },
     [byNum],
   );
@@ -117,6 +123,7 @@ export const MessagesPage = () => {
             id: row.id,
             initials: row.initials,
             online: row.isOnline,
+            adminAccess: row.hasAdminAccess,
             ...(row.shortName ? { shortName: row.shortName } : {}),
             ...(heard ? { heard: t("newDm.heard", { time: heard }) } : {}),
           };

@@ -12,6 +12,7 @@ import type { ConversationRowView } from "./ConversationRow.tsx";
 export interface PeerPresence {
   readonly initials: string;
   readonly online: boolean;
+  readonly adminAccess?: boolean;
 }
 
 export interface ConversationRowViewsInput {
@@ -82,6 +83,7 @@ export function useConversationRowViews({
         name,
         presence?.initials ?? "",
         presence?.online ?? "",
+        presence?.adminAccess ?? "",
         muted,
         author.kind,
         senderName,
@@ -128,6 +130,7 @@ export function useConversationRowViews({
               initials: presence?.initials ?? name.slice(0, 4),
               nodeNum: row.target.peer,
               online: presence?.online ?? false,
+              adminAccess: presence?.adminAccess ?? false,
               route: { type: "direct", chatId: row.target.peer },
             };
       cache.set(row, { signature, view });

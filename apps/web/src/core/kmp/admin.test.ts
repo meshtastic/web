@@ -36,6 +36,16 @@ describe("sendAdmin", () => {
     expect(client.admins.has(0)).toBe(false);
   });
 
+  it("hands a node number above 0x7fffffff to the SDK signed", async () => {
+    const client = new FakeKmpClient();
+    await sendAdmin(
+      client,
+      { case: "getDeviceMetadataRequest", value: true },
+      0xdeadbeef,
+    );
+    expect([...client.admins.keys()]).toEqual([0xdeadbeef | 0]);
+  });
+
   it("maps a failed result to an error carrying the reason", async () => {
     const client = new FakeKmpClient();
     client.admin().results.push(adminFailed("timeout"));

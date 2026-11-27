@@ -4,6 +4,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { NodeDetailsPanel } from "./NodeDetailsPanel.tsx";
+import type { AdminAccessControl } from "./useAdminAccess.ts";
 import type { NodeActions } from "./useNodeActions.ts";
 import { useNodeLabels } from "./useNodeLabels.ts";
 
@@ -23,16 +24,30 @@ const makeActions = (): NodeActions => ({
   openAllDetails: vi.fn(),
 });
 
+const makeAdminAccess = (
+  overrides: Partial<AdminAccessControl> = {},
+): AdminAccessControl => ({
+  available: true,
+  checking: false,
+  authorized: false,
+  check: vi.fn(),
+  refusal: undefined,
+  dismissRefusal: vi.fn(),
+  ...overrides,
+});
+
 const Harness = ({
   row,
   actions,
   onBack,
   hasError,
+  adminAccess,
 }: {
   row: NodeRow;
   actions: NodeActions;
   onBack?: () => void;
   hasError?: boolean;
+  adminAccess?: AdminAccessControl;
 }) => (
   <NodeDetailsPanel
     row={row}
@@ -40,6 +55,7 @@ const Harness = ({
     actions={actions}
     onBack={onBack}
     hasError={hasError}
+    adminAccess={adminAccess}
   />
 );
 
@@ -177,5 +193,130 @@ describe("NodeDetailsPanel", () => {
     expect(
       screen.getByText(/This node reported an error/u),
     ).toBeInTheDocument();
+  });
+
+  describe("remote admin", () => {
+    it("offers a check after Verify key", async () => {
+      const adminAccess = makeAdminAccess();
+      render(
+        <Harness
+          row={node}
+          actions={makeActions()}
+          adminAccess={adminAccess}
+        />,
+      );
+      const names = screen
+        .getByRole("region", { name: "Quick actions" })
+        .querySelectorAll("button");
+      const labels = Array.from(names, (button) => button.textContent);
+      expect(labels.indexOf("Check admin access")).toBe(
+        labels.indexOf("Verify key") + 1,
+      );
+      await userEvent
+        .setup()
+        .click(screen.getByRole("button", { name: "Check admin access" }));
+      expect(adminAccess.check).toHaveBeenCalledTimes(1);
+      expect(
+        screen.queryByRole("button", { name: /Remote admin/u }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("is hidden where a check can't work", () => {
+      const me = makeRow(
+        { num: 9, longName: "Me", publicKey: new Uint8Array([1]) },
+        { myNodeNum: 9 },
+      );
+      const cases: [NodeRow, AdminAccessControl | undefined][] = [
+        [node, undefined],
+        [node, makeAdminAccess({ available: false })],
+        [{ ...node, publicKey: undefined }, makeAdminAccess()],
+        [me, makeAdminAccess()],
+      ];
+      for (const [row, adminAccess] of cases) {
+        const { unmount } = render(
+          <Harness
+            row={row}
+            actions={makeActions()}
+            adminAccess={adminAccess}
+          />,
+        );
+        expect(
+          screen.queryByRole("button", { name: /admin/u }),
+        ).not.toBeInTheDocument();
+        unmount();
+      }
+    });
+
+    it("badges the header avatar of a node this radio can manage", () => {
+      const { rerender } = render(
+        <Harness
+          row={{ ...node, hasAdminAccess: true }}
+          actions={makeActions()}
+        />,
+      );
+      expect(
+        screen.getByText("You can manage this node remotely"),
+      ).toBeInTheDocument();
+      rerender(<Harness row={node} actions={makeActions()} />);
+      expect(
+        screen.queryByText("You can manage this node remotely"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("disables the check while it runs", () => {
+      render(
+        <Harness
+          row={node}
+          actions={makeActions()}
+          adminAccess={makeAdminAccess({ checking: true })}
+        />,
+      );
+      expect(screen.getByRole("button", { name: "Checking…" })).toBeDisabled();
+    });
+
+    it("shows Remote admin, not yet available, once the node answered", async () => {
+      const adminAccess = makeAdminAccess({ authorized: true });
+      render(
+        <Harness
+          row={node}
+          actions={makeActions()}
+          adminAccess={adminAccess}
+        />,
+      );
+      expect(
+        screen.getByRole("button", { name: "Remote admin Coming soon" }),
+      ).toBeDisabled();
+      await userEvent
+        .setup()
+        .click(
+          screen.getByRole("button", { name: "Check admin access again" }),
+        );
+      expect(adminAccess.check).toHaveBeenCalledTimes(1);
+    });
+
+    it("explains a refusal with this radio's key to copy", async () => {
+      const adminAccess = makeAdminAccess({
+        refusal: { name: "IB North", localPublicKey: "AQID" },
+      });
+      render(
+        <Harness
+          row={node}
+          actions={makeActions()}
+          adminAccess={adminAccess}
+        />,
+      );
+      const dialog = screen.getByRole("dialog", {
+        name: "IB North doesn’t list this radio’s key",
+      });
+      expect(dialog).toHaveTextContent("Settings → Security → Remote admin");
+      expect(
+        screen.getByRole("group", { name: "This radio’s public key" }),
+      ).toHaveTextContent("AQID");
+      expect(screen.getByRole("button", { name: /Copy/u })).toBeInTheDocument();
+      await userEvent
+        .setup()
+        .click(screen.getByRole("button", { name: "Close" }));
+      expect(adminAccess.dismissRefusal).toHaveBeenCalled();
+    });
   });
 });
