@@ -1,5 +1,7 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
+import { createMemoryDb } from "@core/storage/memoryDb.ts";
+import { SqlocalNodesRepository } from "@core/storage/nodes.ts";
 import type { Node, NodesRepository } from "@core/storage/types.ts";
 import { Result } from "better-result";
 import { describe, expect, it } from "vitest";
@@ -213,6 +215,121 @@ describe("NodesClient persistence", () => {
     expect(second.list.value.map((node) => node.num)).toEqual([11]);
     expect(second.byNum(11)?.lastHeard).toBe(77);
     expect(second.byNum(11)?.user?.longName).toBe("Node 11");
+  });
+});
+
+describe("NodesClient over the stored node cache", () => {
+  it("shows the NodeInfo fields and status after a reload, and keeps the status through the next snapshot", async () => {
+    const repository = new SqlocalNodesRepository(await createMemoryDb(), {
+      deviceId: 1,
+    });
+    const first = new NodesClient(admin, repository);
+    await settle();
+    first.applyChange({
+      kind: "added",
+      node: toBinary(
+        Protobuf.Mesh.NodeInfoSchema,
+        create(Protobuf.Mesh.NodeInfoSchema, {
+          num: 11,
+          channel: 2,
+          viaMqtt: true,
+          hopsAway: 3,
+          isKeyManuallyVerified: true,
+          isMuted: true,
+          hasXeddsaSigned: true,
+        }),
+      ),
+      nodes: null,
+      nodeNum: 11,
+    });
+    first.patch(11, { status: "on the trail" });
+    await settle();
+
+    const second = new NodesClient(admin, repository);
+    await settle();
+    expect(second.byNum(11)).toMatchObject({
+      channel: 2,
+      viaMqtt: true,
+      hopsAway: 3,
+      isKeyManuallyVerified: true,
+      isMuted: true,
+      hasXeddsaSigned: true,
+      status: "on the trail",
+    });
+
+    second.applyChange({
+      kind: "snapshot",
+      nodes: [nodeBytes(11)],
+      node: null,
+      nodeNum: 0,
+    });
+    await settle();
+    expect(second.byNum(11)?.status).toBe("on the trail");
+    expect((await repository.get(11))?.status).toBe("on the trail");
+  });
+});
+
+describe("NodesClient hydration", () => {
+  it("fills a node written before the stored copy loaded, without erasing what was stored", async () => {
+    const stored = new SqlocalNodesRepository(await createMemoryDb(), {
+      deviceId: 1,
+    });
+    await stored.upsert({
+      num: 11,
+      isFavorite: false,
+      isIgnored: false,
+      user: create(Protobuf.Mesh.UserSchema, { longName: "Stored" }),
+      channel: 2,
+      viaMqtt: true,
+      hopsAway: 3,
+      isKeyManuallyVerified: true,
+      isMuted: true,
+      hasXeddsaSigned: true,
+      status: "on the trail",
+    });
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const repository: NodesRepository = {
+      // Reads the rows when asked, as the database does, but answers late.
+      loadAll: async () => {
+        const rows = await stored.loadAll();
+        await gate;
+        return rows;
+      },
+      get: (num) => stored.get(num),
+      upsert: (node) => stored.upsert(node),
+      upsertBatch: (nodes) => stored.upsertBatch(nodes),
+      remove: (num) => stored.remove(num),
+      clear: () => stored.clear(),
+    };
+
+    const client = new NodesClient(admin, repository);
+    client.heard(heardFrom(11, 500));
+    await settle();
+    // The bare node has been written over the stored row by now.
+    expect((await stored.get(11))?.status).toBeUndefined();
+
+    release();
+    await settle();
+    await settle();
+
+    const expected = {
+      lastHeard: 500,
+      channel: 2,
+      viaMqtt: true,
+      hopsAway: 3,
+      isKeyManuallyVerified: true,
+      isMuted: true,
+      hasXeddsaSigned: true,
+      status: "on the trail",
+    };
+    expect(client.byNum(11)).toMatchObject(expected);
+    expect(client.byNum(11)?.user?.longName).toBe("Stored");
+    const row = await stored.get(11);
+    expect(row).toMatchObject(expected);
+    expect(row?.user?.longName).toBe("Stored");
   });
 });
 

@@ -63,19 +63,28 @@ export function adoptionStatements(from: number, to: number): SqlStatement[] {
     statement(`DELETE FROM drafts WHERE device_id = ?`, from),
     // This connection heard these nodes last, but it started from an empty
     // node list: a field it never learned keeps the stored value, and so do
-    // favourite and ignored, which it only ever saw defaulted (the radio's
-    // node DB, which carries them, arrives after the radio is named).
+    // favourite, ignored, muted and key-verified, which it only ever saw
+    // defaulted (the radio's node DB, which carries them, arrives after the
+    // radio is named).
     statement(
       `INSERT INTO nodes (device_id, num, last_heard, snr, is_favorite, is_ignored,
-         user_json, position_json, metrics_json)
+         user_json, position_json, metrics_json, channel, via_mqtt, hops_away,
+         is_key_manually_verified, is_muted, has_xeddsa_signed, status)
        SELECT ?, num, last_heard, snr, is_favorite, is_ignored,
-         user_json, position_json, metrics_json FROM nodes WHERE device_id = ?
+         user_json, position_json, metrics_json, channel, via_mqtt, hops_away,
+         is_key_manually_verified, is_muted, has_xeddsa_signed, status
+         FROM nodes WHERE device_id = ?
        ON CONFLICT (device_id, num) DO UPDATE SET
          last_heard = coalesce(excluded.last_heard, nodes.last_heard),
          snr = coalesce(excluded.snr, nodes.snr),
          user_json = coalesce(excluded.user_json, nodes.user_json),
          position_json = coalesce(excluded.position_json, nodes.position_json),
-         metrics_json = coalesce(excluded.metrics_json, nodes.metrics_json)`,
+         metrics_json = coalesce(excluded.metrics_json, nodes.metrics_json),
+         channel = coalesce(excluded.channel, nodes.channel),
+         via_mqtt = coalesce(excluded.via_mqtt, nodes.via_mqtt),
+         hops_away = coalesce(excluded.hops_away, nodes.hops_away),
+         has_xeddsa_signed = coalesce(excluded.has_xeddsa_signed, nodes.has_xeddsa_signed),
+         status = coalesce(excluded.status, nodes.status)`,
       to,
       from,
     ),

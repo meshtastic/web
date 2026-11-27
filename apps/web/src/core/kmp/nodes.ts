@@ -85,6 +85,20 @@ export function validateIncomingNode(
   return { accepted: undefined, error: undefined };
 }
 
+/**
+ * `live` with each field it leaves undefined taken from `stored`; `live`
+ * itself when there is nothing to fill.
+ */
+function fillUnset(live: Node, stored: Node): Node {
+  let filled: Record<string, unknown> | undefined;
+  for (const [key, value] of Object.entries(stored)) {
+    if (value === undefined || live[key as keyof Node] !== undefined) continue;
+    filled ??= { ...live };
+    filled[key] = value;
+  }
+  return (filled as Node | undefined) ?? live;
+}
+
 export interface NodesAdmin {
   /** Sends one admin message to the local node. */
   sendAdmin(
@@ -290,8 +304,17 @@ export class NodesClient {
       const persisted = await this.repository.loadAll();
       if (epoch !== this.epoch) return;
       const next = this.draft();
-      for (const node of persisted) {
-        if (!next.has(node.num)) next.set(node.num, node);
+      for (const stored of persisted) {
+        const live = next.get(stored.num);
+        if (!live) {
+          next.set(stored.num, stored);
+          continue;
+        }
+        // Written before the stored copy arrived (a packet heard, a status,
+        // a NodeInfo), and already persisted with its unknown fields empty:
+        // fill them from the stored row and write the result back.
+        const filled = fillUnset(live, stored);
+        if (filled !== live) this.set(filled);
       }
     } catch {
       // nothing stored yet

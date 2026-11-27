@@ -446,6 +446,21 @@ async function v2Database(): Promise<Database> {
   return db;
 }
 
+/**
+ * A version 3 database holding one node: version 2 plus its step, so the
+ * DDL isn't frozen a second time.
+ */
+async function v3Database(): Promise<Database> {
+  const db = await v2Database();
+  for (const statement of MIGRATIONS[2] ?? []) db.run(statement);
+  db.run("PRAGMA user_version = 3");
+  db.run(
+    `INSERT INTO nodes (device_id, num, last_heard, snr, is_favorite, is_ignored, user_json)
+     VALUES (1, 7, 1000, 5, 1, 0, 'dXNlcg==')`,
+  );
+  return db;
+}
+
 const version = (db: Database) =>
   db.exec("PRAGMA user_version")[0]?.values[0]?.[0];
 
@@ -487,6 +502,26 @@ describe("migrations", () => {
     expect(
       db.exec("SELECT packet_id, text, relay_node FROM messages")[0]?.values,
     ).toEqual([[42, "kept", null]]);
+  });
+
+  it("upgrades a version 3 database to the current schema, keeping its nodes (v4)", async () => {
+    const db = await v3Database();
+    await applySchema(rawSql(db));
+    expect(version(db)).toBe(SCHEMA_VERSION);
+    const fresh = await freshSqlite();
+    await applySchema(rawSql(fresh));
+    expect(shape(db)).toEqual(shape(fresh));
+    expect(
+      db.exec(
+        `SELECT num, last_heard, snr, is_favorite, user_json, channel, via_mqtt,
+           hops_away, is_key_manually_verified, is_muted, has_xeddsa_signed, status
+         FROM nodes`,
+      )[0]?.values,
+    ).toEqual([
+      [7, 1000, 5, 1, "dXNlcg==", null, null, null, null, null, null, null],
+    ]);
+    expect(db.exec("SELECT text FROM messages")[0]?.values).toEqual([["kept"]]);
+    expect(minReader(db)).toBe(2);
   });
 
   it("runs a step and keeps the rows", async () => {
