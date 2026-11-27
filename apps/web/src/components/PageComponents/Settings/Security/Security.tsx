@@ -17,6 +17,7 @@ import {
   READ_ONLY_ROWS_CLASS,
   ReadOnlyFieldset,
   SettingsReadOnlyContext,
+  useSettingsReadOnly,
 } from "@components/Settings/SettingsReadOnly.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Callout } from "@components/UI/Callout.tsx";
@@ -121,6 +122,7 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   const [removingSlot, setRemovingSlot] = useState<number>();
   const [pickingRadio, setPickingRadio] = useState(false);
   const [generatingKey, setGeneratingKey] = useState(false);
+  const [confirmingStrict, setConfirmingStrict] = useState(false);
 
   useEffect(() => {
     onFormInit?.(formMethods);
@@ -174,12 +176,60 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   // labels rather than the raw enum names.
   const PacketSignaturePolicy =
     Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy;
-  const packetSignaturePolicyOptions = {
+  const packetSignaturePolicyOptions: Record<string, number> = {
     [t("security.packetSignaturePolicy.compatible")]:
       PacketSignaturePolicy.COMPATIBLE,
     [t("security.packetSignaturePolicy.balanced")]:
       PacketSignaturePolicy.BALANCED,
     [t("security.packetSignaturePolicy.strict")]: PacketSignaturePolicy.STRICT,
+  };
+  const packetSignaturePolicyHelp: Record<number, string> = {
+    [PacketSignaturePolicy.COMPATIBLE]: t(
+      "security.packetSignaturePolicy.compatibleDescription",
+    ),
+    [PacketSignaturePolicy.BALANCED]: t(
+      "security.packetSignaturePolicy.balancedDescription",
+    ),
+    [PacketSignaturePolicy.STRICT]: t(
+      "security.packetSignaturePolicy.strictDescription",
+    ),
+  };
+  const packetSignaturePolicy = useWatch({
+    control,
+    name: "packetSignaturePolicy",
+  });
+  const readOnly = useSettingsReadOnly() || locked;
+  // Only a radio that reports XEdDSA signing can apply the policy.
+  const canSetPolicy = metadata?.hasXeddsa === true && !readOnly;
+  // Losing support or write access cancels a pending Strict confirmation,
+  // as on Android, so it can't reappear by itself when access returns.
+  const [couldSetPolicy, setCouldSetPolicy] = useState(canSetPolicy);
+  if (couldSetPolicy !== canSetPolicy) {
+    setCouldSetPolicy(canSetPolicy);
+    if (!canSetPolicy) setConfirmingStrict(false);
+  }
+
+  /** Strict hides unauthenticated traffic, so it is confirmed first. */
+  const confirmPolicyChange = (label: string): boolean => {
+    const next = packetSignaturePolicyOptions[label];
+    if (
+      next !== PacketSignaturePolicy.STRICT ||
+      packetSignaturePolicy === PacketSignaturePolicy.STRICT
+    ) {
+      return true;
+    }
+    setConfirmingStrict(true);
+    return false;
+  };
+
+  const enableStrict = () => {
+    setConfirmingStrict(false);
+    if (!canSetPolicy) return;
+    setValue("packetSignaturePolicy", PacketSignaturePolicy.STRICT, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    void handleSubmit(onSubmit)();
   };
 
   /** The translated validation message for a field, as DynamicForm shows it. */
@@ -467,9 +517,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
               description:
                 metadata?.hasXeddsa === false
                   ? t("security.packetSignaturePolicy.unsupported")
-                  : t("security.packetSignaturePolicy.description"),
-              // Only a radio that reports XEdDSA signing can apply the policy.
+                  : packetSignaturePolicyHelp[packetSignaturePolicy],
               disabled: metadata?.hasXeddsa !== true,
+              validate: confirmPolicyChange,
               properties: {
                 enumValue: packetSignaturePolicyOptions,
               },
@@ -542,6 +592,17 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
       ) : (
         form
       )}
+      <ConfirmDialog
+        open={confirmingStrict && canSetPolicy}
+        onOpenChange={setConfirmingStrict}
+        title={t("security.packetSignaturePolicy.strictConfirm.title")}
+        description={t(
+          "security.packetSignaturePolicy.strictConfirm.description",
+        )}
+        confirmLabel={t("security.packetSignaturePolicy.strictConfirm.confirm")}
+        onConfirm={enableStrict}
+      />
+
       <ConfirmDialog
         open={privateKeyDialogOpen}
         onOpenChange={setPrivateKeyDialogOpen}

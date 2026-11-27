@@ -16,7 +16,8 @@ import { type FieldValues, useController } from "react-hook-form";
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";
   selectChange?: (e: string, name: string) => void;
-  validate?: (newValue: string) => Promise<boolean>;
+  /** False keeps the current value. Answer synchronously when you can. */
+  validate?: (newValue: string) => boolean | Promise<boolean>;
   defaultValue?: string;
   properties: BaseFormBuilderProps<T>["properties"] & {
     defaultValue?: T;
@@ -79,7 +80,10 @@ export function SelectInput<T extends FieldValues>({
     }
 
     if (field.validate) {
-      const isValid = await field.validate(selectedKey);
+      // A synchronous answer applies the value within this event, so the
+      // form's change handler submits the new value rather than the old one.
+      const result = field.validate(selectedKey);
+      const isValid = typeof result === "boolean" ? result : await result;
       if (!isValid) {
         return;
       }

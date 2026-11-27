@@ -568,11 +568,18 @@
     },
     "packetSignaturePolicy": {
       "label": "Protection level",
-      "description": "Compatible accepts unsigned packets but drops any with a wrong signature. Balanced also rejects unsigned broadcasts from nodes that have signed before. Strict accepts only packets with a verified signature or successful PKI decryption, so packets from older nodes may be ignored.",
-      "compatible": "Compatible - Accept Unsigned",
-      "balanced": "Balanced - Prefer Authenticated",
-      "strict": "Strict - Require Authentication",
-      "unsupported": "This device does not support packet signature verification."
+      "compatible": "Compatible — Accept unsigned",
+      "compatibleDescription": "Accept unsigned traffic for maximum compatibility. A signature that can be checked and is wrong still drops the packet.",
+      "balanced": "Balanced — Prefer authenticated",
+      "balancedDescription": "Reject unsigned downgrade attempts from nodes known to sign.",
+      "strict": "Strict — Require authentication",
+      "strictDescription": "Only show and process cryptographically authenticated mesh packets. Older nodes and oversized packets may disappear.",
+      "unsupported": "This connected device does not support packet signature verification.",
+      "strictConfirm": {
+        "title": "Enable Strict authentication?",
+        "description": "Strict ignores every remote mesh packet that is not cryptographically authenticated. Older firmware, licensed or ham nodes without PKI keys, and oversized packets may disappear. PKI-authenticated direct messages remain available.",
+        "confirm": "Enable Strict"
+      }
     },
     "lockdown": {
       "label": "Lockdown mode",
