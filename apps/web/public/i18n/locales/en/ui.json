@@ -403,6 +403,7 @@
     "percent": "{{value}}%",
     "deviceSettings": "Device settings",
     "reboot": "Reboot device",
+    "managedUnavailable": "Radio is managed",
     "devices": "Devices",
     "activeDevice": "Active",
     "switchToDevice": "Switch to {{name}}",

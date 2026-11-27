@@ -109,11 +109,9 @@ const ActionButton = ({
 
 const iconClass = "size-4";
 
-const noop = () => {};
-
 /**
- * "Check admin access" until a check succeeds; then "Remote admin" (not
- * wired up yet) with the check still on offer as "Check again".
+ * "Check admin access" until a check succeeds; then "Remote admin", which
+ * opens the node's settings, with the check still on offer as "Check again".
  */
 const AdminAccessActions = ({ control }: { control: AdminAccessControl }) => {
   const { t } = useTranslation("nodes");
@@ -126,14 +124,10 @@ const AdminAccessActions = ({ control }: { control: AdminAccessControl }) => {
     <>
       {control.authorized ? (
         <ActionButton
-          disabled
           icon={<ShieldKeyholeIcon aria-hidden="true" className={iconClass} />}
-          onClick={noop}
+          onClick={control.openRemoteAdmin}
         >
           {t("details.remoteAdmin")}
-          <span className="ml-auto text-meta text-muted">
-            {t("details.comingSoon")}
-          </span>
         </ActionButton>
       ) : null}
       <ActionButton

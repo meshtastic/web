@@ -63,6 +63,8 @@ export interface DeviceSummary {
   /** Formatted percentage without the sign, e.g. `12.3`. */
   readonly channelUtilization?: string;
   readonly airUtilTx?: string;
+  /** The radio is managed and drops this app's admin messages. */
+  readonly managed?: boolean;
 }
 
 export interface DeviceMetricsInput {
@@ -277,17 +279,25 @@ export type DeviceMenuActionId =
 export interface DeviceMenuAction {
   readonly id: DeviceMenuActionId;
   readonly tone: "default" | "danger";
+  /** Shown but can't be chosen: a managed radio drops the admin message. */
+  readonly unavailable?: "managed";
 }
 
-/** Menu actions in order. Reboot and disconnect need a live connection. */
+/**
+ * Menu actions in order. Reboot and disconnect need a live connection;
+ * reboot is unavailable while the radio is managed.
+ */
 export const deviceMenuActions = (
   connected: boolean,
+  managed = false,
 ): readonly DeviceMenuAction[] => [
   { id: "deviceSettings", tone: "default" },
   { id: "manageConnections", tone: "default" },
   ...(connected
     ? [
-        { id: "reboot", tone: "default" } as const,
+        managed
+          ? ({ id: "reboot", tone: "default", unavailable: "managed" } as const)
+          : ({ id: "reboot", tone: "default" } as const),
         { id: "disconnect", tone: "danger" } as const,
       ]
     : []),

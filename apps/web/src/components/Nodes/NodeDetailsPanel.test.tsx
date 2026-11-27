@@ -31,6 +31,7 @@ const makeAdminAccess = (
   checking: false,
   authorized: false,
   check: vi.fn(),
+  openRemoteAdmin: vi.fn(),
   refusal: undefined,
   dismissRefusal: vi.fn(),
   ...overrides,
@@ -274,7 +275,7 @@ describe("NodeDetailsPanel", () => {
       expect(screen.getByRole("button", { name: "Checking…" })).toBeDisabled();
     });
 
-    it("shows Remote admin, not yet available, once the node answered", async () => {
+    it("opens remote settings once the node answered", async () => {
       const adminAccess = makeAdminAccess({ authorized: true });
       render(
         <Harness
@@ -283,14 +284,14 @@ describe("NodeDetailsPanel", () => {
           adminAccess={adminAccess}
         />,
       );
-      expect(
-        screen.getByRole("button", { name: "Remote admin Coming soon" }),
-      ).toBeDisabled();
-      await userEvent
-        .setup()
-        .click(
-          screen.getByRole("button", { name: "Check admin access again" }),
-        );
+      const user = userEvent.setup();
+      const remoteAdmin = screen.getByRole("button", { name: "Remote admin" });
+      expect(remoteAdmin).toBeEnabled();
+      await user.click(remoteAdmin);
+      expect(adminAccess.openRemoteAdmin).toHaveBeenCalledTimes(1);
+      await user.click(
+        screen.getByRole("button", { name: "Check admin access again" }),
+      );
       expect(adminAccess.check).toHaveBeenCalledTimes(1);
     });
 

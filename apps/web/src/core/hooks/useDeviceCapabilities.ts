@@ -2,6 +2,7 @@ import { useDevice } from "@core/stores";
 import { firmwareAtLeast } from "@core/utils/firmware.ts";
 import type { Protobuf } from "@core/protobuf.ts";
 import { useActiveClient, useSignal } from "@core/kmp/hooks";
+import { useRemoteSettings } from "@core/settings/remoteContext.ts";
 
 const EMPTY_REGION_PRESETS_SIGNAL = {
   value: undefined as Protobuf.Mesh.LoRaRegionPresetMap | undefined,
@@ -32,14 +33,20 @@ export interface DeviceCapabilities {
  */
 export function useDeviceCapabilities(): DeviceCapabilities {
   const client = useActiveClient();
+  const remote = useRemoteSettings()?.remote;
   const { metadata: storeMetadata } = useDevice();
-  const regionPresets = useSignal(
+  // A remote node's region presets never reach this radio.
+  const localPresets = useSignal(
     client?.device.regionPresets ?? EMPTY_REGION_PRESETS_SIGNAL,
   );
   const clientMetadata = useSignal(
     client?.device.metadata ?? EMPTY_METADATA_SIGNAL,
   );
-  const metadata = clientMetadata ?? storeMetadata.get(0);
+  const remoteMetadata = useSignal(remote?.metadata ?? EMPTY_METADATA_SIGNAL);
+  const regionPresets = remote ? undefined : localPresets;
+  const metadata = remote
+    ? remoteMetadata
+    : (clientMetadata ?? storeMetadata.get(0));
   const supportsFirmware28 =
     regionPresets !== undefined ||
     firmwareAtLeast(metadata?.firmwareVersion ?? "", "2.8.0");

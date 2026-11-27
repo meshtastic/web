@@ -144,7 +144,11 @@ export class FakeKmpClient implements MeshtasticClient {
     return () => this.frameListeners.delete(cb);
   }
 
-  admin(dest = 0): FakeAdmin {
+  /** Every `admin()` call's target and RPC timeout (0 for the default). */
+  readonly adminCalls: Array<{ dest: number; timeoutMs: number }> = [];
+
+  admin(dest = 0, timeoutMs = 0): FakeAdmin {
+    this.adminCalls.push({ dest, timeoutMs });
     const existing = this.admins.get(dest);
     if (existing) return existing;
     const created = new FakeAdmin(dest);

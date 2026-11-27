@@ -36,6 +36,7 @@ import org.meshtastic.sdk.RoutingApi
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 import kotlin.js.Promise
+import kotlin.time.Duration.Companion.milliseconds
 
 @JsExport
 class MeshtasticClient internal constructor(
@@ -105,9 +106,15 @@ class MeshtasticClient internal constructor(
         return { frameListeners.remove(cb) }
     }
 
-    /** Admin messages for the local node, or for `dest` when given. */
-    fun admin(dest: Int = 0): AdminJs =
-        AdminJs(if (dest == 0) client.admin else client.admin.forNode(NodeId(dest)), scope)
+    /**
+     * Admin messages for the local node, or for `dest` when given. A positive
+     * `timeoutMs` replaces the client's RPC timeout for each call, for remote
+     * reads whose answer can take longer than a local round trip.
+     */
+    fun admin(dest: Int = 0, timeoutMs: Int = 0): AdminJs {
+        val target = if (dest == 0) client.admin else client.admin.forNode(NodeId(dest))
+        return AdminJs(if (timeoutMs > 0) target.withRpcTimeout(timeoutMs.milliseconds) else target, scope)
+    }
 
     fun sendText(text: String, to: Int, channel: Int, replyId: Int = 0): SendHandleJs =
         sending { client.sendText(text, NodeId(to), ChannelIndex(channel), replyId) }

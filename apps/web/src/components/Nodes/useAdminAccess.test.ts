@@ -10,11 +10,16 @@ const env = vi.hoisted(() => ({
   sendAdmin: vi.fn(),
   setAdminAccess: vi.fn(),
   toast: vi.fn(),
+  navigate: vi.fn(),
   localKey: new Uint8Array([1, 2, 3]) as Uint8Array | undefined,
 }));
 
 vi.mock("@core/kmp/hooks", () => ({
   useActiveClient: () => ({ sendAdmin: env.sendAdmin }),
+}));
+
+vi.mock("@tanstack/react-router", () => ({
+  useNavigate: () => env.navigate,
 }));
 
 vi.mock("@core/hooks/useToast.ts", () => ({
@@ -86,6 +91,17 @@ describe("useAdminAccess", () => {
     expect(env.setAdminAccess).toHaveBeenCalledWith(0x0c40, false, "AQID");
     act(() => result.current.dismissRefusal());
     expect(result.current.refusal).toBeUndefined();
+  });
+
+  it("opens the node's settings in remote mode", () => {
+    const { result } = renderHook(() =>
+      useAdminAccess({ ...node, hasAdminAccess: true }),
+    );
+    act(() => result.current.openRemoteAdmin());
+    expect(env.navigate).toHaveBeenCalledWith({
+      to: "/settings",
+      search: { node: 0x0c40 },
+    });
   });
 
   it("says when the node could not be reached", async () => {

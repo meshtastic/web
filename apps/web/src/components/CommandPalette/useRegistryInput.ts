@@ -5,6 +5,7 @@ import type {
 } from "@core/commandMenu/sources.ts";
 import { nodeName } from "@core/commandMenu/sources.ts";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
+import { useLocalRadioManaged } from "@core/hooks/useLocalRadioManaged.ts";
 import {
   useMyNodeAsProto,
   useNodesAsProto,
@@ -33,6 +34,7 @@ export function useRegistryInput(now: number): RegistryInput {
   // Immer replaces the map on every device change.
   const deviceMap = useDeviceStore((s) => s.devices);
   const { metadata, excludedModules } = useDeviceCapabilities();
+  const managed = useLocalRadioManaged();
 
   const nodes = useMemo(
     (): NodeSource[] =>
@@ -95,6 +97,7 @@ export function useRegistryInput(now: number): RegistryInput {
       devices,
       deviceTabs,
       moduleTabs,
+      managed,
     }),
     [
       t,
@@ -108,6 +111,7 @@ export function useRegistryInput(now: number): RegistryInput {
       devices,
       deviceTabs,
       moduleTabs,
+      managed,
     ],
   );
 }

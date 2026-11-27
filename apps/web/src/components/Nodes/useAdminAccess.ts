@@ -7,6 +7,7 @@ import {
 import type { NodeRow } from "@core/nodes/nodeRow.ts";
 import { useDevice } from "@core/stores";
 import { base64Encode } from "@bufbuild/protobuf/wire";
+import { useNavigate } from "@tanstack/react-router";
 import { Result } from "better-result";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -26,6 +27,8 @@ export interface AdminAccessControl {
   /** It answered an earlier check. */
   readonly authorized: boolean;
   readonly check: () => void;
+  /** Opens the node's settings, managed remotely. */
+  readonly openRemoteAdmin: () => void;
   readonly refusal?: AdminAccessRefusal;
   readonly dismissRefusal: () => void;
 }
@@ -110,12 +113,19 @@ export function useAdminAccess(node: NodeRow | undefined): AdminAccessControl {
 
   const dismissRefusal = useCallback(() => setRefusal(undefined), []);
 
+  const navigate = useNavigate();
+  const openRemoteAdmin = useCallback(() => {
+    if (num === undefined) return;
+    void navigate({ to: "/settings", search: { node: num } });
+  }, [navigate, num]);
+
   return useMemo<AdminAccessControl>(
     () => ({
       available,
       checking: num !== undefined && inFlight.has(num),
       authorized: node?.hasAdminAccess ?? false,
       check,
+      openRemoteAdmin,
       refusal,
       dismissRefusal,
     }),
@@ -125,6 +135,7 @@ export function useAdminAccess(node: NodeRow | undefined): AdminAccessControl {
       inFlight,
       node?.hasAdminAccess,
       check,
+      openRemoteAdmin,
       refusal,
       dismissRefusal,
     ],

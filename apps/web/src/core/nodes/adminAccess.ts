@@ -33,6 +33,23 @@ const UNREACHABLE_REASONS: ReadonlySet<string> = new Set([
   "NO_RESPONSE",
 ]);
 
+/**
+ * What a failed admin request says about access to the node: it refused
+ * this radio (`unauthorized`), or the request or its answer got lost
+ * (`unreachable`). Anything else (rate limit, a lost link to the radio) is
+ * `undefined`.
+ */
+export function adminFailureKind(
+  error: Error,
+): Exclude<AdminAccess, "authorized"> | undefined {
+  const reason = error instanceof AdminError ? error.reason : undefined;
+  if (reason === "unauthorized") return "unauthorized";
+  if (reason !== undefined && UNREACHABLE_REASONS.has(reason)) {
+    return "unreachable";
+  }
+  return undefined;
+}
+
 export interface AdminAccessDeps {
   sendAdmin: (
     variant: AdminVariant,
@@ -115,14 +132,9 @@ export async function checkAdminAccess(
     deps.setAdminAccess(nodeNum, true);
     return Result.ok("authorized");
   }
-  const reason =
-    outcome.error instanceof AdminError ? outcome.error.reason : undefined;
-  if (reason === "unauthorized") {
+  const kind = adminFailureKind(outcome.error);
+  if (kind === "unauthorized") {
     deps.setAdminAccess(nodeNum, false);
-    return Result.ok("unauthorized");
   }
-  if (reason !== undefined && UNREACHABLE_REASONS.has(reason)) {
-    return Result.ok("unreachable");
-  }
-  return Result.err(outcome.error);
+  return kind === undefined ? Result.err(outcome.error) : Result.ok(kind);
 }

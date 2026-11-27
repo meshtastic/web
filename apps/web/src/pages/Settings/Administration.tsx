@@ -1,3 +1,4 @@
+import { ReadOnlyFieldset } from "@components/Settings/SettingsReadOnly.tsx";
 import {
   SettingsGroup,
   SettingsSections,
@@ -94,16 +95,20 @@ export const Administration = (_props: ConfigProps) => {
       {!connected && (
         <Callout tone="warning">{t("settingsPages.notConnected")}</Callout>
       )}
-      <SettingsGroup title={t("adminSection.powerCard", { ns: "config" })}>
-        {ACTIONS.filter((action) => !action.destructive).map(row)}
-      </SettingsGroup>
-      <SettingsGroup
-        tone="danger"
-        title={t("adminSection.dangerZone", { ns: "config" })}
-        description={t("adminSection.dangerZoneDescription", { ns: "config" })}
-      >
-        {ACTIONS.filter((action) => action.destructive).map(row)}
-      </SettingsGroup>
+      <ReadOnlyFieldset>
+        <SettingsGroup title={t("adminSection.powerCard", { ns: "config" })}>
+          {ACTIONS.filter((action) => !action.destructive).map(row)}
+        </SettingsGroup>
+        <SettingsGroup
+          tone="danger"
+          title={t("adminSection.dangerZone", { ns: "config" })}
+          description={t("adminSection.dangerZoneDescription", {
+            ns: "config",
+          })}
+        >
+          {ACTIONS.filter((action) => action.destructive).map(row)}
+        </SettingsGroup>
+      </ReadOnlyFieldset>
 
       <ConfirmDialog
         open={dfuConfirmOpen}

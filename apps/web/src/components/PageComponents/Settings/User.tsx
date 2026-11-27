@@ -12,6 +12,8 @@ import {
 } from "@components/Form/DynamicForm.tsx";
 import { useDeviceCapabilities } from "@core/hooks/useDeviceCapabilities.ts";
 import { useMyNodeAsProto } from "@core/hooks/useNodesAsProto.ts";
+import { useWaitForConfig } from "@core/hooks/useWaitForConfig.ts";
+import { useRemoteSettings } from "@core/settings/remoteContext.ts";
 import { useDevice } from "@core/stores";
 import { isModuleExcluded } from "@core/utils/excludedModules.ts";
 import { firmwareAtLeast } from "@core/utils/firmware.ts";
@@ -48,10 +50,16 @@ const EMPTY_MODULES_SIGNAL = constantSignal<{
 }>({});
 
 export const User = ({ onFormInit }: UserConfigProps) => {
+  // A remote node's owner is read from the node itself.
+  useWaitForConfig({ owner: true });
   const { t } = useTranslation("config");
+  const remote = useRemoteSettings();
   const editor = useConfigEditor();
   const myNode = useMyNodeAsProto();
   const owner = useSignal(editor?.owner ?? EMPTY_OWNER_SIGNAL);
+  const remoteOwner = useSignal(
+    remote ? remote.remote.editor.deviceOwner : EMPTY_OWNER_SIGNAL,
+  );
   const modules = useSignal(editor?.modules ?? EMPTY_MODULES_SIGNAL);
   const { moduleConfig, getEffectiveModuleConfig } = useDevice();
   const { metadata, supportsFirmware28, excludedModules } =
@@ -74,15 +82,16 @@ export const User = ({ onFormInit }: UserConfigProps) => {
 
   // Seed the editor's baseline when the device's user info first arrives.
   // setBaselineOwner is a no-op when the working copy is dirty, so user
-  // edits in flight are preserved across re-renders.
+  // edits in flight are preserved across re-renders. A remote node's
+  // baseline is its get_owner answer, never the node list's copy.
   useEffect(() => {
-    if (editor && myNode?.user) {
+    if (editor && !remote && myNode?.user) {
       editor.setBaselineOwner(myNode.user);
     }
-  }, [editor, myNode?.user]);
+  }, [editor, remote, myNode?.user]);
 
   const baselineUser =
-    myNode?.user ??
+    (remote ? remoteOwner : myNode?.user) ??
     create(Protobuf.Mesh.UserSchema, {
       id: "",
       longName: "",
@@ -200,12 +209,18 @@ export const User = ({ onFormInit }: UserConfigProps) => {
               label: t("user.isUnmessageable.label"),
               description: t("user.isUnmessageable.description"),
             },
-            {
-              type: "toggle",
-              name: "isLicensed",
-              label: t("user.isLicensed.label"),
-              description: t("user.isLicensed.description"),
-            },
+            // Licensed (ham) mode changes how the node transmits, so it
+            // isn't offered remotely.
+            ...(remote
+              ? []
+              : [
+                  {
+                    type: "toggle" as const,
+                    name: "isLicensed" as const,
+                    label: t("user.isLicensed.label"),
+                    description: t("user.isLicensed.description"),
+                  },
+                ]),
           ],
         },
       ]}

@@ -1,3 +1,4 @@
+import { ReadOnlyFieldset } from "@components/Settings/SettingsReadOnly.tsx";
 import {
   SettingsBlock,
   SettingsGroup,
@@ -89,7 +90,7 @@ export const CleanNodeDb = (_props: ConfigProps) => {
   };
 
   return (
-    <>
+    <ReadOnlyFieldset>
       <SettingsSections>
         <SettingsGroup
           title={t("settingsPages.cleanNodes.title")}
@@ -189,6 +190,6 @@ export const CleanNodeDb = (_props: ConfigProps) => {
         pending={cleaning}
         onConfirm={() => void cleanNow()}
       />
-    </>
+    </ReadOnlyFieldset>
   );
 };

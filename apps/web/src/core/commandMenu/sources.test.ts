@@ -237,6 +237,31 @@ describe("actionCommands", () => {
     expect(byId(commands, "action:reboot")?.hint).toBe("EAO1");
   });
 
+  it("disables actions that write to a managed radio, with a reason", () => {
+    const managed = actionCommands({ ...input, managed: true });
+    const reboot = byId(managed, "action:reboot");
+    expect(reboot?.kind === "action" && reboot.disabled).toBe(true);
+    expect(reboot?.hint).toBe("hint.managed");
+    for (const id of [
+      "shutdown",
+      "resetNodeDb",
+      "factoryResetDevice",
+      "factoryResetConfig",
+      "dfuMode",
+      "qrImport",
+    ]) {
+      const command = byId(managed, `action:${id}`);
+      expect(command?.kind === "action" && command.disabled).toBe(true);
+    }
+    // App-only and read actions stay available.
+    for (const id of ["disconnect", "qrGenerator", "clearAllStores"]) {
+      const command = byId(managed, `action:${id}`);
+      expect(command?.kind === "action" && command.disabled).toBeFalsy();
+    }
+    const local = byId(commands, "action:reboot");
+    expect(local?.kind === "action" && local.disabled).toBeFalsy();
+  });
+
   it("marks destructive actions", () => {
     const reset = byId(commands, "action:factoryResetDevice");
     expect(reset?.kind === "action" && reset.danger).toBe(true);

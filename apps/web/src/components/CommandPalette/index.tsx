@@ -220,6 +220,7 @@ const OpenCommandMenu = ({ onClose }: { onClose: () => void }) => {
   const run = (command: Command) => {
     switch (command.kind) {
       case "action":
+        if (command.disabled === true) return;
         runAction(command.action);
         return;
       case "navigate":

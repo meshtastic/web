@@ -36,6 +36,21 @@ describe("sendAdmin", () => {
     expect(client.admins.has(0)).toBe(false);
   });
 
+  it("asks the SDK to wait longer when given a timeout", async () => {
+    const client = new FakeKmpClient();
+    await sendAdmin(client, { case: "getOwnerRequest", value: true }, 0x1234);
+    await sendAdmin(
+      client,
+      { case: "getOwnerRequest", value: true },
+      0xfedcba98,
+      120_000,
+    );
+    expect(client.adminCalls).toEqual([
+      { dest: 0x1234, timeoutMs: 0 },
+      { dest: 0xfedcba98 | 0, timeoutMs: 120_000 },
+    ]);
+  });
+
   it("hands a node number above 0x7fffffff to the SDK signed", async () => {
     const client = new FakeKmpClient();
     await sendAdmin(

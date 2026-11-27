@@ -1,4 +1,5 @@
 import { create } from "@bufbuild/protobuf";
+import { useSettingsReadOnly } from "@components/Settings/SettingsReadOnly.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Card } from "@components/UI/Card.tsx";
 import { CopyField } from "@components/UI/CopyField.tsx";
@@ -35,6 +36,8 @@ export const ChannelShareCard = ({
 }: ChannelShareCardProps) => {
   const { t } = useTranslation("channels");
   const qrId = useId();
+  // Sharing reads the radio; importing changes it.
+  const readOnly = useSettingsReadOnly();
 
   const url = useMemo(
     () =>
@@ -109,6 +112,7 @@ export const ChannelShareCard = ({
             variant="link"
             className="h-auto p-0 text-help"
             icon={<UploadIcon aria-hidden="true" className="size-4" />}
+            disabled={readOnly}
             onClick={onImport}
           >
             {t("share.import")}

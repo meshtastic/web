@@ -5,6 +5,11 @@ import {
 } from "@app/validation/channel.ts";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import { SettingsCard } from "@components/Settings/SettingsCard.tsx";
+import {
+  READ_ONLY_INLINE_CLASS,
+  READ_ONLY_ROWS_CLASS,
+  ReadOnlyFieldset,
+} from "@components/Settings/SettingsReadOnly.tsx";
 import { SettingsFieldRow } from "@components/Settings/SettingsFieldRow.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Callout } from "@components/UI/Callout.tsx";
@@ -221,7 +226,13 @@ export const ChannelEditor = ({
   });
 
   if (role === "disabled") {
-    return <SettingsCard title={title}>{roleRow}</SettingsCard>;
+    return (
+      <SettingsCard title={title}>
+        <ReadOnlyFieldset className={READ_ONLY_ROWS_CLASS}>
+          {roleRow}
+        </ReadOnlyFieldset>
+      </SettingsCard>
+    );
   }
 
   const kindOptions = KEY_KINDS.map((value) => ({
@@ -244,31 +255,33 @@ export const ChannelEditor = ({
   return (
     <>
       <SettingsCard title={title}>
-        <SettingRow
-          kind="text"
-          label={t("editor.name.label")}
-          help={t("editor.name.help")}
-          value={name}
-          placeholder={defaultName}
-          limit={{ max: CHANNEL_NAME_MAX_BYTES, mode: "bytes", trim: true }}
-          width="lg"
-          dirty={getFieldState("name").isDirty}
-          error={errorText("name")}
-          onValueChange={onNameChange}
-        />
-        {roleRow}
-        <SettingRow<KeyKind | "">
-          kind="select"
-          label={t("editor.encryption.label")}
-          help={t("editor.encryption.help")}
-          value={kind ?? ""}
-          placeholder={t("slots.keyKind.custom")}
-          options={kindOptions}
-          dirty={keyDirty}
-          onValueChange={(next) => {
-            if (next !== "") setPsk(pskForKind(next));
-          }}
-        />
+        <ReadOnlyFieldset className={READ_ONLY_ROWS_CLASS}>
+          <SettingRow
+            kind="text"
+            label={t("editor.name.label")}
+            help={t("editor.name.help")}
+            value={name}
+            placeholder={defaultName}
+            limit={{ max: CHANNEL_NAME_MAX_BYTES, mode: "bytes", trim: true }}
+            width="lg"
+            dirty={getFieldState("name").isDirty}
+            error={errorText("name")}
+            onValueChange={onNameChange}
+          />
+          {roleRow}
+          <SettingRow<KeyKind | "">
+            kind="select"
+            label={t("editor.encryption.label")}
+            help={t("editor.encryption.help")}
+            value={kind ?? ""}
+            placeholder={t("slots.keyKind.custom")}
+            options={kindOptions}
+            dirty={keyDirty}
+            onValueChange={(next) => {
+              if (next !== "") setPsk(pskForKind(next));
+            }}
+          />
+        </ReadOnlyFieldset>
         {kind === "none" ? null : editingKey ? (
           <SettingsFieldRow
             label={t("editor.key.label")}
@@ -277,30 +290,32 @@ export const ChannelEditor = ({
             error={errorText("psk")}
             dirty={keyDirty}
           >
-            <Input
-              id={keyId}
-              className="font-mono"
-              containerClassName="min-w-0 flex-[1_1_16rem]"
-              autoComplete="off"
-              spellCheck={false}
-              value={psk}
-              aria-invalid={errorText("psk") ? true : undefined}
-              aria-describedby={settingRowDescribedBy(keyId, {
-                help: true,
-                error: Boolean(errorText("psk")),
-              })}
-              variant={
-                errorText("psk") ? "invalid" : keyDirty ? "dirty" : "default"
-              }
-              onChange={(event) => setPsk(event.target.value)}
-            />
-            <Button
-              variant="secondary"
-              className={TEXT_BUTTON}
-              onClick={() => setEditingKey(false)}
-            >
-              {t("editor.key.done")}
-            </Button>
+            <ReadOnlyFieldset className={READ_ONLY_INLINE_CLASS}>
+              <Input
+                id={keyId}
+                className="font-mono"
+                containerClassName="min-w-0 flex-[1_1_16rem]"
+                autoComplete="off"
+                spellCheck={false}
+                value={psk}
+                aria-invalid={errorText("psk") ? true : undefined}
+                aria-describedby={settingRowDescribedBy(keyId, {
+                  help: true,
+                  error: Boolean(errorText("psk")),
+                })}
+                variant={
+                  errorText("psk") ? "invalid" : keyDirty ? "dirty" : "default"
+                }
+                onChange={(event) => setPsk(event.target.value)}
+              />
+              <Button
+                variant="secondary"
+                className={TEXT_BUTTON}
+                onClick={() => setEditingKey(false)}
+              >
+                {t("editor.key.done")}
+              </Button>
+            </ReadOnlyFieldset>
           </SettingsFieldRow>
         ) : (
           <SettingRow
@@ -329,23 +344,25 @@ export const ChannelEditor = ({
                     }
                   />
                 </Button>
-                <Button
-                  variant="secondary"
-                  className={TEXT_BUTTON}
-                  onClick={() => {
-                    setShowKey(true);
-                    setEditingKey(true);
-                  }}
-                >
-                  {t("editor.key.edit")}
-                </Button>
-                <Button
-                  variant="secondary"
-                  className={TEXT_BUTTON}
-                  onClick={() => setPsk(regeneratedPsk(psk))}
-                >
-                  {t("editor.key.generate")}
-                </Button>
+                <ReadOnlyFieldset className={READ_ONLY_INLINE_CLASS}>
+                  <Button
+                    variant="secondary"
+                    className={TEXT_BUTTON}
+                    onClick={() => {
+                      setShowKey(true);
+                      setEditingKey(true);
+                    }}
+                  >
+                    {t("editor.key.edit")}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className={TEXT_BUTTON}
+                    onClick={() => setPsk(regeneratedPsk(psk))}
+                  >
+                    {t("editor.key.generate")}
+                  </Button>
+                </ReadOnlyFieldset>
               </>
             }
           />
@@ -360,54 +377,58 @@ export const ChannelEditor = ({
             </Callout>
           </div>
         )}
-        <SettingRow
-          kind="select"
-          label={t("editor.precision.label")}
-          help={t("editor.precision.help")}
-          value={String(precision)}
-          options={precisionOptions}
-          dirty={getFieldState("positionPrecision").isDirty}
-          error={errorText("positionPrecision")}
-          onValueChange={(next) => {
-            setValue("positionPrecision", Number(next), opts);
-            stage();
-          }}
-        />
-        <SettingRow
-          kind="switch"
-          label={t("editor.mute.label")}
-          help={t("editor.mute.help")}
-          checked={values.isMuted ?? false}
-          dirty={getFieldState("isMuted").isDirty}
-          onCheckedChange={(checked) => {
-            setValue("isMuted", checked, opts);
-            stage();
-          }}
-        />
+        <ReadOnlyFieldset className={READ_ONLY_ROWS_CLASS}>
+          <SettingRow
+            kind="select"
+            label={t("editor.precision.label")}
+            help={t("editor.precision.help")}
+            value={String(precision)}
+            options={precisionOptions}
+            dirty={getFieldState("positionPrecision").isDirty}
+            error={errorText("positionPrecision")}
+            onValueChange={(next) => {
+              setValue("positionPrecision", Number(next), opts);
+              stage();
+            }}
+          />
+          <SettingRow
+            kind="switch"
+            label={t("editor.mute.label")}
+            help={t("editor.mute.help")}
+            checked={values.isMuted ?? false}
+            dirty={getFieldState("isMuted").isDirty}
+            onCheckedChange={(checked) => {
+              setValue("isMuted", checked, opts);
+              stage();
+            }}
+          />
+        </ReadOnlyFieldset>
       </SettingsCard>
       <SettingsCard title={t("editor.mqttCard")}>
-        <SettingRow
-          kind="switch"
-          label={t("editor.uplink.label")}
-          help={t("editor.uplink.help")}
-          checked={values.uplinkEnabled ?? false}
-          dirty={getFieldState("uplinkEnabled").isDirty}
-          onCheckedChange={(checked) => {
-            setValue("uplinkEnabled", checked, opts);
-            stage();
-          }}
-        />
-        <SettingRow
-          kind="switch"
-          label={t("editor.downlink.label")}
-          help={t("editor.downlink.help")}
-          checked={values.downlinkEnabled ?? false}
-          dirty={getFieldState("downlinkEnabled").isDirty}
-          onCheckedChange={(checked) => {
-            setValue("downlinkEnabled", checked, opts);
-            stage();
-          }}
-        />
+        <ReadOnlyFieldset className={READ_ONLY_ROWS_CLASS}>
+          <SettingRow
+            kind="switch"
+            label={t("editor.uplink.label")}
+            help={t("editor.uplink.help")}
+            checked={values.uplinkEnabled ?? false}
+            dirty={getFieldState("uplinkEnabled").isDirty}
+            onCheckedChange={(checked) => {
+              setValue("uplinkEnabled", checked, opts);
+              stage();
+            }}
+          />
+          <SettingRow
+            kind="switch"
+            label={t("editor.downlink.label")}
+            help={t("editor.downlink.help")}
+            checked={values.downlinkEnabled ?? false}
+            dirty={getFieldState("downlinkEnabled").isDirty}
+            onCheckedChange={(checked) => {
+              setValue("downlinkEnabled", checked, opts);
+              stage();
+            }}
+          />
+        </ReadOnlyFieldset>
       </SettingsCard>
     </>
   );

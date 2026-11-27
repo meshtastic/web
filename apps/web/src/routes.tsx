@@ -5,12 +5,14 @@ import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
 import ConfigPage from "@pages/Settings/index.tsx";
+import { settingsSearchSchema } from "@pages/Settings/sectionProps.ts";
 import WelcomePage from "@pages/Welcome/index.tsx";
 import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
   redirect,
+  retainSearchParams,
 } from "@tanstack/react-router";
 import type { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
@@ -114,13 +116,16 @@ export const mapWithParamsRoute = createRoute({
   // }),
 });
 
+// Navigating between settings sections keeps `?node=`; Exit drops it.
 export const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings",
   component: ConfigPage,
+  validateSearch: (search) => settingsSearchSchema.parse(search),
+  search: { middlewares: [retainSearchParams(["node"])] },
 });
 
-const settingsTabSearchSchema = z.object({
+const settingsTabSearchSchema = settingsSearchSchema.extend({
   tab: z.string().optional(),
 });
 

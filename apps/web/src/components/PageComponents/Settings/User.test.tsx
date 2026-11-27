@@ -2,6 +2,11 @@ import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@core/protobuf.ts";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  RemoteSettingsContext,
+  type RemoteSettingsScope,
+} from "@core/settings/remoteContext.ts";
+import { SettingsReadOnlyContext } from "@components/Settings/SettingsReadOnly.tsx";
 import { User } from "./User.tsx";
 
 const Excluded = Protobuf.Mesh.ExcludedModules;
@@ -13,6 +18,7 @@ let statusmessage:
   | undefined;
 const setOwner = vi.fn();
 const setModuleSection = vi.fn();
+const setBaselineOwner = vi.fn();
 
 const user = create(Protobuf.Mesh.UserSchema, {
   id: "!abcd1234",
@@ -45,7 +51,7 @@ vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () => ({
     owner: { value: undefined },
     modules: { value: {} },
-    setBaselineOwner: vi.fn(),
+    setBaselineOwner,
     setOwner,
     setModuleSection,
   }),
@@ -120,6 +126,18 @@ describe("User", () => {
     );
   });
 
+  it("keeps the node ID copyable while settings are read-only", () => {
+    render(
+      <SettingsReadOnlyContext.Provider value>
+        <User onFormInit={vi.fn()} />
+      </SettingsReadOnlyContext.Provider>,
+    );
+    expect(screen.getByRole("textbox", { name: "Long Name" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Copy to clipboard" }),
+    ).toBeEnabled();
+  });
+
   it("counts the long name in UTF-8 bytes and flags it once over", () => {
     render(<User onFormInit={vi.fn()} />);
     const longName = screen.getByLabelText("Long Name");
@@ -139,5 +157,43 @@ describe("User", () => {
       target: { value: "📡" },
     });
     expect(screen.getByText("4/4")).toBeInTheDocument();
+  });
+});
+
+describe("User on a remote node", () => {
+  const remoteUser = create(Protobuf.Mesh.UserSchema, {
+    id: "!00000c40",
+    longName: "IB North",
+    shortName: "IBN",
+  });
+  const fixed = <T,>(value: T) => ({
+    value,
+    peek: () => value,
+    subscribe: () => () => {},
+  });
+  const scope = {
+    name: "IB North",
+    remote: {
+      editor: { deviceOwner: fixed(remoteUser) },
+      loads: fixed(new Map([["owner", { status: "loaded" }]])),
+    },
+  } as unknown as RemoteSettingsScope;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    firmwareVersion = "2.7.20";
+    excludedModules = 0;
+    statusmessage = undefined;
+  });
+
+  it("shows the node's own owner, not this radio's, without ham mode", () => {
+    render(
+      <RemoteSettingsContext.Provider value={scope}>
+        <User onFormInit={vi.fn()} />
+      </RemoteSettingsContext.Provider>,
+    );
+    expect(screen.getByLabelText("Long Name")).toHaveValue("IB North");
+    expect(screen.queryByText("Licensed amateur radio (Ham)")).toBeNull();
+    expect(setBaselineOwner).not.toHaveBeenCalled();
   });
 });

@@ -67,6 +67,8 @@ export interface RegistryInput {
   readonly devices: ReadonlyArray<DeviceSource>;
   readonly deviceTabs: ReadonlyArray<SettingsTabSource>;
   readonly moduleTabs: ReadonlyArray<SettingsTabSource>;
+  /** The connected radio is managed and drops this app's admin messages. */
+  readonly managed?: boolean;
 }
 
 type NodeText = Pick<RegistryInput, "t" | "locale" | "now">;
@@ -262,6 +264,8 @@ interface ActionEntry {
   readonly deviceHint?: boolean;
   /** `commandPalette` key of extra space-separated search words. */
   readonly keywordsKey?: string;
+  /** Sends an admin message to the connected radio. */
+  readonly writesRadio?: boolean;
 }
 
 const actionEntries: ReadonlyArray<ActionEntry> = [
@@ -299,6 +303,7 @@ const actionEntries: ReadonlyArray<ActionEntry> = [
     icon: "qrImport",
     action: { type: "dialog", dialog: "import" },
     keywordsKey: "keywords.qr",
+    writesRadio: true,
   },
   {
     id: "reboot",
@@ -306,6 +311,7 @@ const actionEntries: ReadonlyArray<ActionEntry> = [
     icon: "reboot",
     action: { type: "dialog", dialog: "reboot" },
     deviceHint: true,
+    writesRadio: true,
   },
   {
     id: "shutdown",
@@ -313,6 +319,7 @@ const actionEntries: ReadonlyArray<ActionEntry> = [
     icon: "shutdown",
     action: { type: "dialog", dialog: "shutdown" },
     deviceHint: true,
+    writesRadio: true,
   },
   {
     id: "disconnect",
@@ -327,6 +334,7 @@ const actionEntries: ReadonlyArray<ActionEntry> = [
     hintKey: "hint.firmware",
     icon: "dfu",
     action: { type: "enterDfuMode" },
+    writesRadio: true,
   },
   {
     id: "resetNodeDb",
@@ -334,6 +342,7 @@ const actionEntries: ReadonlyArray<ActionEntry> = [
     icon: "trash",
     action: { type: "dialog", dialog: "resetNodeDb" },
     danger: true,
+    writesRadio: true,
   },
   {
     id: "factoryResetDevice",
@@ -341,6 +350,7 @@ const actionEntries: ReadonlyArray<ActionEntry> = [
     icon: "factory",
     action: { type: "dialog", dialog: "factoryResetDevice" },
     danger: true,
+    writesRadio: true,
   },
   {
     id: "factoryResetConfig",
@@ -348,6 +358,7 @@ const actionEntries: ReadonlyArray<ActionEntry> = [
     icon: "factory",
     action: { type: "dialog", dialog: "factoryResetConfig" },
     danger: true,
+    writesRadio: true,
   },
   {
     id: "reconfigure",
@@ -376,24 +387,31 @@ const actionEntries: ReadonlyArray<ActionEntry> = [
 
 /** Device and app actions, plus one search-only row per known device. */
 export const actionCommands = (
-  input: Pick<RegistryInput, "t" | "deviceName" | "devices">,
+  input: Pick<RegistryInput, "t" | "deviceName" | "devices" | "managed">,
 ): Command[] => {
   const { t } = input;
-  const actions = actionEntries.map((entry): Command => ({
-    kind: "action",
-    id: `action:${entry.id}`,
-    group: "commands",
-    label: t(entry.labelKey),
-    hint: entry.deviceHint
-      ? input.deviceName
-      : entry.hintKey
-        ? t(entry.hintKey)
-        : undefined,
-    keywords: entry.keywordsKey ? splitKeywords(t(entry.keywordsKey)) : [],
-    icon: entry.icon,
-    action: entry.action,
-    danger: entry.danger,
-  }));
+  const actions = actionEntries.map((entry): Command => {
+    // A managed radio drops the admin message; say so instead of failing.
+    const locked = input.managed === true && entry.writesRadio === true;
+    return {
+      kind: "action",
+      id: `action:${entry.id}`,
+      group: "commands",
+      label: t(entry.labelKey),
+      hint: locked
+        ? t("hint.managed")
+        : entry.deviceHint
+          ? input.deviceName
+          : entry.hintKey
+            ? t(entry.hintKey)
+            : undefined,
+      keywords: entry.keywordsKey ? splitKeywords(t(entry.keywordsKey)) : [],
+      icon: entry.icon,
+      action: entry.action,
+      danger: entry.danger,
+      ...(locked ? { disabled: true } : {}),
+    };
+  });
   const devices = deviceCommands(input).map((command): Command => ({
     ...command,
     searchOnly: true,

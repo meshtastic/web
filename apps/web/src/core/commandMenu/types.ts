@@ -132,6 +132,8 @@ export type Command =
       readonly action: CommandAction;
       /** Destructive or disruptive; drawn in the danger colour. */
       readonly danger?: boolean;
+      /** Listed but can't be chosen; `hint` says why. */
+      readonly disabled?: boolean;
     })
   | (CommandBase & {
       readonly kind: "node";
