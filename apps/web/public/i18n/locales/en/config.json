@@ -700,6 +700,7 @@
     "updateCard": "Update",
     "openFlasher": "Open Web Flasher",
     "openFlasherHelp": "Opens flasher.meshtastic.org in a new tab.",
+    "openFlasherHelpPreselect": "Opens flasher.meshtastic.org in a new tab and selects this radio's hardware when it can.",
     "openFlasherAction": "Open flasher",
     "guide": "Flashing guide",
     "guideHelp": "Step-by-step instructions for each kind of hardware.",

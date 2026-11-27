@@ -4,7 +4,7 @@ import {
 } from "@components/PageComponents/SettingsPages/SettingsSection.tsx";
 import { ExternalLinkRow } from "@components/Settings/ExternalLinkRow.tsx";
 import { SettingRow } from "@components/UI/SettingRow.tsx";
-import { DOCS_BASE, FIRMWARE_FLASHER_URL } from "@core/settings/registry.ts";
+import { DOCS_BASE, firmwareFlasherUrl } from "@core/settings/registry.ts";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useRadioInfo } from "./radioInfo.ts";
@@ -42,9 +42,13 @@ export const Firmware = (_props: ConfigProps) => {
       <SettingsGroup title={t("firmwareSection.updateCard")}>
         <ExternalLinkRow
           label={t("firmwareSection.openFlasher")}
-          help={t("firmwareSection.openFlasherHelp")}
+          help={
+            radio.hwModel === undefined
+              ? t("firmwareSection.openFlasherHelp")
+              : t("firmwareSection.openFlasherHelpPreselect")
+          }
           actionLabel={t("firmwareSection.openFlasherAction")}
-          href={FIRMWARE_FLASHER_URL}
+          href={firmwareFlasherUrl(radio.hwModel)}
         />
         <ExternalLinkRow
           label={t("firmwareSection.guide")}
