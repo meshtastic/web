@@ -157,13 +157,14 @@ export const DeviceMenuPanel = ({
       ) : null}
 
       <div className="flex flex-col px-2 pt-1 pb-2">
-        {deviceMenuActions(summary.connected).map((action) => (
+        {deviceMenuActions(summary.connected, summary.managed).map((action) => (
           <button
             key={action.id}
             type="button"
+            disabled={action.unavailable !== undefined}
             onClick={() => onAction(action.id)}
             className={cn(
-              "flex h-11 cursor-pointer items-center gap-3 rounded-control px-2.5 text-left text-body font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus",
+              "flex h-11 cursor-pointer items-center gap-3 rounded-control px-2.5 text-left text-body font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent",
               action.tone === "danger"
                 ? "text-danger hover:bg-danger"
                 : "text-primary hover:bg-raised",
@@ -179,6 +180,11 @@ export const DeviceMenuPanel = ({
             {t(deviceMenuActionLabels[action.id].key, {
               ns: deviceMenuActionLabels[action.id].ns,
             })}
+            {action.unavailable === "managed" ? (
+              <span className="ml-auto text-meta font-normal text-muted">
+                {t("shell.managedUnavailable")}
+              </span>
+            ) : null}
           </button>
         ))}
       </div>

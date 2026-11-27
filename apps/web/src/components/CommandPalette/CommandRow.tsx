@@ -78,7 +78,11 @@ const KeySequence = ({ keys }: { keys: readonly [string, string] }) => {
 
 /** One result: icon tile, label, secondary text, shortcut. */
 export const CommandRow = ({ command, onSelect }: CommandRowProps) => (
-  <CommandItem value={command.id} onSelect={() => onSelect(command)}>
+  <CommandItem
+    value={command.id}
+    disabled={command.kind === "action" && command.disabled === true}
+    onSelect={() => onSelect(command)}
+  >
     <CommandTile command={command} />
     <span className="flex min-w-0 flex-1 items-baseline gap-2">
       <span className="truncate font-medium">{command.label}</span>

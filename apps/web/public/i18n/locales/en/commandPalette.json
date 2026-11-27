@@ -65,6 +65,7 @@
     "qrImport": "Import channels from QR code"
   },
   "hint": {
+    "managed": "Radio is managed",
     "unread_one": "{{count}} unread",
     "unread_other": "{{count}} unread",
     "channel": "Channel",

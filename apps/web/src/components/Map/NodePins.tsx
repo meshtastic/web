@@ -36,6 +36,7 @@ interface PinProps {
   name: string;
   initials: string;
   isFavorite: boolean;
+  hasAdminAccess: boolean;
   isSelf: boolean;
   isSelected: boolean;
   tone: PinTone;
@@ -54,6 +55,7 @@ const Pin = memo(function Pin({
   name,
   initials,
   isFavorite,
+  hasAdminAccess,
   isSelf,
   isSelected,
   tone,
@@ -94,6 +96,7 @@ const Pin = memo(function Pin({
           initials={initials}
           tone={isSelf ? { kind: "device" } : { kind: "node", nodeNum: num }}
           size="xs"
+          adminAccess={hasAdminAccess}
         >
           {isFavorite ? (
             <span className="absolute -top-1 -right-1 flex size-3.5 items-center justify-center rounded-full bg-surface text-warning">
@@ -210,6 +213,7 @@ export const NodePins = ({
             name={row.name}
             initials={row.initials}
             isFavorite={row.isFavorite}
+            hasAdminAccess={row.hasAdminAccess}
             isSelf={pin.isSelf}
             isSelected={pin.isSelected}
             tone={pin.tone}

@@ -219,8 +219,9 @@ export class MeshSession {
   sendAdmin(
     variant: AdminVariant,
     dest?: number,
+    timeoutMs?: number,
   ): Promise<Result<AdminResultJs, Error>> {
-    return sendAdmin(this.kmp, variant, dest);
+    return sendAdmin(this.kmp, variant, dest, timeoutMs);
   }
 
   sendPacket(packet: OutboundPacket): Promise<SendOutcomeJs> {

@@ -1,4 +1,5 @@
 import { NodeDetailsPanel } from "@components/Nodes/NodeDetailsPanel.tsx";
+import type { AdminAccessControl } from "@components/Nodes/useAdminAccess.ts";
 import type { NodeActions } from "@components/Nodes/useNodeActions.ts";
 import type { NodeLabels } from "@components/Nodes/useNodeLabels.ts";
 import { Button } from "@components/UI/Button.tsx";
@@ -77,6 +78,8 @@ export interface HeardNodeView {
   readonly name: string;
   readonly initials: string;
   readonly isFavorite: boolean;
+  /** This radio can manage the node remotely. */
+  readonly hasAdminAccess?: boolean;
   /** "2 hops · 3m". */
   readonly meta: string;
 }
@@ -356,6 +359,9 @@ export const ChannelDetailsPanel = ({
                     node.isFavorite
                       ? t("value.favorite", { ns: "nodes" })
                       : undefined,
+                    node.hasAdminAccess
+                      ? t("avatar.adminAccess", { ns: "nodes" })
+                      : undefined,
                     node.meta,
                   ]
                     .filter(Boolean)
@@ -367,6 +373,7 @@ export const ChannelDetailsPanel = ({
                     initials={node.initials}
                     tone={{ kind: "node", nodeNum: node.num }}
                     size="xs"
+                    adminAccess={node.hasAdminAccess}
                   >
                     {node.isFavorite ? (
                       <span className="absolute -top-1 -right-1 flex size-3.5 items-center justify-center rounded-full bg-surface text-warning">
@@ -406,6 +413,7 @@ export interface DirectDetailsPanelProps {
   row: NodeRow | undefined;
   labels: NodeLabels;
   actions: NodeActions;
+  adminAccess?: AdminAccessControl;
   /** Shown when the peer isn't in the node DB. */
   fallbackName: string;
   fallbackId: string;
@@ -417,6 +425,7 @@ export const DirectDetailsPanel = ({
   row,
   labels,
   actions,
+  adminAccess,
   fallbackName,
   fallbackId,
   onClose,
@@ -425,7 +434,12 @@ export const DirectDetailsPanel = ({
   return (
     <DetailsFrame title={t("header.nodeDetails")} onClose={onClose}>
       {row ? (
-        <NodeDetailsPanel row={row} labels={labels} actions={actions} />
+        <NodeDetailsPanel
+          row={row}
+          labels={labels}
+          actions={actions}
+          adminAccess={adminAccess}
+        />
       ) : (
         <div className="flex flex-col gap-2 p-4">
           <p className="m-0 text-header-lg font-bold">{fallbackName}</p>

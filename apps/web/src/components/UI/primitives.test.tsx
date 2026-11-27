@@ -304,6 +304,49 @@ describe("NodeAvatar", () => {
     expect(classes).not.toContain("text-avatar-contrast");
   });
 
+  it("badges a node this radio can manage remotely", () => {
+    const { container, rerender } = render(
+      <NodeAvatar
+        initials="IB"
+        tone={{ kind: "node", nodeNum: 0x0c40 }}
+        adminAccess
+      />,
+    );
+    // Decorative: the initials stay hidden, the badge is announced.
+    expect(screen.getByText("You can manage this node remotely")).toBeTruthy();
+    expect(
+      screen.queryByText("IB")?.closest("[aria-hidden=true]"),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(".-bottom-1.-left-1 svg.lucide-shield-keyhole"),
+    ).toBeTruthy();
+    // Hovering the badge says what it means.
+    expect(
+      container
+        .querySelector(".lucide-shield-keyhole")
+        ?.parentElement?.getAttribute("title"),
+    ).toBe("You can manage this node remotely");
+
+    rerender(
+      <NodeAvatar
+        initials="IB"
+        tone={{ kind: "node", nodeNum: 0x0c40 }}
+        label="IB North"
+        adminAccess
+      />,
+    );
+    expect(
+      screen.getByRole("img", {
+        name: "IB North, You can manage this node remotely",
+      }),
+    ).toBeTruthy();
+
+    rerender(
+      <NodeAvatar initials="IB" tone={{ kind: "node", nodeNum: 0x0c40 }} />,
+    );
+    expect(container.querySelector(".lucide-shield-keyhole")).toBeNull();
+  });
+
   it("is hidden from assistive tech without a label", () => {
     const { container } = render(
       <NodeAvatar initials="EAO1" tone={{ kind: "device" }} />,

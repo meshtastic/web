@@ -3,6 +3,7 @@ import { constantSignal } from "@core/kmp/signals.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { SettingsReadOnlyContext } from "@components/Settings/SettingsReadOnly.tsx";
 import { Channels } from "./Channels.tsx";
 
 const Role = Protobuf.Channel.Channel_Role;
@@ -234,5 +235,30 @@ describe("Channels", () => {
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Discard and switch" }));
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("");
+  });
+
+  it("lets a read-only radio's slots be viewed but not changed", () => {
+    render(
+      <SettingsReadOnlyContext.Provider value>
+        <Channels onFormInit={vi.fn()} />
+      </SettingsReadOnlyContext.Provider>,
+    );
+    openSlot(/Friends/);
+    expect(screen.getByRole("textbox", { name: "Name" })).toBeDisabled();
+    expect(screen.getByRole("switch", { name: "Uplink" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Import channels" }),
+    ).toBeDisabled();
+    // Sharing only reads the radio: the link, QR and key copies still work.
+    for (const copy of screen.getAllByRole("button", {
+      name: "Copy to clipboard",
+    })) {
+      expect(copy).toBeEnabled();
+    }
+    expect(
+      screen.getAllByRole("button", { name: "Copy to clipboard" }),
+    ).toHaveLength(2);
+    expect(screen.getByRole("button", { name: "Download QR" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Generate new" })).toBeDisabled();
   });
 });

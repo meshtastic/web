@@ -30,28 +30,49 @@ export function toResult(result: AdminResultJs): Result<AdminResultJs, Error> {
     : Result.err(new AdminError(result.reason ?? "unknown"));
 }
 
-/** Sends one admin message to `dest` (the local node when omitted). */
+/**
+ * The facade takes a Kotlin `Int`, and the SDK matches a remote reply's
+ * sender (a signed 32-bit int off the wire) against it, so a node number
+ * above 0x7fffffff has to go in signed or no reply would ever match.
+ */
+const toDest = (dest: number | undefined): number | undefined =>
+  dest === undefined ? undefined : dest | 0;
+
+/**
+ * Sends one admin message to `dest` (the local node when omitted). With
+ * `timeoutMs`, the SDK waits that long for the answer instead of its own
+ * RPC timeout.
+ */
 export async function sendAdmin(
   client: MeshtasticClient,
   payloadVariant: AdminVariant,
   dest?: number,
+  timeoutMs?: number,
 ): Promise<Result<AdminResultJs, Error>> {
+  const admin =
+    timeoutMs === undefined
+      ? client.admin(toDest(dest))
+      : client.admin(toDest(dest) ?? 0, timeoutMs);
   return toResult(
-    await client
-      .admin(dest)
-      .send(encodeAdminMessage(adminMessage(payloadVariant))),
+    await admin.send(encodeAdminMessage(adminMessage(payloadVariant))),
   );
 }
 
-/** Sends admin messages as one begin/commit settings transaction. */
+/**
+ * Sends admin messages as one begin/commit settings transaction, with an
+ * optional SDK timeout like {@link sendAdmin}'s.
+ */
 export async function editSettings(
   client: MeshtasticClient,
   messages: readonly Protobuf.Admin.AdminMessage[],
   dest?: number,
+  timeoutMs?: number,
 ): Promise<Result<void, Error>> {
-  const result = await client
-    .admin(dest)
-    .editSettings(messages.map(encodeAdminMessage));
+  const admin =
+    timeoutMs === undefined
+      ? client.admin(toDest(dest))
+      : client.admin(toDest(dest) ?? 0, timeoutMs);
+  const result = await admin.editSettings(messages.map(encodeAdminMessage));
   return result.ok
     ? Result.ok(undefined)
     : Result.err(new AdminError(result.reason ?? "unknown"));

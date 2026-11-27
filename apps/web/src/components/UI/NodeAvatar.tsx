@@ -3,7 +3,9 @@ import { cn } from "@core/utils/cn.ts";
 import { initialsScale } from "@core/utils/avatarFit.ts";
 import { nodeAvatarColors } from "@core/utils/nodeIdentity.ts";
 import { cva } from "class-variance-authority";
+import { ShieldKeyholeIcon } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * What the avatar stands for, which picks its colours:
@@ -51,6 +53,16 @@ const initialsRoomEm = {
   "2xl": 112 / 17,
 } as const satisfies Record<AvatarSize, number>;
 
+/** The remote admin badge and its icon, grown with the avatar. */
+const adminBadgeSize = {
+  xs: ["-bottom-1 -left-1 size-4.5", "size-3.5"],
+  sm: ["-bottom-1 -left-1 size-4.5", "size-3.5"],
+  md: ["-bottom-1 -left-1 size-4.5", "size-3.5"],
+  lg: ["-bottom-1 -left-1 size-4.5", "size-3.5"],
+  xl: ["-bottom-1.5 -left-1.5 size-6", "size-4.5"],
+  "2xl": ["-bottom-1.5 -left-1.5 size-7", "size-5"],
+} as const satisfies Record<AvatarSize, readonly [string, string]>;
+
 const dotSize = {
   xs: "sm",
   sm: "md",
@@ -80,6 +92,11 @@ export interface NodeAvatarProps {
   presenceLabel?: string | null;
   /** Colour of the surface behind the avatar, for the dot's cut-out ring. */
   cutout?: "surface" | "app" | "rail" | "selected";
+  /**
+   * This radio can manage the node remotely: a shield badge in the
+   * bottom-left corner, announced like the presence dot.
+   */
+  adminAccess?: boolean;
   /** Overlays, e.g. a favourite star. */
   children?: ReactNode;
   className?: string;
@@ -97,9 +114,11 @@ export const NodeAvatar = ({
   presence,
   presenceLabel,
   cutout = "surface",
+  adminAccess = false,
   children,
   className,
 }: NodeAvatarProps) => {
+  const { t } = useTranslation("nodes");
   const nodeColors =
     tone.kind === "node" ? nodeAvatarColors(tone.nodeNum) : undefined;
   // The node fill goes through a custom property so a caller's `bg-*`
@@ -126,14 +145,32 @@ export const NodeAvatar = ({
       className="absolute -right-0.5 -bottom-0.5"
     />
   ) : null;
-  // A labelled avatar is one image; its name says who it is. A decorative
-  // one hides its initials but keeps the presence dot announced.
+  const adminText = adminAccess ? t("avatar.adminAccess") : undefined;
+  const badge = adminAccess ? (
+    <span
+      title={adminText}
+      className={cn(
+        "absolute flex items-center justify-center rounded-full bg-surface text-accent",
+        adminBadgeSize[size][0],
+      )}
+    >
+      <ShieldKeyholeIcon
+        aria-hidden="true"
+        className={adminBadgeSize[size][1]}
+      />
+      {label ? null : <span className="sr-only">{adminText}</span>}
+    </span>
+  ) : null;
+  // A labelled avatar is one image; its name says who it is, and the
+  // badge's text joins it. A decorative one hides its initials but keeps
+  // the presence dot and the badge announced.
   const exposeDot = !label && presence !== undefined && presenceLabel !== null;
+  const exposeExtras = exposeDot || (!label && adminAccess);
   return (
     <span
       role={label ? "img" : undefined}
-      aria-label={label}
-      aria-hidden={label || exposeDot ? undefined : true}
+      aria-label={label && adminText ? `${label}, ${adminText}` : label}
+      aria-hidden={label || exposeExtras ? undefined : true}
       className={cn(
         avatarVariants({ size }),
         tone.kind === "device" && "bg-device-avatar text-on-device-avatar",
@@ -148,7 +185,7 @@ export const NodeAvatar = ({
       )}
       style={style}
     >
-      <span aria-hidden={exposeDot ? true : undefined} className="contents">
+      <span aria-hidden={exposeExtras ? true : undefined} className="contents">
         <span
           className="whitespace-nowrap"
           // A name too wide for the avatar is drawn smaller, not cut.
@@ -158,6 +195,7 @@ export const NodeAvatar = ({
         </span>
         {children}
       </span>
+      {badge}
       {dot}
     </span>
   );

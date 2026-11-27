@@ -3,6 +3,7 @@ import {
   type ParsedSecurity,
   type RawSecurity,
   RawSecuritySchema,
+  RemoteRawSecuritySchema,
 } from "@app/validation/config/security.ts";
 import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
@@ -11,7 +12,14 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { SettingsFieldRow } from "@components/Settings/SettingsFieldRow.tsx";
+import {
+  READ_ONLY_INLINE_CLASS,
+  READ_ONLY_ROWS_CLASS,
+  ReadOnlyFieldset,
+  SettingsReadOnlyContext,
+} from "@components/Settings/SettingsReadOnly.tsx";
 import { Button } from "@components/UI/Button.tsx";
+import { Callout } from "@components/UI/Callout.tsx";
 import { ConfirmDialog } from "@components/UI/ConfirmDialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import {
@@ -28,6 +36,7 @@ import {
   useMyNodeAsProto,
   useNodesAsProto,
 } from "@core/hooks/useNodesAsProto.ts";
+import { useRemoteSettings } from "@core/settings/remoteContext.ts";
 import { useDevice } from "@core/stores";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@core/protobuf.ts";
@@ -83,11 +92,19 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
 
   const { t } = useTranslation("config");
   const { metadata } = useDeviceCapabilities();
+  // Released firmware replaces a node's key pair (its identity) when a
+  // security write has no private key. A remote node's key goes back as
+  // it was read; a node that withholds it (2.8.1+) is read-only here.
+  const remote = useRemoteSettings();
+  const remoteKey = remote ? config.security?.privateKey : undefined;
+  const locked = remote !== undefined && remoteKey?.length !== 32;
 
   const formMethods = useForm<RawSecurity>({
     mode: "onChange",
     defaultValues: toFormShape(config.security),
-    resolver: createZodResolver(RawSecuritySchema),
+    resolver: createZodResolver(
+      locked ? RemoteRawSecuritySchema : RawSecuritySchema,
+    ),
     shouldFocusError: false,
     resetOptions: { keepDefaultValues: true },
     values: toFormShape(effective),
@@ -115,11 +132,11 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     useState<boolean>(false);
 
   const onSubmit = (data: RawSecurity) => {
-    if (!formState.isReady || !editor) return;
+    if (!formState.isReady || !editor || locked) return;
 
     const payload: ParsedSecurity = {
       ...data,
-      privateKey: base64Decode(data.privateKey),
+      privateKey: remoteKey ?? base64Decode(data.privateKey),
       publicKey: base64Decode(data.publicKey),
       adminKey: [
         base64Decode(data.adminKey.at(0) ?? ""),
@@ -230,7 +247,17 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
         dirty={getFieldState("publicKey").isDirty}
         error={errorText("publicKey")}
       />
-      {editingPrivateKey ? (
+      {remote ? (
+        locked ? null : (
+          <SettingRow
+            kind="readonlyKey"
+            label={t("security.privateKey.label")}
+            help={t("remoteSettings.privateKeyRemote", { name: remote.name })}
+            value={MASKED_KEY}
+            copyable={false}
+          />
+        )
+      ) : editingPrivateKey ? (
         <SettingsFieldRow
           label={t("security.privateKey.label")}
           htmlFor="privateKeyInput"
@@ -238,34 +265,36 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
           error={errorText("privateKey")}
           dirty={getFieldState("privateKey").isDirty}
         >
-          <Input
-            id="privateKeyInput"
-            className="font-mono"
-            containerClassName="w-full sm:w-[320px]"
-            autoComplete="off"
-            spellCheck={false}
-            value={privateKey ?? ""}
-            aria-invalid={errorText("privateKey") ? true : undefined}
-            aria-describedby={settingRowDescribedBy("privateKeyInput", {
-              help: true,
-              error: Boolean(errorText("privateKey")),
-            })}
-            variant={
-              errorText("privateKey")
-                ? "invalid"
-                : getFieldState("privateKey").isDirty
-                  ? "dirty"
-                  : "default"
-            }
-            onChange={(event) => void updatePublicKey(event.target.value)}
-          />
-          <Button
-            variant="secondary"
-            className="text-help"
-            onClick={() => setEditingPrivateKey(false)}
-          >
-            {t("securitySection.done")}
-          </Button>
+          <ReadOnlyFieldset className={READ_ONLY_INLINE_CLASS}>
+            <Input
+              id="privateKeyInput"
+              className="font-mono"
+              containerClassName="w-full sm:w-[320px]"
+              autoComplete="off"
+              spellCheck={false}
+              value={privateKey ?? ""}
+              aria-invalid={errorText("privateKey") ? true : undefined}
+              aria-describedby={settingRowDescribedBy("privateKeyInput", {
+                help: true,
+                error: Boolean(errorText("privateKey")),
+              })}
+              variant={
+                errorText("privateKey")
+                  ? "invalid"
+                  : getFieldState("privateKey").isDirty
+                    ? "dirty"
+                    : "default"
+              }
+              onChange={(event) => void updatePublicKey(event.target.value)}
+            />
+            <Button
+              variant="secondary"
+              className="text-help"
+              onClick={() => setEditingPrivateKey(false)}
+            >
+              {t("securitySection.done")}
+            </Button>
+          </ReadOnlyFieldset>
         </SettingsFieldRow>
       ) : (
         <SettingRow
@@ -288,23 +317,25 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                   ? t("securitySection.hide")
                   : t("securitySection.show")}
               </Button>
-              <Button
-                variant="secondary"
-                className="text-help"
-                onClick={() => {
-                  setShowPrivateKey(true);
-                  setEditingPrivateKey(true);
-                }}
-              >
-                {t("securitySection.edit")}
-              </Button>
-              <Button
-                variant="secondary"
-                className="text-help text-danger"
-                onClick={() => setPrivateKeyDialogOpen(true)}
-              >
-                {t("button.regenerate")}
-              </Button>
+              <ReadOnlyFieldset className={READ_ONLY_INLINE_CLASS}>
+                <Button
+                  variant="secondary"
+                  className="text-help"
+                  onClick={() => {
+                    setShowPrivateKey(true);
+                    setEditingPrivateKey(true);
+                  }}
+                >
+                  {t("securitySection.edit")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="text-help text-danger"
+                  onClick={() => setPrivateKeyDialogOpen(true)}
+                >
+                  {t("button.regenerate")}
+                </Button>
+              </ReadOnlyFieldset>
             </>
           }
         />
@@ -328,16 +359,18 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
               dirty={name ? getFieldState(name).isDirty : false}
               error={name ? errorText(name) : undefined}
               actions={
-                <Button
-                  variant="secondary"
-                  className="text-help text-danger"
-                  aria-label={t("securitySection.removeAdminKey", {
-                    number: index + 1,
-                  })}
-                  onClick={() => setRemovingSlot(index)}
-                >
-                  {t("button.remove")}
-                </Button>
+                <ReadOnlyFieldset className={READ_ONLY_INLINE_CLASS}>
+                  <Button
+                    variant="secondary"
+                    className="text-help text-danger"
+                    aria-label={t("securitySection.removeAdminKey", {
+                      number: index + 1,
+                    })}
+                    onClick={() => setRemovingSlot(index)}
+                  >
+                    {t("button.remove")}
+                  </Button>
+                </ReadOnlyFieldset>
               }
             />
           );
@@ -350,142 +383,165 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
           error={addingError}
           dirty
         >
-          <Input
-            id="newAdminKeyInput"
-            className="font-mono"
-            containerClassName="w-full sm:w-[320px]"
-            autoComplete="off"
-            spellCheck={false}
-            variant={addingError ? "invalid" : "dirty"}
-            aria-invalid={addingError ? true : undefined}
-            aria-describedby={settingRowDescribedBy("newAdminKeyInput", {
-              help: true,
-              error: Boolean(addingError),
-            })}
-            value={adminKeys?.[addingSlot] ?? ""}
-            onChange={(event) => setAdminKey(addingSlot, event.target.value)}
-          />
-          <Button
-            variant="secondary"
-            className="text-help"
-            onClick={() => setPickingRadio(true)}
-          >
-            {t("securitySection.pickRadio")}
-          </Button>
-          <Button
-            variant="secondary"
-            className="text-help"
-            onClick={() => setGeneratingKey(true)}
-          >
-            {t("securitySection.generateKey")}
-          </Button>
-          <Button
-            variant="secondary"
-            className="text-help"
-            onClick={() => setAddingSlot(undefined)}
-          >
-            {t("securitySection.done")}
-          </Button>
-          <Button
-            variant="ghost"
-            className="text-help"
-            onClick={() => {
-              setAdminKey(addingSlot, "");
-              setAddingSlot(undefined);
-            }}
-          >
-            {t("securitySection.cancel")}
-          </Button>
+          <ReadOnlyFieldset className={READ_ONLY_INLINE_CLASS}>
+            <Input
+              id="newAdminKeyInput"
+              className="font-mono"
+              containerClassName="w-full sm:w-[320px]"
+              autoComplete="off"
+              spellCheck={false}
+              variant={addingError ? "invalid" : "dirty"}
+              aria-invalid={addingError ? true : undefined}
+              aria-describedby={settingRowDescribedBy("newAdminKeyInput", {
+                help: true,
+                error: Boolean(addingError),
+              })}
+              value={adminKeys?.[addingSlot] ?? ""}
+              onChange={(event) => setAdminKey(addingSlot, event.target.value)}
+            />
+            <Button
+              variant="secondary"
+              className="text-help"
+              onClick={() => setPickingRadio(true)}
+            >
+              {t("securitySection.pickRadio")}
+            </Button>
+            <Button
+              variant="secondary"
+              className="text-help"
+              onClick={() => setGeneratingKey(true)}
+            >
+              {t("securitySection.generateKey")}
+            </Button>
+            <Button
+              variant="secondary"
+              className="text-help"
+              onClick={() => setAddingSlot(undefined)}
+            >
+              {t("securitySection.done")}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-help"
+              onClick={() => {
+                setAdminKey(addingSlot, "");
+                setAddingSlot(undefined);
+              }}
+            >
+              {t("securitySection.cancel")}
+            </Button>
+          </ReadOnlyFieldset>
         </SettingsFieldRow>
       )}
       {slots.nextEmpty !== undefined && addingSlot === undefined ? (
-        <SettingRow
-          kind="button"
-          label={t("securitySection.addAdminKey")}
-          help={
-            slots.filled.length === 0
-              ? t("securitySection.noAdminKeys")
-              : t("securitySection.addAdminKeyHelp")
-          }
-          actionLabel={t("securitySection.addKey")}
-          onAction={() => setAddingSlot(slots.nextEmpty)}
-        />
+        <ReadOnlyFieldset className={READ_ONLY_ROWS_CLASS}>
+          <SettingRow
+            kind="button"
+            label={t("securitySection.addAdminKey")}
+            help={
+              slots.filled.length === 0
+                ? t("securitySection.noAdminKeys")
+                : t("securitySection.addAdminKeyHelp")
+            }
+            actionLabel={t("securitySection.addKey")}
+            onAction={() => setAddingSlot(slots.nextEmpty)}
+          />
+        </ReadOnlyFieldset>
       ) : null}
     </>
   );
 
+  const form = (
+    <DynamicForm<RawSecurity>
+      propMethods={formMethods}
+      onSubmit={onSubmit}
+      fieldGroups={[
+        {
+          label: t("security.packetSignaturesCard.label"),
+          description: t("security.packetSignaturesCard.description"),
+          fields: [
+            {
+              type: "select",
+              name: "packetSignaturePolicy",
+              label: t("security.packetSignaturePolicy.label"),
+              description:
+                metadata?.hasXeddsa === false
+                  ? t("security.packetSignaturePolicy.unsupported")
+                  : t("security.packetSignaturePolicy.description"),
+              // Only a radio that reports XEdDSA signing can apply the policy.
+              disabled: metadata?.hasXeddsa !== true,
+              properties: {
+                enumValue: packetSignaturePolicyOptions,
+              },
+            },
+          ],
+        },
+        {
+          label: t("securitySection.keysCard"),
+          description: t("securitySection.keysCardDescription"),
+          content: keyRows,
+          contentHandlesReadOnly: true,
+          fields: [],
+        },
+        {
+          label: t("securitySection.remoteAdminCard"),
+          description: t("securitySection.remoteAdminCardDescription"),
+          content: adminRows,
+          contentHandlesReadOnly: true,
+          fields: [
+            {
+              type: "toggle",
+              name: "isManaged",
+              label: t("security.managed.label"),
+              description: t("security.managed.description"),
+              inputChange: (checked) => {
+                if (checked) {
+                  setManagedModeDialogOpen(true);
+                }
+                setValue("isManaged", false);
+              },
+            },
+          ],
+          // Lockdown unlocks the radio this app is connected to.
+          footer: remote ? undefined : <LockdownSection />,
+        },
+        {
+          label: t("securitySection.accessCard"),
+          description: t("securitySection.accessCardDescription"),
+          fields: [
+            {
+              type: "toggle",
+              name: "serialEnabled",
+              label: t("security.serialOutputEnabled.label"),
+              description: t("security.serialOutputEnabled.description"),
+            },
+            {
+              type: "toggle",
+              name: "debugLogApiEnabled",
+              label: t("security.enableDebugLogApi.label"),
+              description: t("security.enableDebugLogApi.description"),
+            },
+          ],
+        },
+      ]}
+    />
+  );
+
   return (
     <>
-      <DynamicForm<RawSecurity>
-        propMethods={formMethods}
-        onSubmit={onSubmit}
-        fieldGroups={[
-          {
-            label: t("security.packetSignaturesCard.label"),
-            description: t("security.packetSignaturesCard.description"),
-            fields: [
-              {
-                type: "select",
-                name: "packetSignaturePolicy",
-                label: t("security.packetSignaturePolicy.label"),
-                description:
-                  metadata?.hasXeddsa === false
-                    ? t("security.packetSignaturePolicy.unsupported")
-                    : t("security.packetSignaturePolicy.description"),
-                // Only a radio that reports XEdDSA signing can apply the policy.
-                disabled: metadata?.hasXeddsa !== true,
-                properties: {
-                  enumValue: packetSignaturePolicyOptions,
-                },
-              },
-            ],
-          },
-          {
-            label: t("securitySection.keysCard"),
-            description: t("securitySection.keysCardDescription"),
-            content: keyRows,
-            fields: [],
-          },
-          {
-            label: t("securitySection.remoteAdminCard"),
-            description: t("securitySection.remoteAdminCardDescription"),
-            content: adminRows,
-            fields: [
-              {
-                type: "toggle",
-                name: "isManaged",
-                label: t("security.managed.label"),
-                description: t("security.managed.description"),
-                inputChange: (checked) => {
-                  if (checked) {
-                    setManagedModeDialogOpen(true);
-                  }
-                  setValue("isManaged", false);
-                },
-              },
-            ],
-            footer: <LockdownSection />,
-          },
-          {
-            label: t("securitySection.accessCard"),
-            description: t("securitySection.accessCardDescription"),
-            fields: [
-              {
-                type: "toggle",
-                name: "serialEnabled",
-                label: t("security.serialOutputEnabled.label"),
-                description: t("security.serialOutputEnabled.description"),
-              },
-              {
-                type: "toggle",
-                name: "debugLogApiEnabled",
-                label: t("security.enableDebugLogApi.label"),
-                description: t("security.enableDebugLogApi.description"),
-              },
-            ],
-          },
-        ]}
-      />
+      {locked ? (
+        <>
+          <Callout tone="info">
+            {t("remoteSettings.securityLocked", { name: remote.name })}
+          </Callout>
+          {/* Every editable control is disabled; copy buttons still work. */}
+          <SettingsReadOnlyContext.Provider value={true}>
+            {form}
+          </SettingsReadOnlyContext.Provider>
+        </>
+      ) : (
+        form
+      )}
       <ConfirmDialog
         open={privateKeyDialogOpen}
         onOpenChange={setPrivateKeyDialogOpen}

@@ -3,6 +3,7 @@ import type { Node as SdkNode } from "@core/storage/types.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { useMemo } from "react";
 import { useActiveClient, useSignal } from "@core/kmp/hooks";
+import { useRemoteSettings } from "@core/settings/remoteContext.ts";
 
 /**
  * Adapter hooks that surface SDK-managed nodes in the
@@ -61,10 +62,23 @@ export function useNodeAsProto(
 /**
  * "My node" — the node info for the locally-connected device, if its
  * NodeInfo packet has been observed yet. Returns undefined while the
- * device is still configuring or there is no active client.
+ * device is still configuring or there is no active client. Inside remote
+ * settings it is the node being managed; see {@link useLocalNodeAsProto}.
  */
 export function useMyNodeAsProto(): NodeInfoWithStatus | undefined {
-  const myNodeNum = useMyNodeNumSafe();
+  const localNodeNum = useMyNodeNumSafe();
+  const remoteNodeNum = useRemoteSettings()?.remote.nodeNum;
+  return useNodeByNum(remoteNodeNum ?? localNodeNum);
+}
+
+/** The locally-connected device's node info, even inside remote settings. */
+export function useLocalNodeAsProto(): NodeInfoWithStatus | undefined {
+  return useNodeByNum(useMyNodeNumSafe());
+}
+
+function useNodeByNum(
+  myNodeNum: number | undefined,
+): NodeInfoWithStatus | undefined {
   const nodes = useSdkNodesSafe();
   return useMemo(() => {
     if (myNodeNum === undefined) return undefined;

@@ -207,6 +207,46 @@ export const SETTINGS_SECTIONS = [
   },
 ] as const satisfies readonly SettingsSectionDef[];
 
+/**
+ * Sections offered when managing another node remotely: its radio and
+ * module config and its owner. Channels, admin actions, backup, firmware,
+ * debug and the app's own settings stay with the local radio.
+ */
+export const REMOTE_SECTION_IDS: ReadonlySet<SettingsSectionId> = new Set([
+  "user",
+  "lora",
+  "security",
+  "device",
+  "module",
+]);
+
+/**
+ * Sections that write to the connected radio, read-only while it is in
+ * managed mode: firmware then ignores every admin message from this app.
+ * Backup, firmware info and the app's own settings stay usable.
+ */
+export const MANAGED_READ_ONLY_SECTION_IDS: ReadonlySet<SettingsSectionId> =
+  new Set([
+    "user",
+    "lora",
+    "channels",
+    "security",
+    "device",
+    "module",
+    "administration",
+    "clean-nodes",
+  ]);
+
+/**
+ * Modules not offered remotely, because their forms read the local radio:
+ * the canned message list, the ringtone, and Mesh Beacon's channels.
+ */
+export const REMOTE_HIDDEN_MODULES: ReadonlySet<ModuleConfigSection> = new Set([
+  "cannedMessage",
+  "externalNotification",
+  "meshBeacon",
+]);
+
 export const GROUP_LABEL_KEYS = {
   configuration: "sidebar.configuration",
   backupRestore: "sidebar.backupRestore",

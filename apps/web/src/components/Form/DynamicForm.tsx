@@ -5,7 +5,13 @@ import {
 } from "@components/Form/DynamicFormField.tsx";
 import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { SettingsCard } from "@components/Settings/SettingsCard.tsx";
+import {
+  READ_ONLY_INLINE_CLASS,
+  READ_ONLY_ROWS_CLASS,
+  ReadOnlyFieldset,
+} from "@components/Settings/SettingsReadOnly.tsx";
 import { Button } from "@components/UI/Button.tsx";
+import { cn } from "@core/utils/cn.ts";
 import { type ReactNode, useEffect } from "react";
 import {
   type Control,
@@ -63,6 +69,12 @@ export interface DynamicFormProps<T extends FieldValues> {
     fields: FieldProps<T>[];
     /** Rows rendered before the fields, e.g. read-only key rows. */
     content?: ReactNode;
+    /**
+     * The content disables its own editable controls while settings are
+     * read-only, so its copy buttons stay usable. Otherwise all of it is
+     * disabled.
+     */
+    contentHandlesReadOnly?: boolean;
     /** Optional JSX rendered after the field list (e.g. action buttons that
      * reach into the form via useFormContext). */
     footer?: ReactNode;
@@ -162,10 +174,25 @@ export function DynamicForm<T extends FieldValues>({
               )
             }
           >
-            {fieldGroup.content}
+            {fieldGroup.content == null || fieldGroup.contentHandlesReadOnly ? (
+              fieldGroup.content
+            ) : (
+              <ReadOnlyFieldset className={READ_ONLY_ROWS_CLASS}>
+                {fieldGroup.content}
+              </ReadOnlyFieldset>
+            )}
             {fieldGroup.fields.map((field) => {
               const error = get(formState.errors, field.name);
               const fieldState = getFieldState(field.name);
+              const fieldControl = (
+                <DynamicFormField
+                  field={field}
+                  control={control}
+                  disabled={isDisabled(field.disabledBy, field.disabled)}
+                  isDirty={fieldState.isDirty}
+                  invalid={fieldState.invalid}
+                />
+              );
               return (
                 <FieldWrapper
                   key={field.label}
@@ -186,19 +213,28 @@ export function DynamicForm<T extends FieldValues>({
                       : ""
                   }
                 >
-                  <DynamicFormField
-                    field={field}
-                    control={control}
-                    disabled={isDisabled(field.disabledBy, field.disabled)}
-                    isDirty={fieldState.isDirty}
-                    invalid={fieldState.invalid}
-                  />
+                  {/* An always-disabled field (e.g. node ID) is display
+                        only; leaving it unwrapped keeps its copy button. */}
+                  {field.disabled === true ? (
+                    fieldControl
+                  ) : (
+                    <ReadOnlyFieldset
+                      className={cn(
+                        READ_ONLY_INLINE_CLASS,
+                        field.type === "multiSelect" && "w-full",
+                      )}
+                    >
+                      {fieldControl}
+                    </ReadOnlyFieldset>
+                  )}
                 </FieldWrapper>
               );
             })}
             {fieldGroup.footer ? (
               <div className="border-t border-subtle px-4 py-3.5">
-                {fieldGroup.footer}
+                <ReadOnlyFieldset className="m-0 min-w-0 border-0 p-0">
+                  {fieldGroup.footer}
+                </ReadOnlyFieldset>
               </div>
             ) : null}
           </SettingsCard>

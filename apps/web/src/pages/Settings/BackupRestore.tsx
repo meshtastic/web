@@ -8,6 +8,7 @@ import {
 import { useDeviceConnected } from "@components/PageComponents/SettingsPages/useDeviceConnected.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Callout } from "@components/UI/Callout.tsx";
+import { useLocalRadioManaged } from "@core/hooks/useLocalRadioManaged.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import {
   buildDeviceProfile,
@@ -65,6 +66,9 @@ export const BackupRestore = (_props: ConfigProps) => {
   const editor = useConfigEditor();
   const isDirty = useSignal(editor?.isDirty ?? EMPTY_BOOLEAN_SIGNAL);
   const connected = useDeviceConnected();
+  // A managed radio drops the writes an import stages; the settings
+  // banner explains why. Exporting only reads, so it stays available.
+  const managed = useLocalRadioManaged();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<PendingDialog>();
 
@@ -125,6 +129,7 @@ export const BackupRestore = (_props: ConfigProps) => {
     profile: DeviceProfile,
     selection: ProfileSelection,
   ) => {
+    if (managed) return;
     if (!editor) {
       toast({ title: t("settingsPages.backup.import.notConnected") });
       return;
@@ -195,7 +200,7 @@ export const BackupRestore = (_props: ConfigProps) => {
           >
             <Button
               variant="secondary"
-              disabled={!connected}
+              disabled={!connected || managed}
               onClick={() => fileInputRef.current?.click()}
             >
               <UploadIcon aria-hidden="true" className="mr-2 size-4" />

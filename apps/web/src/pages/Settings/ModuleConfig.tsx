@@ -26,6 +26,8 @@ import { constantSignal } from "@core/kmp/signals.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { dirtyModuleTabs } from "@core/settings/dirty.ts";
 import { moduleState } from "@core/settings/moduleState.ts";
+import { useRemoteSettings } from "@core/settings/remoteContext.ts";
+import { REMOTE_HIDDEN_MODULES } from "@core/settings/registry.ts";
 import { useDevice } from "@core/stores";
 import { isModuleExcluded } from "@core/utils/excludedModules.ts";
 import { useNavigate } from "@tanstack/react-router";
@@ -107,6 +109,7 @@ export function useVisibleModules(): ModuleTab[] {
   const radio = useSignal(editor?.radio ?? NO_RADIO);
   const { getEffectiveConfig } = useDevice();
   const { excludedModules, supportsFirmware28 } = useDeviceCapabilities();
+  const remote = useRemoteSettings() !== undefined;
 
   // Staged role first, so TAK appears as soon as the role is set.
   const role = (radio.device ?? getEffectiveConfig("device"))?.role;
@@ -120,9 +123,10 @@ export function useVisibleModules(): ModuleTab[] {
       MODULE_TABS.filter(
         (tab) =>
           !isModuleExcluded(excludedModules, tab.key) &&
-          (tab.key !== "tak" || showTak),
+          (tab.key !== "tak" || showTak) &&
+          !(remote && REMOTE_HIDDEN_MODULES.has(tab.key)),
       ),
-    [excludedModules, showTak],
+    [excludedModules, showTak, remote],
   );
 }
 

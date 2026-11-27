@@ -88,6 +88,19 @@ describe("sortNodeRows", () => {
   });
 });
 
+describe("remote admin sort", () => {
+  it("puts nodes this radio can manage first, each group by last heard", () => {
+    const managed = (num: number, heardSecondsAgo?: number) => ({
+      ...makeRow({ num, longName: `n${num}`, heardSecondsAgo }),
+      hasAdminAccess: true,
+    });
+    const list = [...rows, managed(7, 3600), managed(6, 30)];
+    expect(
+      nums(sortNodeRows(list, { key: "remoteAdmin", direction: "desc" })),
+    ).toEqual([6, 7, 1, 4, 3, 2]);
+  });
+});
+
 describe("node sort keys", () => {
   it("every key has an initial direction", () => {
     for (const key of NODE_SORT_KEYS) {

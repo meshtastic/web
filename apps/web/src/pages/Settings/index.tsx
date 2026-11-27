@@ -3,6 +3,10 @@ import { LoRa } from "@components/PageComponents/Settings/LoRa.tsx";
 import { Security } from "@components/PageComponents/Settings/Security/Security.tsx";
 import { User } from "@components/PageComponents/Settings/User.tsx";
 import { MobileSettingsList } from "@components/Settings/MobileSettingsList.tsx";
+import { RemoteSectionBoundary } from "@components/Settings/RemoteSectionBoundary.tsx";
+import { ManagedModeBanner } from "@components/Settings/ManagedModeBanner.tsx";
+import { SettingsReadOnlyContext } from "@components/Settings/SettingsReadOnly.tsx";
+import { RemoteSettingsBanner } from "@components/Settings/RemoteSettingsBanner.tsx";
 import {
   type SettingsNavGroup,
   SettingsNav,
@@ -13,6 +17,7 @@ import { DeviceCard } from "@components/Shell/DeviceCard.tsx";
 import { ShellPage } from "@components/Shell/ShellPage.tsx";
 import { useDeviceSummary } from "@components/Shell/useDeviceSummary.ts";
 import { Button } from "@components/UI/Button.tsx";
+import { Callout } from "@components/UI/Callout.tsx";
 import { IconButton } from "@components/UI/IconButton.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { useIsMobile } from "@core/hooks/useIsMobile.ts";
@@ -27,9 +32,14 @@ import {
   dirtyModuleTabs,
   sectionChangeCounts,
 } from "@core/settings/dirty.ts";
+import { useRemoteSettings } from "@core/settings/remoteContext.ts";
+import { useDevice } from "@core/stores";
+import { summarizeSave } from "@core/settings/remoteSettings.ts";
 import {
   GROUP_LABEL_KEYS,
+  MANAGED_READ_ONLY_SECTION_IDS,
   moduleDocsUrl,
+  REMOTE_SECTION_IDS,
   SETTINGS_GROUP_IDS,
   SETTINGS_SECTIONS,
   type SettingsSectionDef,
@@ -91,6 +101,13 @@ import {
 } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { Result } from "better-result";
+import {
+  RemoteSettingsProvider,
+  useNodeName,
+  useRemoteNodeParam,
+  useRemoteTarget,
+} from "./RemoteSettingsScope.tsx";
 import type { ConfigProps } from "./sectionProps.ts";
 import { useSettingsListValues } from "./useSettingsListValues.ts";
 
@@ -128,9 +145,11 @@ interface FormHandle {
   markSaved: () => void;
 }
 
-const FIRST_SECTION = SETTINGS_SECTIONS[0];
+const REMOTE_SECTIONS = SETTINGS_SECTIONS.filter((section) =>
+  REMOTE_SECTION_IDS.has(section.id),
+);
 
-const ConfigPage = () => {
+const SettingsScreen = () => {
   const { t } = useTranslation("config");
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -139,6 +158,11 @@ const ConfigPage = () => {
   const device = useDeviceSummary();
   const listValues = useSettingsListValues();
 
+  const remote = useRemoteSettings();
+  const localDevice = useDevice();
+  const sections: readonly SettingsSectionDef[] = remote
+    ? REMOTE_SECTIONS
+    : SETTINGS_SECTIONS;
   const editor = useConfigEditor();
   const editorDirty = useSignal(editor?.isDirty ?? NO_FLAG);
   const dirtyRadio = useSignal(editor?.dirtyRadioSections ?? NO_STRINGS);
@@ -157,8 +181,15 @@ const ConfigPage = () => {
   const routeSection = sectionFromPath(pathname);
   // Desktop opens the first section for a bare /settings; mobile shows the list.
   const activeSection: SettingsSectionDef | undefined =
-    SETTINGS_SECTIONS.find((section) => section.id === routeSection) ??
-    (isMobile ? undefined : FIRST_SECTION);
+    sections.find((section) => section.id === routeSection) ??
+    (isMobile ? undefined : sections[0]);
+  // A section the remote node doesn't offer opens its first one instead.
+  const unsupported =
+    routeSection !== undefined &&
+    !sections.some((section) => section.id === routeSection);
+  useEffect(() => {
+    if (unsupported) void navigate({ to: "/settings/user", replace: true });
+  }, [unsupported, navigate]);
   const deviceSubsection = useDeviceSubsection();
   const moduleSubsection = useModuleSubsection();
   const { metadata } = useDeviceCapabilities();
@@ -191,7 +222,7 @@ const ConfigPage = () => {
       label: t(tab.labelKey, { ns: "moduleConfig" }),
       dirty: dirtyModules.has(tab.key),
     }));
-    const items = SETTINGS_SECTIONS.map((section) => ({
+    const items = sections.map((section) => ({
       id: section.id,
       group: section.group,
       label: t(section.labelKey),
@@ -220,6 +251,7 @@ const ConfigPage = () => {
     );
   }, [
     t,
+    sections,
     changeCounts,
     query,
     metadata,
@@ -270,11 +302,63 @@ const ConfigPage = () => {
     setForm(null);
   }
 
-  const deviceName = device.connected
-    ? device.name
-    : t("settingsLayout.thisRadio");
+  const deviceName = remote
+    ? remote.name
+    : device.connected
+      ? device.name
+      : t("settingsLayout.thisRadio");
+
+  // Each changed section goes to the node on its own; say which made it.
+  const handleRemoteSave = useCallback(async () => {
+    if (!remote) return;
+    setIsSaving(true);
+    try {
+      const result = await remote.remote.save();
+      const summary = Result.isOk(result)
+        ? summarizeSave(result.value)
+        : { saved: 0, failed: 1, skipped: 0, reason: "unreachable" as const };
+      const name = remote.name;
+      if (summary.failed === 0) {
+        toast({
+          variant: "success",
+          title: t("settingsLayout.savedTitle"),
+          description: t("remoteSettings.savedDescription", { name }),
+        });
+        form?.markSaved();
+        titleRef.current?.focus();
+        return;
+      }
+      const reasonKey =
+        summary.reason === "unauthorized"
+          ? "remoteSettings.failedUnauthorized"
+          : summary.reason === "unreachable"
+            ? "remoteSettings.failedUnreachable"
+            : "remoteSettings.failedError";
+      toast({
+        variant: "destructive",
+        title:
+          summary.saved > 0
+            ? t("remoteSettings.partialTitle")
+            : t("remoteSettings.failedTitle", { name }),
+        description:
+          summary.saved > 0
+            ? t("remoteSettings.partialDescription", {
+                name,
+                saved: summary.saved,
+                total: summary.saved + summary.failed + summary.skipped,
+              })
+            : t(reasonKey, { name }),
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [remote, toast, t, form]);
 
   const handleSave = useCallback(async () => {
+    if (remote) {
+      await handleRemoteSave();
+      return;
+    }
     if (!editor) return;
     setIsSaving(true);
     const enablesManaged = editor.enablesManagedMode();
@@ -324,7 +408,7 @@ const ConfigPage = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [editor, toast, t, deviceName, form]);
+  }, [remote, handleRemoteSave, editor, toast, t, deviceName, form]);
 
   const handleReset = useCallback(() => {
     form?.reset();
@@ -351,7 +435,23 @@ const ConfigPage = () => {
     [navigate],
   );
 
-  const hasPending = editorDirty || formState.isDirty;
+  // A managed radio ignores admin messages from this app, so its own
+  // settings are shown read-only. A remote node takes ours regardless.
+  const managed = !remote && localDevice.config?.security?.isManaged === true;
+  const readOnly =
+    managed &&
+    activeSection !== undefined &&
+    MANAGED_READ_ONLY_SECTION_IDS.has(activeSection.id);
+  const hasPending = !readOnly && (editorDirty || formState.isDirty);
+
+  const exitRemote = useCallback(() => {
+    void navigate({ to: "/settings", search: { node: undefined } });
+  }, [navigate]);
+  const banner = remote ? (
+    <RemoteSettingsBanner name={remote.name} onExit={exitRemote} />
+  ) : managed ? (
+    <ManagedModeBanner />
+  ) : null;
 
   const sidebar = (
     <SettingsNav
@@ -377,7 +477,16 @@ const ConfigPage = () => {
       <ShellPage label={t("page.title")} contentClassName="overflow-auto">
         <MobileSettingsList
           title={t("page.title")}
-          header={<DeviceCard />}
+          header={
+            remote ? (
+              banner
+            ) : (
+              <>
+                {banner}
+                <DeviceCard />
+              </>
+            )
+          }
           groups={navGroups}
           values={listValues}
           onSelect={openSection}
@@ -430,7 +539,9 @@ const ConfigPage = () => {
       };
 
   const title = subsection?.title ?? sectionLabel;
-  const note = t("settingsLayout.restartNote", { device: deviceName });
+  const note = remote
+    ? t("remoteSettings.restartNote", { name: remote.name })
+    : t("settingsLayout.restartNote", { device: deviceName });
   const error = formState.isValid ? undefined : t("settingsLayout.fixErrors");
   const Body = SECTION_VIEWS[activeSection.id].component;
 
@@ -472,6 +583,12 @@ const ConfigPage = () => {
       noPadding
     >
       <div className="relative flex min-h-0 flex-1 flex-col">
+        {/* Outside the scroller, so it stays in view on long forms. */}
+        {banner ? (
+          <div className="px-4 pt-3 md:px-10 md:pt-4">
+            <div className="mx-auto max-w-[760px]">{banner}</div>
+          </div>
+        ) : null}
         <div
           className={cn(
             "min-h-0 flex-1 overflow-auto px-4 pt-4 md:px-10 md:pt-8",
@@ -494,9 +611,18 @@ const ConfigPage = () => {
               }
               docsUrl={subsection?.docsUrl ?? activeSection.docsUrl}
             />
-            <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-              <Body onFormInit={onFormInit} />
-            </Suspense>
+            {remote ? (
+              <RemoteSectionBoundary key={sectionKey} scope={remote}>
+                <Body onFormInit={onFormInit} />
+              </RemoteSectionBoundary>
+            ) : (
+              <Suspense fallback={<Spinner size="lg" className="my-5" />}>
+                {/* Forms and actions honour it; navigation stays usable. */}
+                <SettingsReadOnlyContext.Provider value={readOnly}>
+                  <Body onFormInit={onFormInit} />
+                </SettingsReadOnlyContext.Provider>
+              </Suspense>
+            )}
           </div>
         </div>
         {hasPending && isMobile ? (
@@ -528,6 +654,79 @@ const ConfigPage = () => {
         ) : null}
       </div>
     </ShellPage>
+  );
+};
+
+/** Why `?node=` can't open remote settings, with the way back. */
+const RemoteUnavailable = ({
+  nodeNum,
+  reason,
+}: {
+  nodeNum: number;
+  reason: "noRadio" | "notSetUp";
+}) => {
+  const { t } = useTranslation("config");
+  const navigate = useNavigate();
+  const name = useNodeName(nodeNum);
+  return (
+    <ShellPage label={t("page.title")} contentClassName="overflow-auto">
+      <div className="mx-auto flex max-w-[760px] flex-col gap-3 p-4 md:p-10">
+        <Callout tone="warning" title={t("remoteSettings.unavailableTitle")}>
+          {t(`remoteSettings.${reason}`, { name })}
+        </Callout>
+        <Button
+          variant="secondary"
+          className="self-start"
+          onClick={() =>
+            void navigate({ to: "/settings", search: { node: undefined } })
+          }
+        >
+          {t("remoteSettings.openLocal")}
+        </Button>
+      </div>
+    </ShellPage>
+  );
+};
+
+/** Settings for `?node=`, once it's clear this radio can manage it. */
+const RemoteConfigPage = ({ node }: { node: number }) => {
+  const { t } = useTranslation("config");
+  const target = useRemoteTarget(node);
+  switch (target.kind) {
+    case "local":
+      return <SettingsScreen />;
+    case "waiting":
+      return (
+        <ShellPage label={t("page.title")}>
+          <output className="m-auto flex items-center gap-2 text-help text-secondary">
+            <Spinner />
+            {t("remoteSettings.waiting")}
+          </output>
+        </ShellPage>
+      );
+    case "unavailable":
+      return (
+        <RemoteUnavailable nodeNum={target.nodeNum} reason={target.reason} />
+      );
+    case "remote":
+      return (
+        <RemoteSettingsProvider key={target.nodeNum} nodeNum={target.nodeNum}>
+          <SettingsScreen />
+        </RemoteSettingsProvider>
+      );
+  }
+};
+
+/**
+ * This radio's settings, or with `?node=` another node's, managed over
+ * the mesh when this radio is one of its admins.
+ */
+const ConfigPage = () => {
+  const node = useRemoteNodeParam();
+  return node === undefined ? (
+    <SettingsScreen />
+  ) : (
+    <RemoteConfigPage node={node} />
   );
 };
 

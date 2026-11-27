@@ -15,6 +15,9 @@ interface TestEnv {
   enablesManaged: boolean;
   commit: ReturnType<typeof vi.fn>;
   reset: ReturnType<typeof vi.fn>;
+  sendAdmin: ReturnType<typeof vi.fn>;
+  adminAccessNodes: number[];
+  managed: boolean;
 }
 
 const env = vi.hoisted((): TestEnv => ({
@@ -28,6 +31,9 @@ const env = vi.hoisted((): TestEnv => ({
   enablesManaged: false,
   commit: vi.fn(),
   reset: vi.fn(),
+  sendAdmin: vi.fn(),
+  adminAccessNodes: [],
+  managed: false,
 }));
 
 vi.mock("@tanstack/react-router", () => ({
@@ -69,6 +75,15 @@ vi.mock("@core/stores", () => ({
   useDevice: () => ({
     getEffectiveConfig: () => undefined,
     moduleConfig: {},
+    config: {
+      security: {
+        publicKey: new Uint8Array([1, 2, 3]),
+        isManaged: env.managed,
+      },
+    },
+    adminAccessNodes: env.adminAccessNodes,
+    adminAccessKey: "AQID",
+    setAdminAccess: vi.fn(),
   }),
   useAppStore: () => vi.fn(),
 }));
@@ -94,6 +109,18 @@ vi.mock("@core/kmp/hooks", () => ({
     reset: env.reset,
   }),
   useSignal: <T,>(signal: { value: T }) => signal.value,
+  useActiveClient: () => client,
+}));
+
+// One client for the whole run, as the app has.
+const client = vi.hoisted(() => ({
+  sendAdmin: (...args: unknown[]) =>
+    (env.sendAdmin as (...sent: unknown[]) => unknown)(...args),
+  events: { onConnectionState: { subscribe: () => () => {} } },
+  device: {
+    myNodeNum: { value: 9, peek: () => 9, subscribe: () => () => {} },
+  },
+  nodes: { list: { value: [], peek: () => [], subscribe: () => () => {} } },
 }));
 
 vi.mock("@components/Shell/useDeviceSummary.ts", () => ({
@@ -116,6 +143,9 @@ const { stub } = vi.hoisted(() => ({
 vi.mock("@components/PageComponents/Settings/User.tsx", async () => {
   const { useEffect } = await import("react");
   const { useForm } = await import("react-hook-form");
+  // Real sections disable their controls through it (DynamicForm does).
+  const { ReadOnlyFieldset } =
+    await import("@components/Settings/SettingsReadOnly.tsx");
   return {
     User: ({
       onFormInit,
@@ -124,7 +154,11 @@ vi.mock("@components/PageComponents/Settings/User.tsx", async () => {
     }) => {
       const form = useForm({ defaultValues: { name: "EAO1" } });
       useEffect(() => onFormInit(form), [form, onFormInit]);
-      return <input aria-label="Long name" {...form.register("name")} />;
+      return (
+        <ReadOnlyFieldset>
+          <input aria-label="Long name" {...form.register("name")} />
+        </ReadOnlyFieldset>
+      );
     },
   };
 });
@@ -149,7 +183,7 @@ vi.mock("@components/PageComponents/Settings/Position.tsx", () => ({
 }));
 vi.mock("@pages/Settings/About.tsx", () => ({ About: stub("About") }));
 vi.mock("@pages/Settings/AppSettings.tsx", () => ({
-  AppSettings: stub("App"),
+  AppSettings: () => <button type="button">App control</button>,
 }));
 vi.mock("@pages/Settings/Administration.tsx", () => ({
   Administration: stub("Administration"),
@@ -173,6 +207,9 @@ describe("Settings page", () => {
     env.mobile = false;
     env.dirtyRadio = [];
     env.editorDirty = false;
+    env.adminAccessNodes = [];
+    env.managed = false;
+    env.sendAdmin.mockReturnValue(new Promise(() => {}));
   });
 
   it("shows the section with breadcrumb, description and docs link", () => {
@@ -361,5 +398,176 @@ describe("Settings page", () => {
     render(<ConfigPage />);
     expect(screen.getByText("US · LongFast")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
+  });
+});
+
+describe("Settings page managing another node", () => {
+  const NODE = 0x0c40;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    env.pathname = "/settings/lora";
+    env.search = { node: NODE };
+    env.mobile = false;
+    env.dirtyRadio = [];
+    env.editorDirty = false;
+    env.adminAccessNodes = [NODE];
+    env.managed = false;
+    env.sendAdmin.mockReturnValue(new Promise(() => {}));
+  });
+
+  it("doesn't call the managed node read-only: it takes our admin key", async () => {
+    env.managed = true;
+    env.pathname = "/settings/user";
+    render(<ConfigPage />);
+    await screen.findByRole("region", { name: /remotely/u });
+    expect(
+      screen.queryByRole("region", { name: "This radio is managed" }),
+    ).toBeNull();
+    expect(screen.getByRole("textbox", { name: "Long name" })).toBeEnabled();
+  });
+
+  it("says which node is being managed, with a way out", async () => {
+    render(<ConfigPage />);
+    const banner = await screen.findByRole("region", {
+      name: "Managing Meshtastic 0c40 remotely",
+    });
+    expect(banner).toHaveTextContent(
+      "Changes go to Meshtastic 0c40 over the mesh",
+    );
+    expect(
+      screen.getByRole("navigation", { name: "Breadcrumb" }),
+    ).toHaveTextContent("Configuration·Meshtastic 0c40");
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Exit remote settings for Meshtastic 0c40",
+      }),
+    );
+    expect(env.navigate).toHaveBeenCalledWith({
+      to: "/settings",
+      search: { node: undefined },
+    });
+  });
+
+  it("asks the node for its metadata, never the local radio", async () => {
+    render(<ConfigPage />);
+    await screen.findByRole("region", { name: /remotely/u });
+    await waitFor(() =>
+      expect(env.sendAdmin).toHaveBeenCalledWith(
+        { case: "getDeviceMetadataRequest", value: true },
+        NODE,
+        120_000,
+      ),
+    );
+  });
+
+  it("offers only the node's own settings", async () => {
+    render(<ConfigPage />);
+    await screen.findByRole("region", { name: /remotely/u });
+    for (const name of [/^User/u, /^LoRa/u, /^Security/u]) {
+      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+    }
+    for (const name of [
+      /^Channels/u,
+      /^Administration/u,
+      /^Backup/u,
+      /^Firmware/u,
+      /^Debug/u,
+      /^Appearance/u,
+      /^About/u,
+    ]) {
+      expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
+    }
+  });
+
+  it("moves off a section the node doesn't offer", async () => {
+    env.pathname = "/settings/backup";
+    render(<ConfigPage />);
+    await screen.findByRole("region", { name: /remotely/u });
+    expect(env.navigate).toHaveBeenCalledWith({
+      to: "/settings/user",
+      replace: true,
+    });
+  });
+
+  it("explains a node this radio isn't set up to manage", () => {
+    env.adminAccessNodes = [];
+    render(<ConfigPage />);
+    expect(
+      screen.getByText("Can’t manage this node remotely"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: /remotely/u }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open this radio’s settings" }),
+    );
+    expect(env.navigate).toHaveBeenCalledWith({
+      to: "/settings",
+      search: { node: undefined },
+    });
+  });
+
+  it("opens this radio's own settings for its own node number", () => {
+    env.search = { node: 9 };
+    render(<ConfigPage />);
+    expect(screen.getByText("LoRa body")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: /remotely/u }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("puts the banner on top of the mobile list", async () => {
+    env.mobile = true;
+    env.pathname = "/settings";
+    render(<ConfigPage />);
+    await screen.findByRole("region", { name: /remotely/u });
+    expect(screen.queryByText("device card")).not.toBeInTheDocument();
+  });
+});
+
+describe("Settings page for a managed radio", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    env.pathname = "/settings/user";
+    env.search = {};
+    env.mobile = false;
+    env.dirtyRadio = [];
+    env.editorDirty = false;
+    env.managed = true;
+  });
+
+  it("says the radio is managed and shows its settings read-only", () => {
+    render(<ConfigPage />);
+    expect(
+      screen.getByRole("region", { name: "This radio is managed" }),
+    ).toHaveTextContent("only accepts settings changes from its admin radios");
+    expect(screen.getByRole("textbox", { name: "Long name" })).toBeDisabled();
+  });
+
+  it("offers no save, even with staged edits", () => {
+    env.editorDirty = true;
+    env.dirtyRadio = ["lora"];
+    render(<ConfigPage />);
+    expect(screen.queryByRole("button", { name: "Save" })).toBeNull();
+    expect(screen.queryByText("You have unsaved changes")).toBeNull();
+  });
+
+  it("keeps the app's own settings usable", () => {
+    env.pathname = "/settings/app";
+    render(<ConfigPage />);
+    expect(
+      screen.getByRole("region", { name: "This radio is managed" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "App control" })).toBeEnabled();
+  });
+
+  it("shows nothing extra when the radio isn't managed", () => {
+    env.managed = false;
+    render(<ConfigPage />);
+    expect(
+      screen.queryByRole("region", { name: "This radio is managed" }),
+    ).toBeNull();
+    expect(screen.getByRole("textbox", { name: "Long name" })).toBeEnabled();
   });
 });

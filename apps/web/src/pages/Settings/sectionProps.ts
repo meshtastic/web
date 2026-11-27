@@ -8,6 +8,15 @@ export interface ConfigProps {
   onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
 }
 
+/**
+ * Search params every settings page takes: `?node=<node number>` manages
+ * that node remotely. Anything that isn't a node number is dropped, which
+ * opens this radio's settings.
+ */
+export const settingsSearchSchema = z.object({
+  node: z.number().int().positive().max(0xffffffff).optional().catch(undefined),
+});
+
 const tabSearchSchema = z.object({ tab: z.string().optional() });
 
 /**

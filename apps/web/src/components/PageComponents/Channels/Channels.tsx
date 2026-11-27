@@ -1,3 +1,4 @@
+import { ReadOnlyFieldset } from "@components/Settings/SettingsReadOnly.tsx";
 import { BeaconOffers } from "@app/components/PageComponents/Channels/BeaconOffers.tsx";
 import { ConfirmDialog } from "@components/UI/ConfirmDialog.tsx";
 import { StatusDot } from "@components/UI/StatusDot.tsx";
@@ -102,7 +103,9 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
 
   return (
     <div className="flex flex-col gap-5">
-      <BeaconOffers />
+      <ReadOnlyFieldset>
+        <BeaconOffers />
+      </ReadOnlyFieldset>
       <div className="flex flex-wrap items-start gap-4">
         <div className="flex min-w-0 flex-[1_1_220px] flex-col gap-2 md:flex-[0_0_220px]">
           <ul

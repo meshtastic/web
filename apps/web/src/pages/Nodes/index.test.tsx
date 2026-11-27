@@ -49,6 +49,17 @@ vi.mock("@components/Nodes/useNodeActions.ts", () => ({
   }),
 }));
 
+vi.mock("@components/Nodes/useAdminAccess.ts", () => ({
+  useAdminAccess: () => ({
+    available: false,
+    checking: false,
+    authorized: false,
+    check: vi.fn(),
+    refusal: undefined,
+    dismissRefusal: vi.fn(),
+  }),
+}));
+
 const specs = [
   {
     num: 1,

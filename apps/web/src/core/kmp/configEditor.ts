@@ -66,6 +66,40 @@ export class ManagedModeNotAloneError extends Error {
   }
 }
 
+/** One section of a save, as {@link ConfigEditor.commitEach} reports it. */
+export type SavePart =
+  | { readonly kind: "radio"; readonly section: RadioConfigSection }
+  | { readonly kind: "module"; readonly section: ModuleConfigSection }
+  | { readonly kind: "channel"; readonly index: number }
+  | { readonly kind: "owner" }
+  | { readonly kind: "queued"; readonly message: Protobuf.Admin.AdminMessage }
+  | { readonly kind: "staged"; readonly key: string };
+
+/** How one section of a {@link ConfigEditor.commitEach} went. */
+export type SaveOutcome =
+  | { readonly part: SavePart; readonly status: "saved" }
+  | {
+      readonly part: SavePart;
+      readonly status: "failed";
+      readonly error: Error;
+    }
+  /** Not sent: an earlier section's failure stopped the save. */
+  | { readonly part: SavePart; readonly status: "skipped" };
+
+export interface CommitOptions {
+  /**
+   * Send a change that turns on managed mode by itself (the default), as
+   * the local radio needs. A remote node still takes admin from its admin
+   * keys, so remote saves turn this off.
+   */
+  managedAlone?: boolean;
+}
+
+export interface CommitEachOptions {
+  /** Stop after a section fails with an error this accepts. */
+  stopOn?: (error: Error) => boolean;
+}
+
 export interface ConfigEditorOptions {
   /** Called for each staged admin message after a successful commit. */
   onStagedAdminMessageCommitted?: (
@@ -130,6 +164,15 @@ export class ConfigEditor {
     this._isOwnerDirty,
   );
   readonly isDirty: ReadonlySignal<boolean> = toReadonly(this._isDirty);
+  /** What the device most recently sent, without the UI's edits. */
+  readonly deviceRadio: ReadonlySignal<RadioConfig> = toReadonly(
+    this.baselineRadio,
+  );
+  readonly deviceModules: ReadonlySignal<ModuleConfig> = toReadonly(
+    this.baselineModules,
+  );
+  readonly deviceOwner: ReadonlySignal<Protobuf.Mesh.User | undefined> =
+    toReadonly(this.baselineOwner);
   /**
    * Admin messages staged with {@link stageAdminMessage}, by key. Sent on
    * the next commit; cleared by commit, reset and disconnect.
@@ -344,20 +387,85 @@ export class ConfigEditor {
    * Sends every dirty section in one settings transaction. Commits run one
    * at a time; edits made during a commit stay dirty for the next one.
    */
-  commit(): Promise<Result<void, Error>> {
-    const run = this.commitQueue.then(() => this.runCommit());
+  commit(options: CommitOptions = {}): Promise<Result<void, Error>> {
+    const run = this.commitQueue.then(() => this.runCommit(options));
     this.commitQueue = run.catch(() => undefined);
     return run;
   }
 
-  private async runCommit(): Promise<Result<void, Error>> {
+  /**
+   * Sends every dirty section as its own admin message, outside a settings
+   * transaction, one after another. Each section that the device accepts
+   * becomes the new baseline; the rest stay dirty. Errs only when the
+   * device disconnects mid-save.
+   */
+  commitEach(
+    options: CommitEachOptions = {},
+  ): Promise<Result<readonly SaveOutcome[], Error>> {
+    const run = this.commitQueue.then(() => this.runCommitEach(options));
+    this.commitQueue = run.catch(() => undefined);
+    return run;
+  }
+
+  private async runCommitEach({
+    stopOn,
+  }: CommitEachOptions): Promise<Result<readonly SaveOutcome[], Error>> {
+    if (!this._isDirty.peek()) return Result.ok([]);
+
+    const payload = this.collectPayload();
+    const generation = this.connectionGeneration;
+    const outcomes: SaveOutcome[] = [];
+    const saved = new Set<PayloadEntry>();
+    let stopped = false;
+    for (const entry of payload.entries) {
+      if (stopped) {
+        outcomes.push({ part: entry.part, status: "skipped" });
+        continue;
+      }
+      const result = await this.io.send(entry.message);
+      if (generation !== this.connectionGeneration) {
+        return Result.err(
+          new Error("The device disconnected before the save finished"),
+        );
+      }
+      if (Result.isError(result)) {
+        outcomes.push({
+          part: entry.part,
+          status: "failed",
+          error: result.error,
+        });
+        stopped = stopOn?.(result.error) ?? false;
+        continue;
+      }
+      saved.add(entry);
+      outcomes.push({ part: entry.part, status: "saved" });
+    }
+
+    const sent = onlyEntries(payload, saved);
+    this.reconcileAfterCommit(sent);
+    for (const message of sent.staged.values()) {
+      this.onStagedAdminMessageCommitted?.(message);
+    }
+    return Result.ok(outcomes);
+  }
+
+  /** The sections the next commit would send, in send order. */
+  pendingParts(): readonly SavePart[] {
+    if (!this._isDirty.peek()) return [];
+    return this.collectPayload().entries.map((entry) => entry.part);
+  }
+
+  private async runCommit({
+    managedAlone = true,
+  }: CommitOptions): Promise<Result<void, Error>> {
     if (!this._isDirty.peek()) return Result.ok(undefined);
 
     const payload = this.collectPayload();
     if (payload.messages.length === 0) return Result.ok(undefined);
     const generation = this.connectionGeneration;
 
-    const enablesManaged = this.enablesManagedMode();
+    // Only the local radio stops listening once managed mode is on.
+    const enablesManaged = managedAlone && this.enablesManagedMode();
     if (enablesManaged && payload.messages.length > 1) {
       return Result.err(new ManagedModeNotAloneError());
     }
@@ -404,25 +512,44 @@ export class ConfigEditor {
     const queued = this.queuedAdminMessages.peek();
     const staged = this._stagedAdminMessages.peek();
 
-    const messages: Protobuf.Admin.AdminMessage[] = [];
+    const entries: PayloadEntry[] = [];
     for (const section of radioSections) {
-      messages.push(
-        admin({ case: "setConfig", value: radioConfig(radio, section) }),
-      );
+      entries.push({
+        part: { kind: "radio", section },
+        message: admin({
+          case: "setConfig",
+          value: radioConfig(radio, section),
+        }),
+      });
     }
     for (const section of moduleSections) {
-      messages.push(
-        admin({
+      entries.push({
+        part: { kind: "module", section },
+        message: admin({
           case: "setModuleConfig",
           value: moduleConfig(modules, section),
         }),
-      );
+      });
     }
     for (const channel of channelPayload) {
-      messages.push(admin({ case: "setChannel", value: channel }));
+      entries.push({
+        part: { kind: "channel", index: channel.index },
+        message: admin({ case: "setChannel", value: channel }),
+      });
     }
-    if (owner) messages.push(admin({ case: "setOwner", value: owner }));
-    messages.push(...queued, ...staged.values());
+    if (owner) {
+      entries.push({
+        part: { kind: "owner" },
+        message: admin({ case: "setOwner", value: owner }),
+      });
+    }
+    for (const message of queued) {
+      entries.push({ part: { kind: "queued", message }, message });
+    }
+    for (const [key, message] of staged) {
+      entries.push({ part: { kind: "staged", key }, message });
+    }
+    const messages = entries.map((entry) => entry.message);
 
     return {
       radio: { ...pick(radio, radioSections) },
@@ -431,6 +558,7 @@ export class ConfigEditor {
       owner,
       queued,
       staged,
+      entries,
       messages,
     };
   }
@@ -532,7 +660,55 @@ interface CommitPayload {
   owner: Protobuf.Mesh.User | undefined;
   queued: AdminMessages;
   staged: ReadonlyMap<string, Protobuf.Admin.AdminMessage>;
+  /** One per message, in send order, with the section it saves. */
+  entries: PayloadEntry[];
   messages: Protobuf.Admin.AdminMessage[];
+}
+
+interface PayloadEntry {
+  part: SavePart;
+  message: Protobuf.Admin.AdminMessage;
+}
+
+/** The part of `payload` that `saved` covers, for reconciling a partial save. */
+function onlyEntries(
+  payload: CommitPayload,
+  saved: ReadonlySet<PayloadEntry>,
+): CommitPayload {
+  const entries = payload.entries.filter((entry) => saved.has(entry));
+  const parts = entries.map((entry) => entry.part);
+  const radio: Record<string, unknown> = {};
+  const modules: Record<string, unknown> = {};
+  for (const part of parts) {
+    if (part.kind === "radio")
+      radio[part.section] = payload.radio[part.section];
+    if (part.kind === "module") {
+      modules[part.section] = payload.modules[part.section];
+    }
+  }
+  const channelIndexes = new Set(
+    parts.flatMap((part) => (part.kind === "channel" ? [part.index] : [])),
+  );
+  const stagedKeys = new Set(
+    parts.flatMap((part) => (part.kind === "staged" ? [part.key] : [])),
+  );
+  const queued = new Set(
+    parts.flatMap((part) => (part.kind === "queued" ? [part.message] : [])),
+  );
+  return {
+    radio: radio as RadioConfig,
+    modules: modules as ModuleConfig,
+    channels: payload.channels.filter((channel) =>
+      channelIndexes.has(channel.index),
+    ),
+    owner: parts.some((part) => part.kind === "owner")
+      ? payload.owner
+      : undefined,
+    queued: payload.queued.filter((message) => queued.has(message)),
+    staged: new Map([...payload.staged].filter(([key]) => stagedKeys.has(key))),
+    entries,
+    messages: entries.map((entry) => entry.message),
+  };
 }
 
 function admin(

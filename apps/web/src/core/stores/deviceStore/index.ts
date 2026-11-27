@@ -45,6 +45,15 @@ type DeviceData = {
   >;
   waypoints: WaypointWithMetadata[];
   neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
+  /**
+   * Nodes that answered an admin request from this radio, so list its
+   * public key as an admin key. Learned by checking; a refusal removes one.
+   * Valid only while the radio still has `adminAccessKey`; read it through
+   * `rememberedAdminAccess`.
+   */
+  adminAccessNodes: number[];
+  /** This radio's public key (base64) when `adminAccessNodes` was learned. */
+  adminAccessKey?: string;
 };
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
@@ -103,6 +112,16 @@ export interface Device extends DeviceData {
     neighborInfo: Protobuf.Mesh.NeighborInfo,
   ) => void;
   getNeighborInfo: (nodeNum: number) => Protobuf.Mesh.NeighborInfo | undefined;
+  /**
+   * Remembers (or forgets) that this radio, holding `localPublicKey`
+   * (base64), can manage `nodeNum` remotely. A different key than the
+   * stored one starts the list afresh.
+   */
+  setAdminAccess: (
+    nodeNum: number,
+    authorized: boolean,
+    localPublicKey: string,
+  ) => void;
 }
 
 export interface deviceState {
@@ -155,6 +174,8 @@ function deviceFactory(
   const waypoints = data?.waypoints ?? [];
   const neighborInfo =
     data?.neighborInfo ?? new Map<number, Protobuf.Mesh.NeighborInfo>();
+  const adminAccessNodes = data?.adminAccessNodes ?? [];
+  const adminAccessKey = data?.adminAccessKey;
   return {
     id,
     myNodeNum,
@@ -162,6 +183,8 @@ function deviceFactory(
     traceroutes,
     waypoints,
     neighborInfo,
+    adminAccessNodes,
+    adminAccessKey,
 
     status: Types.DeviceStatusEnum.DeviceDisconnected,
     connectionId: null,
@@ -381,6 +404,8 @@ function deviceFactory(
             }
             newDevice.traceroutes = oldStore.traceroutes;
             newDevice.neighborInfo = oldStore.neighborInfo;
+            newDevice.adminAccessNodes = oldStore.adminAccessNodes;
+            newDevice.adminAccessKey = oldStore.adminAccessKey;
 
             // Take this opportunity to remove stale waypoints
             newDevice.waypoints = oldStore.waypoints.filter(
@@ -648,6 +673,29 @@ function deviceFactory(
       }
       return device.neighborInfo.get(nodeNum);
     },
+    setAdminAccess: (nodeNum, authorized, localPublicKey) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (!device) {
+            return;
+          }
+          // Learned under another key: none of it holds for this one.
+          if (device.adminAccessKey !== localPublicKey) {
+            device.adminAccessKey = localPublicKey;
+            device.adminAccessNodes = [];
+          }
+          const known = device.adminAccessNodes.includes(nodeNum);
+          if (authorized && !known) {
+            device.adminAccessNodes.push(nodeNum);
+          } else if (!authorized && known) {
+            device.adminAccessNodes = device.adminAccessNodes.filter(
+              (num) => num !== nodeNum,
+            );
+          }
+        }),
+      );
+    },
   };
 }
 
@@ -770,6 +818,8 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
           traceroutes: db.traceroutes,
           waypoints: db.waypoints,
           neighborInfo: db.neighborInfo,
+          adminAccessNodes: db.adminAccessNodes,
+          adminAccessKey: db.adminAccessKey,
         },
       ]),
     ),

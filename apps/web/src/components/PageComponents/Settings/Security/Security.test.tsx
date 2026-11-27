@@ -10,6 +10,11 @@ import {
   within,
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  RemoteSettingsContext,
+  type RemoteSettingsScope,
+} from "@core/settings/remoteContext.ts";
+import { SettingsReadOnlyContext } from "@components/Settings/SettingsReadOnly.tsx";
 import { Security } from "./Security.tsx";
 
 const baseSecurity = create(Protobuf.Config.Config_SecurityConfigSchema, {
@@ -275,5 +280,104 @@ describe("Security", () => {
       await waitFor(() => expect(staged()).toContain(publicKey));
       expect(staged()).not.toContain(privateKey);
     });
+  });
+});
+
+describe("Security on a remote node", () => {
+  const scope = { name: "IB North" } as unknown as RemoteSettingsScope;
+  const renderRemote = () =>
+    render(
+      <RemoteSettingsContext.Provider value={scope}>
+        <Security onFormInit={vi.fn()} />
+      </RemoteSettingsContext.Provider>,
+    );
+
+  beforeEach(() => {
+    metadata = { hasXeddsa: true };
+    nodes = [];
+    setRadioSection.mockClear();
+  });
+
+  describe("that shared its private key (firmware before 2.8.1)", () => {
+    const nodeKey = keyOf(9);
+    beforeEach(() => {
+      security = create(Protobuf.Config.Config_SecurityConfigSchema, {
+        privateKey: nodeKey,
+        publicKey: keyOf(4),
+      });
+    });
+
+    it("keeps the key as it is, with no way to show, edit or regenerate it", () => {
+      renderRemote();
+      expect(
+        screen.getByText(
+          "Kept as IB North sent it. The private key can’t be changed remotely.",
+        ),
+      ).toBeInTheDocument();
+      for (const name of ["Show", "Edit", "Regenerate"]) {
+        expect(screen.queryByRole("button", { name })).toBeNull();
+      }
+      expect(screen.queryByText(base64Encode(nodeKey))).toBeNull();
+    });
+
+    it("stages changes with the node's own key", async () => {
+      renderRemote();
+      fireEvent.click(screen.getByRole("switch", { name: "Serial console" }));
+      await waitFor(() => expect(setRadioSection).toHaveBeenCalled());
+      const [, staged] = setRadioSection.mock.calls.at(-1) ?? [];
+      expect(staged.serialEnabled).toBe(true);
+      expect(staged.privateKey).toEqual(nodeKey);
+    });
+  });
+
+  describe("that withheld its private key (firmware 2.8.1+)", () => {
+    beforeEach(() => {
+      security = create(Protobuf.Config.Config_SecurityConfigSchema, {
+        privateKey: new Uint8Array(0),
+        publicKey: keyOf(4),
+      });
+    });
+
+    it("is read-only and says why", () => {
+      renderRemote();
+      expect(
+        screen.getByText(
+          /can’t be changed remotely without replacing its identity/u,
+        ),
+      ).toBeInTheDocument();
+      const serial = screen.getByRole("switch", { name: "Serial console" });
+      expect(serial).toBeDisabled();
+      fireEvent.click(serial);
+      expect(setRadioSection).not.toHaveBeenCalled();
+      expect(
+        screen.queryByRole("button", { name: "Add admin key" }),
+      ).toBeNull();
+      expect(screen.getByRole("button", { name: "+ Add key" })).toBeDisabled();
+    });
+  });
+});
+
+describe("Security while settings are read-only", () => {
+  beforeEach(() => {
+    metadata = { hasXeddsa: true };
+    security = baseSecurity;
+    nodes = [];
+  });
+
+  it("disables the key actions, admin keys and managed mode", () => {
+    render(
+      <SettingsReadOnlyContext.Provider value>
+        <Security onFormInit={vi.fn()} />
+      </SettingsReadOnlyContext.Provider>,
+    );
+    for (const name of ["Regenerate", "Edit", "+ Add key"]) {
+      expect(screen.getByRole("button", { name })).toBeDisabled();
+    }
+    expect(screen.getByRole("switch", { name: "Managed Mode" })).toBeDisabled();
+    // Reading a key is not a change: the public key can still be copied.
+    const publicKey = screen.getByRole("group", { name: "Public Key" });
+    expect(
+      within(publicKey).getByRole("button", { name: "Copy to clipboard" }),
+    ).toBeEnabled();
   });
 });

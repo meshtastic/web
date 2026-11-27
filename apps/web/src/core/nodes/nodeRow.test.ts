@@ -110,6 +110,14 @@ describe("toNodeRow", () => {
     expect(makeRow({ num: 6, longName: "x" }, ctx).isMessageable).toBe(true);
   });
 
+  it("marks nodes this radio can manage remotely, never itself", () => {
+    const ctx = { myNodeNum: 5, adminAccessNodes: new Set([5, 6]) };
+    expect(makeRow({ num: 6 }, ctx).hasAdminAccess).toBe(true);
+    expect(makeRow({ num: 7 }, ctx).hasAdminAccess).toBe(false);
+    expect(makeRow({ num: 5 }, ctx).hasAdminAccess).toBe(false);
+    expect(makeRow({ num: 6 }).hasAdminAccess).toBe(false);
+  });
+
   it("carries battery, voltage, key and status", () => {
     const row = makeRow({
       num: 1,

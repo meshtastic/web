@@ -775,5 +775,39 @@
     "pickRadioEmpty": "No other radios with a public key yet.",
     "keyVerified": "Verified",
     "generateKey": "Generate"
+  },
+  "remoteSettings": {
+    "banner": "Managing {{name}} remotely",
+    "bannerHelp": "Changes go to {{name}} over the mesh, one section at a time.",
+    "exit": "Exit",
+    "exitLabel": "Exit remote settings for {{name}}",
+    "loading": "Loading from {{name}}…",
+    "loadingHelp": "Answers over the mesh can take up to 30 seconds.",
+    "unreachableTitle": "No answer from {{name}}",
+    "unreachableDescription": "Try again or move closer. If the answer arrives late, it still shows up here.",
+    "unauthorizedTitle": "{{name}} refused this radio",
+    "unauthorizedDescription": "This radio’s public key is no longer an admin key on {{name}}. Check admin access again from the node’s details.",
+    "errorTitle": "Couldn’t load this from {{name}}",
+    "errorDescription": "Try again in a moment.",
+    "retry": "Try again",
+    "unavailableTitle": "Can’t manage this node remotely",
+    "notSetUp": "This radio isn’t set up to manage {{name}}. Check admin access from the node’s details first.",
+    "noRadio": "Connect to a radio to manage {{name}} remotely.",
+    "waiting": "Reading this radio’s keys…",
+    "openLocal": "Open this radio’s settings",
+    "restartNote": "Saving sends each changed section to {{name}} separately. It may restart to apply them.",
+    "savedDescription": "{{name}} may restart to apply the changes.",
+    "partialTitle": "Not everything was saved",
+    "partialDescription": "{{saved}} of {{total}} changed sections saved to {{name}}. The rest are still here to save again.",
+    "failedTitle": "Couldn’t save to {{name}}",
+    "failedUnreachable": "No answer from {{name}}. Your changes are still here; try again or move closer.",
+    "failedUnauthorized": "{{name}} refused the change: this radio is no longer one of its admins.",
+    "failedError": "{{name}} didn’t accept the change. Your changes are still here.",
+    "privateKeyRemote": "Kept as {{name}} sent it. The private key can’t be changed remotely.",
+    "securityLocked": "{{name}}’s firmware doesn’t share its private key over remote admin, so its security settings can’t be changed remotely without replacing its identity."
+  },
+  "managedMode": {
+    "bannerTitle": "This radio is managed",
+    "bannerDescription": "It only accepts settings changes from its admin radios. Changes made here are ignored, so its settings are shown read-only."
   }
 }

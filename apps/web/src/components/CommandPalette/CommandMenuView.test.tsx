@@ -83,6 +83,29 @@ describe("CommandMenuView", () => {
     expect(props.onSelect).toHaveBeenCalledWith(primary);
   });
 
+  it("shows a disabled row's reason and won't run it", async () => {
+    const reboot: Command = {
+      kind: "action",
+      id: "action:reboot",
+      group: "commands",
+      label: "Schedule reboot",
+      hint: "Radio is managed",
+      icon: "reboot",
+      action: { type: "dialog", dialog: "reboot" },
+      disabled: true,
+    };
+    const props = renderView({
+      groups: [{ id: "commands", commands: [reboot] }],
+    });
+    const row = screen.getByRole("option", { name: /Schedule reboot/u });
+    expect(row).toHaveAttribute("aria-disabled", "true");
+    expect(row).toHaveTextContent("Radio is managed");
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("combobox"));
+    await user.keyboard("{Enter}");
+    expect(props.onSelect).not.toHaveBeenCalled();
+  });
+
   it("shows the empty state", () => {
     renderView({ groups: [], query: "zzz" });
     expect(screen.getByText("No results found.")).toBeInTheDocument();

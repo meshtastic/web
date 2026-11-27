@@ -47,6 +47,7 @@ export const mockDeviceStore: Device = {
   },
   clientNotifications: [],
   neighborInfo: new Map(),
+  adminAccessNodes: [],
 
   setStatus: vi.fn(),
   setConnectionId: vi.fn(),
@@ -72,4 +73,5 @@ export const mockDeviceStore: Device = {
   getClientNotification: vi.fn(),
   getNeighborInfo: vi.fn(),
   addNeighborInfo: vi.fn(),
+  setAdminAccess: vi.fn(),
 };

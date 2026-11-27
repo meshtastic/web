@@ -9,6 +9,7 @@ import { NodeList } from "@components/Nodes/NodeList.tsx";
 import { NodeResponseDialogs } from "@components/Nodes/NodeResponseDialogs.tsx";
 import { NodesTable } from "@components/Nodes/NodesTable.tsx";
 import { useCollator } from "@components/Nodes/useCollator.ts";
+import { useAdminAccess } from "@components/Nodes/useAdminAccess.ts";
 import { useNodeActions } from "@components/Nodes/useNodeActions.ts";
 import { useNodeLabels } from "@components/Nodes/useNodeLabels.ts";
 import { useNodeRows } from "@components/Nodes/useNodeRows.ts";
@@ -122,6 +123,7 @@ const NodesPage = (): JSX.Element => {
   // Looked up among all nodes, so the selection survives filtering.
   const selectedRow = rows.find((row) => row.num === selectedNum);
   const actions = useNodeActions(selectedRow);
+  const adminAccess = useAdminAccess(selectedRow);
 
   // Stable, so the memoised table rows don't re-render on every update.
   const selectNode = useCallback(
@@ -164,6 +166,7 @@ const NodesPage = (): JSX.Element => {
       row={selectedRow}
       labels={labels}
       actions={actions}
+      adminAccess={adminAccess}
       hasError={errorNums.has(selectedRow.num)}
     />
   ) : (
@@ -267,6 +270,7 @@ const NodesPage = (): JSX.Element => {
             row={selectedRow}
             labels={labels}
             actions={actions}
+            adminAccess={adminAccess}
             hasError={errorNums.has(selectedRow.num)}
             onBack={backToList}
           />

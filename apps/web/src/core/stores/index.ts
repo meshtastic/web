@@ -1,4 +1,5 @@
 import { useDeviceContext } from "@core/hooks/useDeviceContext.ts";
+import { useRemoteSettings } from "@core/settings/remoteContext.ts";
 import { type Device, useDeviceStore } from "@core/stores/deviceStore/index.ts";
 
 export {
@@ -41,5 +42,6 @@ export const useDevice = (): Device => {
   const device = useDeviceStore(
     (s) => s.getDevice(deviceId) ?? s.addDevice(deviceId),
   );
-  return device;
+  // Remote settings read another node's config through the same record.
+  return useRemoteSettings()?.device ?? device;
 };

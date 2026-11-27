@@ -65,6 +65,7 @@
     "snr": "SNR",
     "battery": "Battery",
     "distance": "Distance",
+    "remoteAdmin": "Remote admin",
     "lastHeard": "Last heard",
     "encryption": "Encryption",
     "actions": "Actions"
@@ -102,6 +103,10 @@
     "ignore": "Ignore node",
     "unignore": "Stop ignoring node",
     "verifyKey": "Verify key",
+    "checkAdminAccess": "Check admin access",
+    "checkAdminAccessAgain": "Check admin access again",
+    "checkingAdminAccess": "Checking…",
+    "remoteAdmin": "Remote admin",
     "remove": "Remove node",
     "allDetails": "Telemetry and raw data",
     "about": "About",
@@ -132,6 +137,17 @@
   "toast": {
     "tracerouteFailed": "Traceroute failed",
     "positionRequestFailed": "Position request failed",
-    "keyVerificationFailed": "Could not start key verification"
+    "keyVerificationFailed": "Could not start key verification",
+    "adminAccessGranted": "You can manage {{name}} remotely",
+    "adminAccessUnreachable": "Could not reach {{name}}. Try again or move closer.",
+    "adminAccessFailed": "Could not check admin access on {{name}}. Try again later."
+  },
+  "adminAccess": {
+    "refusedTitle": "{{name}} doesn’t list this radio’s key",
+    "refusedDescription": "To manage {{name}} from here, add this radio’s public key as an admin key on {{name}}, in Settings → Security → Remote admin. Then check again.",
+    "localPublicKey": "This radio’s public key"
+  },
+  "avatar": {
+    "adminAccess": "You can manage this node remotely"
   }
 }

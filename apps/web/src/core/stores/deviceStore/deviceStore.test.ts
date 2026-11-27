@@ -427,6 +427,62 @@ describe("DeviceStore – persistence partialize & rehydrate", () => {
   });
 });
 
+describe("DeviceStore – remote admin access", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("remembers and forgets nodes, once each", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(1);
+
+    device.setAdminAccess(0x0c40, true, "KEY");
+    device.setAdminAccess(0x0c40, true, "KEY");
+    device.setAdminAccess(0xdeadbeef, true, "KEY");
+    expect(state.getDevice(1)!.adminAccessNodes).toEqual([0x0c40, 0xdeadbeef]);
+
+    device.setAdminAccess(0x0c40, false, "KEY");
+    device.setAdminAccess(0x9999, false, "KEY");
+    expect(state.getDevice(1)!.adminAccessNodes).toEqual([0xdeadbeef]);
+  });
+
+  it("starts afresh when the radio's key changed", async () => {
+    const { useDeviceStore } = await freshStore(false);
+    const state = useDeviceStore.getState();
+    const device = state.addDevice(1);
+
+    device.setAdminAccess(0x0c40, true, "OLD");
+    device.setAdminAccess(0x0c41, true, "OLD");
+    // Regenerated in Settings → Security: the old list says nothing now.
+    device.setAdminAccess(0x0c42, true, "NEW");
+    expect(state.getDevice(1)!.adminAccessNodes).toEqual([0x0c42]);
+    expect(state.getDevice(1)!.adminAccessKey).toBe("NEW");
+  });
+
+  it("follows the radio to a new entry and survives a reload", async () => {
+    {
+      const { useDeviceStore } = await freshStore(true);
+      const state = useDeviceStore.getState();
+      const old = state.addDevice(1);
+      old.setHardware(makeHardware(42));
+      old.setAdminAccess(0x0c40, true, "KEY");
+
+      // The same radio over another connection.
+      state.addDevice(2).setHardware(makeHardware(42));
+      expect(state.getDevice(1)).toBeUndefined();
+      expect(state.getDevice(2)!.adminAccessNodes).toEqual([0x0c40]);
+    }
+    {
+      const { useDeviceStore } = await freshStore(true);
+      expect(useDeviceStore.getState().getDevice(2)!.adminAccessNodes).toEqual([
+        0x0c40,
+      ]);
+    }
+  });
+});
+
 describe("DeviceStore – sendAdminMessage", () => {
   beforeEach(() => {
     idbMem.clear();

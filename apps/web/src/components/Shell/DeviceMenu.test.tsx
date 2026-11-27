@@ -142,6 +142,22 @@ describe("DeviceMenu", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("disables reboot with a reason while the radio is managed", async () => {
+    state.summary = { ...connectedSummary, managed: true };
+    const { user, panel } = await openMenu();
+    const reboot = within(panel).getByRole("button", {
+      name: /Reboot device/u,
+    });
+    expect(reboot).toBeDisabled();
+    expect(reboot).toHaveTextContent("Radio is managed");
+    await user.click(reboot);
+    expect(state.runAction).not.toHaveBeenCalledWith("reboot");
+    // Leaving the connection doesn't write to the radio.
+    expect(
+      within(panel).getByRole("button", { name: "Disconnect" }),
+    ).toBeEnabled();
+  });
+
   it("lists devices, switches, and connects another", async () => {
     const { user, panel } = await openMenu();
     const active = within(panel).getByRole("button", { name: /EAO1\s*Active/ });

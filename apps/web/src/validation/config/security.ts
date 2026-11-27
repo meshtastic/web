@@ -22,6 +22,7 @@ function sameKey(a: unknown, b: unknown): boolean {
 
 function makeSecuritySchema<KeyT>(
   keyMaker: (optional: boolean) => ZodType<KeyT>,
+  { privateKeyOptional = false }: { privateKeyOptional?: boolean } = {},
 ) {
   return z
     .object({
@@ -30,7 +31,7 @@ function makeSecuritySchema<KeyT>(
       serialEnabled: z.boolean(),
       packetSignaturePolicy: PacketSignaturePolicyEnum,
 
-      privateKey: keyMaker(false),
+      privateKey: keyMaker(privateKeyOptional),
       publicKey: keyMaker(false),
       adminKey: z.tuple([keyMaker(true), keyMaker(true), keyMaker(true)]),
     })
@@ -70,6 +71,14 @@ function makeSecuritySchema<KeyT>(
 
 export const RawSecuritySchema = makeSecuritySchema(stringSchema);
 export type RawSecurity = z.infer<typeof RawSecuritySchema>;
+
+/**
+ * A remote node's security section: firmware never sends its private key
+ * over remote admin, so the form has none.
+ */
+export const RemoteRawSecuritySchema = makeSecuritySchema(stringSchema, {
+  privateKeyOptional: true,
+});
 
 export const ParsedSecuritySchema = makeSecuritySchema(bytesSchema);
 export type ParsedSecurity = z.infer<typeof ParsedSecuritySchema>;

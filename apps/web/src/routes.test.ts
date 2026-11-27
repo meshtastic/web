@@ -110,6 +110,50 @@ describe("routes", () => {
     expect(router.state.location.pathname).toBe(to);
   });
 
+  describe("remote settings ?node=", () => {
+    it("takes a node number on every settings page", async () => {
+      const router = await load("/settings/device?node=3136&tab=position");
+      expect(router.state.location.search).toEqual({
+        node: 3136,
+        tab: "position",
+      });
+      const leaf = router.state.matches.at(-1);
+      expect(leaf?.search).toEqual({ node: 3136, tab: "position" });
+    });
+
+    it.each([
+      "/settings/lora?node=abc",
+      "/settings/lora?node=-4",
+      "/settings/lora?node=1.5",
+      "/settings/lora?node=99999999999",
+    ])("drops a value that isn't a node number (%s)", async (path) => {
+      const router = await load(path);
+      expect(router.state.matches.at(-1)?.search).toEqual({});
+    });
+
+    it("stays on while moving between sections", async () => {
+      const router = await load("/settings/user?node=3136");
+      await router.navigate({ to: "/settings/lora" });
+      expect(router.state.location.search).toEqual({ node: 3136 });
+      await router.navigate({
+        to: "/settings/module",
+        search: { tab: "mqtt" },
+      });
+      expect(router.state.location.search).toEqual({ node: 3136, tab: "mqtt" });
+    });
+
+    it("is dropped by Exit and by leaving Settings", async () => {
+      const router = await load("/settings/lora?node=3136");
+      await router.navigate({ to: "/settings", search: { node: undefined } });
+      expect(router.state.location.pathname).toBe("/settings");
+      expect(router.state.location.search).toEqual({});
+
+      const again = await load("/settings/lora?node=3136");
+      await again.navigate({ to: "/nodes" });
+      expect(again.state.location.search).toEqual({});
+    });
+  });
+
   it("/settings/radio redirects to LoRa", async () => {
     const router = await load("/settings/radio");
     expect(router.state.location.pathname).toBe("/settings/lora");

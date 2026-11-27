@@ -59,6 +59,8 @@ export interface NodeRowContext {
   readonly lora?: LoRaSignalSettings;
   /** Localised name for a node without one, from its id suffix. */
   readonly fallbackName: (idSuffix: string) => string;
+  /** Nodes this radio is known to be able to manage remotely. */
+  readonly adminAccessNodes?: ReadonlySet<number>;
 }
 
 export interface NodeRow {
@@ -106,6 +108,8 @@ export interface NodeRow {
   /** The node accepts direct messages. */
   readonly isMessageable: boolean;
   readonly unheardOnCurrentLora: boolean;
+  /** This radio can manage the node remotely (it answered an admin check). */
+  readonly hasAdminAccess: boolean;
   readonly status?: string;
 }
 
@@ -213,6 +217,7 @@ export function toNodeRow(node: NodeSource, ctx: NodeRowContext): NodeRow {
     // MQTT-only nodes don't depend on LoRa settings, and this radio is
     // never "unheard" by itself.
     unheardOnCurrentLora: !isSelf && !node.heardOnCurrentLora && !node.viaMqtt,
+    hasAdminAccess: !isSelf && (ctx.adminAccessNodes?.has(node.num) ?? false),
     status: nonEmpty(node.status),
   };
 }
