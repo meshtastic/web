@@ -476,7 +476,10 @@ describe("useConnections over the Kotlin SDK (Serial and Bluetooth)", () => {
 
     expect(meshRegistry.get(conn.id)).toBeUndefined();
     expect(meshRegistry.active.value).toBeUndefined();
-    expect(saved(conn.id)?.status).toBe("error");
+    expect(saved(conn.id)).toMatchObject({
+      status: "error",
+      errorKind: "busy",
+    });
   });
 
   it("shows the SDK's reconnect attempts after the device drops", async () => {

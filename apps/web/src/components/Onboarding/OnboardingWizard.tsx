@@ -1,3 +1,4 @@
+import { radioInUse } from "@core/connections/radioInUse.ts";
 import { Callout } from "@components/UI/Callout.tsx";
 import { StepDots } from "@components/UI/StepDots.tsx";
 import { useLocalNetworkAccess } from "@core/hooks/useLocalNetworkAccess.ts";
@@ -218,15 +219,29 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
     lastStatus.current = connection?.status;
     if (step.name !== "sync" || previous === connection?.status) return;
     if (connection?.status === "error") {
-      dispatch({ type: "connectFailed", detail: connection.error });
+      dispatch({
+        type: "connectFailed",
+        detail: connection.error,
+        inUse: radioInUse(connection.errorKind),
+      });
     } else if (
       connection?.status === "disconnected" &&
       previous !== undefined &&
       LIVE.includes(previous)
     ) {
-      dispatch({ type: "connectFailed", detail: t("error.dropped") });
+      dispatch({
+        type: "connectFailed",
+        detail: t("error.dropped"),
+        inUse: "interrupted",
+      });
     }
-  }, [step.name, connection?.status, connection?.error, t]);
+  }, [
+    step.name,
+    connection?.status,
+    connection?.error,
+    connection?.errorKind,
+    t,
+  ]);
 
   // A radio that never answers ends in the error screen, not a spinner.
   const waitingForRadio = step.name === "sync" && view.phase === "connecting";
@@ -383,6 +398,7 @@ export const OnboardingWizard = ({ onFinish }: OnboardingWizardProps) => {
             actions={actions}
             method={state.method}
             detail={step.detail}
+            inUse={step.inUse}
             certificateUrl={
               connection?.type === "http" &&
               connection.errorKind === "cert" &&

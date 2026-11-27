@@ -201,6 +201,33 @@ describe("ConnectionsList diagnostics", () => {
     );
   });
 
+  it("says what to close when another tab or app likely has the radio", () => {
+    connectionsMock.connections = [
+      {
+        ...http(1, "Alpha"),
+        status: "error",
+        error: "The connection to the radio was lost.",
+        errorKind: "interrupted",
+      },
+      {
+        ...http(2, "Beta"),
+        status: "error",
+        error: "Failed to fetch",
+        errorKind: "network",
+      },
+    ];
+    render(<ConnectionsList />);
+    expect(
+      within(row("Alpha")).getByText(/another Meshtastic tab or app/),
+    ).toBeInTheDocument();
+    expect(
+      within(row("Alpha")).getByText(/connected to this address/),
+    ).toBeInTheDocument();
+    expect(
+      within(row("Beta")).queryByText(/another Meshtastic tab or app/),
+    ).toBeNull();
+  });
+
   it("does not show it when the connection has no error", () => {
     connectionsMock.connections = [http(1, "Alpha")];
     render(<ConnectionsList />);

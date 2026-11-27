@@ -1,3 +1,4 @@
+import type { RadioInUse } from "@core/connections/radioInUse.ts";
 import { isLocalNetworkHost } from "@pages/Connections/utils.ts";
 import {
   type ConnectMethod,
@@ -24,7 +25,12 @@ export type WizardStep =
   /** The browser's Bluetooth or USB picker is (or was just) showing. */
   | { readonly name: "pairing"; readonly picker: PickerState }
   /** The connect failed; `detail` is the browser's or SDK's message. */
-  | { readonly name: "pairingError"; readonly detail?: string }
+  | {
+      readonly name: "pairingError";
+      readonly detail?: string;
+      /** Another tab or app likely has the radio. */
+      readonly inUse?: RadioInUse;
+    }
   /** Connected or connecting; the radio streams its config and nodes. */
   | { readonly name: "sync" }
   /** Choosing new or restore, then reviewing the picked file. */
@@ -83,7 +89,11 @@ export type WizardEvent =
   | { readonly type: "connectRequested" }
   | { readonly type: "pickerCancelled" }
   | { readonly type: "devicePicked" }
-  | { readonly type: "connectFailed"; readonly detail?: string }
+  | {
+      readonly type: "connectFailed";
+      readonly detail?: string;
+      readonly inUse?: RadioInUse;
+    }
   | { readonly type: "radioNotListed" }
   /** Try again from pairing error, or search again after a cancel. */
   | { readonly type: "retry" }
@@ -239,7 +249,11 @@ export function wizardReducer(
         : state;
     case "connectFailed":
       return step.name === "pairing" || step.name === "sync"
-        ? withStep(state, { name: "pairingError", detail: event.detail })
+        ? withStep(state, {
+            name: "pairingError",
+            detail: event.detail,
+            inUse: event.inUse,
+          })
         : state;
     case "radioNotListed":
       return step.name === "pairing"

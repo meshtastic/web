@@ -60,9 +60,10 @@ describe("connectFailure", () => {
   });
 
   it("surfaces handshake timeouts and firmware errors", () => {
-    expect(connectFailure(named("handshake-timeout"))).toMatchObject({
+    expect(connectFailure(named("handshake-timeout"))).toEqual({
       status: "error",
       error: "connections:errors.handshakeTimeout",
+      errorKind: "interrupted",
     });
     expect(
       connectFailure(
@@ -72,6 +73,14 @@ describe("connectFailure", () => {
       status: "error",
       error: "Firmware requires newer client",
       errorKind: undefined,
+    });
+  });
+
+  it("marks a serial port held by another tab or app as busy", () => {
+    expect(connectFailure(named("serial-busy"))).toEqual({
+      status: "error",
+      error: "connections:errors.serialBusy",
+      errorKind: "busy",
     });
   });
 

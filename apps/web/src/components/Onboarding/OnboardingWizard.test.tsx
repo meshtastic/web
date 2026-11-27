@@ -284,5 +284,8 @@ describe("OnboardingWizard", () => {
     expect(
       await screen.findByText("The radio disconnected before setup finished."),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Your radio stopped answering" }),
+    ).toBeVisible();
   });
 });

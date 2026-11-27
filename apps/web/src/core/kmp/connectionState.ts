@@ -14,6 +14,7 @@ export type ConnectErrorKind =
   | "lna-prompt"
   | "handshake-timeout"
   | "firmware-too-old"
+  | "serial-busy"
   | "protocol"
   | "transport";
 
@@ -22,6 +23,7 @@ const ERROR_KINDS: ReadonlySet<string> = new Set<ConnectErrorKind>([
   "lna-prompt",
   "handshake-timeout",
   "firmware-too-old",
+  "serial-busy",
   "protocol",
   "transport",
 ]);
@@ -69,10 +71,17 @@ export function connectFailure(error: unknown): ConnectFailure {
       return {
         status: "error",
         error: t("connections:errors.handshakeTimeout"),
-        errorKind: "network",
+        errorKind: "interrupted",
       };
     case "firmware-too-old":
       return { status: "error", error: message, errorKind: undefined };
+    // Another tab, possibly on another site, or another app holds the port.
+    case "serial-busy":
+      return {
+        status: "error",
+        error: t("connections:errors.serialBusy"),
+        errorKind: "busy",
+      };
     default:
       return { status: "error", error: message, errorKind: "network" };
   }

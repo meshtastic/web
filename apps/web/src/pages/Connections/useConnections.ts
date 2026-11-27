@@ -457,7 +457,7 @@ export function useConnections() {
                 status: "error",
                 reconnect: undefined,
                 error: t("connections:errors.connectionLost"),
-                errorKind: "network",
+                errorKind: "interrupted",
               });
               return;
             }

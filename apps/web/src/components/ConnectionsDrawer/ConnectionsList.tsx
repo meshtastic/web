@@ -1,3 +1,4 @@
+import { radioInUse, radioInUseAdvice } from "@core/connections/radioInUse.ts";
 import { TimeAgo } from "@app/components/generic/TimeAgo";
 import type {
   Connection,
@@ -419,6 +420,7 @@ function ConnectionCard({
         {connection.error ? (
           <div className="space-y-1">
             <p className="text-sm text-danger">{connection.error}</p>
+            <InUseTips connection={connection} />
             {connection.type === "http" &&
               connection.url.startsWith("https:") && (
                 <CertificateGuide
@@ -511,5 +513,23 @@ function ConnectionCard({
         </div>
       )}
     </article>
+  );
+}
+
+/** What to try when another tab or app likely has the radio. */
+function InUseTips({ connection }: { connection: Connection }) {
+  const { t } = useTranslation("connections");
+  const inUse = radioInUse(connection.errorKind);
+  if (!inUse) return null;
+  const advice = radioInUseAdvice(inUse, connection.type);
+  return (
+    <div className="space-y-1 text-sm text-secondary">
+      <p>{t(advice.intro)}</p>
+      <ul className="list-disc space-y-1 pl-5">
+        {advice.tips.map((tip) => (
+          <li key={tip}>{t(tip)}</li>
+        ))}
+      </ul>
+    </div>
   );
 }

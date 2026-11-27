@@ -86,6 +86,24 @@
   "status": {
     "reconnecting": "reconnecting {{attempt}}/{{max}}"
   },
+  "inUse": {
+    "busy": {
+      "title": "Your radio is open somewhere else",
+      "intro": "Another tab or app is using the radio's USB port. Only one can use it at a time."
+    },
+    "interrupted": {
+      "title": "Your radio stopped answering",
+      "intro": "It connected, then dropped or stopped answering. The most common cause is another Meshtastic tab or app using it at the same time."
+    },
+    "closeOtherTabs": {
+      "serial": "Close other tabs or apps that use the radio's USB port, including Meshtastic tabs on another site or port.",
+      "bluetooth": "Close other Meshtastic tabs, including ones on another site or port. Two connected at once interfere with each other.",
+      "http": "Close other Meshtastic tabs or apps connected to this address, including ones on another site or port. Two at once interfere with each other."
+    },
+    "quitApps": "Quit apps that use the port, such as the Meshtastic CLI, a serial monitor or Arduino IDE.",
+    "retry": "Then try again.",
+    "elsewhere": "Meshtastic tabs on another site or port, and other apps, can't be switched from here. Close them yourself."
+  },
   "errors": {
     "certNotTrusted": "Self-signed certificate not trusted. Open {{url}} in a new tab, accept the security warning, then return here and try again.",
     "httpsNotReachable": "HTTPS endpoint not reachable. Check that the device is online.",
@@ -97,6 +115,7 @@
     "handshakeTimeout": "The radio stopped responding during the handshake. It may be in CLI or bootloader mode, or its firmware isn't answering config requests.",
     "reconnectFailed": "Could not reconnect after {{attempts}} attempts.",
     "connectionLost": "The connection to the radio was lost.",
+    "serialBusy": "The radio's USB port is in use by another tab or app.",
     "openTimeout": "The radio didn't open. Close other tabs or apps using it, or unplug it and plug it back in, then try again."
   },
   "httpTest": {

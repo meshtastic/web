@@ -53,7 +53,12 @@ export type Connection = {
   isDefault?: boolean;
   status: ConnectionStatus;
   error?: string;
-  errorKind?: "cert" | "network" | "lna-denied";
+  /**
+   * `busy`: another tab or app holds the port. `interrupted`: the link
+   * opened, then the radio dropped or stopped answering, which is how
+   * another tab or app sharing it shows up.
+   */
+  errorKind?: "cert" | "network" | "lna-denied" | "busy" | "interrupted";
   /** The SDK's current reconnect attempt, while it is reconnecting. */
   reconnect?: { attempt: number; maxAttempts: number };
   meshDeviceId?: number;
