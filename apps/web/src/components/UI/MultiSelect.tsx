@@ -37,7 +37,7 @@ const MultiSelectItem = ({
       checked={checked}
       onCheckedChange={(val) => onCheckedChange(name, !!val)}
       className={cn(
-        "inline-flex cursor-pointer items-center rounded-control border border-control bg-app px-3 py-2 text-sm text-primary transition-colors hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-accent-tint data-[state=checked]:bg-accent-tint data-[state=checked]:text-on-accent-tint data-[state=checked]:hover:bg-accent-tint",
+        "inline-flex cursor-pointer items-center rounded-control border border-input bg-app px-3 py-2 text-sm text-primary transition-colors hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-accent-tint data-[state=checked]:bg-accent-tint data-[state=checked]:text-on-accent-tint data-[state=checked]:hover:bg-accent-tint",
         className,
       )}
     >

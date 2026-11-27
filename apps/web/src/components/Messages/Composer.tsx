@@ -209,7 +209,7 @@ export const Composer = ({
         className={cn(
           "flex items-center gap-2",
           !touch &&
-            "rounded-panel border border-control bg-app py-1.5 pr-1.5 pl-3 focus-within:border-accent",
+            "rounded-panel border border-input bg-app py-1.5 pr-1.5 pl-3 focus-within:border-accent",
         )}
       >
         <div

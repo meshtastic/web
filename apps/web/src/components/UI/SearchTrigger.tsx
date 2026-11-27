@@ -31,7 +31,7 @@ export const SearchTrigger = ({
     <button
       type={type}
       className={cn(
-        "flex h-10 w-full items-center gap-2 rounded-control border border-control bg-app px-3 text-body text-muted transition-colors cursor-pointer hover:border-input focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+        "flex h-10 w-full items-center gap-2 rounded-control border border-input bg-app px-3 text-body text-muted transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
         className,
       )}
       {...props}

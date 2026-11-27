@@ -221,7 +221,7 @@ export const EmojiPicker = ({
           <button
             type="button"
             onClick={onRetry}
-            className="relative h-9 cursor-pointer rounded-control border border-control bg-surface px-3 text-body text-primary pointer-coarse:touch-target hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="relative h-9 cursor-pointer rounded-control border border-input bg-surface px-3 text-body text-primary pointer-coarse:touch-target hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             {t("button.retry", { ns: "common" })}
           </button>
