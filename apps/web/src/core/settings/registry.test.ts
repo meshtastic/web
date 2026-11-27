@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  firmwareFlasherUrl,
   GROUP_LABEL_KEYS,
   isSettingsSectionId,
   moduleDocsUrl,
@@ -74,5 +75,12 @@ describe("settings registry", () => {
     expect(moduleDocsUrl("tak")).toBe(
       "https://meshtastic.org/docs/configuration/module/",
     );
+  });
+
+  it("preselects the radio's hardware model in the flasher link", () => {
+    expect(firmwareFlasherUrl(110)).toBe(
+      "https://flasher.meshtastic.org/?hwModel=110",
+    );
+    expect(firmwareFlasherUrl()).toBe("https://flasher.meshtastic.org");
   });
 });

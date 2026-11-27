@@ -63,6 +63,18 @@ const moduleDocs = (page: string) =>
 
 export const FIRMWARE_FLASHER_URL = "https://flasher.meshtastic.org";
 
+/**
+ * The Web Flasher, with the radio's board preselected when its hardware model
+ * is known. The flasher matches `hwModel` against its board list and leaves
+ * the choice to the user when several boards share one model.
+ */
+export function firmwareFlasherUrl(hwModel?: number): string {
+  if (hwModel === undefined) return FIRMWARE_FLASHER_URL;
+  const url = new URL(FIRMWARE_FLASHER_URL);
+  url.searchParams.set("hwModel", String(hwModel));
+  return url.toString();
+}
+
 export const SETTINGS_SECTIONS = [
   {
     id: "user",
