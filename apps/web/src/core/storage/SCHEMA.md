@@ -209,7 +209,9 @@ erDiagram
 
 Prefer additive changes: `ALTER TABLE ... ADD COLUMN`, a new table, a new
 index. A new index needs no step of its own, since the idempotent
-`SCHEMA_SQL` runs after the steps and creates it. A new table does: its
+`SCHEMA_SQL` runs after the steps and creates it. A later step that drops
+or replaces such an index must use `DROP INDEX IF EXISTS`: a file
+upgraded across both versions never had it. A new table does: its
 step runs `CREATE TABLE` with the table as it is at that version, and
 `SCHEMA_SQL` keeps the current definition for fresh files. A file several
 versions behind runs every step before `SCHEMA_SQL`, so a later step that
