@@ -37,6 +37,8 @@
     "close": "Close",
     "relays_one": "Acknowledged by {{count}} node",
     "relays_other": "Acknowledged by {{count}} nodes",
+    "relayedBy": "Relayed by {{relay}}",
+    "ackRelayedBy": "Ack relayed by {{relay}}",
     "enroute": "Sending…",
     "delivered": "Delivered to mesh",
     "relayedNotConfirmed": "Relayed, not confirmed by recipient",

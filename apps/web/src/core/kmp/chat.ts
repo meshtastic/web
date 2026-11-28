@@ -614,6 +614,14 @@ export class ChatClient {
       hopsAway: packet.hopsAway,
       viaMqtt: packet.viaMqtt || undefined,
       transport: packet.transportMechanism,
+      // Only a message from another node keeps the relay it came through.
+      // Our own text echoed back (sent by another app on this radio) carries
+      // our byte, and an outgoing message may only show its ack's relay;
+      // before the handshake names our node, an echo can't be told apart.
+      relayNode:
+        myNodeNum > 0 && packet.from !== myNodeNum
+          ? packet.relayNode || undefined
+          : undefined,
     };
     if (this.store.hasMessage(key, message.id)) return;
     this.store.append(key, message);
@@ -644,14 +652,24 @@ export class ChatClient {
     this.fetchReplyTargets([message]);
   }
 
-  /** One ack or NAK for an outgoing message or reaction (`id`). */
+  /**
+   * One ack or NAK for an outgoing message or reaction (`id`). `relayNode`
+   * is the relay byte it came back through, cleared beforehand when it
+   * names no relay (see `packetRelayNode`).
+   */
   applyAck(
     id: number,
     from: number,
     error: Protobuf.Mesh.Routing_Error,
     proof: Protobuf.Mesh.MeshPacket_AckProofStatus | undefined,
+    relayNode?: number,
   ): void {
-    const ack: RoutingAck = { from, error, proof };
+    const ack: RoutingAck = {
+      from,
+      error,
+      proof,
+      ...(relayNode === undefined ? {} : { relayNode }),
+    };
     const message = this.store.getMessage(id);
     if (message) {
       this.patchDelivery(message, reduceAck(message, ack));
@@ -1102,7 +1120,7 @@ export class ChatClient {
 
   private replayEarlyAcks(id: number): void {
     for (const ack of this.earlyAcks.get(id) ?? []) {
-      this.applyAck(id, ack.from, ack.error, ack.proof);
+      this.applyAck(id, ack.from, ack.error, ack.proof, ack.relayNode);
     }
     this.earlyAcks.delete(id);
   }

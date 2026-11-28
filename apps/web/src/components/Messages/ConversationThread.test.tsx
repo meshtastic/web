@@ -48,7 +48,9 @@ const incoming: Message = {
   state: MessageState.Ack,
 };
 
-const renderThread = () =>
+const renderThread = (
+  relayLabel?: (relayNode: number | undefined) => string | undefined,
+) =>
   render(
     <ConversationThread
       conversation={{ kind: "direct", peer: 7 }}
@@ -60,6 +62,7 @@ const renderThread = () =>
       traceroutes={[]}
       sender={(nodeNum) => ({ nodeNum, name: "COULLS_BASE", initials: "CB" })}
       nameOf={() => "COULLS_BASE"}
+      {...(relayLabel ? { relayLabel } : {})}
       myNodeNum={1}
       muted={false}
       touch={false}
@@ -159,5 +162,29 @@ describe("ConversationThread delivery details", () => {
     await act(() => Promise.resolve());
     expect(env.retry).toHaveBeenCalledWith(11);
     expect(env.toast).toHaveBeenCalledWith({ title: "Couldn't send again" });
+  });
+
+  it("names the node that relayed a received message", async () => {
+    const user = userEvent.setup();
+    env.messages = [
+      {
+        message: { ...incoming, relayNode: 0x5a, hopsAway: 2 },
+        outgoing: false,
+        reactions: [],
+      },
+    ];
+    const relayLabel = vi.fn((relay: number | undefined) =>
+      relay === 0x5a ? "Ridge (0x5A)" : undefined,
+    );
+    renderThread(relayLabel);
+    fireEvent.click(screen.getByRole("button", { name: /^React or reply/ }));
+    await user.click(screen.getByRole("button", { name: "More actions" }));
+    await user.click(
+      await screen.findByRole("menuitem", { name: "Delivery details" }),
+    );
+    expect(await screen.findByRole("dialog")).toHaveTextContent(
+      "Relayed by Ridge (0x5A)",
+    );
+    expect(relayLabel).toHaveBeenCalledWith(0x5a);
   });
 });

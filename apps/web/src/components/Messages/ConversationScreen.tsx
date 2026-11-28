@@ -357,6 +357,7 @@ export const ConversationScreen = ({
         mentionName={mentionName}
         mentionCandidates={mentionCandidates}
         onOpenNode={openNode}
+        relayLabel={directory.relayLabel}
         {...(directory.myNodeNum === undefined
           ? {}
           : { myNodeNum: directory.myNodeNum })}

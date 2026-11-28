@@ -37,6 +37,12 @@ export interface Message {
   readonly hopsAway?: number;
   readonly viaMqtt?: boolean;
   readonly transport?: Protobuf.Mesh.MeshPacket_TransportMechanism;
+  /**
+   * Last byte of the node number of the node that relayed it to us
+   * (MeshPacket.relay_node), or for an outgoing message of the node that
+   * relayed its latest ack back (`messages.relay_node`).
+   */
+  readonly relayNode?: number;
   /** Packet id of the message this one replies to (Data.reply_id). */
   readonly replyId?: number;
   /**
@@ -103,7 +109,7 @@ export interface StoredConversation {
 /** Fields an ack or NAK can change on a stored message. */
 export type MessageDeliveryPatch = {
   -readonly [
-    K in "state" | "ackProof" | "routingError" | "relays"
+    K in "state" | "ackProof" | "routingError" | "relays" | "relayNode"
   ]?: Message[K];
 };
 

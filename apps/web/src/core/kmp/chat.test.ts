@@ -408,3 +408,92 @@ describe("ChatClient direct-send ordering", () => {
     }
   });
 });
+
+describe("ChatClient relay node", () => {
+  const NONE = 0;
+
+  it("keeps a received message's relay byte across a reload", async () => {
+    const { open } = await setup();
+    const first = open();
+    const direct = first.direct(PEER);
+    first.receive(inbound(1, "relayed", { relayNode: 0x5a, hopsAway: 2 }));
+    first.receive(inbound(2, "unset", { relayNode: 0 }));
+    // Ours from another app on this radio: its byte is our own.
+    first.receive(
+      inbound(3, "echo", { from: ME, to: PEER, relayNode: ME & 0xff }),
+    );
+    expect(direct.value.map((m) => m.relayNode)).toEqual([
+      0x5a,
+      undefined,
+      undefined,
+    ]);
+    await first.flush();
+
+    const second = open();
+    const reloaded = second.direct(PEER);
+    await vi.waitFor(() => expect(reloaded.value).toHaveLength(3));
+    expect(reloaded.value.map((m) => m.relayNode)).toEqual([
+      0x5a,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("keeps no relay byte from text received before our node is known", async () => {
+    const { open } = await setup();
+    // An echo of our own text can't be told from a peer's yet, and once it
+    // counts as outgoing it may only show its ack's relay.
+    const chat = open(50, 0);
+    const direct = chat.direct(PEER);
+    chat.receive(inbound(1, "early", { relayNode: 0x5a, hopsAway: 2 }));
+    expect(direct.value[0]?.relayNode).toBeUndefined();
+  });
+
+  it("keeps a sent message's ack relay across a reload", async () => {
+    const { open } = await setup();
+    const first = open();
+    const id = (
+      await first.sendText({ text: "hi", destination: PEER })
+    ).unwrap();
+    first.applyAck(id, 9, 0, undefined, 0x5a);
+    await first.flush();
+
+    const second = open();
+    const reloaded = second.direct(PEER);
+    await vi.waitFor(() => expect(reloaded.value).toHaveLength(1));
+    expect(reloaded.value[0]?.relayNode).toBe(0x5a);
+  });
+
+  it("records the relay each ack came back through", async () => {
+    const { open } = await setup();
+    const chat = open();
+    const sent = await chat.sendText({ text: "hi", destination: PEER });
+    expect(sent.isOk()).toBe(true);
+    const id = sent.unwrap();
+    const direct = chat.direct(PEER);
+    const relayOf = () => direct.value.find((m) => m.id === id)?.relayNode;
+
+    chat.applyAck(id, 9, NONE, undefined, 0x5a);
+    expect(relayOf()).toBe(0x5a);
+    // The recipient's ack replaces it, here with no relay (heard direct).
+    chat.applyAck(id, PEER, NONE, undefined);
+    expect(relayOf()).toBeUndefined();
+    // Once the recipient acked, later acks change nothing.
+    chat.applyAck(id, 9, NONE, undefined, 0x77);
+    expect(relayOf()).toBeUndefined();
+  });
+
+  it("keeps the relay of an ack that arrives before its message is stored", async () => {
+    const { open } = await setup();
+    const chat = open();
+    // The SDK assigns ids from 1000 in this transport.
+    chat.applyAck(1000, PEER, NONE, undefined, 0x5a);
+    const sent = await chat.sendText({ text: "hi", destination: PEER });
+    expect(sent.unwrap()).toBe(1000);
+    await vi.waitFor(() =>
+      expect(
+        chat.direct(PEER).value.find((m) => m.id === 1000)?.relayNode,
+      ).toBe(0x5a),
+    );
+  });
+});

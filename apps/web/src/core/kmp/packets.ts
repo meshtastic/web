@@ -42,6 +42,7 @@ export function packetMetadata(
     hopsAway: hopsAway(packet.hopStart, packet.hopLimit),
     viaMqtt: packet.viaMqtt,
     transportMechanism: packet.transportMechanism,
+    relayNode: packet.relayNode,
   };
 }
 

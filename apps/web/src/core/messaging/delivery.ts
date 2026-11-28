@@ -11,11 +11,13 @@ export interface RoutingAck {
   readonly from: number;
   readonly error: Protobuf.Mesh.Routing_Error;
   readonly proof?: Protobuf.Mesh.MeshPacket_AckProofStatus;
+  /** Relay byte of the ack, already cleared when it names no relay. */
+  readonly relayNode?: number;
 }
 
 export type Deliverable = Pick<
   Message,
-  "state" | "to" | "relays" | "ackProof" | "routingError"
+  "state" | "to" | "relays" | "ackProof" | "routingError" | "relayNode"
 >;
 
 /**
@@ -24,7 +26,9 @@ export type Deliverable = Pick<
  * recipient got it (Ack); one from anyone else means it reached the mesh
  * (Delivered) and counts as a relay. A NAK fails it. Once the recipient has
  * acked, later acks and NAKs no longer change the state. A proof of delivery
- * only ever upgrades (absent < invalid < valid).
+ * only ever upgrades (absent < invalid < valid). Each ack or NAK that
+ * changes the state also replaces the relay it came back through, as on
+ * Android.
  */
 export const reduceAck = (
   current: Deliverable,
@@ -41,6 +45,7 @@ export const reduceAck = (
       patch.state = MessageState.Failed;
       patch.routingError = ack.error;
     }
+    if (ack.relayNode !== current.relayNode) patch.relayNode = ack.relayNode;
   }
   const Proof = Protobuf.Mesh.MeshPacket_AckProofStatus;
   const proof = ack.proof;
