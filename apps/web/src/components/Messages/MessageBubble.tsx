@@ -2,6 +2,10 @@ import { IndicatorIcon } from "@components/generic/NodeTrustIndicators.tsx";
 import { NodeAvatar } from "@components/UI/NodeAvatar.tsx";
 import type { DeliveryLine } from "@core/messaging/deliveryView.ts";
 import {
+  type MentionName,
+  NO_MENTION_NAMES,
+} from "@core/messaging/mentions.ts";
+import {
   type IncomingMeta,
   type MessageActionsAvailability,
   showsSignal,
@@ -19,6 +23,7 @@ import {
 import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DeliveryStatus } from "./DeliveryStatus.tsx";
+import { MessageText } from "./MessageText.tsx";
 import { ReactionChips } from "./ReactionChips.tsx";
 import { ReplyQuote, type ReplyQuoteView } from "./ReplyQuote.tsx";
 import { useLongPress } from "./useLongPress.ts";
@@ -40,6 +45,8 @@ export interface BubbleHandlers {
   retry: (thread: ThreadMessage) => void;
   retryReaction: (packetId: number) => void;
   jumpTo: (key: string) => void;
+  /** Opens a node's details (an @mention was clicked). */
+  openNode?: (nodeNum: number) => void;
 }
 
 /** DOM ids the list uses to reach into a bubble. */
@@ -84,6 +91,12 @@ export interface MessageBubbleProps {
   touch: boolean;
   handlers: BubbleHandlers;
   locale: string;
+  /** Current names for @mentions in the text (raw tokens without). */
+  mentionName?: MentionName;
+  /** My node, for emphasising mentions of me. */
+  myNodeNum?: number;
+  /** Incoming and @mentions me: drawn to stand out. */
+  mentionsMe?: boolean;
 }
 
 const transportIcons = {
@@ -190,6 +203,9 @@ export const MessageBubble = memo(function MessageBubble({
   touch,
   handlers,
   locale,
+  mentionName = NO_MENTION_NAMES,
+  myNodeNum,
+  mentionsMe = false,
 }: MessageBubbleProps) {
   const { t } = useTranslation("messages");
   const { message, outgoing } = thread;
@@ -267,9 +283,13 @@ export const MessageBubble = memo(function MessageBubble({
   ) : null;
 
   const text = (
-    <span className="leading-[1.45] break-words whitespace-pre-wrap">
-      {message.text}
-    </span>
+    <MessageText
+      text={message.text}
+      mentionName={mentionName}
+      {...(handlers.openNode ? { onOpenNode: handlers.openNode } : {})}
+      {...(myNodeNum === undefined ? {} : { myNodeNum })}
+      outgoing={outgoing}
+    />
   );
 
   // `contents`: takes no room in the column; the bar positions itself.
@@ -357,13 +377,19 @@ export const MessageBubble = memo(function MessageBubble({
         <div
           data-message-bubble=""
           className={cn(
-            "flex max-w-full flex-col gap-[3px] self-start rounded-bubble rounded-bl-tail bg-raised px-3.5 py-2.5",
+            "flex max-w-full flex-col gap-[3px] self-start rounded-bubble rounded-bl-tail px-3.5 py-2.5",
+            mentionsMe
+              ? "border border-accent-tint bg-accent-tint text-on-accent-tint"
+              : "bg-raised",
             // Shown only because the user revealed filtered messages.
             thread.filtered && "border border-dashed border-control",
             highlighted && "ring-2 ring-accent",
           )}
         >
           {sender ? <span className="sr-only">{sender.name}: </span> : null}
+          {mentionsMe ? (
+            <span className="sr-only">{t("mentions.mentionsYou")}. </span>
+          ) : null}
           {quote}
           {text}
           {srTime}

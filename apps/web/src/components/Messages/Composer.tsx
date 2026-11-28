@@ -5,28 +5,55 @@ import {
   composerEmojiAction,
   composerKeyAction,
   composerStatus,
-  insertEmoji,
 } from "@core/messaging/composer.ts";
+import {
+  applyComposerEdit,
+  composerMentionQuery,
+  composerText,
+  deleteMention,
+  insertMention,
+  matchMentionCandidates,
+  type MentionName,
+  NO_MENTION_NAMES,
+  wireToDisplayOffset,
+} from "@core/messaging/mentions.ts";
 import { cn } from "@core/utils/cn.ts";
 import { SendIcon, SmileIcon } from "lucide-react";
 import {
   type FormEvent,
   type KeyboardEvent,
   type Ref,
+  useEffect,
+  useEffectEvent,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { type EmojiPickSource, EmojiPickerPopover } from "./EmojiPicker.tsx";
+import {
+  type MentionSuggestion,
+  MentionSuggestions,
+  mentionOptionId,
+} from "./MentionSuggestions.tsx";
 import { ReplyPreview } from "./ReplyPreview.tsx";
 import type { EmojiPrefs } from "./useEmoji.ts";
 
 export interface ComposerReply {
+  /** The message being replied to. */
+  readonly id: number;
   /** Author of the message being replied to ("yourself" for mine). */
   readonly name: string;
   readonly excerpt: string;
+}
+
+export interface ComposerMentions {
+  /** Nodes `@` offers, most recently heard first. */
+  readonly candidates: readonly MentionSuggestion[];
+  /** What a mention in the field shows; undefined shows the raw token. */
+  readonly name: MentionName;
 }
 
 export interface ComposerProps {
@@ -35,11 +62,16 @@ export interface ComposerProps {
   placeholder: string;
   /** Help line under the field (keys, hop limit, encryption). */
   hint?: string;
-  /** The draft; persisted per conversation by the caller. */
+  /**
+   * The draft as it will be sent: mentions are `@!<hex>` tokens, which the
+   * field shows as `@Name`. Persisted per conversation by the caller.
+   */
   value: string;
   onChange: (text: string) => void;
   /** Called with the trimmed text; the caller clears the draft. */
   onSend: (text: string) => void;
+  /** `@` suggestions, and names for the mentions in the field. */
+  mentions?: ComposerMentions;
   disabled?: boolean;
   replying?: ComposerReply;
   onCancelReply: () => void;
@@ -65,6 +97,14 @@ const MAX_HEIGHT_PX = 160;
  * emoji go in at the caret (refused when they'd go over 200 bytes), or,
  * while replying, go as a tapback on that message (see
  * `composerEmojiAction`).
+ *
+ * Typing `@` offers known nodes (arrows, Enter or Tab, Esc). A picked
+ * node goes into `value` as its `@!<hex>` token, the wire format every
+ * client parses, while the field shows `@Name`: the field holds the
+ * friendly text and each edit is mapped back onto the tokens (see
+ * `applyComposerEdit`). A mention is all or nothing: Backspace takes the
+ * whole of it, and typing inside one turns it into plain text. The
+ * counter counts the bytes that will be sent.
  */
 export const Composer = ({
   label,
@@ -73,6 +113,7 @@ export const Composer = ({
   value,
   onChange,
   onSend,
+  mentions,
   disabled = false,
   replying,
   onCancelReply,
@@ -86,13 +127,14 @@ export const Composer = ({
   const counterId = useId();
   const hintId = useId();
   const tapbackId = useId();
+  const mentionListId = useId();
   const field = useRef<HTMLTextAreaElement | null>(null);
   const status = composerStatus(value);
   const canSend = status.canSend && !disabled;
   const [pickerOpen, setPickerOpen] = useState(false);
   const [notice, setNotice] = useState<string | undefined>(undefined);
-  // "Send as tapback" starts on for each reply.
-  const replyKey = replying ? `${replying.name}\n${replying.excerpt}` : "";
+  // "Send as tapback" starts on for each reply, and survives a rename.
+  const replyKey = replying ? String(replying.id) : "";
   const [tapback, setTapback] = useState({ key: "", on: true });
   const tapbackMode = tapback.key === replyKey ? tapback.on : true;
   // Caret to restore once an inserted emoji is in the field.
@@ -100,6 +142,40 @@ export const Composer = ({
   // The picker closed because of a pick: focus goes to the field, not
   // back to the emoji button.
   const picked = useRef(false);
+  const mentionName = mentions?.name ?? NO_MENTION_NAMES;
+  const text = useMemo(
+    () => composerText(value, mentionName),
+    [value, mentionName],
+  );
+  const [focused, setFocused] = useState(false);
+  const [selection, setSelection] = useState({ start: 0, end: 0 });
+  // The `@` whose suggestions Esc closed; they stay closed for it.
+  const [dismissedAt, setDismissedAt] = useState<number | undefined>(undefined);
+  const query =
+    mentions && focused
+      ? composerMentionQuery(text, selection.start, selection.end)
+      : undefined;
+  const queryText = query?.query;
+  const candidates = mentions?.candidates;
+  const suggestions = useMemo(
+    () =>
+      queryText === undefined || !candidates
+        ? []
+        : matchMentionCandidates(candidates, queryText),
+    [queryText, candidates],
+  );
+  const mentionOpen =
+    query !== undefined &&
+    suggestions.length > 0 &&
+    query.start !== dismissedAt;
+  // The highlighted suggestion starts at the top for each query.
+  const queryKey = query ? `${query.start}\u0000${query.query}` : "";
+  const [activeMention, setActiveMention] = useState({ key: "", index: 0 });
+  const activeIndex =
+    activeMention.key === queryKey
+      ? Math.min(activeMention.index, suggestions.length - 1)
+      : 0;
+  const activeSuggestion = mentionOpen ? suggestions[activeIndex] : undefined;
 
   useLayoutEffect(() => {
     const caret = pendingCaret.current;
@@ -110,7 +186,8 @@ export const Composer = ({
     pendingCaret.current = undefined;
     el.focus();
     el.setSelectionRange(caret, caret);
-  }, [value]);
+    // The field shows `text.display`, which changes on a rename too.
+  }, [text.display]);
 
   const closePicker = () => {
     picked.current = true;
@@ -130,20 +207,108 @@ export const Composer = ({
       return true;
     }
     const el = field.current;
-    const result = insertEmoji(
-      value,
-      el?.selectionStart ?? value.length,
-      el?.selectionEnd ?? value.length,
-      choice,
+    const end = text.display.length;
+    const start = el?.selectionStart ?? end;
+    const stop = el?.selectionEnd ?? end;
+    const from = Math.min(start, stop);
+    const caret = from + choice.length;
+    // Into the field's text, as typing would: a mention the selection cuts
+    // into turns into plain text.
+    const result = applyComposerEdit(
+      text,
+      text.display.slice(0, from) +
+        choice +
+        text.display.slice(Math.max(start, stop)),
+      caret,
     );
-    if (!result.ok) {
+    // The limit counts what will be sent.
+    if (composerStatus(result.wire).over) {
       setNotice(t("emojiPicker.noRoom"));
       return false;
     }
     closePicker();
-    pendingCaret.current = result.caret;
-    onChange(result.text);
+    pendingCaret.current = wireToDisplayOffset(
+      composerText(result.wire, mentionName),
+      result.caret,
+    );
+    onChange(result.wire);
     return true;
+  };
+
+  /** `wire` into the draft, with the caret at `caret` (wire offset). */
+  const commitEdit = (wire: string, caret: number) => {
+    const next = composerText(wire, mentionName);
+    const displayCaret = wireToDisplayOffset(next, caret);
+    pendingCaret.current = displayCaret;
+    setSelection({ start: displayCaret, end: displayCaret });
+    onChange(wire);
+  };
+
+  /** Backspace / Delete over a mention: takes all of it (true if it did). */
+  const removeMention = (
+    el: HTMLTextAreaElement,
+    direction: "backward" | "forward",
+  ): boolean => {
+    const result = deleteMention(
+      text,
+      el.selectionStart,
+      el.selectionEnd,
+      direction,
+    );
+    if (!result) {
+      return false;
+    }
+    commitEdit(result.wire, result.caret);
+    return true;
+  };
+  // Soft keyboards often report Backspace as an unidentified key (keyCode
+  // 229); the input event that follows still says what it deletes.
+  const onBeforeInput = useEffectEvent(
+    (el: HTMLTextAreaElement, event: InputEvent) => {
+      const direction =
+        event.inputType === "deleteContentBackward"
+          ? "backward"
+          : event.inputType === "deleteContentForward"
+            ? "forward"
+            : undefined;
+      if (direction && !event.isComposing && removeMention(el, direction)) {
+        event.preventDefault();
+      }
+    },
+  );
+  useEffect(() => {
+    const el = field.current;
+    if (!el) {
+      return;
+    }
+    const listener = (event: InputEvent) => onBeforeInput(el, event);
+    el.addEventListener("beforeinput", listener);
+    return () => el.removeEventListener("beforeinput", listener);
+  }, []);
+
+  const pickMention = (suggestion: MentionSuggestion) => {
+    if (!query) {
+      return;
+    }
+    const result = insertMention(text, query, suggestion.num);
+    commitEdit(result.wire, result.caret);
+  };
+
+  const onFieldChange = (el: HTMLTextAreaElement) => {
+    const next = el.value;
+    const { wire, caret } = applyComposerEdit(text, next, el.selectionEnd);
+    const shown = composerText(wire, mentionName);
+    const displayCaret = wireToDisplayOffset(shown, caret);
+    if (shown.display !== next) {
+      // The edit completed a token typed by hand (or the like): the field
+      // will show its name.
+      pendingCaret.current = displayCaret;
+    }
+    setSelection({ start: displayCaret, end: displayCaret });
+    if (!composerMentionQuery(shown, displayCaret, displayCaret)) {
+      setDismissedAt(undefined);
+    }
+    onChange(wire);
   };
 
   useLayoutEffect(() => {
@@ -153,7 +318,7 @@ export const Composer = ({
     }
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT_PX)}px`;
-  }, [value]);
+  }, [text.display]);
 
   const send = () => {
     if (!canSend) {
@@ -168,14 +333,54 @@ export const Composer = ({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    // Safari reports the Enter that confirms a composition with keyCode 229.
+    const isComposing =
+      event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229;
     const action = composerKeyAction({
       key: event.key,
       shiftKey: event.shiftKey,
-      // Safari reports the Enter that confirms a composition with keyCode 229.
-      isComposing:
-        event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229,
+      isComposing,
       replying: replying !== undefined,
+      mentionOpen,
     });
+    if (action === "mentionNext" || action === "mentionPrevious") {
+      event.preventDefault();
+      const step = action === "mentionNext" ? 1 : -1;
+      setActiveMention({
+        key: queryKey,
+        index: (activeIndex + step + suggestions.length) % suggestions.length,
+      });
+      return;
+    }
+    if (action === "mentionPick") {
+      event.preventDefault();
+      if (activeSuggestion) {
+        pickMention(activeSuggestion);
+      }
+      return;
+    }
+    if (action === "mentionClose") {
+      event.preventDefault();
+      setDismissedAt(query?.start);
+      return;
+    }
+    if (
+      !isComposing &&
+      (event.key === "Backspace" || event.key === "Delete") &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
+      if (
+        removeMention(
+          event.currentTarget,
+          event.key === "Backspace" ? "backward" : "forward",
+        )
+      ) {
+        event.preventDefault();
+      }
+      return;
+    }
     if (action === "send") {
       event.preventDefault();
       send();
@@ -196,8 +401,19 @@ export const Composer = ({
           : // Bottom gap matches the device card's, so the input box
             // lines up with it across the sidebar.
             "px-5 pt-3 pb-2",
+        "relative",
       )}
     >
+      {mentionOpen ? (
+        <MentionSuggestions
+          id={mentionListId}
+          label={t("mentions.suggestions")}
+          suggestions={suggestions}
+          active={activeIndex}
+          onActiveChange={(index) => setActiveMention({ key: queryKey, index })}
+          onPick={pickMention}
+        />
+      ) : null}
       {replying ? (
         <ReplyPreview
           name={replying.name}
@@ -233,16 +449,34 @@ export const Composer = ({
               }
             }}
             rows={1}
-            value={value}
+            value={text.display}
             disabled={disabled}
             placeholder={placeholder}
             autoComplete="off"
             enterKeyHint="send"
             aria-invalid={status.over || undefined}
+            aria-autocomplete={mentions ? "list" : undefined}
+            aria-controls={mentionOpen ? mentionListId : undefined}
+            aria-activedescendant={
+              activeSuggestion
+                ? mentionOptionId(mentionListId, activeSuggestion.num)
+                : undefined
+            }
             aria-describedby={[counterId, hint ? hintId : undefined]
               .filter(Boolean)
               .join(" ")}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={(event) => onFieldChange(event.target)}
+            onSelect={(event) =>
+              setSelection({
+                start: event.currentTarget.selectionStart,
+                end: event.currentTarget.selectionEnd,
+              })
+            }
+            onFocus={() => setFocused(true)}
+            onBlur={() => {
+              setFocused(false);
+              setDismissedAt(undefined);
+            }}
             onKeyDown={onKeyDown}
             className={cn(
               "min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 leading-5 text-primary outline-none placeholder:text-muted disabled:cursor-not-allowed",

@@ -92,6 +92,80 @@ describe("ChatClient with storage", () => {
     ).toBe("two");
   });
 
+  it("tracks unread mentions of me, live and after a reload", async () => {
+    const { open } = await setup();
+    const first = open();
+    const channel = { type: "broadcast", to: BROADCAST_NUM } as const;
+    first.receive(inbound(1, "hey @!00000001", channel));
+    first.receive(inbound(2, "hey @!0000000100 (longer id)", channel));
+    first.receive(inbound(3, "no mention", channel));
+    first.receive(inbound(4, "@!00000001 again", { ...channel, from: 9 }));
+    // Mine never counts.
+    first.receive(inbound(5, "@!00000001 me", { ...channel, from: ME }));
+    expect(first.unread.mentionsByKey.value).toEqual(
+      new Map([["channel:0", [PEER, 9]]]),
+    );
+    await first.flush();
+
+    const second = open();
+    await vi.waitFor(() =>
+      expect(second.unread.mentionsByKey.value).toEqual(
+        new Map([["channel:0", [PEER, 9]]]),
+      ),
+    );
+    second.markRead({ kind: "channel", channel: 0 });
+    expect(second.unread.mentionsByKey.value.size).toBe(0);
+    await second.flush();
+    const third = open();
+    await vi.waitFor(() => expect(third.summaries.value.size).toBe(1));
+    expect(third.unread.mentionsByKey.value.size).toBe(0);
+  });
+
+  it("tells unread subscribers about the first change", () => {
+    const chat = new ChatClient(transport());
+    const calls = { byKey: 0, mentionsByKey: 0, total: 0, count: 0 };
+    chat.unread.byKey.subscribe(() => calls.byKey++);
+    chat.unread.mentionsByKey.subscribe(() => calls.mentionsByKey++);
+    chat.unread.total.subscribe(() => calls.total++);
+    chat.unread
+      .count({ kind: "channel", channel: 0 })
+      .subscribe(() => calls.count++);
+    chat.receive(
+      inbound(1, "@!00000001", { type: "broadcast", to: BROADCAST_NUM }),
+    );
+    expect(calls).toEqual({ byKey: 1, mentionsByKey: 1, total: 1, count: 1 });
+  });
+
+  it("keeps a mention that arrives after a read while the load is in flight", async () => {
+    const { open } = await setup();
+    const first = open();
+    first.receive(inbound(1, "before"));
+    await first.flush();
+
+    const second = open();
+    second.markRead({ kind: "direct", peer: PEER });
+    second.receive(inbound(2, "@!00000001 after"));
+    await vi.waitFor(() =>
+      expect(
+        second.summaries.value.get(`direct:${PEER}`)?.lastMessage?.text,
+      ).toBe("@!00000001 after"),
+    );
+    await second.flush();
+    expect(second.unread.byKey.value).toEqual(new Map([[`direct:${PEER}`, 1]]));
+    expect(second.unread.mentionsByKey.value).toEqual(
+      new Map([[`direct:${PEER}`, [PEER]]]),
+    );
+  });
+
+  it("doesn't count a mention in the open conversation", () => {
+    const chat = new ChatClient(transport());
+    chat.unread.setActive({ kind: "channel", channel: 0 });
+    chat.receive(
+      inbound(1, "@!00000001", { type: "broadcast", to: BROADCAST_NUM }),
+    );
+    expect(chat.unread.mentionsByKey.value.size).toBe(0);
+  });
+
   it("loads unread counts only once my node is known, and keeps the open conversation read", async () => {
     const { open } = await setup();
     const first = open();

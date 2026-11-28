@@ -30,12 +30,14 @@ export {
   useTotalUnread,
   useUnreadByKey,
   useUnreadCount,
+  useUnreadMentionsByKey,
 } from "./useSession.ts";
 export {
   type MessagingActions,
   type UseThreadResult,
   useConversationSummaries,
   useMessagingActions,
+  useMutedNodeNums,
   useThread,
 } from "./useMessaging.ts";
 export { useSignal } from "./useSignal.ts";

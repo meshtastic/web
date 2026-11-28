@@ -113,6 +113,8 @@ export class NodesClient {
   readonly favoriteNums: ReadonlySignal<ReadonlySet<number>>;
   /** Ignored node numbers; the same Set until membership changes. */
   readonly ignoredNums: ReadonlySignal<ReadonlySet<number>>;
+  /** Muted node numbers; the same Set until membership changes. */
+  readonly mutedNums: ReadonlySignal<ReadonlySet<number>>;
 
   constructor(
     private readonly admin: NodesAdmin,
@@ -132,6 +134,11 @@ export class NodesClient {
     this.ignoredNums = deriveStableSignal(
       this.nodes,
       numsWhere((n) => n.isIgnored),
+      sameSet,
+    );
+    this.mutedNums = deriveStableSignal(
+      this.nodes,
+      numsWhere((n) => n.isMuted === true),
       sameSet,
     );
     void this.hydrate();

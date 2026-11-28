@@ -30,4 +30,17 @@ describe("unreadExcludingMuted", () => {
       unreadExcludingMuted(new Map([["direct:1", 4]]), [channel(0, true)]),
     ).toBe(4);
   });
+
+  it("still counts mentions of me in a muted channel, unless the sender is muted", () => {
+    const byKey = new Map([
+      ["channel:1", 5],
+      ["channel:0", 1],
+    ]);
+    const mentions = new Map([["channel:1", [7, 8, 7]]]);
+    const channels = [channel(0, false), channel(1, true)];
+    expect(unreadExcludingMuted(byKey, channels, mentions)).toBe(4);
+    expect(unreadExcludingMuted(byKey, channels, mentions, new Set([7]))).toBe(
+      2,
+    );
+  });
 });

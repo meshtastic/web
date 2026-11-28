@@ -27,8 +27,15 @@ import {
   type ScrollMetrics,
   shouldLoadOlder,
 } from "@core/messaging/scrollAnchor.ts";
+import {
+  type MentionName,
+  mentionsToText,
+  NO_MENTION_NAMES,
+  textMentionsNode,
+} from "@core/messaging/mentions.ts";
 import type { ThreadMessage } from "@core/messaging/thread.ts";
 import { cn } from "@core/utils/cn.ts";
+import { formatNodeId } from "@core/utils/nodeIdentity.ts";
 import type { LoRaSignalSettings } from "@core/utils/signalQuality.ts";
 import { ArrowDownIcon } from "lucide-react";
 import {
@@ -79,6 +86,10 @@ export interface MessageListProps {
   lora?: LoRaSignalSettings;
   /** Announce arriving messages to screen readers (off for muted channels). */
   announce?: boolean;
+  /** Current names for @mentions; without it mentions show raw. */
+  mentionName?: MentionName;
+  /** My node: messages mentioning it stand out. */
+  myNodeNum?: number;
 }
 
 const HIGHLIGHT_MS = 1600;
@@ -90,6 +101,7 @@ interface BubbleProps {
   readonly meta?: IncomingMeta;
   readonly delivery?: DeliveryLine;
   readonly available: MessageActionsAvailability;
+  readonly mentionsMe: boolean;
 }
 
 interface CachedBubbleProps {
@@ -98,6 +110,7 @@ interface CachedBubbleProps {
   readonly quoteName: (nodeNum: number) => string;
   readonly formatTime: (date: Date) => string;
   readonly lora: LoRaSignalSettings | undefined;
+  readonly mentionName: MentionName;
   readonly value: BubbleProps;
 }
 
@@ -132,6 +145,8 @@ export const MessageList = ({
   locale,
   lora,
   announce = true,
+  mentionName = NO_MENTION_NAMES,
+  myNodeNum,
 }: MessageListProps) => {
   const { t } = useTranslation("messages");
   const scroller = useRef<HTMLElement>(null);
@@ -228,11 +243,11 @@ export const MessageList = ({
       summary.kind === "one"
         ? t("thread.announceIncoming", {
             name: sender(summary.from).name,
-            text: summary.text,
+            text: mentionsToText(summary.text, mentionName),
           })
         : t("thread.announceMany", { count: summary.count }),
     );
-  }, [sender, t]);
+  }, [sender, mentionName, t]);
 
   useEffect(
     () => () => {
@@ -487,10 +502,11 @@ export const MessageList = ({
       return {
         kind: "resolved",
         name: quoteName(reply.from),
-        excerpt: reply.excerpt,
+        excerpt: mentionsToText(reply.excerpt, mentionName),
         ...(messageKeys.has(targetKey) ? { targetKey } : {}),
       };
     };
+    const myId = myNodeNum === undefined ? undefined : formatNodeId(myNodeNum);
     const out = new Map<string, BubbleProps>();
     for (const entry of entries) {
       if (entry.kind !== "message") {
@@ -498,7 +514,7 @@ export const MessageList = ({
       }
       const { thread } = entry;
       const reply = thread.replyTo;
-      const signature = `${connected}|${variant}|${
+      const signature = `${connected}|${variant}|${myId ?? ""}|${
         reply?.kind === "resolved" ? messageKeys.has(targetOf(reply)) : ""
       }`;
       const hit = propsCache.get(thread);
@@ -508,7 +524,8 @@ export const MessageList = ({
         hit.sender === sender &&
         hit.quoteName === quoteName &&
         hit.formatTime === formatTime &&
-        hit.lora === lora
+        hit.lora === lora &&
+        hit.mentionName === mentionName
       ) {
         out.set(entry.key, hit.value);
         continue;
@@ -531,6 +548,10 @@ export const MessageList = ({
             }),
         ...(delivery ? { delivery } : {}),
         available: actionsFor(thread, connected, delivery),
+        mentionsMe:
+          !thread.outgoing &&
+          myId !== undefined &&
+          textMentionsNode(thread.message.text, myId),
       };
       propsCache.set(thread, {
         signature,
@@ -538,6 +559,7 @@ export const MessageList = ({
         quoteName,
         formatTime,
         lora,
+        mentionName,
         value,
       });
       out.set(entry.key, value);
@@ -554,6 +576,8 @@ export const MessageList = ({
     variant,
     connected,
     lora,
+    mentionName,
+    myNodeNum,
   ]);
 
   const threadOf = useMemo(() => {
@@ -707,6 +731,8 @@ export const MessageList = ({
                         touch={touch}
                         handlers={bubbleHandlers}
                         locale={locale}
+                        mentionName={mentionName}
+                        {...(myNodeNum === undefined ? {} : { myNodeNum })}
                       />
                     </li>
                   );

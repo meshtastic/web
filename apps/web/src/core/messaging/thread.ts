@@ -1,5 +1,6 @@
 import type { Message, Reaction } from "@core/storage/types.ts";
 import { type DeliveryState, deriveDeliveryState } from "./deliveryState.ts";
+import { mentionTokenRegex } from "./mentions.ts";
 import {
   aggregateReactions,
   type ReactionChip,
@@ -46,9 +47,21 @@ export const excerpt = (
 ): string => {
   const line = text.replace(/\s+/gu, " ").trim();
   const chars = [...line];
-  return chars.length <= maxLength
-    ? line
-    : `${chars.slice(0, Math.max(0, maxLength - 1)).join("")}…`;
+  if (chars.length <= maxLength) {
+    return line;
+  }
+  let kept = chars.slice(0, Math.max(0, maxLength - 1)).join("");
+  // Never half a mention token: the UI swaps whole tokens for names.
+  for (const match of line.matchAll(mentionTokenRegex())) {
+    if (
+      match.index < kept.length &&
+      match.index + match[0].length > kept.length
+    ) {
+      kept = kept.slice(0, match.index).trimEnd();
+      break;
+    }
+  }
+  return `${kept}…`;
 };
 
 /** Reactions grouped by the message they target, in arrival order. */

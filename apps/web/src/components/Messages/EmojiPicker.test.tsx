@@ -4,7 +4,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Composer } from "./Composer.tsx";
+import { Composer, type ComposerMentions } from "./Composer.tsx";
 import { MessageActionsBar } from "./MessageActionsBar.tsx";
 import type { EmojiPrefs } from "./useEmoji.ts";
 
@@ -54,12 +54,16 @@ const ComposerHarness = ({
   prefs = testEmojiPrefs(),
   onTapback = vi.fn(),
   disabled = false,
+  mentions,
+  excerpt = "Morning all",
 }: {
   initial?: string;
   replying?: boolean;
   prefs?: EmojiPrefs;
   onTapback?: (emoji: string) => void;
   disabled?: boolean;
+  mentions?: ComposerMentions;
+  excerpt?: string;
 }) => {
   const [value, setValue] = useState(initial);
   const [reply, setReply] = useState(replying);
@@ -71,9 +75,8 @@ const ComposerHarness = ({
       onChange={setValue}
       onSend={vi.fn()}
       disabled={disabled}
-      {...(reply
-        ? { replying: { name: "COULLS_BASE", excerpt: "Morning all" } }
-        : {})}
+      {...(mentions ? { mentions } : {})}
+      {...(reply ? { replying: { id: 7, name: "COULLS_BASE", excerpt } } : {})}
       onCancelReply={() => setReply(false)}
       emoji={prefs}
       onTapback={(emoji) => {
@@ -143,6 +146,50 @@ describe("Composer emoji picker", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: "Emoji" })).toBeInTheDocument();
     expect(prefs.recordUse).not.toHaveBeenCalled();
+  });
+
+  it("replaces the part of a mention a selection covers, as typing would", async () => {
+    const user = userEvent.setup();
+    const alice: ComposerMentions = {
+      candidates: [],
+      name: (num) => (num === 0xffccee11 ? "Alice" : undefined),
+    };
+    render(<ComposerHarness initial="hi @!ffccee11 there" mentions={alice} />);
+    const input = field();
+    if (!(input instanceof HTMLTextAreaElement)) {
+      throw new Error("not a textarea");
+    }
+    expect(input).toHaveValue("hi @Alice there");
+    input.focus();
+    // "ice there": most of the name and everything after it.
+    input.setSelectionRange(6, 15);
+    await openPicker(user);
+    await user.click(
+      within(await grid()).getByRole("button", { name: "face, joy, tears" }),
+    );
+    expect(input).toHaveValue("hi @Al😂");
+  });
+
+  it("puts the caret after the emoji when it completes a mention token", async () => {
+    const user = userEvent.setup();
+    const alice: ComposerMentions = {
+      candidates: [],
+      name: (num) => (num === 0x12345678 ? "Alice" : undefined),
+    };
+    render(<ComposerHarness initial="hi @!123456789 tail" mentions={alice} />);
+    const input = field();
+    if (!(input instanceof HTMLTextAreaElement)) {
+      throw new Error("not a textarea");
+    }
+    input.focus();
+    // The final "9": replacing it leaves a complete token.
+    input.setSelectionRange(13, 14);
+    await openPicker(user);
+    await user.click(
+      within(await grid()).getByRole("button", { name: "face, joy, tears" }),
+    );
+    expect(input).toHaveValue("hi @Alice😂 tail");
+    expect(input.selectionStart).toBe("hi @Alice😂".length);
   });
 
   it("orders the quick row by frequency", async () => {
@@ -291,6 +338,17 @@ describe("Composer emoji picker while replying", () => {
       within(await grid()).getByRole("button", { name: "face, wink" }),
     );
     expect(onTapback).toHaveBeenCalledWith("😉");
+  });
+
+  it("keeps the tapback mode when the reply's excerpt changes (a rename)", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<ComposerHarness replying />);
+    await openPicker(user);
+    await user.click(screen.getByRole("switch", { name: /Send as tapback/ }));
+    rerender(<ComposerHarness replying excerpt="Morning @Alice" />);
+    expect(
+      screen.getByRole("switch", { name: /Send as tapback/ }),
+    ).not.toBeChecked();
   });
 });
 

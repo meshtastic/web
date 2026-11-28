@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { composerEmojiAction, insertEmoji } from "./composer.ts";
+import {
+  composerEmojiAction,
+  composerKeyAction,
+  insertEmoji,
+} from "./composer.ts";
 
 describe("insertEmoji", () => {
   it("inserts at the caret and puts the caret after the emoji", () => {
@@ -85,5 +89,40 @@ describe("composerEmojiAction", () => {
         source: "grid",
       }),
     ).toBe("insert");
+  });
+});
+
+describe("composerKeyAction with @mention suggestions", () => {
+  const key = (
+    k: string,
+    extra: Partial<Parameters<typeof composerKeyAction>[0]> = {},
+  ) =>
+    composerKeyAction({
+      key: k,
+      shiftKey: false,
+      isComposing: false,
+      replying: true,
+      mentionOpen: true,
+      ...extra,
+    });
+
+  it("moves, picks and closes while they show", () => {
+    expect(key("ArrowDown")).toBe("mentionNext");
+    expect(key("ArrowUp")).toBe("mentionPrevious");
+    expect(key("Enter")).toBe("mentionPick");
+    expect(key("Tab")).toBe("mentionPick");
+    // Escape closes them and leaves the reply alone.
+    expect(key("Escape")).toBe("mentionClose");
+  });
+
+  it("lets an IME composition and Shift+Enter through", () => {
+    expect(key("Enter", { isComposing: true })).toBe("default");
+    expect(key("Enter", { shiftKey: true })).toBe("default");
+  });
+
+  it("is the usual keys once they're closed", () => {
+    expect(key("Enter", { mentionOpen: false })).toBe("send");
+    expect(key("Escape", { mentionOpen: false })).toBe("cancelReply");
+    expect(key("ArrowDown", { mentionOpen: false })).toBe("default");
   });
 });

@@ -50,6 +50,11 @@ describe("excerpt", () => {
     expect(excerpt("👍👍👍👍👍", 3)).toBe("👍👍…");
     expect(excerpt("abc", 3)).toBe("abc");
   });
+
+  it("never cuts a mention token in half", () => {
+    expect(excerpt("hi @!ffccee11 there", 8)).toBe("hi…");
+    expect(excerpt("hi @!ffccee11 there", 15)).toBe("hi @!ffccee11 …");
+  });
 });
 
 describe("resolveReply", () => {

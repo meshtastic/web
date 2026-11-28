@@ -134,6 +134,19 @@ export function useUnreadByKey(): ReadonlyMap<string, number> {
   return useSignal(client?.chat.unread.byKey ?? NO_UNREAD);
 }
 
+const NO_MENTIONS = constantSignal<ReadonlyMap<string, readonly number[]>>(
+  new Map(),
+);
+
+/** Senders of unread messages that @mention me, per conversation. */
+export function useUnreadMentionsByKey(): ReadonlyMap<
+  string,
+  readonly number[]
+> {
+  const client = useActiveClient();
+  return useSignal(client?.chat.unread.mentionsByKey ?? NO_MENTIONS);
+}
+
 export interface UseMeshDeviceResult {
   status: Types.DeviceStatusEnum | undefined;
   isConfigured: boolean;

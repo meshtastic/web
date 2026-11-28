@@ -311,7 +311,7 @@ const ComposerHarness = ({
         setValue("");
       }}
       {...(reply
-        ? { replying: { name: "COULLS_BASE", excerpt: "Morning all" } }
+        ? { replying: { id: 7, name: "COULLS_BASE", excerpt: "Morning all" } }
         : {})}
       onCancelReply={() => setReply(false)}
       emoji={testEmojiPrefs()}
