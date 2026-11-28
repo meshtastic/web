@@ -4,23 +4,47 @@
     "title": "Clear All Messages"
   },
   "import": {
-    "description": "Import a Channel Set from a Meshtastic URL. <br />Valid Meshtasic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
-    "error": {
-      "invalidUrl": "Invalid Meshtastic URL"
-    },
-    "channelPrefix": "Channel ",
-    "primary": "Primary ",
-    "doNotImport": "No not import",
-    "channelName": "Name",
-    "channelSlot": "Slot",
-    "channelSetUrl": "Channel Set/QR Code URL",
-    "useLoraConfig": "Import LoRa Config",
-    "presetDescription": "The current LoRa Config will be replaced.",
     "title": "Import Channels",
+    "description": "Paste a channel link or the link from a channel QR code. Channel links start with \"<italic>https://meshtastic.org/e/</italic>\".",
+    "error": {
+      "invalidUrl": "This isn't a Meshtastic channel link.",
+      "noChannels": "This link has no channels."
+    },
+    "channelSetUrl": "Channel Set/QR Code URL",
+    "mode": "Import mode",
+    "replace": "Replace",
+    "add": "Add",
+    "replaceDescription": "Removes the channels on your radio and applies the selected channels and the link's LoRa settings.",
+    "addDescription": "Adds the selected channels to free slots on your radio. Your channels and LoRa settings stay as they are.",
+    "addOnly": "This link carries no LoRa settings, so it can only add channels.",
+    "channelsHeading": "Channels in this link",
+    "unnamed": "Unnamed (preset default)",
+    "slotPrimary": "Primary",
+    "slot": "Slot {{slot}}",
+    "notImported": "Not imported",
+    "alreadyOnRadio": "Already on your radio",
+    "duplicate": "Same as a channel above",
+    "noSlot": "No free slot",
+    "nameConflict": "Your radio has a channel with this name and a different key.",
+    "freeSlots_one": "Your radio has {{count}} free channel slot.",
+    "freeSlots_other": "Your radio has {{count}} free channel slots.",
+    "alreadyOnRadioCount_one": "{{count}} channel is already on your radio and is left out.",
+    "alreadyOnRadioCount_other": "{{count}} channels are already on your radio and are left out.",
+    "noSlotCount_one": "{{count}} channel doesn't fit: your radio has no free slot for it.",
+    "noSlotCount_other": "{{count}} channels don't fit: your radio has no free slots for them.",
+    "replaces_one": "The {{count}} channel on your radio will be replaced.",
+    "replaces_other": "The {{count}} channels on your radio will be replaced.",
+    "loraApplied": "Your LoRa settings change to the link's modem settings, frequency slot and region.",
+    "loraNotLoaded": "Your radio's LoRa settings haven't loaded yet. You can replace once they do.",
+    "regionChange": "Region changes from {{from}} to {{to}}.",
+    "waitingForRadio": "Your radio's channels haven't loaded yet. You can import once they do.",
+    "selectOne": "Select at least one channel to import.",
+    "confirmReplace": "Replace channels",
+    "confirmAdd": "Add channels",
     "beacon": {
       "addTitle": "Joining a Mesh Beacon offer",
       "addDescription": "The offered channel goes into a free secondary slot and your radio stays on its current settings. Apply stages the change; save it in Settings.",
-      "noFreeSlot": "Every secondary slot is in use. Pick a slot below; the channel in it will be replaced.",
+      "noFreeSlot": "Every secondary slot on your radio is in use. Remove a channel to make room, then join again.",
       "switchTitle": "Switching to another mesh",
       "switchDescription": "The offered channel replaces your primary channel and the LoRa settings change to the offered mesh. Apply stages the change. When you save it in Settings, the radio retunes and reboots, and you leave your current mesh."
     }
@@ -282,12 +306,17 @@
     "title": "Regenerate Key Pair"
   },
   "qr": {
-    "addChannels": "Add Channels",
-    "replaceChannels": "Replace Channels",
+    "title": "Generate QR Code",
+    "description": "Pick the channels to share. Anyone with this link or code can use these channels, so share it only with people you trust.",
     "linkMode": "What scanning the code does",
-    "description": "The current LoRa configuration will also be shared.",
+    "replaceChannels": "Replace",
+    "addChannels": "Add",
+    "replaceHint": "Replace overwrites every channel on their radio with these and applies your LoRa settings.",
+    "addHint": "Add keeps their channels and LoRa settings and adds these. The link carries no LoRa settings.",
+    "selectOne": "Select at least one channel to share.",
+    "waitingForLora": "Waiting for this radio's LoRa settings to load. A Replace link needs them; an Add link doesn't.",
     "sharableUrl": "Sharable URL",
-    "title": "Generate QR Code"
+    "shareTitle": "Meshtastic channels"
   },
   "reboot": {
     "title": "Reboot device",
