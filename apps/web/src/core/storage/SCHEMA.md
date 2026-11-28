@@ -3,7 +3,7 @@
 The web client's own SQLite database. It holds message history, reactions,
 drafts, read markers, the message filter, and caches of the node DB and
 telemetry. Source of truth: [`schema.ts`](./schema.ts). This file describes
-**schema version 3** (`SCHEMA_VERSION`); if the two disagree, `schema.ts` wins.
+**schema version 4** (`SCHEMA_VERSION`); if the two disagree, `schema.ts` wins.
 
 - **File:** `meshtastic-app-v1.db` in the browser's Origin Private File System
   (OPFS), opened through sqlocal and queried with Drizzle.
@@ -106,6 +106,13 @@ A snapshot of the radio's NodeDB.
 | `user_json` | TEXT | yes | `User` protobuf, base64. |
 | `position_json` | TEXT | yes | `Position` protobuf, base64. |
 | `metrics_json` | TEXT | yes | `DeviceMetrics` protobuf, base64. |
+| `channel` | INTEGER | yes | Channel index the node was heard on. Since version 4. |
+| `via_mqtt` | INTEGER (bool) | yes | Last heard through MQTT. Since version 4. |
+| `hops_away` | INTEGER | yes | Hops to the node; null when unknown. Since version 4. |
+| `is_key_manually_verified` | INTEGER (bool) | yes | Public key verified by hand. Since version 4. |
+| `is_muted` | INTEGER (bool) | yes | Notifications muted. Since version 4. |
+| `has_xeddsa_signed` | INTEGER (bool) | yes | Signs its packets with XEdDSA. Since version 4. |
+| `status` | TEXT | yes | Latest status message (`NODE_STATUS_APP`). Since version 4. |
 
 Index: `idx_nodes_last_heard` on `(device_id, last_heard)`.
 
@@ -246,6 +253,7 @@ has shipped is a one-time risk to local history.
 | 1 | First schema: messages, reactions, drafts, read markers, nodes, telemetry. | Wipe (no step). | — |
 | 2 | Message filter tables (`filter_words`, `filter_settings`, `filter_opt_outs`). Later releases at version 2 add `schema_meta`. | Wipe (no step). | 2 |
 | 3 | `messages.relay_node`. First version with migrations. | `ALTER TABLE messages ADD COLUMN relay_node INTEGER`. | 2 |
+| 4 | `nodes.channel`, `via_mqtt`, `hops_away`, `is_key_manually_verified`, `is_muted`, `has_xeddsa_signed`, `status`. | One `ALTER TABLE nodes ADD COLUMN` per column. | 2 |
 
 Version 3 is the first with a newer schema in the field, so this release
 carries the one-time risk above: the released version 2 code (from before
@@ -379,6 +387,28 @@ that byte is what is stored; the node it most likely belongs to is worked
 out when it is shown, against the current NodeDB. It was the first column
 added by a migration, so it sits last in `messages`.
 
+### NodeInfo columns on `nodes` (schema version 4)
+
+Until version 4 the node cache kept only what the node list needed to draw
+a row, so channel, MQTT, hops, key verification, mute, XEdDSA and the
+status message were missing after a reload until the radio sent its node
+DB again. They are plain nullable columns, appended to the table: null
+means "not known", and a row written before version 4 reads back with all
+of them unset. Android stores the same fields (`channel`, `via_mqtt`,
+`hops_away`, `manually_verified`, `is_muted`, `has_xeddsa_signed`,
+`node_status`); the names here follow the web `Node` fields, like
+`is_favorite` and `is_ignored`.
+
+`heard_on_current_lora` is left out on purpose. The radio answers it for
+the LoRa settings it has at that moment, and those can change between
+sessions (from another client, or a region or preset change). Android
+stores the column but doesn't rely on it: loading the cached node DB rests
+the flag at "heard" while the connected firmware isn't yet known to report
+it, and installing the radio's config marks every row heard before the
+radio's node DB rewrites them, so the radio's dump is the only source it
+trusts. The web gets that by not storing it: a cached node has no value,
+which counts as heard, until the radio's node DB sets it.
+
 ### `nodes` and `telemetry`
 
 These two tables are caches of what the radio reports.
@@ -400,6 +430,41 @@ These two tables are caches of what the radio reports.
   cleaned up when pruning.
 - **No channel or config tables.** The SDK owns device configuration.
   Duplicating it here would create two sources of truth.
+
+## Android parity gaps
+
+Columns and tables the Android app stores that the web doesn't yet, from Android's
+Room schema version 69
+(`core/database/schemas/org.meshtastic.core.database.MeshtasticDatabase/69.json`).
+
+| Feature | Android table | Android columns | What it's for |
+| --- | --- | --- | --- |
+| Message search (#1243) | `packet_fts` | FTS5 virtual table over `message_text`, external content `packet`, `unicode61` tokenizer | Full-text search of message history. |
+| Store & Forward (#505) | `packet`, `reactions` | `sfpp_hash` (BLOB) | Recognising a replayed message or reaction as one already stored. |
+| Reaction delivery metadata | `reactions` | `snr`, `rssi`, `hopsAway`, `relays`, `relay_node`, `via_mqtt`, `transport_mechanism`, `xeddsa_signed`, `ack_proof_status` | The same signal and delivery detail `messages` already has, for reactions. |
+| Per-conversation settings | `contact_settings` | `muteUntil`, `pinned`, `display_name` | Muting a conversation until a time, pinning it, and renaming it locally. |
+| Node local fields | `nodes` | `notes`, `display_name` | The user's own notes on a node and a local name for it. |
+| Node key mismatch | `nodes` | `key_match`, `new_public_key` | Recording that a different public key arrived for a known node (the stored key is kept), and which key it was. The web tracks this only in memory, as a `MISMATCH_PKI` node error. |
+| Node signal and transport | `nodes` | `rssi`, `last_transport` | Signal strength of the last packet heard from the node, and the transport (`MeshPacket.TransportMechanism`) it came over. |
+| Node telemetry extras | `nodes` | `paxcounter`, `power_channel_labels` | The latest Paxcounter reading (protobuf), and the user's labels for each power-monitor channel (JSON list). |
+| Message translation | `packet` | `translated_text`, `show_translated` | A translation of the message, and whether the bubble shows it instead of the original. |
+| Quick chat | `quick_chat` (table) | `uuid`, `name`, `message`, `mode` (`Append` or `Instant`), `position` | Canned messages: inserted into the composer, or sent at once, in the user's order. |
+| Reaction channel | `reactions` | `channel` | Channel index the reaction was sent on. The web knows it only for channel conversations, through `conversation_key`; Android's `to` is covered by the web's `to_node`. |
+| Sticky key verification (behaviour, not storage) | `nodes` | `manually_verified` | Android keeps a node verified once it is (`next.manuallyVerified \|\| info.is_key_manually_verified`); the web takes the radio's value each time, so a NodeInfo without the flag clears it. |
+
+An entry is removed from this table in the PR whose migration adds it.
+
+**FTS5 is available.** The SQLite build the app ships, the
+`@sqlite.org/sqlite-wasm` that sqlocal loads (package 3.51.2-build9, whose
+`sqlite3.wasm` reports library version 3.52.0), is compiled with
+`ENABLE_FTS5`. Checked by loading that package's `sqlite3.wasm` (byte for
+byte the one in sqlocal's dependency tree) in Node and running
+`PRAGMA compile_options`, which lists `ENABLE_FTS5` (and no FTS3 or FTS4),
+then `CREATE VIRTUAL TABLE t USING fts5(body)` and a `MATCH` query, which
+returned the matching row. The sql.js build the schema tests run on is not
+compiled with FTS5 (`no such module: fts5`), so a migration that adds an
+FTS5 table needs another test driver, such as sqlite-wasm in Node, to be
+covered by the upgrade-against-fresh check in `schema.test.ts`.
 
 ## Known gaps
 
