@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SCHEMA_SQL > is pinned per SCHEMA_VERSION (bump the version when the DDL changes) > schema v3 1`] = `
+exports[`SCHEMA_SQL > is pinned per SCHEMA_VERSION (bump the version when the DDL changes) > schema v4 1`] = `
 "CREATE TABLE IF NOT EXISTS messages (
     seq INTEGER PRIMARY KEY AUTOINCREMENT,
     device_id INTEGER NOT NULL,
@@ -68,6 +68,13 @@ CREATE TABLE IF NOT EXISTS nodes (
     user_json TEXT,
     position_json TEXT,
     metrics_json TEXT,
+    channel INTEGER,
+    via_mqtt INTEGER,
+    hops_away INTEGER,
+    is_key_manually_verified INTEGER,
+    is_muted INTEGER,
+    has_xeddsa_signed INTEGER,
+    status TEXT,
     PRIMARY KEY (device_id, num)
   );
 CREATE INDEX IF NOT EXISTS idx_nodes_last_heard ON nodes(device_id, last_heard);

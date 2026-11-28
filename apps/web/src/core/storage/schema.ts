@@ -25,7 +25,7 @@ import { MessageState } from "./types.ts";
 export const DATABASE_FILE = "meshtastic-app-v1.db";
 
 /** Bump with every DDL change, adding its `MIGRATIONS` step (tests enforce both). */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /** Oldest version `MIGRATIONS` can upgrade; older files are wiped. */
 export const FIRST_MIGRATABLE_VERSION = 2;
@@ -37,6 +37,16 @@ export const FIRST_MIGRATABLE_VERSION = 2;
 export const MIGRATIONS: Readonly<Record<number, ReadonlyArray<string>>> = {
   // 2 → 3: the relaying node of each message.
   2: ["ALTER TABLE messages ADD COLUMN relay_node INTEGER"],
+  // 3 → 4: the NodeInfo fields the node cache used to drop.
+  3: [
+    "ALTER TABLE nodes ADD COLUMN channel INTEGER",
+    "ALTER TABLE nodes ADD COLUMN via_mqtt INTEGER",
+    "ALTER TABLE nodes ADD COLUMN hops_away INTEGER",
+    "ALTER TABLE nodes ADD COLUMN is_key_manually_verified INTEGER",
+    "ALTER TABLE nodes ADD COLUMN is_muted INTEGER",
+    "ALTER TABLE nodes ADD COLUMN has_xeddsa_signed INTEGER",
+    "ALTER TABLE nodes ADD COLUMN status TEXT",
+  ],
 };
 
 /**
@@ -188,6 +198,9 @@ export const readMarkers = sqliteTable(
 /**
  * Snapshot of the device's NodeDB, as protobuf bytes in base64 (the `_json`
  * names are historical). Last-heard duplicates the column for sorting.
+ * The columns after `metrics_json` (schema version 4) are the rest of
+ * NodeInfo, plus the latest status message; null in rows written before
+ * them. `heard_on_current_lora` is left out on purpose: see SCHEMA.md.
  */
 export const nodes = sqliteTable(
   "nodes",
@@ -205,6 +218,16 @@ export const nodes = sqliteTable(
     userJson: text("user_json"),
     positionJson: text("position_json"),
     metricsJson: text("metrics_json"),
+    channel: integer("channel"),
+    viaMqtt: integer("via_mqtt", { mode: "boolean" }),
+    hopsAway: integer("hops_away"),
+    isKeyManuallyVerified: integer("is_key_manually_verified", {
+      mode: "boolean",
+    }),
+    isMuted: integer("is_muted", { mode: "boolean" }),
+    hasXeddsaSigned: integer("has_xeddsa_signed", { mode: "boolean" }),
+    /** Latest status message the node broadcast (NODE_STATUS_APP). */
+    status: text("status"),
   },
   (t) => [
     primaryKey({ columns: [t.deviceId, t.num] }),
@@ -336,6 +359,13 @@ export const SCHEMA_SQL: ReadonlyArray<string> = [
     user_json TEXT,
     position_json TEXT,
     metrics_json TEXT,
+    channel INTEGER,
+    via_mqtt INTEGER,
+    hops_away INTEGER,
+    is_key_manually_verified INTEGER,
+    is_muted INTEGER,
+    has_xeddsa_signed INTEGER,
+    status TEXT,
     PRIMARY KEY (device_id, num)
   )`,
   `CREATE INDEX IF NOT EXISTS idx_nodes_last_heard ON nodes(device_id, last_heard)`,

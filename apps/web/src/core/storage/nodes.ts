@@ -14,13 +14,17 @@ import {
 /** The `device_id` rows are stored and read under (see `StorageScope`). */
 export type SqlocalNodesRepositoryOptions = ScopeOptions;
 
-/** Rows per INSERT: 9 bound values each, well inside SQLite's variable limit. */
+/** Rows per INSERT: 16 bound values each, well inside SQLite's variable limit. */
 const UPSERT_CHUNK = 500;
 
 /**
  * Persists the snapshot of the device's NodeDB. user/position/metrics are
  * stored as base64-encoded protobuf bytes — round-trip safe across schema
- * additions because the wire shape is the source of truth.
+ * additions because the wire shape is the source of truth. The other
+ * NodeInfo fields are plain columns. `heardOnCurrentLora` is not stored:
+ * it holds only for the LoRa settings the radio had when it said so, so a
+ * cached node reads back without it (counted as heard) until the radio's
+ * node DB arrives.
  */
 export class SqlocalNodesRepository implements NodesRepository {
   private readonly db: SqlocalDb;
@@ -84,6 +88,13 @@ export class SqlocalNodesRepository implements NodesRepository {
               userJson: sql`excluded.user_json`,
               positionJson: sql`excluded.position_json`,
               metricsJson: sql`excluded.metrics_json`,
+              channel: sql`excluded.channel`,
+              viaMqtt: sql`excluded.via_mqtt`,
+              hopsAway: sql`excluded.hops_away`,
+              isKeyManuallyVerified: sql`excluded.is_key_manually_verified`,
+              isMuted: sql`excluded.is_muted`,
+              hasXeddsaSigned: sql`excluded.has_xeddsa_signed`,
+              status: sql`excluded.status`,
             },
           });
       }
@@ -115,6 +126,13 @@ interface NodeRow {
   userJson: string | null;
   positionJson: string | null;
   metricsJson: string | null;
+  channel: number | null;
+  viaMqtt: boolean | null;
+  hopsAway: number | null;
+  isKeyManuallyVerified: boolean | null;
+  isMuted: boolean | null;
+  hasXeddsaSigned: boolean | null;
+  status: string | null;
 }
 
 function rowToNode(row: NodeRow): Node {
@@ -136,6 +154,13 @@ function rowToNode(row: NodeRow): Node {
     snr: row.snr ?? undefined,
     isFavorite: row.isFavorite,
     isIgnored: row.isIgnored,
+    channel: row.channel ?? undefined,
+    viaMqtt: row.viaMqtt ?? undefined,
+    hopsAway: row.hopsAway ?? undefined,
+    isKeyManuallyVerified: row.isKeyManuallyVerified ?? undefined,
+    isMuted: row.isMuted ?? undefined,
+    hasXeddsaSigned: row.hasXeddsaSigned ?? undefined,
+    status: row.status ?? undefined,
   };
 }
 
@@ -158,5 +183,12 @@ function nodeToRow(deviceId: number, node: Node): NodeRow {
           toBinary(Protobuf.Telemetry.DeviceMetricsSchema, node.deviceMetrics),
         )
       : null,
+    channel: node.channel ?? null,
+    viaMqtt: node.viaMqtt ?? null,
+    hopsAway: node.hopsAway ?? null,
+    isKeyManuallyVerified: node.isKeyManuallyVerified ?? null,
+    isMuted: node.isMuted ?? null,
+    hasXeddsaSigned: node.hasXeddsaSigned ?? null,
+    status: node.status ?? null,
   };
 }

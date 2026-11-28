@@ -85,6 +85,9 @@ export function validateIncomingNode(
   return { accepted: undefined, error: undefined };
 }
 
+/** How long node changes wait for the stored nodes before going ahead without them. */
+export const NODE_LOAD_TIMEOUT_MS = 10_000;
+
 export interface NodesAdmin {
   /** Sends one admin message to the local node. */
   sendAdmin(
@@ -105,6 +108,11 @@ export class NodesClient {
   private readonly errorMap = signal<ReadonlyMap<number, NodeError>>(new Map());
   private pending: Map<number, Node> | undefined;
   private changed = new Set<number>();
+  /**
+   * Node changes made while the stored nodes load, applied in order once they
+   * are in: each then lands on the stored node, as it would after the load.
+   */
+  private queued: Array<() => void> | undefined;
   private epoch = 0;
 
   readonly list: ReadonlySignal<ReadonlyArray<Node>>;
@@ -145,6 +153,15 @@ export class NodesClient {
   }
 
   applyChange(change: NodeChangeJs): void {
+    this.whenLoaded(() => this.applyNow(change));
+  }
+
+  private whenLoaded(apply: () => void): void {
+    if (this.queued) this.queued.push(apply);
+    else apply();
+  }
+
+  private applyNow(change: NodeChangeJs): void {
     switch (change.kind) {
       case "snapshot": {
         const next = new Map<number, Node>();
@@ -217,11 +234,30 @@ export class NodesClient {
 
   patch(nodeNum: number, partial: Partial<Node>): void {
     if (nodeNum === 0) return;
-    const existing = this.current().get(nodeNum);
-    const next: Node = existing
-      ? { ...existing, ...partial }
-      : { num: nodeNum, isFavorite: false, isIgnored: false, ...partial };
-    this.set(next);
+    this.whenLoaded(() => {
+      const existing = this.current().get(nodeNum);
+      if (!existing) {
+        this.set({
+          num: nodeNum,
+          isFavorite: false,
+          isIgnored: false,
+          ...partial,
+        });
+        return;
+      }
+      const next: Node = { ...existing, ...partial };
+      // A manual verification is of one key; a new key starts unverified.
+      const newKey = partial.user?.publicKey;
+      const sameKey =
+        !partial.user ||
+        (!!newKey?.length && equalKey(newKey, existing.user?.publicKey));
+      if (sameKey || !next.isKeyManuallyVerified) {
+        this.set(next);
+        return;
+      }
+      const { isKeyManuallyVerified: _, ...unverified } = next;
+      this.set(unverified);
+    });
   }
 
   routingError(nodeNum: number, reason: Protobuf.Mesh.Routing_Error): void {
@@ -286,15 +322,30 @@ export class NodesClient {
   private async hydrate(): Promise<void> {
     if (!this.repository) return;
     const epoch = this.epoch;
+    const queued: Array<() => void> = [];
+    this.queued = queued;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     try {
-      const persisted = await this.repository.loadAll();
+      const persisted = await Promise.race([
+        this.repository.loadAll(),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new Error("timed out")),
+            NODE_LOAD_TIMEOUT_MS,
+          );
+        }),
+      ]);
       if (epoch !== this.epoch) return;
       const next = this.draft();
-      for (const node of persisted) {
-        if (!next.has(node.num)) next.set(node.num, node);
-      }
+      for (const stored of persisted) next.set(stored.num, stored);
     } catch {
-      // nothing stored yet
+      // nothing stored yet, or not in time: go ahead without it
+    } finally {
+      clearTimeout(timer);
+      if (this.queued === queued) {
+        this.queued = undefined;
+        for (const apply of queued) apply();
+      }
     }
   }
 
@@ -370,7 +421,7 @@ export class NodesClient {
   }
 
   remove(nodeNum: number): Promise<Result<unknown, Error>> {
-    this.delete(nodeNum);
+    this.whenLoaded(() => this.delete(nodeNum));
     return this.admin.sendAdmin({ case: "removeByNodenum", value: nodeNum });
   }
 
@@ -385,6 +436,11 @@ export class NodesClient {
         : undefined;
     this.replace(me ? new Map([[me.num, me]]) : new Map());
     this.errorMap.value = new Map();
+    // Everything a load still under way would bring back is being cleared.
+    if (this.queued) {
+      this.epoch++;
+      this.queued = undefined;
+    }
     try {
       await this.repository?.clear();
       if (me) await this.repository?.upsert(me);
