@@ -11,6 +11,7 @@ import {
   testHttpReachable,
 } from "@app/pages/Connections/utils";
 import { CertificateGuide } from "@components/CertificateGuide.tsx";
+import { FirmwareUpdateNotice } from "@components/FirmwareUpdate/FirmwareUpdateNotice.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@components/UI/DropdownMenu.tsx";
 import { useDownloadDiagnostics } from "@core/diagnostics/useDownloadDiagnostics.ts";
+import { useFirmwareUpdateNotice } from "@core/firmware/useFirmwareUpdateNotice.ts";
 import { useAppStore } from "@core/stores";
 import { useToast } from "@core/hooks/useToast.ts";
 import { cn } from "@core/utils/cn.ts";
@@ -72,6 +74,7 @@ export const ConnectionsList = ({ addButtonRef }: ConnectionsListProps) => {
     syncConnectionStatuses,
   } = useConnections();
   const { toast } = useToast();
+  const firmwareUpdate = useFirmwareUpdateNotice();
   const closeConnections = useAppStore((s) => s.closeConnections);
   const setConnectionsView = useAppStore((s) => s.setConnectionsView);
   const { t } = useTranslation("connections");
@@ -160,6 +163,10 @@ export const ConnectionsList = ({ addButtonRef }: ConnectionsListProps) => {
           {t("drawer.addConnection")}
         </Button>
       </div>
+
+      {/* Like Android's Connections screen: the connected radio's update
+          suggestion sits above the connection list. */}
+      {firmwareUpdate ? <FirmwareUpdateNotice nudge={firmwareUpdate} /> : null}
 
       {sorted.length === 0 ? (
         <div

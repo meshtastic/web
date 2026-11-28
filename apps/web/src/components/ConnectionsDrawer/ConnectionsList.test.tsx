@@ -1,4 +1,5 @@
 import type { Connection } from "@app/core/stores/deviceStore/types";
+import type { FirmwareUpdateNudge } from "@core/firmware/useFirmwareUpdateNotice.ts";
 import {
   act,
   fireEvent,
@@ -37,6 +38,14 @@ vi.mock("@core/utils/downloadText.ts", () => ({
 
 vi.mock("@core/hooks/useToast.ts", () => ({
   useToast: () => ({ toast: vi.fn() }),
+}));
+
+const firmwareUpdateMock = vi.hoisted(() => ({
+  nudge: undefined as FirmwareUpdateNudge | undefined,
+}));
+
+vi.mock("@core/firmware/useFirmwareUpdateNotice.ts", () => ({
+  useFirmwareUpdateNotice: () => firmwareUpdateMock.nudge,
 }));
 
 const http = (id: number, name: string): Connection => ({
@@ -236,5 +245,39 @@ describe("ConnectionsList diagnostics", () => {
         name: "Download diagnostics",
       }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("ConnectionsList firmware update notice", () => {
+  beforeEach(() => {
+    connectionsMock.connections = [
+      { ...http(1, "Alpha"), status: "configured" },
+    ];
+    firmwareUpdateMock.nudge = undefined;
+  });
+
+  it("shows nothing while the radio is current or unchecked", () => {
+    render(<ConnectionsList />);
+    expect(screen.queryByTestId("firmware-update-notice")).toBeNull();
+  });
+
+  it("suggests the update above the connection list", () => {
+    firmwareUpdateMock.nudge = {
+      notice: {
+        notificationKey: "firmware-update-notified:!1234abcd:heltec-v4:2.7.26",
+        currentVersion: "2.7.15",
+        stableVersion: "2.7.26",
+        hardwareTarget: "heltec-v4",
+        destination: "meshtasticFlasher",
+      },
+      flasherUrl: "https://flasher.meshtastic.org/?hwModel=110",
+    };
+    render(<ConnectionsList />);
+    const notice = screen.getByTestId("firmware-update-notice");
+    expect(notice).toHaveTextContent("Firmware update available");
+    expect(
+      notice.compareDocumentPosition(row("Alpha")) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });
