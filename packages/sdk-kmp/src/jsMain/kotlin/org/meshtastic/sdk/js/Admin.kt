@@ -90,6 +90,7 @@ private suspend fun AdminApi.dispatch(message: AdminMessage): AdminResultJs {
     message.set_ignored_node?.let { return setIgnored(NodeId(it), true).toJs() }
     message.remove_ignored_node?.let { return setIgnored(NodeId(it), false).toJs() }
     message.remove_by_nodenum?.let { return removeNode(NodeId(it)).toJs() }
+    message.add_contact?.let { return addContact(it).toJs() }
     message.get_config_request?.let { return getConfig(it).toJs { Config.ADAPTER.encode(it).toUint8Array() } }
     message.get_module_config_request?.let {
         return getModuleConfig(it).toJs { ModuleConfig.ADAPTER.encode(it).toUint8Array() }

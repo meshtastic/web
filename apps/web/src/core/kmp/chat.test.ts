@@ -8,7 +8,12 @@ import type {
 import type { Types } from "@core/protobuf.ts";
 import type { SendHandleJs } from "@meshtastic/sdk-kmp";
 import { describe, expect, it, vi } from "vitest";
-import { ChatClient, type ChatTransport, conversationFor } from "./chat.ts";
+import {
+  ChatClient,
+  type ChatTransport,
+  conversationFor,
+  DIRECT_SEND_HOOK_TIMEOUT_MS,
+} from "./chat.ts";
 import { BROADCAST_NUM } from "./packets.ts";
 
 const ME = 1;
@@ -334,5 +339,72 @@ describe("ChatClient with storage", () => {
     for (let id = 1; id <= 10; id++) chat.receive(inbound(id, `m${id}`));
     await chat.flush();
     expect(prune).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("ChatClient direct-send hook", () => {
+  it("runs before direct messages and their resends, not channel messages", async () => {
+    const onDirectSend = vi.fn(async () => {});
+    const chat = new ChatClient(transport(), { onDirectSend });
+    await chat.send({ text: "hi", destination: "broadcast" });
+    expect(onDirectSend).not.toHaveBeenCalled();
+    const sent = await chat.send({ text: "hi", destination: PEER });
+    expect(onDirectSend).toHaveBeenCalledWith(PEER);
+    await chat.resend({
+      id: sent.unwrap(),
+      text: "hi",
+      to: PEER,
+      channel: 0,
+      type: "direct",
+    });
+    expect(onDirectSend).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("ChatClient direct-send ordering", () => {
+  it("sends the text only after the hook settles", async () => {
+    const order: string[] = [];
+    let finish = () => {};
+    const t = transport();
+    const sendText = t.sendText;
+    t.sendText = (...args) => {
+      order.push("text");
+      return sendText(...args);
+    };
+    const chat = new ChatClient(t, {
+      onDirectSend: () =>
+        new Promise<void>((resolve) => {
+          finish = () => {
+            order.push("hook");
+            resolve();
+          };
+        }),
+    });
+    const sending = chat.send({ text: "hi", destination: PEER });
+    await Promise.resolve();
+    expect(order).toEqual([]);
+    finish();
+    await sending;
+    expect(order).toEqual(["hook", "text"]);
+  });
+
+  it("sends anyway when the hook fails or hangs", async () => {
+    vi.useFakeTimers();
+    try {
+      const failing = new ChatClient(transport(), {
+        onDirectSend: () => Promise.reject(new Error("radio said no")),
+      });
+      expect(
+        (await failing.send({ text: "a", destination: PEER })).isOk(),
+      ).toBe(true);
+      const hanging = new ChatClient(transport(), {
+        onDirectSend: () => new Promise<void>(() => {}),
+      });
+      const sending = hanging.send({ text: "b", destination: PEER });
+      await vi.advanceTimersByTimeAsync(DIRECT_SEND_HOOK_TIMEOUT_MS);
+      expect((await sending).isOk()).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
