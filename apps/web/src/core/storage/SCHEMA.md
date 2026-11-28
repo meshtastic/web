@@ -149,13 +149,40 @@ erDiagram
 
 ## Lifecycle
 
-- **No migrations.** The version lives in `PRAGMA user_version`. On open,
-  `schemaStatements` re-runs the DDL when the version matches. When it
-  doesn't (an empty file reads as 0), every table is dropped, the schema is
-  recreated and the version is stamped.
-- **Bumping the version.** Any DDL change needs a `SCHEMA_VERSION` bump.
-  `schema.test.ts` pins the DDL for each version, so an edit without a bump
-  fails the tests.
+- **Two stamps.** The schema version lives in `PRAGMA user_version`. The
+  minimum reader version, the oldest app schema that can still safely read
+  and write the file, lives in the `schema_meta` table (see below).
+- **On open,** `applySchema` reads them and runs what `schemaStatements`
+  returns, all in one `BEGIN IMMEDIATE` transaction:
+  - **Current version:** the idempotent DDL (`SCHEMA_SQL`) again, and the
+    minimum reader version recorded if the file has none yet.
+  - **Older, and migratable:** the steps in `MIGRATIONS` from that version
+    up to `SCHEMA_VERSION`, in order, then the idempotent DDL, then both
+    stamps. Rows are kept.
+  - **Newer, and the app meets its minimum reader version:** a reverted
+    deploy, an old tab or a stale cached bundle (the PWA service worker)
+    opening a file a later release wrote. Only the idempotent
+    `IF NOT EXISTS` DDL runs; nothing is dropped and neither stamp changes,
+    so the later release finds its file as it left it.
+  - **Anything else:** an empty file (version 0), a version older than
+    `FIRST_MIGRATABLE_VERSION` or missing a step, or a newer version whose
+    minimum reader version is above the app's (or that has none). Every
+    table is dropped, the schema is created and both stamps are written.
+- **One transaction.** SQLite keeps `user_version` in the file header and
+  `schema_meta` is an ordinary table; the transaction covers both. A failed
+  step rolls back the data, the DDL and the stamps together: the file stays
+  at its old version and the next open tries again.
+- **Other tabs.** A tab opening the file while another holds the lock waits
+  only a bounded time. After that its open fails; that connection runs
+  without storage, and `getStorageDb` (`core/sdkStorage.ts`) tries again on
+  its next call rather than keeping the failure.
+- **Changing the schema.** Any DDL change needs a `SCHEMA_VERSION` bump, a
+  `MIGRATIONS` entry for the previous version and a decision on
+  `MIN_READER_VERSION` (see [Writing a migration](#writing-a-migration)).
+  `schema.test.ts` pins the DDL for each version, checks a step exists for
+  every migratable version, and checks that upgrading a frozen version 2
+  database ends with the same tables, columns, CHECK clauses and indexes
+  (`index_xinfo`, and uniqueness) as a fresh one.
 - **Before the radio is known.** A connection writes under a negative,
   provisional `device_id`. Once the handshake gives the radio's node number,
   `adopt.ts` moves those rows into the radio's history in one transaction.
@@ -165,24 +192,96 @@ erDiagram
     removed with them.
   - Telemetry is pruned by age and by a per-node cap.
 
+## Writing a migration
+
+1. Change the table in `schema.ts` (Drizzle) and in `SCHEMA_SQL`.
+2. Bump `SCHEMA_VERSION` to N+1 and add `MIGRATIONS[N]`, the statements
+   that take a version N file to N+1.
+3. Decide the minimum reader version. An additive change (a nullable
+   column, a new table or index) keeps `MIN_READER_VERSION` where it was:
+   older code ignores what it doesn't know. A change older code would
+   misread (a column it relies on renamed or retyped, rows it would
+   mishandle) raises it to the new version, so an older release wipes the
+   file instead of corrupting it.
+4. Update the snapshot (`vitest run -u` on `schema.test.ts`), this file's
+   tables and the changelog below.
+
+Prefer additive changes: `ALTER TABLE ... ADD COLUMN`, a new table, a new
+index. A new index needs no step of its own, since the idempotent
+`SCHEMA_SQL` runs after the steps and creates it. A new table does: its
+step runs `CREATE TABLE` with the table as it is at that version, and
+`SCHEMA_SQL` keeps the current definition for fresh files. A file several
+versions behind runs every step before `SCHEMA_SQL`, so a later step that
+alters the table would otherwise find it missing. SQLite's `ALTER TABLE`
+is limited:
+
+- `ADD COLUMN` appends the column at the end of the table. Put it last in
+  the `CREATE TABLE` too, so a fresh file and an upgraded one match (the
+  test compares them). It can't add a `PRIMARY KEY` or `UNIQUE` column, and
+  a `NOT NULL` column needs a non-null default.
+- Renaming or dropping a column (`RENAME COLUMN`, `DROP COLUMN`) works only
+  for columns no index, constraint or view uses.
+- Changing a column's type, constraints or default, or the primary key,
+  needs the rebuild recipe: create the new table, copy the rows with
+  `INSERT INTO ... SELECT`, drop the old table, rename the new one, and
+  recreate its indexes.
+
+When keeping the data isn't worth that, wipe instead: raise
+`FIRST_MIGRATABLE_VERSION` to the new `SCHEMA_VERSION` and add no step.
+`schemaStatements` then wipes any older file, as every version did before
+migrations existed.
+
+Releases from before the minimum reader version existed (schema version 2
+and older) don't read it: like any other version mismatch, they wipe a file
+a later release wrote. Rolling back to such a release once a newer schema
+has shipped is a one-time risk to local history.
+
+## Changelog
+
+| Version | Change | Upgrade | Min reader |
+| --- | --- | --- | --- |
+| 1 | First schema: messages, reactions, drafts, read markers, nodes, telemetry. | Wipe (no step). | — |
+| 2 | Message filter tables (`filter_words`, `filter_settings`, `filter_opt_outs`). Later releases at version 2 add `schema_meta`. | Wipe (no step). | 2 |
+
 ## Design notes
 
-### No migrations
+### Migrations, and when to wipe instead
 
-The database is treated as a local cache that can be rebuilt, not as data
-that must survive upgrades. Two rules follow from that:
+The database is a local cache that can mostly be rebuilt, except for
+message history and drafts. Losing those on every schema change was the
+trade-off before migrations; now a schema change ships a step that keeps
+them. Four rules follow:
 
-1. **A new file name** (`meshtastic-app-v1.db`), so a database written by an
-   older release is never opened, and an old schema can't break startup. A
-   file left by an older release is deleted, best effort, by the tab that
-   owns storage.
-2. **A version stamp that wipes on mismatch, instead of migrations.**
-   Everything except message history and drafts can be fetched again from
-   the radio, and losing local history on a schema change is an accepted
-   trade-off. A migration chain would be code to maintain for little
-   benefit. The DDL is hand-written in `SCHEMA_SQL`, not generated by
-   drizzle-kit, so the database creates itself on first open with no build
-   step.
+1. **A new file name** (`meshtastic-app-v1.db`), so a database written by a
+   release from before versioning is never opened, and an old schema can't
+   break startup. A file left by an older release is deleted, best effort,
+   by the tab that owns storage.
+2. **Steps, not a generated migration chain.** Each step is a few
+   hand-written statements keyed by the version it upgrades from. The DDL
+   is hand-written in `SCHEMA_SQL`, not generated by drizzle-kit, so the
+   database creates itself on first open with no build step.
+3. **A newer file is left alone when it can be.** Deploys get reverted and
+   the PWA can serve an older cached bundle, so an older release opening a
+   newer file is expected. The minimum reader version, written by the
+   release that created or upgraded the file, says whether that's safe.
+4. **Wipe as the fallback.** A file that can't be upgraded or safely read
+   (too old, a missing step, or newer and above the app's floor) is dropped
+   and recreated rather than left half-readable.
+
+### `schema_meta`
+
+| Column | Type | Null | Notes |
+| --- | --- | --- | --- |
+| `key` | TEXT | no | Primary key. Only `min_reader_version` so far. |
+| `value` | INTEGER | no | |
+
+The minimum reader version is kept in the file, next to the version stamp,
+because the code that has to read it is the older release, which knows
+nothing about the newer one. A table rather than a second header field
+(such as `PRAGMA application_id`, which exists to name the file format):
+it says what it holds, can take more keys, and older code that doesn't
+know it ignores it. It isn't part of `SCHEMA_SQL`, since it describes the
+file rather than the data; `schemaStatements` creates and writes it.
 
 ### `device_id` is the radio's node number
 

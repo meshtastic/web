@@ -7,7 +7,14 @@ import {
   type SqlStatement,
 } from "./adopt.ts";
 import * as schema from "./schema.ts";
-import { DATABASE_FILE, SCHEMA_VERSION, schemaStatements } from "./schema.ts";
+import {
+  CURRENT_SCHEMA,
+  DATABASE_FILE,
+  READ_MIN_READER_SQL,
+  SCHEMA_META_TABLE,
+  type SchemaPlan,
+  schemaStatements,
+} from "./schema.ts";
 
 export interface CreateSqlocalDbOptions {
   /** OPFS path. Defaults to `DATABASE_FILE`. */
@@ -53,20 +60,27 @@ export async function openSqlocalDb(
     casing: "snake_case",
   });
 
-  await applySchema(sql);
   const atomic: RunAtomically = async (statements) => {
     await client.batch(() => statements.map(toSqlocalStatement));
   };
-  // Rows a connection wrote before its radio was named belong to no radio;
-  // any a previous page left behind (it closed mid-handshake) go now. They
-  // are harmless if they stay, so a failure here must not cost persistence.
+  let storageType: string;
   try {
-    await atomic(discardStatements());
+    await applySchema(sql);
+    // Rows a connection wrote before its radio was named belong to no radio;
+    // any a previous page left behind (it closed mid-handshake) go now. They
+    // are harmless if they stay, so a failure here must not cost persistence.
+    try {
+      await atomic(discardStatements());
+    } catch (err) {
+      console.warn("openSqlocalDb: could not drop provisional rows", err);
+    }
+    ({ storageType = "memory" } = await client.getDatabaseInfo());
   } catch (err) {
-    console.warn("openSqlocalDb: could not drop provisional rows", err);
+    // Nothing else holds the client: stop its worker so it lets go of the
+    // file before `getStorageDb` tries again.
+    await client.destroy().catch(() => {});
+    throw err;
   }
-
-  const { storageType = "memory" } = await client.getDatabaseInfo();
   return {
     db,
     storageType,
@@ -89,24 +103,38 @@ export type RawSql = (
 ) => Promise<unknown>;
 
 /**
- * Creates the schema, or wipes and recreates it when the file carries
- * another schema version (see `schemaStatements`). Runs in one
- * `BEGIN IMMEDIATE` transaction, so another tab opening the same file waits
- * instead of seeing (or wiping) a half-built schema, and a failure leaves the
- * file as it was.
+ * Creates the schema, upgrades it through its migrations, opens a newer
+ * file the app can still read as it is, or wipes and recreates it (see
+ * `schemaStatements`). Runs in one `BEGIN IMMEDIATE` transaction, both
+ * stamps included (`user_version` lives in the file header and
+ * `schema_meta` is a table, and the transaction covers both), so a failed
+ * migration leaves the file, data and stamps as they were. Another tab
+ * opening the same file meanwhile waits a bounded time for the lock, then
+ * fails its open; `getStorageDb` tries again on its next call.
  */
-export async function applySchema(sql: RawSql): Promise<void> {
+export async function applySchema(
+  sql: RawSql,
+  plan: SchemaPlan = CURRENT_SCHEMA,
+): Promise<void> {
   await sql`BEGIN IMMEDIATE`;
   try {
     const version = numberField(await sql`PRAGMA user_version`, "user_version");
     const tables =
-      version === SCHEMA_VERSION
+      version === plan.version
         ? []
         : stringFields(
             await sql`SELECT name FROM sqlite_master WHERE type = 'table'`,
             "name",
           );
-    for (const statement of schemaStatements(version, tables)) {
+    const minReader =
+      version > plan.version && tables.includes(SCHEMA_META_TABLE)
+        ? optionalNumberField(await sql(literal(READ_MIN_READER_SQL)), "value")
+        : undefined;
+    const statements = schemaStatements(
+      { version, tables, ...(minReader === undefined ? {} : { minReader }) },
+      plan,
+    );
+    for (const statement of statements) {
       await sql(literal(statement));
     }
     await sql`COMMIT`;
@@ -128,9 +156,13 @@ function rowsOf(rows: unknown): ReadonlyArray<object> {
 }
 
 function numberField(rows: unknown, field: string): number {
+  return optionalNumberField(rows, field) ?? 0;
+}
+
+function optionalNumberField(rows: unknown, field: string): number | undefined {
   const first = rowsOf(rows)[0];
   const value: unknown = first ? Reflect.get(first, field) : undefined;
-  return typeof value === "number" ? value : 0;
+  return typeof value === "number" ? value : undefined;
 }
 
 function stringFields(rows: unknown, field: string): string[] {
