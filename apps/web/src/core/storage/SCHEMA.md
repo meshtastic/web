@@ -182,7 +182,7 @@ erDiagram
   `schema.test.ts` pins the DDL for each version, checks a step exists for
   every migratable version, and checks that upgrading a frozen version 2
   database ends with the same tables, columns, CHECK clauses and indexes
-  (`index_xinfo`) as a fresh one.
+  (`index_xinfo`, and uniqueness) as a fresh one.
 - **Before the radio is known.** A connection writes under a negative,
   provisional `device_id`. Once the handshake gives the radio's node number,
   `adopt.ts` moves those rows into the radio's history in one transaction.
@@ -207,9 +207,13 @@ erDiagram
    tables and the changelog below.
 
 Prefer additive changes: `ALTER TABLE ... ADD COLUMN`, a new table, a new
-index. New tables and indexes need no step of their own, since the
-idempotent `SCHEMA_SQL` runs after the steps and creates them. SQLite's
-`ALTER TABLE` is limited:
+index. A new index needs no step of its own, since the idempotent
+`SCHEMA_SQL` runs after the steps and creates it. A new table does: its
+step runs `CREATE TABLE` with the table as it is at that version, and
+`SCHEMA_SQL` keeps the current definition for fresh files. A file several
+versions behind runs every step before `SCHEMA_SQL`, so a later step that
+alters the table would otherwise find it missing. SQLite's `ALTER TABLE`
+is limited:
 
 - `ADD COLUMN` appends the column at the end of the table. Put it last in
   the `CREATE TABLE` too, so a fresh file and an upgraded one match (the
@@ -222,8 +226,9 @@ idempotent `SCHEMA_SQL` runs after the steps and creates them. SQLite's
   `INSERT INTO ... SELECT`, drop the old table, rename the new one, and
   recreate its indexes.
 
-When keeping the data isn't worth that, leave out the step:
-`schemaStatements` wipes the database instead, as every version did before
+When keeping the data isn't worth that, wipe instead: raise
+`FIRST_MIGRATABLE_VERSION` to the new `SCHEMA_VERSION` and add no step.
+`schemaStatements` then wipes any older file, as every version did before
 migrations existed.
 
 Releases from before the minimum reader version existed (schema version 2

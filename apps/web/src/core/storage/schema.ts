@@ -43,9 +43,11 @@ export const FIRST_MIGRATABLE_VERSION = 2;
 /**
  * Upgrade steps: `MIGRATIONS[n]` takes a database from version `n` to
  * `n + 1`. Steps run in order inside the open transaction, followed by the
- * idempotent `SCHEMA_SQL` (which creates any new table or index) and the
- * new version stamp. Prefer additive changes (`ALTER TABLE ... ADD COLUMN`,
- * new tables, new indexes); see SCHEMA.md for what SQLite can't alter.
+ * idempotent `SCHEMA_SQL` (which creates any new index) and the new version
+ * stamp. A step that adds a table creates it itself, as it was at that
+ * version: later steps run before `SCHEMA_SQL` and may alter it. Prefer
+ * additive changes (`ALTER TABLE ... ADD COLUMN`, new tables, new indexes);
+ * see SCHEMA.md for what SQLite can't alter.
  */
 export const MIGRATIONS: Readonly<Record<number, ReadonlyArray<string>>> = {};
 
@@ -56,6 +58,8 @@ export const MIGRATIONS: Readonly<Record<number, ReadonlyArray<string>>> = {};
  * it was, since older code ignores what it doesn't know; a change older code
  * would misread raises it to the new version. Stored in the file (see
  * `SCHEMA_META_SQL`), so an older release that opens it knows whether it may.
+ * Releases from before `schema_meta` (schema version 2 and older) never read
+ * it and wipe a file at any other version; see SCHEMA.md.
  */
 export const MIN_READER_VERSION = 2;
 
