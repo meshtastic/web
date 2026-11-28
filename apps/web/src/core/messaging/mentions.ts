@@ -84,6 +84,9 @@ export const textMentionsNode = (
  */
 export type MentionName = (nodeNum: number) => string | undefined;
 
+/** Knows no names: every mention shows its raw token. */
+export const NO_MENTION_NAMES: MentionName = () => undefined;
+
 /** The name a mention shows, or undefined to show the raw token. */
 export const mentionLabel = (names: {
   readonly longName?: string;

@@ -1,7 +1,11 @@
 import { ConfirmDialog } from "@components/UI/ConfirmDialog.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDraft, useMessagingActions, useThread } from "@core/kmp/hooks";
-import { type MentionName, mentionsToText } from "@core/messaging/mentions.ts";
+import {
+  type MentionName,
+  mentionsToText,
+  NO_MENTION_NAMES,
+} from "@core/messaging/mentions.ts";
 import { buildTimeline, messageKey } from "@core/messaging/messageListView.ts";
 import { excerpt, type ThreadMessage } from "@core/messaging/thread.ts";
 import type { TracerouteView } from "@core/messaging/tracerouteView.ts";
@@ -46,14 +50,13 @@ export interface ConversationThreadProps {
   onConfirmClearChange: (open: boolean) => void;
   onClear: () => void;
 }
-
-const NO_NAMES: MentionName = () => undefined;
 const NO_CANDIDATES: readonly MentionSuggestion[] = [];
 
 interface ReplyTarget {
   readonly id: number;
   readonly name: string;
-  readonly excerpt: string;
+  /** As received: mentions are named when shown, so renames show. */
+  readonly text: string;
 }
 
 /**
@@ -72,7 +75,7 @@ export const ConversationThread = ({
   traceroutes,
   sender,
   nameOf,
-  mentionName = NO_NAMES,
+  mentionName = NO_MENTION_NAMES,
   mentionCandidates = NO_CANDIDATES,
   onOpenNode,
   myNodeNum,
@@ -149,7 +152,7 @@ export const ConversationThread = ({
           name: thread.outgoing
             ? t("reply.yourself")
             : nameOf(thread.message.from),
-          excerpt: excerpt(mentionsToText(thread.message.text, mentionName)),
+          text: thread.message.text,
         });
         composerRef.current?.focus();
       },
@@ -273,7 +276,14 @@ export const ConversationThread = ({
         onSend={send}
         mentions={mentions}
         disabled={!connected}
-        {...(reply ? { replying: reply } : {})}
+        {...(reply
+          ? {
+              replying: {
+                name: reply.name,
+                excerpt: excerpt(mentionsToText(reply.text, mentionName)),
+              },
+            }
+          : {})}
         onCancelReply={() => {
           setReply(undefined);
           composerRef.current?.focus();

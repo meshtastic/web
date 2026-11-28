@@ -5,17 +5,16 @@ import {
   composerEmojiAction,
   composerKeyAction,
   composerStatus,
-  insertEmoji,
 } from "@core/messaging/composer.ts";
 import {
   applyComposerEdit,
   composerMentionQuery,
   composerText,
   deleteMention,
-  displayToWireOffset,
   insertMention,
   matchMentionCandidates,
   type MentionName,
+  NO_MENTION_NAMES,
   wireToDisplayOffset,
 } from "@core/messaging/mentions.ts";
 import { cn } from "@core/utils/cn.ts";
@@ -25,6 +24,7 @@ import {
   type KeyboardEvent,
   type Ref,
   useEffect,
+  useEffectEvent,
   useId,
   useLayoutEffect,
   useMemo,
@@ -53,8 +53,6 @@ export interface ComposerMentions {
   /** What a mention in the field shows; undefined shows the raw token. */
   readonly name: MentionName;
 }
-
-const NO_NAMES: MentionName = () => undefined;
 
 export interface ComposerProps {
   /** Accessible name, e.g. "Message Primary". */
@@ -142,7 +140,7 @@ export const Composer = ({
   // The picker closed because of a pick: focus goes to the field, not
   // back to the emoji button.
   const picked = useRef(false);
-  const mentionName = mentions?.name ?? NO_NAMES;
+  const mentionName = mentions?.name ?? NO_MENTION_NAMES;
   const text = useMemo(
     () => composerText(value, mentionName),
     [value, mentionName],
@@ -156,12 +154,13 @@ export const Composer = ({
       ? composerMentionQuery(text, selection.start, selection.end)
       : undefined;
   const queryText = query?.query;
+  const candidates = mentions?.candidates;
   const suggestions = useMemo(
     () =>
-      queryText === undefined || !mentions
+      queryText === undefined || !candidates
         ? []
-        : matchMentionCandidates(mentions.candidates, queryText),
-    [queryText, mentions],
+        : matchMentionCandidates(candidates, queryText),
+    [queryText, candidates],
   );
   const mentionOpen =
     query !== undefined &&
@@ -185,7 +184,8 @@ export const Composer = ({
     pendingCaret.current = undefined;
     el.focus();
     el.setSelectionRange(caret, caret);
-  }, [value]);
+    // The field shows `text.display`, which changes on a rename too.
+  }, [text.display]);
 
   const closePicker = () => {
     picked.current = true;
@@ -206,23 +206,27 @@ export const Composer = ({
     }
     const el = field.current;
     const end = text.display.length;
-    // Into the wire text, so the limit counts what will be sent.
-    const result = insertEmoji(
-      value,
-      displayToWireOffset(text, el?.selectionStart ?? end),
-      displayToWireOffset(text, el?.selectionEnd ?? end),
-      choice,
+    const start = el?.selectionStart ?? end;
+    const stop = el?.selectionEnd ?? end;
+    const from = Math.min(start, stop);
+    const caret = from + choice.length;
+    // Into the field's text, as typing would: a mention the selection cuts
+    // into turns into plain text.
+    const wire = applyComposerEdit(
+      text,
+      text.display.slice(0, from) +
+        choice +
+        text.display.slice(Math.max(start, stop)),
+      caret,
     );
-    if (!result.ok) {
+    // The limit counts what will be sent.
+    if (composerStatus(wire).over) {
       setNotice(t("emojiPicker.noRoom"));
       return false;
     }
     closePicker();
-    pendingCaret.current = wireToDisplayOffset(
-      composerText(result.text, mentionName),
-      result.caret,
-    );
-    onChange(result.text);
+    pendingCaret.current = caret;
+    onChange(wire);
     return true;
   };
 
@@ -252,34 +256,29 @@ export const Composer = ({
     commitEdit(result.wire, result.caret);
     return true;
   };
-  const removeMentionRef = useRef(removeMention);
-  useLayoutEffect(() => {
-    removeMentionRef.current = removeMention;
-  });
   // Soft keyboards often report Backspace as an unidentified key (keyCode
   // 229); the input event that follows still says what it deletes.
-  useEffect(() => {
-    const el = field.current;
-    if (!el) {
-      return;
-    }
-    const onBeforeInput = (event: InputEvent) => {
+  const onBeforeInput = useEffectEvent(
+    (el: HTMLTextAreaElement, event: InputEvent) => {
       const direction =
         event.inputType === "deleteContentBackward"
           ? "backward"
           : event.inputType === "deleteContentForward"
             ? "forward"
             : undefined;
-      if (
-        direction &&
-        !event.isComposing &&
-        removeMentionRef.current(el, direction)
-      ) {
+      if (direction && !event.isComposing && removeMention(el, direction)) {
         event.preventDefault();
       }
-    };
-    el.addEventListener("beforeinput", onBeforeInput);
-    return () => el.removeEventListener("beforeinput", onBeforeInput);
+    },
+  );
+  useEffect(() => {
+    const el = field.current;
+    if (!el) {
+      return;
+    }
+    const listener = (event: InputEvent) => onBeforeInput(el, event);
+    el.addEventListener("beforeinput", listener);
+    return () => el.removeEventListener("beforeinput", listener);
   }, []);
 
   const pickMention = (suggestion: MentionSuggestion) => {
@@ -322,7 +321,7 @@ export const Composer = ({
     }
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT_PX)}px`;
-  }, [value]);
+  }, [text.display]);
 
   const send = () => {
     if (!canSend) {

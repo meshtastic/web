@@ -30,6 +30,7 @@ import {
 import {
   type MentionName,
   mentionsToText,
+  NO_MENTION_NAMES,
   textMentionsNode,
 } from "@core/messaging/mentions.ts";
 import type { ThreadMessage } from "@core/messaging/thread.ts";
@@ -91,8 +92,6 @@ export interface MessageListProps {
   myNodeNum?: number;
 }
 
-const NO_NAMES: MentionName = () => undefined;
-
 const HIGHLIGHT_MS = 1600;
 
 interface BubbleProps {
@@ -146,7 +145,7 @@ export const MessageList = ({
   locale,
   lora,
   announce = true,
-  mentionName = NO_NAMES,
+  mentionName = NO_MENTION_NAMES,
   myNodeNum,
 }: MessageListProps) => {
   const { t } = useTranslation("messages");

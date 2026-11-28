@@ -63,7 +63,7 @@ import { batch, computed, type Signal, signal } from "@preact/signals-core";
 import { Result } from "better-result";
 import type { ChatFilter } from "./messageFilter.ts";
 import { BROADCAST_NUM } from "./packets.ts";
-import { deriveSignal, type ReadonlySignal, toReadonly } from "./signals.ts";
+import { type ReadonlySignal, toReadonly } from "./signals.ts";
 
 const sameItems = <T>(a: readonly T[], b: readonly T[]): boolean =>
   a.length === b.length && a.every((item, i) => item === b[i]);
@@ -513,14 +513,18 @@ export class ChatClient {
       set: (key, text) => this.setDraft(key, text),
       clear: (key) => this.setDraft(key, ""),
     };
-    const byKey = deriveSignal(this.summaries, unreadCounts);
+    // Plain computeds: `deriveSignal` over a `toReadonly` source drops its
+    // first change.
+    const byKey = computed(() => unreadCounts(this.summaryStore.value));
     this.unread = {
-      byKey,
-      mentionsByKey: deriveSignal(this.summaries, unreadMentions),
-      total: deriveSignal(this.summaries, totalUnread),
+      byKey: toReadonly(byKey),
+      mentionsByKey: toReadonly(
+        computed(() => unreadMentions(this.summaryStore.value)),
+      ),
+      total: toReadonly(computed(() => totalUnread(this.summaryStore.value))),
       count: (key) => {
         const k = conversationKeyString(key);
-        return deriveSignal(byKey, (m) => m.get(k) ?? 0);
+        return toReadonly(computed(() => byKey.value.get(k) ?? 0));
       },
       markRead: (key) => this.markRead(key),
       setActive: (key) => this.setActive(key),
@@ -1147,15 +1151,23 @@ export class ChatClient {
       .then(() => repo.loadConversations(me))
       .then((stored) => {
         if (epoch !== this.epoch) return;
+        // A read during the load clears what storage held, not what was
+        // counted after it.
+        const read = new Set(this.readDuringHydration);
+        if (this.activeKey) read.add(this.activeKey);
         let next = mergeStored(
           this.summaryStore.peek(),
-          stored,
+          stored.map((s) =>
+            read.has(conversationKeyString(s.key))
+              ? { key: s.key, lastMessage: s.lastMessage, unread: 0 }
+              : s,
+          ),
           this.liveUnread,
           this.liveMentions,
         );
-        const read = [...this.readDuringHydration];
-        if (this.activeKey) read.push(this.activeKey);
-        for (const k of read) next = withRead(next, parseConversationKey(k));
+        if (this.activeKey) {
+          next = withRead(next, parseConversationKey(this.activeKey));
+        }
         this.summaryStore.value = next;
       })
       .catch(() => {});

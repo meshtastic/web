@@ -1,7 +1,10 @@
 import { IndicatorIcon } from "@components/generic/NodeTrustIndicators.tsx";
 import { NodeAvatar } from "@components/UI/NodeAvatar.tsx";
 import type { DeliveryLine } from "@core/messaging/deliveryView.ts";
-import type { MentionName } from "@core/messaging/mentions.ts";
+import {
+  type MentionName,
+  NO_MENTION_NAMES,
+} from "@core/messaging/mentions.ts";
 import {
   type IncomingMeta,
   type MessageActionsAvailability,
@@ -95,8 +98,6 @@ export interface MessageBubbleProps {
   /** Incoming and @mentions me: drawn to stand out. */
   mentionsMe?: boolean;
 }
-
-const NO_NAMES: MentionName = () => undefined;
 
 const transportIcons = {
   mqtt: CloudIcon,
@@ -202,7 +203,7 @@ export const MessageBubble = memo(function MessageBubble({
   touch,
   handlers,
   locale,
-  mentionName = NO_NAMES,
+  mentionName = NO_MENTION_NAMES,
   myNodeNum,
   mentionsMe = false,
 }: MessageBubbleProps) {

@@ -74,7 +74,7 @@ export function useConversationSummaries(): readonly SidebarConversation[] {
   // them, so they don't rebuild the sidebar.
   const favorites = useSignal(client?.nodes.favoriteNums ?? NO_NODES);
   const ignored = useSignal(client?.nodes.ignoredNums ?? NO_NODES);
-  const muted = useSignal(client?.nodes.mutedNums ?? NO_NODES);
+  const muted = useMutedNodeNums();
   const [stabilize] = useState(createRowStabilizer);
   const channelSlots = useMemo(
     () =>

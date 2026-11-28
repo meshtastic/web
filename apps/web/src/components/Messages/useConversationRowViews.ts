@@ -2,7 +2,11 @@ import { channelLabel } from "@core/channels/channelLabel.ts";
 import { isChannelMuted } from "@core/channels/mute.ts";
 import type { Channel } from "@core/kmp/channels.ts";
 import type { SidebarConversation } from "@core/messaging/conversations.ts";
-import { type MentionName, mentionsToText } from "@core/messaging/mentions.ts";
+import {
+  type MentionName,
+  mentionsToText,
+  NO_MENTION_NAMES,
+} from "@core/messaging/mentions.ts";
 import { previewAuthor } from "@core/messaging/sidebarView.ts";
 import { formatListTimestamp } from "@core/utils/timeFormat.ts";
 import { useCallback, useMemo, useState } from "react";
@@ -30,8 +34,6 @@ export interface ConversationRowViewsInput {
 
 const MINUTE_MS = 60_000;
 
-const NO_NAMES: MentionName = () => undefined;
-
 interface CachedRow {
   readonly signature: string;
   readonly view: ConversationRowView;
@@ -48,7 +50,7 @@ export function useConversationRowViews({
   nameOf,
   peer,
   myNodeNum,
-  mentionName = NO_NAMES,
+  mentionName = NO_MENTION_NAMES,
   now,
 }: ConversationRowViewsInput) {
   const { t, i18n } = useTranslation("messages");

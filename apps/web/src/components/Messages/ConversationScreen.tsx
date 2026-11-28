@@ -106,13 +106,14 @@ export const ConversationScreen = ({
   const adminAccess = useAdminAccess(peerRow);
   // `@` offers every node but this radio and ignored ones, most recently
   // heard first.
+  const { rows: directoryRows, mentionName } = directory;
   const mentionCandidates = useMemo<readonly MentionSuggestion[]>(
     () =>
-      directory.rows
+      directoryRows
         .filter((row) => !row.isSelf && !row.isIgnored)
         .toSorted((a, b) => (b.lastHeardMs ?? 0) - (a.lastHeardMs ?? 0))
         .map((row) => {
-          const longName = directory.mentionName(row.num);
+          const longName = mentionName(row.num);
           return {
             num: row.num,
             id: row.id,
@@ -124,7 +125,7 @@ export const ConversationScreen = ({
             ...(longName && longName !== row.shortName ? { longName } : {}),
           };
         }),
-    [directory],
+    [directoryRows, mentionName],
   );
   // A mention opens the node's details, like the command palette does.
   const openNode = useCallback(
@@ -353,7 +354,7 @@ export const ConversationScreen = ({
         traceroutes={traces}
         sender={directory.sender}
         nameOf={directory.nameOf}
-        mentionName={directory.mentionName}
+        mentionName={mentionName}
         mentionCandidates={mentionCandidates}
         onOpenNode={openNode}
         {...(directory.myNodeNum === undefined
