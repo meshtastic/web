@@ -7,8 +7,13 @@ import {
 import { recordNotificationKey } from "@core/firmware/updateCheck.ts";
 import { useFirmwareUpdateNotice } from "@core/firmware/useFirmwareUpdateNotice.ts";
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+
+// Covers the gap before the stored list re-renders, and storage that fails.
+// Module scope, so it outlives the notifier unmounting (welcome page, radio
+// disconnect) for the rest of the page session.
+const shownThisSession = new Set<string>();
 
 /**
  * Sends the firmware-update browser notification, once per (node,
@@ -24,12 +29,10 @@ export const FirmwareUpdateNotifier = (): null => {
     [],
     { deserializer: parseNotifiedKeys },
   );
-  // Covers the gap before the stored list re-renders, and storage that fails.
-  const shownThisSession = useRef(new Set<string>());
   const key = nudge?.notice.notificationKey;
 
   useEffect(() => {
-    if (!nudge || !key || shownThisSession.current.has(key)) return;
+    if (!nudge || !key || shownThisSession.has(key)) return;
     const shown = notifyFirmwareUpdate(browserNotificationApi(), {
       notice: nudge.notice,
       title: t("firmwareUpdate.title"),
@@ -43,7 +46,7 @@ export const FirmwareUpdateNotifier = (): null => {
       },
     });
     if (shown) {
-      shownThisSession.current.add(key);
+      shownThisSession.add(key);
       setNotified((keys) => recordNotificationKey(keys, key));
     }
   }, [key, nudge, notified, setNotified, t]);

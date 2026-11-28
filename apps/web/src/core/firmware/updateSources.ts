@@ -297,6 +297,6 @@ export async function checkFirmwareUpdate(
 }
 
 /** The app's sources: the global fetch, looked up at call time. */
-export const firmwareUpdateSources = createFirmwareUpdateSources((url) =>
-  globalThis.fetch(url),
+export const firmwareUpdateSources = createFirmwareUpdateSources((url, init) =>
+  globalThis.fetch(url, init),
 );

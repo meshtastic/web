@@ -2,7 +2,9 @@ import { NOTIFIED_KEYS_STORAGE_KEY } from "@core/firmware/notify.ts";
 import type { FirmwareUpdateNudge } from "@core/firmware/useFirmwareUpdateNotice.ts";
 import { render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { FirmwareUpdateNotifier } from "./FirmwareUpdateNotifier.tsx";
+
+// The notifier keeps shown keys at module scope; reload it per test.
+let FirmwareUpdateNotifier: typeof import("./FirmwareUpdateNotifier.tsx").FirmwareUpdateNotifier;
 
 const hook = vi.hoisted(() => ({
   nudge: undefined as FirmwareUpdateNudge | undefined,
@@ -49,7 +51,9 @@ const installNotification = (permission: NotificationPermission) => {
 };
 
 describe("FirmwareUpdateNotifier", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ FirmwareUpdateNotifier } = await import("./FirmwareUpdateNotifier.tsx"));
     window.localStorage.clear();
     hook.nudge = nudgeFor("2.7.26");
   });
@@ -75,6 +79,23 @@ describe("FirmwareUpdateNotifier", () => {
     expect(
       JSON.parse(window.localStorage.getItem(NOTIFIED_KEYS_STORAGE_KEY) ?? ""),
     ).toEqual(["firmware-update-notified:!1234abcd:heltec-v4:2.7.26"]);
+  });
+
+  it("stays quiet after a remount when storage can't be written", () => {
+    const { shown } = installNotification("granted");
+    const setItem = vi
+      .spyOn(window.localStorage, "setItem")
+      .mockImplementation(() => {
+        throw new DOMException("Quota exceeded", "QuotaExceededError");
+      });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { unmount } = render(<FirmwareUpdateNotifier />);
+    unmount();
+    render(<FirmwareUpdateNotifier />);
+    setItem.mockRestore();
+    warn.mockRestore();
+    expect(window.localStorage.getItem(NOTIFIED_KEYS_STORAGE_KEY)).toBeNull();
+    expect(shown).toHaveLength(1);
   });
 
   it("notifies again for a later stable release", () => {
