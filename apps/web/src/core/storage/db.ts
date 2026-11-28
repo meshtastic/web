@@ -60,20 +60,27 @@ export async function openSqlocalDb(
     casing: "snake_case",
   });
 
-  await applySchema(sql);
   const atomic: RunAtomically = async (statements) => {
     await client.batch(() => statements.map(toSqlocalStatement));
   };
-  // Rows a connection wrote before its radio was named belong to no radio;
-  // any a previous page left behind (it closed mid-handshake) go now. They
-  // are harmless if they stay, so a failure here must not cost persistence.
+  let storageType: string;
   try {
-    await atomic(discardStatements());
+    await applySchema(sql);
+    // Rows a connection wrote before its radio was named belong to no radio;
+    // any a previous page left behind (it closed mid-handshake) go now. They
+    // are harmless if they stay, so a failure here must not cost persistence.
+    try {
+      await atomic(discardStatements());
+    } catch (err) {
+      console.warn("openSqlocalDb: could not drop provisional rows", err);
+    }
+    ({ storageType = "memory" } = await client.getDatabaseInfo());
   } catch (err) {
-    console.warn("openSqlocalDb: could not drop provisional rows", err);
+    // Nothing else holds the client: stop its worker so it lets go of the
+    // file before `getStorageDb` tries again.
+    await client.destroy().catch(() => {});
+    throw err;
   }
-
-  const { storageType = "memory" } = await client.getDatabaseInfo();
   return {
     db,
     storageType,
