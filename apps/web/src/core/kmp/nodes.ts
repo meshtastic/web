@@ -125,6 +125,8 @@ export class NodesClient {
   private readonly errorMap = signal<ReadonlyMap<number, NodeError>>(new Map());
   private pending: Map<number, Node> | undefined;
   private changed = new Set<number>();
+  /** Nodes changed while the stored ones load; written once those are merged in. */
+  private unsaved: Set<number> | undefined;
   private epoch = 0;
 
   readonly list: ReadonlySignal<ReadonlyArray<Node>>;
@@ -283,6 +285,10 @@ export class NodesClient {
 
   private persist(nodes: ReadonlyArray<Node>): void {
     if (nodes.length === 0) return;
+    if (this.unsaved) {
+      for (const node of nodes) this.unsaved.add(node.num);
+      return;
+    }
     void this.repository?.upsertBatch(nodes).catch(() => {});
   }
 
@@ -306,6 +312,7 @@ export class NodesClient {
   private async hydrate(): Promise<void> {
     if (!this.repository) return;
     const epoch = this.epoch;
+    this.unsaved = new Set();
     try {
       const persisted = await this.repository.loadAll();
       if (epoch !== this.epoch) return;
@@ -316,15 +323,24 @@ export class NodesClient {
           next.set(stored.num, stored);
           continue;
         }
-        // Written before the stored copy arrived (a packet heard, a status,
-        // a NodeInfo), and already persisted with its unknown fields empty:
-        // fill them from the stored row and write the result back.
+        // Changed before the stored copy arrived (a packet heard, a status,
+        // a NodeInfo): fill its unknown fields from the stored row.
         const filled = fillUnset(live, stored);
         if (filled !== live) this.set(filled);
       }
     } catch {
       // nothing stored yet
+    } finally {
+      if (epoch === this.epoch) this.saveUnsaved();
     }
+  }
+
+  private saveUnsaved(): void {
+    const unsaved = this.unsaved;
+    this.unsaved = undefined;
+    if (!unsaved?.size) return;
+    const next = this.draft();
+    for (const num of unsaved) if (next.has(num)) this.changed.add(num);
   }
 
   rescope(scope: number): void {

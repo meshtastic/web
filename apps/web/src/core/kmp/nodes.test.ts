@@ -319,8 +319,11 @@ describe("NodesClient hydration", () => {
     const client = new NodesClient(admin, repository);
     client.heard(heardFrom(11, 500));
     await settle();
-    // The bare node has been written over the stored row by now.
-    expect((await stored.get(11))?.status).toBeUndefined();
+    // Nothing is written over the stored row until it has been merged in.
+    const early = await stored.get(11);
+    expect(early?.status).toBe("on the trail");
+    expect(early?.user?.longName).toBe("Stored");
+    expect(early?.lastHeard).toBeUndefined();
 
     release();
     await settle();
@@ -341,6 +344,16 @@ describe("NodesClient hydration", () => {
     const row = await stored.get(11);
     expect(row).toMatchObject(expected);
     expect(row?.user?.longName).toBe("Stored");
+  });
+
+  it("writes the nodes changed meanwhile when the stored ones fail to load", async () => {
+    const repository = new FakeNodesRepository();
+    repository.loadAll = () => Promise.reject(new Error("no table"));
+    const client = new NodesClient(admin, repository);
+    client.heard(heardFrom(11, 500));
+    await settle();
+
+    expect(repository.rows.get(11)?.lastHeard).toBe(500);
   });
 
   it.each([
