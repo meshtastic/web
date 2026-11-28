@@ -79,8 +79,9 @@ export const defaultImportMode = (link: ChannelSet): ChannelImportMode =>
 const bytesEqual = (a: Uint8Array, b: Uint8Array): boolean =>
   a.length === b.length && a.every((byte, i) => byte === b[i]);
 
-const isFreeSlot = (s: ChannelSettings | undefined): boolean =>
-  !s || (!s.name && s.psk.length === 0);
+// A slot holding a channel is used even with no name and no key (an open
+// channel named by the preset); only a disabled slot is free, as on Android.
+const isFreeSlot = (s: ChannelSettings | undefined): boolean => s === undefined;
 
 /**
  * Where each channel in a link goes. "add" fills free secondary slots in
@@ -145,11 +146,8 @@ export function planChannelImport(
     { length: MAX_CHANNELS },
     (_, i) => current[i],
   );
-  // The primary always counts; a blank secondary is a free slot.
-  const onRadio: ChannelIdentity[] = slots.flatMap((s, slot) =>
-    s !== undefined && (slot === 0 || !isFreeSlot(s))
-      ? [channelIdentity(s, lora)]
-      : [],
+  const onRadio: ChannelIdentity[] = slots.flatMap((s) =>
+    s !== undefined ? [channelIdentity(s, lora)] : [],
   );
   const fromLink: ChannelIdentity[] = [];
   const assignments: ChannelAssignment[] = [];
@@ -157,8 +155,7 @@ export function planChannelImport(
   const alreadyOnRadio: number[] = [];
   const duplicates: number[] = [];
   const noSlot: number[] = [];
-  // Slots this add fills, kept apart from their settings: a link channel
-  // with no name and no key would otherwise leave its slot looking free.
+  // Slots this add fills, which `slots` still shows as free.
   const taken = new Set<number>();
   for (const { settings, from } of picked) {
     const identity = channelIdentity(settings, lora);

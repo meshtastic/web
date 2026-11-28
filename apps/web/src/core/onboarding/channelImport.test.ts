@@ -157,6 +157,17 @@ describe("planChannelImport add details", () => {
     const plan = planChannelImport(link, [primary], "add");
     expect(plan.assignments.map((a) => a.slot)).toEqual([1, 2]);
   });
+
+  it("keeps a slot that holds an unnamed, unencrypted channel", () => {
+    // Slot 1 holds a channel (an earlier import, say); slot 2 is disabled.
+    const plan = planChannelImport(
+      replaceLink,
+      [primary, settings("", []), undefined],
+      "add",
+    );
+    expect(plan.freeSlots).toBe(6);
+    expect(plan.assignments.map((a) => a.slot)).toEqual([2, 3]);
+  });
 });
 
 describe("import edits and LoRa", () => {
