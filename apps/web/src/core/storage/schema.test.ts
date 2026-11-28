@@ -387,9 +387,10 @@ function checkClauses(createSql: string): string[] {
 }
 
 /**
- * Every user table's columns and CHECK clauses, and every index's table and
- * columns (`index_xinfo`: key and included columns, order, collation), for
- * comparing two databases. An index redefined under the same name differs.
+ * Every user table's columns and CHECK clauses, and every index's table,
+ * columns (`index_xinfo`: key and included columns, order, collation) and
+ * uniqueness (`index_list`), for comparing two databases. An index redefined
+ * under the same name differs.
  */
 function shape(db: Database): unknown {
   return (
@@ -416,6 +417,12 @@ function shape(db: Database): unknown {
         table,
         // seqno, cid, name, desc, coll, key
         db.exec(`PRAGMA index_xinfo(${quoted})`)[0]?.values ?? [],
+        // unique (index_list: seq, name, unique, origin, partial)
+        (
+          db.exec(
+            `PRAGMA index_list("${String(table).replaceAll('"', '""')}")`,
+          )[0]?.values ?? []
+        ).find((row) => row[1] === name)?.[2],
         // A partial index's WHERE clause.
         /\bWHERE\b/i.test(String(sql ?? "")) ? String(sql) : null,
       ];
@@ -447,11 +454,11 @@ const minReader = (db: Database) =>
     ?.values[0]?.[0];
 
 describe("migrations", () => {
-  it("compares index columns and CHECK clauses, not just names", async () => {
-    const build = async (index: string, check: string) => {
+  it("compares index columns, uniqueness and CHECK clauses, not just names", async () => {
+    const build = async (index: string, check: string, unique = false) => {
       const db = await freshSqlite();
       db.run(`CREATE TABLE t (a INTEGER, b INTEGER CHECK (${check}))`);
-      db.run(`CREATE INDEX idx_t ON t(${index})`);
+      db.run(`CREATE ${unique ? "UNIQUE " : ""}INDEX idx_t ON t(${index})`);
       return shape(db);
     };
     const base = await build("a", "b > 0");
@@ -459,6 +466,7 @@ describe("migrations", () => {
     expect(await build("b", "b > 0")).not.toEqual(base);
     expect(await build("a DESC", "b > 0")).not.toEqual(base);
     expect(await build("a", "b > 1")).not.toEqual(base);
+    expect(await build("a", "b > 0", true)).not.toEqual(base);
   });
 
   it("upgrades a version 2 database to the current schema, keeping its rows", async () => {
