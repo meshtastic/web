@@ -4,8 +4,8 @@ import { createMemoryDb } from "@core/storage/memoryDb.ts";
 import { SqlocalNodesRepository } from "@core/storage/nodes.ts";
 import type { Node, NodesRepository } from "@core/storage/types.ts";
 import { Result } from "better-result";
-import { describe, expect, it } from "vitest";
-import { type NodesAdmin, NodesClient } from "./nodes.ts";
+import { describe, expect, it, vi } from "vitest";
+import { NODE_LOAD_TIMEOUT_MS, type NodesAdmin, NodesClient } from "./nodes.ts";
 
 const admin: NodesAdmin = {
   sendAdmin: () => Promise.resolve(Result.ok(undefined)),
@@ -384,6 +384,143 @@ describe("NodesClient hydration", () => {
       expect(client.byNum(11)?.isKeyManuallyVerified).toBe(verified);
       expect(client.byNum(11)?.isMuted).toBe(true);
       expect((await stored.get(11))?.isKeyManuallyVerified).toBe(verified);
+    },
+  );
+
+  async function storedFlags() {
+    const stored = new FakeNodesRepository();
+    await stored.upsert({ num: 11, isFavorite: true, isIgnored: true });
+    await stored.upsert({ num: 12, isFavorite: false, isIgnored: false });
+    return stored;
+  }
+
+  it("keeps the stored favourite and ignored flags of a node a packet made up", async () => {
+    const stored = await storedFlags();
+    const { repository, release } = lateLoading(stored);
+
+    const client = new NodesClient(admin, repository);
+    client.heard(heardFrom(11, 500));
+    release();
+    await settle();
+    await settle();
+
+    expect(client.byNum(11)).toMatchObject({
+      lastHeard: 500,
+      isFavorite: true,
+      isIgnored: true,
+    });
+    expect(stored.rows.get(11)).toMatchObject({
+      isFavorite: true,
+      isIgnored: true,
+    });
+  });
+
+  it("keeps a favourite or ignore changed while the stored nodes load", async () => {
+    const stored = await storedFlags();
+    const { repository, release } = lateLoading(stored);
+
+    const client = new NodesClient(admin, repository);
+    client.heard(heardFrom(11, 500));
+    await client.unfavorite(11);
+    await client.ignore(12);
+    release();
+    await settle();
+    await settle();
+
+    expect(client.byNum(11)).toMatchObject({
+      isFavorite: false,
+      isIgnored: true,
+    });
+    expect(client.byNum(12)?.isIgnored).toBe(true);
+    expect(stored.rows.get(11)?.isFavorite).toBe(false);
+  });
+
+  it("does not bring back a node removed while the stored nodes load", async () => {
+    const stored = await storedFlags();
+    const { repository, release } = lateLoading(stored);
+
+    const client = new NodesClient(admin, repository);
+    client.heard(heardFrom(11, 500));
+    await client.remove(11);
+    release();
+    await settle();
+    await settle();
+
+    expect(client.byNum(11)).toBeUndefined();
+    expect(stored.rows.has(11)).toBe(false);
+    expect(client.byNum(12)).toBeDefined();
+  });
+
+  it("adds back a removed node that is heard again", async () => {
+    const stored = await storedFlags();
+    const { repository, release } = lateLoading(stored);
+
+    const client = new NodesClient(admin, repository);
+    await client.remove(11);
+    client.heard(heardFrom(11, 600));
+    release();
+    await settle();
+    await settle();
+
+    expect(client.byNum(11)).toMatchObject({ lastHeard: 600 });
+    expect(stored.rows.get(11)?.lastHeard).toBe(600);
+  });
+
+  it("goes ahead without the stored nodes when they take too long", async () => {
+    vi.useFakeTimers();
+    try {
+      const stored = await storedFlags();
+      const { repository, release } = lateLoading(stored);
+      const client = new NodesClient(admin, repository);
+      client.heard(heardFrom(13, 700));
+      await vi.advanceTimersByTimeAsync(NODE_LOAD_TIMEOUT_MS);
+
+      expect(client.byNum(13)?.lastHeard).toBe(700);
+      expect(stored.rows.get(13)?.lastHeard).toBe(700);
+      // A load that finishes late changes nothing.
+      release();
+      await vi.runAllTimersAsync();
+      expect(client.byNum(11)).toBeUndefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not bring back stored nodes after a reset while they load", async () => {
+    const stored = await storedFlags();
+    const { repository, release } = lateLoading(stored);
+
+    const client = new NodesClient(admin, repository);
+    client.heard(heardFrom(11, 500));
+    await client.reset();
+    client.heard(heardFrom(13, 700));
+    release();
+    await settle();
+    await settle();
+
+    expect(client.list.value.map((node) => node.num)).toEqual([13]);
+    expect([...stored.rows.keys()]).toEqual([13]);
+  });
+});
+
+describe("NodesClient key verification", () => {
+  const user = (byte: number) =>
+    create(Protobuf.Mesh.UserSchema, {
+      longName: "Keyed",
+      publicKey: new Uint8Array(32).fill(byte),
+    });
+
+  it.each([
+    ["a new key", { user: user(2) }, undefined],
+    ["the same key", { user: user(1) }, true],
+    ["no user", { lastHeard: 5 }, true],
+  ])(
+    "keeps a manual verification through %s only when it is for that key",
+    (_, partial, verified) => {
+      const client = new NodesClient(admin);
+      client.patch(11, { user: user(1), isKeyManuallyVerified: true });
+      client.patch(11, partial);
+      expect(client.byNum(11)?.isKeyManuallyVerified).toBe(verified);
     },
   );
 });
