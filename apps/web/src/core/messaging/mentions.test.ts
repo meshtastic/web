@@ -218,57 +218,50 @@ describe("composerText", () => {
   });
 });
 
+const editWire = (...args: Parameters<typeof applyComposerEdit>): string =>
+  applyComposerEdit(...args).wire;
+
 describe("applyComposerEdit", () => {
   const text = composerText("hi @!ffccee11 there", name);
   // display "hi @Alice there"
 
   it("keeps mentions around an edit elsewhere", () => {
-    expect(applyComposerEdit(text, "oh hi @Alice there", 3)).toBe(
+    expect(editWire(text, "oh hi @Alice there", 3)).toBe(
       "oh hi @!ffccee11 there",
     );
-    expect(applyComposerEdit(text, "hi @Alice there!", 16)).toBe(
-      "hi @!ffccee11 there!",
-    );
+    expect(editWire(text, "hi @Alice there!", 16)).toBe("hi @!ffccee11 there!");
   });
 
   it("keeps a mention when typing right before or after it", () => {
-    expect(applyComposerEdit(text, "hi x@Alice there", 4)).toBe(
-      "hi x@!ffccee11 there",
-    );
-    expect(applyComposerEdit(text, "hi @Alice, there", 10)).toBe(
-      "hi @!ffccee11, there",
-    );
+    expect(editWire(text, "hi x@Alice there", 4)).toBe("hi x@!ffccee11 there");
+    expect(editWire(text, "hi @Alice, there", 10)).toBe("hi @!ffccee11, there");
   });
 
   it("drops a mention typed inside, leaving its name as text", () => {
-    expect(applyComposerEdit(text, "hi @Alxice there", 7)).toBe(
-      "hi @Alxice there",
-    );
+    expect(editWire(text, "hi @Alxice there", 7)).toBe("hi @Alxice there");
   });
 
   it("uses the caret to tell typing inside from typing after", () => {
     const tommy = composerText("@!ffccee11", () => "Tommy");
     // "@Tommy" + "y", typed between the m and the y: inside.
-    expect(applyComposerEdit(tommy, "@Tommyy", 6)).toBe("@Tommyy");
+    expect(editWire(tommy, "@Tommyy", 6)).toBe("@Tommyy");
     // The same text, typed at the end: after.
-    expect(applyComposerEdit(tommy, "@Tommyy", 7)).toBe("@!ffccee11y");
+    expect(editWire(tommy, "@Tommyy", 7)).toBe("@!ffccee11y");
   });
 
   it("drops a mention a hex digit now follows (it'd be another id)", () => {
     const tight = composerText("@!ffccee11 x", name);
     // Delete the space, then type "a" after the name.
-    expect(applyComposerEdit(tight, "@Alicea x", 7)).toBe("@Alicea x");
-    expect(applyComposerEdit(tight, "@Alice, x", 7)).toBe("@!ffccee11, x");
+    expect(editWire(tight, "@Alicea x", 7)).toBe("@Alicea x");
+    expect(editWire(tight, "@Alice, x", 7)).toBe("@!ffccee11, x");
   });
 
   it("drops a mention a selection replaced part of", () => {
-    expect(applyComposerEdit(text, "hi @Al!", 7)).toBe("hi @Al!");
+    expect(editWire(text, "hi @Al!", 7)).toBe("hi @Al!");
   });
 
   it("is the text itself when there are no mentions", () => {
-    expect(applyComposerEdit(composerText("abc", name), "abcd", 4)).toBe(
-      "abcd",
-    );
+    expect(editWire(composerText("abc", name), "abcd", 4)).toBe("abcd");
   });
 });
 

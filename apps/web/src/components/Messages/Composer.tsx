@@ -42,6 +42,8 @@ import { ReplyPreview } from "./ReplyPreview.tsx";
 import type { EmojiPrefs } from "./useEmoji.ts";
 
 export interface ComposerReply {
+  /** The message being replied to. */
+  readonly id: number;
   /** Author of the message being replied to ("yourself" for mine). */
   readonly name: string;
   readonly excerpt: string;
@@ -131,8 +133,8 @@ export const Composer = ({
   const canSend = status.canSend && !disabled;
   const [pickerOpen, setPickerOpen] = useState(false);
   const [notice, setNotice] = useState<string | undefined>(undefined);
-  // "Send as tapback" starts on for each reply.
-  const replyKey = replying ? `${replying.name}\n${replying.excerpt}` : "";
+  // "Send as tapback" starts on for each reply, and survives a rename.
+  const replyKey = replying ? String(replying.id) : "";
   const [tapback, setTapback] = useState({ key: "", on: true });
   const tapbackMode = tapback.key === replyKey ? tapback.on : true;
   // Caret to restore once an inserted emoji is in the field.
@@ -212,7 +214,7 @@ export const Composer = ({
     const caret = from + choice.length;
     // Into the field's text, as typing would: a mention the selection cuts
     // into turns into plain text.
-    const wire = applyComposerEdit(
+    const result = applyComposerEdit(
       text,
       text.display.slice(0, from) +
         choice +
@@ -220,13 +222,16 @@ export const Composer = ({
       caret,
     );
     // The limit counts what will be sent.
-    if (composerStatus(wire).over) {
+    if (composerStatus(result.wire).over) {
       setNotice(t("emojiPicker.noRoom"));
       return false;
     }
     closePicker();
-    pendingCaret.current = caret;
-    onChange(wire);
+    pendingCaret.current = wireToDisplayOffset(
+      composerText(result.wire, mentionName),
+      result.caret,
+    );
+    onChange(result.wire);
     return true;
   };
 
@@ -291,20 +296,12 @@ export const Composer = ({
 
   const onFieldChange = (el: HTMLTextAreaElement) => {
     const next = el.value;
-    const caret = el.selectionEnd;
-    const wire = applyComposerEdit(text, next, caret);
+    const { wire, caret } = applyComposerEdit(text, next, el.selectionEnd);
     const shown = composerText(wire, mentionName);
-    let displayCaret = caret;
+    const displayCaret = wireToDisplayOffset(shown, caret);
     if (shown.display !== next) {
       // The edit completed a token typed by hand (or the like): the field
-      // will show its name, so keep the caret before the same text.
-      displayCaret = shown.display.length - (next.length - caret);
-      const inside = shown.ranges.find(
-        (range) => range.start < displayCaret && displayCaret < range.end,
-      );
-      if (inside) {
-        displayCaret = inside.end;
-      }
+      // will show its name.
       pendingCaret.current = displayCaret;
     }
     setSelection({ start: displayCaret, end: displayCaret });

@@ -279,6 +279,7 @@ export const ConversationThread = ({
         {...(reply
           ? {
               replying: {
+                id: reply.id,
                 name: reply.name,
                 excerpt: excerpt(mentionsToText(reply.text, mentionName)),
               },

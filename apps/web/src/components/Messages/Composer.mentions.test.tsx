@@ -32,6 +32,7 @@ const candidates: MentionSuggestion[] = [
 const names = new Map([
   [ALICE, "Alice"],
   [BOB, "Bob Base"],
+  [0x23456789, "Carol"],
 ]);
 const mentions: ComposerMentions = {
   candidates,
@@ -193,6 +194,17 @@ describe("Composer @mentions", () => {
     await user.keyboard("x");
     expect(field().value).toBe("@Alxice hi");
     expect(onDraft).toHaveBeenLastCalledWith("@Alxice hi");
+  });
+
+  it("keeps the caret after a mention a deletion completes", async () => {
+    const user = userEvent.setup();
+    render(<Harness initial="hi @!123456789 tail" />);
+    await user.click(field());
+    // After the first "1": deleting it leaves the token for Carol.
+    field().setSelectionRange(6, 6);
+    await user.keyboard("{Backspace}");
+    expect(field().value).toBe("hi @Carol tail");
+    expect(field().selectionStart).toBe("hi @Carol".length);
   });
 
   it("counts the bytes that will be sent, not the names shown", () => {

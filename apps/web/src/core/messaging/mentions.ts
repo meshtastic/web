@@ -362,7 +362,14 @@ export const applyComposerEdit = (
   text: ComposerText,
   next: string,
   caret: number,
-): string => toWire(next, keptRanges(text, next, caret));
+): ComposerEditResult => {
+  const ranges = keptRanges(text, next, caret);
+  const wire = toWire(next, ranges);
+  return {
+    wire,
+    caret: displayToWireOffset({ wire, display: next, ranges }, caret),
+  };
+};
 
 export interface ComposerEditResult {
   readonly wire: string;
