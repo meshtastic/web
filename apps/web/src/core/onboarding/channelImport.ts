@@ -4,7 +4,6 @@ import {
   DEFAULT_LORA,
   sameIdentity,
 } from "@core/channels/channelIdentity.ts";
-import { firstFreeSecondarySlot } from "@core/utils/beaconJoin.ts";
 import { channelSetFromUrl } from "@core/utils/channelUrl.ts";
 import { Protobuf } from "@core/protobuf.ts";
 import { Result } from "better-result";
@@ -158,6 +157,9 @@ export function planChannelImport(
   const alreadyOnRadio: number[] = [];
   const duplicates: number[] = [];
   const noSlot: number[] = [];
+  // Slots this add fills, kept apart from their settings: a link channel
+  // with no name and no key would otherwise leave its slot looking free.
+  const taken = new Set<number>();
   for (const { settings, from } of picked) {
     const identity = channelIdentity(settings, lora);
     if (onRadio.some((c) => sameIdentity(c, identity))) {
@@ -168,8 +170,10 @@ export function planChannelImport(
       duplicates.push(from);
       continue;
     }
-    const slot = firstFreeSecondarySlot(slots);
-    if (slot === undefined) {
+    const slot = slots.findIndex(
+      (s, i) => i > 0 && !taken.has(i) && isFreeSlot(s),
+    );
+    if (slot === -1) {
       noSlot.push(from);
       continue;
     }
@@ -177,7 +181,7 @@ export function planChannelImport(
       nameConflicts.push(from);
     }
     fromLink.push(identity);
-    slots[slot] = settings;
+    taken.add(slot);
     assignments.push({ from, slot, role: "secondary" });
   }
   return {

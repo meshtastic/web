@@ -149,6 +149,14 @@ describe("planChannelImport add details", () => {
     expect(plan.assignments).toEqual([{ from: 0, slot: 7, role: "secondary" }]);
     expect(plan.noSlot).toEqual([1]);
   });
+
+  it("gives an unnamed, unencrypted channel a slot of its own", () => {
+    const link = create(Protobuf.AppOnly.ChannelSetSchema, {
+      settings: [settings("", []), settings("Ops", [3])],
+    });
+    const plan = planChannelImport(link, [primary], "add");
+    expect(plan.assignments.map((a) => a.slot)).toEqual([1, 2]);
+  });
 });
 
 describe("import edits and LoRa", () => {

@@ -28,6 +28,9 @@ const env = vi.hoisted(() => ({
   setChannel: vi.fn(),
   setRadioSection: vi.fn(),
   channels: [] as Protobuf.Channel.Channel[],
+  // Channels staged in the editor but not yet saved.
+  pending: [] as Protobuf.Channel.Channel[],
+  lora: true,
   editor: true,
   phase: "configured" as "configuring" | "configured",
 }));
@@ -41,7 +44,10 @@ vi.mock("@core/kmp/hooks", () => ({
   useConfigEditor: () =>
     env.editor
       ? {
-          radio: constantSignal({ lora: radioLora }),
+          radio: constantSignal({ lora: env.lora ? radioLora : undefined }),
+          channels: constantSignal(
+            new Map([...env.channels, ...env.pending].map((c) => [c.index, c])),
+          ),
           setChannel: env.setChannel,
           setRadioSection: env.setRadioSection,
         }
@@ -94,6 +100,8 @@ describe("ImportDialog", () => {
     env.setChannel.mockClear();
     env.setRadioSection.mockClear();
     env.channels = radioChannels;
+    env.pending = [];
+    env.lora = true;
     env.editor = true;
     env.phase = "configured";
   });
@@ -203,6 +211,29 @@ describe("ImportDialog", () => {
     // Mid-config: the primary has arrived, slot 1 hasn't yet.
     env.phase = "configuring";
     env.channels = [radioChannels[0]!];
+    renderDialog();
+    enterLink(channelSetToUrl(link, { add: true }));
+    expect(screen.getByText(/channels haven't loaded yet/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add channels" })).toBeDisabled();
+  });
+
+  it("keeps the slots of channels staged by an earlier import", () => {
+    env.pending = [
+      create(Protobuf.Channel.ChannelSchema, {
+        index: 2,
+        role: Role.SECONDARY,
+        settings: settings("Staged", [4]),
+      }),
+    ];
+    renderDialog();
+    enterLink(channelSetToUrl(link, { add: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Add channels" }));
+    expect(staged().map(([slot]) => slot)).toEqual([3, 4]);
+  });
+
+  it("waits for the radio's LoRa settings before adding", () => {
+    // Unnamed channels are named by the preset, so Add can't match without it.
+    env.lora = false;
     renderDialog();
     enterLink(channelSetToUrl(link, { add: true }));
     expect(screen.getByText(/channels haven't loaded yet/)).toBeInTheDocument();

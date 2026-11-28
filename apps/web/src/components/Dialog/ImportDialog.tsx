@@ -44,6 +44,9 @@ import { useId, useMemo, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
 const NO_RADIO = constantSignal<RadioConfig>({});
+const NO_CHANNELS = constantSignal<
+  ReadonlyMap<number, Protobuf.Channel.Channel>
+>(new Map());
 
 export interface ImportDialogProps {
   open: boolean;
@@ -83,6 +86,9 @@ export const ImportDialog = ({
   const editor = useConfigEditor();
   const radio = useSignal(editor?.radio ?? NO_RADIO);
   const radioChannels = useChannels();
+  // Plan against the working copy so channels staged by an earlier import
+  // keep their slots.
+  const workingChannels = useSignal(editor?.channels ?? NO_CHANNELS);
   const { t } = useTranslation("dialog");
   const navigate = useNavigate();
   const inputId = useId();
@@ -111,16 +117,20 @@ export const ImportDialog = ({
       : "add";
 
   const current = useMemo(
-    () => channelSettingsByIndex(radioChannels),
-    [radioChannels],
+    () => channelSettingsByIndex([...workingChannels.values()]),
+    [workingChannels],
   );
   // Until the radio finishes sending its config the channel list can be
   // partial, and a slot that hasn't arrived would look free (Android waits
   // the same way: `radioChannelsLoaded` in ScannedQrCodeDialog.kt).
   const configured = useConnectionProgress().phase === "configured";
-  const radioLoaded =
-    editor !== undefined && configured && radioChannels.length > 0;
   const currentLora = radio.lora ?? config.lora;
+  // The LoRa preset names unnamed channels, so Add can't match them without it.
+  const radioLoaded =
+    editor !== undefined &&
+    configured &&
+    radioChannels.length > 0 &&
+    currentLora !== undefined;
 
   const selected = channelSet?.settings
     .map((_, i) => i)
