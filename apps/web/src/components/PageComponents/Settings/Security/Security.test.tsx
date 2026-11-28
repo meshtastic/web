@@ -9,7 +9,8 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   RemoteSettingsContext,
   type RemoteSettingsScope,
@@ -67,6 +68,29 @@ vi.mock("@core/kmp/hooks", () => ({
   useSignal: (signal: { value: unknown }) => signal.value,
 }));
 
+// Radix Select calls these, which jsdom lacks.
+beforeAll(() => {
+  Element.prototype.hasPointerCapture ??= () => false;
+  Element.prototype.releasePointerCapture ??= () => {};
+  Element.prototype.scrollIntoView ??= () => {};
+});
+
+const Policy = Protobuf.Config.Config_SecurityConfig_PacketSignaturePolicy;
+const LABELS = {
+  compatible: "Compatible — Accept unsigned",
+  balanced: "Balanced — Prefer authenticated",
+  strict: "Strict — Require authentication",
+};
+const policySelect = () =>
+  screen.getByRole("combobox", { name: "Protection level" });
+const choosePolicy = async (label: string) => {
+  const user = userEvent.setup();
+  await user.click(policySelect());
+  await user.click(screen.getByRole("option", { name: label }));
+};
+const stagedPolicies = () =>
+  setRadioSection.mock.calls.map(([, staged]) => staged.packetSignaturePolicy);
+
 describe("Security", () => {
   beforeEach(() => {
     metadata = { hasXeddsa: true };
@@ -104,7 +128,7 @@ describe("Security", () => {
     ).toBeDisabled();
     expect(
       screen.getByText(
-        "This device does not support packet signature verification.",
+        "This connected device does not support packet signature verification.",
       ),
     ).toBeInTheDocument();
   });
@@ -115,6 +139,100 @@ describe("Security", () => {
     expect(
       screen.getByRole("combobox", { name: "Protection level" }),
     ).toBeDisabled();
+  });
+
+  describe("packet authenticity", () => {
+    it("offers the three policies in Android's order", async () => {
+      render(<Security onFormInit={vi.fn()} />);
+      await userEvent.setup().click(policySelect());
+      expect(
+        screen.getAllByRole("option").map((option) => option.textContent),
+      ).toEqual([LABELS.compatible, LABELS.balanced, LABELS.strict]);
+    });
+
+    it("shows Compatible, the protobuf default, when the radio sends no policy", () => {
+      render(<Security onFormInit={vi.fn()} />);
+      expect(policySelect()).toHaveTextContent(LABELS.compatible);
+      expect(
+        screen.getByText(/Accept unsigned traffic for maximum compatibility/),
+      ).toBeInTheDocument();
+    });
+
+    it("describes the chosen policy", () => {
+      security = create(Protobuf.Config.Config_SecurityConfigSchema, {
+        ...baseSecurity,
+        packetSignaturePolicy: Policy.STRICT,
+      });
+      render(<Security onFormInit={vi.fn()} />);
+      expect(policySelect()).toHaveTextContent(LABELS.strict);
+      expect(
+        screen.getByText(
+          "Only show and process cryptographically authenticated mesh packets. Older nodes and oversized packets may disappear.",
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it("stages Balanced without asking", async () => {
+      render(<Security onFormInit={vi.fn()} />);
+      await choosePolicy(LABELS.balanced);
+      expect(screen.queryByRole("dialog")).toBeNull();
+      await waitFor(() => expect(stagedPolicies()).toContain(Policy.BALANCED));
+    });
+
+    it("keeps the previous policy when Strict is cancelled", async () => {
+      render(<Security onFormInit={vi.fn()} />);
+      await choosePolicy(LABELS.strict);
+      const dialog = screen.getByRole("dialog", {
+        name: "Enable Strict authentication?",
+      });
+      expect(dialog).toHaveTextContent(
+        "Strict ignores every remote mesh packet that is not cryptographically authenticated.",
+      );
+      expect(dialog).toHaveTextContent("oversized packets may disappear");
+      fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+      expect(policySelect()).toHaveTextContent(LABELS.compatible);
+      expect(stagedPolicies()).not.toContain(Policy.STRICT);
+    });
+
+    it("stages Strict once confirmed", async () => {
+      render(<Security onFormInit={vi.fn()} />);
+      await choosePolicy(LABELS.strict);
+      const dialog = screen.getByRole("dialog", {
+        name: "Enable Strict authentication?",
+      });
+      fireEvent.click(
+        within(dialog).getByRole("button", { name: "Enable Strict" }),
+      );
+      await waitFor(() => expect(stagedPolicies()).toContain(Policy.STRICT));
+      expect(policySelect()).toHaveTextContent(LABELS.strict);
+    });
+
+    it("drops a pending Strict confirmation when support goes away", async () => {
+      const { rerender } = render(<Security onFormInit={vi.fn()} />);
+      await choosePolicy(LABELS.strict);
+      expect(screen.getByRole("dialog")).toBeVisible();
+      metadata = { hasXeddsa: false };
+      rerender(<Security onFormInit={vi.fn()} />);
+      await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+      metadata = { hasXeddsa: true };
+      rerender(<Security onFormInit={vi.fn()} />);
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(stagedPolicies()).not.toContain(Policy.STRICT);
+    });
+
+    it("leaves Strict for a weaker policy without asking", async () => {
+      security = create(Protobuf.Config.Config_SecurityConfigSchema, {
+        ...baseSecurity,
+        packetSignaturePolicy: Policy.STRICT,
+      });
+      render(<Security onFormInit={vi.fn()} />);
+      await choosePolicy(LABELS.compatible);
+      expect(screen.queryByRole("dialog")).toBeNull();
+      await waitFor(() =>
+        expect(stagedPolicies()).toContain(Policy.COMPATIBLE),
+      );
+    });
   });
 
   it("shows the public key and masks the private key until asked", () => {
@@ -328,6 +446,15 @@ describe("Security on a remote node", () => {
       expect(staged.serialEnabled).toBe(true);
       expect(staged.privateKey).toEqual(nodeKey);
     });
+
+    it("stages Strict with the node's own key once confirmed", async () => {
+      renderRemote();
+      await choosePolicy(LABELS.strict);
+      fireEvent.click(screen.getByRole("button", { name: "Enable Strict" }));
+      await waitFor(() => expect(stagedPolicies()).toContain(Policy.STRICT));
+      const [, staged] = setRadioSection.mock.calls.at(-1) ?? [];
+      expect(staged.privateKey).toEqual(nodeKey);
+    });
   });
 
   describe("that withheld its private key (firmware 2.8.1+)", () => {
@@ -353,6 +480,7 @@ describe("Security on a remote node", () => {
         screen.queryByRole("button", { name: "Add admin key" }),
       ).toBeNull();
       expect(screen.getByRole("button", { name: "+ Add key" })).toBeDisabled();
+      expect(policySelect()).toBeDisabled();
     });
   });
 });
@@ -374,6 +502,7 @@ describe("Security while settings are read-only", () => {
       expect(screen.getByRole("button", { name })).toBeDisabled();
     }
     expect(screen.getByRole("switch", { name: "Managed Mode" })).toBeDisabled();
+    expect(policySelect()).toBeDisabled();
     // Reading a key is not a change: the public key can still be copied.
     const publicKey = screen.getByRole("group", { name: "Public Key" });
     expect(
