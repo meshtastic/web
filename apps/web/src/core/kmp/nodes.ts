@@ -87,12 +87,18 @@ export function validateIncomingNode(
 
 /**
  * `live` with each field it leaves undefined taken from `stored`; `live`
- * itself when there is nothing to fill.
+ * itself when there is nothing to fill. The stored key verification is kept
+ * only for the key it was made against.
  */
 function fillUnset(live: Node, stored: Node): Node {
+  const liveKey = live.user?.publicKey;
+  const sameKey =
+    !live.user ||
+    (!!liveKey?.length && equalKey(liveKey, stored.user?.publicKey));
   let filled: Record<string, unknown> | undefined;
   for (const [key, value] of Object.entries(stored)) {
     if (value === undefined || live[key as keyof Node] !== undefined) continue;
+    if (key === "isKeyManuallyVerified" && !sameKey) continue;
     filled ??= { ...live };
     filled[key] = value;
   }

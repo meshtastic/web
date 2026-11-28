@@ -270,6 +270,33 @@ describe("NodesClient over the stored node cache", () => {
 });
 
 describe("NodesClient hydration", () => {
+  /** `stored` behind a `loadAll` that reads when asked, as the database does, but answers on `release`. */
+  function lateLoading(stored: NodesRepository) {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const repository: NodesRepository = {
+      loadAll: async () => {
+        const rows = await stored.loadAll();
+        await gate;
+        return rows;
+      },
+      get: (num) => stored.get(num),
+      upsert: (node) => stored.upsert(node),
+      upsertBatch: (nodes) => stored.upsertBatch(nodes),
+      remove: (num) => stored.remove(num),
+      clear: () => stored.clear(),
+    };
+    return { repository, release };
+  }
+
+  const keyed = (byte: number) =>
+    create(Protobuf.Mesh.UserSchema, {
+      longName: "Keyed",
+      publicKey: new Uint8Array(32).fill(byte),
+    });
+
   it("fills a node written before the stored copy loaded, without erasing what was stored", async () => {
     const stored = new SqlocalNodesRepository(await createMemoryDb(), {
       deviceId: 1,
@@ -287,23 +314,7 @@ describe("NodesClient hydration", () => {
       hasXeddsaSigned: true,
       status: "on the trail",
     });
-    let release!: () => void;
-    const gate = new Promise<void>((resolve) => {
-      release = resolve;
-    });
-    const repository: NodesRepository = {
-      // Reads the rows when asked, as the database does, but answers late.
-      loadAll: async () => {
-        const rows = await stored.loadAll();
-        await gate;
-        return rows;
-      },
-      get: (num) => stored.get(num),
-      upsert: (node) => stored.upsert(node),
-      upsertBatch: (nodes) => stored.upsertBatch(nodes),
-      remove: (num) => stored.remove(num),
-      clear: () => stored.clear(),
-    };
+    const { repository, release } = lateLoading(stored);
 
     const client = new NodesClient(admin, repository);
     client.heard(heardFrom(11, 500));
@@ -331,6 +342,37 @@ describe("NodesClient hydration", () => {
     expect(row).toMatchObject(expected);
     expect(row?.user?.longName).toBe("Stored");
   });
+
+  it.each([
+    ["a different key", 2, undefined],
+    ["the same key", 1, true],
+  ])(
+    "carries the stored key verification onto %s only when it matches",
+    async (_, liveKey, verified) => {
+      const stored = new SqlocalNodesRepository(await createMemoryDb(), {
+        deviceId: 1,
+      });
+      await stored.upsert({
+        num: 11,
+        isFavorite: false,
+        isIgnored: false,
+        user: keyed(1),
+        isKeyManuallyVerified: true,
+        isMuted: true,
+      });
+      const { repository, release } = lateLoading(stored);
+
+      const client = new NodesClient(admin, repository);
+      client.patch(11, { user: keyed(liveKey) });
+      release();
+      await settle();
+      await settle();
+
+      expect(client.byNum(11)?.isKeyManuallyVerified).toBe(verified);
+      expect(client.byNum(11)?.isMuted).toBe(true);
+      expect((await stored.get(11))?.isKeyManuallyVerified).toBe(verified);
+    },
+  );
 });
 
 describe("NodesClient favourite and ignored sets", () => {
